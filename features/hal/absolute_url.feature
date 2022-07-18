@@ -81,7 +81,7 @@ Feature: IRI should contain Absolute URL
     }
     """
 
-  Scenario: I should be able to GET subresources with Absolute Urls
+  Scenario: I should be able to GET resources with Absolute Urls
     Given I add "Accept" header equal to "application/hal+json"
     And I add "Content-Type" header equal to "application/json"
     And I send a "GET" request to "/absolute_url_relation_dummies/1/absolute_url_dummies"

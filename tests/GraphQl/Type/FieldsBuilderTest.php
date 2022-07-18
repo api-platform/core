@@ -546,7 +546,7 @@ class FieldsBuilderTest extends TestCase
             }
             $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, Argument::that(static function (Operation $arg) use ($operation): bool {
                 return $arg->getName() === $operation->getName();
-            }), 'subresourceClass', $propertyName, $depth + 1)->willReturn(GraphQLType::string());
+            }), 'anotherResourceClass', $propertyName, $depth + 1)->willReturn(GraphQLType::string());
             $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)), Argument::type('bool'), Argument::that(static function (Operation $arg) use ($operation): bool {
                 return $arg->getName() === $operation->getName();
             }), '', $resourceClass, $propertyName, $depth + 1)->willReturn(GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))));
@@ -555,7 +555,7 @@ class FieldsBuilderTest extends TestCase
         $this->typesContainerProphecy->all()->willReturn([]);
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
         $this->resourceMetadataCollectionFactoryProphecy->create('resourceClass')->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operation->getName() => $operation])]));
-        $this->resourceMetadataCollectionFactoryProphecy->create('subresourceClass')->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['item_query' => new Query()])]));
+        $this->resourceMetadataCollectionFactoryProphecy->create('anotherResourceClass')->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['item_query' => new Query()])]));
 
         $fieldsBuilder = $this->fieldsBuilder;
         if ($advancedNameConverter) {

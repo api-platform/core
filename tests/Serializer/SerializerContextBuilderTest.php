@@ -101,7 +101,7 @@ class SerializerContextBuilderTest extends TestCase
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/bars/1/foos');
-        $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml', '_api_subresource_context' => ['identifiers' => ['id' => ['Foo', 'id']]], 'id' => '1']);
+        $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml', 'id' => '1']);
         $expected = ['bar' => 'baz', 'operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/bars/1/foos', 'api_allow_update' => false, 'uri' => 'http://localhost/bars/1/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'operation' => $this->operation, 'skip_null_values' => true];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
     }

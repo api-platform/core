@@ -244,7 +244,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.action.delete_item',
             'api_platform.action.get_collection',
             'api_platform.action.get_item',
-            'api_platform.action.get_subresource',
             'api_platform.action.patch_item',
             'api_platform.action.post_collection',
             'api_platform.action.put_item',

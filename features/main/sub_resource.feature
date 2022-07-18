@@ -1,10 +1,10 @@
-Feature: Subresource support
+Feature: Sub-resource support
   In order to use a hypermedia API
   As a client software developer
-  I need to be able to retrieve embedded resources only as Subresources
+  I need to be able to retrieve embedded resources only as resources
 
   @createSchema
-  Scenario: Get subresource one to one relation
+  Scenario: Get sub-resource one to one relation
     Given there is an answer "42" to the question "What's the answer to the Ultimate Question of Life, the Universe and Everything?"
     When I send a "GET" request to "/questions/1/answer"
     Then the response status code should be 200
@@ -25,14 +25,14 @@ Feature: Subresource support
     """
 
   @createSchema
-  Scenario: Get a non existent subresource
+  Scenario: Get a non existent sub-resource
     Given there is an answer "42" to the question "What's the answer to the Ultimate Question of Life, the Universe and Everything?"
     When I send a "GET" request to "/questions/999999/answer"
     Then the response status code should be 404
     And the response should be in JSON
 
   @createSchema
-  Scenario: Get recursive subresource one to many relation
+  Scenario: Get recursive sub-resource one to many relation
     Given there is an answer "42" to the question "What's the answer to the Ultimate Question of Life, the Universe and Everything?"
     When I send a "GET" request to "/questions/1/answer/related_questions"
     And the response status code should be 200
@@ -57,7 +57,7 @@ Feature: Subresource support
     """
 
   @createSchema
-  Scenario: Get the subresource relation collection
+  Scenario: Get the sub-resource relation collection
     Given there is a dummy object with a fourth level relation
     When I send a "GET" request to "/dummies/1/related_dummies"
     Then the response status code should be 200
@@ -147,7 +147,7 @@ Feature: Subresource support
     """
 
   @createSchema
-  Scenario: Get filtered embedded relation subresource collection
+  Scenario: Get filtered embedded relation sub-resource collection
     Given there is a dummy object with a fourth level relation
     When I send a "GET" request to "/dummies/1/related_dummies?name=Hello"
     Then the response status code should be 200
@@ -224,7 +224,7 @@ Feature: Subresource support
     """
 
   @createSchema
-  Scenario: Get the subresource relation item
+  Scenario: Get the sub-resource relation item
     Given there is a dummy object with a fourth level relation
     When I send a "GET" request to "/dummies/1/related_dummies/2"
     Then the response status code should be 200
@@ -252,7 +252,7 @@ Feature: Subresource support
     }
     """
 
-  Scenario: Create a dummy with a relation that is a subresource
+  Scenario: Create a dummy with a relation that is a sub-resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
@@ -265,7 +265,7 @@ Feature: Subresource support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
-  Scenario: Get the embedded relation subresource item at the third level
+  Scenario: Get the embedded relation sub-resource item at the third level
     When I send a "GET" request to "/dummies/1/related_dummies/1/third_level"
     And the response status code should be 200
     And the response should be in JSON
@@ -284,7 +284,7 @@ Feature: Subresource support
     }
     """
 
-  Scenario: Get the embedded relation subresource item at the fourth level
+  Scenario: Get the embedded relation sub-resource item at the fourth level
     When I send a "GET" request to "/dummies/1/related_dummies/1/third_level/fourth_level"
     Then the response status code should be 200
     And the response should be in JSON
@@ -302,7 +302,7 @@ Feature: Subresource support
     """
 
   @createSchema
-  Scenario: Get offers subresource from aggregate offers subresource
+  Scenario: Get offers sub-resource from aggregate offers sub-resource
     Given I have a product with offers
     When I send a "GET" request to "/dummy_products/2/offers/1/offers"
     Then the response status code should be 200
@@ -327,7 +327,7 @@ Feature: Subresource support
     }
     """
 
-  Scenario: Get offers subresource from aggregate offers subresource
+  Scenario: Get offers sub-resource from aggregate offers sub-resource
     When I send a "GET" request to "/dummy_aggregate_offers/1/offers"
     Then the response status code should be 200
     And the response should be in JSON
@@ -401,7 +401,7 @@ Feature: Subresource support
     """
 
   @createSchema
-  Scenario: The OneToOne subresource should be accessible from owned side
+  Scenario: The OneToOne sub-resource should be accessible from owned side
     Given there is a RelatedOwnedDummy object with OneToOne relation
     When I send a "GET" request to "/related_owned_dummies/1/owning_dummy"
     Then the response status code should be 200
@@ -434,7 +434,7 @@ Feature: Subresource support
     """
 
   @createSchema
-  Scenario: The OneToOne subresource should be accessible from owning side
+  Scenario: The OneToOne sub-resource should be accessible from owning side
     Given there is a RelatedOwningDummy object with OneToOne relation
     When I send a "GET" request to "/related_owning_dummies/1/owned_dummy"
     Then the response status code should be 200

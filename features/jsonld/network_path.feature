@@ -63,7 +63,7 @@ Feature: IRI should contain network path
     }
     """
 
-  Scenario: I should be able to GET subresources with network paths
+  Scenario: I should be able to GET resources with network paths
     Given I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/json"
     And I send a "GET" request to "/network_path_relation_dummies/1/network_path_dummies"

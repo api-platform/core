@@ -191,7 +191,7 @@ class ReadStageTest extends TestCase
         $operationName = 'collection_query';
         $resourceClass = 'myResource';
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $fieldName = 'subresource';
+        $fieldName = 'resource';
         $info->fieldName = $fieldName;
         $context = [
             'is_collection' => true,
@@ -210,7 +210,7 @@ class ReadStageTest extends TestCase
         $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->providerProphecy->provide($operation, [], $normalizationContext + ['filters' => $expectedFilters])->willReturn([]);
-        $this->providerProphecy->provide($operation, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'linkClass' => 'myResource'])->willReturn(['subresource']);
+        $this->providerProphecy->provide($operation, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'linkClass' => 'myResource'])->willReturn(['resource']);
 
         $result = ($this->readStage)($resourceClass, $rootClass, $operation, $context);
 
@@ -222,7 +222,7 @@ class ReadStageTest extends TestCase
         $operationName = 'collection_query';
         $resourceClass = 'myResource';
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $fieldName = 'subresource';
+        $fieldName = 'resource';
         $info->fieldName = $fieldName;
         $context = [
             'is_collection' => true,
@@ -272,12 +272,12 @@ class ReadStageTest extends TestCase
                 ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']],
                 [],
             ],
-            'with subresource' => [
+            'with resource' => [
                 [],
                 'myResource',
-                ['subresource' => [], ItemNormalizer::ITEM_IDENTIFIERS_KEY => ['id' => 3], ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => 'myResource'],
+                ['resource' => [], ItemNormalizer::ITEM_IDENTIFIERS_KEY => ['id' => 3], ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => 'myResource'],
                 [],
-                ['subresource'],
+                ['resource'],
             ],
         ];
     }
