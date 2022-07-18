@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface as LegacySchemaFactoryInterface;
 use ApiPlatform\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;

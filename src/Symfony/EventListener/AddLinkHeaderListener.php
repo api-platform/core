@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Util\CorsTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
-use Fig\Link\Link;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\Mercure\Discovery;
 

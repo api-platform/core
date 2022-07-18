@@ -26,7 +26,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: intl, bcmath, curl, openssl, mbstring 
+          extensions: intl, bcmath, curl, openssl, mbstring
           ini-values: memory_limit=-1
           tools: pecl, composer, php-cs-fixer
           coverage: none
@@ -319,7 +319,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: | 
+        run: |
           vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv --tags='~php8'
 
   mysql:
@@ -530,7 +530,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring 
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -573,7 +573,7 @@ jobs:
         with:
           php-version: '8.1'
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring 
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -617,11 +617,11 @@ jobs:
         with:
           php-version: '8.1'
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring 
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages
-        run: sudo apt-get install moreutils 
+        run: sudo apt-get install moreutils
       - name: Get composer cache directory
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
@@ -730,4 +730,4 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction 
+        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
