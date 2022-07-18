@@ -43,8 +43,8 @@ class SchemaFactoryTest extends TestCase
         $resourceMetadataFactoryCollection->create(Dummy::class)->willReturn(
             new ResourceMetadataCollection(Dummy::class, [
                 new ApiResource(operations: [
-                        'get' => new Get(name: 'get'),
-                    ]),
+                    'get' => new Get(name: 'get'),
+                ]),
             ])
         );
 

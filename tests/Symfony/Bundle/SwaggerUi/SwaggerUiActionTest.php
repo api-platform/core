@@ -57,10 +57,10 @@ class SwaggerUiActionTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'getFItem' => new Get(shortName: 'F', name: 'getFItem'),
                 'getFCollection' => new GetCollection(shortName: 'F', name: 'getFCollection'),
-            ])),
+            ]),
         ]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
@@ -173,9 +173,9 @@ class SwaggerUiActionTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(),
-            ])),
+            ]),
         ]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);

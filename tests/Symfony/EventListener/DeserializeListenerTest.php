@@ -110,9 +110,9 @@ class DeserializeListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'post' => new Post(deserialize: false),
-            ])),
+            ]),
         ]));
 
         $request = new Request([], [], ['data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_operation_name' => 'post']);
@@ -132,10 +132,10 @@ class DeserializeListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'put' => new Put(inputFormats: self::FORMATS),
                 'post' => new Post(inputFormats: self::FORMATS),
-            ])),
+            ]),
         ]));
 
         $this->doTestDeserialize($method, $populateObject, $resourceMetadataFactoryProphecy->reveal());
@@ -172,9 +172,9 @@ class DeserializeListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'post' => new Post(inputFormats: self::FORMATS),
-            ])),
+            ]),
         ]));
 
         $this->doTestDeserializeResourceClassSupportedFormat($method, $populateObject, $resourceMetadataFactoryProphecy->reveal());
@@ -215,9 +215,9 @@ class DeserializeListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'post' => new Post(inputFormats: ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]),
-            ])),
+            ]),
         ]));
 
         $this->doTestContentNegotiation($resourceMetadataFactoryProphecy->reveal());
@@ -270,9 +270,9 @@ class DeserializeListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'post' => new Post(inputFormats: ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]),
-            ])),
+            ]),
         ]));
 
         $listener = new DeserializeListener(
@@ -303,9 +303,9 @@ class DeserializeListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'post' => new Post(formats: ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]),
-            ])),
+            ]),
         ]));
 
         $listener = new DeserializeListener(

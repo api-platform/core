@@ -23,9 +23,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ODM\Document]
 class VoDummyCar extends VoDummyVehicle
 {
-    /**
-     * @var Collection
-     */
     #[Groups(['car_read', 'car_write'])]
     #[ODM\ReferenceMany(targetDocument: VoDummyInspection::class, mappedBy: 'car', cascade: ['persist'])]
     private Collection $inspections;

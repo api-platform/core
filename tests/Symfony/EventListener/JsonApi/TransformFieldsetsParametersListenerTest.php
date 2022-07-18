@@ -34,9 +34,9 @@ class TransformFieldsetsParametersListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(shortName: 'dummy'),
-            ])),
+            ]),
         ]));
 
         $this->listener = new TransformFieldsetsParametersListener($resourceMetadataFactoryProphecy->reveal());

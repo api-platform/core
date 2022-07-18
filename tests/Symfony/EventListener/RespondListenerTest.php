@@ -94,9 +94,9 @@ class RespondListenerTest extends TestCase
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'post' => new Post(status: Response::HTTP_OK),
-            ])),
+            ]),
         ]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
@@ -121,9 +121,9 @@ class RespondListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(status: Response::HTTP_MOVED_PERMANENTLY),
-            ])),
+            ]),
         ]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
@@ -199,9 +199,9 @@ class RespondListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(sunset: 'tomorrow'),
-            ])),
+            ]),
         ]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
@@ -223,9 +223,9 @@ class RespondListenerTest extends TestCase
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(status: Response::HTTP_ACCEPTED),
-            ])),
+            ]),
         ]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());

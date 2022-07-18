@@ -63,8 +63,8 @@ class DummyCustomMutation
      * @var int|null
      */
     #[ORM\Column(type: 'integer')]
-     #[ORM\Id]
-     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
@@ -77,14 +77,14 @@ class DummyCustomMutation
      * @var int|null
      */
     #[Groups(['sum'])]
-     #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $operandB;
 
     /**
      * @var int|null
      */
     #[Groups(['result'])]
-     #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $result;
 
     public function getId(): ?int

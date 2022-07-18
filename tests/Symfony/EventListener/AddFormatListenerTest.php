@@ -53,9 +53,9 @@ class AddFormatListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: ['xml' => ['text/xml']]),
-            ])),
+            ]),
         ]));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
@@ -102,9 +102,9 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: ['json' => ['application/json']]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -124,12 +124,12 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: [
                     'binary' => ['application/octet-stream'],
                     'json' => ['application/json'],
                 ]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -149,11 +149,11 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: [
                     'jsonld' => ['application/ld+json', 'application/json'],
                 ]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -173,12 +173,12 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: [
                     'binary' => ['application/octet-stream'],
                     'json' => ['application/json'],
                 ]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -202,12 +202,12 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: [
                     'binary' => ['application/octet-stream'],
                     'json' => ['application/json'],
                 ]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -228,11 +228,11 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: [
                     'json' => ['application/json'],
                 ]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -253,11 +253,11 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: [
                     'json' => ['application/json'],
                 ]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -276,12 +276,12 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: [
                     'xml' => ['application/xml'],
                     'json' => ['application/json'],
                 ]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -303,11 +303,11 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: [
                     'json' => ['application/json'],
                 ]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -325,11 +325,11 @@ class AddFormatListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(outputFormats: [
                     'csv' => ['text/csv'],
                 ]),
-            ])),
+            ]),
         ]));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());

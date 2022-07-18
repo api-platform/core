@@ -75,7 +75,7 @@ class DummyCustomMutation
      * @var int|null
      */
     #[Groups(['sum'])]
-     #[ODM\Field(type: 'int', nullable: true)]
+    #[ODM\Field(type: 'int', nullable: true)]
     private $operandB;
 
     /**

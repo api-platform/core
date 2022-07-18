@@ -59,9 +59,9 @@ class DenyAccessListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(),
-            ])),
+            ]),
         ]));
 
         $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal());
@@ -79,9 +79,9 @@ class DenyAccessListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(security: 'is_granted("ROLE_ADMIN")'),
-            ])),
+            ]),
         ]));
 
         $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
@@ -103,9 +103,9 @@ class DenyAccessListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(security: 'is_granted("ROLE_ADMIN")'),
-            ])),
+            ]),
         ]));
 
         $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
@@ -128,9 +128,9 @@ class DenyAccessListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(security: 'is_granted("ROLE_ADMIN")', securityMessage: 'You are not admin.'),
-            ])),
+            ]),
         ]));
 
         $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);

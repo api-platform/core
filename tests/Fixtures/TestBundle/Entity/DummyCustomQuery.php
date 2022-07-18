@@ -44,8 +44,8 @@ use Doctrine\ORM\Mapping as ORM;
     new QueryCollection(resolver: 'app.graphql.query_resolver.dummy_custom_collection_no_read_and_serialize', read: false, serialize: false, name: 'testCollectionNoReadAndSerialize'),
     new QueryCollection(
         name: 'testCollectionCustomArguments',
-         resolver: 'app.graphql.query_resolver.dummy_custom_collection',
-         args: ['customArgumentString' => ['type' => 'String!']]
+        resolver: 'app.graphql.query_resolver.dummy_custom_collection',
+        args: ['customArgumentString' => ['type' => 'String!']]
     ),
 ])]
 class DummyCustomQuery

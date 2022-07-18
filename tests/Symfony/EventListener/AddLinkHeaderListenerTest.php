@@ -47,11 +47,11 @@ class AddLinkHeaderListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(mercure: [
                     'hub' => 'managed',
                 ]),
-            ])),
+            ]),
         ]));
 
         $event = new ResponseEvent(
@@ -87,7 +87,7 @@ class AddLinkHeaderListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [new Get()])),
+            new ApiResource(operations: [new Get()]),
         ]));
 
         $event = new ResponseEvent(

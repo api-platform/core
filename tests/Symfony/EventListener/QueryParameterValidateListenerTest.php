@@ -57,9 +57,9 @@ class QueryParameterValidateListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(queryParameterValidationEnabled: false),
-            ])),
+            ]),
         ]));
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']);
@@ -82,9 +82,9 @@ class QueryParameterValidateListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new Get(queryParameterValidationEnabled: false),
-            ])),
+            ]),
         ]));
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']);
@@ -178,9 +178,9 @@ class QueryParameterValidateListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'get' => new GetCollection(filters: $filters),
-            ])),
+            ]),
         ]));
 
         $this->queryParameterValidator = $this->prophesize(QueryParameterValidator::class);

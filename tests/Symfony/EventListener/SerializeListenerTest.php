@@ -92,9 +92,9 @@ class SerializeListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource(operations: [
+            new ApiResource(operations: [
                 'post' => new Post(serialize: false),
-            ])),
+            ]),
         ]));
 
         $dummy = new Dummy();

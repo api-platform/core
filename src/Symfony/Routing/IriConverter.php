@@ -173,6 +173,6 @@ final class IriConverter implements IriConverterInterface
 
     private function generateSkolemIri(array $context = [])
     {
-        return $context['iri'] ?? '/.well-known/genid/'.(bin2hex(random_bytes(10)));
+        return $context['iri'] ?? '/.well-known/genid/'.bin2hex(random_bytes(10));
     }
 }
