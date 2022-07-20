@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Util;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Util;
 
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use PHPUnit\Framework\TestCase;

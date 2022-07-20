@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Type\Definition;
+namespace ApiPlatform\Tests\GraphQl\Type\Definition;
 
 use ApiPlatform\GraphQl\Type\Definition\IterableType;
 use GraphQL\Error\Error;

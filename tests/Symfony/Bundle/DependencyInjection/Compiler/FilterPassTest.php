@@ -40,13 +40,9 @@ class FilterPassTest extends TestCase
             return !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference;
         }))->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
-        $filterCollectionFactoryDefinitionProphecy = $this->prophesize(Definition::class);
-        $filterCollectionFactoryDefinitionProphecy->addArgument(['my_id'])->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
-
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter', true)->willReturn(['foo' => [], 'bar' => [['id' => 'my_id']]])->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
         $filterPass->process($containerBuilderProphecy->reveal());
     }
@@ -62,13 +58,9 @@ class FilterPassTest extends TestCase
             return !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference;
         }))->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
-        $filterCollectionFactoryDefinitionProphecy = $this->prophesize(Definition::class);
-        $filterCollectionFactoryDefinitionProphecy->addArgument(['bar'])->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
-
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter', true)->willReturn(['foo' => [], 'bar' => [['hi' => 'hello']]])->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
         $filterPass->process($containerBuilderProphecy->reveal());
     }

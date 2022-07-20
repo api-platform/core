@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Serializer;
+namespace ApiPlatform\Tests\GraphQl\Serializer;
 
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilder;
 use ApiPlatform\Metadata\GraphQl\Mutation;

@@ -15,15 +15,6 @@
         </service>
         <service id="ApiPlatform\Api\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
 
-        <service id="api_platform.route_name_resolver" class="ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolver" public="false">
-            <argument type="service" id="api_platform.router" />
-        </service>
-
-        <service id="api_platform.route_name_resolver.cached" class="ApiPlatform\Core\Bridge\Symfony\Routing\CachedRouteNameResolver" decorates="api_platform.route_name_resolver" decoration-priority="-10" public="false">
-            <argument type="service" id="api_platform.cache.route_name_resolver" />
-            <argument type="service" id="api_platform.route_name_resolver.cached.inner" />
-        </service>
-
         <service id="ApiPlatform\Api\UrlGeneratorInterface" alias="api_platform.router" />
 
         <service id="api_platform.router" class="ApiPlatform\Symfony\Routing\Router" public="false">

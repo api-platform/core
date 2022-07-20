@@ -201,10 +201,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.action.not_found',
             'api_platform.action.placeholder',
             'api_platform.api.identifiers_extractor',
-            'api_platform.filter_collection_factory',
             'api_platform.filter_locator',
-            'api_platform.filters',
-            'api_platform.identifier.uuid_normalizer',
             'api_platform.negotiator',
             'api_platform.pagination',
             'api_platform.pagination_options',
@@ -213,8 +210,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.ramsey_uuid.uri_variables.transformer.uuid',
             'api_platform.resource_class_resolver',
             'api_platform.route_loader',
-            'api_platform.route_name_resolver',
-            'api_platform.route_name_resolver.cached',
             'api_platform.router',
             'api_platform.serializer.context_builder',
             'api_platform.serializer.context_builder.filter',
@@ -263,7 +258,6 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.filter_locator', ['container.service_locator']);
 
         // ramsey_uuid.xml
-        $this->assertServiceHasTags('api_platform.identifier.uuid_normalizer', ['api_platform.identifier.denormalizer']);
         $this->assertServiceHasTags('api_platform.serializer.uuid_denormalizer', ['serializer.normalizer']);
         $this->assertServiceHasTags('api_platform.ramsey_uuid.uri_variables.transformer.uuid', ['api_platform.uri_variables.transformer']);
 
@@ -283,16 +277,12 @@ class ApiPlatformExtensionTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $services = [
-            'api_platform.identifier.symfony_ulid_normalizer',
-            'api_platform.identifier.symfony_uuid_normalizer',
             'api_platform.symfony.uri_variables.transformer.ulid',
             'api_platform.symfony.uri_variables.transformer.uuid',
         ];
 
         $this->assertContainerHas($services, []);
 
-        $this->assertServiceHasTags('api_platform.identifier.symfony_ulid_normalizer', ['api_platform.identifier.denormalizer']);
-        $this->assertServiceHasTags('api_platform.identifier.symfony_uuid_normalizer', ['api_platform.identifier.denormalizer']);
         $this->assertServiceHasTags('api_platform.symfony.uri_variables.transformer.ulid', ['api_platform.uri_variables.transformer']);
         $this->assertServiceHasTags('api_platform.symfony.uri_variables.transformer.uuid', ['api_platform.uri_variables.transformer']);
     }
@@ -388,7 +378,6 @@ class ApiPlatformExtensionTest extends TestCase
             // metadata/property_name.xml
             'api_platform.metadata.property.name_collection_factory',
             'ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface',
-            'ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface',
 
             // metadata/property.xml
             'api_platform.metadata.property.identifier_metadata_factory',
@@ -396,7 +385,6 @@ class ApiPlatformExtensionTest extends TestCase
             // metadata/property_name.xml
             'api_platform.metadata.property.name_collection_factory',
             'ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface',
-            'ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface',
 
             // metadata/resource.xml
             'api_platform.metadata.resource.metadata_collection_factory',

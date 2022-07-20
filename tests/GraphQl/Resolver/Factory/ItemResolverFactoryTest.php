@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
 use ApiPlatform\GraphQl\Resolver\Factory\ItemResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;

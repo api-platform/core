@@ -41,12 +41,7 @@ final class TypeFactory implements TypeFactoryInterface
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
-    /**
-     * SchemaFactoryInterface|LegacySchemaFactoryInterface.
-     *
-     * @param mixed $schemaFactory
-     */
-    public function setSchemaFactory($schemaFactory): void
+    public function setSchemaFactory(SchemaFactoryInterface $schemaFactory): void
     {
         $this->schemaFactory = $schemaFactory;
     }

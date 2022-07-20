@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Action;
+namespace ApiPlatform\Tests\GraphQl\Action;
 
 use ApiPlatform\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\Tests\ProphecyTrait;
