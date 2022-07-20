@@ -120,7 +120,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMessengerConfiguration($container, $config, $loader);
         $this->registerElasticsearchConfiguration($container, $config, $loader);
         $this->registerSecurityConfiguration($container, $loader, $config);
-        $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($container, $loader, $config);
 
         $container->registerForAutoconfiguration(FilterInterface::class)
@@ -694,15 +693,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
 
         $loader->load('json_schema.xml');
-    }
-
-    private function registerMakerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
-    {
-        if (!$this->isConfigEnabled($container, $config['maker'])) {
-            return;
-        }
-
-        $loader->load('maker.xml');
     }
 
     private function registerArgumentResolverConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $config): void
