@@ -39,7 +39,7 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
 
     private LegacyApiResource $resourceAnnotation;
     private IdentifiersExtractorInterface $identifiersExtractor;
-    private bool $isAnnotation = false;
+    private bool $isAnnotation;
     private string $resourceClass;
 
     public function __construct(LegacyApiResource $resourceAnnotation, bool $isAnnotation, IdentifiersExtractorInterface $identifiersExtractor, string $resourceClass)

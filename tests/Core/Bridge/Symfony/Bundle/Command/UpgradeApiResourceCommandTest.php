@@ -91,11 +91,13 @@ class UpgradeApiResourceCommandTest extends TestCase
 
         $expectedStrings = [
             '-use ApiPlatform\\Core\\Annotation\\ApiSubresource',
+            '-use ApiPlatform\\Core\\Annotation\\ApiProperty',
             '-use ApiPlatform\\Core\\Annotation\\ApiResource',
             '-use ApiPlatform\\Core\\Annotation\\ApiFilter',
             '-use ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\SearchFilter;',
             '-use ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\ExistsFilter;',
             '-use ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\DateFilter;',
+            '+use ApiPlatform\\Metadata\\ApiProperty',
             '+use ApiPlatform\\Metadata\\ApiResource',
             '+use ApiPlatform\\Metadata\\ApiFilter',
             '+use ApiPlatform\\Doctrine\\Orm\\Filter\\SearchFilter',
@@ -108,6 +110,9 @@ class UpgradeApiResourceCommandTest extends TestCase
             '+    #[ApiFilter(filterClass: SearchFilter::class)]',
             '+    #[ApiFilter(filterClass: ExistsFilter::class)]',
             '+    #[ApiFilter(filterClass: DateFilter::class)]',
+            '+    #[ApiProperty(writable: false)]',
+            "+    #[ApiProperty(iris: ['RelatedDummy.name'])]",
+            "+    #[ApiProperty(deprecationReason: 'This property is deprecated for upgrade test')]",
         ];
 
         $display = $commandTester->getDisplay();
