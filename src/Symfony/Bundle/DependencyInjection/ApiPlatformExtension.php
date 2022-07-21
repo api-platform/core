@@ -191,7 +191,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
         }
         $container->setParameter('api_platform.asset_package', $config['asset_package']);
-        $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? [], $config['metadata_backward_compatibility_layer'] ?? false));
+        $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
     }
 
     /**
@@ -212,7 +212,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         return array_merge($collectionPaginationConfiguration, $paginationOptions);
     }
 
-    private function normalizeDefaults(array $defaults, bool $compatibility = false): array
+    private function normalizeDefaults(array $defaults): array
     {
         $normalizedDefaults = ['extra_properties' => $defaults['extra_properties'] ?? []];
         unset($defaults['extra_properties']);
