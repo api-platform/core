@@ -87,7 +87,6 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue('0.0.0')
                 ->end()
                 ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
-                ->booleanNode('metadata_backward_compatibility_layer')->defaultTrue()->info('If true, declared services are using legacy interfaces for the following services: "api_platform.iri_converter", "api_platform.openapi.factory", "api_platform.identifiers_extractor".')->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()
                 ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()

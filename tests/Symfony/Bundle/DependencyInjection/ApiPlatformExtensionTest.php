@@ -62,7 +62,6 @@ class ApiPlatformExtensionTest extends TestCase
 
     public const DEFAULT_CONFIG = ['api_platform' => [
         'title' => 'title',
-        'metadata_backward_compatibility_layer' => false,
         'description' => 'description',
         'version' => 'version',
         'formats' => [
@@ -698,7 +697,6 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['graphql']['enabled'] = true;
-        $config['api_platform']['metadata_backward_compatibility_layer'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $services = [
