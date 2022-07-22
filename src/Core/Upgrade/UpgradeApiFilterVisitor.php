@@ -86,6 +86,24 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
                 OrmRangeFilter::class,
             ];
 
+            $legacyNamespaces = [
+                LegacyApiFilter::class,
+                LegacyOdmSearchFilter::class,
+                LegacyOdmExistsFilter::class,
+                LegacyOdmDateFilter::class,
+                LegacyOdmBooleanFilter::class,
+                LegacyOdmNumericFilter::class,
+                LegacyOdmOrderFilter::class,
+                LegacyOdmRangeFilter::class,
+                LegacyOrmSearchFilter::class,
+                LegacyOrmExistsFilter::class,
+                LegacyOrmDateFilter::class,
+                LegacyOrmBooleanFilter::class,
+                LegacyOrmNumericFilter::class,
+                LegacyOrmOrderFilter::class,
+                LegacyOrmRangeFilter::class,
+            ];
+
             foreach ($node->stmts as $k => $stmt) {
                 if (!$stmt instanceof Node\Stmt\Use_) {
                     break;
@@ -93,71 +111,12 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
 
                 $useStatement = implode('\\', $stmt->uses[0]->name->parts);
 
-                if (false !== ($key = array_search($useStatement, $namespaces, true))) {
-                    unset($namespaces[$key]);
+                foreach($legacyNamespaces as $legacyNamespace) {
+                    if ($legacyNamespace === $useStatement) {
+                        unset($node->stmts[$k]);
+                        continue;
+                    }
                 }
-                if (LegacyApiFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOdmSearchFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOdmExistsFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOdmDateFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOdmBooleanFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOdmNumericFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOdmOrderFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOdmRangeFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-
-                if (LegacyOrmSearchFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOrmExistsFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOrmDateFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOrmBooleanFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOrmNumericFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOrmOrderFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-                if (LegacyOrmRangeFilter::class === $useStatement) {
-                    unset($node->stmts[$k]);
-                    continue;
-                }
-
                 if (false !== ($key = array_search($useStatement, $namespaces, true))) {
                     unset($namespaces[$key]);
                 }
@@ -215,7 +174,7 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
         }
     }
 
-    private function readApiFilters(\ReflectionProperty|\ReflectionClass|\ReflectionInterface $reflection): ?\Generator
+    private function readApiFilters(\ReflectionProperty|\ReflectionClass $reflection): ?\Generator
     {
         if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(LegacyApiFilter::class)) {
             yield from array_map(function ($attribute) {
@@ -273,7 +232,7 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
         }
     }
 
-    private function removeAnnotation(Node\Stmt\Property|Node\Stmt\Class_ $node)
+    private function removeAnnotation(Node\Stmt\Property|Node\Stmt\Class_|Node\Stmt\Interface_ $node)
     {
         $comment = $node->getDocComment();
 
@@ -282,7 +241,7 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
         }
     }
 
-    private function removeAttribute(Node\Stmt\Property|Node\Stmt\Class_ $node)
+    private function removeAttribute(Node\Stmt\Property|Node\Stmt\Class_|Node\Stmt\Interface_ $node)
     {
         foreach ($node->attrGroups as $k => $attrGroupNode) {
             foreach ($attrGroupNode->attrs as $i => $attribute) {
