@@ -14,20 +14,34 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Upgrade;
 
 use ApiPlatform\Core\Annotation\ApiFilter as LegacyApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter as LegacyBooleanFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter as LegacyDateFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter as LegacyExistsFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter as LegacyNumericFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter as LegacyOrderFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter as LegacyRangeFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter as LegacySearchFilter;
-use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\BooleanFilter as LegacyOdmBooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\DateFilter as LegacyOdmDateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\ExistsFilter as LegacyOdmExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\NumericFilter as LegacyOdmNumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\OrderFilter as LegacyOdmOrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\RangeFilter as LegacyOdmRangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\SearchFilter as LegacyOdmSearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter as LegacyOrmBooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter as LegacyOrmDateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter as LegacyOrmExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter as LegacyOrmNumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter as LegacyOrmOrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter as LegacyOrmRangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter as LegacyOrmSearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\BooleanFilter as OdmBooleanFilter;;
+use ApiPlatform\Doctrine\Odm\Filter\DateFilter as OdmDateFilter;;
+use ApiPlatform\Doctrine\Odm\Filter\ExistsFilter as OdmExistsFilter;;
+use ApiPlatform\Doctrine\Odm\Filter\NumericFilter as OdmNumericFilter;;
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter as OdmOrderFilter;;
+use ApiPlatform\Doctrine\Odm\Filter\RangeFilter as OdmRangeFilter;;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter as OdmSearchFilter;;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter as OrmBooleanFilter;;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter as OrmDateFilter;;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter as OrmExistsFilter;;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter as OrmNumericFilter;;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter as OrmOrderFilter;;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter as OrmRangeFilter;;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter as OrmSearchFilter;;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -56,13 +70,20 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Namespace_) {
             $namespaces = [
                 ApiFilter::class,
-                SearchFilter::class,
-                ExistsFilter::class,
-                DateFilter::class,
-                BooleanFilter::class,
-                NumericFilter::class,
-                OrderFilter::class,
-                RangeFilter::class,
+                OdmSearchFilter::class,
+                OdmExistsFilter::class,
+                OdmDateFilter::class,
+                OdmBooleanFilter::class,
+                OdmNumericFilter::class,
+                OdmOrderFilter::class,
+                OdmRangeFilter::class,
+                OrmSearchFilter::class,
+                OrmExistsFilter::class,
+                OrmDateFilter::class,
+                OrmBooleanFilter::class,
+                OrmNumericFilter::class,
+                OrmOrderFilter::class,
+                OrmRangeFilter::class,
             ];
 
             foreach ($node->stmts as $k => $stmt) {
@@ -72,35 +93,67 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
 
                 $useStatement = implode('\\', $stmt->uses[0]->name->parts);
 
+                if (false !== ($key = array_search($useStatement, $namespaces, true))) {
+                    unset($namespaces[$key]);
+                }
                 if (LegacyApiFilter::class === $useStatement) {
                     unset($node->stmts[$k]);
                     continue;
                 }
-                if (LegacySearchFilter::class === $useStatement) {
+                if (LegacyOdmSearchFilter::class === $useStatement) {
                     unset($node->stmts[$k]);
                     continue;
                 }
-                if (LegacyExistsFilter::class === $useStatement) {
+                if (LegacyOdmExistsFilter::class === $useStatement) {
                     unset($node->stmts[$k]);
                     continue;
                 }
-                if (LegacyDateFilter::class === $useStatement) {
+                if (LegacyOdmDateFilter::class === $useStatement) {
                     unset($node->stmts[$k]);
                     continue;
                 }
-                if (LegacyBooleanFilter::class === $useStatement) {
+                if (LegacyOdmBooleanFilter::class === $useStatement) {
                     unset($node->stmts[$k]);
                     continue;
                 }
-                if (LegacyNumericFilter::class === $useStatement) {
+                if (LegacyOdmNumericFilter::class === $useStatement) {
                     unset($node->stmts[$k]);
                     continue;
                 }
-                if (LegacyOrderFilter::class === $useStatement) {
+                if (LegacyOdmOrderFilter::class === $useStatement) {
                     unset($node->stmts[$k]);
                     continue;
                 }
-                if (LegacyRangeFilter::class === $useStatement) {
+                if (LegacyOdmRangeFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+
+                if (LegacyOrmSearchFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+                if (LegacyOrmExistsFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+                if (LegacyOrmDateFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+                if (LegacyOrmBooleanFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+                if (LegacyOrmNumericFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+                if (LegacyOrmOrderFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+                if (LegacyOrmRangeFilter::class === $useStatement) {
                     unset($node->stmts[$k]);
                     continue;
                 }
