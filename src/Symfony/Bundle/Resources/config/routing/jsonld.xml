@@ -10,7 +10,8 @@
         <default key="_format">jsonld</default>
         <default key="_api_respond">true</default>
 
-        <requirement key="shortName">.+</requirement>
+        <requirement key="shortName">[^.]+</requirement>
+        <requirement key="_format">jsonld</requirement>
     </route>
 
 </routes>
