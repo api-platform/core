@@ -19,8 +19,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Upgrade\ColorConsoleDiffFormatter;
 use ApiPlatform\Core\Upgrade\SubresourceTransformer;
-use ApiPlatform\Core\Upgrade\UpgradeApiResourceVisitor;
 use ApiPlatform\Core\Upgrade\UpgradeApiFilterVisitor;
+use ApiPlatform\Core\Upgrade\UpgradeApiResourceVisitor;
 use ApiPlatform\Core\Upgrade\UpgradeApiSubresourceVisitor;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -107,8 +107,8 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
 
             $traverser = new NodeTraverser();
             [$attribute, $isAnnotation] = $this->readApiResource($resourceClass);
-            
-            $traverser->addVisitor(new UpgradeApiFilterVisitor($this->reader, $resourceClass, $attribute));
+
+            $traverser->addVisitor(new UpgradeApiFilterVisitor($this->reader, $resourceClass));
 
             if (!$attribute) {
                 continue;

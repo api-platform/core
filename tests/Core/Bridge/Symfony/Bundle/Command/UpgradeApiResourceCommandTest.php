@@ -105,9 +105,9 @@ class UpgradeApiResourceCommandTest extends TestCase
             "+#[ApiResource(graphQlOperations: [new Query(name: 'item_query'), new Mutation(name: 'update', normalizationContext: ['groups' => ['chicago', 'fakemanytomany']], denormalizationContext: ['groups' => ['friends']])], types: ['https://schema.org/Product'], normalizationContext: ['groups' => ['friends']], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'])]",
             "#[ApiResource(uriTemplate: '/related_dummies/{id}/id.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]",
             "+#[ApiFilter(filterClass: SearchFilter::class, properties: ['id', 'name'])]",
-            "+    #[ApiFilter(filterClass: SearchFilter::class)]",
-            "+    #[ApiFilter(filterClass: ExistsFilter::class)]",
-            "+    #[ApiFilter(filterClass: DateFilter::class)]",
+            '+    #[ApiFilter(filterClass: SearchFilter::class)]',
+            '+    #[ApiFilter(filterClass: ExistsFilter::class)]',
+            '+    #[ApiFilter(filterClass: DateFilter::class)]',
         ];
 
         $display = $commandTester->getDisplay();

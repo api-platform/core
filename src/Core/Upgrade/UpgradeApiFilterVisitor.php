@@ -14,12 +14,20 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Upgrade;
 
 use ApiPlatform\Core\Annotation\ApiFilter as LegacyApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter as LegacySearchFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter as LegacyExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter as LegacyBooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter as LegacyDateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter as LegacyExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter as LegacyNumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter as LegacyOrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter as LegacyRangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter as LegacySearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -51,6 +59,10 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
                 SearchFilter::class,
                 ExistsFilter::class,
                 DateFilter::class,
+                BooleanFilter::class,
+                NumericFilter::class,
+                OrderFilter::class,
+                RangeFilter::class,
             ];
 
             foreach ($node->stmts as $k => $stmt) {
@@ -76,9 +88,22 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
                     unset($node->stmts[$k]);
                     continue;
                 }
-
-
-
+                if (LegacyBooleanFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+                if (LegacyNumericFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+                if (LegacyOrderFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
+                if (LegacyRangeFilter::class === $useStatement) {
+                    unset($node->stmts[$k]);
+                    continue;
+                }
 
                 if (false !== ($key = array_search($useStatement, $namespaces, true))) {
                     unset($namespaces[$key]);
@@ -96,15 +121,12 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
             }
         }
 
-        if ($node instanceof Node\Stmt\Property || $node instanceof Node\Stmt\Class_) {
+        if ($node instanceof Node\Stmt\Property || $node instanceof Node\Stmt\Class_ || $node instanceof Node\Stmt\Interface_) {
             if ($node instanceof Node\Stmt\Property) {
                 $reflection = $this->reflectionClass->getProperty($node->props[0]->name->__toString());
             } else {
                 $reflection = $this->reflectionClass;
             }
-
-            // filter annotation : array
-            $filterAnnotations = $this->readApiFilters($reflection);
 
             foreach ($this->readApiFilters($reflection) as $annotation) {
                 [$filterAnnotation, $isAnnotation] = $annotation;
@@ -122,19 +144,11 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
                     'properties',
                     'arguments',
                 ] as $key) {
-                $value = $filterAnnotation->{$key};
-                if (null === $value || [] === $value) {
-                    continue;
-                }
-                $arguments[$key] = $this->valueToNode($value);
+                    $value = $filterAnnotation->{$key};
 
-                }
-                foreach ($filterAnnotation->attributes ?? [] as $key => $value) {
-                    if (null === $value || [] === $value) {
+                    if (!$value) {
                         continue;
                     }
-
-                    [$key, $value] = $this->getKeyValue($key, $value);
                     $arguments[$key] = $this->valueToNode($value);
                 }
 
@@ -146,15 +160,14 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
                 ]));
             }
         }
-
     }
 
-    private function readApiFilters(\ReflectionProperty|\ReflectionClass $reflection): ?\Generator
+    private function readApiFilters(\ReflectionProperty|\ReflectionClass|\ReflectionInterface $reflection): ?\Generator
     {
         if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(LegacyApiFilter::class)) {
-            yield from array_map(function($attribute) {
-                return $attribute->newInstance();
-            } , $attributes);
+            yield from array_map(function ($attribute) {
+                return [$attribute->newInstance(), false];
+            }, $attributes);
         }
 
         if (null === $this->reader) {
@@ -165,7 +178,6 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
             $annotations = $this->reader->getPropertyAnnotations($reflection);
         } else {
             $annotations = $this->reader->getClassAnnotations($reflection);
-
         }
 
         foreach ($annotations as $annotation) {
@@ -236,13 +248,13 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
     {
         $args = [];
         foreach ($arguments as $key => $value) {
-            if ($value) 
+            if ($value) {
                 $args[] = new Node\Arg($value, false, false, [], new Node\Identifier($key));
+            }
         }
 
         return $args;
     }
-
 
     private function getShortName(string $class): string
     {
@@ -252,5 +264,4 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
 
         return $class;
     }
-
 }
