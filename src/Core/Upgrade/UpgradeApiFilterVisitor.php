@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Upgrade;
 
 use ApiPlatform\Core\Annotation\ApiFilter as LegacyApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\BooleanFilter as LegacyOdmBooleanFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\DateFilter as LegacyOdmDateFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\ExistsFilter as LegacyOdmExistsFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\NumericFilter as LegacyOdmNumericFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\OrderFilter as LegacyOdmOrderFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\RangeFilter as LegacyOdmRangeFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Odm\Filter\SearchFilter as LegacyOdmSearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter as LegacyOdmBooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter as LegacyOdmDateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter as LegacyOdmExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\NumericFilter as LegacyOdmNumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter as LegacyOdmOrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter as LegacyOdmRangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter as LegacyOdmSearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter as LegacyOrmBooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter as LegacyOrmDateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter as LegacyOrmExistsFilter;
@@ -28,22 +28,26 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter as LegacyOrmNumeri
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter as LegacyOrmOrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter as LegacyOrmRangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter as LegacyOrmSearchFilter;
-use ApiPlatform\Doctrine\Odm\Filter\BooleanFilter as OdmBooleanFilter;;
-use ApiPlatform\Doctrine\Odm\Filter\DateFilter as OdmDateFilter;;
-use ApiPlatform\Doctrine\Odm\Filter\ExistsFilter as OdmExistsFilter;;
-use ApiPlatform\Doctrine\Odm\Filter\NumericFilter as OdmNumericFilter;;
-use ApiPlatform\Doctrine\Odm\Filter\OrderFilter as OdmOrderFilter;;
-use ApiPlatform\Doctrine\Odm\Filter\RangeFilter as OdmRangeFilter;;
-use ApiPlatform\Doctrine\Odm\Filter\SearchFilter as OdmSearchFilter;;
-use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter as OrmBooleanFilter;;
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter as OrmDateFilter;;
-use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter as OrmExistsFilter;;
-use ApiPlatform\Doctrine\Orm\Filter\NumericFilter as OrmNumericFilter;;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter as OrmOrderFilter;;
-use ApiPlatform\Doctrine\Orm\Filter\RangeFilter as OrmRangeFilter;;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter as OrmSearchFilter;;
+use ApiPlatform\Core\Serializer\Filter\GroupFilter as LegacyGroupFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter as LegacyPropertyFilter;
+use ApiPlatform\Doctrine\Odm\Filter\BooleanFilter as OdmBooleanFilter;
+use ApiPlatform\Doctrine\Odm\Filter\DateFilter as OdmDateFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ExistsFilter as OdmExistsFilter;
+use ApiPlatform\Doctrine\Odm\Filter\NumericFilter as OdmNumericFilter;
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter as OdmOrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\RangeFilter as OdmRangeFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter as OdmSearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter as OrmBooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter as OrmDateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter as OrmExistsFilter;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter as OrmNumericFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter as OrmOrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter as OrmRangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter as OrmSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
+use ApiPlatform\Serializer\Filter\GroupFilter;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -68,41 +72,45 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Namespace_) {
-            $namespaces = [
-                ApiFilter::class,
-                OdmSearchFilter::class,
-                OdmExistsFilter::class,
-                OdmDateFilter::class,
-                OdmBooleanFilter::class,
-                OdmNumericFilter::class,
-                OdmOrderFilter::class,
-                OdmRangeFilter::class,
-                OrmSearchFilter::class,
-                OrmExistsFilter::class,
-                OrmDateFilter::class,
-                OrmBooleanFilter::class,
-                OrmNumericFilter::class,
-                OrmOrderFilter::class,
-                OrmRangeFilter::class,
-            ];
+            $namespaces = [ApiFilter::class];
 
             $legacyNamespaces = [
-                LegacyApiFilter::class,
-                LegacyOdmSearchFilter::class,
-                LegacyOdmExistsFilter::class,
-                LegacyOdmDateFilter::class,
-                LegacyOdmBooleanFilter::class,
-                LegacyOdmNumericFilter::class,
-                LegacyOdmOrderFilter::class,
-                LegacyOdmRangeFilter::class,
-                LegacyOrmSearchFilter::class,
-                LegacyOrmExistsFilter::class,
-                LegacyOrmDateFilter::class,
-                LegacyOrmBooleanFilter::class,
-                LegacyOrmNumericFilter::class,
-                LegacyOrmOrderFilter::class,
-                LegacyOrmRangeFilter::class,
+                LegacyApiFilter::class => ApiFilter::class,
+                LegacyOdmSearchFilter::class => OdmSearchFilter::class,
+                LegacyOdmExistsFilter::class => OdmExistsFilter::class,
+                LegacyOdmDateFilter::class => OdmDateFilter::class,
+                LegacyOdmBooleanFilter::class => OdmBooleanFilter::class,
+                LegacyOdmNumericFilter::class => OdmNumericFilter::class,
+                LegacyOdmOrderFilter::class => OdmOrderFilter::class,
+                LegacyOdmRangeFilter::class => OdmRangeFilter::class,
+                LegacyOrmSearchFilter::class => OrmSearchFilter::class,
+                LegacyOrmExistsFilter::class => OrmExistsFilter::class,
+                LegacyOrmDateFilter::class => OrmDateFilter::class,
+                LegacyOrmBooleanFilter::class => OrmBooleanFilter::class,
+                LegacyOrmNumericFilter::class => OrmNumericFilter::class,
+                LegacyOrmOrderFilter::class => OrmOrderFilter::class,
+                LegacyOrmRangeFilter::class => OrmRangeFilter::class,
+                LegacyPropertyFilter::class => PropertyFilter::class,
+                LegacyGroupFilter::class => GroupFilter::class,
             ];
+
+            foreach ($this->readApiFilters($this->reflectionClass) as $annotation) {
+                [$filterAnnotation,] = $annotation;
+                if (isset($legacyNamespaces[$filterAnnotation->filterClass])) {
+                    $namespaces[] = $legacyNamespaces[$filterAnnotation->filterClass];
+                }
+            }
+
+            foreach ($this->reflectionClass->getProperties() as $reflectionProperty) {
+                foreach ($this->readApiFilters($reflectionProperty) as $annotation) {
+                    [$filterAnnotation,] = $annotation;
+                    if (isset($legacyNamespaces[$filterAnnotation->filterClass])) {
+                        $namespaces[] = $legacyNamespaces[$filterAnnotation->filterClass];
+                    }
+                }
+            }
+
+            $namespaces = array_unique($namespaces);
 
             foreach ($node->stmts as $k => $stmt) {
                 if (!$stmt instanceof Node\Stmt\Use_) {
@@ -111,12 +119,12 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
 
                 $useStatement = implode('\\', $stmt->uses[0]->name->parts);
 
-                foreach($legacyNamespaces as $legacyNamespace) {
+                foreach (array_keys($legacyNamespaces) as $legacyNamespace) {
                     if ($legacyNamespace === $useStatement) {
                         unset($node->stmts[$k]);
-                        continue;
                     }
                 }
+
                 if (false !== ($key = array_search($useStatement, $namespaces, true))) {
                     unset($namespaces[$key]);
                 }
@@ -134,10 +142,9 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Stmt\Property || $node instanceof Node\Stmt\Class_ || $node instanceof Node\Stmt\Interface_) {
+            $reflection = $this->reflectionClass;
             if ($node instanceof Node\Stmt\Property) {
                 $reflection = $this->reflectionClass->getProperty($node->props[0]->name->__toString());
-            } else {
-                $reflection = $this->reflectionClass;
             }
 
             foreach ($this->readApiFilters($reflection) as $annotation) {
@@ -151,6 +158,7 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
                 $arguments = [];
 
                 foreach ([
+                    'id',
                     'strategy',
                     'filterClass',
                     'properties',
@@ -164,12 +172,12 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
                     $arguments[$key] = $this->valueToNode($value);
                 }
 
-                array_unshift($node->attrGroups, new Node\AttributeGroup([
+                $node->attrGroups[] = new Node\AttributeGroup([
                     new Node\Attribute(
                         new Node\Name('ApiFilter'),
                         $this->arrayToArguments($arguments),
                     ),
-                ]));
+                ]);
             }
         }
     }

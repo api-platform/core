@@ -108,7 +108,7 @@ Feature: Subresource support
       "hydra:totalItems": 2,
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[],id,id[],name,name[],symfony,symfony[],dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after]}",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[],id,id[],symfony,symfony[],dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -151,18 +151,6 @@ Feature: Subresource support
             "@type": "IriTemplateMapping",
             "variable": "id[]",
             "property": "id",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "name",
-            "property": "name",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "name[]",
-            "property": "name",
             "required": false
           },
           {
@@ -245,7 +233,7 @@ Feature: Subresource support
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[]}",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[],id,id[],symfony,symfony[],dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -288,18 +276,6 @@ Feature: Subresource support
             "@type": "IriTemplateMapping",
             "variable": "id[]",
             "property": "id",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "name",
-            "property": "name",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "name[]",
-            "property": "name",
             "required": false
           },
           {

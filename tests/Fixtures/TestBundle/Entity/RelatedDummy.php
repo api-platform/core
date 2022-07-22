@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ApiResource(graphql={"item_query", "update"={"normalization_context"={"groups"={"chicago", "fakemanytomany"}}, "denormalization_context"={"groups"={"friends"}}}}, iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.friends", "related_dummy.complex_sub_query"}})
  * @ORM\Entity
- * @ApiFilter(SearchFilter::class, properties={"id", "name"})
+ * @ApiFilter(SearchFilter::class, properties={"id"})
  */
 class RelatedDummy extends ParentDummy
 {

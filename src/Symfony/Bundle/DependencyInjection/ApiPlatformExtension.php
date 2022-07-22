@@ -962,11 +962,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!$config['metadata_backward_compatibility_layer']) {
             $loader->load('symfony.xml');
-
-            return;
         }
-
-        $loader->load('legacy/api.xml');
     }
 
     private function registerUpgradeCommandConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $config): void
