@@ -222,6 +222,7 @@ parameters:
 		- src/Core/Test/DoctrineMongoDbOdmFilterTestCase.php
 		- src/Core/Test/DoctrineOrmFilterTestCase.php
 		- src/Core/Upgrade/SubresourceTransformer.php
+		- src/Core/Upgrade/UpgradeApiPropertyVisitor.php
 		- src/Core/Upgrade/UpgradeApiResourceVisitor.php
 		- src/Core/Upgrade/UpgradeApiSubresourceVisitor.php
 		- src/Core/Upgrade/UpgradeApiFilterVisitor.php

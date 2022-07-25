@@ -50,12 +50,14 @@ class RelatedDummy extends ParentDummy
     /**
      * @var string|null A name
      *
+     * @ApiProperty(iri="RelatedDummy.name")
      * @ORM\Column(nullable=true)
      * @Groups({"friends"})
      */
     public $name;
 
     /**
+     * @ApiProperty(attributes={"deprecation_reason"="This property is deprecated for upgrade test"})
      * @ORM\Column
      * @Groups({"barcelona", "chicago", "friends"})
      * @ApiFilter(SearchFilter::class)

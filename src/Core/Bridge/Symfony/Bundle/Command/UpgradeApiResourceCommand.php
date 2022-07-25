@@ -20,6 +20,7 @@ use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Upgrade\ColorConsoleDiffFormatter;
 use ApiPlatform\Core\Upgrade\SubresourceTransformer;
 use ApiPlatform\Core\Upgrade\UpgradeApiFilterVisitor;
+use ApiPlatform\Core\Upgrade\UpgradeApiPropertyVisitor;
 use ApiPlatform\Core\Upgrade\UpgradeApiResourceVisitor;
 use ApiPlatform\Core\Upgrade\UpgradeApiSubresourceVisitor;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
@@ -109,6 +110,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
             [$attribute, $isAnnotation] = $this->readApiResource($resourceClass);
 
             $traverser->addVisitor(new UpgradeApiFilterVisitor($this->reader, $resourceClass));
+            $traverser->addVisitor(new UpgradeApiPropertyVisitor($this->reader, $resourceClass));
 
             if (!$attribute) {
                 continue;
