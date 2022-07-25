@@ -10,7 +10,7 @@
         <service id="api_platform.http_cache.purger.varnish" alias="api_platform.http_cache.purger.varnish.ban" public="false" />
         <service id="api_platform.http_cache.purger.varnish.ban" class="ApiPlatform\HttpCache\VarnishPurger" public="false" />
         <service id="api_platform.http_cache.purger.varnish.xkey" class="ApiPlatform\HttpCache\VarnishXKeyPurger" public="false">
-            <argument type="collection"></argument>
+            <argument type="collection"/>
             <argument>%api_platform.http_cache.invalidation.max_header_length%</argument>
             <argument>%api_platform.http_cache.invalidation.xkey.glue%</argument>
         </service>
