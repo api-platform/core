@@ -235,7 +235,8 @@ parameters:
 		- src/Core/Util/RequestParser.php
 		- src/Core/Validator/EventListener/ValidateListener.php
 		# Symfony cache
-		- tests/Fixtures/app/var/cache
+		- tests/Fixtures/app/var/
+		- tests/Fixtures/Symfony/Maker
 		# Deprecated integrations (will be removed in API Platform 3)
 		- src/Core/Bridge/NelmioApiDoc/*
 		- tests/Core/Bridge/NelmioApiDoc/*
@@ -260,7 +261,7 @@ parameters:
 		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
 		# Templates for Maker
 		- src/Core/Bridge/Symfony/Maker/Resources/skeleton
-		- src/Bridge/Symfony/Maker/Resources/skeleton
+		- src/Symfony/Maker/Resources/skeleton
 		# Rector because new API Platform 3.0 classes don't exist yet
 		- src/Core/Bridge/Rector
 		- src/Core/Bridge/Symfony/Bundle/Command/RectorCommand.php
@@ -325,7 +326,7 @@ parameters:
 
 		# Expected, due to deprecations
 		- '#Method ApiPlatform\\PathResolver\\OperationPathResolverInterface::resolveOperationPath\(\) invoked with 4 parameters, 3 required\.#'
-		- 
+		-
 			message: '#If condition is always false.#'
 			path: src/Core
 
@@ -351,10 +352,10 @@ parameters:
 			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
 			path: src
 		# Skipped tests, we do this on purpose
-		- 
+		-
 			message: "#^Unreachable statement - code above always terminates.$#"
 			path: tests
-		- 
+		-
 			message: "#^Unreachable statement - code above always terminates.$#"
 			path: src/Core/Bridge/Doctrine/EventListener/PublishMercureUpdatesListener.php
 		-
