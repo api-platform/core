@@ -1,4 +1,5 @@
 Feature: GraphQL type support
+
   @createSchema
   Scenario: Use a custom type for a field
     Given there are 2 dummy objects with dummyDate

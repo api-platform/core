@@ -328,6 +328,7 @@ Feature: Collections support
       "hydra:next":"/dummies?page=4"
     }
     """
+
   Scenario: Filter with exact match
     When I send a "GET" request to "/dummies?id=8"
     Then the response status code should be 200

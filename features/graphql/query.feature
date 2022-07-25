@@ -1,4 +1,5 @@
 Feature: GraphQL query support
+
   @createSchema
   Scenario: Execute a basic GraphQL query
     Given there are 2 dummy objects with relatedDummy

@@ -1,4 +1,5 @@
 Feature: GraphQL collection support
+
   @createSchema
   Scenario: Retrieve a collection through a GraphQL query
     Given there are 4 dummy objects with relatedDummy and its thirdLevel

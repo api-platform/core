@@ -4,7 +4,6 @@ Feature: Resource operations
   I should be able to persist data from a processor
 
   @php8
-  @v3
   @createSchema
   @!mongodb
   Scenario: Create an operation resource
@@ -20,7 +19,6 @@ Feature: Resource operations
     Then the response status code should be 201
 
   @php8
-  @v3
   @!mongodb
   Scenario: Patch an operation resource
     When I add "Content-Type" header equal to "application/merge-patch+json"
@@ -44,7 +42,6 @@ Feature: Resource operations
     """
 
   @php8
-  @v3
   @!mongodb
   Scenario: Update an operation resource
     When I add "Content-Type" header equal to "application/ld+json"

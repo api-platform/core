@@ -2,9 +2,8 @@ Feature: Resource attributes
   In order to use the Resource attribute
   As a developer
   I should be able to fetch data from a state provider
-  
+
   @php8
-  @v3
   @!mysql
   @!mongodb
   Scenario: Retrieve a Resource collection
@@ -37,10 +36,9 @@ Feature: Resource attributes
     """
 
   @php8
-  @v3
   @!mysql
   @!mongodb
-  Scenario: Retrieve the first resource 
+  Scenario: Retrieve the first resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/attribute_resources/1"
     Then the response status code should be 200
@@ -54,11 +52,10 @@ Feature: Resource attributes
       "@type": "AttributeResource",
       "identifier": 1,
       "name": "Foo"
-    } 
+    }
     """
 
   @php8
-  @v3
   @!mysql
   @!mongodb
   Scenario: Retrieve the aliased resource
@@ -77,11 +74,10 @@ Feature: Resource attributes
       "identifier": 2,
       "dummy": "/dummies/1",
       "name": "Foo"
-    } 
+    }
     """
 
   @php8
-  @v3
   @!mysql
   @!mongodb
   Scenario: Patch the aliased resource
@@ -103,5 +99,5 @@ Feature: Resource attributes
       "identifier": 2,
       "dummy": "/dummies/1",
       "name": "Patched"
-    } 
+    }
     """

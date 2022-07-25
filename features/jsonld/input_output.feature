@@ -275,7 +275,7 @@ Feature: JSON-LD DTO input and output
     """
 
   @createSchema
-  Scenario: Initialize input data with a DataTransformerInitializer 
+  Scenario: Initialize input data with a DataTransformerInitializer
     Given there is an InitializeInput object with id 1
     When I send a "PUT" request to "/initialize_inputs/1" with body:
     """
@@ -302,7 +302,7 @@ Feature: JSON-LD DTO input and output
     """
     {
       "foo": "test",
-      "bar": "test" 
+      "bar": "test"
     }
     """
     Then the response status code should be 400
@@ -310,7 +310,7 @@ Feature: JSON-LD DTO input and output
     And the JSON node "hydra:description" should be equal to "The input data is misformatted."
 
   @!mongodb
-  Scenario: Reset password through an input DTO without DataTransformer 
+  Scenario: Reset password through an input DTO without DataTransformer
     When I send a "POST" request to "/user-reset-password" with body:
     """
     {
@@ -323,7 +323,7 @@ Feature: JSON-LD DTO input and output
     And the JSON node "email" should be equal to "user@example.com"
 
   @!mongodb
-  Scenario: Reset password with an invalid payload through an input DTO without DataTransformer 
+  Scenario: Reset password with an invalid payload through an input DTO without DataTransformer
     And I send a "POST" request to "/user-reset-password" with body:
     """
     {
