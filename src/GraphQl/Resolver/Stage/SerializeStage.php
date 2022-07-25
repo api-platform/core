@@ -16,6 +16,7 @@ namespace ApiPlatform\GraphQl\Resolver\Stage;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
@@ -47,8 +48,7 @@ final class SerializeStage implements SerializeStageInterface
      */
     public function __invoke($itemOrCollection, string $resourceClass, Operation $operation, array $context): ?array
     {
-        // TODO: replace by $operation->isCollection and $operation instanceof CollectionOperationInterface
-        $isCollection = $context['is_collection'];
+        $isCollection = $context['is_collection'] || $operation instanceof CollectionOperationInterface;
         $isMutation = $context['is_mutation'];
         $isSubscription = $context['is_subscription'];
         $shortName = $operation->getShortName();

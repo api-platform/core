@@ -459,7 +459,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }, $filtered);
     }
 
-    // TODO: this code is similar to the one used in JsonLd
     private function getResourceShortName(string $resourceClass): string
     {
         if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
