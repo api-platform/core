@@ -17,7 +17,8 @@ parameters:
 		- tests/Fixtures/app/AppKernel.php
 	excludePaths:
 		# Symfony cache
-		- tests/Fixtures/app/var/cache
+		- tests/Fixtures/app/var/
+		- tests/Fixtures/Symfony/Maker
 		# BC layer
 		- src/deprecated_interfaces.php
 		- tests/Fixtures/TestBundle/BrowserKit/Client.php
@@ -30,7 +31,7 @@ parameters:
 		- tests/Symfony/Bundle/Test/WebTestCaseTest.php
 		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
 		# Templates for Maker
-		- src/Bridge/Symfony/Maker/Resources/skeleton
+		- src/Symfony/Maker/Resources/skeleton
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail

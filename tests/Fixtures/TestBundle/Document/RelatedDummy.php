@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -20,6 +21,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ExistsFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -40,6 +44,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies/{relatedDummies}.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.mongodb.friends'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies')], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.mongodb.friends'], normalizationContext: ['groups' => ['friends']], operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.mongodb.friends'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
+#[ApiFilter(filterClass: SearchFilter::class, properties: ['id'])]
 #[ODM\Document]
 class RelatedDummy extends ParentDummy
 {
@@ -55,6 +60,8 @@ class RelatedDummy extends ParentDummy
     public $name;
     #[Groups(['barcelona', 'chicago', 'friends'])]
     #[ODM\Field(type: 'string')]
+    #[ApiFilter(filterClass: SearchFilter::class)]
+    #[ApiFilter(filterClass: ExistsFilter::class)]
     protected $symfony = 'symfony';
     /**
      * @var \DateTime A dummy date
@@ -62,6 +69,7 @@ class RelatedDummy extends ParentDummy
     #[Assert\DateTime]
     #[Groups(['friends'])]
     #[ODM\Field(type: 'date', nullable: true)]
+    #[ApiFilter(filterClass: DateFilter::class)]
     public $dummyDate;
     #[Groups(['barcelona', 'chicago', 'friends'])]
     #[ODM\ReferenceOne(targetDocument: ThirdLevel::class, cascade: ['persist'], nullable: true, storeAs: 'id')]
