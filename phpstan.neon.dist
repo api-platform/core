@@ -224,6 +224,7 @@ parameters:
 		- src/Core/Upgrade/SubresourceTransformer.php
 		- src/Core/Upgrade/UpgradeApiResourceVisitor.php
 		- src/Core/Upgrade/UpgradeApiSubresourceVisitor.php
+		- src/Core/Upgrade/UpgradeApiFilterVisitor.php
 		- src/Core/Util/AttributesExtractor.php
 		- src/Core/Util/ErrorFormatGuesser.php
 		- src/Core/Util/Inflector.php

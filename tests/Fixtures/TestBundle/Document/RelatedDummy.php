@@ -13,9 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ExistsFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -30,6 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ApiResource(graphql={"item_query", "update"={"normalization_context"={"groups"={"chicago", "fakemanytomany"}}, "denormalization_context"={"groups"={"friends"}}}}, iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.mongodb.friends"}})
  * @ODM\Document
+ * @ApiFilter(SearchFilter::class, properties={"id"})
  */
 class RelatedDummy extends ParentDummy
 {
@@ -52,6 +57,8 @@ class RelatedDummy extends ParentDummy
     /**
      * @ODM\Field(type="string")
      * @Groups({"barcelona", "chicago", "friends"})
+     * @ApiFilter(SearchFilter::class)
+     * @ApiFilter(ExistsFilter::class)
      */
     protected $symfony = 'symfony';
 
@@ -61,6 +68,7 @@ class RelatedDummy extends ParentDummy
      * @ODM\Field(type="date", nullable=true)
      * @Assert\DateTime
      * @Groups({"friends"})
+     * @ApiFilter(DateFilter::class)
      */
     public $dummyDate;
 

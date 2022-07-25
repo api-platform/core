@@ -108,7 +108,7 @@ Feature: Subresource support
       "hydra:totalItems": 2,
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[]}",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[],id,id[],symfony,symfony[],dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -139,6 +139,54 @@ Feature: Subresource support
             "@type": "IriTemplateMapping",
             "variable": "age[]",
             "property": "age",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "id",
+            "property": "id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "id[]",
+            "property": "id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "symfony",
+            "property": "symfony",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "symfony[]",
+            "property": "symfony",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[before]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[strictly_before]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[after]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[strictly_after]",
+            "property": "dummyDate",
             "required": false
           }
         ]
@@ -185,7 +233,7 @@ Feature: Subresource support
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[]}",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[],id,id[],symfony,symfony[],dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -216,6 +264,54 @@ Feature: Subresource support
             "@type": "IriTemplateMapping",
             "variable": "age[]",
             "property": "age",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "id",
+            "property": "id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "id[]",
+            "property": "id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "symfony",
+            "property": "symfony",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "symfony[]",
+            "property": "symfony",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[before]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[strictly_before]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[after]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[strictly_after]",
+            "property": "dummyDate",
             "required": false
           }
         ]
