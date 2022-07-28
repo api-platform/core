@@ -437,7 +437,6 @@ final class Configuration implements ConfigurationInterface
                                 ->scalarNode('email')->defaultNull()->info('The email address of the contact person/organization. MUST be in the format of an email address.')->end()
                             ->end()
                         ->end()
-                        ->booleanNode('backward_compatibility_layer')->defaultTrue()->info('Enable this to decorate the "api_platform.swagger.normalizer.documentation" instead of decorating the OpenAPI factory.')->end()
                         ->scalarNode('termsOfService')->defaultNull()->info('A URL to the Terms of Service for the API. MUST be in the format of a URL.')->end()
                         ->arrayNode('license')
                         ->addDefaultsIfNotSet()

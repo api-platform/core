@@ -8,8 +8,7 @@ use ApiPlatform\State\ProviderInterface;
 
 class <?php echo $class_name; ?> implements ProviderInterface
 {
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])<?php if (\PHP_VERSION_ID >= 80000) { ?>: object|array|null<?php } ?>
-
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         // Retrieve the state from somewhere
     }
