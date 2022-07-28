@@ -14,6 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Api\QueryParameterValidator;
 
 use ApiPlatform\Api\FilterLocatorTrait;
+use ApiPlatform\Api\QueryParameterValidator\Validator\ArrayItems;
+use ApiPlatform\Api\QueryParameterValidator\Validator\Bounds;
+use ApiPlatform\Api\QueryParameterValidator\Validator\Enum;
+use ApiPlatform\Api\QueryParameterValidator\Validator\Length;
+use ApiPlatform\Api\QueryParameterValidator\Validator\MultipleOf;
+use ApiPlatform\Api\QueryParameterValidator\Validator\Pattern;
+use ApiPlatform\Api\QueryParameterValidator\Validator\Required;
 use ApiPlatform\Exception\FilterValidationException;
 use Psr\Container\ContainerInterface;
 
@@ -33,13 +40,13 @@ class QueryParameterValidator
         $this->setFilterLocator($filterLocator);
 
         $this->validators = [
-            new Validator\ArrayItems(),
-            new Validator\Bounds(),
-            new Validator\Enum(),
-            new Validator\Length(),
-            new Validator\MultipleOf(),
-            new Validator\Pattern(),
-            new Validator\Required(),
+            new ArrayItems(),
+            new Bounds(),
+            new Enum(),
+            new Length(),
+            new MultipleOf(),
+            new Pattern(),
+            new Required(),
         ];
     }
 

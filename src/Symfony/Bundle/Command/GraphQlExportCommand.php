@@ -28,12 +28,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class GraphQlExportCommand extends Command
 {
-    private SchemaBuilderInterface $schemaBuilder;
-
-    public function __construct(SchemaBuilderInterface $schemaBuilder)
+    public function __construct(private readonly SchemaBuilderInterface $schemaBuilder)
     {
-        $this->schemaBuilder = $schemaBuilder;
-
         parent::__construct();
     }
 
@@ -50,10 +46,8 @@ class GraphQlExportCommand extends Command
 
     /**
      * {@inheritdoc}
-     *
-     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 

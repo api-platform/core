@@ -80,10 +80,7 @@ class DoctrineMongoDbOdmSetup
         return $config;
     }
 
-    /**
-     * @return Cache|CacheItemPoolInterface
-     */
-    private static function createCacheConfiguration(bool $isDevMode, string $proxyDir, string $hydratorDir, ?Cache $cache)
+    private static function createCacheConfiguration(bool $isDevMode, string $proxyDir, string $hydratorDir, ?Cache $cache): Cache|CacheItemPoolInterface
     {
         $cache = self::createCacheInstance($isDevMode, $cache);
 

@@ -15,43 +15,8 @@ namespace ApiPlatform\OpenApi;
 
 final class Options
 {
-    private $title;
-    private $description;
-    private $version;
-    private $oAuthEnabled;
-    private $oAuthType;
-    private $oAuthFlow;
-    private $oAuthTokenUrl;
-    private $oAuthAuthorizationUrl;
-    private $oAuthRefreshUrl;
-    private $oAuthScopes;
-    private $apiKeys;
-    private $contactName;
-    private $contactUrl;
-    private $contactEmail;
-    private $termsOfService;
-    private $licenseName;
-    private $licenseUrl;
-
-    public function __construct(string $title, string $description = '', string $version = '', bool $oAuthEnabled = false, ?string $oAuthType = null, ?string $oAuthFlow = null, ?string $oAuthTokenUrl = null, ?string $oAuthAuthorizationUrl = null, ?string $oAuthRefreshUrl = null, array $oAuthScopes = [], array $apiKeys = [], string $contactName = null, string $contactUrl = null, string $contactEmail = null, string $termsOfService = null, string $licenseName = null, string $licenseUrl = null)
+    public function __construct(private readonly string $title, private readonly string $description = '', private readonly string $version = '', private readonly bool $oAuthEnabled = false, private readonly ?string $oAuthType = null, private readonly ?string $oAuthFlow = null, private readonly ?string $oAuthTokenUrl = null, private readonly ?string $oAuthAuthorizationUrl = null, private readonly ?string $oAuthRefreshUrl = null, private readonly array $oAuthScopes = [], private readonly array $apiKeys = [], private readonly ?string $contactName = null, private readonly ?string $contactUrl = null, private readonly ?string $contactEmail = null, private readonly ?string $termsOfService = null, private readonly ?string $licenseName = null, private readonly ?string $licenseUrl = null)
     {
-        $this->title = $title;
-        $this->description = $description;
-        $this->version = $version;
-        $this->oAuthEnabled = $oAuthEnabled;
-        $this->oAuthType = $oAuthType;
-        $this->oAuthFlow = $oAuthFlow;
-        $this->oAuthTokenUrl = $oAuthTokenUrl ?: null;
-        $this->oAuthAuthorizationUrl = $oAuthAuthorizationUrl ?: null;
-        $this->oAuthRefreshUrl = $oAuthRefreshUrl ?: null;
-        $this->oAuthScopes = $oAuthScopes;
-        $this->apiKeys = $apiKeys;
-        $this->contactName = $contactName;
-        $this->contactUrl = $contactUrl;
-        $this->contactEmail = $contactEmail;
-        $this->termsOfService = $termsOfService;
-        $this->licenseName = $licenseName;
-        $this->licenseUrl = $licenseUrl;
     }
 
     public function getTitle(): string

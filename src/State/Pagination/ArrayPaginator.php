@@ -20,10 +20,10 @@ namespace ApiPlatform\State\Pagination;
  */
 final class ArrayPaginator implements \IteratorAggregate, PaginatorInterface
 {
-    private $iterator;
-    private $firstResult;
-    private $maxResults;
-    private $totalItems;
+    private \Traversable $iterator;
+    private readonly int $firstResult;
+    private readonly int $maxResults;
+    private readonly int $totalItems;
 
     public function __construct(array $results, int $firstResult, int $maxResults)
     {

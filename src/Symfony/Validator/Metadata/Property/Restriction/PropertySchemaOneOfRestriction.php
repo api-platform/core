@@ -23,16 +23,10 @@ use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 final class PropertySchemaOneOfRestriction implements PropertySchemaRestrictionMetadataInterface
 {
     /**
-     * @var iterable<PropertySchemaRestrictionMetadataInterface>
-     */
-    private $restrictionsMetadata;
-
-    /**
      * @param iterable<PropertySchemaRestrictionMetadataInterface> $restrictionsMetadata
      */
-    public function __construct(iterable $restrictionsMetadata = [])
+    public function __construct(private readonly iterable $restrictionsMetadata = [])
     {
-        $this->restrictionsMetadata = $restrictionsMetadata;
     }
 
     /**

@@ -27,11 +27,8 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
 {
     use AttributeFilterExtractorTrait;
 
-    private $decorated;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
-        $this->decorated = $decorated;
     }
 
     /**
@@ -47,7 +44,7 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
 
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 

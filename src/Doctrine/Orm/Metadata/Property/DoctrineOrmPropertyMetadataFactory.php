@@ -25,13 +25,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    private PropertyMetadataFactoryInterface $decorated;
-    private ManagerRegistry $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry, PropertyMetadataFactoryInterface $decorated)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly PropertyMetadataFactoryInterface $decorated)
     {
-        $this->managerRegistry = $managerRegistry;
-        $this->decorated = $decorated;
     }
 
     /**

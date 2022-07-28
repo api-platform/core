@@ -25,7 +25,7 @@ use Psr\Container\ContainerInterface;
  */
 trait FilterLocatorTrait
 {
-    private ?ContainerInterface $filterLocator;
+    private ?ContainerInterface $filterLocator = null;
 
     /**
      * Sets a filter locator with a backward compatibility.

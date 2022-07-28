@@ -23,16 +23,11 @@ use Symfony\Component\Routing\RequestContext;
  */
 final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGeneratorInterface
 {
-    private $requestContext;
-    private $registry;
-
     /**
      * @param HubRegistry|string $registry
      */
-    public function __construct(RequestContext $requestContext, $registry)
+    public function __construct(private readonly RequestContext $requestContext, private $registry)
     {
-        $this->requestContext = $requestContext;
-        $this->registry = $registry;
     }
 
     public function generateTopicIri(string $subscriptionId): string

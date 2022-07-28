@@ -44,9 +44,7 @@ final class RequestParser
 
         $source = preg_replace_callback(
             '/(^|(?<=&))[^=[&]+/',
-            static function ($key) {
-                return bin2hex(urldecode($key[0]));
-            },
+            static fn ($key): string => bin2hex(urldecode($key[0])),
             $source
         );
 
@@ -71,7 +69,7 @@ final class RequestParser
 
         $parts = [];
 
-        foreach (explode('&', $qs) as $param) {
+        foreach (explode('&', (string) $qs) as $param) {
             if ('' === $param || '=' === $param[0]) {
                 // Ignore useless delimiters, e.g. "x=y&".
                 // Also ignore pairs with empty key, even if there was a value, e.g. "=value", as such nameless values cannot be retrieved anyway.

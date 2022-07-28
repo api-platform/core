@@ -31,10 +31,8 @@ class DoctrineMongoDbOdmTestCase extends TestCase
 {
     /**
      * @param mixed $paths
-     *
-     * @return DocumentManager
      */
-    public static function createTestDocumentManager($paths = [])
+    public static function createTestDocumentManager($paths = []): DocumentManager
     {
         $config = new Configuration();
         $config->setAutoGenerateProxyClasses(Configuration::AUTOGENERATE_FILE_NOT_EXISTS);

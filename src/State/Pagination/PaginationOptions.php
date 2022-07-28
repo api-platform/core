@@ -15,31 +15,8 @@ namespace ApiPlatform\State\Pagination;
 
 final class PaginationOptions
 {
-    private $paginationEnabled;
-    private $paginationPageParameterName;
-    private $clientItemsPerPage;
-    private $itemsPerPageParameterName;
-    private $paginationClientEnabled;
-    private $paginationClientEnabledParameterName;
-    private $itemsPerPage;
-    private $maximumItemsPerPage;
-    private $partialPaginationEnabled;
-    private $clientPartialPaginationEnabled;
-    private $partialPaginationParameterName;
-
-    public function __construct(bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', int $itemsPerPage = 30, int $maximumItemsPerPage = null, bool $partialPaginationEnabled = false, bool $clientPartialPaginationEnabled = false, string $partialPaginationParameterName = 'partial')
+    public function __construct(private readonly bool $paginationEnabled = true, private readonly string $paginationPageParameterName = 'page', private readonly bool $clientItemsPerPage = false, private readonly string $itemsPerPageParameterName = 'itemsPerPage', private readonly bool $paginationClientEnabled = false, private readonly string $paginationClientEnabledParameterName = 'pagination', private readonly int $itemsPerPage = 30, private readonly ?int $maximumItemsPerPage = null, private readonly bool $partialPaginationEnabled = false, private readonly bool $clientPartialPaginationEnabled = false, private readonly string $partialPaginationParameterName = 'partial')
     {
-        $this->paginationEnabled = $paginationEnabled;
-        $this->paginationPageParameterName = $paginationPageParameterName;
-        $this->clientItemsPerPage = $clientItemsPerPage;
-        $this->itemsPerPageParameterName = $itemsPerPageParameterName;
-        $this->paginationClientEnabled = $paginationClientEnabled;
-        $this->paginationClientEnabledParameterName = $paginationClientEnabledParameterName;
-        $this->itemsPerPage = $itemsPerPage;
-        $this->maximumItemsPerPage = $maximumItemsPerPage;
-        $this->partialPaginationEnabled = $partialPaginationEnabled;
-        $this->clientPartialPaginationEnabled = $clientPartialPaginationEnabled;
-        $this->partialPaginationParameterName = $partialPaginationParameterName;
     }
 
     public function isPaginationEnabled(): bool

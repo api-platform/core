@@ -26,13 +26,9 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 {
     public const FORMAT = 'jsonld';
 
-    private $urlGenerator;
-
-    public function __construct(UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
     {
         parent::__construct($serializePayloadFields, $nameConverter);
-
-        $this->urlGenerator = $urlGenerator;
     }
 
     /**

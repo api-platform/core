@@ -26,19 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class DocumentationAction
 {
-    private ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory;
-    private string $title;
-    private string $description;
-    private string $version;
-    private OpenApiFactoryInterface|null $openApiFactory;
-
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', OpenApiFactoryInterface $openApiFactory = null)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly string $title = '', private readonly string $description = '', private readonly string $version = '', private readonly ?OpenApiFactoryInterface $openApiFactory = null)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->title = $title;
-        $this->description = $description;
-        $this->version = $version;
-        $this->openApiFactory = $openApiFactory;
     }
 
     public function __invoke(Request $request = null): DocumentationInterface

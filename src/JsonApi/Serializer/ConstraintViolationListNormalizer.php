@@ -30,17 +30,14 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
 {
     public const FORMAT = 'jsonapi';
 
-    private $nameConverter;
-    private $propertyMetadataFactory;
-
-    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null)
     {
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->nameConverter = $nameConverter;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @return array{errors: array<int, array{detail: mixed, source: array{pointer: mixed}}>}
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
@@ -81,7 +78,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
             return 'data';
         }
 
-        $class = \get_class($violation->getRoot());
+        $class = $violation->getRoot()::class;
         /** @var ApiProperty */
         $propertyMetadata = $this->propertyMetadataFactory
             ->create(

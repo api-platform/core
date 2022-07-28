@@ -33,17 +33,12 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 final class IdentifiersExtractor implements IdentifiersExtractorInterface
 {
     use ResourceClassInfoTrait;
+    private readonly PropertyAccessorInterface|PropertyAccessor $propertyAccessor;
 
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-    private $propertyAccessor;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
@@ -61,7 +56,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         }
 
         $resourceClass = $this->getResourceClass($item, true);
-        $operation = $operation ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
+        $operation ??= $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
 
         if ($operation instanceof HttpOperation) {
             $links = $operation->getUriVariables();
@@ -70,7 +65,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         }
 
         foreach ($links ?? [] as $link) {
-            if (1 < \count($link->getIdentifiers())) {
+            if (1 < (is_countable($link->getIdentifiers()) ? \count($link->getIdentifiers()) : 0)) {
                 $compositeIdentifiers = [];
                 foreach ($link->getIdentifiers() as $identifier) {
                     $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $link->getFromClass() ?? $resourceClass, $identifier, $link->getParameterName());

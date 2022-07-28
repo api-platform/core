@@ -16,36 +16,6 @@ namespace ApiPlatform\Metadata;
 abstract class Operation
 {
     use WithResourceTrait;
-
-    protected $shortName;
-    protected $class;
-    protected $paginationEnabled;
-    protected $paginationType;
-    protected $paginationItemsPerPage;
-    protected $paginationMaximumItemsPerPage;
-    protected $paginationPartial;
-    protected $paginationClientEnabled;
-    protected $paginationClientItemsPerPage;
-    protected $paginationClientPartial;
-    protected $paginationFetchJoinCollection;
-    protected $paginationUseOutputWalkers;
-    protected $paginationViaCursor;
-    protected $order;
-    protected $description;
-    protected $normalizationContext;
-    protected $denormalizationContext;
-    protected $security;
-    protected $securityMessage;
-    protected $securityPostDenormalize;
-    protected $securityPostDenormalizeMessage;
-    protected $securityPostValidation;
-    protected $securityPostValidationMessage;
-    protected $deprecationReason;
-    /**
-     * @var string[]
-     */
-    protected $filters;
-    protected $validationContext;
     /**
      * @var null
      */
@@ -55,25 +25,6 @@ abstract class Operation
      */
     protected $output;
     /**
-     * @var string|array|bool|null
-     */
-    protected $mercure;
-    /**
-     * @var string|bool|null
-     */
-    protected $messenger;
-    protected $elasticsearch;
-    protected $urlGenerationStrategy;
-    protected $read;
-    protected $deserialize;
-    protected $validate;
-    protected $write;
-    protected $serialize;
-    protected $fetchPartial;
-    protected $forceEager;
-    protected $priority;
-    protected $name;
-    /**
      * @var string|callable|null
      */
     protected $provider;
@@ -81,98 +32,70 @@ abstract class Operation
      * @var string|callable|null
      */
     protected $processor;
-    protected $extraProperties;
 
+    /**
+     * @param string[]   $filters
+     * @param mixed|null $input
+     * @param mixed|null $output
+     * @param mixed|null $provider
+     * @param mixed|null $processor
+     */
     public function __construct(
-        ?string $shortName = null,
-        ?string $class = null,
-        ?bool $paginationEnabled = null,
-        ?string $paginationType = null,
-        ?int $paginationItemsPerPage = null,
-        ?int $paginationMaximumItemsPerPage = null,
-        ?bool $paginationPartial = null,
-        ?bool $paginationClientEnabled = null,
-        ?bool $paginationClientItemsPerPage = null,
-        ?bool $paginationClientPartial = null,
-        ?bool $paginationFetchJoinCollection = null,
-        ?bool $paginationUseOutputWalkers = null,
-        ?array $paginationViaCursor = null,
-        ?array $order = null,
-        ?string $description = null,
-        ?array $normalizationContext = null,
-        ?array $denormalizationContext = null,
-        ?string $security = null,
-        ?string $securityMessage = null,
-        ?string $securityPostDenormalize = null,
-        ?string $securityPostDenormalizeMessage = null,
-        ?string $securityPostValidation = null,
-        ?string $securityPostValidationMessage = null,
-        ?string $deprecationReason = null,
-        ?array $filters = null,
-        ?array $validationContext = null,
+        protected ?string $shortName = null,
+        protected ?string $class = null,
+        protected ?bool $paginationEnabled = null,
+        protected ?string $paginationType = null,
+        protected ?int $paginationItemsPerPage = null,
+        protected ?int $paginationMaximumItemsPerPage = null,
+        protected ?bool $paginationPartial = null,
+        protected ?bool $paginationClientEnabled = null,
+        protected ?bool $paginationClientItemsPerPage = null,
+        protected ?bool $paginationClientPartial = null,
+        protected ?bool $paginationFetchJoinCollection = null,
+        protected ?bool $paginationUseOutputWalkers = null,
+        protected ?array $paginationViaCursor = null,
+        protected ?array $order = null,
+        protected ?string $description = null,
+        protected ?array $normalizationContext = null,
+        protected ?array $denormalizationContext = null,
+        protected ?string $security = null,
+        protected ?string $securityMessage = null,
+        protected ?string $securityPostDenormalize = null,
+        protected ?string $securityPostDenormalizeMessage = null,
+        protected ?string $securityPostValidation = null,
+        protected ?string $securityPostValidationMessage = null,
+        protected ?string $deprecationReason = null,
+        protected ?array $filters = null,
+        protected ?array $validationContext = null,
         $input = null,
         $output = null,
-        $mercure = null,
-        $messenger = null,
-        ?bool $elasticsearch = null,
-        ?int $urlGenerationStrategy = null,
-        ?bool $read = null,
-        ?bool $deserialize = null,
-        ?bool $validate = null,
-        ?bool $write = null,
-        ?bool $serialize = null,
-        ?bool $fetchPartial = null,
-        ?bool $forceEager = null,
-        ?int $priority = null,
-        ?string $name = null,
+        /**
+         * @var string|array|bool|null
+         */
+        protected $mercure = null,
+        /**
+         * @var string|bool|null
+         */
+        protected $messenger = null,
+        protected ?bool $elasticsearch = null,
+        protected ?int $urlGenerationStrategy = null,
+        protected ?bool $read = null,
+        protected ?bool $deserialize = null,
+        protected ?bool $validate = null,
+        protected ?bool $write = null,
+        protected ?bool $serialize = null,
+        protected ?bool $fetchPartial = null,
+        protected ?bool $forceEager = null,
+        protected ?int $priority = null,
+        protected ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        protected array $extraProperties = []
     ) {
-        $this->shortName = $shortName;
-        $this->class = $class;
-        $this->paginationEnabled = $paginationEnabled;
-        $this->paginationType = $paginationType;
-        $this->paginationItemsPerPage = $paginationItemsPerPage;
-        $this->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
-        $this->paginationPartial = $paginationPartial;
-        $this->paginationClientEnabled = $paginationClientEnabled;
-        $this->paginationClientItemsPerPage = $paginationClientItemsPerPage;
-        $this->paginationClientPartial = $paginationClientPartial;
-        $this->paginationFetchJoinCollection = $paginationFetchJoinCollection;
-        $this->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-        $this->paginationViaCursor = $paginationViaCursor;
-        $this->order = $order;
-        $this->description = $description;
-        $this->normalizationContext = $normalizationContext;
-        $this->denormalizationContext = $denormalizationContext;
-        $this->security = $security;
-        $this->securityMessage = $securityMessage;
-        $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-        $this->securityPostValidation = $securityPostValidation;
-        $this->securityPostValidationMessage = $securityPostValidationMessage;
-        $this->deprecationReason = $deprecationReason;
-        $this->filters = $filters;
-        $this->validationContext = $validationContext;
         $this->input = $input;
         $this->output = $output;
-        $this->mercure = $mercure;
-        $this->messenger = $messenger;
-        $this->elasticsearch = $elasticsearch;
-        $this->urlGenerationStrategy = $urlGenerationStrategy;
-        $this->read = $read;
-        $this->deserialize = $deserialize;
-        $this->validate = $validate;
-        $this->write = $write;
-        $this->serialize = $serialize;
-        $this->fetchPartial = $fetchPartial;
-        $this->forceEager = $forceEager;
-        $this->priority = $priority;
-        $this->name = $name;
         $this->provider = $provider;
         $this->processor = $processor;
-        $this->extraProperties = $extraProperties;
     }
 
     public function withOperation($operation)

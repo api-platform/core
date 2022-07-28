@@ -26,16 +26,11 @@ use ApiPlatform\Util\ReflectionClassRecursiveIterator;
  */
 final class AttributesResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
-    private $paths;
-    private $decorated;
-
     /**
      * @param string[] $paths
      */
-    public function __construct(array $paths, ResourceNameCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly array $paths, private readonly ?ResourceNameCollectionFactoryInterface $decorated = null)
     {
-        $this->paths = $paths;
-        $this->decorated = $decorated;
     }
 
     /**

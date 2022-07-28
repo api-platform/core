@@ -30,12 +30,10 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
 {
     public const FORMAT = null; // Must be overrode
 
-    private $serializePayloadFields;
-    private $nameConverter;
+    private readonly ?array $serializePayloadFields;
 
-    public function __construct(array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
+    public function __construct(array $serializePayloadFields = null, private readonly ?NameConverterInterface $nameConverter = null)
     {
-        $this->nameConverter = $nameConverter;
         $this->serializePayloadFields = null === $serializePayloadFields ? null : array_flip($serializePayloadFields);
     }
 
@@ -60,7 +58,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
         $violations = $messages = [];
 
         foreach ($constraintViolationList as $violation) {
-            $class = \is_object($root = $violation->getRoot()) ? \get_class($root) : null;
+            $class = \is_object($root = $violation->getRoot()) ? $root::class : null;
             $violationData = [
                 'propertyPath' => $this->nameConverter ? $this->nameConverter->normalize($violation->getPropertyPath(), $class, static::FORMAT) : $violation->getPropertyPath(),
                 'message' => $violation->getMessage(),

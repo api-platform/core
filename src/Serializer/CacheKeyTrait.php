@@ -15,10 +15,7 @@ namespace ApiPlatform\Serializer;
 
 trait CacheKeyTrait
 {
-    /**
-     * @return string|bool
-     */
-    private function getCacheKey(?string $format, array $context)
+    private function getCacheKey(?string $format, array $context): string|bool
     {
         foreach ($context[self::EXCLUDE_FROM_CACHE_KEY] ?? $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] as $key) {
             unset($context[$key]);
@@ -28,7 +25,7 @@ trait CacheKeyTrait
 
         try {
             return md5($format.serialize($context));
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // The context cannot be serialized, skip the cache
             return false;
         }

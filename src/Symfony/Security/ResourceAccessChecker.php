@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Checks if the logged user has sufficient permissions to access the given resource.
@@ -28,21 +29,8 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 final class ResourceAccessChecker implements ResourceAccessCheckerInterface
 {
-    private $expressionLanguage;
-    private $authenticationTrustResolver;
-    private $roleHierarchy;
-    private $tokenStorage;
-    private $authorizationChecker;
-    private $exceptionOnNoToken;
-
-    public function __construct(ExpressionLanguage $expressionLanguage = null, AuthenticationTrustResolverInterface $authenticationTrustResolver = null, RoleHierarchyInterface $roleHierarchy = null, TokenStorageInterface $tokenStorage = null, AuthorizationCheckerInterface $authorizationChecker = null, bool $exceptionOnNoToken = true)
+    public function __construct(private readonly ?ExpressionLanguage $expressionLanguage = null, private readonly ?AuthenticationTrustResolverInterface $authenticationTrustResolver = null, private readonly ?RoleHierarchyInterface $roleHierarchy = null, private readonly ?TokenStorageInterface $tokenStorage = null, private readonly ?AuthorizationCheckerInterface $authorizationChecker = null, private readonly bool $exceptionOnNoToken = true)
     {
-        $this->expressionLanguage = $expressionLanguage;
-        $this->authenticationTrustResolver = $authenticationTrustResolver;
-        $this->roleHierarchy = $roleHierarchy;
-        $this->tokenStorage = $tokenStorage;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->exceptionOnNoToken = $exceptionOnNoToken;
     }
 
     public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool
@@ -79,6 +67,8 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
      * @copyright Fabien Potencier <fabien@symfony.com>
      *
      * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Authorization/Voter/ExpressionVoter.php
+     *
+     * @return array{token: TokenInterface, user: (UserInterface | null), roles: string[]}
      */
     private function getVariables(TokenInterface $token): array
     {

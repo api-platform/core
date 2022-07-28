@@ -30,13 +30,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 {
     use ResourceClassInfoTrait;
 
-    private $serializerClassMetadataFactory;
-    private $decorated;
-
-    public function __construct(SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(private readonly SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null)
     {
-        $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
-        $this->decorated = $decorated;
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
@@ -57,7 +52,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             if ($denormalizationGroups && !\is_array($denormalizationGroups)) {
                 $denormalizationGroups = [$denormalizationGroups];
             }
-        } catch (ResourceClassNotFoundException $e) {
+        } catch (ResourceClassNotFoundException) {
             // TODO: for input/output classes, the serializer groups must be read from the actual resource class
             return $propertyMetadata;
         }

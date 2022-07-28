@@ -145,7 +145,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      *
      * @param mixed $values
      */
-    private function addEqualityMatchStrategy(string $strategy, Builder $aggregationBuilder, string $field, string $matchField, $values, bool $caseSensitive, ClassMetadata $metadata): void
+    private function addEqualityMatchStrategy(string $strategy, Builder $aggregationBuilder, string $field, string $matchField, array $values, bool $caseSensitive, ClassMetadata $metadata): void
     {
         $inValues = [];
         foreach ($values as $inValue) {
@@ -164,10 +164,8 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      * @param mixed $value
      *
      * @throws InvalidArgumentException If strategy does not exist
-     *
-     * @return Regex|string
      */
-    private function getEqualityMatchStrategyValue(string $strategy, string $field, $value, bool $caseSensitive, ClassMetadata $metadata)
+    private function getEqualityMatchStrategyValue(string $strategy, string $field, $value, bool $caseSensitive, ClassMetadata $metadata): Regex|string
     {
         $type = $metadata->getTypeOfField($field);
 
@@ -202,20 +200,12 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      */
     protected function getType(string $doctrineType): string
     {
-        switch ($doctrineType) {
-            case MongoDbType::INT:
-            case MongoDbType::INTEGER:
-                return 'int';
-            case MongoDbType::BOOL:
-            case MongoDbType::BOOLEAN:
-                return 'bool';
-            case MongoDbType::DATE:
-            case MongoDbType::DATE_IMMUTABLE:
-                return \DateTimeInterface::class;
-            case MongoDbType::FLOAT:
-                return 'float';
-        }
-
-        return 'string';
+        return match ($doctrineType) {
+            MongoDbType::INT, MongoDbType::INTEGER => 'int',
+            MongoDbType::BOOL, MongoDbType::BOOLEAN => 'bool',
+            MongoDbType::DATE, MongoDbType::DATE_IMMUTABLE => \DateTimeInterface::class,
+            MongoDbType::FLOAT => 'float',
+            default => 'string',
+        };
     }
 }

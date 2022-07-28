@@ -43,16 +43,12 @@ final class ItemNormalizer extends BaseItemNormalizer
     public const ITEM_RESOURCE_CLASS_KEY = '#itemResourceClass';
     public const ITEM_IDENTIFIERS_KEY = '#itemIdentifiers';
 
-    /**
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, /**
      * @var IdentifiersExtractorInterface
      */
-    private $identifiersExtractor;
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, LoggerInterface $logger = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+        private $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, LoggerInterface $logger = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $logger ?: new NullLogger(), $resourceMetadataCollectionFactory, $resourceAccessChecker);
-
-        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     /**
@@ -116,10 +112,8 @@ final class ItemNormalizer extends BaseItemNormalizer
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|bool
      */
-    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
+    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false): array|bool
     {
         $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
 

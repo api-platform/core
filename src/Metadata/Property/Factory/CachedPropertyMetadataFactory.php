@@ -28,12 +28,9 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
     public const CACHE_KEY_PREFIX = 'property_metadata_';
 
-    private $decorated;
-
-    public function __construct(CacheItemPoolInterface $cacheItemPool, PropertyMetadataFactoryInterface $decorated)
+    public function __construct(CacheItemPoolInterface $cacheItemPool, private readonly PropertyMetadataFactoryInterface $decorated)
     {
         $this->cacheItemPool = $cacheItemPool;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -43,8 +40,6 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $property, $options]));
 
-        return $this->getCached($cacheKey, function () use ($resourceClass, $property, $options) {
-            return $this->decorated->create($resourceClass, $property, $options);
-        });
+        return $this->getCached($cacheKey, fn (): ApiProperty => $this->decorated->create($resourceClass, $property, $options));
     }
 }

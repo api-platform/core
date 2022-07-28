@@ -54,32 +54,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     use InputOutputMetadataTrait;
 
     public const IS_TRANSFORMED_TO_SAME_CLASS = 'is_transformed_to_same_class';
-
-    protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory;
-    protected PropertyMetadataFactoryInterface $propertyMetadataFactory;
-    protected IriConverterInterface $iriConverter;
-    protected ResourceClassResolverInterface $resourceClassResolver;
-    protected ?ResourceAccessCheckerInterface $resourceAccessChecker;
     protected PropertyAccessorInterface $propertyAccessor;
     protected $localCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
-            $defaultContext['circular_reference_handler'] = function ($object) {
-                return $this->iriConverter->getIriFromResource($object);
-            };
+            $defaultContext['circular_reference_handler'] = fn ($object): ?string => $this->iriConverter->getIriFromResource($object);
         }
 
         parent::__construct($classMetadataFactory, $nameConverter, null, null, \Closure::fromCallable([$this, 'getObjectClass']), $defaultContext);
-
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->iriConverter = $iriConverter;
-        $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     /**
@@ -135,7 +121,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $context['api_normalize'] = true;
-        $iri = $context['iri'] = $context['iri'] ?? $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
+        $iri = $context['iri'] ??= $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
 
         /*
          * When true, converts the normalized data array of a resource into an
@@ -254,10 +240,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * @internal
-     *
-     * @return object
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null): object
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
             unset($context[static::OBJECT_TO_POPULATE]);
@@ -344,17 +328,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return string[]
      */
-    protected function extractAttributes($object, $format = null, array $context = [])
+    protected function extractAttributes($object, $format = null, array $context = []): array
     {
         return [];
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|bool
      */
-    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
+    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false): array|bool
     {
         if (!$this->resourceClassResolver->isResourceClass($context['resource_class'])) {
             return parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
@@ -384,10 +366,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = []): bool
     {
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
             return false;
@@ -458,7 +438,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function validateType(string $attribute, Type $type, $value, string $format = null)
     {
         $builtinType = $type->getBuiltinType();
-        if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && false !== strpos($format, 'json')) {
+        if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && str_contains($format, 'json')) {
             $isValid = \is_float($value) || \is_int($value);
         } else {
             $isValid = \call_user_func('is_'.$builtinType, $value);
@@ -648,7 +628,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             unset($childContext['iri'], $childContext['uri_variables']);
 
             if (null !== ($propertyIris = $propertyMetadata->getIris())) {
-                $childContext['output']['iri'] = 1 === \count($propertyIris) ? $propertyIris[0] : $propertyIris;
+                $childContext['output']['iri'] = 1 === (is_countable($propertyIris) ? \count($propertyIris) : 0) ? $propertyIris[0] : $propertyIris;
             }
 
             return $this->serializer->normalize($attributeValue, $format, $childContext);
@@ -819,16 +799,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                         return (float) $value;
                     }
 
-                    switch ($value) {
-                        case 'NaN':
-                            return \NAN;
-                        case 'INF':
-                            return \INF;
-                        case '-INF':
-                            return -\INF;
-                        default:
-                            throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $className, $value));
-                    }
+                    return match ($value) {
+                        'NaN' => \NAN,
+                        'INF' => \INF,
+                        '-INF' => -\INF,
+                        default => throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $className, $value)),
+                    };
             }
         }
 
@@ -847,11 +823,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * @param object $object
      * @param mixed  $value
      */
-    private function setValue($object, string $attributeName, $value)
+    private function setValue($object, string $attributeName, $value): void
     {
         try {
             $this->propertyAccessor->setValue($object, $attributeName, $value);
-        } catch (NoSuchPropertyException $exception) {
+        } catch (NoSuchPropertyException) {
             // Properties not found are ignored
         }
     }

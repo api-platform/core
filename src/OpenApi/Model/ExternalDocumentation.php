@@ -17,13 +17,8 @@ final class ExternalDocumentation
 {
     use ExtensionTrait;
 
-    private $description;
-    private $url;
-
-    public function __construct(string $description = '', string $url = '')
+    public function __construct(private string $description = '', private string $url = '')
     {
-        $this->description = $description;
-        $this->url = $url;
     }
 
     public function getDescription(): string

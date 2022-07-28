@@ -35,12 +35,9 @@ final class RespondListener
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
-    private $iriConverter;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, IriConverterInterface $iriConverter = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private readonly ?IriConverterInterface $iriConverter = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
-        $this->iriConverter = $iriConverter;
     }
 
     /**
@@ -91,7 +88,7 @@ final class RespondListener
             $headers['Location'] = $this->iriConverter->getIriFromResource($request->attributes->get('data'), UrlGeneratorInterface::ABS_PATH, $operation);
         }
 
-        $status = $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK;
+        $status ??= self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK;
 
         if ($request->attributes->has('_api_write_item_iri')) {
             $headers['Content-Location'] = $request->attributes->get('_api_write_item_iri');

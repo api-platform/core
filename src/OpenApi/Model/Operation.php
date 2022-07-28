@@ -17,33 +17,8 @@ final class Operation
 {
     use ExtensionTrait;
 
-    private $tags;
-    private $summary;
-    private $description;
-    private $operationId;
-    private $parameters;
-    private $requestBody;
-    private $responses;
-    private $callbacks;
-    private $deprecated;
-    private $security;
-    private $servers;
-    private $externalDocs;
-
-    public function __construct(string $operationId = null, array $tags = [], array $responses = [], string $summary = '', string $description = '', ExternalDocumentation $externalDocs = null, array $parameters = [], RequestBody $requestBody = null, \ArrayObject $callbacks = null, bool $deprecated = false, ?array $security = null, ?array $servers = null, array $extensionProperties = [])
+    public function __construct(private ?string $operationId = null, private array $tags = [], private array $responses = [], private string $summary = '', private string $description = '', private ?ExternalDocumentation $externalDocs = null, private array $parameters = [], private ?RequestBody $requestBody = null, private ?\ArrayObject $callbacks = null, private bool $deprecated = false, private ?array $security = null, private ?array $servers = null, array $extensionProperties = [])
     {
-        $this->tags = $tags;
-        $this->summary = $summary;
-        $this->description = $description;
-        $this->operationId = $operationId;
-        $this->parameters = $parameters;
-        $this->requestBody = $requestBody;
-        $this->responses = $responses;
-        $this->callbacks = $callbacks;
-        $this->deprecated = $deprecated;
-        $this->security = $security;
-        $this->servers = $servers;
-        $this->externalDocs = $externalDocs;
         $this->extensionProperties = $extensionProperties;
     }
 

@@ -20,14 +20,13 @@ use RuntimeException;
  */
 final class Operations implements \IteratorAggregate, \Countable
 {
-    private $operations;
+    private array $operations = [];
 
     /**
      * @param array<string|int, Operation> $operations
      */
     public function __construct(array $operations = [])
     {
-        $this->operations = [];
         foreach ($operations as $operationName => $operation) {
             // When we use an int-indexed array in the constructor, compute priorities
             if (\is_int($operationName)) {
@@ -42,7 +41,7 @@ final class Operations implements \IteratorAggregate, \Countable
 
     public function getIterator(): \Traversable
     {
-        return (function () {
+        return (function (): \Generator {
             foreach ($this->operations as [$operationName, $operation]) {
                 yield $operationName => $operation;
             }
@@ -95,9 +94,7 @@ final class Operations implements \IteratorAggregate, \Countable
 
     public function sort(): self
     {
-        usort($this->operations, function ($a, $b) {
-            return $a[1]->getPriority() - $b[1]->getPriority();
-        });
+        usort($this->operations, fn ($a, $b): int|float => $a[1]->getPriority() - $b[1]->getPriority());
 
         return $this;
     }

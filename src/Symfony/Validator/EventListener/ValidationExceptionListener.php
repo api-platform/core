@@ -27,15 +27,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class ValidationExceptionListener
 {
-    private $serializer;
-    private $errorFormats;
-    private $exceptionToStatus;
-
-    public function __construct(SerializerInterface $serializer, array $errorFormats, array $exceptionToStatus = [])
+    public function __construct(private readonly SerializerInterface $serializer, private readonly array $errorFormats, private readonly array $exceptionToStatus = [])
     {
-        $this->serializer = $serializer;
-        $this->errorFormats = $errorFormats;
-        $this->exceptionToStatus = $exceptionToStatus;
     }
 
     /**
@@ -47,7 +40,7 @@ final class ValidationExceptionListener
         if (!$exception instanceof ConstraintViolationListAwareExceptionInterface && !$exception instanceof FilterValidationException) {
             return;
         }
-        $exceptionClass = \get_class($exception);
+        $exceptionClass = $exception::class;
         $statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
 
         foreach ($this->exceptionToStatus as $class => $status) {

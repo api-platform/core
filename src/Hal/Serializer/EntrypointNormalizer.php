@@ -32,19 +32,14 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 {
     public const FORMAT = 'jsonhal';
 
-    private $resourceMetadataFactory;
-    private $iriConverter;
-    private $urlGenerator;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly IriConverterInterface $iriConverter, private readonly UrlGeneratorInterface $urlGenerator)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->iriConverter = $iriConverter;
-        $this->urlGenerator = $urlGenerator;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @return array{_links: array<string, array{href: string|null}>&mixed[]}
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {

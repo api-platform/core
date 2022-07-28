@@ -24,15 +24,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class LinkFactory implements LinkFactoryInterface
 {
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-    private $resourceClassResolver;
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver)
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface $resourceClassResolver)
     {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     /**
@@ -102,7 +95,7 @@ final class LinkFactory implements LinkFactoryInterface
                     $links[] = $attributeLink;
                 }
             }
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
         }
 
         return $links;
@@ -117,7 +110,7 @@ final class LinkFactory implements LinkFactoryInterface
             $link = $link->withIdentifiers($this->getIdentifiersFromResourceClass($link->getFromClass()));
         }
 
-        if (1 < \count($link->getIdentifiers())) {
+        if (1 < \count((array) $link->getIdentifiers())) {
             $link = $link->withCompositeIdentifier(true);
         }
 

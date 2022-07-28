@@ -71,6 +71,8 @@ trait PropertyHelperTrait
      * Returns an array with the following keys:
      *   - associations: array of associations according to nesting order
      *   - field: string holding the actual field (leaf node)
+     *
+     * @return array{associations: string[], field: string}
      */
     protected function splitPropertyParts(string $property, string $resourceClass): array
     {

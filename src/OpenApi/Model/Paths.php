@@ -17,7 +17,7 @@ final class Paths
 {
     private $paths;
 
-    public function addPath(string $path, PathItem $pathItem)
+    public function addPath(string $path, PathItem $pathItem): void
     {
         $this->paths[$path] = $pathItem;
 

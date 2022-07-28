@@ -36,13 +36,8 @@ class_exists(AbstractPaginator::class);
  */
 final class PaginationExtension implements QueryResultCollectionExtensionInterface
 {
-    private ManagerRegistry $managerRegistry;
-    private ?Pagination $pagination;
-
-    public function __construct(ManagerRegistry $managerRegistry, Pagination $pagination)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly ?Pagination $pagination)
     {
-        $this->managerRegistry = $managerRegistry;
-        $this->pagination = $pagination;
     }
 
     /**

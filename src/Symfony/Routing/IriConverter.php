@@ -50,18 +50,9 @@ final class IriConverter implements IriConverterInterface
     use ResourceClassInfoTrait;
     use UriVariablesResolverTrait;
 
-    private $provider;
-    private $router;
-    private $identifiersExtractor;
-    private $resourceMetadataCollectionFactory;
-
-    public function __construct(ProviderInterface $provider, RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null)
+    public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null)
     {
-        $this->provider = $provider;
-        $this->router = $router;
         $this->uriVariablesConverter = $uriVariablesConverter;
-        $this->identifiersExtractor = $identifiersExtractor;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         // For the ResourceClassInfoTrait
         $this->resourceClassResolver = $resourceClassResolver;
         $this->resourceMetadataFactory = $resourceMetadataCollectionFactory;
@@ -78,7 +69,7 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
         }
 
-        $parameters['_api_operation_name'] = $parameters['_api_operation_name'] ?? null;
+        $parameters['_api_operation_name'] ??= null;
 
         if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'])) {
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));

@@ -29,20 +29,15 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class OpenApiCommand extends Command
 {
-    private OpenApiFactoryInterface $openApiFactory;
-    private NormalizerInterface $normalizer;
-
-    public function __construct(OpenApiFactoryInterface $openApiFactory, NormalizerInterface $normalizer)
+    public function __construct(private readonly OpenApiFactoryInterface $openApiFactory, private readonly NormalizerInterface $normalizer)
     {
         parent::__construct();
-        $this->openApiFactory = $openApiFactory;
-        $this->normalizer = $normalizer;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Dump the Open API documentation')

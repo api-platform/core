@@ -27,22 +27,10 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class Paginator implements \IteratorAggregate, PaginatorInterface
 {
-    private DenormalizerInterface $denormalizer;
-    private array $documents;
-    private string $resourceClass;
-    private int $limit;
-    private int $offset;
     private array $cachedDenormalizedDocuments = [];
-    private array $denormalizationContext = [];
 
-    public function __construct(DenormalizerInterface $denormalizer, array $documents, string $resourceClass, int $limit, int $offset, array $denormalizationContext = [])
+    public function __construct(private readonly DenormalizerInterface $denormalizer, private readonly array $documents, private readonly string $resourceClass, private readonly int $limit, private readonly int $offset, private readonly array $denormalizationContext = [])
     {
-        $this->denormalizer = $denormalizer;
-        $this->documents = $documents;
-        $this->resourceClass = $resourceClass;
-        $this->limit = $limit;
-        $this->offset = $offset;
-        $this->denormalizationContext = $denormalizationContext;
     }
 
     /**

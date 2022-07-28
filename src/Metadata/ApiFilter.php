@@ -25,12 +25,12 @@ use ApiPlatform\Exception\InvalidArgumentException;
 final class ApiFilter
 {
     /**
-     * @var string
+     * @var string|null
      */
     public $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     public $strategy;
 

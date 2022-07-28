@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema\Command;
 
 use ApiPlatform\JsonSchema\Schema;
-use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -31,12 +30,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class JsonSchemaGenerateCommand extends Command
 {
-    private SchemaFactoryInterface $schemaFactory;
-    private $formats;
+    // @noRector
+    private array $formats;
 
-    public function __construct($schemaFactory, array $formats)
+    public function __construct(private $schemaFactory, array $formats)
     {
-        $this->schemaFactory = $schemaFactory;
         $this->formats = array_keys($formats);
 
         parent::__construct();
@@ -45,7 +43,7 @@ final class JsonSchemaGenerateCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Generates the JSON Schema for a resource operation.')

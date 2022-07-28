@@ -89,6 +89,9 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
     }
 
+    /**
+     * @return array{shortName: bool|int|string|mixed[]|null, description: bool|int|string|mixed[]|null, urlGenerationStrategy: bool|int|string|mixed[]|null, deprecationReason: bool|int|string|mixed[]|null, elasticsearch: bool|int|string|mixed[]|null, fetchPartial: bool|int|string|mixed[]|null, forceEager: bool|int|string|mixed[]|null, paginationClientEnabled: bool|int|string|mixed[]|null, paginationClientItemsPerPage: bool|int|string|mixed[]|null, paginationClientPartial: bool|int|string|mixed[]|null, paginationEnabled: bool|int|string|mixed[]|null, paginationFetchJoinCollection: bool|int|string|mixed[]|null, paginationUseOutputWalkers: bool|int|string|mixed[]|null, paginationItemsPerPage: bool|int|string|mixed[]|null, paginationMaximumItemsPerPage: bool|int|string|mixed[]|null, paginationPartial: bool|int|string|mixed[]|null, paginationType: bool|int|string|mixed[]|null, processor: bool|int|string|mixed[]|null, provider: bool|int|string|mixed[]|null, security: bool|int|string|mixed[]|null, securityMessage: bool|int|string|mixed[]|null, securityPostDenormalize: bool|int|string|mixed[]|null, securityPostDenormalizeMessage: bool|int|string|mixed[]|null, securityPostValidation: bool|int|string|mixed[]|null, securityPostValidationMessage: bool|int|string|mixed[]|null, input: bool|int|string|mixed[]|null, output: bool|int|string|mixed[]|null, normalizationContext: mixed[]|null, denormalizationContext: mixed[]|null, validationContext: mixed[]|null, filters: mixed[]|null, order: mixed[]|null, extraProperties: mixed[]|null, mercure: bool|string|string[]|null, messenger: bool|string|mixed[]|null, read: bool|int|string|mixed[]|null, write: bool|int|string|mixed[]|null, uriTemplate: mixed[]|bool|int|string|null, routePrefix: mixed[]|bool|int|string|null, stateless: mixed[]|bool|int|string|null, sunset: mixed[]|bool|int|string|null, acceptPatch: mixed[]|bool|int|string|null, host: mixed[]|bool|int|string|null, condition: mixed[]|bool|int|string|null, controller: mixed[]|bool|int|string|null, queryParameterValidationEnabled: mixed[]|bool|int|string|null, types: mixed[]|null, cacheHeaders: mixed[]|null, hydraContext: mixed[]|null, openapiContext: mixed[]|null, paginationViaCursor: mixed[]|null, exceptionToStatus: mixed[]|null, defaults: mixed[]|null, requirements: mixed[]|null, options: mixed[]|null, status: mixed[]|bool|int|string|null, schemes: mixed[]|null, formats: mixed[]|null, uriVariables: mixed[]|null, inputFormats: mixed[]|null, outputFormats: mixed[]|null}
+     */
     private function buildExtendedBase(array $resource): array
     {
         return array_merge($this->buildBase($resource), [
@@ -119,6 +122,9 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         ]);
     }
 
+    /**
+     * @return array{shortName: mixed[]|bool|int|string|null, description: mixed[]|bool|int|string|null, urlGenerationStrategy: mixed[]|bool|int|string|null, deprecationReason: mixed[]|bool|int|string|null, elasticsearch: mixed[]|bool|int|string|null, fetchPartial: mixed[]|bool|int|string|null, forceEager: mixed[]|bool|int|string|null, paginationClientEnabled: mixed[]|bool|int|string|null, paginationClientItemsPerPage: mixed[]|bool|int|string|null, paginationClientPartial: mixed[]|bool|int|string|null, paginationEnabled: mixed[]|bool|int|string|null, paginationFetchJoinCollection: mixed[]|bool|int|string|null, paginationUseOutputWalkers: mixed[]|bool|int|string|null, paginationItemsPerPage: mixed[]|bool|int|string|null, paginationMaximumItemsPerPage: mixed[]|bool|int|string|null, paginationPartial: mixed[]|bool|int|string|null, paginationType: mixed[]|bool|int|string|null, processor: mixed[]|bool|int|string|null, provider: mixed[]|bool|int|string|null, security: mixed[]|bool|int|string|null, securityMessage: mixed[]|bool|int|string|null, securityPostDenormalize: mixed[]|bool|int|string|null, securityPostDenormalizeMessage: mixed[]|bool|int|string|null, securityPostValidation: mixed[]|bool|int|string|null, securityPostValidationMessage: mixed[]|bool|int|string|null, input: mixed[]|bool|int|string|null, output: mixed[]|bool|int|string|null, normalizationContext: mixed[]|null, denormalizationContext: mixed[]|null, validationContext: mixed[]|null, filters: mixed[]|null, order: mixed[]|null, extraProperties: mixed[]|null, mercure: string[]|bool|string|null, messenger: mixed[]|bool|string|null, read: mixed[]|bool|int|string|null, write: mixed[]|bool|int|string|null}
+     */
     private function buildBase(array $resource): array
     {
         return [
@@ -175,7 +181,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 continue;
             }
 
-            if (2 === \count($data) && isset($data[0]) && isset($data[1])) {
+            if (2 === (is_countable($data) ? \count($data) : 0) && isset($data[0]) && isset($data[1])) {
                 $data['fromClass'] = $data[0];
                 $data['fromProperty'] = $data[1];
                 unset($data[0], $data[1]);

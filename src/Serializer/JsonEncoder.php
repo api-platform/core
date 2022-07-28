@@ -26,14 +26,9 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder as BaseJsonEncoder;
  */
 final class JsonEncoder implements EncoderInterface, DecoderInterface
 {
-    private $format;
-    private $jsonEncoder;
-
-    public function __construct(string $format, BaseJsonEncoder $jsonEncoder = null)
+    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
+    public function __construct(private readonly string $format, private ?BaseJsonEncoder $jsonEncoder = null)
     {
-        $this->format = $format;
-        $this->jsonEncoder = $jsonEncoder;
-
         if (null !== $this->jsonEncoder) {
             return;
         }

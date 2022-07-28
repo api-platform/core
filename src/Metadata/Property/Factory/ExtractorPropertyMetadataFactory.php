@@ -26,13 +26,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    private $extractor;
-    private $decorated;
-
-    public function __construct(PropertyExtractorInterface $extractor, PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly PropertyExtractorInterface $extractor, private readonly ?PropertyMetadataFactoryInterface $decorated = null)
     {
-        $this->extractor = $extractor;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -44,7 +39,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         if ($this->decorated) {
             try {
                 $parentPropertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-            } catch (PropertyNotFoundException $propertyNotFoundException) {
+            } catch (PropertyNotFoundException) {
                 // Ignore not found exception from decorated factories
             }
         }
@@ -64,9 +59,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
         foreach ($propertyMetadata as $key => $value) {
             if ('builtinTypes' === $key && null !== $value) {
-                $value = array_map(function (string $builtinType): Type {
-                    return new Type($builtinType);
-                }, $value);
+                $value = array_map(fn (string $builtinType): Type => new Type($builtinType), $value);
             }
 
             $methodName = 'with'.ucfirst($key);

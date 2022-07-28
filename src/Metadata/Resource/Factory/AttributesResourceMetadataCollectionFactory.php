@@ -45,18 +45,12 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  */
 final class AttributesResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $defaults;
-    private $decorated;
-    private $logger;
-    private $graphQlEnabled;
-    private $camelCaseToSnakeCaseNameConverter;
+    private readonly LoggerInterface $logger;
+    private readonly CamelCaseToSnakeCaseNameConverter $camelCaseToSnakeCaseNameConverter;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, LoggerInterface $logger = null, array $defaults = [], bool $graphQlEnabled = false)
+    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, LoggerInterface $logger = null, private readonly array $defaults = [], private readonly bool $graphQlEnabled = false)
     {
-        $this->defaults = $defaults;
-        $this->decorated = $decorated;
         $this->logger = $logger ?? new NullLogger();
-        $this->graphQlEnabled = $graphQlEnabled;
         $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
@@ -72,7 +66,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
@@ -173,7 +167,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     {
         // Inherit from resource defaults
         foreach (get_class_methods($resource) as $methodName) {
-            if (0 !== strpos($methodName, 'get')) {
+            if (!str_starts_with($methodName, 'get')) {
                 continue;
             }
 
@@ -225,10 +219,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         ];
     }
 
-    /**
-     * @param ApiResource|HttpOperation|GraphQlOperation $operation
-     */
-    private function addGlobalDefaults($operation)
+    private function addGlobalDefaults(ApiResource|HttpOperation|GraphQlOperation $operation)
     {
         $extraProperties = [];
         foreach ($this->defaults as $key => $value) {

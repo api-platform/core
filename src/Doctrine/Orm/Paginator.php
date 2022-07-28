@@ -23,7 +23,7 @@ use Doctrine\ORM\Query;
  */
 final class Paginator extends AbstractPaginator implements PaginatorInterface, QueryAwareInterface
 {
-    private ?int $totalItems;
+    private ?int $totalItems = null;
 
     /**
      * {@inheritdoc}

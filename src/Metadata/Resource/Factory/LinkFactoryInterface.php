@@ -25,20 +25,16 @@ interface LinkFactoryInterface
     /**
      * Create Links by using the resource class identifiers.
      *
-     * @param ApiResource|Operation $operation
-     *
      * @return Link[]
      */
-    public function createLinksFromIdentifiers($operation);
+    public function createLinksFromIdentifiers(ApiResource|Operation $operation);
 
     /**
      * Create Links from the relations metadata information.
      *
-     * @param ApiResource|Operation $operation
-     *
      * @return Link[]
      */
-    public function createLinksFromRelations($operation);
+    public function createLinksFromRelations(ApiResource|Operation $operation);
 
     /**
      * Create Links by using PHP attribute Links found on properties.

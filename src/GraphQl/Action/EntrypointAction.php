@@ -33,33 +33,15 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class EntrypointAction
 {
-    private SchemaBuilderInterface $schemaBuilder;
-    private ExecutorInterface $executor;
-    private GraphiQlAction $graphiQlAction;
-    private GraphQlPlaygroundAction $graphQlPlaygroundAction;
-    private NormalizerInterface $normalizer;
-    private ErrorHandlerInterface $errorHandler;
     private int|bool $debug;
-    private bool $graphiqlEnabled;
-    private bool $graphQlPlaygroundEnabled;
-    private string|bool $defaultIde;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, ErrorHandlerInterface $errorHandler, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
+    public function __construct(private readonly SchemaBuilderInterface $schemaBuilder, private readonly ExecutorInterface $executor, private readonly GraphiQlAction $graphiQlAction, private readonly GraphQlPlaygroundAction $graphQlPlaygroundAction, private readonly NormalizerInterface $normalizer, private readonly ErrorHandlerInterface $errorHandler, bool $debug = false, private readonly bool $graphiqlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false, private $defaultIde = false)
     {
-        $this->schemaBuilder = $schemaBuilder;
-        $this->executor = $executor;
-        $this->graphiQlAction = $graphiQlAction;
-        $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
-        $this->normalizer = $normalizer;
-        $this->errorHandler = $errorHandler;
         if (class_exists(Debug::class)) {
             $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
         } else {
             $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
         }
-        $this->graphiqlEnabled = $graphiqlEnabled;
-        $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
-        $this->defaultIde = $defaultIde;
     }
 
     public function __invoke(Request $request): Response
@@ -129,7 +111,7 @@ final class EntrypointAction
      */
     private function parseData(?string $query, ?string $operationName, array $variables, string $jsonContent): array
     {
-        if (!\is_array($data = json_decode($jsonContent, true))) {
+        if (!\is_array($data = json_decode($jsonContent, true, 512, \JSON_THROW_ON_ERROR))) {
             throw new BadRequestHttpException('GraphQL data is not valid JSON.');
         }
 
@@ -160,7 +142,7 @@ final class EntrypointAction
         [$query, $operationName, $variables] = $this->parseData($query, $operationName, $variables, $operations);
 
         /** @var string $map */
-        if (!\is_array($decodedMap = json_decode($map, true))) {
+        if (!\is_array($decodedMap = json_decode($map, true, 512, \JSON_THROW_ON_ERROR))) {
             throw new BadRequestHttpException('GraphQL multipart request map is not valid JSON.');
         }
 
@@ -180,7 +162,7 @@ final class EntrypointAction
             }
 
             foreach ($map[$key] as $mapValue) {
-                $path = explode('.', $mapValue);
+                $path = explode('.', (string) $mapValue);
 
                 if ('variables' !== $path[0]) {
                     throw new BadRequestHttpException('GraphQL multipart request path in map is invalid.');
@@ -188,9 +170,7 @@ final class EntrypointAction
 
                 unset($path[0]);
 
-                $mapPathExistsInVariables = array_reduce($path, static function (array $inVariables, string $pathElement) {
-                    return \array_key_exists($pathElement, $inVariables) ? $inVariables[$pathElement] : false;
-                }, $variables);
+                $mapPathExistsInVariables = array_reduce($path, static fn (array $inVariables, string $pathElement) => \array_key_exists($pathElement, $inVariables) ? $inVariables[$pathElement] : false, $variables);
 
                 if (false === $mapPathExistsInVariables) {
                     throw new BadRequestHttpException('GraphQL multipart request path in map does not match the variables.');
@@ -212,7 +192,7 @@ final class EntrypointAction
      */
     private function decodeVariables(string $variables): array
     {
-        if (!\is_array($decoded = json_decode($variables, true))) {
+        if (!\is_array($decoded = json_decode($variables, true, 512, \JSON_THROW_ON_ERROR))) {
             throw new BadRequestHttpException('GraphQL variables are not valid JSON.');
         }
 

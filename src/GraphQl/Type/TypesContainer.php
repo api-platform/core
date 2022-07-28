@@ -22,7 +22,7 @@ use GraphQL\Type\Definition\Type as GraphQLType;
  */
 final class TypesContainer implements TypesContainerInterface
 {
-    private $graphqlTypes = [];
+    private array $graphqlTypes = [];
 
     /**
      * {@inheritdoc}

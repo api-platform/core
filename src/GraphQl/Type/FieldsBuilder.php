@@ -29,6 +29,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Util\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use GraphQL\Type\Definition\WrappingType;
@@ -45,43 +47,14 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class FieldsBuilder implements FieldsBuilderInterface
 {
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-    private $resourceMetadataCollectionFactory;
-    private $resourceClassResolver;
-    private $typesContainer;
-    private $typeBuilder;
-    private $typeConverter;
-    private $itemResolverFactory;
-    private $collectionResolverFactory;
-    private $itemMutationResolverFactory;
-    private $itemSubscriptionResolverFactory;
-    private $filterLocator;
-    private $pagination;
-    private $nameConverter;
-    private $nestingSeparator;
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ResolverFactoryInterface $itemSubscriptionResolverFactory, ContainerInterface $filterLocator, Pagination $pagination, ?NameConverterInterface $nameConverter, string $nestingSeparator)
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, private readonly TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ResolverFactoryInterface $collectionResolverFactory, private readonly ResolverFactoryInterface $itemMutationResolverFactory, private readonly ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator)
     {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->resourceClassResolver = $resourceClassResolver;
-        $this->typesContainer = $typesContainer;
-        $this->typeBuilder = $typeBuilder;
-        $this->typeConverter = $typeConverter;
-        $this->itemResolverFactory = $itemResolverFactory;
-        $this->collectionResolverFactory = $collectionResolverFactory;
-        $this->itemMutationResolverFactory = $itemMutationResolverFactory;
-        $this->itemSubscriptionResolverFactory = $itemSubscriptionResolverFactory;
-        $this->filterLocator = $filterLocator;
-        $this->pagination = $pagination;
-        $this->nameConverter = $nameConverter;
-        $this->nestingSeparator = $nestingSeparator;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @return array{type: InterfaceType, args: array{id: array{type: NonNull}}, resolve: callable}
      */
     public function getNodeQueryFields(): array
     {
@@ -324,7 +297,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                     $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
                     try {
                         $operation = $resourceMetadataCollection->getOperation(null, true);
-                    } catch (OperationNotFoundException $e) {
+                    } catch (OperationNotFoundException) {
                     }
                 }
 
@@ -348,7 +321,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 'resolve' => $resolve,
                 'deprecationReason' => $deprecationReason,
             ];
-        } catch (InvalidTypeException $e) {
+        } catch (InvalidTypeException) {
             // just ignore invalid types
         }
 
@@ -415,7 +388,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
                 $graphqlFilterType = $this->convertType($filterType, false, $rootOperation, $resourceClass, $rootResource, $property, $depth);
 
-                if ('[]' === substr($key, -2)) {
+                if (str_ends_with($key, '[]')) {
                     $graphqlFilterType = GraphQLType::listOf($graphqlFilterType);
                     $key = substr($key, 0, -2).'_list';
                 }
@@ -427,7 +400,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 if (\array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
                     $parsed = [$key => ''];
                 }
-                array_walk_recursive($parsed, static function (&$value) use ($graphqlFilterType) {
+                array_walk_recursive($parsed, static function (&$value) use ($graphqlFilterType): void {
                     $value = $graphqlFilterType;
                 });
                 $args = $this->mergeFilterArgs($args, $parsed, $operation, $key);
@@ -441,7 +414,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
      * @param AbstractOperation|null $operation
      * @param mixed                  $original
      */
-    private function mergeFilterArgs(array $args, array $parsed, $operation = null, $original = ''): array
+    private function mergeFilterArgs(array $args, array $parsed, $operation = null, string $original = ''): array
     {
         foreach ($parsed as $key => $value) {
             // Never override keys that cannot be merged

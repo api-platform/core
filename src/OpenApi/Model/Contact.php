@@ -17,15 +17,8 @@ final class Contact
 {
     use ExtensionTrait;
 
-    private $name;
-    private $url;
-    private $email;
-
-    public function __construct(string $name = null, string $url = null, string $email = null)
+    public function __construct(private ?string $name = null, private ?string $url = null, private ?string $email = null)
     {
-        $this->name = $name;
-        $this->url = $url;
-        $this->email = $email;
     }
 
     public function getName(): ?string

@@ -40,19 +40,12 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
     public const FORMAT = 'jsonld';
     public const IRI_ONLY = 'iri_only';
-
-    private $contextBuilder;
-    private $resourceClassResolver;
-    private $iriConverter;
-    private $defaultContext = [
+    private array $defaultContext = [
         self::IRI_ONLY => false,
     ];
 
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, array $defaultContext = [])
+    public function __construct(private ContextBuilderInterface $contextBuilder, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, array $defaultContext = [])
     {
-        $this->contextBuilder = $contextBuilder;
-        $this->resourceClassResolver = $resourceClassResolver;
-        $this->iriConverter = $iriConverter;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 

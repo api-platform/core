@@ -26,14 +26,11 @@ use ApiPlatform\Util\ClassInfoTrait;
 final class ResourceClassResolver implements ResourceClassResolverInterface
 {
     use ClassInfoTrait;
+    private array $localIsResourceClassCache = [];
+    private array $localMostSpecificResourceClassCache = [];
 
-    private $resourceNameCollectionFactory;
-    private $localIsResourceClassCache = [];
-    private $localMostSpecificResourceClassCache = [];
-
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
     /**

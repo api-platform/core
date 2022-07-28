@@ -26,16 +26,13 @@ final class VarnishPurger implements PurgerInterface
 {
     private const DEFAULT_VARNISH_MAX_HEADER_LENGTH = 8000;
     private const REGEXP_PATTERN = '(%s)($|\,)';
-
-    private $clients;
-    private $maxHeaderLength;
+    private readonly int $maxHeaderLength;
 
     /**
      * @param HttpClientInterface[] $clients
      */
-    public function __construct(array $clients, int $maxHeaderLength = self::DEFAULT_VARNISH_MAX_HEADER_LENGTH)
+    public function __construct(private readonly array $clients, int $maxHeaderLength = self::DEFAULT_VARNISH_MAX_HEADER_LENGTH)
     {
-        $this->clients = $clients;
         $this->maxHeaderLength = $maxHeaderLength - mb_strlen(self::REGEXP_PATTERN) + 2; // 2 for %s
     }
 
@@ -69,7 +66,7 @@ final class VarnishPurger implements PurgerInterface
     /**
      * {@inheritdoc}
      */
-    public function purge(array $iris)
+    public function purge(array $iris): void
     {
         if (!$iris) {
             return;
@@ -91,13 +88,11 @@ final class VarnishPurger implements PurgerInterface
         return ['Cache-Tags' => implode(',', $iris)];
     }
 
-    private function purgeRequest(array $iris)
+    private function purgeRequest(array $iris): void
     {
         // Create the regex to purge all tags in just one request
-        $parts = array_map(static function ($iri) {
-            // here we should remove the prefix as it's not discriminent and cost a lot to compute
-            return preg_quote($iri);
-        }, $iris);
+        $parts = array_map(static fn ($iri): string => // here we should remove the prefix as it's not discriminent and cost a lot to compute
+preg_quote($iri), $iris);
 
         foreach ($this->chunkRegexParts($parts) as $regex) {
             $regex = sprintf(self::REGEXP_PATTERN, $regex);

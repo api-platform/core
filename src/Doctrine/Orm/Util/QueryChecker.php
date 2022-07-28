@@ -92,9 +92,9 @@ final class QueryChecker
     public static function hasOrderByOnFetchJoinedToManyAssociation(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         if (
-            0 === \count($selectParts = $queryBuilder->getDQLPart('select')) ||
-            0 === \count($queryBuilder->getDQLPart('join')) ||
-            0 === \count($orderByParts = $queryBuilder->getDQLPart('orderBy'))
+            0 === (is_countable($selectParts = $queryBuilder->getDQLPart('select')) ? \count($selectParts = $queryBuilder->getDQLPart('select')) : 0) ||
+            0 === (is_countable($queryBuilder->getDQLPart('join')) ? \count($queryBuilder->getDQLPart('join')) : 0) ||
+            0 === (is_countable($orderByParts = $queryBuilder->getDQLPart('orderBy')) ? \count($orderByParts = $queryBuilder->getDQLPart('orderBy')) : 0)
         ) {
             return false;
         }
@@ -105,7 +105,7 @@ final class QueryChecker
 
         foreach ($selectParts as $select) {
             foreach ($select->getParts() as $part) {
-                [$alias] = explode('.', $part);
+                [$alias] = explode('.', (string) $part);
 
                 $selectAliases[] = $alias;
             }
@@ -120,8 +120,8 @@ final class QueryChecker
 
         foreach ($orderByParts as $orderBy) {
             foreach ($orderBy->getParts() as $part) {
-                if (str_contains($part, '.')) {
-                    [$alias] = explode('.', $part);
+                if (str_contains((string) $part, '.')) {
+                    [$alias] = explode('.', (string) $part);
 
                     $orderByAliases[] = $alias;
                 }
@@ -172,7 +172,7 @@ final class QueryChecker
     public static function hasJoinedToManyAssociation(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         if (
-            0 === \count($queryBuilder->getDQLPart('join'))
+            0 === (is_countable($queryBuilder->getDQLPart('join')) ? \count($queryBuilder->getDQLPart('join')) : 0)
         ) {
             return false;
         }

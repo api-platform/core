@@ -35,13 +35,8 @@ final class DeserializeListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'deserialize';
 
-    private $serializer;
-    private $serializerContextBuilder;
-
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
     {
-        $this->serializer = $serializer;
-        $this->serializerContextBuilder = $serializerContextBuilder;
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
 

@@ -21,13 +21,8 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $linkFactory;
-    private $decorated;
-
-    public function __construct(LinkFactoryInterface $linkFactory, ResourceMetadataCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly LinkFactoryInterface $linkFactory, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
-        $this->linkFactory = $linkFactory;
-        $this->decorated = $decorated;
     }
 
     /**

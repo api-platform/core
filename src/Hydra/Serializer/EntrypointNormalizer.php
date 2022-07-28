@@ -32,15 +32,8 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 {
     public const FORMAT = 'jsonld';
 
-    private $resourceMetadataFactory;
-    private $iriConverter;
-    private $urlGenerator;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly IriConverterInterface $iriConverter, private readonly UrlGeneratorInterface $urlGenerator)
     {
-        $this->iriConverter = $iriConverter;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->urlGenerator = $urlGenerator;
     }
 
     /**

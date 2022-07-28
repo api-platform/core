@@ -29,15 +29,8 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     public const FORMAT = 'jsonld';
 
-    private $decorated;
-    private $iriConverter;
-    private $anonymousContextBuilder;
-
-    public function __construct(NormalizerInterface $decorated, IriConverterInterface $iriConverter, AnonymousContextBuilderInterface $anonymousContextBuilder)
+    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter, private AnonymousContextBuilderInterface $anonymousContextBuilder)
     {
-        $this->decorated = $decorated;
-        $this->iriConverter = $iriConverter;
-        $this->anonymousContextBuilder = $anonymousContextBuilder;
     }
 
     /**
@@ -86,7 +79,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         if (isset($originalResource)) {
             try {
                 $context['output']['iri'] = $this->iriConverter->getIriFromResource($originalResource);
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException) {
                 // The original resource has no identifiers
             }
             $context['api_resource'] = $originalResource;

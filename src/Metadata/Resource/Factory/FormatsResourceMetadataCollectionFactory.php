@@ -34,15 +34,8 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class FormatsResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $decorated;
-    private $formats;
-    private $patchFormats;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated, array $formats, array $patchFormats)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly array $formats, private readonly array $patchFormats)
     {
-        $this->decorated = $decorated;
-        $this->formats = $formats;
-        $this->patchFormats = $patchFormats;
     }
 
     /**
@@ -116,11 +109,9 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
     }
 
     /**
-     * @param array|string $currentFormats
-     *
      * @throws InvalidArgumentException
      */
-    private function normalizeFormats($currentFormats): array
+    private function normalizeFormats(array|string $currentFormats): array
     {
         $currentFormats = (array) $currentFormats;
 

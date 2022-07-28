@@ -32,7 +32,7 @@ final class MetadataAwareNameConverterPass implements CompilerPassInterface
      *
      * @throws RuntimeException
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('serializer.name_converter.metadata_aware')) {
             return;

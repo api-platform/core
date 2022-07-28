@@ -62,7 +62,7 @@ final class ArrayItems implements ValidatorInterface
 
         $collectionFormat = $filterDescription['swagger']['collectionFormat'] ?? 'csv';
 
-        return explode(self::getSeparator($collectionFormat), $value) ?: []; // @phpstan-ignore-line
+        return explode(self::getSeparator($collectionFormat), (string) $value) ?: []; // @phpstan-ignore-line
     }
 
     /**
@@ -70,17 +70,12 @@ final class ArrayItems implements ValidatorInterface
      */
     private static function getSeparator(string $collectionFormat): string
     {
-        switch ($collectionFormat) {
-            case 'csv':
-                return ',';
-            case 'ssv':
-                return ' ';
-            case 'tsv':
-                return '\t';
-            case 'pipes':
-                return '|';
-            default:
-                throw new \InvalidArgumentException(sprintf('Unknown collection format %s', $collectionFormat));
-        }
+        return match ($collectionFormat) {
+            'csv' => ',',
+            'ssv' => ' ',
+            'tsv' => '\t',
+            'pipes' => '|',
+            default => throw new \InvalidArgumentException(sprintf('Unknown collection format %s', $collectionFormat)),
+        };
     }
 }

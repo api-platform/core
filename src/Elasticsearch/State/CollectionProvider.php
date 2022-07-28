@@ -33,30 +33,17 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class CollectionProvider implements ProviderInterface
 {
-    private Client $client;
-    private DocumentMetadataFactoryInterface $documentMetadataFactory;
-    private DenormalizerInterface $denormalizer;
-    private Pagination $pagination;
-    private iterable $collectionExtensions;
-
     /**
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, DenormalizerInterface $denormalizer, Pagination $pagination, iterable $collectionExtensions = [])
+    public function __construct(private readonly Client $client, private readonly DocumentMetadataFactoryInterface $documentMetadataFactory, private readonly DenormalizerInterface $denormalizer, private readonly Pagination $pagination, private readonly iterable $collectionExtensions = [])
     {
-        $this->client = $client;
-        $this->documentMetadataFactory = $documentMetadataFactory;
-
-        $this->denormalizer = $denormalizer;
-        $this->pagination = $pagination;
-
-        $this->collectionExtensions = $collectionExtensions;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): Paginator
     {
         $resourceClass = $operation->getClass();
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
@@ -70,8 +57,8 @@ final class CollectionProvider implements ProviderInterface
             $body['query'] = ['match_all' => new \stdClass()];
         }
 
-        $limit = $body['size'] = $body['size'] ?? $this->pagination->getLimit($operation, $context);
-        $offset = $body['from'] = $body['from'] ?? $this->pagination->getOffset($operation, $context);
+        $limit = $body['size'] ??= $this->pagination->getLimit($operation, $context);
+        $offset = $body['from'] ??= $this->pagination->getOffset($operation, $context);
 
         $params = [
             'index' => $documentMetadata->getIndex(),

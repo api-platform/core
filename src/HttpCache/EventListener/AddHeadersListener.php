@@ -29,24 +29,9 @@ final class AddHeadersListener
 {
     use OperationRequestInitiatorTrait;
 
-    private $etag;
-    private $maxAge;
-    private $sharedMaxAge;
-    private $vary;
-    private $public;
-    private $staleWhileRevalidate;
-    private $staleIfError;
-
-    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, int $staleWhileRevalidate = null, int $staleIfError = null)
+    public function __construct(private readonly bool $etag = false, private readonly ?int $maxAge = null, private readonly ?int $sharedMaxAge = null, private readonly ?array $vary = null, private readonly ?bool $public = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?int $staleWhileRevalidate = null, private readonly ?int $staleIfError = null)
     {
-        $this->etag = $etag;
-        $this->maxAge = $maxAge;
-        $this->sharedMaxAge = $sharedMaxAge;
-        $this->vary = $vary;
-        $this->public = $public;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->staleWhileRevalidate = $staleWhileRevalidate;
-        $this->staleIfError = $staleIfError;
     }
 
     public function onKernelResponse(ResponseEvent $event): void

@@ -29,9 +29,9 @@ use Symfony\Component\PropertyInfo\Type;
  */
 trait FieldDatatypeTrait
 {
-    private PropertyMetadataFactoryInterface $propertyMetadataFactory;
+    private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory;
 
-    private ResourceClassResolverInterface $resourceClassResolver;
+    private readonly ResourceClassResolverInterface $resourceClassResolver;
 
     /**
      * Is the decomposed given property of the given resource class potentially mapped as a nested field in Elasticsearch?
@@ -55,7 +55,7 @@ trait FieldDatatypeTrait
 
         try {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $currentProperty);
-        } catch (PropertyNotFoundException $e) {
+        } catch (PropertyNotFoundException) {
             return null;
         }
 

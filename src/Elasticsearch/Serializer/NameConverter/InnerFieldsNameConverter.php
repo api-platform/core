@@ -26,11 +26,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
 {
-    private NameConverterInterface $decorated;
-
-    public function __construct(?NameConverterInterface $decorated = null)
+    public function __construct(private readonly NameConverterInterface $decorated = new CamelCaseToSnakeCaseNameConverter())
     {
-        $this->decorated = $decorated ?? new CamelCaseToSnakeCaseNameConverter();
     }
 
     /**
@@ -49,7 +46,7 @@ final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
         return $this->convertInnerFields($propertyName, false, $class, $format, $context);
     }
 
-    private function convertInnerFields(string $propertyName, bool $normalization, string $class = null, string $format = null, $context = []): string
+    private function convertInnerFields(string $propertyName, bool $normalization, string $class = null, string $format = null, array $context = []): string
     {
         $convertedProperties = [];
 

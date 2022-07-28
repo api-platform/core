@@ -35,18 +35,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractSearchFilter extends AbstractFilter implements ConstantScoreFilterInterface
 {
-    protected $iriConverter;
-    protected $propertyAccessor;
-
     /**
      * {@inheritdoc}
      */
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected IriConverterInterface $iriConverter, protected PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
-
-        $this->iriConverter = $iriConverter;
-        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -169,7 +163,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
             $item = $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => false]);
 
             return $this->propertyAccessor->getValue($item, $property);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
         }
 
         return $iri;

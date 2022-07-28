@@ -30,21 +30,20 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     public const FORMAT = 'jsonproblem';
     public const TYPE = 'type';
     public const TITLE = 'title';
-
-    private $debug;
-    private $defaultContext = [
+    private array $defaultContext = [
         self::TYPE => 'https://tools.ietf.org/html/rfc2616#section-10',
         self::TITLE => 'An error occurred',
     ];
 
-    public function __construct(bool $debug = false, array $defaultContext = [])
+    public function __construct(private readonly bool $debug = false, array $defaultContext = [])
     {
-        $this->debug = $debug;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @return array{type: mixed, title: mixed, detail: string, trace?: mixed}
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {

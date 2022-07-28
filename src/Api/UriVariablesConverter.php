@@ -26,19 +26,11 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class UriVariablesConverter implements UriVariablesConverterInterface
 {
-    private PropertyMetadataFactoryInterface $propertyMetadataFactory;
-    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
-    /** @var iterable<UriVariableTransformerInterface> */
-    private $uriVariableTransformers;
-
     /**
      * @param iterable<UriVariableTransformerInterface> $uriVariableTransformers
      */
-    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, iterable $uriVariableTransformers)
+    public function __construct(private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly iterable $uriVariableTransformers)
     {
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->uriVariableTransformers = $uriVariableTransformers;
     }
 
     /**

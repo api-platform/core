@@ -25,11 +25,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
-    private $nameConverter;
-
-    public function __construct(?NameConverterInterface $nameConverter)
+    public function __construct(private readonly ?NameConverterInterface $nameConverter)
     {
-        $this->nameConverter = $nameConverter;
     }
 
     public function create(?string $resourceClass, Operation $operation, array $resolverContext, bool $normalization): array

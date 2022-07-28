@@ -26,13 +26,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
  */
 final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory;
-    private ?DocumentMetadataFactoryInterface $decorated;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ?DocumentMetadataFactoryInterface $decorated = null)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -45,7 +40,7 @@ final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryI
         if ($this->decorated) {
             try {
                 $documentMetadata = $this->decorated->create($resourceClass);
-            } catch (IndexNotFoundException $e) {
+            } catch (IndexNotFoundException) {
             }
         }
 
@@ -62,7 +57,7 @@ final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryI
         }
 
         if (!$documentMetadata || DocumentMetadata::DEFAULT_TYPE === $documentMetadata->getType()) {
-            $resourceMetadata = $resourceMetadata ?? $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadata ??= $this->resourceMetadataFactory->create($resourceClass);
             $type = $resourceMetadata->getOperation()->getExtraProperties()['elasticsearch_type'] ?? null;
 
             if (null !== $type) {

@@ -32,15 +32,8 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
     public const ITEM_RESOURCE_CLASS_KEY = '#itemResourceClass';
     public const ITEM_IDENTIFIERS_KEY = '#itemIdentifiers';
 
-    private $decorated;
-    private $iriConverter;
-    private $identifiersExtractor;
-
-    public function __construct(NormalizerInterface $decorated, IriConverterInterface $iriConverter, IdentifiersExtractorInterface $identifiersExtractor)
+    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter, private readonly IdentifiersExtractorInterface $identifiersExtractor)
     {
-        $this->decorated = $decorated;
-        $this->iriConverter = $iriConverter;
-        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     /**

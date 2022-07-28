@@ -26,91 +26,7 @@ class ApiResource
 {
     use WithResourceTrait;
 
-    protected $operations;
-    protected $uriTemplate;
-    protected $shortName;
-    protected $description;
-    protected $types;
-    /**
-     * @var array|mixed|string|null
-     */
-    protected $formats;
-    /**
-     * @var array|mixed|string|null
-     */
-    protected $inputFormats;
-    /**
-     * @var array|mixed|string|null
-     */
-    protected $outputFormats;
-    /**
-     * @var array<string, Link>|array<string, array>|string[]|string|null
-     */
-    protected $uriVariables;
-    protected $routePrefix;
-    protected $defaults;
-    protected $requirements;
-    protected $options;
-    protected $stateless;
-    protected $sunset;
-    protected $acceptPatch;
-
-    protected $status;
-    protected $host;
-    protected $schemes;
-    protected $condition;
-    protected $controller;
-    protected $class;
-    protected $urlGenerationStrategy;
-    protected $deprecationReason;
-    protected $cacheHeaders;
-    protected $normalizationContext;
-    protected $denormalizationContext;
-    /**
-     * @var string[]|null
-     */
-    protected $hydraContext;
-    protected $openapiContext;
-    protected $validationContext;
-    /**
-     * @var string[]
-     */
-    protected $filters;
-    protected $elasticsearch;
-    /**
-     * @var array|bool|mixed|null
-     */
-    protected $mercure;
-    /**
-     * @var bool|mixed|null
-     */
-    protected $messenger;
-    protected $input;
-    protected $output;
-    protected $order;
-    protected $fetchPartial;
-    protected $forceEager;
-    protected $paginationClientEnabled;
-    protected $paginationClientItemsPerPage;
-    protected $paginationClientPartial;
-    protected $paginationViaCursor;
-    protected $paginationEnabled;
-    protected $paginationFetchJoinCollection;
-    protected $paginationUseOutputWalkers;
-    protected $paginationItemsPerPage;
-    protected $paginationMaximumItemsPerPage;
-    protected $paginationPartial;
-    protected $paginationType;
-    protected $security;
-    protected $securityMessage;
-    protected $securityPostDenormalize;
-    protected $securityPostDenormalizeMessage;
-    protected $securityPostValidation;
-    protected $securityPostValidationMessage;
-    protected $compositeIdentifier;
-    protected $exceptionToStatus;
-    protected $queryParameterValidationEnabled;
-    protected $graphQlOperations;
+    protected ?Operations $operations;
     /**
      * @var string|callable|null
      */
@@ -119,180 +35,119 @@ class ApiResource
      * @var string|callable|null
      */
     protected $processor;
-    protected $extraProperties;
 
     /**
-     * @param array|null        $types                          The RDF types of this resource
-     * @param mixed|null        $operations
-     * @param array|string|null $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array|string|null $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array|string|null $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param mixed|null        $uriVariables
-     * @param string|null       $routePrefix                    https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
-     * @param string|null       $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
-     * @param string|null       $deprecationReason              https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param array|null        $cacheHeaders                   https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
-     * @param array|null        $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
-     * @param array|null        $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
-     * @param string[]|null     $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
-     * @param array|null        $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param array|null        $validationContext              https://api-platform.com/docs/core/validation/#using-validation-groups
-     * @param string[]|null     $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
-     * @param bool|null         $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
-     * @param mixed|null        $mercure                        https://api-platform.com/docs/core/mercure
-     * @param mixed|null        $messenger                      https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus
-     * @param mixed|null        $input                          https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
-     * @param mixed|null        $output                         https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
-     * @param array|null        $order                          https://api-platform.com/docs/core/default-order/#overriding-default-order
-     * @param bool|null         $fetchPartial                   https://api-platform.com/docs/core/performance/#fetch-partial
-     * @param bool|null         $forceEager                     https://api-platform.com/docs/core/performance/#force-eager
-     * @param bool|null         $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
-     * @param bool|null         $paginationClientItemsPerPage   https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3
-     * @param bool|null         $paginationClientPartial        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6
-     * @param array|null        $paginationViaCursor            https://api-platform.com/docs/core/pagination/#cursor-based-pagination
-     * @param bool|null         $paginationEnabled              https://api-platform.com/docs/core/pagination/#for-a-specific-resource
-     * @param bool|null         $paginationFetchJoinCollection  https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator
-     * @param int|null          $paginationItemsPerPage         https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page
-     * @param int|null          $paginationMaximumItemsPerPage  https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page
-     * @param bool|null         $paginationPartial              https://api-platform.com/docs/core/performance/#partial-pagination
-     * @param string|null       $paginationType                 https://api-platform.com/docs/core/graphql/#using-the-page-based-pagination
-     * @param string|null       $security                       https://api-platform.com/docs/core/security
-     * @param string|null       $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param string|null       $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param string|null       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param string            $securityPostValidation         https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validtion
-     * @param string            $securityPostValidationMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param mixed|null        $provider
-     * @param mixed|null        $processor
+     * @param array|null                                                      $types                          The RDF types of this resource
+     * @param mixed|null                                                      $operations
+     * @param array|string|null                                               $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
+     * @param array|string|null                                               $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
+     * @param array|string|null                                               $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
+     * @param array<string, Link>|array<string, mixed[]>|string[]|string|null $uriVariables
+     * @param string|null                                                     $routePrefix                    https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
+     * @param string|null                                                     $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
+     * @param string|null                                                     $deprecationReason              https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param array|null                                                      $cacheHeaders                   https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
+     * @param array|null                                                      $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
+     * @param array|null                                                      $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
+     * @param string[]|null                                                   $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
+     * @param array|null                                                      $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param array|null                                                      $validationContext              https://api-platform.com/docs/core/validation/#using-validation-groups
+     * @param string[]                                                        $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
+     * @param bool|null                                                       $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
+     * @param mixed|null                                                      $mercure                        https://api-platform.com/docs/core/mercure
+     * @param mixed|null                                                      $messenger                      https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus
+     * @param mixed|null                                                      $input                          https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
+     * @param mixed|null                                                      $output                         https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
+     * @param array|null                                                      $order                          https://api-platform.com/docs/core/default-order/#overriding-default-order
+     * @param bool|null                                                       $fetchPartial                   https://api-platform.com/docs/core/performance/#fetch-partial
+     * @param bool|null                                                       $forceEager                     https://api-platform.com/docs/core/performance/#force-eager
+     * @param bool|null                                                       $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
+     * @param bool|null                                                       $paginationClientItemsPerPage   https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3
+     * @param bool|null                                                       $paginationClientPartial        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6
+     * @param array|null                                                      $paginationViaCursor            https://api-platform.com/docs/core/pagination/#cursor-based-pagination
+     * @param bool|null                                                       $paginationEnabled              https://api-platform.com/docs/core/pagination/#for-a-specific-resource
+     * @param bool|null                                                       $paginationFetchJoinCollection  https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator
+     * @param int|null                                                        $paginationItemsPerPage         https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page
+     * @param int|null                                                        $paginationMaximumItemsPerPage  https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page
+     * @param bool|null                                                       $paginationPartial              https://api-platform.com/docs/core/performance/#partial-pagination
+     * @param string|null                                                     $paginationType                 https://api-platform.com/docs/core/graphql/#using-the-page-based-pagination
+     * @param string|null                                                     $security                       https://api-platform.com/docs/core/security
+     * @param string|null                                                     $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string|null                                                     $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param string|null                                                     $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string                                                          $securityPostValidation         https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validtion
+     * @param string                                                          $securityPostValidationMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param mixed|null                                                      $provider
+     * @param mixed|null                                                      $processor
      */
     public function __construct(
-        ?string $uriTemplate = null,
-        ?string $shortName = null,
-        ?string $description = null,
-        $types = null,
+        protected ?string $uriTemplate = null,
+        protected ?string $shortName = null,
+        protected ?string $description = null,
+        protected $types = null,
         $operations = null,
-        $formats = null,
-        $inputFormats = null,
-        $outputFormats = null,
-        $uriVariables = null,
-        ?string $routePrefix = null,
-        ?array $defaults = null,
-        ?array $requirements = null,
-        ?array $options = null,
-        ?bool $stateless = null,
-        ?string $sunset = null,
-        ?string $acceptPatch = null,
-        ?int $status = null,
-        ?string $host = null,
-        ?array $schemes = null,
-        ?string $condition = null,
-        ?string $controller = null,
-        ?string $class = null,
-        ?int $urlGenerationStrategy = null,
-        ?string $deprecationReason = null,
-        ?array $cacheHeaders = null,
-        ?array $normalizationContext = null,
-        ?array $denormalizationContext = null,
-        ?array $hydraContext = null,
-        ?array $openapiContext = null,
-        ?array $validationContext = null,
-        ?array $filters = null,
-        ?bool $elasticsearch = null,
-        $mercure = null,
-        $messenger = null,
-        $input = null,
-        $output = null,
-        ?array $order = null,
-        ?bool $fetchPartial = null,
-        ?bool $forceEager = null,
-        ?bool $paginationClientEnabled = null,
-        ?bool $paginationClientItemsPerPage = null,
-        ?bool $paginationClientPartial = null,
-        ?array $paginationViaCursor = null,
-        ?bool $paginationEnabled = null,
-        ?bool $paginationFetchJoinCollection = null,
-        ?bool $paginationUseOutputWalkers = null,
-        ?int $paginationItemsPerPage = null,
-        ?int $paginationMaximumItemsPerPage = null,
-        ?bool $paginationPartial = null,
-        ?string $paginationType = null,
-        ?string $security = null,
-        ?string $securityMessage = null,
-        ?string $securityPostDenormalize = null,
-        ?string $securityPostDenormalizeMessage = null,
-        ?string $securityPostValidation = null,
-        ?string $securityPostValidationMessage = null,
-        ?bool $compositeIdentifier = null,
-        ?array $exceptionToStatus = null,
-        ?bool $queryParameterValidationEnabled = null,
-        ?array $graphQlOperations = null,
+        protected $formats = null,
+        protected $inputFormats = null,
+        protected $outputFormats = null,
+        protected $uriVariables = null,
+        protected ?string $routePrefix = null,
+        protected ?array $defaults = null,
+        protected ?array $requirements = null,
+        protected ?array $options = null,
+        protected ?bool $stateless = null,
+        protected ?string $sunset = null,
+        protected ?string $acceptPatch = null,
+        protected ?int $status = null,
+        protected ?string $host = null,
+        protected ?array $schemes = null,
+        protected ?string $condition = null,
+        protected ?string $controller = null,
+        protected ?string $class = null,
+        protected ?int $urlGenerationStrategy = null,
+        protected ?string $deprecationReason = null,
+        protected ?array $cacheHeaders = null,
+        protected ?array $normalizationContext = null,
+        protected ?array $denormalizationContext = null,
+        protected ?array $hydraContext = null,
+        protected ?array $openapiContext = null,
+        protected ?array $validationContext = null,
+        protected ?array $filters = null,
+        protected ?bool $elasticsearch = null,
+        protected $mercure = null,
+        protected $messenger = null,
+        protected $input = null,
+        protected $output = null,
+        protected ?array $order = null,
+        protected ?bool $fetchPartial = null,
+        protected ?bool $forceEager = null,
+        protected ?bool $paginationClientEnabled = null,
+        protected ?bool $paginationClientItemsPerPage = null,
+        protected ?bool $paginationClientPartial = null,
+        protected ?array $paginationViaCursor = null,
+        protected ?bool $paginationEnabled = null,
+        protected ?bool $paginationFetchJoinCollection = null,
+        protected ?bool $paginationUseOutputWalkers = null,
+        protected ?int $paginationItemsPerPage = null,
+        protected ?int $paginationMaximumItemsPerPage = null,
+        protected ?bool $paginationPartial = null,
+        protected ?string $paginationType = null,
+        protected ?string $security = null,
+        protected ?string $securityMessage = null,
+        protected ?string $securityPostDenormalize = null,
+        protected ?string $securityPostDenormalizeMessage = null,
+        protected ?string $securityPostValidation = null,
+        protected ?string $securityPostValidationMessage = null,
+        protected ?bool $compositeIdentifier = null,
+        protected ?array $exceptionToStatus = null,
+        protected ?bool $queryParameterValidationEnabled = null,
+        protected ?array $graphQlOperations = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        protected array $extraProperties = []
     ) {
         $this->operations = null === $operations ? null : new Operations($operations);
-        $this->uriTemplate = $uriTemplate;
-        $this->shortName = $shortName;
-        $this->description = $description;
-        $this->types = $types;
-        $this->formats = $formats;
-        $this->inputFormats = $inputFormats;
-        $this->outputFormats = $outputFormats;
-        $this->uriVariables = $uriVariables;
-        $this->routePrefix = $routePrefix;
-        $this->defaults = $defaults;
-        $this->requirements = $requirements;
-        $this->options = $options;
-        $this->stateless = $stateless;
-        $this->sunset = $sunset;
-        $this->acceptPatch = $acceptPatch;
-        $this->status = $status;
-        $this->host = $host;
-        $this->schemes = $schemes;
-        $this->condition = $condition;
-        $this->controller = $controller;
-        $this->class = $class;
-        $this->urlGenerationStrategy = $urlGenerationStrategy;
-        $this->deprecationReason = $deprecationReason;
-        $this->cacheHeaders = $cacheHeaders;
-        $this->normalizationContext = $normalizationContext;
-        $this->denormalizationContext = $denormalizationContext;
-        $this->hydraContext = $hydraContext;
-        $this->openapiContext = $openapiContext;
-        $this->validationContext = $validationContext;
-        $this->filters = $filters;
-        $this->elasticsearch = $elasticsearch;
-        $this->mercure = $mercure;
-        $this->messenger = $messenger;
-        $this->input = $input;
-        $this->output = $output;
-        $this->order = $order;
-        $this->fetchPartial = $fetchPartial;
-        $this->forceEager = $forceEager;
-        $this->paginationClientEnabled = $paginationClientEnabled;
-        $this->paginationClientItemsPerPage = $paginationClientItemsPerPage;
-        $this->paginationClientPartial = $paginationClientPartial;
-        $this->paginationViaCursor = $paginationViaCursor;
-        $this->paginationEnabled = $paginationEnabled;
-        $this->paginationFetchJoinCollection = $paginationFetchJoinCollection;
-        $this->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-        $this->paginationItemsPerPage = $paginationItemsPerPage;
-        $this->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
-        $this->paginationPartial = $paginationPartial;
-        $this->paginationType = $paginationType;
-        $this->security = $security;
-        $this->securityMessage = $securityMessage;
-        $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-        $this->securityPostValidation = $securityPostValidation;
-        $this->securityPostValidationMessage = $securityPostValidationMessage;
-        $this->compositeIdentifier = $compositeIdentifier;
-        $this->exceptionToStatus = $exceptionToStatus;
-        $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
-        $this->graphQlOperations = $graphQlOperations;
         $this->provider = $provider;
         $this->processor = $processor;
-        $this->extraProperties = $extraProperties;
     }
 
     public function getOperations(): ?Operations
@@ -355,7 +210,7 @@ class ApiResource
     /**
      * @param string[]|string $types
      */
-    public function withTypes($types): self
+    public function withTypes(array|string $types): self
     {
         $self = clone $this;
         $self->types = (array) $types;
@@ -530,7 +385,7 @@ class ApiResource
         return $self;
     }
 
-    public function getStatus()
+    public function getStatus(): ?int
     {
         return $this->status;
     }

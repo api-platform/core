@@ -18,22 +18,18 @@ use ApiPlatform\Metadata\Operation as AbstractOperation;
 
 class Operation extends AbstractOperation
 {
-    protected $resolver;
-    protected $args;
-    /** @var Link[]|null */
-    protected $links;
-
     /**
-     * @param string     $resolver
-     * @param mixed|null $input
-     * @param mixed|null $output
-     * @param mixed|null $mercure
-     * @param mixed|null $messenger
+     * @param string      $resolver
+     * @param mixed|null  $input
+     * @param mixed|null  $output
+     * @param mixed|null  $mercure
+     * @param mixed|null  $messenger
+     * @param Link[]|null $links
      */
     public function __construct(
-        ?string $resolver = null,
-        ?array $args = null,
-        ?array $links = null,
+        protected ?string $resolver = null,
+        protected ?array $args = null,
+        protected ?array $links = null,
 
         // abstract operation arguments
         ?string $shortName = null,
@@ -81,10 +77,6 @@ class Operation extends AbstractOperation
         ?string $processor = null,
         array $extraProperties = []
     ) {
-        $this->resolver = $resolver;
-        $this->args = $args;
-        $this->links = $links;
-
         // Abstract operation properties
         $this->shortName = $shortName;
         $this->class = $class;
@@ -161,7 +153,7 @@ class Operation extends AbstractOperation
     /**
      * @return Link[]|null
      */
-    public function getLinks()
+    public function getLinks(): ?array
     {
         return $this->links;
     }

@@ -31,15 +31,10 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
 
     public const FORMAT = 'jsonld';
     public const TITLE = 'title';
+    private array $defaultContext = [self::TITLE => 'An error occurred'];
 
-    private $urlGenerator;
-    private $debug;
-    private $defaultContext = [self::TITLE => 'An error occurred'];
-
-    public function __construct(UrlGeneratorInterface $urlGenerator, bool $debug = false, array $defaultContext = [])
+    public function __construct(private readonly UrlGeneratorInterface $urlGenerator, private readonly bool $debug = false, array $defaultContext = [])
     {
-        $this->urlGenerator = $urlGenerator;
-        $this->debug = $debug;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 

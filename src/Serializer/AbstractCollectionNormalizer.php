@@ -39,16 +39,8 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      */
     public const FORMAT = 'to-override';
 
-    protected $resourceClassResolver;
-    protected $pageParameterName;
-
-    protected $resourceMetadataFactory;
-
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(protected ResourceClassResolverInterface $resourceClassResolver, protected string $pageParameterName, protected ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
     {
-        $this->resourceClassResolver = $resourceClassResolver;
-        $this->pageParameterName = $pageParameterName;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -126,7 +118,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
             $currentPage = $object->getCurrentPage();
             $itemsPerPage = $object->getItemsPerPage();
-        } elseif (\is_array($object) || $object instanceof \Countable) {
+        } elseif (is_countable($object)) {
             $totalItems = \count($object);
         }
 

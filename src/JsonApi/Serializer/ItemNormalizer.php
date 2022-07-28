@@ -49,7 +49,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public const FORMAT = 'jsonapi';
 
-    private $componentsCache = [];
+    private array $componentsCache = [];
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
@@ -245,7 +245,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = []): bool
     {
-        return preg_match('/^\\w[-\\w_]*$/', $attribute) && parent::isAllowedAttribute($classOrObject, $attribute, $format, $context);
+        return preg_match('/^\\w[-\\w_]*$/', (string) $attribute) && parent::isAllowedAttribute($classOrObject, $attribute, $format, $context);
     }
 
     /**
@@ -445,13 +445,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         $normalizedName = $this->nameConverter ? $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context) : $relationshipName;
 
-        $filtered = array_filter($context['api_included'] ?? [], static function (string $included) use ($normalizedName) {
-            return 0 === strpos($included, $normalizedName.'.');
-        });
+        $filtered = array_filter($context['api_included'] ?? [], static fn (string $included): bool => str_starts_with($included, $normalizedName.'.'));
 
-        return array_map(static function (string $nested) {
-            return substr($nested, strpos($nested, '.') + 1);
-        }, $filtered);
+        return array_map(static fn (string $nested): string => substr($nested, strpos($nested, '.') + 1), $filtered);
     }
 
     private function getResourceShortName(string $resourceClass): string

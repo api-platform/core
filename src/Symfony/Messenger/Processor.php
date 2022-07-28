@@ -31,9 +31,6 @@ final class Processor implements ProcessorInterface
         $this->messageBus = $messageBus;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function persist($data, array $context = [])
     {
         $envelope = $this->dispatch(
@@ -49,10 +46,7 @@ final class Processor implements ProcessorInterface
         return $handledStamp->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    private function remove($data, array $context = [])
+    private function remove($data): void
     {
         $this->dispatch(
             (new Envelope($data))
@@ -66,6 +60,6 @@ final class Processor implements ProcessorInterface
             return $this->remove($data);
         }
 
-        return $this->persist($data);
+        return $this->persist($data, $context);
     }
 }

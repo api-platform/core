@@ -33,38 +33,14 @@ final class SwaggerUiAction
 {
     use NormalizeOperationNameTrait;
 
-    private $twig;
-    private $urlGenerator;
-    private $normalizer;
-    private $openApiFactory;
-    private $openApiOptions;
-    private $swaggerUiContext;
-    private $formats;
-    private $resourceMetadataFactory;
-    private $oauthClientId;
-    private $oauthClientSecret;
-    private $oauthPkce;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, NormalizerInterface $normalizer, OpenApiFactoryInterface $openApiFactory, Options $openApiOptions, SwaggerUiContext $swaggerUiContext, array $formats = [], string $oauthClientId = null, string $oauthClientSecret = null, bool $oauthPkce = false)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ?TwigEnvironment $twig, private readonly UrlGeneratorInterface $urlGenerator, private readonly NormalizerInterface $normalizer, private readonly OpenApiFactoryInterface $openApiFactory, private readonly Options $openApiOptions, private readonly SwaggerUiContext $swaggerUiContext, private readonly array $formats = [], private readonly ?string $oauthClientId = null, private readonly ?string $oauthClientSecret = null, private readonly bool $oauthPkce = false)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->twig = $twig;
-        $this->urlGenerator = $urlGenerator;
-        $this->normalizer = $normalizer;
-        $this->openApiFactory = $openApiFactory;
-        $this->openApiOptions = $openApiOptions;
-        $this->swaggerUiContext = $swaggerUiContext;
-        $this->formats = $formats;
-        $this->oauthClientId = $oauthClientId;
-        $this->oauthClientSecret = $oauthClientSecret;
-        $this->oauthPkce = $oauthPkce;
-
         if (null === $this->twig) {
             throw new \RuntimeException('The documentation cannot be displayed since the Twig bundle is not installed. Try running "composer require symfony/twig-bundle".');
         }
     }
 
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): Response
     {
         $openApi = $this->openApiFactory->__invoke(['base_url' => $request->getBaseUrl() ?: '/']);
 

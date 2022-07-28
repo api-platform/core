@@ -40,14 +40,9 @@ final class ReadListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'read';
 
-    private $serializerContextBuilder;
-    private $provider;
-
-    public function __construct(ProviderInterface $provider, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, SerializerContextBuilderInterface $serializerContextBuilder = null, UriVariablesConverterInterface $uriVariablesConverter = null)
+    public function __construct(private readonly ProviderInterface $provider, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null, UriVariablesConverterInterface $uriVariablesConverter = null)
     {
-        $this->provider = $provider;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->serializerContextBuilder = $serializerContextBuilder;
         $this->uriVariablesConverter = $uriVariablesConverter;
     }
 
@@ -91,9 +86,7 @@ final class ReadListener
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $parameters, $resourceClass);
             $data = $this->provider->provide($operation, $uriVariables, $context);
-        } catch (InvalidIdentifierException $e) {
-            throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
-        } catch (InvalidUriVariableException $e) {
+        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
         }
 

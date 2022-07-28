@@ -26,13 +26,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class DeserializeStage implements DeserializeStageInterface
 {
-    private $denormalizer;
-    private $serializerContextBuilder;
-
-    public function __construct(DenormalizerInterface $denormalizer, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(private readonly DenormalizerInterface $denormalizer, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
     {
-        $this->denormalizer = $denormalizer;
-        $this->serializerContextBuilder = $serializerContextBuilder;
     }
 
     /**

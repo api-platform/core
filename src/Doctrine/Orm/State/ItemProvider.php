@@ -34,18 +34,11 @@ final class ItemProvider implements ProviderInterface
 {
     use LinksHandlerTrait;
 
-    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
-    private ManagerRegistry $managerRegistry;
-    private iterable $itemExtensions;
-
     /**
      * @param QueryItemExtensionInterface[] $itemExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, iterable $itemExtensions = [])
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $itemExtensions = [])
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->managerRegistry = $managerRegistry;
-        $this->itemExtensions = $itemExtensions;
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = [])

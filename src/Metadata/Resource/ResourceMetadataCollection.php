@@ -25,18 +25,16 @@ use ApiPlatform\Metadata\Operation;
  */
 final class ResourceMetadataCollection extends \ArrayObject
 {
-    private $operationCache = [];
-    private $resourceClass;
+    private array $operationCache = [];
 
-    public function __construct(string $resourceClass, array $input = [])
+    public function __construct(private readonly string $resourceClass, array $input = [])
     {
-        $this->resourceClass = $resourceClass;
         parent::__construct($input);
     }
 
     public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
     {
-        $operationName = $operationName ?? '';
+        $operationName ??= '';
         if (isset($this->operationCache[$operationName])) {
             return $this->operationCache[$operationName];
         }

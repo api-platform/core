@@ -32,15 +32,8 @@ final class ContextAction
         'Error' => true,
     ];
 
-    private $contextBuilder;
-    private $resourceNameCollectionFactory;
-    private $resourceMetadataCollectionFactory;
-
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
-        $this->contextBuilder = $contextBuilder;
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**

@@ -68,21 +68,11 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
         Issn::class => 'http://schema.org/issn',
     ];
 
-    private $decorated;
-    private $validatorMetadataFactory;
-    /**
-     * @var iterable<PropertySchemaRestrictionMetadataInterface>
-     */
-    private $restrictionsMetadata;
-
     /**
      * @param PropertySchemaRestrictionMetadataInterface[] $restrictionsMetadata
      */
-    public function __construct(ValidatorMetadataFactoryInterface $validatorMetadataFactory, PropertyMetadataFactoryInterface $decorated, iterable $restrictionsMetadata = [])
+    public function __construct(private readonly ValidatorMetadataFactoryInterface $validatorMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, private readonly iterable $restrictionsMetadata = [])
     {
-        $this->validatorMetadataFactory = $validatorMetadataFactory;
-        $this->decorated = $decorated;
-        $this->restrictionsMetadata = $restrictionsMetadata;
     }
 
     /**
@@ -108,7 +98,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
         $validationGroups = $this->getValidationGroups($validatorClassMetadata, $options);
         $restrictions = [];
-        $types = $types ?? [];
+        $types ??= [];
 
         foreach ($validatorClassMetadata->getPropertyMetadata($property) as $validatorPropertyMetadata) {
             foreach ($this->getPropertyConstraints($validatorPropertyMetadata, $validationGroups) as $constraint) {
@@ -116,7 +106,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
                     $required = true;
                 }
 
-                $type = self::SCHEMA_MAPPED_CONSTRAINTS[\get_class($constraint)] ?? null;
+                $type = self::SCHEMA_MAPPED_CONSTRAINTS[$constraint::class] ?? null;
 
                 if ($type && !\in_array($type, $types, true)) {
                     $types[] = $type;

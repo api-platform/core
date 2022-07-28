@@ -35,26 +35,13 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 {
     use CloneTrait;
 
-    private $readStage;
-    private $securityStage;
-    private $securityPostDenormalizeStage;
-    private $serializeStage;
-    private $queryResolverLocator;
-    private $requestStack;
-
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, RequestStack $requestStack = null)
+    public function __construct(private readonly ReadStageInterface $readStage, private readonly SecurityStageInterface $securityStage, private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, private readonly SerializeStageInterface $serializeStage, private readonly ContainerInterface $queryResolverLocator, private readonly ?RequestStack $requestStack = null)
     {
-        $this->readStage = $readStage;
-        $this->securityStage = $securityStage;
-        $this->securityPostDenormalizeStage = $securityPostDenormalizeStage;
-        $this->serializeStage = $serializeStage;
-        $this->queryResolverLocator = $queryResolverLocator;
-        $this->requestStack = $requestStack;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {
-        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
+        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation): ?array {
             // If authorization has failed for a relation field (e.g. via ApiProperty security), the field is not present in the source: null can be returned directly to ensure the collection isn't in the response.
             if (null === $resourceClass || null === $rootClass || (null !== $source && !\array_key_exists($info->fieldName, $source))) {
                 return null;

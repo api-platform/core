@@ -34,8 +34,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public const FORMAT = 'jsonhal';
 
-    private $componentsCache = [];
-    private $attributesMetadataCache = [];
+    private array $componentsCache = [];
+    private array $attributesMetadataCache = [];
 
     /**
      * {@inheritdoc}
@@ -101,7 +101,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws LogicException
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): never
     {
         throw new LogicException(sprintf('%s is a read-only format.', self::FORMAT));
     }

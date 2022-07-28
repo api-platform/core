@@ -38,6 +38,8 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @return array{links: array{self: string, first?: string, last?: string, prev?: string, next?: string}, meta?: array{totalItems: mixed, itemsPerPage?: int, currentPage?: int}}
      */
     protected function getPaginationData($object, array $context = []): array
     {
@@ -86,6 +88,8 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
      * {@inheritdoc}
      *
      * @throws UnexpectedValueException
+     *
+     * @return array{data: mixed[], included?: mixed[]}
      */
     protected function getItemsData($object, string $format = null, array $context = []): array
     {

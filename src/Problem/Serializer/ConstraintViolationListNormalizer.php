@@ -29,7 +29,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     public const TYPE = 'type';
     public const TITLE = 'title';
 
-    private $defaultContext = [
+    private array $defaultContext = [
         self::TYPE => 'https://tools.ietf.org/html/rfc2616#section-10',
         self::TITLE => 'An error occurred',
     ];
@@ -43,6 +43,8 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 
     /**
      * {@inheritdoc}
+     *
+     * @return array{type: mixed, title: mixed, detail: string, violations: mixed}
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {

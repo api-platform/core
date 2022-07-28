@@ -23,11 +23,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
  */
 final class EntrypointAction
 {
-    private $resourceNameCollectionFactory;
-
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
     public function __invoke(): Entrypoint

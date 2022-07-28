@@ -24,14 +24,8 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private ResourceMetadataCollectionFactoryInterface $decorated;
-
-    private Client $client;
-
-    public function __construct(Client $client, ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private readonly Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated)
     {
-        $this->decorated = $decorated;
-        $this->client = $client;
     }
 
     /**
@@ -92,7 +86,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
             $this->client->cat()->indices(['index' => $index]);
 
             return true;
-        } catch (Missing404Exception $e) {
+        } catch (Missing404Exception) {
             return false;
         }
     }

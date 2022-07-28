@@ -42,7 +42,7 @@ trait ErrorNormalizerTrait
         if ($object instanceof FlattenException) {
             $exceptionClass = $object->getClass();
         } else {
-            $exceptionClass = \get_class($object);
+            $exceptionClass = $object::class;
         }
 
         if (is_a($exceptionClass, ErrorCodeSerializableInterface::class, true)) {

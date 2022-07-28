@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 final class DateTimeUriVariableTransformer implements UriVariableTransformerInterface
 {
-    private $dateTimeNormalizer;
+    private readonly DateTimeNormalizer $dateTimeNormalizer;
 
     public function __construct()
     {

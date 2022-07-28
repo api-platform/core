@@ -24,13 +24,8 @@ use ApiPlatform\State\ProcessorInterface;
  */
 final class WriteStage implements WriteStageInterface
 {
-    private $processor;
-    private $serializerContextBuilder;
-
-    public function __construct(ProcessorInterface $processor, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(private readonly ProcessorInterface $processor, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
     {
-        $this->processor = $processor;
-        $this->serializerContextBuilder = $serializerContextBuilder;
     }
 
     /**

@@ -25,22 +25,18 @@ use Symfony\Component\Validator\Constraints\Required;
 final class PropertySchemaCollectionRestriction implements PropertySchemaRestrictionMetadataInterface
 {
     /**
-     * @var iterable<PropertySchemaRestrictionMetadataInterface>
-     */
-    private $restrictionsMetadata;
-
-    /**
      * @param iterable<PropertySchemaRestrictionMetadataInterface> $restrictionsMetadata
      */
-    public function __construct(iterable $restrictionsMetadata = [])
+    public function __construct(private readonly iterable $restrictionsMetadata = [])
     {
-        $this->restrictionsMetadata = $restrictionsMetadata;
     }
 
     /**
      * {@inheritdoc}
      *
      * @param Collection $constraint
+     *
+     * @return array{type: string, properties: array<int|string, mixed[]>, additionalProperties: mixed, required?: mixed[]}
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
@@ -75,10 +71,7 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
         return $constraint instanceof Collection;
     }
 
-    /**
-     * @param Required|Optional $constraint
-     */
-    private function mergeConstraintRestrictions(Constraint $constraint, ApiProperty $propertyMetadata): array
+    private function mergeConstraintRestrictions(Required|Optional $constraint, ApiProperty $propertyMetadata): array
     {
         $propertyRestrictions = [];
         $nestedConstraints = $constraint->constraints;

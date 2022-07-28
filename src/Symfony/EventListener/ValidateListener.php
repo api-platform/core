@@ -32,11 +32,8 @@ final class ValidateListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'validate';
 
-    private $validator;
-
-    public function __construct(ValidatorInterface $validator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(private readonly ValidatorInterface $validator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
-        $this->validator = $validator;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 

@@ -24,16 +24,9 @@ use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 
 final class DebugResourceCommand extends Command
 {
-    private $resourceMetadataCollectionFactory;
-    private $cloner;
-    private $dumper;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ClonerInterface $cloner, $dumper)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ClonerInterface $cloner, private $dumper)
     {
         parent::__construct();
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->cloner = $cloner;
-        $this->dumper = $dumper;
     }
 
     /**

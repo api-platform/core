@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class ItemNormalizer extends AbstractItemNormalizer
 {
-    private $logger;
+    private readonly LoggerInterface $logger;
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, LoggerInterface $logger = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
@@ -74,7 +74,7 @@ class ItemNormalizer extends AbstractItemNormalizer
     {
         try {
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $operation = $this->resourceMetadataCollectionFactory->create($context['resource_class'])->getOperation();
             // todo: we could guess uri variables with the operation and the data instead of hardcoding id
             $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => $data['id']]]);

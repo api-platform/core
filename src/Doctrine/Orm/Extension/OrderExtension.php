@@ -28,11 +28,8 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class OrderExtension implements QueryCollectionExtensionInterface
 {
-    private ?string $order;
-
-    public function __construct(string $order = null)
+    public function __construct(private readonly ?string $order = null)
     {
-        $this->order = $order;
     }
 
     /**

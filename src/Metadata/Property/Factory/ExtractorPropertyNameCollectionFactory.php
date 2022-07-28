@@ -27,13 +27,8 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
  */
 final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
-    private $extractor;
-    private $decorated;
-
-    public function __construct(PropertyExtractorInterface $extractor, PropertyNameCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly PropertyExtractorInterface $extractor, private readonly ?PropertyNameCollectionFactoryInterface $decorated = null)
     {
-        $this->extractor = $extractor;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -49,7 +44,7 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
         if ($this->decorated) {
             try {
                 $propertyNameCollection = $this->decorated->create($resourceClass, $options);
-            } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
+            } catch (ResourceClassNotFoundException) {
                 // Ignore not found exceptions from decorated factory
             }
 

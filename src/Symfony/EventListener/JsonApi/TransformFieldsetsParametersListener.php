@@ -24,11 +24,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 final class TransformFieldsetsParametersListener
 {
-    private $resourceMetadataCollectionFactory;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -61,7 +58,7 @@ final class TransformFieldsetsParametersListener
 
         $properties = [];
         foreach ($fieldsParameter as $resourceType => $fields) {
-            $fields = explode(',', $fields);
+            $fields = explode(',', (string) $fields);
 
             if ($resourceShortName === $resourceType) {
                 $properties = array_merge($properties, $fields);

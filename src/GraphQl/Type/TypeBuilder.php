@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
@@ -38,17 +39,11 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeBuilder implements TypeBuilderInterface
 {
-    private $typesContainer;
     private $defaultFieldResolver;
-    private $fieldsBuilderLocator;
-    private $pagination;
 
-    public function __construct(TypesContainerInterface $typesContainer, callable $defaultFieldResolver, ContainerInterface $fieldsBuilderLocator, Pagination $pagination)
+    public function __construct(private readonly TypesContainerInterface $typesContainer, callable $defaultFieldResolver, private readonly ContainerInterface $fieldsBuilderLocator, private readonly Pagination $pagination)
     {
-        $this->typesContainer = $typesContainer;
         $this->defaultFieldResolver = $defaultFieldResolver;
-        $this->fieldsBuilderLocator = $fieldsBuilderLocator;
-        $this->pagination = $pagination;
     }
 
     /**
@@ -85,7 +80,7 @@ final class TypeBuilder implements TypeBuilderInterface
                 if ($resourceMetadataCollection->getOperation($operation instanceof CollectionOperationInterface ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
                     $shortName .= $operation instanceof CollectionOperationInterface ? 'Collection' : 'Item';
                 }
-            } catch (OperationNotFoundException $e) {
+            } catch (OperationNotFoundException) {
             }
         }
 
@@ -119,7 +114,7 @@ final class TypeBuilder implements TypeBuilderInterface
 
                     try {
                         $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
-                    } catch (OperationNotFoundException $e) {
+                    } catch (OperationNotFoundException) {
                         $mutationNormalizationContext = [];
                     }
                     // Use a new type for the wrapped object only if there is a specific normalization context for the mutation or the subscription.
@@ -134,7 +129,7 @@ final class TypeBuilder implements TypeBuilderInterface
 
                     try {
                         $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
-                    } catch (OperationNotFoundException $e) {
+                    } catch (OperationNotFoundException) {
                         $wrappedOperation = ('collection_query' === $wrappedOperationName ? new QueryCollection() : new Query())
                             ->withResource($resourceMetadataCollection[0])
                             ->withName($wrappedOperationName);
@@ -197,7 +192,7 @@ final class TypeBuilder implements TypeBuilderInterface
                     'description' => 'The id of this node.',
                 ],
             ],
-            'resolveType' => function ($value) {
+            'resolveType' => function ($value): ?GraphQLType {
                 if (!isset($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
                     return null;
                 }
@@ -250,6 +245,9 @@ final class TypeBuilder implements TypeBuilderInterface
         return $type->isCollection() && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) && null !== $collectionValueType->getClassName();
     }
 
+    /**
+     * @return array{edges: ListOfType, pageInfo: NonNull, totalCount: NonNull}
+     */
     private function getCursorBasedPaginationFields(GraphQLType $resourceType): array
     {
         $shortName = $resourceType->name;
@@ -285,6 +283,9 @@ final class TypeBuilder implements TypeBuilderInterface
         ];
     }
 
+    /**
+     * @return array{collection: ListOfType, paginationInfo: NonNull}
+     */
     private function getPageBasedPaginationFields(GraphQLType $resourceType): array
     {
         $shortName = $resourceType->name;

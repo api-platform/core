@@ -26,19 +26,8 @@ use Twig\Environment as TwigEnvironment;
  */
 final class GraphQlPlaygroundAction
 {
-    private $twig;
-    private $router;
-    private $graphQlPlaygroundEnabled;
-    private $title;
-    private $assetPackage;
-
-    public function __construct(TwigEnvironment $twig, RouterInterface $router, bool $graphQlPlaygroundEnabled = false, string $title = '', $assetPackage = null)
+    public function __construct(private readonly TwigEnvironment $twig, private readonly RouterInterface $router, private readonly bool $graphQlPlaygroundEnabled = false, private readonly string $title = '', private $assetPackage = null)
     {
-        $this->twig = $twig;
-        $this->router = $router;
-        $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
-        $this->title = $title;
-        $this->assetPackage = $assetPackage;
     }
 
     public function __invoke(Request $request): Response

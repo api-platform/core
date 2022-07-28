@@ -27,24 +27,17 @@ abstract class AbstractFilter implements FilterInterface
 {
     use OrmPropertyHelperTrait;
     use PropertyHelperTrait;
-
-    protected ManagerRegistry $managerRegistry;
     protected LoggerInterface $logger;
-    protected ?array $properties;
-    protected ?NameConverterInterface $nameConverter;
 
-    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
+    public function __construct(protected ManagerRegistry $managerRegistry, LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
     {
-        $this->managerRegistry = $managerRegistry;
         $this->logger = $logger ?? new NullLogger();
-        $this->properties = $properties;
-        $this->nameConverter = $nameConverter;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = [])
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         foreach ($context['filters'] as $property => $value) {
             $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);

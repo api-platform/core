@@ -18,31 +18,16 @@ use ApiPlatform\JsonSchema\Schema as JsonSchema;
 final class Schema extends \ArrayObject
 {
     use ExtensionTrait;
+    private readonly JsonSchema $schema;
 
-    private $discriminator;
-    private $readOnly;
-    private $writeOnly;
-    private $xml;
-    private $externalDocs;
-    private $example;
-    private $deprecated;
-    private $schema;
-
-    public function __construct($discriminator = null, bool $readOnly = false, bool $writeOnly = false, string $xml = null, $externalDocs = null, $example = null, bool $deprecated = false)
+    public function __construct(private $discriminator = null, private bool $readOnly = false, private bool $writeOnly = false, private ?string $xml = null, private $externalDocs = null, private $example = null, private bool $deprecated = false)
     {
-        $this->discriminator = $discriminator;
-        $this->readOnly = $readOnly;
-        $this->writeOnly = $writeOnly;
-        $this->xml = $xml;
-        $this->externalDocs = $externalDocs;
-        $this->example = $example;
-        $this->deprecated = $deprecated;
         $this->schema = new JsonSchema();
 
         parent::__construct([]);
     }
 
-    public function setDefinitions(array $definitions)
+    public function setDefinitions(array $definitions): void
     {
         $this->schema->setDefinitions(new \ArrayObject($definitions));
     }

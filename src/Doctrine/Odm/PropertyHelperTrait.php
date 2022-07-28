@@ -89,7 +89,7 @@ trait PropertyHelperTrait
                 $aggregationBuilder->unwind("\$$alias");
 
                 // association.property => association_lkup.property
-                $property = substr_replace($property, $propertyAlias, strpos($property, $association), \strlen($association));
+                $property = substr_replace($property, $propertyAlias, strpos($property, (string) $association), \strlen((string) $association));
                 $resourceClass = $classMetadata->getAssociationTargetClass($association);
                 $alias .= '.';
             } elseif ($classMetadata->hasEmbed($association)) {

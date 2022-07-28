@@ -39,7 +39,7 @@ final class ConstantScoreFilterExtension extends AbstractFilterExtension
      */
     protected function alterRequestBody(array $requestBody, array $clauseBody): array
     {
-        $requestBody['query'] = $requestBody['query'] ?? [];
+        $requestBody['query'] ??= [];
         $requestBody['query'] += [
             'constant_score' => [
                 'filter' => $clauseBody,

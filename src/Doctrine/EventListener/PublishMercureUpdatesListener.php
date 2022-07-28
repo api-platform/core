@@ -57,39 +57,28 @@ final class PublishMercureUpdatesListener
         'hub' => true,
         'enable_async_update' => true,
     ];
-
-    private $iriConverter;
-    private $serializer;
     private $hubRegistry;
-    private $expressionLanguage;
+    private readonly ?ExpressionLanguage $expressionLanguage;
     private $createdObjects;
     private $updatedObjects;
     private $deletedObjects;
-    private $formats;
-    private $graphQlSubscriptionManager;
-    private $graphQlMercureSubscriptionIriGenerator;
 
     /**
      * @param array<string, string[]|string> $formats
      * @param HubRegistry|callable           $hubRegistry
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $hubRegistry = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly SerializerInterface $serializer, private readonly array $formats, MessageBusInterface $messageBus = null, $hubRegistry = null, private readonly ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, private readonly ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $hubRegistry) {
             throw new InvalidArgumentException('A message bus or a hub registry must be provided.');
         }
 
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->iriConverter = $iriConverter;
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->serializer = $serializer;
-        $this->formats = $formats;
         $this->messageBus = $messageBus;
         $this->hubRegistry = $hubRegistry;
         $this->expressionLanguage = $expressionLanguage ?? (class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null);
-        $this->graphQlSubscriptionManager = $graphQlSubscriptionManager;
-        $this->graphQlMercureSubscriptionIriGenerator = $graphQlMercureSubscriptionIriGenerator;
         $this->reset();
 
         if ($this->expressionLanguage) {
@@ -97,11 +86,7 @@ final class PublishMercureUpdatesListener
             $this->expressionLanguage->addFunction($rawurlencode);
 
             $this->expressionLanguage->addFunction(
-                new ExpressionFunction('iri', static function (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string {
-                    return sprintf('iri(%s, %d)', $apiResource, $referenceType);
-                }, static function (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL) use ($iriConverter): string {
-                    return $iriConverter->getIriFromResource($apiResource, $referenceType);
-                })
+                new ExpressionFunction('iri', static fn (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string => sprintf('iri(%s, %d)', $apiResource, $referenceType), static fn (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string => $iriConverter->getIriFromResource($apiResource, $referenceType))
             );
         }
     }
@@ -175,7 +160,7 @@ final class PublishMercureUpdatesListener
 
         try {
             $options = $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getMercure() ?? false;
-        } catch (OperationNotFoundException $e) {
+        } catch (OperationNotFoundException) {
             return;
         }
 
@@ -218,7 +203,7 @@ final class PublishMercureUpdatesListener
             }
         }
 
-        $options['enable_async_update'] = $options['enable_async_update'] ?? true;
+        $options['enable_async_update'] ??= true;
 
         if ($options['topics'] ?? false) {
             $topics = [];
@@ -228,7 +213,7 @@ final class PublishMercureUpdatesListener
                     continue;
                 }
 
-                if (0 !== strpos($topic, '@=')) {
+                if (!str_starts_with($topic, '@=')) {
                     $topics[] = $topic;
                     continue;
                 }
@@ -266,7 +251,7 @@ final class PublishMercureUpdatesListener
             // and I'm not a fond of this approach.
             $iri = $options['topics'] ?? $object->iri;
             /** @var string $data */
-            $data = json_encode(['@id' => $object->id]);
+            $data = json_encode(['@id' => $object->id], \JSON_THROW_ON_ERROR);
         } else {
             $resourceClass = $this->getObjectClass($object);
             $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext() ?? [];
@@ -315,7 +300,7 @@ final class PublishMercureUpdatesListener
     /**
      * @param string|string[] $iri
      */
-    private function buildUpdate($iri, string $data, array $options): Update
+    private function buildUpdate(string|array $iri, string $data, array $options): Update
     {
         if (method_exists(Update::class, 'isPrivate')) {
             return new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);

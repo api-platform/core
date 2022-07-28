@@ -35,33 +35,13 @@ final class ApiLoader extends Loader
 {
     public const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
 
-    private $fileLoader;
-    private $resourceNameCollectionFactory;
-    private $resourceMetadataFactory;
-    private $container;
-    private $formats;
-    private $resourceClassDirectories;
-    private $graphqlEnabled;
-    private $graphiQlEnabled;
-    private $graphQlPlaygroundEnabled;
-    private $entrypointEnabled;
-    private $docsEnabled;
+    private readonly XmlFileLoader $fileLoader;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false)
+    public function __construct(KernelInterface $kernel, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ContainerInterface $container, private readonly array $formats, private readonly array $resourceClassDirectories = [], private readonly bool $graphqlEnabled = false, private readonly bool $entrypointEnabled = true, private readonly bool $docsEnabled = true, private readonly bool $graphiQlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false)
     {
         /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
         $this->fileLoader = new XmlFileLoader(new FileLocator($paths));
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->container = $container;
-        $this->formats = $formats;
-        $this->resourceClassDirectories = $resourceClassDirectories;
-        $this->graphqlEnabled = $graphqlEnabled;
-        $this->graphiQlEnabled = $graphiQlEnabled;
-        $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
-        $this->entrypointEnabled = $entrypointEnabled;
-        $this->docsEnabled = $docsEnabled;
     }
 
     /**

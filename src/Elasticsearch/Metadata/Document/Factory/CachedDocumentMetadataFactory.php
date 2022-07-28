@@ -28,15 +28,10 @@ use Psr\Cache\CacheItemPoolInterface;
 final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
     private const CACHE_KEY_PREFIX = 'index_metadata';
-
-    private CacheItemPoolInterface $cacheItemPool;
-    private DocumentMetadataFactoryInterface $decorated;
     private array $localCache = [];
 
-    public function __construct(CacheItemPoolInterface $cacheItemPool, DocumentMetadataFactoryInterface $decorated)
+    public function __construct(private readonly CacheItemPoolInterface $cacheItemPool, private readonly DocumentMetadataFactoryInterface $decorated)
     {
-        $this->cacheItemPool = $cacheItemPool;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -50,7 +45,7 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
 
         try {
             $cacheItem = $this->cacheItemPool->getItem(self::CACHE_KEY_PREFIX.md5($resourceClass));
-        } catch (CacheException $e) {
+        } catch (CacheException) {
             return $this->handleNotFound($this->localCache[$resourceClass] = $this->decorated->create($resourceClass), $resourceClass);
         }
 

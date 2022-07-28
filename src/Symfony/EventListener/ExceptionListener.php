@@ -27,10 +27,7 @@ use Symfony\Component\HttpKernel\EventListener\ExceptionListener as LegacyExcept
  */
 final class ExceptionListener
 {
-    /**
-     * @var ErrorListener
-     */
-    private $exceptionListener;
+    private readonly ErrorListener $exceptionListener;
 
     public function __construct($controller, LoggerInterface $logger = null, $debug = false, ErrorListener $errorListener = null)
     {

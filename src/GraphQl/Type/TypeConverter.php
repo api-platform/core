@@ -39,17 +39,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeConverter implements TypeConverterInterface
 {
-    private $typeBuilder;
-    private $typesContainer;
-    private $resourceMetadataCollectionFactory;
-    private $propertyMetadataFactory;
-
-    public function __construct(TypeBuilderInterface $typeBuilder, TypesContainerInterface $typesContainer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
+    public function __construct(private readonly TypeBuilderInterface $typeBuilder, private readonly TypesContainerInterface $typesContainer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
-        $this->typeBuilder = $typeBuilder;
-        $this->typesContainer = $typesContainer;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
     }
 
     /**
@@ -119,7 +110,7 @@ final class TypeConverter implements TypeConverterInterface
 
         try {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        } catch (ResourceClassNotFoundException $e) {
+        } catch (ResourceClassNotFoundException) {
             return null;
         }
 
@@ -167,7 +158,7 @@ final class TypeConverter implements TypeConverterInterface
             if (!$operation instanceof Operation) {
                 throw new OperationNotFoundException();
             }
-        } catch (OperationNotFoundException $e) {
+        } catch (OperationNotFoundException) {
             /** @var Operation */
             $operation = ($isCollection ? new QueryCollection() : new Query())
                 ->withResource($resourceMetadataCollection[0])

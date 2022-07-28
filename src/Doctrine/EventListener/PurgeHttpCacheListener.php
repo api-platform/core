@@ -40,18 +40,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 final class PurgeHttpCacheListener
 {
     use ClassInfoTrait;
+    private readonly PropertyAccessorInterface $propertyAccessor;
+    private array $tags = [];
 
-    private $purger;
-    private $iriConverter;
-    private $resourceClassResolver;
-    private $propertyAccessor;
-    private $tags = [];
-
-    public function __construct(PurgerInterface $purger, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(private readonly PurgerInterface $purger, private readonly IriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->purger = $purger;
-        $this->iriConverter = $iriConverter;
-        $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
@@ -114,7 +107,7 @@ final class PurgeHttpCacheListener
         $this->tags = [];
     }
 
-    private function gatherResourceAndItemTags($entity, bool $purgeItem): void
+    private function gatherResourceAndItemTags(object $entity, bool $purgeItem): void
     {
         try {
             $resourceClass = $this->resourceClassResolver->getResourceClass($entity);
@@ -124,11 +117,11 @@ final class PurgeHttpCacheListener
             if ($purgeItem) {
                 $this->addTagForItem($entity);
             }
-        } catch (OperationNotFoundException|InvalidArgumentException $e) {
+        } catch (OperationNotFoundException|InvalidArgumentException) {
         }
     }
 
-    private function gatherRelationTags(EntityManagerInterface $em, $entity): void
+    private function gatherRelationTags(EntityManagerInterface $em, object $entity): void
     {
         $associationMappings = $em->getClassMetadata(ClassUtils::getClass($entity))->getAssociationMappings();
         foreach (array_keys($associationMappings) as $property) {
@@ -168,7 +161,7 @@ final class PurgeHttpCacheListener
         try {
             $iri = $this->iriConverter->getIriFromResource($value);
             $this->tags[$iri] = $iri;
-        } catch (RuntimeException|InvalidArgumentException $e) {
+        } catch (RuntimeException|InvalidArgumentException) {
         }
     }
 }

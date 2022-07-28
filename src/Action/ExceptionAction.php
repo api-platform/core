@@ -34,19 +34,12 @@ final class ExceptionAction
 {
     use OperationRequestInitiatorTrait;
 
-    private $serializer;
-    private $errorFormats;
-    private $exceptionToStatus;
-
     /**
      * @param array $errorFormats      A list of enabled error formats
      * @param array $exceptionToStatus A list of exceptions mapped to their HTTP status code
      */
-    public function __construct(SerializerInterface $serializer, array $errorFormats, array $exceptionToStatus = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+    public function __construct(private readonly SerializerInterface $serializer, private readonly array $errorFormats, private readonly array $exceptionToStatus = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
-        $this->serializer = $serializer;
-        $this->errorFormats = $errorFormats;
-        $this->exceptionToStatus = $exceptionToStatus;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 

@@ -35,6 +35,8 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @return array{_links: array{self: array{href: string}, first?: array{href: string}, last?: array{href: string}, prev?: array{href: string}, next?: array{href: string}}, totalItems?: mixed, itemsPerPage?: int}
      */
     protected function getPaginationData($object, array $context = []): array
     {

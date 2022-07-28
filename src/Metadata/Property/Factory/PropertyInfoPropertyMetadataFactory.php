@@ -24,13 +24,8 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
  */
 final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    private $propertyInfo;
-    private $decorated;
-
-    public function __construct(PropertyInfoExtractorInterface $propertyInfo, PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly PropertyInfoExtractorInterface $propertyInfo, private readonly ?PropertyMetadataFactoryInterface $decorated = null)
     {
-        $this->propertyInfo = $propertyInfo;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -43,7 +38,7 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
         } else {
             try {
                 $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-            } catch (PropertyNotFoundException $propertyNotFoundException) {
+            } catch (PropertyNotFoundException) {
                 $propertyMetadata = new ApiProperty();
             }
         }

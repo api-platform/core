@@ -33,22 +33,13 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class Response implements ResponseInterface
 {
-    private $httpFoundationResponse;
-    private $browserKitResponse;
-    private $headers;
+    private array $headers;
+    private array $info;
+    private string $content;
+    private ?array $jsonData = null;
 
-    /**
-     * @var array
-     */
-    private $info;
-    private $content;
-    private $jsonData;
-
-    public function __construct(HttpFoundationResponse $httpFoundationResponse, BrowserKitResponse $browserKitResponse, array $info)
+    public function __construct(private readonly HttpFoundationResponse $httpFoundationResponse, private readonly BrowserKitResponse $browserKitResponse, array $info)
     {
-        $this->httpFoundationResponse = $httpFoundationResponse;
-        $this->browserKitResponse = $browserKitResponse;
-
         $this->headers = $httpFoundationResponse->headers->all();
 
         // Compute raw headers

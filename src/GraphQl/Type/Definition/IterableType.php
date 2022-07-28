@@ -90,10 +90,7 @@ final class IterableType extends ScalarType implements TypeInterface
         throw new \Exception();
     }
 
-    /**
-     * @param StringValueNode|BooleanValueNode|IntValueNode|FloatValueNode|ObjectValueNode|ListValueNode|ValueNode $valueNode
-     */
-    private function parseIterableLiteral($valueNode)
+    private function parseIterableLiteral(StringValueNode|BooleanValueNode|IntValueNode|FloatValueNode|ObjectValueNode|ListValueNode|ValueNode $valueNode)
     {
         switch ($valueNode) {
             case $valueNode instanceof StringValueNode:

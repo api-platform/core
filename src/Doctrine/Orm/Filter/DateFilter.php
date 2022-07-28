@@ -129,7 +129,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
     /**
      * Adds the where clause according to the chosen null management.
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, mixed $value, string $nullManagement = null, DBALType|string $type = null)
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, mixed $value, string $nullManagement = null, DBALType|string $type = null): void
     {
         $type = (string) $type;
         $value = $this->normalizeValue($value, $operator);
@@ -140,7 +140,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
 
         try {
             $value = !str_contains($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Silently ignore this filter if it can not be transformed to a \DateTime
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),

@@ -37,20 +37,11 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 final class SchemaFactory implements SchemaFactoryInterface
 {
     use ResourceClassInfoTrait;
+    private array $distinctFormats = [];
 
-    private $typeFactory;
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-    private $nameConverter;
-    private $distinctFormats = [];
-
-    public function __construct(TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(private readonly TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
-        $this->typeFactory = $typeFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->nameConverter = $nameConverter;
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
@@ -342,6 +333,8 @@ final class SchemaFactory implements SchemaFactoryInterface
 
     /**
      * Gets the options for the property name collection / property metadata factories.
+     *
+     * @return array{enable_getter_setter_extraction: true, serializer_groups?: mixed[], normalization_groups?: mixed, denormalization_groups?: mixed, validation_groups?: mixed[]}
      */
     private function getFactoryOptions(array $serializerContext, array $validationGroups, ?HttpOperation $operation = null): array
     {

@@ -24,23 +24,17 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 final class PropertyFilter implements FilterInterface
 {
-    private $overrideDefaultProperties;
-    private $parameterName;
-    private $whitelist;
-    private $nameConverter;
+    private ?array $whitelist;
 
-    public function __construct(string $parameterName = 'properties', bool $overrideDefaultProperties = false, array $whitelist = null, NameConverterInterface $nameConverter = null)
+    public function __construct(private string $parameterName = 'properties', private readonly bool $overrideDefaultProperties = false, array $whitelist = null, private readonly ?NameConverterInterface $nameConverter = null)
     {
-        $this->overrideDefaultProperties = $overrideDefaultProperties;
-        $this->parameterName = $parameterName;
         $this->whitelist = null === $whitelist ? null : $this->formatWhitelist($whitelist);
-        $this->nameConverter = $nameConverter;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(Request $request, bool $normalization, array $attributes, array &$context)
+    public function apply(Request $request, bool $normalization, array $attributes, array &$context): void
     {
         if (null !== $propertyAttribute = $request->attributes->get('_api_filter_property')) {
             $properties = $propertyAttribute;
@@ -129,7 +123,7 @@ final class PropertyFilter implements FilterInterface
 
     private function getProperties(array $properties, array $whitelist = null): array
     {
-        $whitelist = $whitelist ?? $this->whitelist;
+        $whitelist ??= $this->whitelist;
         $result = [];
 
         foreach ($properties as $key => $value) {

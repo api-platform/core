@@ -29,20 +29,19 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
 
     public const FORMAT = 'jsonapi';
     public const TITLE = 'title';
-
-    private $debug;
-    private $defaultContext = [
+    private array $defaultContext = [
         self::TITLE => 'An error occurred',
     ];
 
-    public function __construct(bool $debug = false, array $defaultContext = [])
+    public function __construct(private readonly bool $debug = false, array $defaultContext = [])
     {
-        $this->debug = $debug;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @return array{title: mixed, description: string, code?: string, trace?: mixed}
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {

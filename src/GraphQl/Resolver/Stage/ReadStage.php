@@ -36,17 +36,8 @@ final class ReadStage implements ReadStageInterface
     use ClassInfoTrait;
     use IdentifierTrait;
 
-    private $iriConverter;
-    private $provider;
-    private $serializerContextBuilder;
-    private $nestingSeparator;
-
-    public function __construct(IriConverterInterface $iriConverter, ProviderInterface $provider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
+    public function __construct(private readonly IriConverterInterface $iriConverter, private readonly ProviderInterface $provider, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private readonly string $nestingSeparator)
     {
-        $this->iriConverter = $iriConverter;
-        $this->provider = $provider;
-        $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->nestingSeparator = $nestingSeparator;
     }
 
     /**
@@ -108,7 +99,7 @@ final class ReadStage implements ReadStageInterface
 
         try {
             $item = $this->iriConverter->getResourceFromIri($identifier, $normalizationContext);
-        } catch (ItemNotFoundException $e) {
+        } catch (ItemNotFoundException) {
             return null;
         }
 
