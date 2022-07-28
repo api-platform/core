@@ -74,12 +74,9 @@ class SecuredDummy
     #[ODM\Field]
     private ?string $owner = null;
 
-    /**
-     * @var Collection<RelatedDummy> Several dummies
-     */
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
     #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
-    public $relatedDummies;
+    public Collection $relatedDummies;
 
     /**
      * @var RelatedDummy
@@ -90,12 +87,10 @@ class SecuredDummy
 
     /**
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
-     *
-     * @var Collection<RelatedSecuredDummy> Several dummies
      */
     #[ApiProperty(security: "is_granted('ROLE_USER')")]
     #[ODM\ReferenceMany(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
-    public $relatedSecuredDummies;
+    public Collection $relatedSecuredDummies;
 
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
@@ -107,11 +102,9 @@ class SecuredDummy
     protected $relatedSecuredDummy;
     /**
      * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
-     *
-     * @var Collection<RelatedSecuredDummy> Several dummies
      */
     #[ODM\ReferenceMany(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
-    public $publicRelatedSecuredDummies;
+    public Collection $publicRelatedSecuredDummies;
     /**
      * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
@@ -137,17 +130,17 @@ class SecuredDummy
         return $this->title;
     }
 
-    public function setTitle(string $title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -157,7 +150,7 @@ class SecuredDummy
         return $this->adminOnlyProperty;
     }
 
-    public function setAdminOnlyProperty(?string $adminOnlyProperty)
+    public function setAdminOnlyProperty(?string $adminOnlyProperty): void
     {
         $this->adminOnlyProperty = $adminOnlyProperty;
     }
@@ -167,7 +160,7 @@ class SecuredDummy
         return $this->ownerOnlyProperty;
     }
 
-    public function setOwnerOnlyProperty(?string $ownerOnlyProperty)
+    public function setOwnerOnlyProperty(?string $ownerOnlyProperty): void
     {
         $this->ownerOnlyProperty = $ownerOnlyProperty;
     }
@@ -177,17 +170,17 @@ class SecuredDummy
         return $this->owner;
     }
 
-    public function setOwner(string $owner)
+    public function setOwner(string $owner): void
     {
         $this->owner = $owner;
     }
 
-    public function addRelatedDummy(RelatedDummy $relatedDummy)
+    public function addRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummies->add($relatedDummy);
     }
 
-    public function getRelatedDummies()
+    public function getRelatedDummies(): Collection
     {
         return $this->relatedDummies;
     }
@@ -197,17 +190,17 @@ class SecuredDummy
         return $this->relatedDummy;
     }
 
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }
 
-    public function addRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    public function addRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy): void
     {
         $this->relatedSecuredDummies->add($relatedSecuredDummy);
     }
 
-    public function getRelatedSecuredDummies()
+    public function getRelatedSecuredDummies(): Collection
     {
         return $this->relatedSecuredDummies;
     }
@@ -217,17 +210,17 @@ class SecuredDummy
         return $this->relatedSecuredDummy;
     }
 
-    public function setRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    public function setRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy): void
     {
         $this->relatedSecuredDummy = $relatedSecuredDummy;
     }
 
-    public function addPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    public function addPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy): void
     {
         $this->publicRelatedSecuredDummies->add($publicRelatedSecuredDummy);
     }
 
-    public function getPublicRelatedSecuredDummies()
+    public function getPublicRelatedSecuredDummies(): Collection
     {
         return $this->publicRelatedSecuredDummies;
     }
@@ -237,7 +230,7 @@ class SecuredDummy
         return $this->publicRelatedSecuredDummy;
     }
 
-    public function setPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    public function setPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy): void
     {
         $this->publicRelatedSecuredDummy = $publicRelatedSecuredDummy;
     }

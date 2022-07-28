@@ -120,7 +120,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT));
     }
 
-    public function testNormalizeCircularReference()
+    public function testNormalizeCircularReference(): void
     {
         $circularReferenceEntity = new CircularReference();
         $circularReferenceEntity->id = 1;
@@ -158,20 +158,20 @@ class ItemNormalizerTest extends TestCase
 
             $context = [
                 'circular_reference_limit' => [spl_object_hash($circularReferenceEntity) => 2],
-                'cache_error' => function () {},
+                'cache_error' => function (): void {},
             ];
         } else {
             $context = [
                 'circular_reference_limit' => $circularReferenceLimit,
                 'circular_reference_limit_counters' => [spl_object_hash($circularReferenceEntity) => 2],
-                'cache_error' => function () {},
+                'cache_error' => function (): void {},
             ];
         }
 
-        $this->assertEquals('/circular_references/1', $normalizer->normalize($circularReferenceEntity, ItemNormalizer::FORMAT, $context));
+        $this->assertSame('/circular_references/1', $normalizer->normalize($circularReferenceEntity, ItemNormalizer::FORMAT, $context));
     }
 
-    public function testNormalizeNonExistentProperty()
+    public function testNormalizeNonExistentProperty(): void
     {
         $this->expectException(NoSuchPropertyException::class);
 
@@ -218,7 +218,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer->normalize($dummy, ItemNormalizer::FORMAT);
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $data = [
             'data' => [
@@ -263,19 +263,17 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::any())->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummyType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', Argument::any())->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummiesType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
 
-        $getItemFromIriSecondArgCallback = function ($arg) {
-            return \is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
-        };
+        $getItemFromIriSecondArgCallback = fn ($arg): bool => \is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getResourceFromIri('/related_dummies/1', Argument::that($getItemFromIriSecondArgCallback))->willReturn($relatedDummy1);
         $iriConverterProphecy->getResourceFromIri('/related_dummies/2', Argument::that($getItemFromIriSecondArgCallback))->willReturn($relatedDummy2);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
-        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->will(function () {});
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->will(function (): void {});
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'ghost', 'invisible')->willThrow(new NoSuchPropertyException());
-        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummy', $relatedDummy1)->will(function () {});
-        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummies', [$relatedDummy2])->will(function () {});
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummy', $relatedDummy1)->will(function (): void {});
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummies', [$relatedDummy2])->will(function (): void {});
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
@@ -312,7 +310,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT));
     }
 
-    public function testDenormalizeUpdateOperationNotAllowed()
+    public function testDenormalizeUpdateOperationNotAllowed(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('Update is not allowed for this operation.');
@@ -339,7 +337,7 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalizeCollectionIsNotArray()
+    public function testDenormalizeCollectionIsNotArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The type of the "relatedDummies" attribute must be "array", "string" given.');
@@ -390,7 +388,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT);
     }
 
-    public function testDenormalizeCollectionWithInvalidKey()
+    public function testDenormalizeCollectionWithInvalidKey(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The type of the key "0" must be "string", "integer" given.');
@@ -444,7 +442,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT);
     }
 
-    public function testDenormalizeRelationIsNotResourceLinkage()
+    public function testDenormalizeRelationIsNotResourceLinkage(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');

@@ -550,7 +550,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         $operations = [];
         foreach ($values as $type => $graphQlOperations) {
             switch ($type) {
-                default:
                 case 'queries':
                     $class = Query::class;
                     break;
@@ -560,7 +559,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 case 'subscriptions':
                     $class = Subscription::class;
                     break;
-            }
+                default:
+                }
 
             foreach ($graphQlOperations as $value) {
                 $operation = new $class();
@@ -594,7 +594,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
     {
         foreach (get_class_methods($resource) as $methodName) {
-            if (0 !== strpos($methodName, 'get')) {
+            if (!str_starts_with($methodName, 'get')) {
                 continue;
             }
 

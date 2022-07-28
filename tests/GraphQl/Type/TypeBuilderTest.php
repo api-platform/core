@@ -56,8 +56,7 @@ class TypeBuilderTest extends TestCase
     /** @var ObjectProphecy */
     private $fieldsBuilderLocatorProphecy;
 
-    /** @var TypeBuilder */
-    private $typeBuilder;
+    private TypeBuilder $typeBuilder;
 
     /**
      * {@inheritdoc}
@@ -65,7 +64,7 @@ class TypeBuilderTest extends TestCase
     protected function setUp(): void
     {
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
-        $this->defaultFieldResolver = function () {
+        $this->defaultFieldResolver = function (): void {
         };
         $this->fieldsBuilderLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $this->typeBuilder = new TypeBuilder(
@@ -127,7 +126,7 @@ class TypeBuilderTest extends TestCase
     /**
      * @dataProvider resourceObjectTypeQuerySerializationGroupsProvider
      */
-    public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, Operation $operation, string $shortName)
+    public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, Operation $operation, string $shortName): void
     {
         $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
             'item_query' => (new Query())->withShortName('shortName')->withNormalizationContext(['groups' => [$itemSerializationGroup]]),

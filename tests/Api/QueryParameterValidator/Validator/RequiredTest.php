@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class RequiredTest extends TestCase
 {
-    public function testNonRequiredFilter()
+    public function testNonRequiredFilter(): void
     {
         $request = [];
         $filter = new Required();
@@ -37,7 +37,7 @@ class RequiredTest extends TestCase
         );
     }
 
-    public function testRequiredFilterNotInQuery()
+    public function testRequiredFilterNotInQuery(): void
     {
         $request = [];
         $filter = new Required();
@@ -48,7 +48,7 @@ class RequiredTest extends TestCase
         );
     }
 
-    public function testRequiredFilterIsPresent()
+    public function testRequiredFilterIsPresent(): void
     {
         $request = ['some_filter' => 'some_value'];
         $filter = new Required();
@@ -58,7 +58,7 @@ class RequiredTest extends TestCase
         );
     }
 
-    public function testEmptyValueNotAllowed()
+    public function testEmptyValueNotAllowed(): void
     {
         $request = ['some_filter' => ''];
         $filter = new Required();
@@ -85,7 +85,7 @@ class RequiredTest extends TestCase
         );
     }
 
-    public function testEmptyValueAllowed()
+    public function testEmptyValueAllowed(): void
     {
         $request = ['some_filter' => ''];
         $filter = new Required();
@@ -102,7 +102,7 @@ class RequiredTest extends TestCase
         );
     }
 
-    public function testBracketNotation()
+    public function testBracketNotation(): void
     {
         $filter = new Required();
 
@@ -117,7 +117,7 @@ class RequiredTest extends TestCase
         );
     }
 
-    public function testDotNotation()
+    public function testDotNotation(): void
     {
         $request = ['foo.bar' => 'bar'];
         $filter = new Required();

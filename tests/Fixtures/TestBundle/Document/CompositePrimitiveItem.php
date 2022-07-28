@@ -24,9 +24,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class CompositePrimitiveItem
 {
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
-    private $id;
+    private ?int $id = null;
     #[ODM\Field(type: 'string')]
-    private $description;
+    private ?string $description = null;
 
     public function __construct(
         #[ODM\Field(type: 'string')] private readonly string $name,
@@ -61,7 +61,7 @@ class CompositePrimitiveItem
     /**
      * Sets description.
      */
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }

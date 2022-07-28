@@ -46,7 +46,7 @@ final class OperationResourceProcessor implements ProcessorInterface
         return $data;
     }
 
-    private function remove($data, array $context = [])
+    private function remove($data, array $context = []): void
     {
         if (!$manager = $this->getManager($data)) {
             return;

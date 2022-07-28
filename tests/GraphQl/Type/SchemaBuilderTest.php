@@ -56,8 +56,7 @@ class SchemaBuilderTest extends TestCase
     /** @var ObjectProphecy */
     private $fieldsBuilderProphecy;
 
-    /** @var SchemaBuilder */
-    private $schemaBuilder;
+    private SchemaBuilder $schemaBuilder;
 
     /**
      * {@inheritdoc}
@@ -86,24 +85,12 @@ class SchemaBuilderTest extends TestCase
         $typeFoo->name = 'Foo';
         $this->typesContainerProphecy->get('Foo')->willReturn(GraphQLType::listOf($typeFoo));
         $this->fieldsBuilderProphecy->getNodeQueryFields()->shouldBeCalled()->willReturn(['node_fields']);
-        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'item_query' === $arg->getName();
-        }), [])->willReturn(['query' => ['query_fields']]);
-        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'collection_query' === $arg->getName();
-        }), [])->willReturn(['query' => ['query_fields']]);
-        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'custom_item_query' === $arg->getName();
-        }), [])->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
-        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'custom_collection_query' === $arg->getName();
-        }), [])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
-        $this->fieldsBuilderProphecy->getMutationFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'mutation' === $arg->getName();
-        }))->willReturn(['mutation' => ['mutation_fields']]);
-        $this->fieldsBuilderProphecy->getSubscriptionFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'update' === $arg->getName();
-        }))->willReturn(['subscription' => ['subscription_fields']]);
+        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'item_query' === $arg->getName()), [])->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'collection_query' === $arg->getName()), [])->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'custom_item_query' === $arg->getName()), [])->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
+        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'custom_collection_query' === $arg->getName()), [])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
+        $this->fieldsBuilderProphecy->getMutationFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'mutation' === $arg->getName()))->willReturn(['mutation' => ['mutation_fields']]);
+        $this->fieldsBuilderProphecy->getSubscriptionFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'update' === $arg->getName()))->willReturn(['subscription' => ['subscription_fields']]);
 
         $this->resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([$resourceClass]));
         $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);

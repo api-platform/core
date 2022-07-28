@@ -28,7 +28,7 @@ class ObjectNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testDoesNotSupportDenormalization()
+    public function testDoesNotSupportDenormalization(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('jsonhal is a read-only format.');
@@ -45,7 +45,7 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize(['foo'], 'Foo');
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $std = new \stdClass();
         $dummy = new Dummy();

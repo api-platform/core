@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PatternTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $filter = new Pattern();
 
@@ -30,7 +30,7 @@ class PatternTest extends TestCase
         );
     }
 
-    public function testFilterWithEmptyValue()
+    public function testFilterWithEmptyValue(): void
     {
         $filter = new Pattern();
 
@@ -51,7 +51,7 @@ class PatternTest extends TestCase
         );
     }
 
-    public function testFilterWithZeroAsParameter()
+    public function testFilterWithZeroAsParameter(): void
     {
         $filter = new Pattern();
 
@@ -67,7 +67,7 @@ class PatternTest extends TestCase
         );
     }
 
-    public function testFilterWithNonMatchingValue()
+    public function testFilterWithNonMatchingValue(): void
     {
         $filter = new Pattern();
 
@@ -83,7 +83,7 @@ class PatternTest extends TestCase
         );
     }
 
-    public function testFilterWithNonchingValue()
+    public function testFilterWithNonchingValue(): void
     {
         $filter = new Pattern();
 

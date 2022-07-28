@@ -28,7 +28,7 @@ class TaxonItemProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         return $this->managerRegistry->getRepository($this->orm ? Taxon::class : TaxonDocument::class)->findOneBy([
             'code' => $uriVariables['code'],

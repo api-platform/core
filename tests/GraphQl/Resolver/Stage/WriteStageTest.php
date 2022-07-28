@@ -29,8 +29,7 @@ class WriteStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var WriteStage */
-    private $writeStage;
+    private WriteStage $writeStage;
     private $processorProphecy;
     private $serializerContextBuilderProphecy;
 

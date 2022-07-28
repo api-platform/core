@@ -69,14 +69,14 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
      */
     public function __invoke(string $resourceClass, array $parameters, array $fixtures): array
     {
-        $xml = new \SimpleXMLElement(<<<XML
+        $xml = new \SimpleXMLElement(<<<XML_WRAP
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources xmlns="https://api-platform.com/schema/metadata/resources-3.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
            https://api-platform.com/schema/metadata/resources-3.0.xsd">
 </resources>
-XML
+XML_WRAP
         );
 
         foreach ($fixtures as $fixture) {
@@ -106,7 +106,7 @@ XML
                     continue;
                 }
 
-                throw new \LogicException(sprintf('Cannot adapt attribute or child "%s". Please add fixtures in '.ResourceMetadataCompatibilityTest::class.' and create a "%s" method in %s.', $parameterName, 'build'.ucfirst($parameterName), __CLASS__));
+                throw new \LogicException(sprintf('Cannot adapt attribute or child "%s". Please add fixtures in '.ResourceMetadataCompatibilityTest::class.' and create a "%s" method in %s.', $parameterName, 'build'.ucfirst($parameterName), self::class));
             }
         }
 
@@ -280,14 +280,10 @@ XML
     {
         $node = $resource->addChild('graphQlOperations');
         foreach ($values as $type => $operations) {
-            switch ($type) {
-                case 'queries':
-                    $operationType = 'query';
-                    break;
-                default:
-                    $operationType = substr($type, 0, -1);
-                    break;
-            }
+            $operationType = match ($type) {
+                'queries' => 'query',
+                default => substr($type, 0, -1),
+            };
 
             foreach ($operations as $key => $value) {
                 $child = $node->addChild($operationType);
@@ -305,7 +301,7 @@ XML
                         continue;
                     }
 
-                    throw new \LogicException(sprintf('Cannot adapt graphQlOperation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), __CLASS__));
+                    throw new \LogicException(sprintf('Cannot adapt graphQlOperation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), self::class));
                 }
             }
         }
@@ -327,7 +323,7 @@ XML
                     continue;
                 }
 
-                throw new \LogicException(sprintf('Cannot adapt operation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), __CLASS__));
+                throw new \LogicException(sprintf('Cannot adapt operation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), self::class));
             }
         }
     }

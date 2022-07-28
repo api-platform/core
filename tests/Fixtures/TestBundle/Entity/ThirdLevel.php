@@ -25,11 +25,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource]
-#[ApiResource(uriTemplate: '/dummies/{id}/related_dummies/{relatedDummies}/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
-#[ApiResource(uriTemplate: '/related_dummies/{id}/id/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
-#[ApiResource(uriTemplate: '/related_dummies/{id}/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
-#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies/{relatedDummies}/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
-#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/dummies/{id}/related_dummies/{relatedDummies}/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_dummies/{id}/id/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_dummies/{id}/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies/{relatedDummies}/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}/third_level.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel')], status: 200, operations: [new Get()])]
 #[ORM\Entity]
 class ThirdLevel
 {
@@ -47,7 +47,7 @@ class ThirdLevel
     private bool $test = true;
     #[ORM\ManyToOne(targetEntity: FourthLevel::class, cascade: ['persist'])]
     #[Groups(['barcelona', 'chicago', 'friends'])]
-    public $fourthLevel;
+    public ?FourthLevel $fourthLevel = null;
     #[ORM\ManyToOne(targetEntity: FourthLevel::class, cascade: ['persist'])]
     public $badFourthLevel;
 
@@ -64,7 +64,7 @@ class ThirdLevel
     /**
      * @param int $level
      */
-    public function setLevel($level)
+    public function setLevel($level): void
     {
         $this->level = $level;
     }
@@ -77,7 +77,7 @@ class ThirdLevel
     /**
      * @param bool $test
      */
-    public function setTest($test)
+    public function setTest($test): void
     {
         $this->test = $test;
     }
@@ -87,7 +87,7 @@ class ThirdLevel
         return $this->fourthLevel;
     }
 
-    public function setFourthLevel(FourthLevel $fourthLevel = null)
+    public function setFourthLevel(FourthLevel $fourthLevel = null): void
     {
         $this->fourthLevel = $fourthLevel;
     }

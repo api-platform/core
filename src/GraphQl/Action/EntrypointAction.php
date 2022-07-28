@@ -35,7 +35,7 @@ final class EntrypointAction
 {
     private int|bool $debug;
 
-    public function __construct(private readonly SchemaBuilderInterface $schemaBuilder, private readonly ExecutorInterface $executor, private readonly GraphiQlAction $graphiQlAction, private readonly GraphQlPlaygroundAction $graphQlPlaygroundAction, private readonly NormalizerInterface $normalizer, private readonly ErrorHandlerInterface $errorHandler, bool $debug = false, private readonly bool $graphiqlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false, private $defaultIde = false)
+    public function __construct(private readonly SchemaBuilderInterface $schemaBuilder, private readonly ExecutorInterface $executor, private readonly GraphiQlAction $graphiQlAction, private readonly GraphQlPlaygroundAction $graphQlPlaygroundAction, private readonly NormalizerInterface $normalizer, private readonly ErrorHandlerInterface $errorHandler, bool $debug = false, private readonly bool $graphiqlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false, private readonly ?string $defaultIde = null)
     {
         if (class_exists(Debug::class)) {
             $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
@@ -111,7 +111,7 @@ final class EntrypointAction
      */
     private function parseData(?string $query, ?string $operationName, array $variables, string $jsonContent): array
     {
-        if (!\is_array($data = json_decode($jsonContent, true, 512, \JSON_THROW_ON_ERROR))) {
+        if (!\is_array($data = json_decode($jsonContent, true, 512, \JSON_ERROR_NONE))) {
             throw new BadRequestHttpException('GraphQL data is not valid JSON.');
         }
 
@@ -142,7 +142,7 @@ final class EntrypointAction
         [$query, $operationName, $variables] = $this->parseData($query, $operationName, $variables, $operations);
 
         /** @var string $map */
-        if (!\is_array($decodedMap = json_decode($map, true, 512, \JSON_THROW_ON_ERROR))) {
+        if (!\is_array($decodedMap = json_decode($map, true, 512, \JSON_ERROR_NONE))) {
             throw new BadRequestHttpException('GraphQL multipart request map is not valid JSON.');
         }
 
@@ -192,7 +192,7 @@ final class EntrypointAction
      */
     private function decodeVariables(string $variables): array
     {
-        if (!\is_array($decoded = json_decode($variables, true, 512, \JSON_THROW_ON_ERROR))) {
+        if (!\is_array($decoded = json_decode($variables, true, 512, \JSON_ERROR_NONE))) {
             throw new BadRequestHttpException('GraphQL variables are not valid JSON.');
         }
 

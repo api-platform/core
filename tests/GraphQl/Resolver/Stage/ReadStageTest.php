@@ -37,8 +37,7 @@ class ReadStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ReadStage */
-    private $readStage;
+    private ReadStage $readStage;
     private $iriConverterProphecy;
     private $providerProphecy;
     private $serializerContextBuilderProphecy;
@@ -175,11 +174,11 @@ class ReadStageTest extends TestCase
 
         return [
             'no identifier' => [true, false, 'myResource', null, $item, false, null],
-            'identifier' => [true, false, 'stdClass', 'identifier', $item, false, $item],
+            'identifier' => [true, false, \stdClass::class, 'identifier', $item, false, $item],
             'identifier bad item' => [true, false, 'myResource', 'identifier', $item, false, $item, \UnexpectedValueException::class, 'Item "identifier" did not match expected type "shortName".'],
             'identifier not found' => [true, false, 'myResource', 'identifier_not_found', $item, true, null, NotFoundHttpException::class, 'Item "identifier_not_found" not found.'],
             'no identifier (subscription)' => [false, true, 'myResource', null, $item, false, null],
-            'identifier (subscription)' => [false, true, 'stdClass', 'identifier', $item, false, $item],
+            'identifier (subscription)' => [false, true, \stdClass::class, 'identifier', $item, false, $item],
         ];
     }
 
@@ -246,12 +245,9 @@ class ReadStageTest extends TestCase
 
         ($this->readStage)($resourceClass, $resourceClass, $operation, $context);
 
-        $this->providerProphecy->provide($operation, [], Argument::that(function ($args) {
-            // Prophecy does not check the order of items in associative arrays. Checking if some.field comes first manually
-            return
-            array_search('some.field', array_keys($args['filters']['order']), true) <
-            array_search('localField', array_keys($args['filters']['order']), true);
-        }))->shouldHaveBeenCalled();
+        $this->providerProphecy->provide($operation, [], Argument::that(fn ($args): bool => // Prophecy does not check the order of items in associative arrays. Checking if some.field comes first manually
+array_search('some.field', array_keys($args['filters']['order']), true) <
+        array_search('localField', array_keys($args['filters']['order']), true)))->shouldHaveBeenCalled();
     }
 
     public function collectionProvider(): array

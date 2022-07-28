@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -29,7 +30,7 @@ class Relation2
     #[ORM\GeneratedValue]
     public $id;
     #[ORM\OneToMany(targetEntity: Relation1::class, mappedBy: 'relation2')]
-    public $relation1s;
+    public Collection $relation1s;
 
     public function __construct()
     {

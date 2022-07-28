@@ -28,13 +28,13 @@ class CompositeItem implements \Stringable
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private ?int $id = null;
     #[ORM\Column(type: 'string', nullable: true)]
     #[Groups(['default'])]
-    private $field1;
+    private ?string $field1 = null;
     #[ORM\OneToMany(targetEntity: CompositeRelation::class, mappedBy: 'compositeItem', fetch: 'EAGER')]
     #[Groups(['default'])]
-    private $compositeValues;
+    private ?Collection $compositeValues = null;
 
     /**
      * Gets id.
@@ -57,7 +57,7 @@ class CompositeItem implements \Stringable
      *
      * @param string|null $field1 the value to set
      */
-    public function setField1($field1 = null)
+    public function setField1($field1 = null): void
     {
         $this->field1 = $field1;
     }

@@ -21,27 +21,19 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class ReadableOnlyProperty
 {
-    /**
-     * @var int The id
-     */
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    /**
-     * @var string The foo name
-     */
-    #[ApiProperty(writable: false)]
-    #[ORM\Column]
-    private readonly string $name;
-
-    public function __construct()
-    {
-        $this->name = 'Read only';
+    public function __construct(
+        #[ApiProperty(writable: false)]
+        #[ORM\Column]
+        private readonly string $name = 'Read only'
+    ) {
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -51,7 +43,7 @@ class ReadableOnlyProperty
         throw new \Exception('Can not write name.');
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

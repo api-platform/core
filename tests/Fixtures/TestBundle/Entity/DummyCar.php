@@ -43,7 +43,7 @@ class DummyCar
      */
     #[ORM\Id]
     #[ORM\OneToOne(targetEntity: DummyCarIdentifier::class, cascade: ['persist'])]
-    private readonly \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCarIdentifier $id;
+    private readonly DummyCarIdentifier $id;
     /**
      * @var mixed Something else
      */
@@ -97,7 +97,7 @@ class DummyCar
         $this->info = new DummyCarInfo();
     }
 
-    public function getId()
+    public function getId(): DummyCarIdentifier
     {
         return $this->id;
     }
@@ -119,7 +119,7 @@ class DummyCar
         return $this->secondColors;
     }
 
-    public function setSecondColors($secondColors)
+    public function setSecondColors($secondColors): void
     {
         $this->secondColors = $secondColors;
     }
@@ -129,7 +129,7 @@ class DummyCar
         return $this->thirdColors;
     }
 
-    public function setThirdColors($thirdColors)
+    public function setThirdColors($thirdColors): void
     {
         $this->thirdColors = $thirdColors;
     }
@@ -139,7 +139,7 @@ class DummyCar
         return $this->uuid;
     }
 
-    public function setUuid($uuid)
+    public function setUuid($uuid): void
     {
         $this->uuid = $uuid;
     }
@@ -152,7 +152,7 @@ class DummyCar
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -162,7 +162,7 @@ class DummyCar
         return $this->canSell;
     }
 
-    public function setCanSell(bool $canSell)
+    public function setCanSell(bool $canSell): void
     {
         $this->canSell = $canSell;
     }
@@ -172,7 +172,7 @@ class DummyCar
         return $this->availableAt;
     }
 
-    public function setAvailableAt(\DateTime $availableAt)
+    public function setAvailableAt(\DateTime $availableAt): void
     {
         $this->availableAt = $availableAt;
     }

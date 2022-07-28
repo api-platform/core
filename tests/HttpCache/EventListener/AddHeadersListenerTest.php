@@ -33,7 +33,7 @@ class AddHeadersListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testDoNotSetHeaderWhenMethodNotCacheable()
+    public function testDoNotSetHeaderWhenMethodNotCacheable(): void
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']);
         $request->setMethod('PUT');
@@ -51,7 +51,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
-    public function testDoNotSetHeaderOnUnsuccessfulResponse()
+    public function testDoNotSetHeaderOnUnsuccessfulResponse(): void
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']);
         $response = new Response('{}', Response::HTTP_BAD_REQUEST);
@@ -68,7 +68,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
-    public function testDoNotSetHeaderWhenNotAnApiOperation()
+    public function testDoNotSetHeaderWhenNotAnApiOperation(): void
     {
         $response = new Response();
         $event = new ResponseEvent(
@@ -84,7 +84,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
-    public function testDoNotSetHeaderWhenNoContent()
+    public function testDoNotSetHeaderWhenNoContent(): void
     {
         $response = new Response();
         $event = new ResponseEvent(
@@ -99,7 +99,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
-    public function testAddHeaders()
+    public function testAddHeaders(): void
     {
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
         $event = new ResponseEvent(
@@ -120,7 +120,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertSame(['Accept', 'Cookie', 'Accept-Encoding'], $response->getVary());
     }
 
-    public function testDoNotSetHeaderWhenAlreadySet()
+    public function testDoNotSetHeaderWhenAlreadySet(): void
     {
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
         $response->setEtag('etag');
@@ -146,7 +146,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertSame(['Accept', 'Cookie', 'Accept-Encoding'], $response->getVary());
     }
 
-    public function testSetHeadersFromResourceMetadata()
+    public function testSetHeadersFromResourceMetadata(): void
     {
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
         $event = new ResponseEvent(
@@ -167,7 +167,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertSame(['Accept', 'Cookie', 'Vary-1', 'Vary-2'], $response->getVary());
     }
 
-    public function testSetHeadersFromResourceMetadataMarkedAsPrivate()
+    public function testSetHeadersFromResourceMetadataMarkedAsPrivate(): void
     {
         $response = new Response('some content', 200);
         $event = new ResponseEvent(
@@ -195,7 +195,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertStringNotContainsString('s-maxage', $response->headers->get('Cache-Control'));
     }
 
-    public function testSetHeadersFromResourceMetadataMarkedAsPublic()
+    public function testSetHeadersFromResourceMetadataMarkedAsPublic(): void
     {
         $response = new Response('some content', 200);
         $event = new ResponseEvent(
@@ -220,7 +220,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
     }
 
-    public function testSetHeadersFromResourceMetadataWithNoPrivacy()
+    public function testSetHeadersFromResourceMetadataWithNoPrivacy(): void
     {
         $response = new Response('some content', 200);
         $event = new ResponseEvent(
@@ -244,7 +244,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
     }
 
-    public function testSetHeadersFromResourceMetadataWithNoPrivacyDefaultsPrivate()
+    public function testSetHeadersFromResourceMetadataWithNoPrivacyDefaultsPrivate(): void
     {
         $response = new Response('some content', 200);
         $event = new ResponseEvent(

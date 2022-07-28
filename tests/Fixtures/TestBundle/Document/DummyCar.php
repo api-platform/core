@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -49,28 +50,28 @@ class DummyCar
     #[ApiFilter(SearchFilter::class, properties: ['colors.prop' => 'ipartial', 'colors' => 'exact'])]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
-    private $colors;
+    private Collection $colors;
     /**
      * @var mixed Something else
      */
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
-    private mixed $secondColors = null;
+    private Collection $secondColors;
     /**
      * @var mixed Something else
      */
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
-    private mixed $thirdColors = null;
+    private Collection $thirdColors;
     /**
      * @var mixed Something else
      */
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: UuidIdentifierDummy::class)]
-    private mixed $uuid = null;
+    private Collection $uuid;
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     #[ODM\Field(type: 'string')]
     private ?string $name = null;
@@ -86,9 +87,12 @@ class DummyCar
     public function __construct()
     {
         $this->colors = new ArrayCollection();
+        $this->secondColors = new ArrayCollection();
+        $this->thirdColors = new ArrayCollection();
+        $this->uuid = new ArrayCollection();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -110,7 +114,7 @@ class DummyCar
         return $this->secondColors;
     }
 
-    public function setSecondColors($secondColors)
+    public function setSecondColors($secondColors): void
     {
         $this->secondColors = $secondColors;
     }
@@ -120,7 +124,7 @@ class DummyCar
         return $this->thirdColors;
     }
 
-    public function setThirdColors($thirdColors)
+    public function setThirdColors($thirdColors): void
     {
         $this->thirdColors = $thirdColors;
     }
@@ -130,7 +134,7 @@ class DummyCar
         return $this->uuid;
     }
 
-    public function setUuid($uuid)
+    public function setUuid($uuid): void
     {
         $this->uuid = $uuid;
     }
@@ -140,7 +144,7 @@ class DummyCar
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -150,7 +154,7 @@ class DummyCar
         return $this->canSell;
     }
 
-    public function setCanSell(bool $canSell)
+    public function setCanSell(bool $canSell): void
     {
         $this->canSell = $canSell;
     }
@@ -160,7 +164,7 @@ class DummyCar
         return $this->availableAt;
     }
 
-    public function setAvailableAt(\DateTime $availableAt)
+    public function setAvailableAt(\DateTime $availableAt): void
     {
         $this->availableAt = $availableAt;
     }

@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ApiResource]
 #[ODM\Document]
-class DummyFriend
+class DummyFriend implements \Stringable
 {
     /**
      * @var int|null The id
@@ -56,7 +56,7 @@ class DummyFriend
      *
      * @param int $id the value to set
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -74,12 +74,12 @@ class DummyFriend
      *
      * @param string $name the value to set
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->getId();
     }

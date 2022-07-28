@@ -33,7 +33,7 @@ class ConvertedDate
     #[ORM\Column(type: 'date')]
     public $nameConverted;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

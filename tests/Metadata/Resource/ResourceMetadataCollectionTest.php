@@ -26,7 +26,7 @@ final class ResourceMetadataCollectionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testGetOperation()
+    public function testGetOperation(): void
     {
         $operation = new Get();
         $query = new Query();
@@ -37,7 +37,7 @@ final class ResourceMetadataCollectionTest extends TestCase
         $this->assertEquals($query, $resourceMetadataCollection->getOperation('query'));
     }
 
-    public function testOperationNotFound()
+    public function testOperationNotFound(): void
     {
         $this->expectException(OperationNotFoundException::class);
         $operation = new Get();

@@ -45,12 +45,9 @@ class RelatedNormalizedDummy
     #[ODM\Field]
     private ?string $name = null;
 
-    /**
-     * @var iterable Several Normalized dummies
-     */
     #[Groups(['related_output', 'related_input'])]
     #[ODM\ReferenceMany(targetDocument: CustomNormalizedDummy::class)]
-    public $customNormalizedDummy;
+    public ?Collection $customNormalizedDummy = null;
 
     public function __construct()
     {
@@ -65,7 +62,7 @@ class RelatedNormalizedDummy
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

@@ -26,10 +26,7 @@ class TypesContainerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @var TypesContainer
-     */
-    private $typesContainer;
+    private TypesContainer $typesContainer;
 
     /**
      * {@inheritdoc}

@@ -32,14 +32,14 @@ class DummyWithEmbedManyOmittingTargetDocument
      * @var EmbeddableDummy[]|Collection
      */
     #[ODM\EmbedMany]
-    private $embeddedDummies;
+    private readonly array|Collection $embeddedDummies;
 
     public function __construct()
     {
         $this->embeddedDummies = new ArrayCollection();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

@@ -26,9 +26,9 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 #[ApiResource]
-#[ApiResource(uriTemplate: '/dummy_aggregate_offers/{id}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
-#[ApiResource(uriTemplate: '/dummy_products/{id}/offers/{offers}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct::class, identifiers: ['id'], toProperty: 'product'), 'offers' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
-#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products/{relatedProducts}/offers/{offers}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct::class, identifiers: ['id']), 'relatedProducts' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct::class, identifiers: ['id'], toProperty: 'product'), 'offers' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/dummy_aggregate_offers/{id}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/dummy_products/{id}/offers/{offers}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: DummyProduct::class, identifiers: ['id'], toProperty: 'product'), 'offers' => new Link(fromClass: DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products/{relatedProducts}/offers/{offers}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: DummyProduct::class, identifiers: ['id']), 'relatedProducts' => new Link(fromClass: DummyProduct::class, identifiers: ['id'], toProperty: 'product'), 'offers' => new Link(fromClass: DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
 #[ORM\Entity]
 class DummyOffer
 {
@@ -50,7 +50,7 @@ class DummyOffer
     #[ORM\ManyToOne(targetEntity: DummyAggregateOffer::class, inversedBy: 'offers')]
     private ?DummyAggregateOffer $aggregate = null;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -60,17 +60,17 @@ class DummyOffer
         return $this->value;
     }
 
-    public function setValue(int $value)
+    public function setValue(int $value): void
     {
         $this->value = $value;
     }
 
-    public function getAggregate()
+    public function getAggregate(): ?DummyAggregateOffer
     {
         return $this->aggregate;
     }
 
-    public function setAggregate(DummyAggregateOffer $aggregate)
+    public function setAggregate(DummyAggregateOffer $aggregate): void
     {
         $this->aggregate = $aggregate;
     }

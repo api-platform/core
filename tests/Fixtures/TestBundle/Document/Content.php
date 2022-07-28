@@ -32,14 +32,13 @@ class Content implements \JsonSerializable
      * @var Collection<Field>
      */
     #[ODM\ReferenceMany(targetDocument: Field::class, mappedBy: 'content', strategy: 'set', cascade: ['persist'])]
-    private \Doctrine\Common\Collections\Collection $fields;
+    private Collection $fields;
     #[ODM\Field(type: 'string')]
-    private string $status;
+    private string $status = ContentStatus::DRAFT;
 
     public function __construct()
     {
         $this->fields = new ArrayCollection();
-        $this->status = ContentStatus::DRAFT;
     }
 
     #[Groups(['get_content'])]
@@ -110,7 +109,7 @@ class Content implements \JsonSerializable
     /**
      * {@inheritdoc}
      *
-     * @return mixed
+     * @return array{id: int|null, contentType: string, fields: Collection&Field[]}
      */
     #[\ReturnTypeWillChange]
     public function jsonSerialize()

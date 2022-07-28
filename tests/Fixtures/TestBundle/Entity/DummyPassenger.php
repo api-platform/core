@@ -30,7 +30,7 @@ class DummyPassenger
     #[ORM\Column(type: 'string')]
     public $nickname;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

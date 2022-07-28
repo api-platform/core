@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Controller\MongoDbOdm;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\CustomActionDummy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -24,7 +25,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class CustomActionController extends AbstractController
 {
     #[Route(methods: ['GET'], name: 'custom_normalization', path: '/custom/{id}/normalization', defaults: ['_api_resource_class' => CustomActionDummy::class, '_api_operation_name' => 'custom_normalization'])]
-    public function customNormalizationAction(CustomActionDummy $data)
+    public function customNormalizationAction(CustomActionDummy $data): JsonResponse
     {
         $data->setFoo('foo');
 
@@ -44,7 +45,7 @@ class CustomActionController extends AbstractController
     }
 
     #[Route(methods: ['GET'], name: 'short_custom_normalization', path: '/short_custom/{id}/normalization', defaults: ['_api_resource_class' => CustomActionDummy::class, '_api_operation_name' => 'custom_normalization'])]
-    public function shortCustomNormalizationAction(CustomActionDummy $data)
+    public function shortCustomNormalizationAction(CustomActionDummy $data): JsonResponse
     {
         $data->setFoo('short');
 

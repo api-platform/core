@@ -29,8 +29,6 @@ class ErrorNormalizerTest extends TestCase
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->errorNormalizer = new ErrorNormalizer();
     }
 

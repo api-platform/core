@@ -26,12 +26,12 @@ class RemoveProcessorTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(ProcessorInterface::class, new RemoveProcessor($this->prophesize(ManagerRegistry::class)->reveal()));
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $dummy = new Dummy();
 
@@ -45,7 +45,7 @@ class RemoveProcessorTest extends TestCase
         (new RemoveProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Delete(), []);
     }
 
-    public function testRemoveWithNullManager()
+    public function testRemoveWithNullManager(): void
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();

@@ -31,7 +31,7 @@ class VarnishPurgerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testPurge()
+    public function testPurge(): void
     {
         $clientProphecy1 = $this->prophesize(HttpClientInterface::class);
         $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
@@ -57,7 +57,7 @@ class VarnishPurgerTest extends TestCase
         $purger->purge(['/foo' => '/foo', '/bar' => '/bar']);
     }
 
-    public function testEmptyTags()
+    public function testEmptyTags(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request()->shouldNotBeCalled();

@@ -35,19 +35,13 @@ class Employee
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
 
-    /**
-     * @var string The dummy name
-     */
     #[ODM\Field]
     #[Groups(['company_employees_read'])]
-    public $name;
+    public ?string $name = null;
 
-    /**
-     * @var ?Company
-     */
     #[ODM\ReferenceOne(targetDocument: Company::class, storeAs: 'id')]
     #[Groups(['company_employees_read'])]
-    public $company;
+    public ?Company $company = null;
 
     public function getId()
     {

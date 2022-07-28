@@ -15,11 +15,8 @@ namespace ApiPlatform\Tests\Fixtures;
 
 class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
 {
-    private $array;
-
-    public function __construct(array $array = [])
+    public function __construct(private array $array = [])
     {
-        $this->array = $array;
     }
 
     #[\ReturnTypeWillChange]

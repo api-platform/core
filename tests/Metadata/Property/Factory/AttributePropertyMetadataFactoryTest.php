@@ -31,7 +31,7 @@ class AttributePropertyMetadataFactoryTest extends TestCase
     /**
      * @requires PHP 8.0
      */
-    public function testCreateAttribute()
+    public function testCreateAttribute(): void
     {
         $factory = new AttributePropertyMetadataFactory();
 
@@ -43,7 +43,7 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $this->assertSame('a foo', $metadata->getDescription());
     }
 
-    public function testClassNotFound()
+    public function testClassNotFound(): void
     {
         $this->expectException(PropertyNotFoundException::class);
         $this->expectExceptionMessage('Property "foo" of class "\\DoNotExist" not found.');
@@ -52,7 +52,7 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $factory->create('\DoNotExist', 'foo');
     }
 
-    public function testClassNotFoundButParentFound()
+    public function testClassNotFoundButParentFound(): void
     {
         $propertyMetadata = new ApiProperty();
 
@@ -66,7 +66,7 @@ class AttributePropertyMetadataFactoryTest extends TestCase
     /**
      * @requires PHP 8.0
      */
-    public function testClassFoundAndParentFound()
+    public function testClassFoundAndParentFound(): void
     {
         $parentPropertyMetadata = (new ApiProperty('Desc', true, false, true, false, true, false, 'Default', 'Example'))->withTypes(['https://example.com']);
 

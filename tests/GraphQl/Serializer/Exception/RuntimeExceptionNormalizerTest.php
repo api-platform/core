@@ -29,8 +29,6 @@ class RuntimeExceptionNormalizerTest extends TestCase
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->runtimeExceptionNormalizer = new RuntimeExceptionNormalizer();
     }
 

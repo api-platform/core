@@ -56,7 +56,7 @@ class Employee
     #[Groups(['company_employees_read'])]
     public string $name;
 
-    #[ORM\ManyToOne(targetEntity: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company::class)]
+    #[ORM\ManyToOne(targetEntity: Company::class)]
     #[Groups(['company_employees_read'])]
     public ?Company $company = null;
 

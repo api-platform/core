@@ -42,12 +42,12 @@ class ArrayFilterValidator
     #[ORM\Column]
     private $name;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

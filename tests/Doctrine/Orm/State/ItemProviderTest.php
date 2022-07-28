@@ -66,7 +66,7 @@ class ItemProviderTest extends TestCase
 
         /** @var HttpOperation */
         $operation = (new Get())->withUriVariables([
-            'identifier' => (new Link())->withFromClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource")
+            'identifier' => (new Link())->withFromClass(OperationResource::class)
             ->withIdentifiers([
                 0 => 'identifier',
             ]),
@@ -97,11 +97,11 @@ class ItemProviderTest extends TestCase
 
         /** @var HttpOperation */
         $operation = (new Get())->withUriVariables([
-            'ida' => (new Link())->withFromClass('ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource')
+            'ida' => (new Link())->withFromClass(OperationResource::class)
                 ->withIdentifiers([
                     0 => 'ida',
                 ]),
-            'idb' => (new Link())->withFromClass('ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource')
+            'idb' => (new Link())->withFromClass(OperationResource::class)
                 ->withIdentifiers([
                     0 => 'idb',
                 ]),
@@ -147,7 +147,7 @@ class ItemProviderTest extends TestCase
 
         /** @var HttpOperation */
         $operation = (new Get())->withUriVariables([
-            'identifier' => (new Link())->withFromClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource")->withIdentifiers([
+            'identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers([
                 0 => 'identifier',
             ]),
         ])->withClass(OperationResource::class)->withName('get');

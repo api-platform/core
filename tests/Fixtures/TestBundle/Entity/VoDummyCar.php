@@ -36,17 +36,17 @@ class VoDummyCar extends VoDummyVehicle
         $this->inspections = new ArrayCollection();
     }
 
-    public function getMileage()
+    public function getMileage(): int
     {
         return $this->mileage;
     }
 
-    public function getBodyType()
+    public function getBodyType(): string
     {
         return $this->bodyType;
     }
 
-    public function getInspections()
+    public function getInspections(): Collection
     {
         return $this->inspections;
     }

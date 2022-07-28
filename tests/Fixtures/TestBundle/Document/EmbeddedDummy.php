@@ -49,18 +49,15 @@ class EmbeddedDummy
      */
     #[Assert\DateTime]
     #[ODM\Field(type: 'date')]
-    public $dummyDate;
-    /**
-     * @var EmbeddableDummy
-     */
+    public ?\DateTime $dummyDate = null;
     #[Groups(['embed'])]
     #[ODM\EmbedOne(targetDocument: EmbeddableDummy::class)]
-    public $embeddedDummy;
+    public ?EmbeddableDummy $embeddedDummy = null;
     /**
      * @var RelatedDummy|null A related dummy
      */
     #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, storeAs: 'id')]
-    public $relatedDummy;
+    public ?RelatedDummy $relatedDummy = null;
 
     public static function staticMethod(): void
     {

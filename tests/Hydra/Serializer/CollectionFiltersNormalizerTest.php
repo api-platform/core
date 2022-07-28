@@ -40,7 +40,7 @@ class CollectionFiltersNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
@@ -58,7 +58,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizeNonResourceCollection()
+    public function testNormalizeNonResourceCollection(): void
     {
         $notAResourceA = new NotAResource('A', 'buzz');
         $notAResourceB = new NotAResource('B', 'bzzt');
@@ -99,7 +99,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         ], $actual);
     }
 
-    public function testNormalizeSubLevelResourceCollection()
+    public function testNormalizeSubLevelResourceCollection(): void
     {
         $fooOne = new Foo();
         $fooOne->id = 1;
@@ -152,7 +152,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         ], $actual);
     }
 
-    public function testNormalizeSubLevelNonResourceCollection()
+    public function testNormalizeSubLevelNonResourceCollection(): void
     {
         $notAResourceA = new NotAResource('A', 'buzz');
         $notAResourceB = new NotAResource('B', 'bzzt');
@@ -194,7 +194,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         ], $actual);
     }
 
-    public function testDoNothingIfNoFilter()
+    public function testDoNothingIfNoFilter(): void
     {
         $dummy = new Dummy();
 
@@ -229,7 +229,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         ]));
     }
 
-    public function testDoNothingIfNoRequestUri()
+    public function testDoNothingIfNoRequestUri(): void
     {
         $dummy = new Dummy();
 
@@ -267,7 +267,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         ]));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $filterProphecy = $this->prophesize(FilterInterface::class);
         $filterProphecy->getDescription(Dummy::class)->willReturn(['a' => ['property' => 'name', 'required' => true]])->shouldBeCalled();

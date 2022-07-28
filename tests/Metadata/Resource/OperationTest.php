@@ -30,7 +30,7 @@ use PHPUnit\Framework\TestCase;
 
 final class OperationTest extends TestCase
 {
-    public function testWithResourceTrait()
+    public function testWithResourceTrait(): void
     {
         $operation = (new GetCollection())->withOperation((new HttpOperation())->withShortName('test')->withRead(false));
 
@@ -42,7 +42,7 @@ final class OperationTest extends TestCase
     /**
      * @dataProvider operationProvider
      */
-    public function testOperationConstructor(Operation $operation)
+    public function testOperationConstructor(Operation $operation): void
     {
         $this->assertInstanceOf(Operation::class, $operation);
     }

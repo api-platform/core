@@ -34,14 +34,14 @@ class DummyTableInheritanceRelated
      */
     #[Groups(['default'])]
     #[ODM\ReferenceMany(targetDocument: DummyTableInheritance::class, mappedBy: 'parent')]
-    private \Doctrine\Common\Collections\Collection $children;
+    private Collection $children;
 
     public function __construct()
     {
         $this->children = new ArrayCollection();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -51,7 +51,7 @@ class DummyTableInheritanceRelated
         return $this->children;
     }
 
-    public function setChildren($children)
+    public function setChildren(Collection $children)
     {
         $this->children = $children;
 

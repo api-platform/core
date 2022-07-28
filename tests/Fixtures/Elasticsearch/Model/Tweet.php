@@ -27,16 +27,16 @@ class Tweet
 {
     #[Groups(['tweet:read', 'user:read'])]
     #[ApiProperty(identifier: true)]
-    private $id;
+    private ?string $id = null;
 
     #[Groups(['tweet:read'])]
-    private $author;
+    private ?User $author = null;
 
     #[Groups(['tweet:read', 'user:read'])]
-    private $date;
+    private ?\DateTimeImmutable $date = null;
 
     #[Groups(['tweet:read', 'user:read'])]
-    private $message;
+    private ?string $message = null;
 
     public function getId(): ?string
     {

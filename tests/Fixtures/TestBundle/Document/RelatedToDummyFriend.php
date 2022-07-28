@@ -25,11 +25,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Related To Dummy Friend represent an association table for a manytomany relation.
  */
 #[ApiResource(normalizationContext: ['groups' => ['fakemanytomany']], filters: ['related_to_dummy_friend.mongodb.name'])]
-#[ApiResource(uriTemplate: '/dummies/{id}/related_dummies/{relatedDummies}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
-#[ApiResource(uriTemplate: '/related_dummies/{id}/id/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
-#[ApiResource(uriTemplate: '/related_dummies/{id}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
-#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies/{relatedDummies}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
-#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/dummies/{id}/related_dummies/{relatedDummies}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_dummies/{id}/id/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_dummies/{id}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies/{relatedDummies}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.mongodb.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
 #[ODM\Document]
 class RelatedToDummyFriend
 {
@@ -52,22 +52,22 @@ class RelatedToDummyFriend
     #[Groups(['fakemanytomany', 'friends'])]
     #[Assert\NotNull]
     #[ODM\ReferenceOne(targetDocument: DummyFriend::class, storeAs: 'id')]
-    private $dummyFriend;
+    private DummyFriend $dummyFriend;
     #[Assert\NotNull]
     #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, inversedBy: 'relatedToDummyFriend', storeAs: 'id')]
-    private $relatedDummy;
+    private RelatedDummy $relatedDummy;
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -85,7 +85,7 @@ class RelatedToDummyFriend
     /**
      * @param string|null $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
@@ -103,7 +103,7 @@ class RelatedToDummyFriend
      *
      * @param DummyFriend $dummyFriend the value to set
      */
-    public function setDummyFriend(DummyFriend $dummyFriend)
+    public function setDummyFriend(DummyFriend $dummyFriend): void
     {
         $this->dummyFriend = $dummyFriend;
     }
@@ -121,7 +121,7 @@ class RelatedToDummyFriend
      *
      * @param RelatedDummy $relatedDummy the value to set
      */
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }

@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 class IndexNotFoundExceptionTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $indexNotFoundException = new IndexNotFoundException();
 

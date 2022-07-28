@@ -15,13 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
 
 class CustomObject
 {
-    public $id;
-
-    public $text;
-
-    public function __construct($id, $text)
+    public function __construct(public $id, public $text)
     {
-        $this->id = $id;
-        $this->text = $text;
     }
 }

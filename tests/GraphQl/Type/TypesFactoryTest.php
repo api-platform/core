@@ -26,7 +26,7 @@ class TypesFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testGetTypes()
+    public function testGetTypes(): void
     {
         $typeProphecy = $this->prophesize(TypeInterface::class);
         $typeProphecy->getName()->willReturn('Foo');

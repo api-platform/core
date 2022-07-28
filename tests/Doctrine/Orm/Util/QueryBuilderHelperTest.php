@@ -108,7 +108,7 @@ class QueryBuilderHelperTest extends TestCase
 
         $actual = QueryBuilderHelper::getEntityClassByAlias('a_1', $queryBuilder, $managerRegistryProphecy->reveal());
 
-        $this->assertEquals(RelatedDummy::class, $actual);
+        $this->assertSame(RelatedDummy::class, $actual);
     }
 
     public function testGetEntityClassByAliasWithJoinByClass(): void
@@ -127,20 +127,18 @@ class QueryBuilderHelperTest extends TestCase
 
         $actual = QueryBuilderHelper::getEntityClassByAlias('a_1', $queryBuilder, $managerRegistryProphecy->reveal());
 
-        $this->assertEquals(RelatedDummy::class, $actual);
+        $this->assertSame(RelatedDummy::class, $actual);
     }
 
-    public function provideAddJoinOnce(): array
+    public function provideAddJoinOnce(): \Iterator
     {
-        return [
-            [
-                null,
-                'b',
-            ],
-            [
-                'f2',
-                'b2',
-            ],
+        yield [
+            null,
+            'b',
+        ];
+        yield [
+            'f2',
+            'b2',
         ];
     }
 }

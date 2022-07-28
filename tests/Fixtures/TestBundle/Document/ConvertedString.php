@@ -31,7 +31,7 @@ class ConvertedString
     #[ODM\Field(type: 'string', nullable: true)]
     public $nameConverted;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

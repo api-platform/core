@@ -30,8 +30,7 @@ class ValidateStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ValidateStage */
-    private $validateStage;
+    private ValidateStage $validateStage;
     private $validatorProphecy;
 
     /**

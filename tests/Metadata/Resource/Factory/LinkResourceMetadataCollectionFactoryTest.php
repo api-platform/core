@@ -38,7 +38,7 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Argument::cetera())->willReturn(new PropertyNameCollection([
@@ -94,7 +94,7 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
         );
     }
 
-    public function testCreateWithLinkAttribute()
+    public function testCreateWithLinkAttribute(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Argument::cetera())->willReturn(new PropertyNameCollection([

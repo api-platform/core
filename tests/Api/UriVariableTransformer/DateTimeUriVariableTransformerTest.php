@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 class DateTimeUriVariableTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $this->expectException(InvalidUriVariableException::class);
 
@@ -27,7 +27,7 @@ class DateTimeUriVariableTransformerTest extends TestCase
         $normalizer->transform('not valid', [\DateTimeImmutable::class]);
     }
 
-    public function testSupportsTransformationForDateTime()
+    public function testSupportsTransformationForDateTime(): void
     {
         $normalizer = new DateTimeUriVariableTransformer();
 

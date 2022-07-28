@@ -34,7 +34,7 @@ class DummyPlainIdentifierDenormalizer implements DenormalizerInterface, Denorma
 {
     use DenormalizerAwareTrait;
 
-    public function __construct(private IriConverterInterface $iriConverter)
+    public function __construct(private readonly IriConverterInterface $iriConverter)
     {
     }
 

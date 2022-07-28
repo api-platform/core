@@ -48,7 +48,7 @@ class DummyProduct
      * @var string The tour name
      */
     #[ORM\Column]
-    private $name;
+    private string $name;
     /**
      * @var Collection<int,DummyProduct>
      */
@@ -68,18 +68,18 @@ class DummyProduct
         return $this->offers;
     }
 
-    public function setOffers($offers)
+    public function setOffers(Collection $offers): void
     {
         $this->offers = $offers;
     }
 
-    public function addOffer(DummyAggregateOffer $offer)
+    public function addOffer(DummyAggregateOffer $offer): void
     {
         $this->offers->add($offer);
         $offer->setProduct($this);
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -89,7 +89,7 @@ class DummyProduct
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -99,12 +99,12 @@ class DummyProduct
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(iterable $relatedProducts)
+    public function setRelatedProducts(iterable $relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }
 
-    public function addRelatedProduct(self $relatedProduct)
+    public function addRelatedProduct(self $relatedProduct): void
     {
         $this->relatedProducts->add($relatedProduct);
         $relatedProduct->setParent($this);
@@ -115,7 +115,7 @@ class DummyProduct
         return $this->parent;
     }
 
-    public function setParent(self $product)
+    public function setParent(self $product): void
     {
         $this->parent = $product;
     }

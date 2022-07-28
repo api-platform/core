@@ -59,7 +59,7 @@ class DummyDtoCustom
     #[ODM\Field]
     public $ipsum;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

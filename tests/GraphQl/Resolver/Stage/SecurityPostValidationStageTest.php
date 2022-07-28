@@ -31,8 +31,7 @@ class SecurityPostValidationStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var SecurityPostValidationStage */
-    private $securityPostValidationStage;
+    private SecurityPostValidationStage $securityPostValidationStage;
     private $resourceAccessCheckerProphecy;
 
     /**

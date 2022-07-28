@@ -40,7 +40,7 @@ class DummyNoGetOperation
     #[ORM\Column]
     public $lorem;
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }

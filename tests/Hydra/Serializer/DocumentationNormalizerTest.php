@@ -363,7 +363,7 @@ class DocumentationNormalizerTest extends TestCase
         $this->assertTrue($documentationNormalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizeInputOutputClass()
+    public function testNormalizeInputOutputClass(): void
     {
         $title = 'Test Api';
         $desc = 'test ApiGerard';

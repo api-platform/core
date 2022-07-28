@@ -26,7 +26,7 @@ class PhpDocResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testExistingDescription()
+    public function testExistingDescription(): void
     {
         $resourceCollection = new ResourceMetadataCollection('Foo', [new ApiResource(description: 'I am foo')]);
         $decoratedProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -37,7 +37,7 @@ class PhpDocResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame($resourceCollection[0], $factory->create('Foo')[0]);
     }
 
-    public function testNoDocBlock()
+    public function testNoDocBlock(): void
     {
         $resourceCollection = new ResourceMetadataCollection('Foo', [new ApiResource()]);
         $decoratedProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -48,7 +48,7 @@ class PhpDocResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame($resourceCollection[0], $factory->create(ClassWithNoDocBlock::class)[0]);
     }
 
-    public function testExtractDescription()
+    public function testExtractDescription(): void
     {
         $resourceCollection = new ResourceMetadataCollection(DummyEntity::class, [new ApiResource()]);
         $decoratedProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

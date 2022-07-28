@@ -33,23 +33,20 @@ class RelatedOwningDummy
      */
     #[ODM\Field(type: 'string')]
     public $name;
-    /**
-     * @var Dummy
-     */
     #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], mappedBy: 'relatedOwningDummy')]
-    public $ownedDummy;
+    public ?Dummy $ownedDummy = null;
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -72,7 +69,7 @@ class RelatedOwningDummy
      *
      * @param Dummy $ownedDummy the value to set
      */
-    public function setOwnedDummy(Dummy $ownedDummy)
+    public function setOwnedDummy(Dummy $ownedDummy): void
     {
         $this->ownedDummy = $ownedDummy;
         if ($this !== $this->ownedDummy->getRelatedOwningDummy()) {

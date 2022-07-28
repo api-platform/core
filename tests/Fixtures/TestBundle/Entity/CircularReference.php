@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -36,7 +37,7 @@ class CircularReference
     public $parent;
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     #[Groups(['circular'])]
-    public $children;
+    public Collection $children;
 
     public function __construct()
     {

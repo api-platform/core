@@ -37,27 +37,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ODM\Document(collection: 'user_test')]
 class User extends AbstractSecurityUser
 {
-    /**
-     * @var int|null
-     */
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
-    protected $id;
-    /**
-     * @var string|null
-     */
+    protected ?int $id = null;
     #[Groups(['user'])]
-    protected $email;
-    /**
-     * @var string|null
-     */
+    protected ?string $email = null;
     #[Groups(['user'])]
     #[ODM\Field(type: 'string', nullable: true)]
-    protected $fullname;
-    /**
-     * @var string|null
-     */
+    protected ?string $fullname = null;
     #[Groups(['user-write'])]
-    protected $plainPassword;
+    protected ?string $plainPassword = null;
     /**
      * @var string|null
      */
@@ -126,7 +114,7 @@ class User extends AbstractSecurityUser
         return null;
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 }

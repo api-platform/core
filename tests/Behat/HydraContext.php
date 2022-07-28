@@ -23,15 +23,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class HydraContext implements Context
 {
-    /**
-     * @var RestContext
-     */
-    private $restContext;
-    private $propertyAccessor;
+    private ?RestContext $restContext = null;
 
-    public function __construct(PropertyAccessorInterface $propertyAccessor)
+    public function __construct(private readonly PropertyAccessorInterface $propertyAccessor)
     {
-        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -39,7 +34,7 @@ final class HydraContext implements Context
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /**
          * @var InitializedContextEnvironment $environment
@@ -71,7 +66,7 @@ final class HydraContext implements Context
     {
         try {
             $this->getClassInfo($className);
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
             return;
         }
 
@@ -81,7 +76,7 @@ final class HydraContext implements Context
     /**
      * @Then the boolean value of the node :node of the Hydra class :class is true
      */
-    public function assertBooleanNodeValueIs(string $nodeName, string $className)
+    public function assertBooleanNodeValueIs(string $nodeName, string $className): void
     {
         Assert::assertTrue($this->propertyAccessor->getValue($this->getClassInfo($className), $nodeName));
     }
@@ -89,7 +84,7 @@ final class HydraContext implements Context
     /**
      * @Then the value of the node :node of the Hydra class :class is :value
      */
-    public function assertNodeValueIs(string $nodeName, string $className, string $value)
+    public function assertNodeValueIs(string $nodeName, string $className, string $value): void
     {
         Assert::assertEquals(
             $this->propertyAccessor->getValue($this->getClassInfo($className), $nodeName),
@@ -100,7 +95,7 @@ final class HydraContext implements Context
     /**
      * @Then the boolean value of the node :node of the property :prop of the Hydra class :class is true
      */
-    public function assertPropertyNodeValueIsTrue(string $nodeName, string $propertyName, string $className)
+    public function assertPropertyNodeValueIsTrue(string $nodeName, string $propertyName, string $className): void
     {
         Assert::assertTrue($this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName));
     }
@@ -108,7 +103,7 @@ final class HydraContext implements Context
     /**
      * @Then the value of the node :node of the property :prop of the Hydra class :class is :value
      */
-    public function assertPropertyNodeValueIs(string $nodeName, string $propertyName, string $className, string $value)
+    public function assertPropertyNodeValueIs(string $nodeName, string $propertyName, string $className, string $value): void
     {
         Assert::assertEquals(
             $this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName),
@@ -119,7 +114,7 @@ final class HydraContext implements Context
     /**
      * @Then the boolean value of the node :node of the operation :operation of the Hydra class :class is true
      */
-    public function assertOperationNodeBooleanValueIs(string $nodeName, string $operationMethod, string $className)
+    public function assertOperationNodeBooleanValueIs(string $nodeName, string $operationMethod, string $className): void
     {
         Assert::assertTrue($this->propertyAccessor->getValue($this->getOperation($operationMethod, $className), $nodeName));
     }
@@ -127,7 +122,7 @@ final class HydraContext implements Context
     /**
      * @Then the value of the node :node of the operation :operation of the Hydra class :class is :value
      */
-    public function assertOperationNodeValueIs(string $nodeName, string $operationMethod, string $className, string $value)
+    public function assertOperationNodeValueIs(string $nodeName, string $operationMethod, string $className, string $value): void
     {
         Assert::assertEquals(
             $this->propertyAccessor->getValue($this->getOperation($operationMethod, $className), $nodeName),
@@ -138,7 +133,7 @@ final class HydraContext implements Context
     /**
      * @Then the value of the node :node of the operation :operation of the Hydra class :class contains :value
      */
-    public function assertOperationNodeValueContains(string $nodeName, string $operationMethod, string $className, string $value)
+    public function assertOperationNodeValueContains(string $nodeName, string $operationMethod, string $className, string $value): void
     {
         $property = $this->getOperation($operationMethod, $className);
 
@@ -148,7 +143,7 @@ final class HydraContext implements Context
     /**
      * @Then :nb operations are available for Hydra class :class
      */
-    public function assertNbOperationsExist(int $nb, string $className)
+    public function assertNbOperationsExist(int $nb, string $className): void
     {
         Assert::assertEquals($nb, \count($this->getOperations($className)));
     }
@@ -156,7 +151,7 @@ final class HydraContext implements Context
     /**
      * @Then :nb properties are available for Hydra class :class
      */
-    public function assertNbPropertiesExist(int $nb, string $className)
+    public function assertNbPropertiesExist(int $nb, string $className): void
     {
         Assert::assertEquals($nb, \count($this->getProperties($className)));
     }
@@ -168,7 +163,7 @@ final class HydraContext implements Context
     {
         try {
             $this->getPropertyInfo($propertyName, $className);
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
             return;
         }
 
@@ -300,7 +295,7 @@ final class HydraContext implements Context
      */
     private function getLastJsonResponse(): \stdClass
     {
-        if (null === $decoded = json_decode($this->restContext->getMink()->getSession()->getDriver()->getContent())) {
+        if (null === $decoded = json_decode($this->restContext->getMink()->getSession()->getDriver()->getContent(), null, 512, \JSON_THROW_ON_ERROR)) {
             throw new \RuntimeException('JSON response seems to be invalid');
         }
 

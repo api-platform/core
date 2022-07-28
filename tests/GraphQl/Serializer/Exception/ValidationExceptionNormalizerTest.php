@@ -32,8 +32,6 @@ class ValidationExceptionNormalizerTest extends TestCase
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->validationExceptionNormalizer = new ValidationExceptionNormalizer();
     }
 

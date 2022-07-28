@@ -38,7 +38,7 @@ class Order
     #[Groups(['order_read'])]
     public $recipient;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

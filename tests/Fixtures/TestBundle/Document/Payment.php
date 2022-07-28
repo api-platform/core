@@ -27,7 +27,7 @@ class Payment
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     #[ODM\ReferenceOne(targetDocument: VoidPayment::class, mappedBy: 'payment')]
-    private $voidPayment;
+    private ?VoidPayment $voidPayment = null;
 
     public function __construct(private readonly ?string $amount)
     {

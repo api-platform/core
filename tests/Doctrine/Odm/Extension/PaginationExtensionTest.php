@@ -50,8 +50,6 @@ class PaginationExtensionTest extends TestCase
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
     }
 
@@ -408,7 +406,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    private function mockAggregationBuilder($expectedOffset, $expectedLimit)
+    private function mockAggregationBuilder(int $expectedOffset, int $expectedLimit)
     {
         $skipProphecy = $this->prophesize(Skip::class);
         if ($expectedLimit > 0) {

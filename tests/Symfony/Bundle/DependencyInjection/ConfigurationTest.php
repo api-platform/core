@@ -212,7 +212,6 @@ class ConfigurationTest extends TestCase
                     'name' => null,
                     'url' => null,
                 ],
-                'backward_compatibility_layer' => true,
                 'swagger_ui_extra_configuration' => [],
             ],
             'maker' => [

@@ -36,26 +36,26 @@ class EmbeddableDummy
      * @var bool|null A dummy boolean
      */
     #[ODM\Field(type: 'bool')]
-    public $dummyBoolean;
+    public ?bool $dummyBoolean = null;
     /**
      * @var \DateTime|null A dummy date
      */
     #[Assert\DateTime]
     #[ODM\Field(type: 'date')]
-    public $dummyDate;
+    public ?\DateTime $dummyDate = null;
     /**
      * @var float|null A dummy float
      */
     #[ODM\Field(type: 'float')]
-    public $dummyFloat;
+    public ?float $dummyFloat = null;
     /**
      * @var float|null A dummy price
      */
     #[ODM\Field(type: 'float')]
-    public $dummyPrice;
+    public ?float $dummyPrice = null;
     #[Groups(['barcelona', 'chicago'])]
     #[ODM\Field(type: 'string')]
-    protected $symfony;
+    protected ?string $symfony = null;
 
     public static function staticMethod(): void
     {

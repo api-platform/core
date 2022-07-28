@@ -28,6 +28,9 @@ class EnumFilter extends AbstractFilter
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
+    /**
+     * @return array{enum: array{property: string, type: string, required: false, swagger: array{enum: string[]}}}
+     */
     public function getDescription(string $resourceClass): array
     {
         return [

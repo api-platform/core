@@ -22,11 +22,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 final class HttpCacheContext implements Context
 {
-    private $kernel;
-
-    public function __construct(KernelInterface $kernel)
+    public function __construct(private readonly KernelInterface $kernel)
     {
-        $this->kernel = $kernel;
     }
 
     /**

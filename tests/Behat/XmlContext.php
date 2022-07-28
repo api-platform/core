@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
 final class XmlContext extends BaseXmlContext
 {
-    private $xmlEncoder;
+    private readonly XmlEncoder $xmlEncoder;
 
     public function __construct()
     {

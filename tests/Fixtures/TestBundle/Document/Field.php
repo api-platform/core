@@ -65,7 +65,7 @@ class Field implements \JsonSerializable
     /**
      * {@inheritdoc}
      *
-     * @return mixed
+     * @return array{id: int|null, name: string|null, value: string|null}
      */
     #[\ReturnTypeWillChange]
     public function jsonSerialize()

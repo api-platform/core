@@ -15,10 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
 class NonResourceClass implements \Stringable
 {
-    /**
-     * @var string
-     */
-    public $foo;
+    public ?string $foo = null;
 
     public function __toString(): string
     {

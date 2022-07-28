@@ -21,7 +21,7 @@ class CompositeIdentifierParserTest extends TestCase
     /**
      * @dataProvider variousIdentifiers
      */
-    public function testNormalizeCompositeCorrectly(array $identifiers)
+    public function testNormalizeCompositeCorrectly(array $identifiers): void
     {
         foreach ($identifiers as $string => $expected) {
             $this->assertEquals(CompositeIdentifierParser::parse($string), $expected);
@@ -45,10 +45,10 @@ class CompositeIdentifierParserTest extends TestCase
     /**
      * @dataProvider compositeIdentifiers
      */
-    public function testStringify(array $identifiers)
+    public function testStringify(array $identifiers): void
     {
         foreach ($identifiers as $string => $arr) {
-            $this->assertEquals(CompositeIdentifierParser::stringify($arr), $string);
+            $this->assertSame(CompositeIdentifierParser::stringify($arr), $string);
         }
     }
 

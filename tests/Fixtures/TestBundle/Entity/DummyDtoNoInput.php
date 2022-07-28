@@ -64,7 +64,7 @@ class DummyDtoNoInput
     #[ORM\Column(type: 'float')]
     public $ipsum;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

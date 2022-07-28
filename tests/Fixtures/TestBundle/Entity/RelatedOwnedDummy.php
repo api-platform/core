@@ -28,18 +28,15 @@ class RelatedOwnedDummy
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private ?int $id = null;
     /**
      * @var string|null A name
      */
     #[ORM\Column(nullable: true)]
-    public $name;
-    /**
-     * @var Dummy
-     */
+    public ?string $name = null;
     #[ORM\OneToOne(targetEntity: Dummy::class, cascade: ['persist'], inversedBy: 'relatedOwnedDummy')]
     #[ORM\JoinColumn(nullable: false)]
-    public $owningDummy;
+    public ?Dummy $owningDummy = null;
 
     public function getId(): ?int
     {

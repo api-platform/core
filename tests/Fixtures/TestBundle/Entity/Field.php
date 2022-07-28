@@ -24,7 +24,7 @@ class Field implements \JsonSerializable
     private ?int $id = null;
     #[ORM\ManyToOne(targetEntity: Content::class, inversedBy: 'fields')]
     #[ORM\JoinColumn(nullable: false)]
-    private \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Content $content;
+    private Content $content;
     #[ORM\Column(type: 'string')]
     private string $name;
     #[ORM\Column(type: 'text')]
@@ -68,7 +68,7 @@ class Field implements \JsonSerializable
     /**
      * {@inheritdoc}
      *
-     * @return mixed
+     * @return array{id: int|null, name: string, value: string}
      */
     #[\ReturnTypeWillChange]
     public function jsonSerialize()

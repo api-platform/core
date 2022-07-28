@@ -31,7 +31,7 @@ class InputOutputResourceMetadataCollectionFactoryTest extends TestCase
      * @param mixed $input
      * @param mixed $expected
      */
-    public function testInputOutputMetadata($input, $expected)
+    public function testInputOutputMetadata($input, $expected): void
     {
         $resourceCollection = new ResourceMetadataCollection('Foo', [new ApiResource(input: $input)]);
         $decoratedProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

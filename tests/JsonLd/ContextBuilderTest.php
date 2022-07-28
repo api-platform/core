@@ -57,7 +57,7 @@ class ContextBuilderTest extends TestCase
         $this->urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
     }
 
-    public function testResourceContext()
+    public function testResourceContext(): void
     {
         $this->resourceMetadataCollectionFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadataCollection('DummyEntity', [
             (new ApiResource())
@@ -78,7 +78,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
-    public function testIriOnlyResourceContext()
+    public function testIriOnlyResourceContext(): void
     {
         $this->resourceMetadataCollectionFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadataCollection('DummyEntity', [
             (new ApiResource())
@@ -101,7 +101,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
-    public function testResourceContextWithJsonldContext()
+    public function testResourceContextWithJsonldContext(): void
     {
         $this->resourceMetadataCollectionFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadataCollection('DummyEntity', [
             (new ApiResource())
@@ -126,7 +126,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
-    public function testGetEntryPointContext()
+    public function testGetEntryPointContext(): void
     {
         $this->resourceMetadataCollectionFactoryProphecy->create('dummyPropertyA')->willReturn(new ResourceMetadataCollection('DummyEntity', [
             (new ApiResource())
@@ -151,7 +151,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getEntrypointContext());
     }
 
-    public function testResourceContextWithReverse()
+    public function testResourceContextWithReverse(): void
     {
         $this->resourceMetadataCollectionFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadataCollection('DummyEntity', [
             (new ApiResource())
@@ -175,7 +175,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
-    public function testAnonymousResourceContext()
+    public function testAnonymousResourceContext(): void
     {
         $dummy = new Dummy();
         $this->propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
@@ -184,7 +184,7 @@ class ContextBuilderTest extends TestCase
         $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal());
 
         $context = $contextBuilder->getAnonymousResourceContext($dummy);
-        $this->assertEquals('Dummy', $context['@type']);
+        $this->assertSame('Dummy', $context['@type']);
         $this->assertStringStartsWith('/.well-known/genid', $context['@id']);
         $this->assertEquals([
             '@vocab' => '#',
@@ -193,7 +193,7 @@ class ContextBuilderTest extends TestCase
         ], $context['@context']);
     }
 
-    public function testAnonymousResourceContextWithIri()
+    public function testAnonymousResourceContextWithIri(): void
     {
         $output = new OutputDto();
         $this->propertyNameCollectionFactoryProphecy->create(OutputDto::class)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
@@ -214,7 +214,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'name' => 'Dummy']));
     }
 
-    public function testAnonymousResourceContextWithApiResource()
+    public function testAnonymousResourceContextWithApiResource(): void
     {
         $output = new OutputDto();
         $this->propertyNameCollectionFactoryProphecy->create(OutputDto::class)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
@@ -241,7 +241,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'name' => 'Dummy', 'api_resource' => new Dummy()]));
     }
 
-    public function testAnonymousResourceContextWithApiResourceHavingContext()
+    public function testAnonymousResourceContextWithApiResourceHavingContext(): void
     {
         $output = new OutputDto();
         $this->propertyNameCollectionFactoryProphecy->create(OutputDto::class)->willReturn(new PropertyNameCollection(['dummyPropertyA']));

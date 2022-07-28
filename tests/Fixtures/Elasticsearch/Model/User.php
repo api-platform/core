@@ -25,25 +25,25 @@ class User
 {
     #[ApiProperty(identifier: true)]
     #[Groups(['tweet:read', 'user:read'])]
-    private $id;
+    private ?string $id = null;
 
     #[Groups(['tweet:read', 'user:read'])]
-    private $gender;
+    private ?string $gender = null;
 
     #[Groups(['tweet:read', 'user:read'])]
-    private $age;
+    private ?int $age = null;
 
     #[Groups(['tweet:read', 'user:read'])]
-    private $firstName;
+    private ?string $firstName = null;
 
     #[Groups(['tweet:read', 'user:read'])]
-    private $lastName;
+    private ?string $lastName = null;
 
     #[Groups(['user:read'])]
-    private $registeredAt;
+    private ?\DateTimeInterface $registeredAt = null;
 
     #[Groups(['user:read'])]
-    private $tweets = [];
+    private array $tweets = [];
 
     public function getId(): ?string
     {
@@ -70,7 +70,7 @@ class User
         return $this->age;
     }
 
-    public function setAge(int $age)
+    public function setAge(int $age): void
     {
         $this->age = $age;
     }

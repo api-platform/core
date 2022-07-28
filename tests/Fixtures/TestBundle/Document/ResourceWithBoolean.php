@@ -28,7 +28,7 @@ class ResourceWithBoolean
     #[ODM\Field(type: 'bool')]
     private bool $myBooleanField = false;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

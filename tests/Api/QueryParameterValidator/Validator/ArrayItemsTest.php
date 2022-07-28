@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ArrayItemsTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $request = [];
         $filter = new ArrayItems();
@@ -31,7 +31,7 @@ class ArrayItemsTest extends TestCase
         );
     }
 
-    public function testEmptyQueryParameter()
+    public function testEmptyQueryParameter(): void
     {
         $request = ['some_filter' => ''];
         $filter = new ArrayItems();
@@ -41,7 +41,7 @@ class ArrayItemsTest extends TestCase
         );
     }
 
-    public function testNonMatchingParameter()
+    public function testNonMatchingParameter(): void
     {
         $filter = new ArrayItems();
 
@@ -65,7 +65,7 @@ class ArrayItemsTest extends TestCase
         );
     }
 
-    public function testMatchingParameter()
+    public function testMatchingParameter(): void
     {
         $filter = new ArrayItems();
 
@@ -87,7 +87,7 @@ class ArrayItemsTest extends TestCase
         );
     }
 
-    public function testNonMatchingUniqueItems()
+    public function testNonMatchingUniqueItems(): void
     {
         $filter = new ArrayItems();
 
@@ -104,7 +104,7 @@ class ArrayItemsTest extends TestCase
         );
     }
 
-    public function testMatchingUniqueItems()
+    public function testMatchingUniqueItems(): void
     {
         $filter = new ArrayItems();
 
@@ -120,7 +120,7 @@ class ArrayItemsTest extends TestCase
         );
     }
 
-    public function testSeparators()
+    public function testSeparators(): void
     {
         $filter = new ArrayItems();
 
@@ -177,7 +177,7 @@ class ArrayItemsTest extends TestCase
         );
     }
 
-    public function testSeparatorsUnknownSeparator()
+    public function testSeparatorsUnknownSeparator(): void
     {
         $filter = new ArrayItems();
 

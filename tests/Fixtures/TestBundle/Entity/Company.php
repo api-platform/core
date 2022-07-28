@@ -60,7 +60,7 @@ class Company
     #[Link(toProperty: 'company')]
     public $employees = []; // only used to set metadata
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

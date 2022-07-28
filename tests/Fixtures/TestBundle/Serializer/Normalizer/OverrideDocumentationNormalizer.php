@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -29,7 +30,7 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
      * @param mixed      $object
      * @param mixed|null $format
      *
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      *
      * @return mixed
      */

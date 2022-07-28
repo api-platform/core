@@ -40,12 +40,12 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     // PHPUnit
-//    $rectorConfig->sets([
-//        PHPUnitSetList::PHPUNIT_91,
-//        PHPUnitSetList::PHPUNIT_CODE_QUALITY,
-//        PHPUnitSetList::PHPUNIT_EXCEPTION,
-//        PHPUnitSetList::REMOVE_MOCKS,
-//        PHPUnitSetList::PHPUNIT_SPECIFIC_METHOD,
-//        PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER,
-//    ]);
+    $rectorConfig->sets([
+        PHPUnitSetList::PHPUNIT_91,
+        PHPUnitSetList::PHPUNIT_CODE_QUALITY,
+        PHPUnitSetList::PHPUNIT_EXCEPTION,
+        PHPUnitSetList::REMOVE_MOCKS,
+        PHPUnitSetList::PHPUNIT_SPECIFIC_METHOD,
+        PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER,
+    ]);
 };

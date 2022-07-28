@@ -77,13 +77,11 @@ class SecuredDummy
 
     /**
      * A collection of dummies that only admins can access.
-     *
-     * @var Collection<RelatedDummy> Several dummies
      */
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
     #[ORM\JoinTable(name: 'secured_dummy_related_dummy')]
-    public $relatedDummies;
+    public Collection $relatedDummies;
 
     /**
      * A dummy that only admins can access.
@@ -97,13 +95,11 @@ class SecuredDummy
 
     /**
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
-     *
-     * @var Collection<RelatedSecuredDummy> Several dummies
      */
     #[ApiProperty(security: "is_granted('ROLE_USER')")]
     #[ORM\ManyToMany(targetEntity: RelatedSecuredDummy::class)]
     #[ORM\JoinTable(name: 'secured_dummy_related_secured_dummy')]
-    public $relatedSecuredDummies;
+    public Collection $relatedSecuredDummies;
 
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
@@ -117,12 +113,10 @@ class SecuredDummy
 
     /**
      * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
-     *
-     * @var Collection<RelatedSecuredDummy> Several dummies
      */
     #[ORM\ManyToMany(targetEntity: RelatedSecuredDummy::class)]
     #[ORM\JoinTable(name: 'secured_dummy_public_related_secured_dummy')]
-    public $publicRelatedSecuredDummies;
+    public Collection $publicRelatedSecuredDummies;
 
     /**
      * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
@@ -180,7 +174,7 @@ class SecuredDummy
         return $this->ownerOnlyProperty;
     }
 
-    public function setOwnerOnlyProperty(?string $ownerOnlyProperty)
+    public function setOwnerOnlyProperty(?string $ownerOnlyProperty): void
     {
         $this->ownerOnlyProperty = $ownerOnlyProperty;
     }
@@ -195,12 +189,12 @@ class SecuredDummy
         $this->owner = $owner;
     }
 
-    public function addRelatedDummy(RelatedDummy $relatedDummy)
+    public function addRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummies->add($relatedDummy);
     }
 
-    public function getRelatedDummies()
+    public function getRelatedDummies(): Collection
     {
         return $this->relatedDummies;
     }
@@ -210,17 +204,17 @@ class SecuredDummy
         return $this->relatedDummy;
     }
 
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }
 
-    public function addRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    public function addRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy): void
     {
         $this->relatedSecuredDummies->add($relatedSecuredDummy);
     }
 
-    public function getRelatedSecuredDummies()
+    public function getRelatedSecuredDummies(): Collection
     {
         return $this->relatedSecuredDummies;
     }
@@ -230,17 +224,17 @@ class SecuredDummy
         return $this->relatedSecuredDummy;
     }
 
-    public function setRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    public function setRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy): void
     {
         $this->relatedSecuredDummy = $relatedSecuredDummy;
     }
 
-    public function addPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    public function addPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy): void
     {
         $this->publicRelatedSecuredDummies->add($publicRelatedSecuredDummy);
     }
 
-    public function getPublicRelatedSecuredDummies()
+    public function getPublicRelatedSecuredDummies(): Collection
     {
         return $this->publicRelatedSecuredDummies;
     }
@@ -250,7 +244,7 @@ class SecuredDummy
         return $this->publicRelatedSecuredDummy;
     }
 
-    public function setPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    public function setPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy): void
     {
         $this->publicRelatedSecuredDummy = $publicRelatedSecuredDummy;
     }

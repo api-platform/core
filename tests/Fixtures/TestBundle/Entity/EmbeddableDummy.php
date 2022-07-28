@@ -35,28 +35,28 @@ class EmbeddableDummy
      * @var bool|null A dummy boolean
      */
     #[ORM\Column(type: 'boolean', nullable: true)]
-    public $dummyBoolean;
+    public ?bool $dummyBoolean = null;
     /**
      * @var \DateTime|null A dummy date
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Assert\DateTime]
-    public $dummyDate;
+    public ?\DateTime $dummyDate = null;
     /**
      * @var float|null A dummy float
      */
     #[ORM\Column(type: 'float', nullable: true)]
-    public $dummyFloat;
+    public ?float $dummyFloat = null;
     /**
      * @var string|null A dummy price
      */
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    public $dummyPrice;
+    public ?string $dummyPrice = null;
     #[ORM\Column(type: 'string', nullable: true)]
     #[Groups(['barcelona', 'chicago'])]
     protected $symfony;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -69,7 +69,7 @@ class EmbeddableDummy
         return $this->dummyName;
     }
 
-    public function setDummyName(string $dummyName)
+    public function setDummyName(string $dummyName): void
     {
         $this->dummyName = $dummyName;
     }
@@ -79,7 +79,7 @@ class EmbeddableDummy
         return $this->dummyBoolean;
     }
 
-    public function setDummyBoolean(bool $dummyBoolean)
+    public function setDummyBoolean(bool $dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }
@@ -89,7 +89,7 @@ class EmbeddableDummy
         return $this->dummyDate;
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate): void
     {
         $this->dummyDate = $dummyDate;
     }
@@ -99,7 +99,7 @@ class EmbeddableDummy
         return $this->dummyFloat;
     }
 
-    public function setDummyFloat(float $dummyFloat)
+    public function setDummyFloat(float $dummyFloat): void
     {
         $this->dummyFloat = $dummyFloat;
     }
@@ -109,7 +109,7 @@ class EmbeddableDummy
         return $this->dummyPrice;
     }
 
-    public function setDummyPrice(string $dummyPrice)
+    public function setDummyPrice(string $dummyPrice): void
     {
         $this->dummyPrice = $dummyPrice;
     }
@@ -119,7 +119,7 @@ class EmbeddableDummy
         return $this->symfony;
     }
 
-    public function setSymfony($symfony)
+    public function setSymfony($symfony): void
     {
         $this->symfony = $symfony;
     }

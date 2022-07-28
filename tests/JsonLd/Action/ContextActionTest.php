@@ -36,7 +36,7 @@ class ContextActionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testContextActionWithEntrypoint()
+    public function testContextActionWithEntrypoint(): void
     {
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
@@ -47,7 +47,7 @@ class ContextActionTest extends TestCase
         $this->assertEquals(['@context' => ['/entrypoints']], $contextAction('Entrypoint'));
     }
 
-    public function testContextActionWithContexts()
+    public function testContextActionWithContexts(): void
     {
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
@@ -58,7 +58,7 @@ class ContextActionTest extends TestCase
         $this->assertEquals(['@context' => ['/contexts']], $contextAction('Error'));
     }
 
-    public function testContextActionWithResourceClass()
+    public function testContextActionWithResourceClass(): void
     {
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
@@ -86,7 +86,7 @@ class ContextActionTest extends TestCase
         $this->assertEquals(['@context' => ['/dummies']], $contextAction('dummy'));
     }
 
-    public function testContextActionWithThrown()
+    public function testContextActionWithThrown(): void
     {
         $this->expectException(NotFoundHttpException::class);
 

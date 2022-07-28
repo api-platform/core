@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 class InternalUser extends AbstractUser
 {
     #[ORM\Column]
-    private $internalId;
+    private ?string $internalId = null;
 
     public function getInternalId(): ?string
     {

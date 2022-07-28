@@ -23,7 +23,7 @@ class DummyForAdditionalFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     public function __construct(#[ORM\Column] private readonly string $name, #[ORM\Column] private readonly string $slug)
     {

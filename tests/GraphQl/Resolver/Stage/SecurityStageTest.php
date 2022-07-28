@@ -31,8 +31,7 @@ class SecurityStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var SecurityStage */
-    private $securityStage;
+    private SecurityStage $securityStage;
     private $resourceAccessCheckerProphecy;
 
     /**

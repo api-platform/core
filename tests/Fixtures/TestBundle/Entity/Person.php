@@ -35,12 +35,9 @@ class Person
     #[ORM\Column(type: 'string')]
     #[Groups(['people.pets'])]
     public $name;
-    /**
-     * @var Collection<int, PersonToPet>
-     */
     #[ORM\OneToMany(targetEntity: PersonToPet::class, mappedBy: 'person')]
     #[Groups(['people.pets'])]
-    public $pets;
+    public Collection $pets;
     #[ORM\OneToMany(targetEntity: Greeting::class, mappedBy: 'sender')]
     public $sentGreetings;
 

@@ -62,7 +62,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolve(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'update';
         $operation = (new Subscription())->withMercure(true)->withName($operationName);
@@ -106,7 +106,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolveNullOperationName(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $source = ['source'];
         $args = ['args'];
@@ -117,7 +117,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolveBadReadStageItem(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'update';
         $operation = (new Subscription())->withName($operationName);
@@ -137,7 +137,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolveNoSubscriptionId(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'update';
         $operation = (new Subscription())->withName($operationName)->withMercure(true);
@@ -161,7 +161,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolveNoMercureSubscriptionIriGenerator(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'update';
         /** @var Operation $operation */

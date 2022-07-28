@@ -45,7 +45,7 @@ final class DateTimeType extends ScalarType implements TypeInterface
      *
      * @return mixed
      */
-    public function serialize($value)
+    public function serialize($value): string
     {
         // Already serialized.
         if (\is_string($value)) {

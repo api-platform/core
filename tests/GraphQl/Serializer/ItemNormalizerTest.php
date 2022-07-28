@@ -37,7 +37,7 @@ class ItemNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $std = new \stdClass();
         $dummy = new Dummy();
@@ -69,7 +69,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class, ItemNormalizer::FORMAT));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -163,7 +163,7 @@ class ItemNormalizerTest extends TestCase
         ]));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];
 

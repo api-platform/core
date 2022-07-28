@@ -32,7 +32,7 @@ class ConstraintViolationNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $nameConverterInterface = $this->prophesize(NameConverterInterface::class);
@@ -45,7 +45,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)]))->shouldBeCalledTimes(1);

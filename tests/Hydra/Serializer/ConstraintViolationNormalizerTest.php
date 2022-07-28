@@ -30,7 +30,7 @@ class ConstraintViolationNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
@@ -46,15 +46,13 @@ class ConstraintViolationNormalizerTest extends TestCase
     /**
      * @dataProvider payloadFieldsProvider
      */
-    public function testNormalize(?array $fields, array $result)
+    public function testNormalize(?array $fields, array $result): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
 
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList'])->willReturn('/context/foo')->shouldBeCalled();
-        $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(function ($args) {
-            return '_'.$args[0];
-        });
+        $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(fn ($args): string => '_'.$args[0]);
 
         $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), $fields, $nameConverterProphecy->reveal());
 

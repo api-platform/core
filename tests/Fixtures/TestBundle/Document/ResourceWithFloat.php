@@ -28,7 +28,7 @@ class ResourceWithFloat
     #[ODM\Field(type: 'float')]
     private float $myFloatField = 0.0;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

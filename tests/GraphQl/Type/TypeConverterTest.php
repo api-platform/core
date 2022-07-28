@@ -52,8 +52,7 @@ class TypeConverterTest extends TestCase
     /** @var ObjectProphecy */
     private $propertyMetadataFactoryProphecy;
 
-    /** @var TypeConverter */
-    private $typeConverter;
+    private TypeConverter $typeConverter;
 
     /**
      * {@inheritdoc}
@@ -201,13 +200,11 @@ class TypeConverterTest extends TestCase
 
     /**
      * @dataProvider resolveTypeProvider
-     *
-     * @param string|GraphQLType $expectedGraphqlType
      */
-    public function testResolveType(string $type, $expectedGraphqlType): void
+    public function testResolveType(string $type, string|GraphQLType $expectedGraphqlType): void
     {
-        $this->typesContainerProphecy->has('DateTime')->willReturn(true);
-        $this->typesContainerProphecy->get('DateTime')->willReturn(new DateTimeType());
+        $this->typesContainerProphecy->has(\DateTime::class)->willReturn(true);
+        $this->typesContainerProphecy->get(\DateTime::class)->willReturn(new DateTimeType());
 
         $this->assertEquals($expectedGraphqlType, $this->typeConverter->resolveType($type));
     }
@@ -223,7 +220,7 @@ class TypeConverterTest extends TestCase
             ['[Int!]', GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::int()))],
             ['Float', GraphQLType::float()],
             ['[Float]!', GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::float()))],
-            ['DateTime', new DateTimeType()],
+            [\DateTime::class, new DateTimeType()],
             ['[DateTime!]!', GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(new DateTimeType())))],
         ];
     }

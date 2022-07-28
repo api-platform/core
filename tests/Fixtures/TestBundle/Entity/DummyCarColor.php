@@ -41,7 +41,7 @@ class DummyCarColor
     #[Serializer\Groups(['colors'])]
     private string $prop = '';
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

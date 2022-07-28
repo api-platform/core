@@ -51,12 +51,12 @@ final class AttributeResource
     {
     }
 
-    public function getIdentifier()
+    public function getIdentifier(): int
     {
         return $this->identifier;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

@@ -29,12 +29,12 @@ class VoDummyDriver
     ) {
     }
 
-    public function getFirstName()
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
 
-    public function getLastName()
+    public function getLastName(): string
     {
         return $this->lastName;
     }

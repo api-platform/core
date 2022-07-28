@@ -50,9 +50,6 @@ class DummyDtoInputOutput
      */
     #[ODM\Field(type: 'float')]
     public $num;
-    /**
-     * @var Collection<RelatedDummy>
-     */
     #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
-    public $relatedDummies;
+    public Collection $relatedDummies;
 }

@@ -32,8 +32,6 @@ class HttpExceptionNormalizerTest extends TestCase
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->httpExceptionNormalizer = new HttpExceptionNormalizer();
     }
 

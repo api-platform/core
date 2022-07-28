@@ -17,7 +17,6 @@ use ApiPlatform\Util\RequestAttributesExtractor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
-use Symfony\Component\HttpKernel\EventListener\ExceptionListener as LegacyExceptionListener;
 
 /**
  * Handles requests errors.
@@ -27,11 +26,11 @@ use Symfony\Component\HttpKernel\EventListener\ExceptionListener as LegacyExcept
  */
 final class ExceptionListener
 {
-    private readonly ErrorListener $exceptionListener;
+    private readonly ErrorListener $errorListener;
 
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false, ErrorListener $errorListener = null)
+    public function __construct(string|object|array|null $controller, LoggerInterface $logger = null, bool $debug = false)
     {
-        $this->exceptionListener = $errorListener ? new ErrorListener($controller, $logger, $debug) : new LegacyExceptionListener($controller, $logger, $debug); // @phpstan-ignore-line
+        $this->errorListener = new ErrorListener($controller, $logger, $debug);
     }
 
     public function onKernelException(ExceptionEvent $event): void
@@ -45,6 +44,6 @@ final class ExceptionListener
             return;
         }
 
-        $this->exceptionListener->onKernelException($event);
+        $this->errorListener->onKernelException($event);
     }
 }

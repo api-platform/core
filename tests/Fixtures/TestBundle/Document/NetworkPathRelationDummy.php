@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::NET_PATH)]
@@ -25,7 +26,7 @@ class NetworkPathRelationDummy
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
     #[ODM\ReferenceMany(targetDocument: NetworkPathDummy::class, mappedBy: 'networkPathRelationDummy')]
-    public $networkPathDummies;
+    public Collection $networkPathDummies;
 
     public function __construct()
     {

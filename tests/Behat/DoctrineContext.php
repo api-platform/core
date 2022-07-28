@@ -171,13 +171,13 @@ use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Query\Builder;
+use Doctrine\ODM\MongoDB\SchemaManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Uid\Uuid as SymfonyUuid;
 
 /**
@@ -185,18 +185,9 @@ use Symfony\Component\Uid\Uuid as SymfonyUuid;
  */
 final class DoctrineContext implements Context
 {
-    /**
-     * @var ObjectManager
-     */
-    private $manager;
-    private $doctrine;
-
-    /**
-     * @var UserPasswordHasherInterface|UserPasswordEncoderInterface
-     */
-    private $passwordHasher; // @phpstan-ignore-line
-    private $schemaTool;
-    private $schemaManager;
+    private readonly ObjectManager $manager; // @phpstan-ignore-line
+    private readonly ?SchemaTool $schemaTool;
+    private readonly ?SchemaManager $schemaManager;
 
     /**
      * Initializes context.
@@ -207,10 +198,8 @@ final class DoctrineContext implements Context
      *
      * @param mixed $passwordHasher
      */
-    public function __construct(ManagerRegistry $doctrine, $passwordHasher)
+    public function __construct(private readonly ManagerRegistry $doctrine, private $passwordHasher)
     {
-        $this->doctrine = $doctrine;
-        $this->passwordHasher = $passwordHasher;
         $this->manager = $doctrine->getManager();
         $this->schemaTool = $this->manager instanceof EntityManagerInterface ? new SchemaTool($this->manager) : null;
         $this->schemaManager = $this->manager instanceof DocumentManager ? $this->manager->getSchemaManager() : null;
@@ -219,9 +208,9 @@ final class DoctrineContext implements Context
     /**
      * @BeforeScenario @createSchema
      */
-    public function createDatabase()
+    public function createDatabase(): void
     {
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
+        /** @var ClassMetadata[] $classes */
         $classes = $this->manager->getMetadataFactory()->getAllMetadata();
 
         if ($this->isOrm()) {
@@ -258,7 +247,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy objects
      */
-    public function thereAreDummyObjects(int $nb)
+    public function thereAreDummyObjects(int $nb): void
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -279,7 +268,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb pagination entities
      */
-    public function thereArePaginationEntities(int $nb)
+    public function thereArePaginationEntities(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $paginationEntity = new PaginationEntity();
@@ -292,7 +281,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb of these so many objects
      */
-    public function thereAreOfTheseSoManyObjects(int $nb)
+    public function thereAreOfTheseSoManyObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = $this->isOrm() ? new SoMany() : new SoManyDocument();
@@ -307,7 +296,7 @@ final class DoctrineContext implements Context
     /**
      * @When some dummy table inheritance data but not api resource child are created
      */
-    public function someDummyTableInheritanceDataButNotApiResourceChildAreCreated()
+    public function someDummyTableInheritanceDataButNotApiResourceChildAreCreated(): void
     {
         $dummy = $this->buildDummyTableInheritanceNotApiResourceChild();
         $dummy->setName('Foobarbaz inheritance');
@@ -318,7 +307,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb foo objects with fake names
      */
-    public function thereAreFooObjectsWithFakeNames(int $nb)
+    public function thereAreFooObjectsWithFakeNames(int $nb): void
     {
         $names = ['Hawsepipe', 'Sthenelus', 'Ephesian', 'Separativeness', 'Balbo'];
         $bars = ['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet'];
@@ -339,7 +328,7 @@ final class DoctrineContext implements Context
      *
      * @param mixed $nb
      */
-    public function thereAreFooDummyObjectsWithFakeNames($nb)
+    public function thereAreFooDummyObjectsWithFakeNames($nb): void
     {
         $names = ['Hawsepipe', 'Ephesian', 'Sthenelus', 'Separativeness', 'Balbo'];
         $dummies = ['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet'];
@@ -361,7 +350,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy group objects
      */
-    public function thereAreDummyGroupObjects(int $nb)
+    public function thereAreDummyGroupObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyGroup = $this->buildDummyGroup();
@@ -379,7 +368,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy property objects
      */
-    public function thereAreDummyPropertyObjects(int $nb)
+    public function thereAreDummyPropertyObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyProperty = $this->buildDummyProperty();
@@ -402,7 +391,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy property objects with a shared group
      */
-    public function thereAreDummyPropertyObjectsWithASharedGroup(int $nb)
+    public function thereAreDummyPropertyObjectsWithASharedGroup(int $nb): void
     {
         $dummyGroup = $this->buildDummyGroup();
         foreach (['foo', 'bar', 'baz'] as $property) {
@@ -427,8 +416,9 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy property objects with different number of related groups
      */
-    public function thereAreDummyPropertyObjectsWithADifferentNumberRelatedGroups(int $nb)
+    public function thereAreDummyPropertyObjectsWithADifferentNumberRelatedGroups(int $nb): void
     {
+        $dummyGroups = [];
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyGroup = $this->buildDummyGroup();
             $dummyProperty = $this->buildDummyProperty();
@@ -453,7 +443,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy property objects with :nb2 groups
      */
-    public function thereAreDummyPropertyObjectsWithGroups(int $nb, int $nb2)
+    public function thereAreDummyPropertyObjectsWithGroups(int $nb, int $nb2): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyProperty = $this->buildDummyProperty();
@@ -486,7 +476,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb embedded dummy objects
      */
-    public function thereAreEmbeddedDummyObjects(int $nb)
+    public function thereAreEmbeddedDummyObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = $this->buildEmbeddedDummy();
@@ -505,7 +495,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy objects with relatedDummy
      */
-    public function thereAreDummyObjectsWithRelatedDummy(int $nb)
+    public function thereAreDummyObjectsWithRelatedDummy(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = $this->buildRelatedDummy();
@@ -527,7 +517,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are dummies with similar properties
      */
-    public function thereAreDummiesWithSimilarProperties()
+    public function thereAreDummiesWithSimilarProperties(): void
     {
         $dummy1 = $this->buildDummy();
         $dummy1->setName('foo');
@@ -555,7 +545,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummyDtoNoInput objects
      */
-    public function thereAreDummyDtoNoInputObjects(int $nb)
+    public function thereAreDummyDtoNoInputObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyDto = $this->buildDummyDtoNoInput();
@@ -571,7 +561,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummyDtoNoOutput objects
      */
-    public function thereAreDummyDtoNoOutputObjects(int $nb)
+    public function thereAreDummyDtoNoOutputObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyDto = $this->buildDummyDtoNoOutput();
@@ -587,7 +577,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummyCustomQuery objects
      */
-    public function thereAreDummyCustomQueryObjects(int $nb)
+    public function thereAreDummyCustomQueryObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyCustomQuery = $this->buildDummyCustomQuery();
@@ -601,7 +591,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummyCustomMutation objects
      */
-    public function thereAreDummyCustomMutationObjects(int $nb)
+    public function thereAreDummyCustomMutationObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $customMutationDummy = $this->buildDummyCustomMutation();
@@ -616,7 +606,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy objects with JSON and array data
      */
-    public function thereAreDummyObjectsWithJsonData(int $nb)
+    public function thereAreDummyObjectsWithJsonData(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = $this->buildDummy();
@@ -634,7 +624,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy with null JSON objects
      */
-    public function thereAreDummyWithNullJsonObjects(int $nb)
+    public function thereAreDummyWithNullJsonObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = $this->buildWithJsonDummy();
@@ -650,7 +640,7 @@ final class DoctrineContext implements Context
      * @Given there are :nb dummy objects with relatedDummy and its thirdLevel
      * @Given there is :nb dummy object with relatedDummy and its thirdLevel
      */
-    public function thereAreDummyObjectsWithRelatedDummyAndItsThirdLevel(int $nb)
+    public function thereAreDummyObjectsWithRelatedDummyAndItsThirdLevel(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $thirdLevel = $this->buildThirdLevel();
@@ -675,7 +665,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a dummy object with :nb relatedDummies and their thirdLevel
      */
-    public function thereIsADummyObjectWithRelatedDummiesAndTheirThirdLevel(int $nb)
+    public function thereIsADummyObjectWithRelatedDummiesAndTheirThirdLevel(int $nb): void
     {
         $dummy = $this->buildDummy();
         $dummy->setName('Dummy with relations');
@@ -699,7 +689,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a dummy object with :nb relatedDummies with same thirdLevel
      */
-    public function thereIsADummyObjectWithRelatedDummiesWithSameThirdLevel(int $nb)
+    public function thereIsADummyObjectWithRelatedDummiesWithSameThirdLevel(int $nb): void
     {
         $dummy = $this->buildDummy();
         $dummy->setName('Dummy with relations');
@@ -722,7 +712,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy objects with embeddedDummy
      */
-    public function thereAreDummyObjectsWithEmbeddedDummy(int $nb)
+    public function thereAreDummyObjectsWithEmbeddedDummy(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $embeddableDummy = $this->buildEmbeddableDummy();
@@ -741,7 +731,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy objects having each :nbrelated relatedDummies
      */
-    public function thereAreDummyObjectsWithRelatedDummies(int $nb, int $nbrelated)
+    public function thereAreDummyObjectsWithRelatedDummies(int $nb, int $nbrelated): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = $this->buildDummy();
@@ -767,7 +757,7 @@ final class DoctrineContext implements Context
      * @Given there are :nb dummy objects with dummyDate
      * @Given there is :nb dummy object with dummyDate
      */
-    public function thereAreDummyObjectsWithDummyDate(int $nb)
+    public function thereAreDummyObjectsWithDummyDate(int $nb): void
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -829,7 +819,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy objects with dummyDate and relatedDummy
      */
-    public function thereAreDummyObjectsWithDummyDateAndRelatedDummy(int $nb)
+    public function thereAreDummyObjectsWithDummyDateAndRelatedDummy(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -857,7 +847,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb embedded dummy objects with dummyDate and embeddedDummy
      */
-    public function thereAreDummyObjectsWithDummyDateAndEmbeddedDummy(int $nb)
+    public function thereAreDummyObjectsWithDummyDateAndEmbeddedDummy(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -883,7 +873,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb convertedDate objects
      */
-    public function thereAreconvertedDateObjectsWith(int $nb)
+    public function thereAreconvertedDateObjectsWith(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $convertedDate = $this->buildConvertedDate();
@@ -898,7 +888,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb convertedString objects
      */
-    public function thereAreconvertedStringObjectsWith(int $nb)
+    public function thereAreconvertedStringObjectsWith(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $convertedString = $this->buildConvertedString();
@@ -913,7 +903,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb convertedBoolean objects
      */
-    public function thereAreconvertedBooleanObjectsWith(int $nb)
+    public function thereAreconvertedBooleanObjectsWith(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $convertedBoolean = $this->buildConvertedBoolean();
@@ -928,7 +918,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb convertedInteger objects
      */
-    public function thereAreconvertedIntegerObjectsWith(int $nb)
+    public function thereAreconvertedIntegerObjectsWith(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $convertedInteger = $this->buildConvertedInteger();
@@ -943,7 +933,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy objects with dummyPrice
      */
-    public function thereAreDummyObjectsWithDummyPrice(int $nb)
+    public function thereAreDummyObjectsWithDummyPrice(int $nb): void
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
         $prices = ['9.99', '12.99', '15.99', '19.99'];
@@ -1053,7 +1043,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb SecuredDummy objects
      */
-    public function thereAreSecuredDummyObjects(int $nb)
+    public function thereAreSecuredDummyObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $securedDummy = $this->buildSecuredDummy();
@@ -1070,7 +1060,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb SecuredDummy objects owned by :ownedby with related dummies
      */
-    public function thereAreSecuredDummyObjectsOwnedByWithRelatedDummies(int $nb, string $ownedby)
+    public function thereAreSecuredDummyObjectsOwnedByWithRelatedDummies(int $nb, string $ownedby): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $securedDummy = $this->buildSecuredDummy();
@@ -1104,7 +1094,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a RelationEmbedder object
      */
-    public function thereIsARelationEmbedderObject()
+    public function thereIsARelationEmbedderObject(): void
     {
         $relationEmbedder = $this->buildRelationEmbedder();
 
@@ -1115,7 +1105,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a Dummy Object mapped by UUID
      */
-    public function thereIsADummyObjectMappedByUUID()
+    public function thereIsADummyObjectMappedByUUID(): void
     {
         $dummy = new UuidIdentifierDummy();
         $dummy->setName('My Dummy');
@@ -1128,7 +1118,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are Composite identifier objects
      */
-    public function thereIsACompositeIdentifierObject()
+    public function thereIsACompositeIdentifierObject(): void
     {
         $item = $this->buildCompositeItem();
         $item->setField1('foobar');
@@ -1157,7 +1147,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are composite primitive identifiers objects
      */
-    public function thereAreCompositePrimitiveIdentifiersObjects()
+    public function thereAreCompositePrimitiveIdentifiersObjects(): void
     {
         $foo = $this->buildCompositePrimitiveItem('Foo', 2016);
         $foo->setDescription('This is foo.');
@@ -1174,7 +1164,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a FileConfigDummy object
      */
-    public function thereIsAFileConfigDummyObject()
+    public function thereIsAFileConfigDummyObject(): void
     {
         $fileConfigDummy = $this->buildFileConfigDummy();
         $fileConfigDummy->setName('ConfigDummy');
@@ -1187,7 +1177,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a DummyCar entity with related colors
      */
-    public function thereIsAFooEntityWithRelatedBars()
+    public function thereIsAFooEntityWithRelatedBars(): void
     {
         $foo = $this->buildDummyCar();
         $foo->setName('mustli');
@@ -1221,7 +1211,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a dummy travel
      */
-    public function thereIsADummyTravel()
+    public function thereIsADummyTravel(): void
     {
         $car = $this->buildDummyCar();
         $car->setName('model x');
@@ -1245,7 +1235,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a RelatedDummy with :nb friends
      */
-    public function thereIsARelatedDummyWithFriends(int $nb)
+    public function thereIsARelatedDummyWithFriends(int $nb): void
     {
         $relatedDummy = $this->buildRelatedDummy();
         $relatedDummy->setName('RelatedDummy with friends');
@@ -1281,7 +1271,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is an answer :answer to the question :question
      */
-    public function thereIsAnAnswerToTheQuestion(string $a, string $q)
+    public function thereIsAnAnswerToTheQuestion(string $a, string $q): void
     {
         $answer = $this->buildAnswer();
         $answer->setContent($a);
@@ -1301,7 +1291,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a UrlEncodedId resource
      */
-    public function thereIsAUrlEncodedIdResource()
+    public function thereIsAUrlEncodedIdResource(): void
     {
         $urlEncodedIdResource = ($this->isOrm() ? new UrlEncodedId() : new UrlEncodedIdDocument());
         $this->manager->persist($urlEncodedIdResource);
@@ -1312,7 +1302,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a Program
      */
-    public function thereIsAProgram()
+    public function thereIsAProgram(): void
     {
         $this->thereArePrograms(1);
     }
@@ -1320,7 +1310,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb Programs
      */
-    public function thereArePrograms(int $nb)
+    public function thereArePrograms(int $nb): void
     {
         $author = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find(1);
         if (null === $author) {
@@ -1359,7 +1349,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a Comment
      */
-    public function thereIsAComment()
+    public function thereIsAComment(): void
     {
         $this->thereAreComments(1);
     }
@@ -1367,7 +1357,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb Comments
      */
-    public function thereAreComments(int $nb)
+    public function thereAreComments(int $nb): void
     {
         $author = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find(1);
         if (null === $author) {
@@ -1418,7 +1408,7 @@ final class DoctrineContext implements Context
     /**
      * @Given I have a product with offers
      */
-    public function createProductWithOffers()
+    public function createProductWithOffers(): void
     {
         $offer = $this->buildDummyOffer();
         $offer->setValue(2);
@@ -1444,7 +1434,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are people having pets
      */
-    public function createPeopleWithPets()
+    public function createPeopleWithPets(): void
     {
         $personToPet = $this->buildPersonToPet();
 
@@ -1473,7 +1463,7 @@ final class DoctrineContext implements Context
      * @Given there are :nb dummydate objects with dummyDate
      * @Given there is :nb dummydate object with dummyDate
      */
-    public function thereAreDummyDateObjectsWithDummyDate(int $nb)
+    public function thereAreDummyDateObjectsWithDummyDate(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -1491,7 +1481,7 @@ final class DoctrineContext implements Context
      * @Given there are :nb dummydate objects with nullable dateIncludeNullAfter
      * @Given there is :nb dummydate object with nullable dateIncludeNullAfter
      */
-    public function thereAreDummyDateObjectsWithNullableDateIncludeNullAfter(int $nb)
+    public function thereAreDummyDateObjectsWithNullableDateIncludeNullAfter(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -1510,7 +1500,7 @@ final class DoctrineContext implements Context
      * @Given there are :nb dummydate objects with nullable dateIncludeNullBefore
      * @Given there is :nb dummydate object with nullable dateIncludeNullBefore
      */
-    public function thereAreDummyDateObjectsWithNullableDateIncludeNullBefore(int $nb)
+    public function thereAreDummyDateObjectsWithNullableDateIncludeNullBefore(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -1529,7 +1519,7 @@ final class DoctrineContext implements Context
      * @Given there are :nb dummydate objects with nullable dateIncludeNullBeforeAndAfter
      * @Given there is :nb dummydate object with nullable dateIncludeNullBeforeAndAfter
      */
-    public function thereAreDummyDateObjectsWithNullableDateIncludeNullBeforeAndAfter(int $nb)
+    public function thereAreDummyDateObjectsWithNullableDateIncludeNullBeforeAndAfter(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -1547,7 +1537,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummyimmutabledate objects with dummyDate
      */
-    public function thereAreDummyImmutableDateObjectsWithDummyDate(int $nb)
+    public function thereAreDummyImmutableDateObjectsWithDummyDate(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTimeImmutable(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -1563,7 +1553,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy with different GraphQL serialization groups objects
      */
-    public function thereAreDummyWithDifferentGraphQlSerializationGroupsObjects(int $nb)
+    public function thereAreDummyWithDifferentGraphQlSerializationGroupsObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyDifferentGraphQlSerializationGroup = $this->buildDummyDifferentGraphQlSerializationGroup();
@@ -1580,7 +1570,7 @@ final class DoctrineContext implements Context
      *
      * @param non-empty-string $uuid
      */
-    public function thereIsARamseyIdentifiedResource(string $uuid)
+    public function thereIsARamseyIdentifiedResource(string $uuid): void
     {
         $dummy = new RamseyUuidDummy(Uuid::fromString($uuid));
 
@@ -1591,7 +1581,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a Symfony dummy identified resource with uuid :uuid
      */
-    public function thereIsASymfonyDummyIdentifiedResource(string $uuid)
+    public function thereIsASymfonyDummyIdentifiedResource(string $uuid): void
     {
         $dummy = new SymfonyUuidDummy(SymfonyUuid::fromString($uuid));
 
@@ -1602,7 +1592,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a dummy object with a fourth level relation
      */
-    public function thereIsADummyObjectWithAFourthLevelRelation()
+    public function thereIsADummyObjectWithAFourthLevelRelation(): void
     {
         $fourthLevel = $this->buildFourthLevel();
         $fourthLevel->setLevel(4);
@@ -1635,7 +1625,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a RelatedOwnedDummy object with OneToOne relation
      */
-    public function thereIsARelatedOwnedDummy()
+    public function thereIsARelatedOwnedDummy(): void
     {
         $relatedOwnedDummy = $this->buildRelatedOwnedDummy();
         $this->manager->persist($relatedOwnedDummy);
@@ -1651,7 +1641,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a RelatedOwningDummy object with OneToOne relation
      */
-    public function thereIsARelatedOwningDummy()
+    public function thereIsARelatedOwningDummy(): void
     {
         $dummy = $this->buildDummy();
         $dummy->setName('plop');
@@ -1667,7 +1657,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a person named :name greeting with a :message message
      */
-    public function thereIsAPersonWithAGreeting(string $name, string $message)
+    public function thereIsAPersonWithAGreeting(string $name, string $message): void
     {
         $person = $this->buildPerson();
         $person->name = $name;
@@ -1686,7 +1676,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a max depth dummy with :level level of descendants
      */
-    public function thereIsAMaxDepthDummyWithLevelOfDescendants(int $level)
+    public function thereIsAMaxDepthDummyWithLevelOfDescendants(int $level): void
     {
         $maxDepthDummy = $this->buildMaxDepthDummy();
         $maxDepthDummy->name = "level $level";
@@ -1704,7 +1694,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a DummyDtoCustom
      */
-    public function thereIsADummyDtoCustom()
+    public function thereIsADummyDtoCustom(): void
     {
         $this->thereAreNbDummyDtoCustom(1);
     }
@@ -1714,7 +1704,7 @@ final class DoctrineContext implements Context
      *
      * @param mixed $nb
      */
-    public function thereAreNbDummyDtoCustom($nb)
+    public function thereAreNbDummyDtoCustom($nb): void
     {
         for ($i = 0; $i < $nb; ++$i) {
             $dto = $this->isOrm() ? new DummyDtoCustom() : new DummyDtoCustomDocument();
@@ -1730,7 +1720,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is an order with same customer and recipient
      */
-    public function thereIsAnOrderWithSameCustomerAndRecipient()
+    public function thereIsAnOrderWithSameCustomerAndRecipient(): void
     {
         $customer = $this->isOrm() ? new Customer() : new CustomerDocument();
         $customer->name = 'customer_name';
@@ -1759,7 +1749,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb sites with internal owner
      */
-    public function thereAreSitesWithInternalOwner(int $nb)
+    public function thereAreSitesWithInternalOwner(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $internalUser = new InternalUser();
@@ -1779,7 +1769,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb sites with external owner
      */
-    public function thereAreSitesWithExternalOwner(int $nb)
+    public function thereAreSitesWithExternalOwner(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $externalUser = new ExternalUser();
@@ -1801,7 +1791,7 @@ final class DoctrineContext implements Context
      */
     public function thereIsTheFollowingTaxon(PyStringNode $dataNode): void
     {
-        $data = json_decode((string) $dataNode, true);
+        $data = json_decode((string) $dataNode, true, 512, \JSON_THROW_ON_ERROR);
 
         $taxon = $this->isOrm() ? new Taxon() : new TaxonDocument();
         $taxon->setCode($data['code']);
@@ -1815,7 +1805,7 @@ final class DoctrineContext implements Context
      */
     public function thereIsTheFollowingProduct(PyStringNode $dataNode): void
     {
-        $data = json_decode((string) $dataNode, true);
+        $data = json_decode((string) $dataNode, true, 512, \JSON_THROW_ON_ERROR);
 
         $product = $this->isOrm() ? new Product() : new ProductDocument();
         $product->setCode($data['code']);
@@ -1834,7 +1824,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb convertedOwner objects with convertedRelated
      */
-    public function thereAreConvertedOwnerObjects(int $nb)
+    public function thereAreConvertedOwnerObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $related = $this->buildConvertedRelated();
@@ -1853,7 +1843,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy mercure objects
      */
-    public function thereAreDummyMercureObjects(int $nb)
+    public function thereAreDummyMercureObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = $this->buildRelatedDummy();
@@ -1874,7 +1864,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb iriOnlyDummies
      */
-    public function thereAreIriOnlyDummies(int $nb)
+    public function thereAreIriOnlyDummies(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $iriOnlyDummy = $this->buildIriOnlyDummy();
@@ -1888,7 +1878,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb absoluteUrlDummy objects with a related absoluteUrlRelationDummy
      */
-    public function thereAreAbsoluteUrlDummies(int $nb)
+    public function thereAreAbsoluteUrlDummies(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $absoluteUrlRelationDummy = $this->buildAbsoluteUrlRelationDummy();
@@ -1905,7 +1895,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb networkPathDummy objects with a related networkPathRelationDummy
      */
-    public function thereAreNetworkPathDummies(int $nb)
+    public function thereAreNetworkPathDummies(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $networkPathRelationDummy = $this->buildNetworkPathRelationDummy();
@@ -1922,7 +1912,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is an InitializeInput object with id :id
      */
-    public function thereIsAnInitializeInput(int $id)
+    public function thereIsAnInitializeInput(int $id): void
     {
         $initializeInput = $this->buildInitializeInput();
         $initializeInput->id = $id;
@@ -1936,7 +1926,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a PatchDummyRelation
      */
-    public function thereIsAPatchDummyRelation()
+    public function thereIsAPatchDummyRelation(): void
     {
         $dummy = $this->buildPatchDummyRelation();
         $related = $this->buildRelatedDummy();
@@ -1950,7 +1940,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a book
      */
-    public function thereIsABook()
+    public function thereIsABook(): void
     {
         $book = $this->buildBook();
         $book->name = '1984';
@@ -1962,7 +1952,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a custom multiple identifier dummy
      */
-    public function thereIsACustomMultipleIdentifierDummy()
+    public function thereIsACustomMultipleIdentifierDummy(): void
     {
         $dummy = $this->buildCustomMultipleIdentifierDummy();
         $dummy->setName('Orwell');
@@ -1976,7 +1966,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there is a payment
      */
-    public function thereIsAPayment()
+    public function thereIsAPayment(): void
     {
         $this->manager->persist($this->buildPayment('123.45'));
         $this->manager->flush();
@@ -1992,498 +1982,312 @@ final class DoctrineContext implements Context
         return null !== $this->schemaManager;
     }
 
-    /**
-     * @return Answer|AnswerDocument
-     */
-    private function buildAnswer()
+    private function buildAnswer(): Answer|AnswerDocument
     {
         return $this->isOrm() ? new Answer() : new AnswerDocument();
     }
 
-    /**
-     * @return CompositeItem|CompositeItemDocument
-     */
-    private function buildCompositeItem()
+    private function buildCompositeItem(): CompositeItem|CompositeItemDocument
     {
         return $this->isOrm() ? new CompositeItem() : new CompositeItemDocument();
     }
 
-    /**
-     * @return CompositeLabel|CompositeLabelDocument
-     */
-    private function buildCompositeLabel()
+    private function buildCompositeLabel(): CompositeLabel|CompositeLabelDocument
     {
         return $this->isOrm() ? new CompositeLabel() : new CompositeLabelDocument();
     }
 
-    /**
-     * @return CompositePrimitiveItem|CompositePrimitiveItemDocument
-     */
-    private function buildCompositePrimitiveItem(string $name, int $year)
+    private function buildCompositePrimitiveItem(string $name, int $year): CompositePrimitiveItem|CompositePrimitiveItemDocument
     {
         return $this->isOrm() ? new CompositePrimitiveItem($name, $year) : new CompositePrimitiveItemDocument($name, $year);
     }
 
-    /**
-     * @return CompositeRelation|CompositeRelationDocument
-     */
-    private function buildCompositeRelation()
+    private function buildCompositeRelation(): CompositeRelation|CompositeRelationDocument
     {
         return $this->isOrm() ? new CompositeRelation() : new CompositeRelationDocument();
     }
 
-    /**
-     * @return Dummy|DummyDocument
-     */
-    private function buildDummy()
+    private function buildDummy(): Dummy|DummyDocument
     {
         return $this->isOrm() ? new Dummy() : new DummyDocument();
     }
 
-    /**
-     * @return DummyTableInheritanceNotApiResourceChild|DummyTableInheritanceNotApiResourceChildDocument
-     */
-    private function buildDummyTableInheritanceNotApiResourceChild()
+    private function buildDummyTableInheritanceNotApiResourceChild(): DummyTableInheritanceNotApiResourceChild|DummyTableInheritanceNotApiResourceChildDocument
     {
         return $this->isOrm() ? new DummyTableInheritanceNotApiResourceChild() : new DummyTableInheritanceNotApiResourceChildDocument();
     }
 
-    /**
-     * @return DummyAggregateOffer|DummyAggregateOfferDocument
-     */
-    private function buildDummyAggregateOffer()
+    private function buildDummyAggregateOffer(): DummyAggregateOffer|DummyAggregateOfferDocument
     {
         return $this->isOrm() ? new DummyAggregateOffer() : new DummyAggregateOfferDocument();
     }
 
-    /**
-     * @return DummyCar|DummyCarDocument
-     */
-    private function buildDummyCar()
+    private function buildDummyCar(): DummyCar|DummyCarDocument
     {
         return $this->isOrm() ? new DummyCar() : new DummyCarDocument();
     }
 
-    /**
-     * @return DummyCarColor|DummyCarColorDocument
-     */
-    private function buildDummyCarColor()
+    private function buildDummyCarColor(): DummyCarColor|DummyCarColorDocument
     {
         return $this->isOrm() ? new DummyCarColor() : new DummyCarColorDocument();
     }
 
-    /**
-     * @return DummyPassenger|DummyPassengerDocument
-     */
-    private function buildDummyPassenger()
+    private function buildDummyPassenger(): DummyPassenger|DummyPassengerDocument
     {
         return $this->isOrm() ? new DummyPassenger() : new DummyPassengerDocument();
     }
 
-    /**
-     * @return DummyTravel|DummyTravelDocument
-     */
-    private function buildDummyTravel()
+    private function buildDummyTravel(): DummyTravel|DummyTravelDocument
     {
         return $this->isOrm() ? new DummyTravel() : new DummyTravelDocument();
     }
 
-    /**
-     * @return DummyDate|DummyDateDocument
-     */
-    private function buildDummyDate()
+    private function buildDummyDate(): DummyDate|DummyDateDocument
     {
         return $this->isOrm() ? new DummyDate() : new DummyDateDocument();
     }
 
-    /**
-     * @return DummyImmutableDate|DummyImmutableDateDocument
-     */
-    private function buildDummyImmutableDate()
+    private function buildDummyImmutableDate(): DummyImmutableDate|DummyImmutableDateDocument
     {
         return $this->isOrm() ? new DummyImmutableDate() : new DummyImmutableDateDocument();
     }
 
-    /**
-     * @return DummyDifferentGraphQlSerializationGroup|DummyDifferentGraphQlSerializationGroupDocument
-     */
-    private function buildDummyDifferentGraphQlSerializationGroup()
+    private function buildDummyDifferentGraphQlSerializationGroup(): DummyDifferentGraphQlSerializationGroup|DummyDifferentGraphQlSerializationGroupDocument
     {
         return $this->isOrm() ? new DummyDifferentGraphQlSerializationGroup() : new DummyDifferentGraphQlSerializationGroupDocument();
     }
 
-    /**
-     * @return DummyDtoNoInput|DummyDtoNoInputDocument
-     */
-    private function buildDummyDtoNoInput()
+    private function buildDummyDtoNoInput(): DummyDtoNoInput|DummyDtoNoInputDocument
     {
         return $this->isOrm() ? new DummyDtoNoInput() : new DummyDtoNoInputDocument();
     }
 
-    /**
-     * @return DummyDtoNoOutput|DummyDtoNoOutputDocument
-     */
-    private function buildDummyDtoNoOutput()
+    private function buildDummyDtoNoOutput(): DummyDtoNoOutput|DummyDtoNoOutputDocument
     {
         return $this->isOrm() ? new DummyDtoNoOutput() : new DummyDtoNoOutputDocument();
     }
 
-    /**
-     * @return DummyCustomQuery|DummyCustomQueryDocument
-     */
-    private function buildDummyCustomQuery()
+    private function buildDummyCustomQuery(): DummyCustomQuery|DummyCustomQueryDocument
     {
         return $this->isOrm() ? new DummyCustomQuery() : new DummyCustomQueryDocument();
     }
 
-    /**
-     * @return DummyCustomMutation|DummyCustomMutationDocument
-     */
-    private function buildDummyCustomMutation()
+    private function buildDummyCustomMutation(): DummyCustomMutation|DummyCustomMutationDocument
     {
         return $this->isOrm() ? new DummyCustomMutation() : new DummyCustomMutationDocument();
     }
 
-    /**
-     * @return DummyFriend|DummyFriendDocument
-     */
-    private function buildDummyFriend()
+    private function buildDummyFriend(): DummyFriend|DummyFriendDocument
     {
         return $this->isOrm() ? new DummyFriend() : new DummyFriendDocument();
     }
 
-    /**
-     * @return DummyGroup|DummyGroupDocument
-     */
-    private function buildDummyGroup()
+    private function buildDummyGroup(): DummyGroup|DummyGroupDocument
     {
         return $this->isOrm() ? new DummyGroup() : new DummyGroupDocument();
     }
 
-    /**
-     * @return DummyOffer|DummyOfferDocument
-     */
-    private function buildDummyOffer()
+    private function buildDummyOffer(): DummyOffer|DummyOfferDocument
     {
         return $this->isOrm() ? new DummyOffer() : new DummyOfferDocument();
     }
 
-    /**
-     * @return DummyProduct|DummyProductDocument
-     */
-    private function buildDummyProduct()
+    private function buildDummyProduct(): DummyProduct|DummyProductDocument
     {
         return $this->isOrm() ? new DummyProduct() : new DummyProductDocument();
     }
 
-    /**
-     * @return DummyProperty|DummyPropertyDocument
-     */
-    private function buildDummyProperty()
+    private function buildDummyProperty(): DummyProperty|DummyPropertyDocument
     {
         return $this->isOrm() ? new DummyProperty() : new DummyPropertyDocument();
     }
 
-    /**
-     * @return EmbeddableDummy|EmbeddableDummyDocument
-     */
-    private function buildEmbeddableDummy()
+    private function buildEmbeddableDummy(): EmbeddableDummy|EmbeddableDummyDocument
     {
         return $this->isOrm() ? new EmbeddableDummy() : new EmbeddableDummyDocument();
     }
 
-    /**
-     * @return EmbeddedDummy|EmbeddedDummyDocument
-     */
-    private function buildEmbeddedDummy()
+    private function buildEmbeddedDummy(): EmbeddedDummy|EmbeddedDummyDocument
     {
         return $this->isOrm() ? new EmbeddedDummy() : new EmbeddedDummyDocument();
     }
 
-    /**
-     * @return FileConfigDummy|FileConfigDummyDocument
-     */
-    private function buildFileConfigDummy()
+    private function buildFileConfigDummy(): FileConfigDummy|FileConfigDummyDocument
     {
         return $this->isOrm() ? new FileConfigDummy() : new FileConfigDummyDocument();
     }
 
-    /**
-     * @return Foo|FooDocument
-     */
-    private function buildFoo()
+    private function buildFoo(): Foo|FooDocument
     {
         return $this->isOrm() ? new Foo() : new FooDocument();
     }
 
-    /**
-     * @return FooDummy|FooDummyDocument
-     */
-    private function buildFooDummy()
+    private function buildFooDummy(): FooDummy|FooDummyDocument
     {
         return $this->isOrm() ? new FooDummy() : new FooDummyDocument();
     }
 
-    /**
-     * @return FourthLevel|FourthLevelDocument
-     */
-    private function buildFourthLevel()
+    private function buildFourthLevel(): FourthLevel|FourthLevelDocument
     {
         return $this->isOrm() ? new FourthLevel() : new FourthLevelDocument();
     }
 
-    /**
-     * @return Greeting|GreetingDocument
-     */
-    private function buildGreeting()
+    private function buildGreeting(): Greeting|GreetingDocument
     {
         return $this->isOrm() ? new Greeting() : new GreetingDocument();
     }
 
-    /**
-     * @return IriOnlyDummy|IriOnlyDummyDocument
-     */
-    private function buildIriOnlyDummy()
+    private function buildIriOnlyDummy(): IriOnlyDummy|IriOnlyDummyDocument
     {
         return $this->isOrm() ? new IriOnlyDummy() : new IriOnlyDummyDocument();
     }
 
-    /**
-     * @return MaxDepthDummy|MaxDepthDummyDocument
-     */
-    private function buildMaxDepthDummy()
+    private function buildMaxDepthDummy(): MaxDepthDummy|MaxDepthDummyDocument
     {
         return $this->isOrm() ? new MaxDepthDummy() : new MaxDepthDummyDocument();
     }
 
-    /**
-     * @return Person|PersonDocument
-     */
-    private function buildPerson()
+    private function buildPerson(): Person|PersonDocument
     {
         return $this->isOrm() ? new Person() : new PersonDocument();
     }
 
-    /**
-     * @return PersonToPet|PersonToPetDocument
-     */
-    private function buildPersonToPet()
+    private function buildPersonToPet(): PersonToPet|PersonToPetDocument
     {
         return $this->isOrm() ? new PersonToPet() : new PersonToPetDocument();
     }
 
-    /**
-     * @return Pet|PetDocument
-     */
-    private function buildPet()
+    private function buildPet(): Pet|PetDocument
     {
         return $this->isOrm() ? new Pet() : new PetDocument();
     }
 
-    /**
-     * @return Question|QuestionDocument
-     */
-    private function buildQuestion()
+    private function buildQuestion(): Question|QuestionDocument
     {
         return $this->isOrm() ? new Question() : new QuestionDocument();
     }
 
-    /**
-     * @return RelatedDummy|RelatedDummyDocument
-     */
-    private function buildRelatedDummy()
+    private function buildRelatedDummy(): RelatedDummy|RelatedDummyDocument
     {
         return $this->isOrm() ? new RelatedDummy() : new RelatedDummyDocument();
     }
 
-    /**
-     * @return RelatedOwnedDummy|RelatedOwnedDummyDocument
-     */
-    private function buildRelatedOwnedDummy()
+    private function buildRelatedOwnedDummy(): RelatedOwnedDummy|RelatedOwnedDummyDocument
     {
         return $this->isOrm() ? new RelatedOwnedDummy() : new RelatedOwnedDummyDocument();
     }
 
-    /**
-     * @return RelatedOwningDummy|RelatedOwningDummyDocument
-     */
-    private function buildRelatedOwningDummy()
+    private function buildRelatedOwningDummy(): RelatedOwningDummy|RelatedOwningDummyDocument
     {
         return $this->isOrm() ? new RelatedOwningDummy() : new RelatedOwningDummyDocument();
     }
 
-    /**
-     * @return RelatedToDummyFriend|RelatedToDummyFriendDocument
-     */
-    private function buildRelatedToDummyFriend()
+    private function buildRelatedToDummyFriend(): RelatedToDummyFriend|RelatedToDummyFriendDocument
     {
         return $this->isOrm() ? new RelatedToDummyFriend() : new RelatedToDummyFriendDocument();
     }
 
-    /**
-     * @return RelationEmbedder|RelationEmbedderDocument
-     */
-    private function buildRelationEmbedder()
+    private function buildRelationEmbedder(): RelationEmbedder|RelationEmbedderDocument
     {
         return $this->isOrm() ? new RelationEmbedder() : new RelationEmbedderDocument();
     }
 
-    /**
-     * @return SecuredDummy|SecuredDummyDocument
-     */
-    private function buildSecuredDummy()
+    private function buildSecuredDummy(): SecuredDummy|SecuredDummyDocument
     {
         return $this->isOrm() ? new SecuredDummy() : new SecuredDummyDocument();
     }
 
-    /**
-     * @return RelatedSecuredDummy|RelatedSecuredDummyDocument
-     */
-    private function buildRelatedSecureDummy()
+    private function buildRelatedSecureDummy(): RelatedSecuredDummy|RelatedSecuredDummyDocument
     {
         return $this->isOrm() ? new RelatedSecuredDummy() : new RelatedSecuredDummyDocument();
     }
 
-    /**
-     * @return ThirdLevel|ThirdLevelDocument
-     */
-    private function buildThirdLevel()
+    private function buildThirdLevel(): ThirdLevel|ThirdLevelDocument
     {
         return $this->isOrm() ? new ThirdLevel() : new ThirdLevelDocument();
     }
 
-    /**
-     * @return ConvertedDate|ConvertedDateDocument
-     */
-    private function buildConvertedDate()
+    private function buildConvertedDate(): ConvertedDate|ConvertedDateDocument
     {
         return $this->isOrm() ? new ConvertedDate() : new ConvertedDateDocument();
     }
 
-    /**
-     * @return ConvertedBoolean|ConvertedBoolDocument
-     */
-    private function buildConvertedBoolean()
+    private function buildConvertedBoolean(): ConvertedBoolean|ConvertedBoolDocument
     {
         return $this->isOrm() ? new ConvertedBoolean() : new ConvertedBoolDocument();
     }
 
-    /**
-     * @return ConvertedInteger|ConvertedIntegerDocument
-     */
-    private function buildConvertedInteger()
+    private function buildConvertedInteger(): ConvertedInteger|ConvertedIntegerDocument
     {
         return $this->isOrm() ? new ConvertedInteger() : new ConvertedIntegerDocument();
     }
 
-    /**
-     * @return ConvertedString|ConvertedStringDocument
-     */
-    private function buildConvertedString()
+    private function buildConvertedString(): ConvertedString|ConvertedStringDocument
     {
         return $this->isOrm() ? new ConvertedString() : new ConvertedStringDocument();
     }
 
-    /**
-     * @return ConvertedOwner|ConvertedOwnerDocument
-     */
-    private function buildConvertedOwner()
+    private function buildConvertedOwner(): ConvertedOwner|ConvertedOwnerDocument
     {
         return $this->isOrm() ? new ConvertedOwner() : new ConvertedOwnerDocument();
     }
 
-    /**
-     * @return ConvertedRelated|ConvertedRelatedDocument
-     */
-    private function buildConvertedRelated()
+    private function buildConvertedRelated(): ConvertedRelated|ConvertedRelatedDocument
     {
         return $this->isOrm() ? new ConvertedRelated() : new ConvertedRelatedDocument();
     }
 
-    /**
-     * @return DummyMercure|DummyMercureDocument
-     */
-    private function buildDummyMercure()
+    private function buildDummyMercure(): DummyMercure|DummyMercureDocument
     {
         return $this->isOrm() ? new DummyMercure() : new DummyMercureDocument();
     }
 
-    /**
-     * @return AbsoluteUrlDummyDocument|AbsoluteUrlDummy
-     */
-    private function buildAbsoluteUrlDummy()
+    private function buildAbsoluteUrlDummy(): AbsoluteUrlDummyDocument|AbsoluteUrlDummy
     {
         return $this->isOrm() ? new AbsoluteUrlDummy() : new AbsoluteUrlDummyDocument();
     }
 
-    /**
-     * @return AbsoluteUrlRelationDummyDocument|AbsoluteUrlRelationDummy
-     */
-    private function buildAbsoluteUrlRelationDummy()
+    private function buildAbsoluteUrlRelationDummy(): AbsoluteUrlRelationDummyDocument|AbsoluteUrlRelationDummy
     {
         return $this->isOrm() ? new AbsoluteUrlRelationDummy() : new AbsoluteUrlRelationDummyDocument();
     }
 
-    /**
-     * @return NetworkPathDummyDocument|NetworkPathDummy
-     */
-    private function buildNetworkPathDummy()
+    private function buildNetworkPathDummy(): NetworkPathDummyDocument|NetworkPathDummy
     {
         return $this->isOrm() ? new NetworkPathDummy() : new NetworkPathDummyDocument();
     }
 
-    /**
-     * @return NetworkPathRelationDummyDocument|NetworkPathRelationDummy
-     */
-    private function buildNetworkPathRelationDummy()
+    private function buildNetworkPathRelationDummy(): NetworkPathRelationDummyDocument|NetworkPathRelationDummy
     {
         return $this->isOrm() ? new NetworkPathRelationDummy() : new NetworkPathRelationDummyDocument();
     }
 
-    /**
-     * @return InitializeInput|InitializeInputDocument
-     */
-    private function buildInitializeInput()
+    private function buildInitializeInput(): InitializeInput|InitializeInputDocument
     {
         return $this->isOrm() ? new InitializeInput() : new InitializeInputDocument();
     }
 
-    /**
-     * @return PatchDummyRelation|PatchDummyRelationDocument
-     */
-    private function buildPatchDummyRelation()
+    private function buildPatchDummyRelation(): PatchDummyRelation|PatchDummyRelationDocument
     {
         return $this->isOrm() ? new PatchDummyRelation() : new PatchDummyRelationDocument();
     }
 
-    /**
-     * @return BookDocument|Book
-     */
-    private function buildBook()
+    private function buildBook(): BookDocument|Book
     {
         return $this->isOrm() ? new Book() : new BookDocument();
     }
 
-    /**
-     * @return CustomMultipleIdentifierDummy|CustomMultipleIdentifierDummyDocument
-     */
-    private function buildCustomMultipleIdentifierDummy()
+    private function buildCustomMultipleIdentifierDummy(): CustomMultipleIdentifierDummy|CustomMultipleIdentifierDummyDocument
     {
         return $this->isOrm() ? new CustomMultipleIdentifierDummy() : new CustomMultipleIdentifierDummyDocument();
     }
 
-    /**
-     * @return WithJsonDummy|WithJsonDummyDocument
-     */
-    private function buildWithJsonDummy()
+    private function buildWithJsonDummy(): WithJsonDummy|WithJsonDummyDocument
     {
         return $this->isOrm() ? new WithJsonDummy() : new WithJsonDummyDocument();
     }
 
-    /**
-     * @return Payment|PaymentDocument
-     */
-    private function buildPayment(string $amount)
+    private function buildPayment(string $amount): Payment|PaymentDocument
     {
         return $this->isOrm() ? new Payment($amount) : new PaymentDocument($amount);
     }

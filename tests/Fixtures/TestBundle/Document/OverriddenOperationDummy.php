@@ -68,12 +68,12 @@ class OverriddenOperationDummy
     #[ODM\Field(nullable: true)]
     public $notGettable;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -83,7 +83,7 @@ class OverriddenOperationDummy
         return $this->name;
     }
 
-    public function setAlias($alias)
+    public function setAlias($alias): void
     {
         $this->alias = $alias;
     }
@@ -93,7 +93,7 @@ class OverriddenOperationDummy
         return $this->alias;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }

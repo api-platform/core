@@ -39,7 +39,7 @@ class UuidIdentifierDummy
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid)
+    public function setUuid(string $uuid): void
     {
         $this->uuid = $uuid;
     }
@@ -49,7 +49,7 @@ class UuidIdentifierDummy
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }

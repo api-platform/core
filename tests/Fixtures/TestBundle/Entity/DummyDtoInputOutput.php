@@ -52,9 +52,6 @@ class DummyDtoInputOutput
      */
     #[ORM\Column(type: 'float')]
     public $num;
-    /**
-     * @var Collection<RelatedDummy>
-     */
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
-    public $relatedDummies;
+    public Collection $relatedDummies;
 }

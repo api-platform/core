@@ -43,7 +43,7 @@ class PurgeHttpCacheListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testOnFlush()
+    public function testOnFlush(): void
     {
         $toInsert1 = new Dummy();
         $toInsert2 = new Dummy();
@@ -106,7 +106,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener->postFlush();
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $oldRelatedDummy = new RelatedDummy();
         $oldRelatedDummy->setId(1);
@@ -144,7 +144,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener->postFlush();
     }
 
-    public function testNothingToPurge()
+    public function testNothingToPurge(): void
     {
         $dummyNoGetOperation = new DummyNoGetOperation();
         $dummyNoGetOperation->setId(1);
@@ -172,7 +172,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener->postFlush();
     }
 
-    public function testNotAResourceClass()
+    public function testNotAResourceClass(): void
     {
         $containNonResource = new ContainNonResource();
         $nonResource = new NotAResource('foo', 'bar');

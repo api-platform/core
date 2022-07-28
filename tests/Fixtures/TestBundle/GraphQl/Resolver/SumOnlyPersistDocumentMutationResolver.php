@@ -27,7 +27,7 @@ class SumOnlyPersistDocumentMutationResolver implements MutationResolverInterfac
     /**
      * @param DummyCustomMutationDocument|null $item
      */
-    public function __invoke($item, array $context)
+    public function __invoke($item, array $context): DummyCustomMutationDocument
     {
         if (null !== $item) {
             throw new RuntimeException('Item should be null');

@@ -20,7 +20,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
 
 final class CustomOutputDtoProvider implements ProviderInterface
 {
-    public function __construct(private ProviderInterface $itemProvider, private ProviderInterface $collectionProvider)
+    public function __construct(private readonly ProviderInterface $itemProvider, private readonly ProviderInterface $collectionProvider)
     {
     }
 

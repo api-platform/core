@@ -42,7 +42,7 @@ class UpperCaseIdentifierDummy
         return $this->Uuid;
     }
 
-    public function setUuid(string $Uuid)
+    public function setUuid(string $Uuid): void
     {
         $this->Uuid = $Uuid;
     }
@@ -52,7 +52,7 @@ class UpperCaseIdentifierDummy
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }

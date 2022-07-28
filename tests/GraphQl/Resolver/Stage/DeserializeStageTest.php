@@ -29,8 +29,7 @@ class DeserializeStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var DeserializeStage */
-    private $deserializeStage;
+    private DeserializeStage $deserializeStage;
     private $denormalizerProphecy;
     private $serializerContextBuilderProphecy;
 
@@ -86,6 +85,9 @@ class DeserializeStageTest extends TestCase
         $this->assertSame($denormalizedData, $result);
     }
 
+    /**
+     * @return array{null: array{denormalization: true}[]|null[], object: \stdClass[]|array{denormalization: true, object_to_populate: mixed}[]}
+     */
     public function objectToPopulateProvider(): array
     {
         return [

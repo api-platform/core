@@ -67,7 +67,7 @@ class SchemaFactoryTest extends TestCase
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class);
 
         $this->assertTrue($resultSchema->isDefined());
-        $this->assertEquals('Dummy.jsonld', $resultSchema->getRootDefinitionKey());
+        $this->assertSame('Dummy.jsonld', $resultSchema->getRootDefinitionKey());
     }
 
     public function testCustomFormatBuildSchema(): void
@@ -75,7 +75,7 @@ class SchemaFactoryTest extends TestCase
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'json');
 
         $this->assertTrue($resultSchema->isDefined());
-        $this->assertEquals('Dummy', $resultSchema->getRootDefinitionKey());
+        $this->assertSame('Dummy', $resultSchema->getRootDefinitionKey());
     }
 
     public function testHasRootDefinitionKeyBuildSchema(): void

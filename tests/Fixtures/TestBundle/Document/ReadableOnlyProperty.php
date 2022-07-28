@@ -32,14 +32,13 @@ class ReadableOnlyProperty
      */
     #[ApiProperty(writable: false)]
     #[ODM\Field]
-    private string $name;
+    private string $name = 'Read only';
 
     public function __construct()
     {
-        $this->name = 'Read only';
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -49,7 +48,7 @@ class ReadableOnlyProperty
         throw new \Exception('Can not write name.');
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

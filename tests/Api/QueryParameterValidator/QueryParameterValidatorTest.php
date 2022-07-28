@@ -48,7 +48,7 @@ class QueryParameterValidatorTest extends TestCase
     /**
      * unsafe method should not use filter validations.
      */
-    public function testOnKernelRequestWithUnsafeMethod()
+    public function testOnKernelRequestWithUnsafeMethod(): void
     {
         $request = [];
 
@@ -60,7 +60,7 @@ class QueryParameterValidatorTest extends TestCase
     /**
      * If the tested filter is non-existent, then nothing should append.
      */
-    public function testOnKernelRequestWithWrongFilter()
+    public function testOnKernelRequestWithWrongFilter(): void
     {
         $request = [];
 
@@ -73,7 +73,7 @@ class QueryParameterValidatorTest extends TestCase
     /**
      * if the required parameter is not set, throw an FilterValidationException.
      */
-    public function testOnKernelRequestWithRequiredFilterNotSet()
+    public function testOnKernelRequestWithRequiredFilterNotSet(): void
     {
         $request = [];
 
@@ -103,7 +103,7 @@ class QueryParameterValidatorTest extends TestCase
     /**
      * if the required parameter is set, no exception should be throwned.
      */
-    public function testOnKernelRequestWithRequiredFilter()
+    public function testOnKernelRequestWithRequiredFilter(): void
     {
         $request = ['required' => 'foo'];
 

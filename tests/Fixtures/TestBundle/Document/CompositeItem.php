@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -25,13 +27,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class CompositeItem implements \Stringable
 {
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
-    private $id;
+    private ?int $id = null;
     #[Groups(['default'])]
     #[ODM\Field(type: 'string', nullable: true)]
-    private $field1;
+    private ?string $field1 = null;
     #[Groups(['default'])]
     #[ODM\ReferenceMany(targetDocument: CompositeRelation::class, mappedBy: 'compositeItem')]
-    private $compositeValues;
+    private Collection $compositeValues;
+
+    public function __construct()
+    {
+        $this->compositeValues = new ArrayCollection();
+    }
 
     /**
      * Gets id.
@@ -54,7 +61,7 @@ class CompositeItem implements \Stringable
      *
      * @param string|null $field1 the value to set
      */
-    public function setField1($field1 = null)
+    public function setField1($field1 = null): void
     {
         $this->field1 = $field1;
     }

@@ -41,12 +41,12 @@ class JsonldContextDummy
     )]
     private $person;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setPerson($person)
+    public function setPerson($person): void
     {
         $this->person = $person;
     }

@@ -44,8 +44,6 @@ class CollectionProviderTest extends TestCase
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
     }

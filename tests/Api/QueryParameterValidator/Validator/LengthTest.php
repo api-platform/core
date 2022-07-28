@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class LengthTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $filter = new Length();
 
@@ -30,7 +30,7 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testEmptyQueryParameter()
+    public function testEmptyQueryParameter(): void
     {
         $filter = new Length();
 
@@ -39,7 +39,7 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testNonMatchingParameter()
+    public function testNonMatchingParameter(): void
     {
         $filter = new Length();
 
@@ -61,7 +61,7 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testNonMatchingParameterWithOnlyOneDefinition()
+    public function testNonMatchingParameterWithOnlyOneDefinition(): void
     {
         $filter = new Length();
 
@@ -88,7 +88,7 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testMatchingParameter()
+    public function testMatchingParameter(): void
     {
         $filter = new Length();
 
@@ -112,7 +112,7 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testMatchingParameterWithOneDefinition()
+    public function testMatchingParameterWithOneDefinition(): void
     {
         $filter = new Length();
 

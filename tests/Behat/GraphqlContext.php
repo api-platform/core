@@ -30,26 +30,17 @@ use PHPUnit\Framework\ExpectationFailedException;
  */
 final class GraphqlContext implements Context
 {
-    /**
-     * @var RestContext
-     */
-    private $restContext;
+    private ?RestContext $restContext = null;
 
     /**
      * @var array
      */
     private $graphqlRequest;
 
-    /**
-     * @var int
-     */
-    private $graphqlLine; // @phpstan-ignore-line
+    private ?int $graphqlLine = null;
 
-    private $request;
-
-    public function __construct(Request $request)
+    public function __construct(private readonly Request $request)
     {
-        $this->request = $request;
     }
 
     /**
@@ -57,7 +48,7 @@ final class GraphqlContext implements Context
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /**
          * @var InitializedContextEnvironment $environment
@@ -73,7 +64,7 @@ final class GraphqlContext implements Context
     /**
      * @When I have the following GraphQL request:
      */
-    public function IHaveTheFollowingGraphqlRequest(PyStringNode $request)
+    public function IHaveTheFollowingGraphqlRequest(PyStringNode $request): void
     {
         $this->graphqlRequest = ['query' => $request->getRaw()];
         $this->graphqlLine = $request->getLine();
@@ -82,7 +73,7 @@ final class GraphqlContext implements Context
     /**
      * @When I send the following GraphQL request:
      */
-    public function ISendTheFollowingGraphqlRequest(PyStringNode $request)
+    public function ISendTheFollowingGraphqlRequest(PyStringNode $request): void
     {
         $this->IHaveTheFollowingGraphqlRequest($request);
         $this->sendGraphqlRequest();
@@ -91,7 +82,7 @@ final class GraphqlContext implements Context
     /**
      * @When I send the GraphQL request with variables:
      */
-    public function ISendTheGraphqlRequestWithVariables(PyStringNode $variables)
+    public function ISendTheGraphqlRequestWithVariables(PyStringNode $variables): void
     {
         $this->graphqlRequest['variables'] = $variables->getRaw();
         $this->sendGraphqlRequest();
@@ -100,7 +91,7 @@ final class GraphqlContext implements Context
     /**
      * @When I send the GraphQL request with operationName :operationName
      */
-    public function ISendTheGraphqlRequestWithOperation(string $operationName)
+    public function ISendTheGraphqlRequestWithOperation(string $operationName): void
     {
         $this->graphqlRequest['operationName'] = $operationName;
         $this->sendGraphqlRequest();
@@ -127,7 +118,7 @@ final class GraphqlContext implements Context
     /**
      * @Given I have the following GraphQL multipart request map:
      */
-    public function iHaveTheFollowingGraphqlMultipartRequestMap(PyStringNode $string)
+    public function iHaveTheFollowingGraphqlMultipartRequestMap(PyStringNode $string): void
     {
         $this->graphqlRequest['map'] = $string->getRaw();
     }
@@ -135,7 +126,7 @@ final class GraphqlContext implements Context
     /**
      * @When I send the following GraphQL multipart request operations:
      */
-    public function iSendTheFollowingGraphqlMultipartRequestOperations(PyStringNode $string)
+    public function iSendTheFollowingGraphqlMultipartRequestOperations(PyStringNode $string): void
     {
         $params = [];
         $params['operations'] = $string->getRaw();
@@ -148,7 +139,7 @@ final class GraphqlContext implements Context
     /**
      * @When I send the query to introspect the schema
      */
-    public function ISendTheQueryToIntrospectTheSchema()
+    public function ISendTheQueryToIntrospectTheSchema(): void
     {
         $this->graphqlRequest = ['query' => Introspection::getIntrospectionQuery()];
         $this->sendGraphqlRequest();
@@ -159,7 +150,7 @@ final class GraphqlContext implements Context
      */
     public function theGraphQLFieldIsDeprecatedForTheReason(string $fieldName, string $reason)
     {
-        foreach (json_decode($this->request->getContent(), true)['data']['__type']['fields'] as $field) { // @phpstan-ignore-line
+        foreach (json_decode($this->request->getContent(), true, 512, \JSON_THROW_ON_ERROR)['data']['__type']['fields'] as $field) { // @phpstan-ignore-line
             if ($fieldName === $field['name'] && $field['isDeprecated'] && $reason === $field['deprecationReason']) {
                 return;
             }
@@ -168,7 +159,7 @@ final class GraphqlContext implements Context
         throw new ExpectationFailedException(sprintf('The field "%s" is not deprecated.', $fieldName));
     }
 
-    private function sendGraphqlRequest()
+    private function sendGraphqlRequest(): void
     {
         $this->restContext->iSendARequestTo('GET', '/graphql?'.http_build_query($this->graphqlRequest));
     }

@@ -31,8 +31,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var SecurityPostDenormalizeStage */
-    private $securityPostDenormalizeStage;
+    private SecurityPostDenormalizeStage $securityPostDenormalizeStage;
     private $resourceAccessCheckerProphecy;
 
     /**

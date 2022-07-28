@@ -24,7 +24,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CompositePrimitiveItem
 {
     #[ORM\Column(type: 'text')]
-    private $description;
+    private string $description;
 
     public function __construct(#[ORM\Id] #[ORM\Column(type: 'string')] private readonly string $name, #[ORM\Id] #[ORM\Column(type: 'integer')] private readonly int $year)
     {
@@ -49,7 +49,7 @@ class CompositePrimitiveItem
     /**
      * Sets description.
      */
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }

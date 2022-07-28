@@ -73,7 +73,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
 
         $this->assertSame((new \ReflectionClass(NotAResource::class))->getShortName(), $rootDefinitionKey);
-        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
+        $this->assertArrayHasKey($rootDefinitionKey, $definitions);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
         $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
         $this->assertArrayNotHasKey('additionalProperties', $definitions[$rootDefinitionKey]);
@@ -134,7 +134,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
 
         $this->assertSame((new \ReflectionClass(OverriddenOperationDummy::class))->getShortName().'-'.$serializerGroup, $rootDefinitionKey);
-        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
+        $this->assertArrayHasKey($rootDefinitionKey, $definitions);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
         $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
         $this->assertFalse($definitions[$rootDefinitionKey]['additionalProperties']);
@@ -154,7 +154,7 @@ class SchemaFactoryTest extends TestCase
             Argument::type(Type::class),
             Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING),
             Argument::which('isCollection', true),
-            Argument::that(function (Type $type) {
+            Argument::that(function (Type $type): bool {
                 $keyTypes = $type->getCollectionKeyTypes();
 
                 return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_INT === $keyTypes[0]->getBuiltinType();
@@ -166,7 +166,7 @@ class SchemaFactoryTest extends TestCase
             Argument::type(Type::class),
             Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING),
             Argument::which('isCollection', true),
-            Argument::that(function (Type $type) {
+            Argument::that(function (Type $type): bool {
                 $keyTypes = $type->getCollectionKeyTypes();
 
                 return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_STRING === $keyTypes[0]->getBuiltinType();
@@ -195,7 +195,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
 
         $this->assertSame((new \ReflectionClass(NotAResource::class))->getShortName(), $rootDefinitionKey);
-        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
+        $this->assertArrayHasKey($rootDefinitionKey, $definitions);
         $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
         $this->assertArrayHasKey('foo', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['foo']);

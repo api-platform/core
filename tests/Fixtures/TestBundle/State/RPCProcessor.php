@@ -19,7 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RPCOutput;
 
 final class RPCProcessor implements ProcessorInterface
 {
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = []): RPCOutput
     {
         return new RPCOutput();
     }
