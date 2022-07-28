@@ -25,7 +25,6 @@ use ApiPlatform\Tests\ProphecyTrait;
 use DomainException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,7 +48,7 @@ class ExceptionActionTest extends TestCase
         if (!is_a(ExceptionInterface::class, \Throwable::class, true)) {
             $serializerException->willExtend(\Exception::class);
         }
-        $flattenException = class_exists(FlattenException::class) ? FlattenException::create($serializerException->reveal()) : LegacyFlattenException::create($serializerException->reveal()); /** @phpstan-ignore-line */
+        $flattenException = FlattenException::create($serializerException->reveal());
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => Response::HTTP_BAD_REQUEST])->willReturn('');
 

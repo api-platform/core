@@ -17,7 +17,7 @@ use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Hydra\Serializer\ErrorNormalizer;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

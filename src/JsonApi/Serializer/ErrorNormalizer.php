@@ -14,13 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
-use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Converts {@see \Exception} or {@see FlattenException} or {@see LegacyFlattenException}  to a JSON API error representation.
+ * Converts {@see \Exception} or {@see FlattenException} or to a JSON API error representation.
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
@@ -71,7 +70,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException || $data instanceof LegacyFlattenException);
+        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 
     /**

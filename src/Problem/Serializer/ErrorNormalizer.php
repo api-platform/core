@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Problem\Serializer;
 
-use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -67,7 +66,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException || $data instanceof LegacyFlattenException);
+        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 
     /**

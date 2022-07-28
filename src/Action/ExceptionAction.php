@@ -19,14 +19,13 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Util\ErrorFormatGuesser;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
-use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Renders a normalized exception for a given {@see FlattenException} or {@see LegacyFlattenException}.
+ * Renders a normalized exception for a given {@see FlattenException}.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -53,10 +52,8 @@ final class ExceptionAction
 
     /**
      * Converts an exception to a JSON response.
-     *
-     * @param FlattenException|LegacyFlattenException $exception
      */
-    public function __invoke($exception, Request $request): Response
+    public function __invoke(FlattenException $exception, Request $request): Response
     {
         $operation = $this->initializeOperation($request);
         $exceptionClass = $exception->getClass();
