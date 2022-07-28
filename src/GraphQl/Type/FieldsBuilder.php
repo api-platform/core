@@ -278,7 +278,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
             if (
                 $isCollectionType &&
-                $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+                $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
             ) {
                 $resourceClass = $collectionValueType->getClassName();
             } else {

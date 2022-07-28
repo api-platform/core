@@ -59,7 +59,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && is_iterable($data);
     }
@@ -69,7 +69,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      *
      * @param iterable $object
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $this->normalizeRawCollection($object, $format, $context);

@@ -42,7 +42,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return static::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }

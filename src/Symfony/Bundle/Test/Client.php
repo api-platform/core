@@ -247,10 +247,6 @@ final class Client implements HttpClientInterface
 
     public function loginUser(UserInterface $user, string $firewallContext = 'main'): self
     {
-        if (!method_exists($this->kernelBrowser, 'loginUser')) {
-            throw new \LogicException(sprintf('"%s" requires symfony/framework-bundle 5.1+ to be installed.', __METHOD__));
-        }
-
         $this->kernelBrowser->loginUser($user, $firewallContext);
 
         return $this;

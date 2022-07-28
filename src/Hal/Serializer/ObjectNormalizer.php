@@ -39,7 +39,7 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $this->decorated->supportsNormalization($data, $format, $context);
     }
@@ -54,10 +54,8 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];
@@ -87,7 +85,7 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
         return self::FORMAT === $format;
@@ -97,10 +95,8 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
      * {@inheritdoc}
      *
      * @throws LogicException
-     *
-     * @return mixed
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         throw new LogicException(sprintf('%s is a read-only format.', self::FORMAT));
     }

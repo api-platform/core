@@ -64,20 +64,8 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
             $propertyMetadata = $propertyMetadata->withWritable($writable);
         }
 
-        if (method_exists($this->propertyInfo, 'isInitializable')) {
-            if (null === $propertyMetadata->isInitializable() && null !== $initializable = $this->propertyInfo->isInitializable($resourceClass, $property, $options)) {
-                $propertyMetadata = $propertyMetadata->withInitializable($initializable);
-            }
-        } else {
-            // BC layer for Symfony < 4.2
-            $ref = new \ReflectionClass($resourceClass);
-            if ($ref->isInstantiable() && $constructor = $ref->getConstructor()) {
-                foreach ($constructor->getParameters() as $constructorParameter) {
-                    if ($constructorParameter->name === $property && null === $propertyMetadata->isInitializable()) {
-                        $propertyMetadata = $propertyMetadata->withInitializable(true);
-                    }
-                }
-            }
+        if (null === $propertyMetadata->isInitializable() && null !== $initializable = $this->propertyInfo->isInitializable($resourceClass, $property, $options)) {
+            $propertyMetadata = $propertyMetadata->withInitializable($initializable);
         }
 
         return $propertyMetadata;

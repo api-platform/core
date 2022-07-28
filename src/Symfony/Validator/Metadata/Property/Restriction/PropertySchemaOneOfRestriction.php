@@ -42,7 +42,7 @@ final class PropertySchemaOneOfRestriction implements PropertySchemaRestrictionM
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
-        $oneOfConstraints = method_exists($constraint, 'getNestedContraints') ? $constraint->getNestedContraints() : $constraint->constraints;
+        $oneOfConstraints = $constraint->constraints;
         $oneOfRestrictions = [];
 
         foreach ($oneOfConstraints as $oneOfConstraint) {

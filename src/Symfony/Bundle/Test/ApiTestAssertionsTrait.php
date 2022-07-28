@@ -168,7 +168,7 @@ trait ApiTestAssertionsTrait
 
     private static function getSchemaFactory(): SchemaFactoryInterface
     {
-        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container; // @phpstan-ignore-line
+        $container = static::getContainer();
 
         try {
             /** @var SchemaFactoryInterface $schemaFactory */
@@ -182,7 +182,7 @@ trait ApiTestAssertionsTrait
 
     private static function getResourceMetadataCollectionFactory(): ?ResourceMetadataCollectionFactoryInterface
     {
-        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container; // @phpstan-ignore-line
+        $container = static::getContainer();
 
         try {
             $resourceMetadataFactoryCollection = $container->get('api_platform.metadata.resource.metadata_collection_factory');

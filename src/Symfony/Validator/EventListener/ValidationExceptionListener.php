@@ -43,7 +43,7 @@ final class ValidationExceptionListener
      */
     public function onKernelException(ExceptionEvent $event): void
     {
-        $exception = method_exists($event, 'getThrowable') ? $event->getThrowable() : $event->getException(); // @phpstan-ignore-line
+        $exception = $event->getThrowable();
         if (!$exception instanceof ConstraintViolationListAwareExceptionInterface && !$exception instanceof FilterValidationException) {
             return;
         }

@@ -23,8 +23,6 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyForAdditionalFields;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyForAdditionalFieldsInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\ProphecyTrait;
@@ -35,8 +33,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -145,10 +141,6 @@ class AbstractItemNormalizerTest extends TestCase
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($normalizer, 'setIgnoredAttributes')) {
-            $normalizer->setIgnoredAttributes(['alias']);
-        }
-
         $expected = [
             'name' => 'foo',
             'relatedDummy' => '/dummies/2',
@@ -209,10 +201,6 @@ class AbstractItemNormalizerTest extends TestCase
             $resourceAccessChecker->reveal(),
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
-
-        if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($normalizer, 'setIgnoredAttributes')) {
-            $normalizer->setIgnoredAttributes(['alias']);
-        }
 
         $expected = [
             'title' => 'myPublicTitle',

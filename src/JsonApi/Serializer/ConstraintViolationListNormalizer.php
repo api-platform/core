@@ -40,12 +40,9 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
     }
 
     /**
-     * @param mixed      $object
-     * @param mixed|null $format
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         $violations = [];
         foreach ($object as $violation) {
@@ -63,7 +60,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }

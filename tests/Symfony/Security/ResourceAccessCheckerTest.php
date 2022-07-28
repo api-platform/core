@@ -48,11 +48,7 @@ class ResourceAccessCheckerTest extends TestCase
         $token = $tokenProphecy->reveal();
         $tokenProphecy->getUser()->shouldBeCalled();
 
-        if (method_exists($token, 'getRoleNames')) {
-            $tokenProphecy->getRoleNames()->willReturn([])->shouldBeCalled();
-        } else {
-            $tokenProphecy->getRoles()->willReturn([])->shouldBeCalled();
-        }
+        $tokenProphecy->getRoleNames()->willReturn([])->shouldBeCalled();
 
         $tokenStorageProphecy->getToken()->willReturn($token);
 

@@ -12,18 +12,24 @@
             "homepage": "https://dunglas.fr"
         }
     ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git@github.com:cdaguerre/contexts.git"
+        }
+    ],
     "require": {
         "php": ">=8.1",
         "doctrine/inflector": "^1.0 || ^2.0",
         "fig/link-util": "^1.0",
         "psr/cache": "^1.0 || ^2.0 || ^3.0",
         "psr/container": "^1.0 || ^2.0",
-        "symfony/http-foundation": "^6.0",
-        "symfony/http-kernel": "^6.0",
-        "symfony/property-access": "^6.0",
-        "symfony/property-info": "^6.0",
-        "symfony/serializer": "^6.0",
-        "symfony/web-link": "^6.0",
+        "symfony/http-foundation": "^6.1",
+        "symfony/http-kernel": "^6.1",
+        "symfony/property-access": "^6.1",
+        "symfony/property-info": "^6.1",
+        "symfony/serializer": "^6.1",
+        "symfony/web-link": "^6.1",
         "willdurand/negotiation": "^2.0.3 || ^3.0"
     },
     "require-dev": {
@@ -54,37 +60,37 @@
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "ramsey/uuid": "^3.7 || ^4.0",
         "ramsey/uuid-doctrine": "^1.4",
-        "soyuka/contexts": "dev-main",
+        "behatch/contexts": "dev-patch-1",
         "soyuka/stubs-mongodb": "^1.0",
-        "symfony/asset": "^6.0",
-        "symfony/browser-kit": "^6.0",
-        "symfony/cache": "^6.0",
-        "symfony/config": "^6.0",
-        "symfony/console": "^6.0",
-        "symfony/css-selector": "^6.0",
-        "symfony/dependency-injection": "^6.0",
-        "symfony/doctrine-bridge": "^6.0",
-        "symfony/dom-crawler": "^6.0",
-        "symfony/error-handler": "^6.0",
-        "symfony/event-dispatcher": "^6.0",
-        "symfony/expression-language": "^6.0",
-        "symfony/finder": "^6.0",
-        "symfony/form": "^6.0",
-        "symfony/framework-bundle": "^6.0",
-        "symfony/http-client": "^6.0",
-        "symfony/intl": "^6.0",
+        "symfony/asset": "^6.1",
+        "symfony/browser-kit": "^6.1",
+        "symfony/cache": "^6.1",
+        "symfony/config": "^6.1",
+        "symfony/console": "^6.1",
+        "symfony/css-selector": "^6.1",
+        "symfony/dependency-injection": "^6.1",
+        "symfony/doctrine-bridge": "^6.1",
+        "symfony/dom-crawler": "^6.1",
+        "symfony/error-handler": "^6.1",
+        "symfony/event-dispatcher": "^6.1",
+        "symfony/expression-language": "^6.1",
+        "symfony/finder": "^6.1",
+        "symfony/form": "^6.1",
+        "symfony/framework-bundle": "^6.1",
+        "symfony/http-client": "^6.1",
+        "symfony/intl": "^6.1",
         "symfony/maker-bundle": "^1.24",
         "symfony/mercure-bundle": "*",
-        "symfony/messenger": "^6.0",
-        "symfony/phpunit-bridge": "^6.0",
-        "symfony/routing": "^6.0",
-        "symfony/security-bundle": "^6.0",
-        "symfony/security-core": "^6.0",
-        "symfony/twig-bundle": "^6.0",
-        "symfony/uid": "^6.0",
-        "symfony/validator": "^6.0",
-        "symfony/web-profiler-bundle": "^6.0",
-        "symfony/yaml": "^6.0",
+        "symfony/messenger": "^6.1",
+        "symfony/phpunit-bridge": "^6.1",
+        "symfony/routing": "^6.1",
+        "symfony/security-bundle": "^6.1",
+        "symfony/security-core": "^6.1",
+        "symfony/twig-bundle": "^6.1",
+        "symfony/uid": "^6.1",
+        "symfony/validator": "^6.1",
+        "symfony/web-profiler-bundle": "^6.1",
+        "symfony/yaml": "^6.1",
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
         "webonyx/graphql-php": "^14.0"
     },
@@ -136,9 +142,6 @@
     "extra": {
         "branch-alias": {
             "dev-main": "3.0.x-dev"
-        },
-        "symfony": {
-            "require": "^6.0"
         }
     }
 }

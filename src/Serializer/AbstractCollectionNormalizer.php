@@ -54,7 +54,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return static::FORMAT === $format && is_iterable($data);
     }
@@ -71,10 +71,8 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      * {@inheritdoc}
      *
      * @param iterable $object
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $this->normalizeRawCollection($object, $format, $context);

@@ -106,7 +106,7 @@ final class TypeConverter implements TypeConverterInterface
     {
         if (
             $this->typeBuilder->isCollection($type) &&
-            $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+            $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
         ) {
             $resourceClass = $collectionValueType->getClassName();
         } else {

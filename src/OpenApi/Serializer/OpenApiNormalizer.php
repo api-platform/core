@@ -15,6 +15,7 @@ namespace ApiPlatform\OpenApi\Serializer;
 
 use ApiPlatform\OpenApi\Model\Paths;
 use ApiPlatform\OpenApi\OpenApi;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -37,14 +38,14 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         $pathsCallback = static function ($innerObject) {
             return $innerObject instanceof Paths ? $innerObject->getPaths() : [];
         };
         $context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] = true;
         $context[AbstractObjectNormalizer::SKIP_NULL_VALUES] = true;
-        $context[AbstractObjectNormalizer::CALLBACKS] = [
+        $context[AbstractNormalizer::CALLBACKS] = [
             'paths' => $pathsCallback,
         ];
 
@@ -74,7 +75,7 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof OpenApi;
     }

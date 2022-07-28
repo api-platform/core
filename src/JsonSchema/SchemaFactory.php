@@ -202,8 +202,8 @@ final class SchemaFactory implements SchemaFactoryInterface
         $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
         if (null !== $type) {
             if ($isCollection = $type->isCollection()) {
-                $keyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
-                $valueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
+                $keyType = $type->getCollectionKeyTypes()[0] ?? null;
+                $valueType = $type->getCollectionValueTypes()[0] ?? null;
             } else {
                 $keyType = null;
                 $valueType = $type;

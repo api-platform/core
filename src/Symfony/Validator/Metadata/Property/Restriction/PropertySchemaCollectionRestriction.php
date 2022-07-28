@@ -81,7 +81,7 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
     private function mergeConstraintRestrictions(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
         $propertyRestrictions = [];
-        $nestedConstraints = method_exists($constraint, 'getNestedContraints') ? $constraint->getNestedContraints() : $constraint->constraints;
+        $nestedConstraints = $constraint->constraints;
 
         foreach ($nestedConstraints as $nestedConstraint) {
             foreach ($this->restrictionsMetadata as $restrictionMetadata) {

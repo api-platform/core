@@ -53,7 +53,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Yaml\Yaml;
 
 class ApiPlatformExtensionTest extends TestCase
 {

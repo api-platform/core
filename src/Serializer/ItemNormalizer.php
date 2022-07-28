@@ -48,10 +48,8 @@ class ItemNormalizer extends AbstractItemNormalizer
      * {@inheritdoc}
      *
      * @throws NotNormalizableValueException
-     *
-     * @return mixed
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['id']) && !isset($context[self::OBJECT_TO_POPULATE])) {

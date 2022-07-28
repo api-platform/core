@@ -19,7 +19,6 @@ use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
@@ -96,15 +95,9 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
     private function getEffectiveRoles(TokenInterface $token): array
     {
         if (null === $this->roleHierarchy) {
-            return method_exists($token, 'getRoleNames') ? $token->getRoleNames() : array_map('strval', $token->getRoles()); // @phpstan-ignore-line
+            return $token->getRoleNames();
         }
 
-        if (method_exists($this->roleHierarchy, 'getReachableRoleNames')) {
-            return $this->roleHierarchy->getReachableRoleNames($token->getRoleNames());
-        }
-
-        return array_map(static function (Role $role): string {
-            return $role->getRole(); // @phpstan-ignore-line
-        }, $this->roleHierarchy->getReachableRoles($token->getRoles())); // @phpstan-ignore-line
+        return $this->roleHierarchy->getReachableRoleNames($token->getRoleNames());
     }
 }

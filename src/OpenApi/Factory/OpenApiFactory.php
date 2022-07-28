@@ -163,7 +163,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $pathItem = new Model\PathItem();
             }
 
-            $forceSchemaCollection = $operation instanceof CollectionOperationInterface && 'GET' === $method ? true : false;
+            $forceSchemaCollection = $operation instanceof CollectionOperationInterface && 'GET' === $method;
             $schema = new Schema('openapi');
             $schema->setDefinitions($schemas);
 

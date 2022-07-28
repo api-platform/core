@@ -85,7 +85,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         if (!\is_object($data) || is_iterable($data)) {
             return false;
@@ -111,10 +111,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * @throws LogicException
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $resourceClass = $this->getObjectClass($object);
         if ($outputClass = $this->getOutputClass($resourceClass, $context)) {
@@ -168,7 +166,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         if (($context['input']['class'] ?? null) === $type) {
             return true;
@@ -179,10 +177,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed
     {
         $resourceClass = $class;
 
@@ -486,7 +482,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw new InvalidArgumentException(sprintf('The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)));
         }
 
-        $collectionKeyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
+        $collectionKeyType = $type->getCollectionKeyTypes()[0] ?? null;
         $collectionKeyBuiltinType = null === $collectionKeyType ? null : $collectionKeyType->getBuiltinType();
 
         $values = [];
@@ -602,7 +598,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (
             $type &&
             $type->isCollection() &&
-            ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) &&
+            ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) &&
             ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
@@ -732,7 +728,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $value;
         }
 
-        $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
+        $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
 
         /* From @see AbstractObjectNormalizer::validateAndDenormalize() */
         // Fix a collection that contains the only one element
@@ -802,7 +798,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             switch ($type->getBuiltinType()) {
                 case Type::BUILTIN_TYPE_BOOL:
-                    // according to https://www.w3.org/TR/xmlschema-2/#boolean, valid representations are "false", "true", "0" and "1"
+                    // according to http://www.w3.org/TR/xmlschema-2/#boolean, valid representations are "false", "true", "0" and "1"
                     if ('false' === $value || '0' === $value) {
                         $value = false;
                     } elseif ('true' === $value || '1' === $value) {

@@ -247,7 +247,7 @@ final class TypeBuilder implements TypeBuilderInterface
      */
     public function isCollection(Type $type): bool
     {
-        return $type->isCollection() && ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) && null !== $collectionValueType->getClassName();
+        return $type->isCollection() && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) && null !== $collectionValueType->getClassName();
     }
 
     private function getCursorBasedPaginationFields(GraphQLType $resourceType): array

@@ -149,10 +149,6 @@ class SchemaFactoryTest extends TestCase
 
     public function testBuildSchemaForAssociativeArray(): void
     {
-        if (!method_exists(Type::class, 'getCollectionKeyTypes')) {
-            $this->markTestSkipped();
-        }
-
         $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
         $typeFactoryProphecy->getType(Argument::allOf(
             Argument::type(Type::class),

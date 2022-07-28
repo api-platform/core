@@ -26,7 +26,6 @@ use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -60,17 +59,15 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $resourceClass = $this->getObjectClass($object);
         if ($this->getOutputClass($resourceClass, $context)) {
@@ -130,7 +127,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
     }
@@ -139,10 +136,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * {@inheritdoc}
      *
      * @throws NotNormalizableValueException
-     *
-     * @return mixed
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed
     {
         // Avoid issues with proxies if we populated the object
         if (!isset($context[self::OBJECT_TO_POPULATE]) && isset($data['data']['id'])) {
@@ -288,10 +283,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             if (null !== $type) {
                 if ($type->isCollection()) {
-                    $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
-                    $isMany = ($collectionValueType && $className = $collectionValueType->getClassName()) ? $this->resourceClassResolver->isResourceClass($className) : false;
+                    $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
+                    $isMany = $collectionValueType && ($className = $collectionValueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
                 } else {
-                    $isOne = ($className = $type->getClassName()) ? $this->resourceClassResolver->isResourceClass($className) : false;
+                    $isOne = ($className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
                 }
             }
 

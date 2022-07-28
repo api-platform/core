@@ -60,10 +60,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $classes = [];
         $entrypointProperties = [];
@@ -339,7 +337,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return null;
         }
 
-        if ($type->isCollection() && null !== $collectionType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) {
+        if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
             $type = $collectionType;
         }
 
@@ -554,7 +552,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof Documentation;
     }

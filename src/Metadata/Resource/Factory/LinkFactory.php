@@ -156,7 +156,7 @@ final class LinkFactory implements LinkFactoryInterface
     {
         foreach ($types ?? [] as $type) {
             if ($type->isCollection()) {
-                return $this->getPropertyClassType(method_exists(Type::class, 'getCollectionValueTypes') ? $type->getCollectionValueTypes() : ($type->getCollectionValueType() ? [$type->getCollectionValueType()] : null));
+                return $this->getPropertyClassType($type->getCollectionValueTypes());
             }
 
             if ($class = $type->getClassName()) {

@@ -17,7 +17,6 @@ use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Util\ResourceClassInfoTrait;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 
@@ -87,7 +86,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     {
         $serializerAttributeMetadata = $this->getSerializerAttributeMetadata($resourceClass, $propertyName);
         $groups = $serializerAttributeMetadata ? $serializerAttributeMetadata->getGroups() : [];
-        $ignored = $serializerAttributeMetadata && method_exists($serializerAttributeMetadata, 'isIgnored') ? $serializerAttributeMetadata->isIgnored() : false;
+        $ignored = $serializerAttributeMetadata && $serializerAttributeMetadata->isIgnored();
 
         if (false !== $propertyMetadata->isReadable()) {
             $propertyMetadata = $propertyMetadata->withReadable(!$ignored && (null === $normalizationGroups || array_intersect($normalizationGroups, $groups)));
@@ -125,7 +124,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         if (
             $type->isCollection() &&
-            $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+            $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
         ) {
             $relatedClass = $collectionValueType->getClassName();
         } else {
