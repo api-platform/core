@@ -26,12 +26,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ODM\Document]
 class ConcreteDummy extends AbstractDummy
 {
-    /**
-     * @var string a concrete thing
-     */
     #[Assert\NotBlank]
     #[ODM\Field]
-    private $instance;
+    private ?string $instance = null;
 
     public function setInstance($instance): void
     {

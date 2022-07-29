@@ -38,8 +38,6 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{_links: array<string, array{href: string|null}>&mixed[]}
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {

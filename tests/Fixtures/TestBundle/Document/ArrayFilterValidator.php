@@ -28,18 +28,12 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 #[ODM\Document]
 class ArrayFilterValidator
 {
-    /**
-     * @var int The id
-     */
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
-    /**
-     * @var string A name
-     */
     #[ApiProperty(types: ['http://schema.org/name'])]
     #[ODM\Field]
-    private $name;
+    private ?string $name = null;
 
     public function getId(): ?int
     {

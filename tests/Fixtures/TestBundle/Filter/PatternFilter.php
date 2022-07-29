@@ -28,9 +28,6 @@ class PatternFilter extends AbstractFilter
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
-    /**
-     * @return array{pattern: array{property: string, type: string, required: false, swagger: array{pattern: string}}}
-     */
     public function getDescription(string $resourceClass): array
     {
         return [

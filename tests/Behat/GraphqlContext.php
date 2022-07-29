@@ -37,7 +37,7 @@ final class GraphqlContext implements Context
      */
     private $graphqlRequest;
 
-    private ?int $graphqlLine = null;
+    private ?int $graphqlLine = null; // @phpstan-ignore-line
 
     public function __construct(private readonly Request $request)
     {

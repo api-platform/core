@@ -109,8 +109,6 @@ final class SerializeStage implements SerializeStageInterface
     /**
      * @throws \LogicException
      * @throws \UnexpectedValueException
-     *
-     * @return array{totalCount: float|int, edges: array<mixed, array{node: mixed[]|bool|float|int|string|null, cursor: string}>, pageInfo: array{startCursor: string|null, endCursor: string|null, hasNextPage: bool, hasPreviousPage: bool}}
      */
     private function serializeCursorBasedPaginatedCollection(iterable $collection, array $normalizationContext, array $context): array
     {
@@ -175,8 +173,6 @@ final class SerializeStage implements SerializeStageInterface
 
     /**
      * @throws \LogicException
-     *
-     * @return array{collection: bool[]|float[]|int[]|string[]|mixed[][]|null[], paginationInfo: array{itemsPerPage: float, totalCount: float, lastPage: float}}
      */
     private function serializePageBasedPaginatedCollection(iterable $collection, array $normalizationContext): array
     {
@@ -196,33 +192,21 @@ final class SerializeStage implements SerializeStageInterface
         return $data;
     }
 
-    /**
-     * @return array{totalCount: float, edges: never[], pageInfo: array{startCursor: null, endCursor: null, hasNextPage: false, hasPreviousPage: false}}
-     */
     private function getDefaultCursorBasedPaginatedData(): array
     {
         return ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]];
     }
 
-    /**
-     * @return array{collection: never[], paginationInfo: array{itemsPerPage: float, totalCount: float, lastPage: float}}
-     */
     private function getDefaultPageBasedPaginatedData(): array
     {
         return ['collection' => [], 'paginationInfo' => ['itemsPerPage' => 0., 'totalCount' => 0., 'lastPage' => 0.]];
     }
 
-    /**
-     * @return array{clientMutationId: mixed}
-     */
     private function getDefaultMutationData(array $context): array
     {
         return ['clientMutationId' => $context['args']['input']['clientMutationId'] ?? null];
     }
 
-    /**
-     * @return array{clientSubscriptionId: mixed}
-     */
     private function getDefaultSubscriptionData(array $context): array
     {
         return ['clientSubscriptionId' => $context['args']['input']['clientSubscriptionId'] ?? null];

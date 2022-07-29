@@ -185,9 +185,12 @@ use Symfony\Component\Uid\Uuid as SymfonyUuid;
  */
 final class DoctrineContext implements Context
 {
-    private readonly ObjectManager $manager; // @phpstan-ignore-line
-    private readonly ?SchemaTool $schemaTool;
-    private readonly ?SchemaManager $schemaManager;
+    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
+    private ObjectManager $manager;
+    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
+    private ?SchemaTool $schemaTool;
+    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
+    private ?SchemaManager $schemaManager;
 
     /**
      * Initializes context.
@@ -195,10 +198,8 @@ final class DoctrineContext implements Context
      * Every scenario gets its own context instance.
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
-     *
-     * @param mixed $passwordHasher
      */
-    public function __construct(private readonly ManagerRegistry $doctrine, private $passwordHasher)
+    public function __construct(private readonly ManagerRegistry $doctrine, private readonly mixed $passwordHasher)
     {
         $this->manager = $doctrine->getManager();
         $this->schemaTool = $this->manager instanceof EntityManagerInterface ? new SchemaTool($this->manager) : null;
@@ -1400,7 +1401,7 @@ final class DoctrineContext implements Context
     public function thePasswordForUserShouldBeHashed(string $password, string $user)
     {
         $user = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find($user);
-        if (!$this->passwordHasher->isPasswordValid($user, $password)) { // @phpstan-ignore-line
+        if (!$this->passwordHasher->isPasswordValid($user, $password)) {
             throw new \Exception('User password mismatch');
         }
     }

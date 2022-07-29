@@ -35,8 +35,6 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
      * {@inheritdoc}
      *
      * @param Collection $constraint
-     *
-     * @return array{type: string, properties: array<int|string, mixed[]>, additionalProperties: mixed, required?: mixed[]}
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {

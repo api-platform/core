@@ -29,8 +29,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Util\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use GraphQL\Type\Definition\WrappingType;
@@ -53,8 +51,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{type: InterfaceType, args: array{id: array{type: NonNull}}, resolve: callable}
      */
     public function getNodeQueryFields(): array
     {
@@ -379,7 +375,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         foreach ($operation->getFilters() ?? [] as $filterId) {
-            if (null === $this->filterLocator || !$this->filterLocator->has($filterId)) {
+            if (!$this->filterLocator->has($filterId)) {
                 continue;
             }
 
@@ -410,11 +406,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $this->convertFilterArgsToTypes($args);
     }
 
-    /**
-     * @param AbstractOperation|null $operation
-     * @param mixed                  $original
-     */
-    private function mergeFilterArgs(array $args, array $parsed, $operation = null, string $original = ''): array
+    private function mergeFilterArgs(array $args, array $parsed, ?AbstractOperation $operation = null, string $original = ''): array
     {
         foreach ($parsed as $key => $value) {
             // Never override keys that cannot be merged

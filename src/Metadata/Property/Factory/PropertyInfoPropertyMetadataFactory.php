@@ -59,6 +59,7 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
             $propertyMetadata = $propertyMetadata->withWritable($writable);
         }
 
+        /* @phpstan-ignore-next-line */
         if (null === $propertyMetadata->isInitializable() && null !== $initializable = $this->propertyInfo->isInitializable($resourceClass, $property, $options)) {
             $propertyMetadata = $propertyMetadata->withInitializable($initializable);
         }

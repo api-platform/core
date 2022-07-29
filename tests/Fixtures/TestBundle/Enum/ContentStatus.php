@@ -39,9 +39,6 @@ final class ContentStatus implements \JsonSerializable
         return $this->value;
     }
 
-    /**
-     * @return array{DRAFT: string, PUBLISHED: string}
-     */
     public static function toArray(): array
     {
         return [
@@ -62,11 +59,8 @@ final class ContentStatus implements \JsonSerializable
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{key: bool|string, value: string}
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'key' => $this->getKey(),

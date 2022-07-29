@@ -40,8 +40,6 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{title: mixed, description: string, code?: string, trace?: mixed}
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {

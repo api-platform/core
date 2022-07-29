@@ -52,7 +52,7 @@ class RelatedNormalizedDummy
      */
     #[ORM\ManyToMany(targetEntity: CustomNormalizedDummy::class)]
     #[Groups(['related_output', 'related_input'])]
-    public ?Collection $customNormalizedDummy = null;
+    public Collection $customNormalizedDummy;
 
     public function __construct()
     {

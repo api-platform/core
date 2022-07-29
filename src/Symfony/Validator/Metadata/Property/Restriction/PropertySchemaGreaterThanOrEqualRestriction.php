@@ -27,8 +27,6 @@ final class PropertySchemaGreaterThanOrEqualRestriction implements PropertySchem
      * {@inheritdoc}
      *
      * @param GreaterThanOrEqual $constraint
-     *
-     * @return array{minimum: mixed}
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {

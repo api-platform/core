@@ -46,7 +46,7 @@ final class OperationResourceProcessor implements ProcessorInterface
         return $data;
     }
 
-    private function remove($data, array $context = []): void
+    private function remove($data): void
     {
         if (!$manager = $this->getManager($data)) {
             return;
@@ -59,7 +59,9 @@ final class OperationResourceProcessor implements ProcessorInterface
     public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if ($operation instanceof DeleteOperationInterface) {
-            return $this->remove($data);
+            $this->remove($data);
+
+            return $data;
         }
 
         return $this->persist($data);

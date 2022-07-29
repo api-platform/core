@@ -24,8 +24,6 @@ final class PropertySchemaUniqueRestriction implements PropertySchemaRestriction
 {
     /**
      * {@inheritdoc}
-     *
-     * @return array{uniqueItems: true}
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {

@@ -36,8 +36,6 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{errors: array<int, array{detail: mixed, source: array{pointer: mixed}}>}
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {

@@ -48,7 +48,7 @@ class ExceptionActionTest extends TestCase
         if (!is_a(ExceptionInterface::class, \Throwable::class, true)) {
             $serializerException->willExtend(\Exception::class);
         }
-        $flattenException = FlattenException::create($serializerException->reveal());
+        $flattenException = FlattenException::create($serializerException->reveal()); // @phpstan-ignore-line
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => Response::HTTP_BAD_REQUEST])->willReturn('');
 

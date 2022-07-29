@@ -58,10 +58,8 @@ class CompositeItem implements \Stringable
 
     /**
      * Sets field1.
-     *
-     * @param string|null $field1 the value to set
      */
-    public function setField1($field1 = null): void
+    public function setField1(?string $field1 = null): void
     {
         $this->field1 = $field1;
     }
@@ -69,7 +67,7 @@ class CompositeItem implements \Stringable
     /**
      * Gets compositeValues.
      */
-    public function getCompositeValues(): ?CompositeRelation
+    public function getCompositeValues(): Collection
     {
         return $this->compositeValues;
     }

@@ -67,11 +67,8 @@ class Field implements \JsonSerializable
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{id: int|null, name: string, value: string}
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,

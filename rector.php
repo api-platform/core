@@ -30,7 +30,7 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
     $rectorConfig->phpstanConfig(__DIR__.'/phpstan.neon.dist');
     $rectorConfig->importNames();
-    $rectorConfig->disableImportShortClasses();
+    $rectorConfig->importShortClasses(false);
 
     $rectorConfig->rule(InlineConstructorDefaultToPropertyRector::class);
 

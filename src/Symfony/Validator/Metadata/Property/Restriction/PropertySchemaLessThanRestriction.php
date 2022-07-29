@@ -27,8 +27,6 @@ final class PropertySchemaLessThanRestriction implements PropertySchemaRestricti
      * {@inheritdoc}
      *
      * @param LessThan $constraint
-     *
-     * @return array{maximum: mixed, exclusiveMaximum: true}
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {

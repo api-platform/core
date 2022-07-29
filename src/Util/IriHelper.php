@@ -33,8 +33,6 @@ final class IriHelper
      * Parses and standardizes the request IRI.
      *
      * @throws InvalidArgumentException
-     *
-     * @return array{parts: array{scheme?: string, host?: string, port?: int, user?: string, pass?: string, path?: string, query?: string, fragment?: string}, parameters: mixed[]}
      */
     public static function parseIri(string $iri, string $pageParameterName): array
     {

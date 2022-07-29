@@ -20,7 +20,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Checks if the logged user has sufficient permissions to access the given resource.
@@ -67,8 +66,6 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
      * @copyright Fabien Potencier <fabien@symfony.com>
      *
      * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Authorization/Voter/ExpressionVoter.php
-     *
-     * @return array{token: TokenInterface, user: (UserInterface | null), roles: string[]}
      */
     private function getVariables(TokenInterface $token): array
     {

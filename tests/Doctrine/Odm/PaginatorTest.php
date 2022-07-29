@@ -36,9 +36,9 @@ class PaginatorTest extends TestCase
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
-        $this->assertSame($currentPage, $paginator->getCurrentPage());
-        $this->assertSame($lastPage, $paginator->getLastPage());
-        $this->assertSame($maxResults, $paginator->getItemsPerPage());
+        $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
+        $this->assertSame((float) $lastPage, $paginator->getLastPage());
+        $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
     }
 
     public function testInitializeWithFacetStageNotApplied(): void
@@ -85,18 +85,18 @@ class PaginatorTest extends TestCase
     {
         $paginator = $this->getPaginator(0, 5, 0, true);
 
-        $this->assertSame(1, $paginator->getCurrentPage());
-        $this->assertSame(1, $paginator->getLastPage());
-        $this->assertSame(0, $paginator->getItemsPerPage());
+        $this->assertSame(1., $paginator->getCurrentPage());
+        $this->assertSame(1., $paginator->getLastPage());
+        $this->assertSame(0., $paginator->getItemsPerPage());
     }
 
     public function testInitializeWithNoCount(): void
     {
         $paginator = $this->getPaginatorWithNoCount();
 
-        $this->assertSame(1, $paginator->getCurrentPage());
-        $this->assertSame(1, $paginator->getLastPage());
-        $this->assertSame(15, $paginator->getItemsPerPage());
+        $this->assertSame(1., $paginator->getCurrentPage());
+        $this->assertSame(1., $paginator->getLastPage());
+        $this->assertSame(15., $paginator->getItemsPerPage());
     }
 
     public function testGetIterator(): void

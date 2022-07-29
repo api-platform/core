@@ -112,11 +112,8 @@ class Content implements \JsonSerializable
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{id: int|null, contentType: string, fields: Collection&Field[]}
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return ['id' => $this->id, 'contentType' => $this->contentType, 'fields' => $this->fields];
     }

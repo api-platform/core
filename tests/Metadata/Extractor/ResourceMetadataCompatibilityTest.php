@@ -550,6 +550,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         $operations = [];
         foreach ($values as $type => $graphQlOperations) {
             switch ($type) {
+                default:
                 case 'queries':
                     $class = Query::class;
                     break;
@@ -559,8 +560,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 case 'subscriptions':
                     $class = Subscription::class;
                     break;
-                default:
-                }
+            }
 
             foreach ($graphQlOperations as $value) {
                 $operation = new $class();

@@ -43,9 +43,6 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @return array{collection_query: QueryCollection, item_query: Query, update: Mutation, delete: DeleteMutation, create: Mutation}
-     */
     private function getDefaultGraphqlOperations(string $shortName, string $class, mixed $provider = null): array
     {
         return [

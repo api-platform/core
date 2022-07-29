@@ -25,7 +25,6 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
@@ -245,9 +244,6 @@ final class TypeBuilder implements TypeBuilderInterface
         return $type->isCollection() && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) && null !== $collectionValueType->getClassName();
     }
 
-    /**
-     * @return array{edges: ListOfType, pageInfo: NonNull, totalCount: NonNull}
-     */
     private function getCursorBasedPaginationFields(GraphQLType $resourceType): array
     {
         $shortName = $resourceType->name;
@@ -283,9 +279,6 @@ final class TypeBuilder implements TypeBuilderInterface
         ];
     }
 
-    /**
-     * @return array{collection: ListOfType, paginationInfo: NonNull}
-     */
     private function getPageBasedPaginationFields(GraphQLType $resourceType): array
     {
         $shortName = $resourceType->name;

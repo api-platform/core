@@ -421,7 +421,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * Gets parameters corresponding to enabled filters.
      */
-    private function getFiltersParameters(CollectionOperationInterface $operation): array
+    private function getFiltersParameters(HttpOperation $operation): array
     {
         $parameters = [];
 
@@ -459,7 +459,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $parameters;
     }
 
-    private function getPaginationParameters(CollectionOperationInterface $operation): array
+    private function getPaginationParameters(HttpOperation $operation): array
     {
         if (!$this->paginationOptions->isPaginationEnabled()) {
             return [];

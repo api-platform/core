@@ -51,8 +51,6 @@ final class VarnishXKeyPurger implements PurgerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{xkey: string}
      */
     public function getResponseHeaders(array $iris): array
     {

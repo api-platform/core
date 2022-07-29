@@ -151,7 +151,7 @@ XML_WRAP
         }
     }
 
-    private function parse(string|int|float|bool $value): ?string
+    private function parse(string|int|float|bool|null $value): ?string
     {
         if (null === $value) {
             return null;

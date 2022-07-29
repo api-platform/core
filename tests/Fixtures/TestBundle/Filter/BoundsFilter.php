@@ -28,9 +28,6 @@ class BoundsFilter extends AbstractFilter
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
-    /**
-     * @return array{maximum: array{property: string, type: string, required: false, swagger: array{maximum: int}}, exclusiveMaximum: array{property: string, type: string, required: false, swagger: array{maximum: int, exclusiveMaximum: true}}, minimum: array{property: string, type: string, required: false, swagger: array{minimum: int}}, exclusiveMinimum: array{property: string, type: string, required: false, swagger: array{minimum: int, exclusiveMinimum: true}}}
-     */
     public function getDescription(string $resourceClass): array
     {
         return [

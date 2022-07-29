@@ -42,8 +42,6 @@ final class DateTimeType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
     public function serialize($value): string
     {

@@ -23,8 +23,6 @@ final class NoPropertiesArgumentFilter implements FilterInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{property: string, type: string, required: false}
      */
     public function getDescription(string $resourceClass): array
     {

@@ -333,8 +333,6 @@ final class SchemaFactory implements SchemaFactoryInterface
 
     /**
      * Gets the options for the property name collection / property metadata factories.
-     *
-     * @return array{enable_getter_setter_extraction: true, serializer_groups?: mixed[], normalization_groups?: mixed, denormalization_groups?: mixed, validation_groups?: mixed[]}
      */
     private function getFactoryOptions(array $serializerContext, array $validationGroups, ?HttpOperation $operation = null): array
     {

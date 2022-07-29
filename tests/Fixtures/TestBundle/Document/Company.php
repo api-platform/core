@@ -31,9 +31,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ODM\Document]
 class Company
 {
-    /**
-     * @var int|null The id
-     */
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
@@ -43,7 +40,7 @@ class Company
 
     /** @var Employee[] */
     #[Link(toProperty: 'company')]
-    public $employees = []; // only used to set metadata
+    public array $employees = []; // only used to set metadata
 
     public function getId(): ?int
     {

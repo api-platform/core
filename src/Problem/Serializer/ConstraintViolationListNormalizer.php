@@ -43,8 +43,6 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 
     /**
      * {@inheritdoc}
-     *
-     * @return array{type: mixed, title: mixed, detail: string, violations: mixed}
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
