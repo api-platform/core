@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -33,7 +32,7 @@ class CompositeItem implements \Stringable
     private ?string $field1 = null;
     #[Groups(['default'])]
     #[ODM\ReferenceMany(targetDocument: CompositeRelation::class, mappedBy: 'compositeItem')]
-    private Collection $compositeValues;
+    private $compositeValues;
 
     public function __construct()
     {
@@ -67,7 +66,7 @@ class CompositeItem implements \Stringable
     /**
      * Gets compositeValues.
      */
-    public function getCompositeValues(): Collection
+    public function getCompositeValues(): iterable
     {
         return $this->compositeValues;
     }

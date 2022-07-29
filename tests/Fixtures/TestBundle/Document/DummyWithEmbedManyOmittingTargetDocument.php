@@ -32,7 +32,7 @@ class DummyWithEmbedManyOmittingTargetDocument
      * @var EmbeddableDummy[]|Collection
      */
     #[ODM\EmbedMany]
-    private array|Collection $embeddedDummies;
+    private $embeddedDummies;
 
     public function __construct()
     {
@@ -44,7 +44,7 @@ class DummyWithEmbedManyOmittingTargetDocument
         return $this->id;
     }
 
-    public function getEmbeddedDummies(): Collection
+    public function getEmbeddedDummies(): iterable
     {
         return $this->embeddedDummies;
     }

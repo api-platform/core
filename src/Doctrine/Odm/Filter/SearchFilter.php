@@ -159,11 +159,9 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     /**
      * Get equality match value according to the strategy.
      *
-     * @param mixed $value
-     *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    private function getEqualityMatchStrategyValue(string $strategy, string $field, $value, bool $caseSensitive, ClassMetadata $metadata): Regex|string
+    private function getEqualityMatchStrategyValue(string $strategy, string $field, mixed $value, bool $caseSensitive, ClassMetadata $metadata): Regex|string|int
     {
         $type = $metadata->getTypeOfField($field);
 

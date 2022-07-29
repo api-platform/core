@@ -16,7 +16,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -47,7 +46,7 @@ class RelatedNormalizedDummy
 
     #[Groups(['related_output', 'related_input'])]
     #[ODM\ReferenceMany(targetDocument: CustomNormalizedDummy::class)]
-    public ?Collection $customNormalizedDummy = null;
+    public $customNormalizedDummy;
 
     public function __construct()
     {
@@ -72,7 +71,7 @@ class RelatedNormalizedDummy
         return $this->name;
     }
 
-    public function getCustomNormalizedDummy(): Collection
+    public function getCustomNormalizedDummy(): iterable
     {
         return $this->customNormalizedDummy;
     }

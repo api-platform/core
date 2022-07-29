@@ -21,15 +21,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 #[ODM\Document]
 class ReadableOnlyProperty
 {
-    /**
-     * @var int The id
-     */
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
-    /**
-     * @var string The foo name
-     */
     #[ApiProperty(writable: false)]
     #[ODM\Field]
     private string $name = 'Read only';

@@ -25,7 +25,6 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -76,7 +75,7 @@ class RelatedDummy extends ParentDummy implements \Stringable
     public ?ThirdLevel $thirdLevel = null;
     #[Groups(['fakemanytomany', 'friends'])]
     #[ODM\ReferenceMany(targetDocument: RelatedToDummyFriend::class, cascade: ['persist'], mappedBy: 'relatedDummy', storeAs: 'id')]
-    public ?Collection $relatedToDummyFriend = null;
+    public $relatedToDummyFriend;
     #[Groups(['friends'])]
     #[ODM\Field(type: 'bool')]
     public ?bool $dummyBoolean = null;
@@ -156,7 +155,7 @@ class RelatedDummy extends ParentDummy implements \Stringable
     /**
      * Get relatedToDummyFriend.
      */
-    public function getRelatedToDummyFriend(): Collection
+    public function getRelatedToDummyFriend(): iterable
     {
         return $this->relatedToDummyFriend;
     }

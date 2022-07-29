@@ -32,7 +32,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[Delete]
 class OperationResource
 {
-    public function __construct(#[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column(type: 'integer')] #[ApiProperty(identifier: true)] private int $identifier, public string $name)
+    public function __construct(#[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column(type: 'integer')] #[ApiProperty(identifier: true)] private int $identifier, public $name)
     {
     }
 
@@ -41,7 +41,7 @@ class OperationResource
         return $this->identifier;
     }
 
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }

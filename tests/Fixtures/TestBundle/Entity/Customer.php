@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -34,7 +33,7 @@ class Customer
     #[ORM\ManyToMany(targetEntity: Address::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['order_read'])]
-    public Collection $addresses;
+    public $addresses;
 
     public function __construct()
     {

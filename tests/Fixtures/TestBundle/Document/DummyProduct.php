@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -38,14 +37,14 @@ class DummyProduct
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     #[ODM\ReferenceMany(targetDocument: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
-    private Collection $offers;
+    private $offers;
     /**
      * @var string The tour name
      */
     #[ODM\Field]
     private string $name;
     #[ODM\ReferenceMany(targetDocument: self::class, mappedBy: 'parent')]
-    private Collection $relatedProducts;
+    private $relatedProducts;
     #[ODM\ReferenceOne(targetDocument: self::class, inversedBy: 'relatedProducts')]
     private $parent;
 
@@ -55,12 +54,12 @@ class DummyProduct
         $this->relatedProducts = new ArrayCollection();
     }
 
-    public function getOffers(): Collection
+    public function getOffers(): iterable
     {
         return $this->offers;
     }
 
-    public function setOffers(Collection $offers): void
+    public function setOffers($offers): void
     {
         $this->offers = $offers;
     }
@@ -86,12 +85,12 @@ class DummyProduct
         $this->name = $name;
     }
 
-    public function getRelatedProducts(): Collection
+    public function getRelatedProducts(): iterable
     {
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(iterable $relatedProducts): void
+    public function setRelatedProducts($relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }

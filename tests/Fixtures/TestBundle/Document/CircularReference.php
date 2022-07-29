@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -35,7 +34,7 @@ class CircularReference
     public $parent;
     #[Groups(['circular'])]
     #[ODM\ReferenceMany(targetDocument: self::class, mappedBy: 'parent')]
-    public Collection $children;
+    public $children;
 
     public function __construct()
     {

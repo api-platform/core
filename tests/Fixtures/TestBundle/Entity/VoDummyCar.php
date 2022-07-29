@@ -28,7 +28,7 @@ class VoDummyCar extends VoDummyVehicle
      */
     #[ORM\OneToMany(targetEntity: VoDummyInspection::class, mappedBy: 'car', cascade: ['persist'])]
     #[Groups(['car_read', 'car_write'])]
-    private Collection $inspections;
+    private $inspections;
 
     public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, #[ORM\Column(type: 'integer')] #[Groups(['car_read', 'car_write'])] private int $mileage, #[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $bodyType = 'coupe')
     {
@@ -46,7 +46,7 @@ class VoDummyCar extends VoDummyVehicle
         return $this->bodyType;
     }
 
-    public function getInspections(): Collection
+    public function getInspections(): iterable
     {
         return $this->inspections;
     }

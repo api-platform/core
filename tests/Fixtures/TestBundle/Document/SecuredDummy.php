@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -76,7 +75,7 @@ class SecuredDummy
 
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
     #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
-    public Collection $relatedDummies;
+    public $relatedDummies;
 
     /**
      * @var RelatedDummy
@@ -90,7 +89,7 @@ class SecuredDummy
      */
     #[ApiProperty(security: "is_granted('ROLE_USER')")]
     #[ODM\ReferenceMany(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
-    public Collection $relatedSecuredDummies;
+    public $relatedSecuredDummies;
 
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
@@ -104,7 +103,7 @@ class SecuredDummy
      * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      */
     #[ODM\ReferenceMany(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
-    public Collection $publicRelatedSecuredDummies;
+    public $publicRelatedSecuredDummies;
     /**
      * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
@@ -180,7 +179,7 @@ class SecuredDummy
         $this->relatedDummies->add($relatedDummy);
     }
 
-    public function getRelatedDummies(): Collection
+    public function getRelatedDummies(): iterable
     {
         return $this->relatedDummies;
     }
@@ -200,7 +199,7 @@ class SecuredDummy
         $this->relatedSecuredDummies->add($relatedSecuredDummy);
     }
 
-    public function getRelatedSecuredDummies(): Collection
+    public function getRelatedSecuredDummies(): iterable
     {
         return $this->relatedSecuredDummies;
     }
@@ -220,7 +219,7 @@ class SecuredDummy
         $this->publicRelatedSecuredDummies->add($publicRelatedSecuredDummy);
     }
 
-    public function getPublicRelatedSecuredDummies(): Collection
+    public function getPublicRelatedSecuredDummies(): iterable
     {
         return $this->publicRelatedSecuredDummies;
     }

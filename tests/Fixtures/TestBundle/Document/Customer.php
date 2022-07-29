@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -31,7 +30,7 @@ class Customer
     public $name;
     #[Groups(['order_read'])]
     #[ODM\ReferenceMany(targetDocument: Address::class)]
-    public Collection $addresses;
+    public $addresses;
 
     public function __construct()
     {

@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -39,7 +38,7 @@ class DummyAggregateOffer
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     #[ODM\ReferenceMany(targetDocument: DummyOffer::class, mappedBy: 'aggregate', cascade: ['persist'])]
-    private Collection $offers;
+    private $offers;
     /**
      * @var DummyProduct The dummy product
      */
@@ -56,12 +55,12 @@ class DummyAggregateOffer
         $this->offers = new ArrayCollection();
     }
 
-    public function getOffers(): Collection
+    public function getOffers(): iterable
     {
         return $this->offers;
     }
 
-    public function setOffers(Collection $offers): void
+    public function setOffers($offers): void
     {
         $this->offers = $offers;
     }

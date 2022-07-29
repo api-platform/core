@@ -30,14 +30,14 @@ class Relation3
      * @var Collection<int, Relation2>
      */
     #[ORM\ManyToMany(targetEntity: Relation2::class, orphanRemoval: true)]
-    private Collection $relation2s;
+    private $relation2s;
 
     public function __construct()
     {
         $this->relation2s = new ArrayCollection();
     }
 
-    public function getRelation2s(): Collection
+    public function getRelation2s(): iterable
     {
         return $this->relation2s;
     }

@@ -26,11 +26,12 @@ class ReadableOnlyProperty
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    public function __construct(
-        #[ApiProperty(writable: false)]
-        #[ORM\Column]
-        private string $name = 'Read only'
-    ) {
+    #[ApiProperty(writable: false)]
+    #[ORM\Column]
+    private string $name = 'Read only';
+
+    public function __construct()
+    {
     }
 
     public function getId(): ?int

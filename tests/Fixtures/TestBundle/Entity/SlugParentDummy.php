@@ -49,7 +49,7 @@ class SlugParentDummy
      * @var Collection<int, SlugChildDummy>
      */
     #[ORM\OneToMany(targetEntity: SlugChildDummy::class, mappedBy: 'parentDummy')]
-    private Collection $childDummies;
+    private $childDummies;
 
     public function __construct()
     {
@@ -74,7 +74,7 @@ class SlugParentDummy
     /**
      * @return Collection<SlugChildDummy>
      */
-    public function getChildDummies(): Collection
+    public function getChildDummies(): iterable
     {
         return $this->childDummies;
     }

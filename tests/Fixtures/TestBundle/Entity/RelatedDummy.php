@@ -84,7 +84,7 @@ class RelatedDummy extends ParentDummy implements \Stringable
 
     #[ORM\OneToMany(targetEntity: RelatedToDummyFriend::class, cascade: ['persist'], mappedBy: 'relatedDummy')]
     #[Groups(['fakemanytomany', 'friends'])]
-    public ?Collection $relatedToDummyFriend = null;
+    public $relatedToDummyFriend;
 
     /**
      * @var bool|null A dummy bool
@@ -171,7 +171,7 @@ class RelatedDummy extends ParentDummy implements \Stringable
      *
      * @return Collection<RelatedToDummyFriend>
      */
-    public function getRelatedToDummyFriend(): Collection
+    public function getRelatedToDummyFriend(): iterable
     {
         return $this->relatedToDummyFriend;
     }

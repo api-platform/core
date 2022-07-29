@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -25,7 +24,7 @@ class VoDummyCar extends VoDummyVehicle
 {
     #[Groups(['car_read', 'car_write'])]
     #[ODM\ReferenceMany(targetDocument: VoDummyInspection::class, mappedBy: 'car', cascade: ['persist'])]
-    private Collection $inspections;
+    private $inspections;
 
     public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, #[Groups(['car_read', 'car_write'])] #[ODM\Field(type: 'int')] private int $mileage, #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $bodyType = 'coupe')
     {
@@ -43,7 +42,7 @@ class VoDummyCar extends VoDummyVehicle
         return $this->bodyType;
     }
 
-    public function getInspections(): Collection
+    public function getInspections(): iterable
     {
         return $this->inspections;
     }
