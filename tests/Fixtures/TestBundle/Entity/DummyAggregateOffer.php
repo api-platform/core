@@ -44,7 +44,7 @@ class DummyAggregateOffer
      * @var Collection<int,DummyOffer>
      */
     #[ORM\OneToMany(targetEntity: DummyOffer::class, mappedBy: 'aggregate', cascade: ['persist'])]
-    private $offers;
+    private Collection|iterable $offers;
     /**
      * @var DummyProduct|null The dummy product
      */
@@ -61,12 +61,12 @@ class DummyAggregateOffer
         $this->offers = new ArrayCollection();
     }
 
-    public function getOffers(): iterable
+    public function getOffers(): Collection|iterable
     {
         return $this->offers;
     }
 
-    public function setOffers($offers): void
+    public function setOffers(Collection|iterable $offers): void
     {
         $this->offers = $offers;
     }

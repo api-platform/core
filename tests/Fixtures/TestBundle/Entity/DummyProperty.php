@@ -59,12 +59,9 @@ class DummyProperty
     #[ORM\ManyToOne(targetEntity: DummyGroup::class, cascade: ['persist'])]
     #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
     public $group;
-    /**
-     * @var Collection<int, DummyGroup>
-     */
     #[ORM\ManyToMany(targetEntity: DummyGroup::class, cascade: ['persist'])]
     #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
-    public $groups;
+    public Collection|iterable|null $groups = null;
     /**
      * @var string|null
      */

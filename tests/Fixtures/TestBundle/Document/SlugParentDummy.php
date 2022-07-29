@@ -48,7 +48,7 @@ class SlugParentDummy
      * @var Collection<int,SlugChildDummy>
      */
     #[ODM\ReferenceMany(targetDocument: SlugChildDummy::class, mappedBy: 'parentDummy')]
-    private $childDummies;
+    private Collection|iterable $childDummies;
 
     public function __construct()
     {
@@ -73,7 +73,7 @@ class SlugParentDummy
     /**
      * @return Collection<int, SlugChildDummy>
      */
-    public function getChildDummies(): iterable
+    public function getChildDummies(): Collection|iterable
     {
         return $this->childDummies;
     }

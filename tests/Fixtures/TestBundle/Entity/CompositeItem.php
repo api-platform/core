@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -34,7 +35,7 @@ class CompositeItem implements \Stringable
     private ?string $field1 = null;
     #[ORM\OneToMany(targetEntity: CompositeRelation::class, mappedBy: 'compositeItem', fetch: 'EAGER')]
     #[Groups(['default'])]
-    private $compositeValues; // @phpstan-ignore-line
+    private Collection|iterable $compositeValues; // @phpstan-ignore-line
 
     public function __construct()
     {
@@ -70,7 +71,7 @@ class CompositeItem implements \Stringable
     /**
      * Gets compositeValues.
      */
-    public function getCompositeValues()
+    public function getCompositeValues(): Collection|iterable
     {
         return $this->compositeValues;
     }

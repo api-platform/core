@@ -43,7 +43,7 @@ class DummyProduct
      * @var Collection<int, DummyAggregateOffer>
      */
     #[ORM\OneToMany(targetEntity: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
-    private $offers;
+    private Collection|iterable $offers;
     /**
      * @var string The tour name
      */
@@ -53,7 +53,7 @@ class DummyProduct
      * @var Collection<int,DummyProduct>
      */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
-    private $relatedProducts;
+    private Collection|iterable $relatedProducts;
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'relatedProducts')]
     private $parent;
 
@@ -63,12 +63,12 @@ class DummyProduct
         $this->relatedProducts = new ArrayCollection();
     }
 
-    public function getOffers(): iterable
+    public function getOffers(): Collection|iterable
     {
         return $this->offers;
     }
 
-    public function setOffers($offers): void
+    public function setOffers(Collection|iterable $offers): void
     {
         $this->offers = $offers;
     }
@@ -94,12 +94,12 @@ class DummyProduct
         $this->name = $name;
     }
 
-    public function getRelatedProducts(): iterable
+    public function getRelatedProducts(): Collection|iterable
     {
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(iterable $relatedProducts): void
+    public function setRelatedProducts(Collection|iterable $relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }

@@ -19,6 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -52,5 +53,5 @@ class DummyDtoInputOutput
     #[ORM\Column(type: 'float')]
     public $num;
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
-    public $relatedDummies;
+    public Collection|iterable|null $relatedDummies = null;
 }

@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -34,9 +35,9 @@ class Person
     public $name;
     #[Groups(['people.pets'])]
     #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'person')]
-    public $pets;
+    public Collection|iterable $pets;
     #[ODM\ReferenceMany(targetDocument: Greeting::class, mappedBy: 'sender')]
-    public $sentGreetings;
+    public Collection|iterable|null $sentGreetings = null;
 
     public function __construct()
     {

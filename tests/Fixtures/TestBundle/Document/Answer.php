@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -44,7 +45,7 @@ class Answer
     private ?Question $question = null;
     #[Serializer\Groups(['foobar'])]
     #[ODM\ReferenceMany(targetDocument: Question::class, mappedBy: 'answer')]
-    private $relatedQuestions;
+    private Collection|iterable $relatedQuestions;
 
     public function __construct()
     {
@@ -98,7 +99,7 @@ class Answer
     /**
      * Get related question.
      */
-    public function getRelatedQuestions(): iterable
+    public function getRelatedQuestions(): Collection|iterable
     {
         return $this->relatedQuestions;
     }

@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -44,37 +45,25 @@ class DummyCar
     #[ORM\Id]
     #[ORM\OneToOne(targetEntity: DummyCarIdentifier::class, cascade: ['persist'])]
     private DummyCarIdentifier $id;
-    /**
-     * @var mixed Something else
-     */
     #[ApiFilter(SearchFilter::class, properties: ['colors.prop' => 'ipartial', 'colors' => 'exact'])]
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
     #[Serializer\Groups(['colors'])]
-    private $colors;
-    /**
-     * @var mixed Something else
-     */
+    private Collection|iterable $colors;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
     #[Serializer\Groups(['colors'])]
-    private mixed $secondColors = null;
-    /**
-     * @var mixed Something else
-     */
+    private Collection|iterable|null $secondColors = null;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
     #[Serializer\Groups(['colors'])]
-    private mixed $thirdColors = null;
-    /**
-     * @var mixed Something else
-     */
+    private Collection|iterable|null $thirdColors = null;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[ORM\ManyToMany(targetEntity: UuidIdentifierDummy::class, indexBy: 'uuid')]
     #[ORM\JoinColumn(name: 'car_id', referencedColumnName: 'id_id')]
     #[ORM\InverseJoinColumn(name: 'uuid_uuid', referencedColumnName: 'uuid')]
     #[ORM\JoinTable(name: 'uuid_cars')]
     #[Serializer\Groups(['colors'])]
-    private $uuid = null;
+    private Collection|iterable|null $uuid = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     #[ORM\Column(type: 'string')]
@@ -102,19 +91,19 @@ class DummyCar
         return $this->id;
     }
 
-    public function getColors()
+    public function getColors(): Collection|iterable
     {
         return $this->colors;
     }
 
-    public function setColors($colors): self
+    public function setColors(Collection|iterable $colors): self
     {
         $this->colors = $colors;
 
         return $this;
     }
 
-    public function getSecondColors()
+    public function getSecondColors(): ?iterable
     {
         return $this->secondColors;
     }
@@ -124,7 +113,7 @@ class DummyCar
         $this->secondColors = $secondColors;
     }
 
-    public function getThirdColors()
+    public function getThirdColors(): ?iterable
     {
         return $this->thirdColors;
     }
@@ -134,7 +123,7 @@ class DummyCar
         $this->thirdColors = $thirdColors;
     }
 
-    public function getUuid()
+    public function getUuid(): ?iterable
     {
         return $this->uuid;
     }

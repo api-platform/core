@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -35,7 +36,7 @@ class Pet
     #[Groups(['people.pets'])]
     public $name;
     #[ORM\OneToMany(targetEntity: PersonToPet::class, mappedBy: 'pet')]
-    public $people;
+    public Collection|iterable $people;
 
     public function __construct()
     {

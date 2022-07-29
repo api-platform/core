@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -61,7 +62,7 @@ class DummyProperty
      */
     #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
     #[ODM\ReferenceMany(targetDocument: DummyGroup::class, cascade: ['persist'])]
-    public $groups;
+    public Collection|iterable|null $groups = null;
     /**
      * @var string|null
      */

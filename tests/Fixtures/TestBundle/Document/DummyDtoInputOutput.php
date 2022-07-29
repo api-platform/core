@@ -19,6 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -50,5 +51,5 @@ class DummyDtoInputOutput
     #[ODM\Field(type: 'float')]
     public $num;
     #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
-    public $relatedDummies;
+    public Collection|iterable|null $relatedDummies = null;
 }

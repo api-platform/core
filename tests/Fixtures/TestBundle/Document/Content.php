@@ -32,7 +32,7 @@ class Content implements \JsonSerializable
      * @var Collection<Field>
      */
     #[ODM\ReferenceMany(targetDocument: Field::class, mappedBy: 'content', strategy: 'set', cascade: ['persist'])]
-    private $fields;
+    private Collection|iterable $fields;
     #[ODM\Field(type: 'string')]
     private string $status = ContentStatus::DRAFT;
 

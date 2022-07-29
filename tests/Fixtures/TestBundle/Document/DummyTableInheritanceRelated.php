@@ -34,7 +34,7 @@ class DummyTableInheritanceRelated
      */
     #[Groups(['default'])]
     #[ODM\ReferenceMany(targetDocument: DummyTableInheritance::class, mappedBy: 'parent')]
-    private $children;
+    private Collection|iterable $children;
 
     public function __construct()
     {
@@ -46,12 +46,12 @@ class DummyTableInheritanceRelated
         return $this->id;
     }
 
-    public function getChildren(): iterable
+    public function getChildren(): Collection|iterable
     {
         return $this->children;
     }
 
-    public function setChildren($children)
+    public function setChildren(Collection|iterable $children)
     {
         $this->children = $children;
 

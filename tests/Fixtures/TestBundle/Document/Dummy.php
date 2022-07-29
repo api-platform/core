@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -87,7 +88,7 @@ class Dummy
     #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     public ?RelatedDummy $relatedDummy = null;
     #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
-    public $relatedDummies;
+    public Collection|iterable $relatedDummies;
     #[ODM\Field(type: 'hash', nullable: true)]
     public array $jsonData = [];
     #[ODM\Field(type: 'collection', nullable: true)]

@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -43,19 +44,19 @@ class DummyCar
     #[ApiFilter(SearchFilter::class, properties: ['colors.prop' => 'ipartial', 'colors' => 'exact'])]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
-    private $colors;
+    private Collection|iterable $colors;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
-    private $secondColors;
+    private Collection|iterable $secondColors;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
-    private $thirdColors;
+    private Collection|iterable $thirdColors;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: UuidIdentifierDummy::class)]
-    private $uuid;
+    private Collection|iterable $uuid;
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     #[ODM\Field(type: 'string')]
     private ?string $name = null;
@@ -81,44 +82,44 @@ class DummyCar
         return $this->id;
     }
 
-    public function getColors(): iterable
+    public function getColors(): Collection|iterable
     {
         return $this->colors;
     }
 
-    public function setColors($colors): self
+    public function setColors(Collection|iterable $colors): self
     {
         $this->colors = $colors;
 
         return $this;
     }
 
-    public function getSecondColors(): iterable
+    public function getSecondColors(): Collection|iterable
     {
         return $this->secondColors;
     }
 
-    public function setSecondColors($secondColors): void
+    public function setSecondColors(Collection|iterable $secondColors): void
     {
         $this->secondColors = $secondColors;
     }
 
-    public function getThirdColors(): iterable
+    public function getThirdColors(): Collection|iterable
     {
         return $this->thirdColors;
     }
 
-    public function setThirdColors($thirdColors): void
+    public function setThirdColors(Collection|iterable $thirdColors): void
     {
         $this->thirdColors = $thirdColors;
     }
 
-    public function getUuid(): iterable
+    public function getUuid(): Collection|iterable
     {
         return $this->uuid;
     }
 
-    public function setUuid($uuid): void
+    public function setUuid(Collection|iterable $uuid): void
     {
         $this->uuid = $uuid;
     }

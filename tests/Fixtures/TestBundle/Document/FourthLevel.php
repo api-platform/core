@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -43,7 +44,7 @@ class FourthLevel
     #[ODM\Field(type: 'int')]
     private ?int $level = 4;
     #[ODM\ReferenceMany(targetDocument: ThirdLevel::class, cascade: ['persist'], mappedBy: 'badFourthLevel', storeAs: 'id')]
-    public $badThirdLevel;
+    public Collection|iterable|null $badThirdLevel = null;
 
     public function getId(): ?int
     {

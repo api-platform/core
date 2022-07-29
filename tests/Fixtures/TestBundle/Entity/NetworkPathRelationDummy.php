@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::NET_PATH)]
@@ -27,7 +28,7 @@ class NetworkPathRelationDummy
     #[ORM\Column(type: 'integer')]
     private $id;
     #[ORM\OneToMany(targetEntity: NetworkPathDummy::class, mappedBy: 'networkPathRelationDummy')]
-    public $networkPathDummies;
+    public Collection|iterable $networkPathDummies;
 
     public function __construct()
     {

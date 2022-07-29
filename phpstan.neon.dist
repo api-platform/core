@@ -43,6 +43,7 @@ parameters:
 			message: '#but database expects#'
 			paths:
 				- tests/Fixtures/TestBundle/Entity/
+		- '#Cannot call method add\(\) on iterable.#'
 		-
 			message: '#is never read, only written.#'
 			paths:
