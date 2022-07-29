@@ -37,7 +37,7 @@ abstract class AbstractDummy
 {
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[Assert\NotBlank]
     #[ODM\Field]
     private ?string $name = null;

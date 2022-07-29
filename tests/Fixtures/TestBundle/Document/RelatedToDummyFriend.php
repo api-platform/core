@@ -39,7 +39,7 @@ class RelatedToDummyFriend
      * @var string The dummy name
      */
     #[Assert\NotBlank]
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[Groups(['fakemanytomany', 'friends'])]
     #[ODM\Field(type: 'string')]
     private $name;

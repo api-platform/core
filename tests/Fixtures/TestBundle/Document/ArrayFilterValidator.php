@@ -31,7 +31,7 @@ class ArrayFilterValidator
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ODM\Field]
     private ?string $name = null;
 

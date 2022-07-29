@@ -42,7 +42,7 @@ class FilterValidator
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ORM\Column]
     private string $name;
 

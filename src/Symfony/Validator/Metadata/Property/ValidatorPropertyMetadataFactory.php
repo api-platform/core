@@ -52,20 +52,20 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     public const REQUIRED_CONSTRAINTS = [NotBlank::class, NotNull::class];
 
     public const SCHEMA_MAPPED_CONSTRAINTS = [
-        Url::class => 'http://schema.org/url',
-        Email::class => 'http://schema.org/email',
-        Uuid::class => 'http://schema.org/identifier',
-        CardScheme::class => 'http://schema.org/identifier',
-        Bic::class => 'http://schema.org/identifier',
-        Iban::class => 'http://schema.org/identifier',
-        Date::class => 'http://schema.org/Date',
-        DateTime::class => 'http://schema.org/DateTime',
-        Time::class => 'http://schema.org/Time',
-        Image::class => 'http://schema.org/image',
-        File::class => 'http://schema.org/MediaObject',
-        Currency::class => 'http://schema.org/priceCurrency',
-        Isbn::class => 'http://schema.org/isbn',
-        Issn::class => 'http://schema.org/issn',
+        Url::class => 'https://schema.org/url',
+        Email::class => 'https://schema.org/email',
+        Uuid::class => 'https://schema.org/identifier',
+        CardScheme::class => 'https://schema.org/identifier',
+        Bic::class => 'https://schema.org/identifier',
+        Iban::class => 'https://schema.org/identifier',
+        Date::class => 'https://schema.org/Date',
+        DateTime::class => 'https://schema.org/DateTime',
+        Time::class => 'https://schema.org/Time',
+        Image::class => 'https://schema.org/image',
+        File::class => 'https://schema.org/MediaObject',
+        Currency::class => 'https://schema.org/priceCurrency',
+        Isbn::class => 'https://schema.org/isbn',
+        Issn::class => 'https://schema.org/issn',
     ];
 
     /**

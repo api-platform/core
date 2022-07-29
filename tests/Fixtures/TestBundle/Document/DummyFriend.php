@@ -38,7 +38,7 @@ class DummyFriend implements \Stringable
      * @var string|null The dummy name
      */
     #[Assert\NotBlank]
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[Groups(['fakemanytomany', 'friends'])]
     #[ODM\Field(type: 'string')]
     private ?string $name = null;

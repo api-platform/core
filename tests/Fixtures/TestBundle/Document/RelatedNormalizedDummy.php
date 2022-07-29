@@ -39,7 +39,7 @@ class RelatedNormalizedDummy
      * @var string|null The dummy name
      */
     #[Assert\NotBlank]
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[Groups(['related_output', 'related_input'])]
     #[ODM\Field]
     private ?string $name = null;

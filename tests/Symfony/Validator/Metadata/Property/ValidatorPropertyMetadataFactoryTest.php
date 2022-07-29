@@ -95,7 +95,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy')->withReadable(true)->withWritable(true);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(false);
-        $expectedPropertyMetadata = $expectedPropertyMetadata->withTypes(['http://schema.org/Date']);
+        $expectedPropertyMetadata = $expectedPropertyMetadata->withTypes(['https://schema.org/Date']);
 
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyDate', [])->willReturn($propertyMetadata)->shouldBeCalled();
@@ -200,7 +200,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithRequiredByDecorated(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy group')->withReadable(true)->withRequired(true)->withTypes(['foo:bar']);
-        $expectedPropertyMetadata = (clone $propertyMetadata)->withTypes(['foo:bar', 'http://schema.org/Date']);
+        $expectedPropertyMetadata = (clone $propertyMetadata)->withTypes(['foo:bar', 'https://schema.org/Date']);
 
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyDate', [])->willReturn($propertyMetadata)->shouldBeCalled();
@@ -224,20 +224,20 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
 
         $types = [
-            'dummyUrl' => 'http://schema.org/url',
-            'dummyEmail' => 'http://schema.org/email',
-            'dummyUuid' => 'http://schema.org/identifier',
-            'dummyCardScheme' => 'http://schema.org/identifier',
-            'dummyBic' => 'http://schema.org/identifier',
-            'dummyIban' => 'http://schema.org/identifier',
-            'dummyDate' => 'http://schema.org/Date',
-            'dummyDateTime' => 'http://schema.org/DateTime',
-            'dummyTime' => 'http://schema.org/Time',
-            'dummyImage' => 'http://schema.org/image',
-            'dummyFile' => 'http://schema.org/MediaObject',
-            'dummyCurrency' => 'http://schema.org/priceCurrency',
-            'dummyIsbn' => 'http://schema.org/isbn',
-            'dummyIssn' => 'http://schema.org/issn',
+            'dummyUrl' => 'https://schema.org/url',
+            'dummyEmail' => 'https://schema.org/email',
+            'dummyUuid' => 'https://schema.org/identifier',
+            'dummyCardScheme' => 'https://schema.org/identifier',
+            'dummyBic' => 'https://schema.org/identifier',
+            'dummyIban' => 'https://schema.org/identifier',
+            'dummyDate' => 'https://schema.org/Date',
+            'dummyDateTime' => 'https://schema.org/DateTime',
+            'dummyTime' => 'https://schema.org/Time',
+            'dummyImage' => 'https://schema.org/image',
+            'dummyFile' => 'https://schema.org/MediaObject',
+            'dummyCurrency' => 'https://schema.org/priceCurrency',
+            'dummyIsbn' => 'https://schema.org/isbn',
+            'dummyIssn' => 'https://schema.org/issn',
         ];
 
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);

@@ -44,14 +44,14 @@ class OverriddenOperationDummy
      */
     #[Assert\NotBlank]
     #[Groups(['overridden_operation_dummy_read', 'overridden_operation_dummy_write', 'overridden_operation_dummy_get'])]
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ODM\Field]
     private $name;
 
     /**
      * @var string The dummy name alias
      */
-    #[ApiProperty(types: ['http://schema.org/alternateName'])]
+    #[ApiProperty(types: ['https://schema.org/alternateName'])]
     #[Groups(['overridden_operation_dummy_read', 'overridden_operation_dummy_put', 'overridden_operation_dummy_get'])]
     #[ODM\Field(nullable: true)]
     private $alias;
@@ -59,7 +59,7 @@ class OverriddenOperationDummy
     /**
      * @var string A short description of the item
      */
-    #[ApiProperty(types: ['http://schema.org/description'])]
+    #[ApiProperty(types: ['https://schema.org/description'])]
     #[Groups(['overridden_operation_dummy_read', 'overridden_operation_dummy_write', 'overridden_operation_dummy_get', 'overridden_operation_dummy_put'])]
     #[ODM\Field(nullable: true)]
     public $description;

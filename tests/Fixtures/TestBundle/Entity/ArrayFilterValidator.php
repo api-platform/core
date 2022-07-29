@@ -38,7 +38,7 @@ class ArrayFilterValidator
     /**
      * @var string A name
      */
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ORM\Column]
     private $name;
 

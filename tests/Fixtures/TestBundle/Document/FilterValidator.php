@@ -44,7 +44,7 @@ class FilterValidator
     /**
      * @var string A name
      */
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ODM\Field]
     private $name;
 

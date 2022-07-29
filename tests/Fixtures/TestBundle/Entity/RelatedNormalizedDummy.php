@@ -42,7 +42,7 @@ class RelatedNormalizedDummy
     /**
      * @var string The dummy name
      */
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Groups(['related_output', 'related_input'])]

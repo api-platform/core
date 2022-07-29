@@ -36,7 +36,7 @@ class RelatedToDummyFriend
     /**
      * @var string The dummy name
      */
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Groups(['fakemanytomany', 'friends'])]

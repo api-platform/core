@@ -111,7 +111,7 @@ class DocumentationNormalizerTest extends TestCase
                 'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
                 'xmls' => 'http://www.w3.org/2001/XMLSchema#',
                 'owl' => 'http://www.w3.org/2002/07/owl#',
-                'schema' => 'http://schema.org/',
+                'schema' => 'https://schema.org/',
                 'domain' => [
                     '@id' => 'rdfs:domain',
                     '@type' => '@id',
@@ -415,7 +415,7 @@ class DocumentationNormalizerTest extends TestCase
                 'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
                 'xmls' => 'http://www.w3.org/2001/XMLSchema#',
                 'owl' => 'http://www.w3.org/2002/07/owl#',
-                'schema' => 'http://schema.org/',
+                'schema' => 'https://schema.org/',
                 'domain' => [
                     '@id' => 'rdfs:domain',
                     '@type' => '@id',
