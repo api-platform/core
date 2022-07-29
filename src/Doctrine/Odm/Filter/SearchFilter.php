@@ -161,7 +161,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    private function getEqualityMatchStrategyValue(string $strategy, string $field, mixed $value, bool $caseSensitive, ClassMetadata $metadata): Regex|string|int
+    private function getEqualityMatchStrategyValue(string $strategy, string $field, mixed $value, bool $caseSensitive, ClassMetadata $metadata): mixed
     {
         $type = $metadata->getTypeOfField($field);
 
