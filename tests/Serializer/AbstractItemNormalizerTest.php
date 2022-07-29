@@ -46,7 +46,7 @@ class AbstractItemNormalizerTest extends TestCase
     use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    public function testSupportNormalizationAndSupportDenormalization()
+    public function testSupportNormalizationAndSupportDenormalization(): void
     {
         $std = new \stdClass();
         $dummy = new Dummy();
@@ -81,7 +81,7 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization([]));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $relatedDummy = new RelatedDummy();
 
@@ -152,7 +152,7 @@ class AbstractItemNormalizerTest extends TestCase
         ]));
     }
 
-    public function testNormalizeWithSecuredProperty()
+    public function testNormalizeWithSecuredProperty(): void
     {
         $dummy = new SecuredDummy();
         $dummy->setTitle('myPublicTitle');
@@ -210,7 +210,7 @@ class AbstractItemNormalizerTest extends TestCase
         ]));
     }
 
-    public function testDenormalizeWithSecuredProperty()
+    public function testDenormalizeWithSecuredProperty(): void
     {
         $data = [
             'title' => 'foo',
@@ -264,7 +264,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'adminOnlyProperty', 'secret')->shouldNotHaveBeenCalled();
     }
 
-    public function testDenormalizeCreateWithDeniedPostDenormalizeSecuredProperty()
+    public function testDenormalizeCreateWithDeniedPostDenormalizeSecuredProperty(): void
     {
         $data = [
             'title' => 'foo',
@@ -319,7 +319,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'ownerOnlyProperty', '')->shouldHaveBeenCalled();
     }
 
-    public function testDenormalizeUpdateWithSecuredProperty()
+    public function testDenormalizeUpdateWithSecuredProperty(): void
     {
         $dummy = new SecuredDummy();
 
@@ -382,7 +382,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'ownerOnlyProperty', 'secret')->shouldHaveBeenCalled();
     }
 
-    public function testDenormalizeUpdateWithDeniedSecuredProperty()
+    public function testDenormalizeUpdateWithDeniedSecuredProperty(): void
     {
         $dummy = new SecuredDummy();
         $dummy->setOwnerOnlyProperty('secret');
@@ -446,7 +446,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'ownerOnlyProperty', 'should not be set')->shouldNotHaveBeenCalled();
     }
 
-    public function testDenormalizeUpdateWithDeniedPostDenormalizeSecuredProperty()
+    public function testDenormalizeUpdateWithDeniedPostDenormalizeSecuredProperty(): void
     {
         $dummy = new SecuredDummy();
         $dummy->setOwnerOnlyProperty('secret');
@@ -507,7 +507,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'ownerOnlyProperty', 'secret')->shouldHaveBeenCalled();
     }
 
-    public function testNormalizeReadableLinks()
+    public function testNormalizeReadableLinks(): void
     {
         $relatedDummy = new RelatedDummy();
 
@@ -576,7 +576,7 @@ class AbstractItemNormalizerTest extends TestCase
         ]));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $data = [
             'name' => 'foo',
@@ -637,7 +637,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'relatedDummies', [$relatedDummy2])->shouldHaveBeenCalled();
     }
 
-    public function testCanDenormalizeInputClassWithDifferentFieldsThanResourceClass()
+    public function testCanDenormalizeInputClassWithDifferentFieldsThanResourceClass(): void
     {
         // $data = [
         //     'dummyName' => 'Dummy Name',
@@ -692,7 +692,7 @@ class AbstractItemNormalizerTest extends TestCase
         // $this->assertEquals('Dummy Name', $actual->getName());
     }
 
-    public function testDenormalizeWritableLinks()
+    public function testDenormalizeWritableLinks(): void
     {
         $data = [
             'name' => 'foo',
@@ -752,7 +752,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'relatedDummies', [$relatedDummy2])->shouldHaveBeenCalled();
     }
 
-    public function testBadRelationType()
+    public function testBadRelationType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected IRI or nested document for attribute "relatedDummy", "integer" given.');
@@ -799,7 +799,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class);
     }
 
-    public function testInnerDocumentNotAllowed()
+    public function testInnerDocumentNotAllowed(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Nested documents for attribute "relatedDummy" are not allowed. Use IRIs instead.');
@@ -848,7 +848,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class);
     }
 
-    public function testBadType()
+    public function testBadType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('The type of the "foo" attribute must be "float", "integer" given.');
@@ -891,7 +891,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class);
     }
 
-    public function testTypeChecksCanBeDisabled()
+    public function testTypeChecksCanBeDisabled(): void
     {
         $data = [
             'foo' => 42,
@@ -935,7 +935,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'foo', 42)->shouldHaveBeenCalled();
     }
 
-    public function testJsonAllowIntAsFloat()
+    public function testJsonAllowIntAsFloat(): void
     {
         $data = [
             'foo' => 42,
@@ -979,7 +979,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'foo', 42)->shouldHaveBeenCalled();
     }
 
-    public function testDenormalizeBadKeyType()
+    public function testDenormalizeBadKeyType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The type of the key "a" must be "int", "string" given.');
@@ -1043,7 +1043,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class);
     }
 
-    public function testNullable()
+    public function testNullable(): void
     {
         $data = [
             'name' => null,
@@ -1087,7 +1087,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'name', null)->shouldHaveBeenCalled();
     }
 
-    public function testDenormalizeBasicTypePropertiesFromXml()
+    public function testDenormalizeBasicTypePropertiesFromXml(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(ObjectWithBasicProperties::class, [])->willReturn(new PropertyNameCollection([
@@ -1131,9 +1131,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'float1', Argument::approximate(123.456, 0))->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'float2', Argument::approximate(-1.2344e56, 1))->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'float3', Argument::approximate(45E-6, 1))->shouldBeCalled();
-        $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatNaN', Argument::that(static function (float $arg) {
-            return is_nan($arg);
-        }))->shouldBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatNaN', Argument::that(static fn (float $arg) => is_nan($arg)))->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatInf', \INF)->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatNegInf', -\INF)->shouldBeCalled();
 
@@ -1180,7 +1178,7 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertInstanceOf(ObjectWithBasicProperties::class, $objectWithBasicProperties);
     }
 
-    public function testDenormalizeCollectionDecodedFromXmlWithOneChild()
+    public function testDenormalizeCollectionDecodedFromXmlWithOneChild(): void
     {
         $data = [
             'relatedDummies' => [

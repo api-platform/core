@@ -27,8 +27,8 @@ class SchemaTest extends TestCase
         $schema['$ref'] = $ref;
 
         $this->assertInstanceOf(\ArrayObject::class, $schema);
-        $this->assertSame($version, $schema->getVersion());
-        $this->assertSame('Foo', $schema->getRootDefinitionKey());
+        $this->assertEquals($version, $schema->getVersion());
+        $this->assertEquals('Foo', $schema->getRootDefinitionKey());
     }
 
     /**
@@ -40,8 +40,8 @@ class SchemaTest extends TestCase
         $schema['items']['$ref'] = $ref;
 
         $this->assertInstanceOf(\ArrayObject::class, $schema);
-        $this->assertSame($version, $schema->getVersion());
-        $this->assertSame('Foo', $schema->getItemsDefinitionKey());
+        $this->assertEquals($version, $schema->getVersion());
+        $this->assertEquals('Foo', $schema->getItemsDefinitionKey());
     }
 
     public function versionProvider(): iterable
@@ -59,7 +59,7 @@ class SchemaTest extends TestCase
     public function testContainsJsonSchemaVersion(): void
     {
         $schema = new Schema();
-        $this->assertSame('http://json-schema.org/draft-07/schema#', $schema['$schema']);
+        $this->assertEquals('http://json-schema.org/draft-07/schema#', $schema['$schema']);
     }
 
     /**
@@ -73,10 +73,12 @@ class SchemaTest extends TestCase
         if (Schema::VERSION_OPENAPI === $version) {
             $this->assertArrayHasKey('schemas', $schema['components']);
         } else {
+            // @noRector
             $this->assertTrue(isset($schema['definitions']));
         }
 
         $definitions = $schema->getDefinitions();
+        // @noRector
         $this->assertTrue(isset($definitions['foo']));
 
         $this->assertArrayNotHasKey('definitions', $schema->getArrayCopy(false));

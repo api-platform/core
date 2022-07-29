@@ -19,6 +19,7 @@ use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -30,8 +31,8 @@ class QueryParameterValidatorTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $testedInstance;
-    private $filterLocatorProphecy;
+    private QueryParameterValidator $testedInstance;
+    private ObjectProphecy $filterLocatorProphecy;
 
     /**
      * {@inheritdoc}
@@ -52,9 +53,7 @@ class QueryParameterValidatorTest extends TestCase
     {
         $request = [];
 
-        $this->assertNull(
-            $this->testedInstance->validateFilters(Dummy::class, [], $request)
-        );
+        $this->testedInstance->validateFilters(Dummy::class, [], $request);
     }
 
     /**
@@ -65,9 +64,7 @@ class QueryParameterValidatorTest extends TestCase
         $request = [];
 
         $this->filterLocatorProphecy->has('some_inexistent_filter')->willReturn(false);
-        $this->assertNull(
-            $this->testedInstance->validateFilters(Dummy::class, ['some_inexistent_filter'], $request)
-        );
+        $this->testedInstance->validateFilters(Dummy::class, ['some_inexistent_filter'], $request);
     }
 
     /**
@@ -125,8 +122,6 @@ class QueryParameterValidatorTest extends TestCase
             ->shouldBeCalled()
             ->willReturn($filterProphecy->reveal());
 
-        $this->assertNull(
-            $this->testedInstance->validateFilters(Dummy::class, ['some_filter'], $request)
-        );
+        $this->testedInstance->validateFilters(Dummy::class, ['some_filter'], $request);
     }
 }

@@ -267,7 +267,7 @@ class TypeFactoryTest extends TestCase
     public function testGetTypeWithOpenAPIV2Syntax(array $schema, Type $type): void
     {
         $typeFactory = new TypeFactory();
-        $this->assertSame($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_SWAGGER)));
+        $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_SWAGGER)));
     }
 
     public function openAPIV2TypeProvider(): iterable
@@ -384,7 +384,7 @@ class TypeFactoryTest extends TestCase
         $typeFactory = new TypeFactory();
         $typeFactory->setSchemaFactory($schemaFactoryProphecy->reveal());
 
-        $this->assertSame(['$ref' => 'ref'], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
+        $this->assertEquals(['$ref' => 'ref'], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
     }
 
     /** @dataProvider classTypeWithNullabilityDataProvider */
@@ -393,7 +393,7 @@ class TypeFactoryTest extends TestCase
         $typeFactory = new TypeFactory();
         $typeFactory->setSchemaFactory($schemaFactory);
 
-        self::assertSame(
+        self::assertEquals(
             $expected,
             $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class), 'jsonld', true, ['foo' => 'bar'], $schema)
         );

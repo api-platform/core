@@ -58,9 +58,9 @@ class CachedDocumentMetadataFactoryTest extends TestCase
 
         $documentMetadata = (new CachedDocumentMetadataFactory($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
 
-        self::assertSame($originalDocumentMetadata, $documentMetadata);
-        self::assertSame('foo', $documentMetadata->getIndex());
-        self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
+        self::assertEquals($originalDocumentMetadata, $documentMetadata);
+        self::assertEquals('foo', $documentMetadata->getIndex());
+        self::assertEquals(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
     public function testCreateWithLocalCache(): void
@@ -84,9 +84,9 @@ class CachedDocumentMetadataFactoryTest extends TestCase
 
         $documentMetadata = $documentMetadataFactory->create(Foo::class);
 
-        self::assertSame($originalDocumentMetadata, $documentMetadata);
-        self::assertSame('foo', $documentMetadata->getIndex());
-        self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
+        self::assertEquals($originalDocumentMetadata, $documentMetadata);
+        self::assertEquals('foo', $documentMetadata->getIndex());
+        self::assertEquals(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
     public function testCreateWithCacheException(): void
@@ -107,9 +107,9 @@ class CachedDocumentMetadataFactoryTest extends TestCase
 
         $documentMetadata = (new CachedDocumentMetadataFactory($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
 
-        self::assertSame($originalDocumentMetadata, $documentMetadata);
-        self::assertSame('foo', $documentMetadata->getIndex());
-        self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
+        self::assertEquals($originalDocumentMetadata, $documentMetadata);
+        self::assertEquals('foo', $documentMetadata->getIndex());
+        self::assertEquals(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
     public function testCreateWithCacheHit(): void
@@ -130,9 +130,9 @@ class CachedDocumentMetadataFactoryTest extends TestCase
 
         $documentMetadata = (new CachedDocumentMetadataFactory($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
 
-        self::assertSame($originalDocumentMetadata, $documentMetadata);
-        self::assertSame('foo', $documentMetadata->getIndex());
-        self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
+        self::assertEquals($originalDocumentMetadata, $documentMetadata);
+        self::assertEquals('foo', $documentMetadata->getIndex());
+        self::assertEquals(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
     public function testCreateWithIndexNotDefined(): void

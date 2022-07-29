@@ -49,7 +49,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $listener = new AddLinkHeaderListener($urlGenerator->reveal());
         $listener->onKernelResponse($event);
-        $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
+        $this->assertEquals($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
     }
 
     public function provider(): \Iterator

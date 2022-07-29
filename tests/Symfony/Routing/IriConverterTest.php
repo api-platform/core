@@ -33,13 +33,14 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Routing\RouterInterface;
 
 class IriConverterTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testGetIriFromItemWithOperation()
+    public function testGetIriFromItemWithOperation(): void
     {
         $item = new Dummy();
         $item->setId(1);
@@ -62,7 +63,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals('/dummies/1', $iriConverter->getIriFromResource($item, UrlGeneratorInterface::ABS_PATH, $operation));
     }
 
-    public function testGetIriFromItemWithoutOperation()
+    public function testGetIriFromItemWithoutOperation(): void
     {
         $item = new Dummy();
         $item->setId(1);
@@ -85,7 +86,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals('/dummies/1', $iriConverter->getIriFromResource($item));
     }
 
-    public function testGetIriFromItemWithContextOperation()
+    public function testGetIriFromItemWithContextOperation(): void
     {
         $item = new Dummy();
         $item->setId(1);
@@ -106,7 +107,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals('/dummies/1', $iriConverter->getIriFromResource($item, UrlGeneratorInterface::ABS_URL, $operation));
     }
 
-    public function testGetIriFromItemWithNoOperations()
+    public function testGetIriFromItemWithNoOperations(): void
     {
         $this->expectExceptionMessage(sprintf('Unable to generate an IRI for the item of type "%s"', Dummy::class));
 
@@ -125,7 +126,7 @@ class IriConverterTest extends TestCase
         $iriConverter->getIriFromResource($item);
     }
 
-    public function testGetIriFromItemWithBadIdentifiers()
+    public function testGetIriFromItemWithBadIdentifiers(): void
     {
         $this->expectExceptionMessage(sprintf('Unable to generate an IRI for the item of type "%s"', Dummy::class));
 
@@ -144,7 +145,7 @@ class IriConverterTest extends TestCase
         $iriConverter->getIriFromResource($item);
     }
 
-    public function testGetCollectionIri()
+    public function testGetCollectionIri(): void
     {
         $operationName = 'operation_name';
         $operation = (new GetCollection())->withName($operationName)->withClass(Dummy::class);
@@ -158,7 +159,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals('/dummies', $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation));
     }
 
-    public function testGetIriFromResourceClassWithIdentifiers()
+    public function testGetIriFromResourceClassWithIdentifiers(): void
     {
         $operationName = 'operation_name';
         $operation = (new GetCollection())->withClass(Dummy::class);
@@ -175,7 +176,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals('/dummies/1/foo', $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_URL, $operation, ['uri_variables' => ['id' => 1]]));
     }
 
-    public function testGetIriFromResourceClassWithoutOperation()
+    public function testGetIriFromResourceClassWithoutOperation(): void
     {
         $operationName = 'operation_name';
         $operation = (new GetCollection())->withName($operationName)->withClass(Dummy::class);
@@ -189,7 +190,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals('/dummies/1/foo', $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_URL, $operation, ['uri_variables' => ['id' => 1]]));
     }
 
-    public function testGetItemFromCollectionIri()
+    public function testGetItemFromCollectionIri(): void
     {
         $operationName = 'operation_name';
         $operation = (new GetCollection())->withName($operationName);
@@ -208,7 +209,7 @@ class IriConverterTest extends TestCase
         $iriConverter->getResourceFromIri('/dummies');
     }
 
-    public function testGetItemFromIri()
+    public function testGetItemFromIri(): void
     {
         $item = new Dummy();
         $operationName = 'operation_name';
@@ -230,7 +231,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals($item, $iriConverter->getResourceFromIri('/dummies/1'));
     }
 
-    public function testGetNoItemFromIri()
+    public function testGetNoItemFromIri(): void
     {
         $this->expectExceptionMessage('Item not found for "/dummies/1"');
         $operationName = 'operation_name';
@@ -255,18 +256,14 @@ class IriConverterTest extends TestCase
     private function getResourceClassResolver()
     {
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(function ($args) {
-            return true;
-        });
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(fn ($args) => true);
 
-        $resourceClassResolver->getResourceClass(Argument::cetera())->will(function ($args) {
-            return \get_class($args[0]);
-        });
+        $resourceClassResolver->getResourceClass(Argument::cetera())->will(fn ($args) => $args[0]::class);
 
         return $resourceClassResolver->reveal();
     }
 
-    private function getIriConverter($stateProviderProphecy = null, $routerProphecy = null, $identifiersExtractorProphecy = null, $resourceMetadataCollectionFactoryProphecy = null, $uriVariablesConverter = null)
+    private function getIriConverter(?ObjectProphecy $stateProviderProphecy = null, ?ObjectProphecy $routerProphecy = null, ?ObjectProphecy $identifiersExtractorProphecy = null, $resourceMetadataCollectionFactoryProphecy = null, $uriVariablesConverter = null): IriConverter
     {
         if (!$stateProviderProphecy) {
             $stateProviderProphecy = $this->prophesize(ProviderInterface::class);

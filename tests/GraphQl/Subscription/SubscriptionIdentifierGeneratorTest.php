@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SubscriptionIdentifierGeneratorTest extends TestCase
 {
-    private $subscriptionIdentifierGenerator;
+    private SubscriptionIdentifierGenerator $subscriptionIdentifierGenerator;
 
     /**
      * {@inheritdoc}
@@ -33,7 +33,7 @@ class SubscriptionIdentifierGeneratorTest extends TestCase
 
     public function testGenerateSubscriptionIdentifier(): void
     {
-        $this->assertSame('bf861b4e0edd7766ff61da90c60fdceef2618b595a3628901921d4d8eca555d0', $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier([
+        $this->assertEquals('bf861b4e0edd7766ff61da90c60fdceef2618b595a3628901921d4d8eca555d0', $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier([
             'dummyMercure' => [
                 'id' => true,
                 'name' => true,
@@ -68,7 +68,7 @@ class SubscriptionIdentifierGeneratorTest extends TestCase
             'clientSubscriptionId' => true,
         ]);
 
-        $this->assertSame($subscriptionId, $subscriptionId2);
+        $this->assertEquals($subscriptionId, $subscriptionId2);
     }
 
     public function testDifferentGeneratedSubscriptionIdentifiers(): void

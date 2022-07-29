@@ -31,6 +31,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -40,12 +41,12 @@ class ContextBuilderTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $entityClass;
-    private $resourceNameCollectionFactoryProphecy;
-    private $resourceMetadataCollectionFactoryProphecy;
-    private $propertyNameCollectionFactoryProphecy;
-    private $propertyMetadataFactoryProphecy;
-    private $urlGeneratorProphecy;
+    private string $entityClass;
+    private ObjectProphecy $resourceNameCollectionFactoryProphecy;
+    private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
+    private ObjectProphecy $propertyNameCollectionFactoryProphecy;
+    private ObjectProphecy $propertyMetadataFactoryProphecy;
+    private ObjectProphecy $urlGeneratorProphecy;
 
     protected function setUp(): void
     {
@@ -184,7 +185,7 @@ class ContextBuilderTest extends TestCase
         $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal());
 
         $context = $contextBuilder->getAnonymousResourceContext($dummy);
-        $this->assertSame('Dummy', $context['@type']);
+        $this->assertEquals('Dummy', $context['@type']);
         $this->assertStringStartsWith('/.well-known/genid', $context['@id']);
         $this->assertEquals([
             '@vocab' => '#',

@@ -41,7 +41,7 @@ class TypesContainerTest extends TestCase
         $type = $this->prophesize(GraphQLType::class)->reveal();
 
         $this->typesContainer->set('test', $type);
-        $this->assertSame($type, $this->typesContainer->get('test'));
+        $this->assertEquals($type, $this->typesContainer->get('test'));
     }
 
     public function testGet(): void
@@ -49,7 +49,7 @@ class TypesContainerTest extends TestCase
         $type = $this->prophesize(GraphQLType::class)->reveal();
 
         $this->typesContainer->set('test', $type);
-        $this->assertSame($type, $this->typesContainer->get('test'));
+        $this->assertEquals($type, $this->typesContainer->get('test'));
     }
 
     public function testGetTypeNotFound(): void
@@ -65,7 +65,7 @@ class TypesContainerTest extends TestCase
         $type = $this->prophesize(GraphQLType::class)->reveal();
 
         $this->typesContainer->set('test', $type);
-        $this->assertSame(['test' => $type], $this->typesContainer->all());
+        $this->assertEquals(['test' => $type], $this->typesContainer->all());
     }
 
     public function testHas(): void

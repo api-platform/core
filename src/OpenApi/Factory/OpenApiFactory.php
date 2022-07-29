@@ -193,7 +193,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             if ($operation instanceof CollectionOperationInterface && HttpOperation::METHOD_POST !== $method) {
-                /* @phpstan-ignore-next-line phpstan looses the Operation type */
                 foreach (array_merge($this->getPaginationParameters($operation), $this->getFiltersParameters($operation)) as $parameter) {
                     if ($this->hasParameter($parameter, $parameters)) {
                         continue;
@@ -421,7 +420,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * Gets parameters corresponding to enabled filters.
      */
-    private function getFiltersParameters(HttpOperation $operation): array
+    private function getFiltersParameters(CollectionOperationInterface|HttpOperation $operation): array
     {
         $parameters = [];
 
@@ -459,7 +458,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $parameters;
     }
 
-    private function getPaginationParameters(HttpOperation $operation): array
+    private function getPaginationParameters(CollectionOperationInterface|HttpOperation $operation): array
     {
         if (!$this->paginationOptions->isPaginationEnabled()) {
             return [];

@@ -121,7 +121,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         }
     }
 
-    private function cursorPaginationFields(array $fields, int $direction, $object)
+    private function cursorPaginationFields(array $fields, int $direction, $object): array
     {
         $paginationFilters = [];
 

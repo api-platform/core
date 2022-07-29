@@ -33,9 +33,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class Response implements ResponseInterface
 {
-    private array $headers;
+    private readonly array $headers;
     private array $info;
-    private string $content;
+    private readonly string $content;
     private ?array $jsonData = null;
 
     public function __construct(private readonly HttpFoundationResponse $httpFoundationResponse, private readonly BrowserKitResponse $browserKitResponse, array $info)

@@ -29,7 +29,7 @@ class SwaggerUiListenerTest extends TestCase
     /**
      * @dataProvider getParameters
      */
-    public function testOnKernelRequest(Request $request, string $controller = null)
+    public function testOnKernelRequest(Request $request, string $controller = null): void
     {
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();

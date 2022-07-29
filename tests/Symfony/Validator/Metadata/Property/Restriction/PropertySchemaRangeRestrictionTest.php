@@ -29,7 +29,7 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaRangeRestriction;
+    private PropertySchemaRangeRestriction $propertySchemaRangeRestriction;
 
     protected function setUp(): void
     {
@@ -41,7 +41,7 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
      */
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
-        self::assertSame($expectedResult, $this->propertySchemaRangeRestriction->supports($constraint, $propertyMetadata));
+        self::assertEquals($expectedResult, $this->propertySchemaRangeRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
@@ -58,7 +58,7 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
      */
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
-        self::assertSame($expectedResult, $this->propertySchemaRangeRestriction->create($constraint, $propertyMetadata));
+        self::assertEquals($expectedResult, $this->propertySchemaRangeRestriction->create($constraint, $propertyMetadata));
     }
 
     public function createProvider(): \Generator

@@ -227,7 +227,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 WHERE relateddummy_a1.symfony = :symfony_p1', $this->alias, Dummy::class));
-        $this->assertSame($actual, $expected);
+        $this->assertEquals($actual, $expected);
     }
 
     public function testTripleJoin(): void
@@ -243,7 +243,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 inner join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', $this->alias, Dummy::class));
-        $this->assertSame($actual, $expected);
+        $this->assertEquals($actual, $expected);
     }
 
     public function testJoinLeft(): void
@@ -258,7 +258,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT %s FROM %s %1$s left join %1$s.relatedDummy relateddummy_a1 left join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', $this->alias, Dummy::class));
-        $this->assertSame($actual, $expected);
+        $this->assertEquals($actual, $expected);
     }
 
     public function testApplyWithAnotherAlias(): void
@@ -271,12 +271,12 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
 
         $expectedDql = sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', 'somealias', Dummy::class);
-        $this->assertSame($expectedDql, $queryBuilder->getQuery()->getDQL());
+        $this->assertEquals($expectedDql, $queryBuilder->getQuery()->getDQL());
     }
 
     public function provideApplyTestData(): array
     {
-        $filterFactory = [$this, 'buildSearchFilter'];
+        $filterFactory = $this->buildSearchFilter(...);
 
         return array_merge_recursive(
             $this->provideApplyTestArguments(),

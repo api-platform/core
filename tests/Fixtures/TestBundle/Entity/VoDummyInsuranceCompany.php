@@ -23,7 +23,7 @@ class VoDummyInsuranceCompany
 {
     use VoDummyIdAwareTrait;
 
-    public function __construct(#[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $name)
+    public function __construct(#[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $name)
     {
     }
 

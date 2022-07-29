@@ -25,7 +25,7 @@ class DummyForAdditionalFields
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    public function __construct(#[ORM\Column] private readonly string $name, #[ORM\Column] private readonly string $slug)
+    public function __construct(#[ORM\Column] private string $name, #[ORM\Column] private string $slug)
     {
     }
 

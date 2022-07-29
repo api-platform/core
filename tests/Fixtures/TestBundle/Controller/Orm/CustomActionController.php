@@ -33,7 +33,7 @@ class CustomActionController extends AbstractController
     }
 
     #[Route(methods: ['POST'], name: 'custom_denormalization', path: '/custom/denormalization', defaults: ['_api_resource_class' => CustomActionDummy::class, '_api_operation_name' => 'custom_denormalization', '_api_receive' => false])]
-    public function customDenormalizationAction(Request $request)
+    public function customDenormalizationAction(Request $request): CustomActionDummy
     {
         if ($request->attributes->has('data')) {
             throw new \RuntimeException('The "data" attribute must not be set.');
@@ -53,7 +53,7 @@ class CustomActionController extends AbstractController
     }
 
     #[Route(methods: ['POST'], name: 'short_custom_denormalization', path: '/short_custom/denormalization', defaults: ['_api_resource_class' => CustomActionDummy::class, '_api_operation_name' => 'custom_denormalization', '_api_receive' => false])]
-    public function shortCustomDenormalizationAction(Request $request)
+    public function shortCustomDenormalizationAction(Request $request): CustomActionDummy
     {
         if ($request->attributes->has('data')) {
             throw new \RuntimeException('The "data" attribute must not be set.');

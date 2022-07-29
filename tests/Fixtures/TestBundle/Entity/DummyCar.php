@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -43,7 +44,7 @@ class DummyCar
      */
     #[ORM\Id]
     #[ORM\OneToOne(targetEntity: DummyCarIdentifier::class, cascade: ['persist'])]
-    private readonly DummyCarIdentifier $id;
+    private DummyCarIdentifier $id;
     /**
      * @var mixed Something else
      */
@@ -107,7 +108,7 @@ class DummyCar
         return $this->colors;
     }
 
-    public function setColors($colors): self
+    public function setColors(Collection $colors): self
     {
         $this->colors = $colors;
 

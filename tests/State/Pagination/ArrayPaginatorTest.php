@@ -31,7 +31,7 @@ class ArrayPaginatorTest extends TestCase
      * @param mixed $currentPage
      * @param mixed $lastPage
      */
-    public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage)
+    public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage): void
     {
         $paginator = new ArrayPaginator($results, $firstResult, $maxResults);
 

@@ -29,15 +29,13 @@ final class MatchesJsonSchema extends Constraint
      * @var object|array
      */
     private $schema;
-    private $checkMode;
 
     /**
      * @param object|array|string $schema
      */
-    public function __construct($schema, ?int $checkMode = null)
+    public function __construct($schema, private readonly ?int $checkMode = null)
     {
-        $this->schema = \is_string($schema) ? json_decode($schema) : $schema;
-        $this->checkMode = $checkMode;
+        $this->schema = \is_string($schema) ? json_decode($schema, null, 512, \JSON_THROW_ON_ERROR) : $schema;
     }
 
     /**
@@ -102,11 +100,11 @@ final class MatchesJsonSchema extends Constraint
             throw new \InvalidArgumentException('Document must be scalar, array or object.');
         }
 
-        $document = json_encode($document);
+        $document = json_encode($document, \JSON_THROW_ON_ERROR);
         if (!\is_string($document)) {
             throw new \UnexpectedValueException('JSON encode failed.');
         }
-        $document = json_decode($document);
+        $document = json_decode($document, null, 512, \JSON_THROW_ON_ERROR);
         if (!\is_array($document) && !\is_object($document)) {
             throw new \UnexpectedValueException('JSON decode failed.');
         }

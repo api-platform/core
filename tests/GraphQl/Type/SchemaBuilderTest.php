@@ -41,20 +41,15 @@ class SchemaBuilderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ObjectProphecy */
-    private $resourceNameCollectionFactoryProphecy;
+    private ObjectProphecy $resourceNameCollectionFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $resourceMetadataCollectionFactoryProphecy;
+    private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $typesFactoryProphecy;
+    private ObjectProphecy $typesFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $typesContainerProphecy;
+    private ObjectProphecy $typesContainerProphecy;
 
-    /** @var ObjectProphecy */
-    private $fieldsBuilderProphecy;
+    private ObjectProphecy $fieldsBuilderProphecy;
 
     private SchemaBuilder $schemaBuilder;
 

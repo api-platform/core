@@ -81,7 +81,7 @@ class TermFilterTest extends TestCase
             $nameConverterProphecy->reveal()
         );
 
-        self::assertSame(
+        self::assertEquals(
             ['bool' => ['must' => [['term' => ['id' => 1]], ['terms' => ['name' => ['Caroline', 'Xavier']]]]]],
             $termFilter->apply([], Foo::class, null, ['filters' => ['id' => '/foos/1', 'name' => ['Caroline', 'Xavier']]])
         );
@@ -113,7 +113,7 @@ class TermFilterTest extends TestCase
             ['foo.bar' => null]
         );
 
-        self::assertSame(
+        self::assertEquals(
             ['bool' => ['must' => [['nested' => ['path' => 'foo', 'query' => ['term' => ['foo.bar' => 'Krupicka']]]]]]],
             $termFilter->apply([], Foo::class, null, ['filters' => ['foo.bar' => 'Krupicka']])
         );
@@ -140,7 +140,7 @@ class TermFilterTest extends TestCase
             $this->prophesize(NameConverterInterface::class)->reveal()
         );
 
-        self::assertSame(
+        self::assertEquals(
             [],
             $termFilter->apply([], Foo::class, null, ['filters' => ['id' => '/invalid_iri_foos/1', 'bar' => 'Chaverot']])
         );
@@ -170,7 +170,7 @@ class TermFilterTest extends TestCase
             $this->prophesize(NameConverterInterface::class)->reveal()
         );
 
-        self::assertSame(
+        self::assertEquals(
             [
                 'id' => [
                     'property' => 'id',

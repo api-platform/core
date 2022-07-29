@@ -72,24 +72,25 @@ class SchemaFactoryTest extends TestCase
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
         $definitions = $resultSchema->getDefinitions();
 
-        $this->assertSame((new \ReflectionClass(NotAResource::class))->getShortName(), $rootDefinitionKey);
+        $this->assertEquals((new \ReflectionClass(NotAResource::class))->getShortName(), $rootDefinitionKey);
+        // @noRector
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
+        $this->assertEquals('object', $definitions[$rootDefinitionKey]['type']);
         $this->assertArrayNotHasKey('additionalProperties', $definitions[$rootDefinitionKey]);
         $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
         $this->assertArrayHasKey('foo', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['foo']);
         $this->assertArrayNotHasKey('default', $definitions[$rootDefinitionKey]['properties']['foo']);
         $this->assertArrayNotHasKey('example', $definitions[$rootDefinitionKey]['properties']['foo']);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['foo']['type']);
+        $this->assertEquals('string', $definitions[$rootDefinitionKey]['properties']['foo']['type']);
         $this->assertArrayHasKey('bar', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['bar']);
         $this->assertArrayHasKey('default', $definitions[$rootDefinitionKey]['properties']['bar']);
         $this->assertArrayHasKey('example', $definitions[$rootDefinitionKey]['properties']['bar']);
-        $this->assertSame('integer', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
-        $this->assertSame('default_bar', $definitions[$rootDefinitionKey]['properties']['bar']['default']);
-        $this->assertSame('example_bar', $definitions[$rootDefinitionKey]['properties']['bar']['example']);
+        $this->assertEquals('integer', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
+        $this->assertEquals('default_bar', $definitions[$rootDefinitionKey]['properties']['bar']['default']);
+        $this->assertEquals('example_bar', $definitions[$rootDefinitionKey]['properties']['bar']['example']);
     }
 
     public function testBuildSchemaWithSerializerGroups(): void
@@ -133,18 +134,19 @@ class SchemaFactoryTest extends TestCase
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
         $definitions = $resultSchema->getDefinitions();
 
-        $this->assertSame((new \ReflectionClass(OverriddenOperationDummy::class))->getShortName().'-'.$serializerGroup, $rootDefinitionKey);
+        $this->assertEquals((new \ReflectionClass(OverriddenOperationDummy::class))->getShortName().'-'.$serializerGroup, $rootDefinitionKey);
+        // @noRector
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
+        $this->assertEquals('object', $definitions[$rootDefinitionKey]['type']);
         $this->assertFalse($definitions[$rootDefinitionKey]['additionalProperties']);
         $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
         $this->assertArrayHasKey('alias', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['alias']);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['alias']['type']);
+        $this->assertEquals('string', $definitions[$rootDefinitionKey]['properties']['alias']['type']);
         $this->assertArrayHasKey('description', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['description']);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['description']['type']);
+        $this->assertEquals('string', $definitions[$rootDefinitionKey]['properties']['description']['type']);
     }
 
     public function testBuildSchemaForAssociativeArray(): void
@@ -194,17 +196,18 @@ class SchemaFactoryTest extends TestCase
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
         $definitions = $resultSchema->getDefinitions();
 
-        $this->assertSame((new \ReflectionClass(NotAResource::class))->getShortName(), $rootDefinitionKey);
+        $this->assertEquals((new \ReflectionClass(NotAResource::class))->getShortName(), $rootDefinitionKey);
+        // @noRector
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
         $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
         $this->assertArrayHasKey('foo', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['foo']);
         $this->assertArrayNotHasKey('additionalProperties', $definitions[$rootDefinitionKey]['properties']['foo']);
-        $this->assertSame('array', $definitions[$rootDefinitionKey]['properties']['foo']['type']);
+        $this->assertEquals('array', $definitions[$rootDefinitionKey]['properties']['foo']['type']);
         $this->assertArrayHasKey('bar', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['bar']);
         $this->assertArrayHasKey('additionalProperties', $definitions[$rootDefinitionKey]['properties']['bar']);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['bar']['additionalProperties']);
+        $this->assertEquals('object', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
+        $this->assertEquals('string', $definitions[$rootDefinitionKey]['properties']['bar']['additionalProperties']);
     }
 }

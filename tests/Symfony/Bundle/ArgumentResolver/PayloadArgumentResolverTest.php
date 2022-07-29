@@ -113,7 +113,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
             'data' => new ResourceImplementation(),
         ]);
 
-        $this->assertSame(
+        $this->assertEquals(
             [$request->attributes->get('data')],
             iterator_to_array($resolver->resolve($request, $argument))
         );
@@ -130,7 +130,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
             'data' => new ResourceImplementation(),
         ]);
 
-        $this->assertSame(
+        $this->assertEquals(
             [$request->attributes->get('data')],
             iterator_to_array($resolver->resolve($request, $argument))
         );
@@ -196,7 +196,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
 
         $arguments = $argumentsResolver->getArguments($request, $controller);
 
-        self::assertSame($expectedArguments, $arguments);
+        self::assertEquals($expectedArguments, $arguments);
     }
 
     public function provideIntegrationCases(): iterable
@@ -209,7 +209,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
                 '_api_operation_name' => '_api_/resource_implementations.{_format}_put',
                 'data' => $resource,
             ]),
-            static function (ResourceImplementation $payload) {},
+            static function (ResourceImplementation $payload): void {},
             [$resource],
         ];
 
@@ -219,7 +219,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
                 '_api_operation_name' => '_api_/resource_implementations.{_format}_put',
                 'data' => $resource,
             ]),
-            static function (ResourceImplementation $payload, $data) {},
+            static function (ResourceImplementation $payload, $data): void {},
             [$resource, $resource],
         ];
     }
@@ -243,7 +243,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
                 false,
                 Argument::type('array')
             )
-            ->will(function (array $arguments) {
+            ->will(function (array $arguments): array {
                 /** @var Request $request */
                 $request = $arguments[0];
 

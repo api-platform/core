@@ -34,7 +34,7 @@ class RespondListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testDoNotHandleResponse()
+    public function testDoNotHandleResponse(): void
     {
         $listener = new RespondListener();
         $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, null);
@@ -43,7 +43,7 @@ class RespondListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
-    public function testDoNotHandleWhenRespondFlagIsFalse()
+    public function testDoNotHandleWhenRespondFlagIsFalse(): void
     {
         $listener = new RespondListener();
         $event = new ViewEvent(
@@ -57,7 +57,7 @@ class RespondListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
-    public function testCreate200Response()
+    public function testCreate200Response(): void
     {
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
@@ -81,7 +81,7 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
     }
 
-    public function testPost200WithoutLocation()
+    public function testPost200WithoutLocation(): void
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'post', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
         $request->setMethod('POST');
@@ -104,10 +104,10 @@ class RespondListenerTest extends TestCase
 
         $response = $event->getResponse();
         $this->assertFalse($response->headers->has('Location'));
-        $this->assertSame(Response::HTTP_OK, $event->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $event->getResponse()->getStatusCode());
     }
 
-    public function testPost301WithLocation()
+    public function testPost301WithLocation(): void
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
         $request->setMethod('POST');
@@ -132,10 +132,10 @@ class RespondListenerTest extends TestCase
         $response = $event->getResponse();
         $this->assertTrue($response->headers->has('Location'));
         $this->assertEquals('/dummy_entities/1', $response->headers->get('Location'));
-        $this->assertSame(Response::HTTP_MOVED_PERMANENTLY, $event->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_MOVED_PERMANENTLY, $event->getResponse()->getStatusCode());
     }
 
-    public function testCreate201Response()
+    public function testCreate201Response(): void
     {
         $request = new Request([], [], ['_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
         $request->setMethod('POST');
@@ -163,7 +163,7 @@ class RespondListenerTest extends TestCase
         $this->assertTrue($response->headers->has('Location'));
     }
 
-    public function testCreate204Response()
+    public function testCreate204Response(): void
     {
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
@@ -188,7 +188,7 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
     }
 
-    public function testSetSunsetHeader()
+    public function testSetSunsetHeader(): void
     {
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -213,7 +213,7 @@ class RespondListenerTest extends TestCase
         $this->assertEquals(new \DateTimeImmutable('tomorrow'), \DateTime::createFromFormat(\DATE_RFC1123, $value));
     }
 
-    public function testSetCustomStatus()
+    public function testSetCustomStatus(): void
     {
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -231,10 +231,10 @@ class RespondListenerTest extends TestCase
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);
 
-        $this->assertSame(Response::HTTP_ACCEPTED, $event->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_ACCEPTED, $event->getResponse()->getStatusCode());
     }
 
-    public function testHandleResponse()
+    public function testHandleResponse(): void
     {
         $listener = new RespondListener();
 
@@ -247,6 +247,6 @@ class RespondListenerTest extends TestCase
         );
         $listener->onKernelView($event);
 
-        $this->assertSame($response, $event->getResponse());
+        $this->assertEquals($response, $event->getResponse());
     }
 }

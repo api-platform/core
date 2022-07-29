@@ -25,6 +25,7 @@ use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -33,12 +34,12 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $itemSubscriptionResolverFactory;
-    private $readStageProphecy;
-    private $securityStageProphecy;
-    private $serializeStageProphecy;
-    private $subscriptionManagerProphecy;
-    private $mercureSubscriptionIriGeneratorProphecy;
+    private ItemSubscriptionResolverFactory $itemSubscriptionResolverFactory;
+    private ObjectProphecy $readStageProphecy;
+    private ObjectProphecy $securityStageProphecy;
+    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $subscriptionManagerProphecy;
+    private ObjectProphecy $mercureSubscriptionIriGeneratorProphecy;
 
     /**
      * {@inheritdoc}
@@ -88,7 +89,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $mercureUrl = 'mercure-url';
         $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl($subscriptionId, null)->shouldBeCalled()->willReturn($mercureUrl);
 
-        $this->assertSame($serializeStageData + ['mercureUrl' => $mercureUrl], ($this->itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertEquals($serializeStageData + ['mercureUrl' => $mercureUrl], ($this->itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveNullResourceClass(): void
@@ -156,7 +157,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
         $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl(Argument::any())->shouldNotBeCalled();
 
-        $this->assertSame($serializeStageData, ($this->itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertEquals($serializeStageData, ($this->itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveNoMercureSubscriptionIriGenerator(): void

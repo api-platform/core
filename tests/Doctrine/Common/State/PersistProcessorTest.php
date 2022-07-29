@@ -49,7 +49,7 @@ class PersistProcessorTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
 
         $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
-        $this->assertSame($dummy, $result);
+        $this->assertEquals($dummy, $result);
     }
 
     public function testPersistIfEntityAlreadyManaged(): void
@@ -67,7 +67,7 @@ class PersistProcessorTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
 
         $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
-        $this->assertSame($dummy, $result);
+        $this->assertEquals($dummy, $result);
     }
 
     public function testPersistWithNullManager(): void
@@ -78,7 +78,7 @@ class PersistProcessorTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
 
         $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
-        $this->assertSame($dummy, $result);
+        $this->assertEquals($dummy, $result);
     }
 
     public function getTrackingPolicyParameters()
@@ -120,6 +120,6 @@ class PersistProcessorTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy)->shouldBeCalled();
 
         $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
-        $this->assertSame($dummy, $result);
+        $this->assertEquals($dummy, $result);
     }
 }

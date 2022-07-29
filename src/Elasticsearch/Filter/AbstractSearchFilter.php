@@ -58,7 +58,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
             }
 
             if ($hasAssociation || $this->isIdentifier($nestedResourceClass, $nestedProperty, $operation)) {
-                $values = array_map([$this, 'getIdentifierValue'], $values, array_fill(0, \count($values), $nestedProperty));
+                $values = array_map($this->getIdentifierValue(...), $values, array_fill(0, \count($values), $nestedProperty));
             }
 
             if (!$this->hasValidValues($values, $type)) {

@@ -32,14 +32,14 @@ class ResponseTest extends TestCase
 
         $response = new Response($httpFoundationResponse, $browserKitResponse, []);
 
-        $this->assertSame($httpFoundationResponse, $response->getKernelResponse());
-        $this->assertSame($browserKitResponse, $response->getBrowserKitResponse());
+        $this->assertEquals($httpFoundationResponse, $response->getKernelResponse());
+        $this->assertEquals($browserKitResponse, $response->getBrowserKitResponse());
 
-        $this->assertSame(200, $response->getInfo('http_code'));
-        $this->assertSame(200, $response->getInfo()['http_code']);
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('application/json', $response->getHeaders()['content-type'][0]);
-        $this->assertSame('', $response->getContent());
+        $this->assertEquals(200, $response->getInfo('http_code'));
+        $this->assertEquals(200, $response->getInfo()['http_code']);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('application/json', $response->getHeaders()['content-type'][0]);
+        $this->assertEquals('', $response->getContent());
     }
 
     /**
@@ -68,8 +68,8 @@ class ResponseTest extends TestCase
         $httpFoundationResponse = new HttpFoundationResponse('{"foo": "bar"}', 200, ['content-type' => 'application/ld+json']);
 
         $response = new Response($httpFoundationResponse, $browserKitResponse, []);
-        $this->assertSame(['foo' => 'bar'], $response->toArray());
-        $this->assertSame(['foo' => 'bar'], $response->toArray()); // Trigger the cache
+        $this->assertEquals(['foo' => 'bar'], $response->toArray());
+        $this->assertEquals(['foo' => 'bar'], $response->toArray()); // Trigger the cache
     }
 
     public function testToArrayTransportException(): void
@@ -121,6 +121,6 @@ class ResponseTest extends TestCase
         $response = new Response(new HttpFoundationResponse(), new BrowserKitResponse(), []);
         $response->cancel();
 
-        $this->assertSame('Response has been canceled.', $response->getInfo('error'));
+        $this->assertEquals('Response has been canceled.', $response->getInfo('error'));
     }
 }

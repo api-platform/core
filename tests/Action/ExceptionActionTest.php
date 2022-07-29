@@ -42,7 +42,7 @@ class ExceptionActionTest extends TestCase
     use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    public function testActionWithCatchableException()
+    public function testActionWithCatchableException(): void
     {
         $serializerException = $this->prophesize(ExceptionInterface::class);
         if (!is_a(ExceptionInterface::class, \Throwable::class, true)) {
@@ -58,8 +58,8 @@ class ExceptionActionTest extends TestCase
         $request->setFormat('jsonproblem', 'application/problem+json');
 
         $response = $exceptionAction($flattenException, $request);
-        $this->assertSame('', $response->getContent());
-        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertEquals('', $response->getContent());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         $this->assertTrue($response->headers->contains('Content-Type', 'application/problem+json; charset=utf-8'));
         $this->assertTrue($response->headers->contains('X-Content-Type-Options', 'nosniff'));
         $this->assertTrue($response->headers->contains('X-Frame-Options', 'deny'));
@@ -73,7 +73,7 @@ class ExceptionActionTest extends TestCase
         ?array $resourceExceptionToStatus,
         ?array $operationExceptionToStatus,
         int $expectedStatusCode
-    ) {
+    ): void {
         $exception = new DomainException();
         $flattenException = FlattenException::create($exception);
 
@@ -118,8 +118,8 @@ class ExceptionActionTest extends TestCase
 
         $response = $exceptionAction($flattenException, $request);
 
-        $this->assertSame('', $response->getContent());
-        $this->assertSame($expectedStatusCode, $response->getStatusCode());
+        $this->assertEquals('', $response->getContent());
+        $this->assertEquals($expectedStatusCode, $response->getStatusCode());
         $this->assertTrue($response->headers->contains('Content-Type', 'application/problem+json; charset=utf-8'));
         $this->assertTrue($response->headers->contains('X-Content-Type-Options', 'nosniff'));
         $this->assertTrue($response->headers->contains('X-Frame-Options', 'deny'));
@@ -219,7 +219,7 @@ class ExceptionActionTest extends TestCase
         ];
     }
 
-    public function testActionWithUncatchableException()
+    public function testActionWithUncatchableException(): void
     {
         $serializerException = $this->prophesize(ExceptionInterface::class);
         if (!is_a(ExceptionInterface::class, \Throwable::class, true)) {

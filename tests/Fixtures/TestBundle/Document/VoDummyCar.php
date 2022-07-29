@@ -25,9 +25,9 @@ class VoDummyCar extends VoDummyVehicle
 {
     #[Groups(['car_read', 'car_write'])]
     #[ODM\ReferenceMany(targetDocument: VoDummyInspection::class, mappedBy: 'car', cascade: ['persist'])]
-    private readonly Collection $inspections;
+    private Collection $inspections;
 
-    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, #[Groups(['car_read', 'car_write'])] #[ODM\Field(type: 'int')] private readonly int $mileage, #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $bodyType = 'coupe')
+    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, #[Groups(['car_read', 'car_write'])] #[ODM\Field(type: 'int')] private int $mileage, #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $bodyType = 'coupe')
     {
         parent::__construct($make, $insuranceCompany, $drivers);
         $this->inspections = new ArrayCollection();

@@ -35,7 +35,7 @@ class ResourceAccessCheckerTest extends TestCase
     /**
      * @dataProvider getGranted
      */
-    public function testIsGranted(bool $granted)
+    public function testIsGranted(bool $granted): void
     {
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);
         $expressionLanguageProphecy->evaluate('is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn($granted)->shouldBeCalled();
@@ -53,7 +53,7 @@ class ResourceAccessCheckerTest extends TestCase
         $tokenStorageProphecy->getToken()->willReturn($token);
 
         $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
-        $this->assertSame($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
+        $this->assertEquals($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
     }
 
     public function getGranted(): array
@@ -61,7 +61,7 @@ class ResourceAccessCheckerTest extends TestCase
         return [[true], [false]];
     }
 
-    public function testSecurityComponentNotAvailable()
+    public function testSecurityComponentNotAvailable(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "symfony/security" library must be installed to use the "security" attribute.');
@@ -70,7 +70,7 @@ class ResourceAccessCheckerTest extends TestCase
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
-    public function testExpressionLanguageNotInstalled()
+    public function testExpressionLanguageNotInstalled(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "symfony/expression-language" library must be installed to use the "security" attribute.');
@@ -83,7 +83,7 @@ class ResourceAccessCheckerTest extends TestCase
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
-    public function testNotBehindAFirewall()
+    public function testNotBehindAFirewall(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The current token must be set to use the "security" attribute (is the URL behind a firewall?).');
@@ -95,7 +95,7 @@ class ResourceAccessCheckerTest extends TestCase
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
-    public function testWithoutAuthenticationTokenAndExceptionOnNoTokenIsFalse()
+    public function testWithoutAuthenticationTokenAndExceptionOnNoTokenIsFalse(): void
     {
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);
         $expressionLanguageProphecy->evaluate('is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(true)->shouldBeCalled();

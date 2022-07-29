@@ -29,7 +29,7 @@ class ReadableOnlyProperty
     public function __construct(
         #[ApiProperty(writable: false)]
         #[ORM\Column]
-        private readonly string $name = 'Read only'
+        private string $name = 'Read only'
     ) {
     }
 

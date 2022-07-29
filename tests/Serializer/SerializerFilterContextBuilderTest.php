@@ -35,7 +35,7 @@ class SerializerFilterContextBuilderTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreateFromRequestWithCollectionOperation()
+    public function testCreateFromRequestWithCollectionOperation(): void
     {
         $request = new Request();
 
@@ -68,7 +68,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $serializerContextBuilderFilter->createFromRequest($request, true, $attributes);
     }
 
-    public function testCreateFromRequestWithItemOperation()
+    public function testCreateFromRequestWithItemOperation(): void
     {
         $request = new Request();
 
@@ -100,7 +100,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $serializerContextBuilderFilter->createFromRequest($request, true, $attributes);
     }
 
-    public function testCreateFromRequestWithoutFilters()
+    public function testCreateFromRequestWithoutFilters(): void
     {
         $request = new Request();
 
@@ -123,7 +123,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $serializerContextBuilderFilter->createFromRequest($request, false, $attributes);
     }
 
-    public function testCreateFromRequestWithoutAttributes()
+    public function testCreateFromRequestWithoutAttributes(): void
     {
         $request = new Request([], [], [
             '_api_resource_class' => DummyGroup::class,
@@ -163,7 +163,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $serializerContextBuilderFilter->createFromRequest($request, true);
     }
 
-    public function testCreateFromRequestThrowsExceptionWithoutAttributesAndRequestAttributes()
+    public function testCreateFromRequestThrowsExceptionWithoutAttributesAndRequestAttributes(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Request attributes are not valid.');

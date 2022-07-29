@@ -48,8 +48,10 @@ final class ElasticsearchClientPass implements CompilerPassInterface
         $clientDefinition = $container->getDefinition('api_platform.elasticsearch.client');
 
         if (!$clientConfiguration) {
+            // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
             $clientDefinition->setFactory([ClientBuilder::class, 'build']);
         } else {
+            // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
             $clientDefinition->setFactory([ClientBuilder::class, 'fromConfig']);
             $clientDefinition->setArguments([$clientConfiguration]);
         }

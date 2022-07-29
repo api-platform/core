@@ -18,6 +18,7 @@ use ApiPlatform\Symfony\Bundle\Test\Client;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -26,8 +27,8 @@ final class TestClientPassTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $containerBuilderProphecy;
-    private $testClientPass;
+    private ObjectProphecy $containerBuilderProphecy;
+    private TestClientPass $testClientPass;
 
     protected function setUp(): void
     {
@@ -56,12 +57,9 @@ final class TestClientPassTest extends TestCase
                 'test.api_platform.client',
                 Argument::allOf(
                     Argument::type(Definition::class),
-                    Argument::that(function (Definition $testClientDefinition) {
-                        return
-                            Client::class === $testClientDefinition->getClass() &&
-                            !$testClientDefinition->isShared() &&
-                            $testClientDefinition->isPublic();
-                    })
+                    Argument::that(fn (Definition $testClientDefinition) => Client::class === $testClientDefinition->getClass() &&
+                    !$testClientDefinition->isShared() &&
+                    $testClientDefinition->isPublic())
                 )
             )
             ->shouldBeCalledOnce();

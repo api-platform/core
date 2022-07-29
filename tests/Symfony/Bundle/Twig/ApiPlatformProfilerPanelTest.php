@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Twig;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -25,16 +26,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class ApiPlatformProfilerPanelTest extends WebTestCase
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $manager;
-    private $schemaTool;
-    private $env;
+    private EntityManagerInterface $manager;
+    private SchemaTool $schemaTool;
+    private string $env;
 
     protected function setUp(): void
     {
-        parent::setUp();
         $kernel = self::bootKernel();
         $this->env = $kernel->getEnvironment();
 
@@ -44,7 +41,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $manager = $doctrine->getManager();
         $this->manager = $manager;
         $this->schemaTool = new SchemaTool($this->manager);
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
+        /** @var ClassMetadata[] $classes */
         $classes = $this->manager->getMetadataFactory()->getAllMetadata();
         $this->schemaTool->dropSchema($classes);
         $this->manager->clear();
@@ -60,7 +57,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         parent::tearDown();
     }
 
-    public function testDebugBarContentNotResourceClass()
+    public function testDebugBarContentNotResourceClass(): void
     {
         $client = static::createClient();
         $client->enableProfiler();
@@ -76,10 +73,10 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Check extra info content
         $this->assertStringContainsString('sf-toolbar-status-default', $block->attr('class'), 'The toolbar block should have the default color.');
-        $this->assertSame('Not an API Platform resource', $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
+        $this->assertEquals('Not an API Platform resource', $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    public function testDebugBarContent()
+    public function testDebugBarContent(): void
     {
         $client = static::createClient();
         $client->enableProfiler();
@@ -94,10 +91,10 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Check extra info content
         $this->assertStringContainsString('sf-toolbar-status-default', $block->attr('class'), 'The toolbar block should have the default color.');
-        $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
+        $this->assertEquals('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    public function testProfilerGeneralLayoutNotResourceClass()
+    public function testProfilerGeneralLayoutNotResourceClass(): void
     {
         $client = static::createClient();
         $client->enableProfiler();
@@ -113,12 +110,12 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         $metrics = $crawler->filter('.metrics');
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
-        $this->assertSame('Not an API Platform resource', $metrics->filter('span.value')->html());
+        $this->assertEquals('Not an API Platform resource', $metrics->filter('span.value')->html());
 
         $this->assertEmpty($crawler->filter('.sf-tabs .tab'), 'Tabs must not be presents on the panel.');
     }
 
-    public function testProfilerGeneralLayout()
+    public function testProfilerGeneralLayout(): void
     {
         $client = static::createClient();
         $client->enableProfiler();
@@ -133,18 +130,18 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         $metrics = $crawler->filter('.metrics');
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
-        $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
+        $this->assertEquals('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
         $this->assertCount(4, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
 
         // Metadata tab
-        $this->assertSame('Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
+        $this->assertEquals('Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
         $tabContent = $crawler->filter('.tab:nth-of-type(1) .tab-content');
         $this->assertStringEndsWith('Dummy', trim($tabContent->filter('h3')->html()), 'the resource shortname should be displayed.');
 
         $this->assertCount(9, $tabContent->filter('table'));
-        $this->assertSame('Resource', $tabContent->filter('table:first-of-type thead th:first-of-type')->html());
-        $this->assertSame('Operations', $tabContent->filter('table:nth-of-type(2) thead th:first-of-type')->html());
-        $this->assertSame('Filters', $tabContent->filter('table:nth-of-type(3) thead th:first-of-type')->html());
+        $this->assertEquals('Resource', $tabContent->filter('table:first-of-type thead th:first-of-type')->html());
+        $this->assertEquals('Operations', $tabContent->filter('table:nth-of-type(2) thead th:first-of-type')->html());
+        $this->assertEquals('Filters', $tabContent->filter('table:nth-of-type(3) thead th:first-of-type')->html());
     }
 }

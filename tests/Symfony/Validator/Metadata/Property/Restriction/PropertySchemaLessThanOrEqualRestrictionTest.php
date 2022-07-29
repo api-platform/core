@@ -30,7 +30,7 @@ final class PropertySchemaLessThanOrEqualRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaLessThanOrEqualRestriction;
+    private PropertySchemaLessThanOrEqualRestriction $propertySchemaLessThanOrEqualRestriction;
 
     protected function setUp(): void
     {
@@ -42,7 +42,7 @@ final class PropertySchemaLessThanOrEqualRestrictionTest extends TestCase
      */
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
-        self::assertSame($expectedResult, $this->propertySchemaLessThanOrEqualRestriction->supports($constraint, $propertyMetadata));
+        self::assertEquals($expectedResult, $this->propertySchemaLessThanOrEqualRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
@@ -56,6 +56,6 @@ final class PropertySchemaLessThanOrEqualRestrictionTest extends TestCase
 
     public function testCreate(): void
     {
-        self::assertSame(['maximum' => 10], $this->propertySchemaLessThanOrEqualRestriction->create(new LessThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));
+        self::assertEquals(['maximum' => 10], $this->propertySchemaLessThanOrEqualRestriction->create(new LessThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));
     }
 }

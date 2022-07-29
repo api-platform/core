@@ -41,7 +41,7 @@ class SwaggerUiActionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public const SPEC = [
+    final public const SPEC = [
         'paths' => [
             '/fs' => ['get' => ['operationId' => 'getFCollection']],
             '/fs/{id}' => ['get' => ['operationId' => 'getFItem']],
@@ -53,7 +53,7 @@ class SwaggerUiActionTest extends TestCase
      *
      * @param mixed $twigProphecy
      */
-    public function testInvoke(Request $request, $twigProphecy)
+    public function testInvoke(Request $request, $twigProphecy): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
@@ -169,7 +169,7 @@ class SwaggerUiActionTest extends TestCase
     /**
      * @dataProvider getDoNotRunCurrentRequestParameters
      */
-    public function testDoNotRunCurrentRequest(Request $request)
+    public function testDoNotRunCurrentRequest(Request $request): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [

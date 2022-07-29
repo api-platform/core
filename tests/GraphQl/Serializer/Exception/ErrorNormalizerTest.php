@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ErrorNormalizerTest extends TestCase
 {
-    private $errorNormalizer;
+    private ErrorNormalizer $errorNormalizer;
 
     /**
      * {@inheritdoc}
@@ -38,8 +38,8 @@ class ErrorNormalizerTest extends TestCase
         $error = new Error($errorMessage);
 
         $normalizedError = $this->errorNormalizer->normalize($error);
-        $this->assertSame($errorMessage, $normalizedError['message']);
-        $this->assertSame(Error::CATEGORY_GRAPHQL, $normalizedError['extensions']['category']);
+        $this->assertEquals($errorMessage, $normalizedError['message']);
+        $this->assertEquals(Error::CATEGORY_GRAPHQL, $normalizedError['extensions']['category']);
     }
 
     public function testSupportsNormalization(): void

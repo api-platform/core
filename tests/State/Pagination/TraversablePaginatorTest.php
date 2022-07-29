@@ -40,7 +40,7 @@ class TraversablePaginatorTest extends TestCase
         self::assertEquals($perPage, $paginator->getItemsPerPage());
         self::assertEquals($currentItems, $paginator->count());
 
-        self::assertSame($results, iterator_to_array($paginator));
+        self::assertEquals($results, iterator_to_array($paginator));
     }
 
     public function initializeProvider(): array

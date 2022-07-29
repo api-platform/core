@@ -28,21 +28,21 @@ class ClassInfoTraitTest extends TestCase
         };
     }
 
-    public function testDoctrineRealClassName()
+    public function testDoctrineRealClassName(): void
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 
         $this->assertEquals(Dummy::class, $classInfo->getRealClassName('Proxies\__CG__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy'));
     }
 
-    public function testProxyManagerRealClassName()
+    public function testProxyManagerRealClassName(): void
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 
         $this->assertEquals(Dummy::class, $classInfo->getRealClassName('MongoDBODMProxies\__PM__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy\Generated'));
     }
 
-    public function testUnmarkedRealClassName()
+    public function testUnmarkedRealClassName(): void
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 

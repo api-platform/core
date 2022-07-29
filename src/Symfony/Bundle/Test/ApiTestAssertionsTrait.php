@@ -23,6 +23,11 @@ use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Bundle\FrameworkBundle\Test\BrowserKitAssertionsTrait;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -39,18 +44,16 @@ trait ApiTestAssertionsTrait
      *
      * This method delegates to static::assertArraySubset().
      *
-     * @param array|string $subset
-     *
-     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      */
-    public static function assertJsonContains($subset, bool $checkForObjectIdentity = true, string $message = ''): void
+    public static function assertJsonContains(array|string $subset, bool $checkForObjectIdentity = true, string $message = ''): void
     {
         if (\is_string($subset)) {
-            $subset = json_decode($subset, true);
+            $subset = json_decode($subset, true, 512, \JSON_THROW_ON_ERROR);
         }
         if (!\is_array($subset)) {
             throw new \InvalidArgumentException('$subset must be array or string (JSON array or JSON object)');
@@ -63,13 +66,11 @@ trait ApiTestAssertionsTrait
      * Asserts that the retrieved JSON is equal to $json.
      *
      * Both values are canonicalized before the comparison.
-     *
-     * @param array|string $json
      */
-    public static function assertJsonEquals($json, string $message = ''): void
+    public static function assertJsonEquals(array|string $json, string $message = ''): void
     {
         if (\is_string($json)) {
-            $json = json_decode($json, true);
+            $json = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
         }
         if (!\is_array($json)) {
             throw new \InvalidArgumentException('$json must be array or string (JSON array or JSON object)');
@@ -151,7 +152,7 @@ trait ApiTestAssertionsTrait
         }
 
         if (!$client instanceof Client) {
-            static::fail(sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient()"?', __CLASS__));
+            static::fail(sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient()"?', self::class));
         }
 
         return $client;
@@ -173,7 +174,7 @@ trait ApiTestAssertionsTrait
         try {
             /** @var SchemaFactoryInterface $schemaFactory */
             $schemaFactory = $container->get('api_platform.json_schema.schema_factory');
-        } catch (ServiceNotFoundException $e) {
+        } catch (ServiceNotFoundException) {
             throw new \LogicException('You cannot use the resource JSON Schema assertions if the "api_platform.swagger.versions" config is null or empty.');
         }
 
@@ -186,7 +187,7 @@ trait ApiTestAssertionsTrait
 
         try {
             $resourceMetadataFactoryCollection = $container->get('api_platform.metadata.resource.metadata_collection_factory');
-        } catch (ServiceNotFoundException $e) {
+        } catch (ServiceNotFoundException) {
             return null;
         }
 

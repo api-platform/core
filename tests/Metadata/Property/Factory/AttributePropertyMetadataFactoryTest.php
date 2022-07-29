@@ -37,10 +37,10 @@ class AttributePropertyMetadataFactoryTest extends TestCase
 
         $metadata = $factory->create(DummyPhp8ApiPropertyAttribute::class, 'id');
         $this->assertTrue($metadata->isIdentifier());
-        $this->assertSame('the identifier', $metadata->getDescription());
+        $this->assertEquals('the identifier', $metadata->getDescription());
 
         $metadata = $factory->create(DummyPhp8ApiPropertyAttribute::class, 'foo');
-        $this->assertSame('a foo', $metadata->getDescription());
+        $this->assertEquals('a foo', $metadata->getDescription());
     }
 
     public function testClassNotFound(): void
@@ -77,15 +77,15 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $metadata = $factory->create(DummyPhp8ApiPropertyAttribute::class, 'empty');
 
         $this->assertNotSame($parentPropertyMetadata, $metadata);
-        $this->assertSame('Desc', $metadata->getDescription());
+        $this->assertEquals('Desc', $metadata->getDescription());
         $this->assertTrue($metadata->isReadable());
         $this->assertFalse($metadata->isWritable());
         $this->assertTrue($metadata->isReadableLink());
         $this->assertFalse($metadata->isWritableLink());
         $this->assertTrue($metadata->isRequired());
         $this->assertFalse($metadata->isIdentifier());
-        $this->assertSame('Default', $metadata->getDefault());
-        $this->assertSame('Example', $metadata->getExample());
-        $this->assertSame(['https://example.com'], $metadata->getTypes());
+        $this->assertEquals('Default', $metadata->getDefault());
+        $this->assertEquals('Example', $metadata->getExample());
+        $this->assertEquals(['https://example.com'], $metadata->getTypes());
     }
 }

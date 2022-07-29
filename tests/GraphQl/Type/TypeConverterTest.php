@@ -40,17 +40,13 @@ class TypeConverterTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ObjectProphecy */
-    private $typeBuilderProphecy;
+    private ObjectProphecy $typeBuilderProphecy;
 
-    /** @var ObjectProphecy */
-    private $typesContainerProphecy;
+    private ObjectProphecy $typesContainerProphecy;
 
-    /** @var ObjectProphecy */
-    private $resourceMetadataCollectionFactoryProphecy;
+    private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $propertyMetadataFactoryProphecy;
+    private ObjectProphecy $propertyMetadataFactoryProphecy;
 
     private TypeConverter $typeConverter;
 

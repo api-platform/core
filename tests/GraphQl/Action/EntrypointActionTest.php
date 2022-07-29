@@ -206,8 +206,8 @@ class EntrypointActionTest extends TestCase
         $request->headers->set('Content-Type', 'application/xml');
         $mockedEntrypoint = $this->getEntrypointAction();
 
-        $this->assertSame(200, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertSame('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        $this->assertEquals(200, $mockedEntrypoint($request)->getStatusCode());
+        $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
     }
 
     public function testBadMethodAction(): void
@@ -216,8 +216,8 @@ class EntrypointActionTest extends TestCase
         $request->setMethod('PUT');
         $mockedEntrypoint = $this->getEntrypointAction();
 
-        $this->assertSame(200, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertSame('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        $this->assertEquals(200, $mockedEntrypoint($request)->getStatusCode());
+        $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
     }
 
     public function testBadVariablesAction(): void
@@ -226,8 +226,8 @@ class EntrypointActionTest extends TestCase
         $request->setRequestFormat('json');
         $mockedEntrypoint = $this->getEntrypointAction();
 
-        $this->assertSame(200, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertSame('{"errors":[{"message":"GraphQL variables are not valid JSON.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        $this->assertEquals(200, $mockedEntrypoint($request)->getStatusCode());
+        $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
     }
 
     private function getEntrypointAction(array $variables = ['graphqlVariable']): EntrypointAction
@@ -244,7 +244,7 @@ class EntrypointActionTest extends TestCase
 
         $executionResultProphecy = $this->prophesize(ExecutionResult::class);
         $executionResultProphecy->toArray(DebugFlag::NONE)->willReturn(['GraphQL']);
-        $executionResultProphecy->setErrorFormatter([$normalizer, 'normalize'])->willReturn($executionResultProphecy);
+        $executionResultProphecy->setErrorFormatter(Argument::type('callable'))->willReturn($executionResultProphecy);
         $executionResultProphecy->setErrorsHandler($errorHandler)->willReturn($executionResultProphecy);
         $executorProphecy = $this->prophesize(ExecutorInterface::class);
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, $variables, 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());

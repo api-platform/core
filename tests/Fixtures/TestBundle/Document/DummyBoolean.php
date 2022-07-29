@@ -24,7 +24,7 @@ class DummyBoolean
     private ?int $id = null;
 
     public function __construct(
-        #[ODM\Field(type: 'bool', nullable: true)] private readonly bool $isDummyBoolean
+        #[ODM\Field(type: 'bool', nullable: true)] private bool $isDummyBoolean
     ) {
     }
 

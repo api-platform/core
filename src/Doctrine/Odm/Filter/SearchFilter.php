@@ -102,7 +102,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         if ($metadata->hasField($field) && !$metadata->hasAssociation($field)) {
             if ('id' === $field) {
-                $values = array_map([$this, 'getIdFromValue'], $values);
+                $values = array_map($this->getIdFromValue(...), $values);
             }
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
@@ -123,7 +123,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             return;
         }
 
-        $values = array_map([$this, 'getIdFromValue'], $values);
+        $values = array_map($this->getIdFromValue(...), $values);
 
         $associationResourceClass = $metadata->getAssociationTargetClass($field);
         $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];

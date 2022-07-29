@@ -169,6 +169,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\WithJsonDummy;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Doctrine\ODM\MongoDB\SchemaManager;
@@ -1204,7 +1205,7 @@ final class DoctrineContext implements Context
         $this->manager->persist($bar2);
         $this->manager->flush();
 
-        $foo->setColors([$bar1, $bar2]);
+        $foo->setColors(new ArrayCollection([$bar1, $bar2]));
         $this->manager->persist($foo);
         $this->manager->flush();
     }

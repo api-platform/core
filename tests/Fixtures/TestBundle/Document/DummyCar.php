@@ -82,44 +82,44 @@ class DummyCar
         return $this->id;
     }
 
-    public function getColors()
+    public function getColors(): Collection
     {
         return $this->colors;
     }
 
-    public function setColors($colors): self
+    public function setColors(Collection $colors): self
     {
         $this->colors = $colors;
 
         return $this;
     }
 
-    public function getSecondColors()
+    public function getSecondColors(): Collection
     {
         return $this->secondColors;
     }
 
-    public function setSecondColors($secondColors): void
+    public function setSecondColors(Collection $secondColors): void
     {
         $this->secondColors = $secondColors;
     }
 
-    public function getThirdColors()
+    public function getThirdColors(): Collection
     {
         return $this->thirdColors;
     }
 
-    public function setThirdColors($thirdColors): void
+    public function setThirdColors(Collection $thirdColors): void
     {
         $this->thirdColors = $thirdColors;
     }
 
-    public function getUuid()
+    public function getUuid(): Collection
     {
         return $this->uuid;
     }
 
-    public function setUuid($uuid): void
+    public function setUuid(Collection $uuid): void
     {
         $this->uuid = $uuid;
     }

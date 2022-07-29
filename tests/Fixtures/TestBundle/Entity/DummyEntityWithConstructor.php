@@ -47,7 +47,7 @@ class DummyEntityWithConstructor
     /**
      * @param DummyObjectWithoutConstructor[] $items
      */
-    public function __construct(#[ORM\Column] private readonly string $foo, #[ORM\Column] private readonly string $bar, private readonly array $items)
+    public function __construct(#[ORM\Column] private string $foo, #[ORM\Column] private string $bar, private array $items)
     {
     }
 

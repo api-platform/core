@@ -35,7 +35,7 @@ class ConcreteDummy extends AbstractDummy
         $this->instance = $instance;
     }
 
-    public function getInstance()
+    public function getInstance(): ?string
     {
         return $this->instance;
     }

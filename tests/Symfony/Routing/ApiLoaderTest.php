@@ -47,7 +47,7 @@ class ApiLoaderTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testApiLoader()
+    public function testApiLoader(): void
     {
         $path = '/dummies/{id}.{_format}';
 
@@ -182,7 +182,7 @@ class ApiLoaderTest extends TestCase
         );
     }
 
-    public function testApiLoaderWithPrefix()
+    public function testApiLoaderWithPrefix(): void
     {
         $prefix = '/foobar-prefix';
         $path = '/dummies/{id}.{_format}';
@@ -285,7 +285,7 @@ class ApiLoaderTest extends TestCase
 
     private function getRoute(string $path, string $controller, ?bool $stateless, string $resourceClass, array $identifiers, string $operationName, array $extraDefaults = [], array $methods = [], array $requirements = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
     {
-        $isCollection = false !== strpos($operationName, 'collection');
+        $isCollection = str_contains($operationName, 'collection');
 
         return new Route(
             $path,

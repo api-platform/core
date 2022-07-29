@@ -26,7 +26,7 @@ class IriHelperTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    public function testHelpers()
+    public function testHelpers(): void
     {
         $parsed = [
             'parts' => [
@@ -43,7 +43,7 @@ class IriHelperTest extends TestCase
         $this->assertEquals('/hello.json?foo=bar&bar=3&page=2', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2.));
     }
 
-    public function testHelpersWithNetworkPath()
+    public function testHelpersWithNetworkPath(): void
     {
         $parsed = [
             'parts' => [
@@ -73,7 +73,7 @@ class IriHelperTest extends TestCase
         $this->assertEquals('//foo:bar@localhost:443/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
     }
 
-    public function testParseIriWithInvalidUrl()
+    public function testParseIriWithInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The request URI "http:///" is malformed.');

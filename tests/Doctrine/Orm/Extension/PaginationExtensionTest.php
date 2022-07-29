@@ -392,7 +392,7 @@ class PaginationExtensionTest extends TestCase
         $doctrinePaginatorReflectionProperty->setAccessible(true);
 
         $doctrinePaginator = $doctrinePaginatorReflectionProperty->getValue($result);
-        $this->assertSame($expected, $doctrinePaginator->getFetchJoinCollection());
+        $this->assertEquals($expected, $doctrinePaginator->getFetchJoinCollection());
     }
 
     public function fetchJoinCollectionProvider(): array
@@ -442,7 +442,7 @@ class PaginationExtensionTest extends TestCase
         $doctrinePaginatorReflectionProperty->setAccessible(true);
 
         $doctrinePaginator = $doctrinePaginatorReflectionProperty->getValue($result);
-        $this->assertSame($expected, $doctrinePaginator->getUseOutputWalkers());
+        $this->assertEquals($expected, $doctrinePaginator->getUseOutputWalkers());
     }
 
     public function fetchUseOutputWalkersProvider(): array

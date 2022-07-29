@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema\Command;
 
 use ApiPlatform\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -30,10 +31,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class JsonSchemaGenerateCommand extends Command
 {
-    // @noRector
+    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private array $formats;
 
-    public function __construct(private $schemaFactory, array $formats)
+    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, array $formats)
     {
         $this->formats = array_keys($formats);
 

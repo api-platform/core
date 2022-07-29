@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class EventPrioritiesTest extends TestCase
 {
-    public function testConstants()
+    public function testConstants(): void
     {
         $this->assertEquals(5, EventPriorities::PRE_READ);
         $this->assertEquals(3, EventPriorities::POST_READ);

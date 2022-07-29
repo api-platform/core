@@ -26,7 +26,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 {
     private ApplicationTester $tester;
 
-    private $entityClass;
+    private string $entityClass;
 
     protected function setUp(): void
     {

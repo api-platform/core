@@ -53,6 +53,14 @@ parameters:
 			message: '#is never written, only read.#'
 			paths:
 				- tests/Fixtures/TestBundle/Document/
+		-
+			message: '#Parameter \#1 \$constraint of method#'
+			paths:
+				- tests/Symfony/Validator/Metadata/Property/Restriction/
+		-
+			message: '#expects ApiPlatform\\Metadata\\GraphQl\\Operation\|null, ApiPlatform\\Metadata\\Operation given#'
+			paths:
+				- tests/GraphQl/Resolver/Factory/
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
 		-

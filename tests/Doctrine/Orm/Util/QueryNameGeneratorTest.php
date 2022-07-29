@@ -24,12 +24,12 @@ class QueryNameGeneratorTest extends TestCase
     public function testGenerateJoinAlias(): void
     {
         $queryNameGenerator = new QueryNameGenerator();
-        $this->assertSame('related_a1', $queryNameGenerator->generateJoinAlias('related'));
+        $this->assertEquals('related_a1', $queryNameGenerator->generateJoinAlias('related'));
     }
 
     public function testGenerateParameterName(): void
     {
         $queryNameGenerator = new QueryNameGenerator();
-        $this->assertSame('name_p1', $queryNameGenerator->generateParameterName('name'));
+        $this->assertEquals('name_p1', $queryNameGenerator->generateParameterName('name'));
     }
 }

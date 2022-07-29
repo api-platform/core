@@ -37,7 +37,7 @@ class SerializeListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testDoNotSerializeWhenControllerResultIsResponse()
+    public function testDoNotSerializeWhenControllerResultIsResponse(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize(Argument::cetera())->shouldNotBeCalled();
@@ -58,7 +58,7 @@ class SerializeListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
-    public function testDoNotSerializeWhenRespondFlagIsFalse()
+    public function testDoNotSerializeWhenRespondFlagIsFalse(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize(Argument::cetera())->shouldNotBeCalled();
@@ -83,7 +83,7 @@ class SerializeListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
-    public function testDoNotSerializeWhenDisabledInOperationAttribute()
+    public function testDoNotSerializeWhenDisabledInOperationAttribute(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize(Argument::cetera())->shouldNotBeCalled();
@@ -114,7 +114,7 @@ class SerializeListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
-    public function testSerializeCollectionOperation()
+    public function testSerializeCollectionOperation(): void
     {
         $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -124,9 +124,7 @@ class SerializeListenerTest extends TestCase
                 Argument::any(),
                 'xml',
                 Argument::allOf(
-                    Argument::that(function (array $context) {
-                        return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
-                    }),
+                    Argument::that(fn (array $context) => $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList),
                     Argument::withEntry('request_uri', ''),
                     Argument::withEntry('resource_class', 'Foo'),
                     Argument::withEntry('operation_name', 'get')
@@ -150,10 +148,10 @@ class SerializeListenerTest extends TestCase
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
 
-        $this->assertSame('bar', $event->getControllerResult());
+        $this->assertEquals('bar', $event->getControllerResult());
     }
 
-    public function testSerializeCollectionOperationWithOutputClassDisabled()
+    public function testSerializeCollectionOperationWithOutputClassDisabled(): void
     {
         $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'operation_name' => 'post', 'output' => ['class' => null]];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -177,7 +175,7 @@ class SerializeListenerTest extends TestCase
         $this->assertNull($event->getControllerResult());
     }
 
-    public function testSerializeItemOperation()
+    public function testSerializeItemOperation(): void
     {
         $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -186,9 +184,7 @@ class SerializeListenerTest extends TestCase
                 Argument::any(),
                 'xml',
                 Argument::allOf(
-                    Argument::that(function (array $context) {
-                        return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
-                    }),
+                    Argument::that(fn (array $context) => $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList),
                     Argument::withEntry('request_uri', ''),
                     Argument::withEntry('resource_class', 'Foo'),
                     Argument::withEntry('operation_name', 'get')
@@ -212,10 +208,10 @@ class SerializeListenerTest extends TestCase
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
 
-        $this->assertSame('bar', $event->getControllerResult());
+        $this->assertEquals('bar', $event->getControllerResult());
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(EncoderInterface::class);
@@ -237,6 +233,6 @@ class SerializeListenerTest extends TestCase
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
 
-        $this->assertSame('bar', $event->getControllerResult());
+        $this->assertEquals('bar', $event->getControllerResult());
     }
 }

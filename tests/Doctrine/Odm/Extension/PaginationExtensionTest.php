@@ -33,6 +33,7 @@ use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -43,7 +44,7 @@ class PaginationExtensionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $managerRegistryProphecy;
+    private ObjectProphecy $managerRegistryProphecy;
 
     /**
      * {@inheritdoc}

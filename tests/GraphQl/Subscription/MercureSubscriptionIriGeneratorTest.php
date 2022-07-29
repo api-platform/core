@@ -25,11 +25,11 @@ use Symfony\Component\Routing\RequestContext;
  */
 class MercureSubscriptionIriGeneratorTest extends TestCase
 {
-    private $requestContext;
-    private $defaultHub;
-    private $managedHub;
-    private $registry;
-    private $mercureSubscriptionIriGenerator;
+    private RequestContext $requestContext;
+    private Hub $defaultHub;
+    private Hub $managedHub;
+    private HubRegistry $registry;
+    private MercureSubscriptionIriGenerator $mercureSubscriptionIriGenerator;
 
     /**
      * {@inheritdoc}
@@ -53,21 +53,21 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
     {
         $mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator(new RequestContext('', 'GET', 'example.com'), 'https://example.com/.well-known/mercure');
 
-        $this->assertSame('http://example.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
+        $this->assertEquals('http://example.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
     }
 
     public function testGenerateDefaultTopicIriWithLegacySignature(): void
     {
         $mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator(new RequestContext('', 'GET', '', ''), 'https://example.com/.well-known/mercure');
 
-        $this->assertSame('https://api-platform.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
+        $this->assertEquals('https://api-platform.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
     }
 
     public function testGenerateMercureUrlWithLegacySignature(): void
     {
         $mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator(new RequestContext('', 'GET', 'example.com'), 'https://example.com/.well-known/mercure');
 
-        $this->assertSame('https://example.com/.well-known/mercure?topic=http://example.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id'));
+        $this->assertEquals('https://example.com/.well-known/mercure?topic=http://example.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id'));
     }
 
     public function testGenerateTopicIri(): void
@@ -76,7 +76,7 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
             $this->markTestSkipped();
         }
 
-        $this->assertSame('http://example.com/subscriptions/subscription-id', $this->mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
+        $this->assertEquals('http://example.com/subscriptions/subscription-id', $this->mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
     }
 
     public function testGenerateDefaultTopicIri(): void
@@ -87,7 +87,7 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
 
         $mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator(new RequestContext('', 'GET', '', ''), $this->registry);
 
-        $this->assertSame('https://api-platform.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
+        $this->assertEquals('https://api-platform.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
     }
 
     public function testGenerateMercureUrl(): void
@@ -96,7 +96,7 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
             $this->markTestSkipped();
         }
 
-        $this->assertSame("{$this->defaultHub->getUrl()}?topic=http://example.com/subscriptions/subscription-id", $this->mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id'));
+        $this->assertEquals("{$this->defaultHub->getUrl()}?topic=http://example.com/subscriptions/subscription-id", $this->mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id'));
     }
 
     public function testGenerateExplicitDefaultMercureUrl(): void
@@ -105,7 +105,7 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
             $this->markTestSkipped();
         }
 
-        $this->assertSame("{$this->defaultHub->getUrl()}?topic=http://example.com/subscriptions/subscription-id", $this->mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id', 'default'));
+        $this->assertEquals("{$this->defaultHub->getUrl()}?topic=http://example.com/subscriptions/subscription-id", $this->mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id', 'default'));
     }
 
     public function testGenerateNonDefaultMercureUrl(): void
@@ -114,6 +114,6 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
             $this->markTestSkipped();
         }
 
-        $this->assertSame("{$this->managedHub->getUrl()}?topic=http://example.com/subscriptions/subscription-id", $this->mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id', 'managed'));
+        $this->assertEquals("{$this->managedHub->getUrl()}?topic=http://example.com/subscriptions/subscription-id", $this->mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id', 'managed'));
     }
 }

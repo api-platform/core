@@ -26,14 +26,14 @@ class TransformPaginationParametersListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $listener;
+    private TransformPaginationParametersListener $listener;
 
     protected function setUp(): void
     {
         $this->listener = new TransformPaginationParametersListener();
     }
 
-    public function testOnKernelRequestWithInvalidFormat()
+    public function testOnKernelRequestWithInvalidFormat(): void
     {
         $expectedRequest = new Request();
         $expectedRequest->setRequestFormat('badformat');
@@ -48,7 +48,7 @@ class TransformPaginationParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidPage()
+    public function testOnKernelRequestWithInvalidPage(): void
     {
         $eventProphecy = $this->prophesize(RequestEvent::class);
 
@@ -70,7 +70,7 @@ class TransformPaginationParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $request = new Request(['page' => ['size' => 5, 'number' => 3, 'error' => -1]]);
         $request->setRequestFormat('jsonapi');

@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RequestAttributesExtractorTest extends TestCase
 {
-    public function testExtractCollectionAttributes()
+    public function testExtractCollectionAttributes(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'post']);
 
@@ -36,7 +36,7 @@ class RequestAttributesExtractorTest extends TestCase
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
-    public function testExtractItemAttributes()
+    public function testExtractItemAttributes(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
 
@@ -50,7 +50,7 @@ class RequestAttributesExtractorTest extends TestCase
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
-    public function testExtractReceive()
+    public function testExtractReceive(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_receive' => '0']);
 
@@ -86,7 +86,7 @@ class RequestAttributesExtractorTest extends TestCase
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
-    public function testExtractRespond()
+    public function testExtractRespond(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_respond' => '0']);
 
@@ -122,7 +122,7 @@ class RequestAttributesExtractorTest extends TestCase
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
-    public function testExtractPersist()
+    public function testExtractPersist(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_persist' => '0']);
 
@@ -158,17 +158,17 @@ class RequestAttributesExtractorTest extends TestCase
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
-    public function testResourceClassNotSet()
+    public function testResourceClassNotSet(): void
     {
         $this->assertEmpty(RequestAttributesExtractor::extractAttributes(new Request([], [], ['_api_operation_name' => 'get'])));
     }
 
-    public function testOperationNotSet()
+    public function testOperationNotSet(): void
     {
         $this->assertEmpty(RequestAttributesExtractor::extractAttributes(new Request([], [], ['_api_resource_class' => 'Foo'])));
     }
 
-    public function testExtractPreviousDataAttributes()
+    public function testExtractPreviousDataAttributes(): void
     {
         $object = new \stdClass();
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', 'previous_data' => $object]);
@@ -184,7 +184,7 @@ class RequestAttributesExtractorTest extends TestCase
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
-    public function testExtractIdentifiers()
+    public function testExtractIdentifiers(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_identifiers' => ['test'], '_api_has_composite_identifier' => true]);
 

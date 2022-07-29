@@ -20,7 +20,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 class RecoverPasswordProcessor implements ProcessorInterface
 {
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = []): RecoverPasswordOutput
     {
         // Because we're in a PUT operation, we will use the retrieved object...
         $resourceObject = $context['previous_data'] ?? new $context['resource_class']();

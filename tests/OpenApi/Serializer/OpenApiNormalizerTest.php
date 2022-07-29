@@ -32,7 +32,11 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
-use ApiPlatform\OpenApi\Model;
+use ApiPlatform\OpenApi\Model\Components;
+use ApiPlatform\OpenApi\Model\Info;
+use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\OpenApi\Model\Paths;
+use ApiPlatform\OpenApi\Model\Server;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
@@ -57,9 +61,9 @@ class OpenApiNormalizerTest extends TestCase
         'output_formats' => ['jsonld' => ['application/ld+json']],
     ];
 
-    public function testNormalizeWithSchemas()
+    public function testNormalizeWithSchemas(): void
     {
-        $openApi = new OpenApi(new Model\Info('My API', '1.0.0', 'An amazing API'), [new Model\Server('https://example.com')], new Model\Paths(), new Model\Components(new \ArrayObject(['z' => [], 'b' => []])));
+        $openApi = new OpenApi(new Info('My API', '1.0.0', 'An amazing API'), [new Server('https://example.com')], new Paths(), new Components(new \ArrayObject(['z' => [], 'b' => []])));
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
 
@@ -73,9 +77,9 @@ class OpenApiNormalizerTest extends TestCase
         $this->assertEquals(array_keys($array['components']['schemas']), ['b', 'z']);
     }
 
-    public function testNormalizeWithEmptySchemas()
+    public function testNormalizeWithEmptySchemas(): void
     {
-        $openApi = new OpenApi(new Model\Info('My API', '1.0.0', 'An amazing API'), [new Model\Server('https://example.com')], new Model\Paths(), new Model\Components(new \ArrayObject()));
+        $openApi = new OpenApi(new Info('My API', '1.0.0', 'An amazing API'), [new Server('https://example.com')], new Paths(), new Components(new \ArrayObject()));
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
 
@@ -91,7 +95,7 @@ class OpenApiNormalizerTest extends TestCase
     /**
      * @requires php 8.0
      */
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class, 'Zorro']));
@@ -229,11 +233,11 @@ class OpenApiNormalizerTest extends TestCase
         $openApi->getPaths()->addPath('/dummies/{id}', $pathItem->withGet(
             $operation->withParameters(array_merge(
                 $operation->getParameters(),
-                [new Model\Parameter('fields', 'query', 'Fields to remove of the output')]
+                [new Parameter('fields', 'query', 'Fields to remove of the output')]
             ))
         ));
 
-        $openApi = $openApi->withInfo((new Model\Info('New Title', 'v2', 'Description of my custom API'))->withExtensionProperty('info-key', 'Info value'));
+        $openApi = $openApi->withInfo((new Info('New Title', 'v2', 'Description of my custom API'))->withExtensionProperty('info-key', 'Info value'));
         $openApi = $openApi->withExtensionProperty('key', 'Custom x-key value');
         $openApi = $openApi->withExtensionProperty('x-value', 'Custom x-value value');
 

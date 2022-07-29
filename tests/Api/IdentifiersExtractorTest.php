@@ -84,6 +84,6 @@ class IdentifiersExtractorTest extends TestCase
 
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
 
-        $this->assertEquals(['id' => '1'], $identifiersExtractor->getIdentifiersFromItem($item, $operation));
+        $this->assertEquals(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($item, $operation));
     }
 }

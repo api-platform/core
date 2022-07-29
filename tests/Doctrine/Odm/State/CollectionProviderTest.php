@@ -28,6 +28,7 @@ use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @group mongodb
@@ -36,8 +37,8 @@ class CollectionProviderTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $managerRegistryProphecy;
-    private $resourceMetadataFactoryProphecy;
+    private ObjectProphecy $managerRegistryProphecy;
+    private ObjectProphecy $resourceMetadataFactoryProphecy;
 
     /**
      * {@inheritdoc}

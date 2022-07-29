@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -30,8 +31,8 @@ class WriteStageTest extends TestCase
     use ProphecyTrait;
 
     private WriteStage $writeStage;
-    private $processorProphecy;
-    private $serializerContextBuilderProphecy;
+    private ObjectProphecy $processorProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}
@@ -69,7 +70,7 @@ class WriteStageTest extends TestCase
         $data = new \stdClass();
         $result = ($this->writeStage)($data, $resourceClass, $operation, []);
 
-        $this->assertSame($data, $result);
+        $this->assertEquals($data, $result);
     }
 
     public function testApply(): void
@@ -89,6 +90,6 @@ class WriteStageTest extends TestCase
 
         $result = ($this->writeStage)($data, $resourceClass, $operation, $context);
 
-        $this->assertSame($processedData, $result);
+        $this->assertEquals($processedData, $result);
     }
 }

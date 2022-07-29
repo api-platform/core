@@ -35,7 +35,7 @@ class AddFormatListenerTest extends TestCase
     use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    public function testNoResourceClass()
+    public function testNoResourceClass(): void
     {
         $request = new Request();
 
@@ -68,8 +68,8 @@ class AddFormatListenerTest extends TestCase
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
 
-        $this->assertSame('xml', $request->getRequestFormat());
-        $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
+        $this->assertEquals('xml', $request->getRequestFormat());
+        $this->assertEquals('text/xml', $request->getMimeType($request->getRequestFormat()));
     }
 
     public function testRespondFlag(): void
@@ -84,8 +84,8 @@ class AddFormatListenerTest extends TestCase
         $listener = new AddFormatListener(new Negotiator(), null, ['xml' => ['text/xml']]);
         $listener->onKernelRequest($event);
 
-        $this->assertSame('xml', $request->getRequestFormat());
-        $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
+        $this->assertEquals('xml', $request->getRequestFormat());
+        $this->assertEquals('text/xml', $request->getMimeType($request->getRequestFormat()));
     }
 
     public function testUnsupportedRequestFormat(): void
@@ -110,7 +110,7 @@ class AddFormatListenerTest extends TestCase
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
 
-        $this->assertSame('json', $request->getRequestFormat());
+        $this->assertEquals('json', $request->getRequestFormat());
     }
 
     public function testSupportedAcceptHeader(): void
@@ -135,7 +135,7 @@ class AddFormatListenerTest extends TestCase
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
 
-        $this->assertSame('json', $request->getRequestFormat());
+        $this->assertEquals('json', $request->getRequestFormat());
     }
 
     public function testSupportedAcceptHeaderSymfonyBuiltInFormat(): void
@@ -159,7 +159,7 @@ class AddFormatListenerTest extends TestCase
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
 
-        $this->assertSame('jsonld', $request->getRequestFormat());
+        $this->assertEquals('jsonld', $request->getRequestFormat());
     }
 
     public function testAcceptAllHeader(): void
@@ -184,8 +184,8 @@ class AddFormatListenerTest extends TestCase
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
 
-        $this->assertSame('binary', $request->getRequestFormat());
-        $this->assertSame('application/octet-stream', $request->getMimeType($request->getRequestFormat()));
+        $this->assertEquals('binary', $request->getRequestFormat());
+        $this->assertEquals('application/octet-stream', $request->getMimeType($request->getRequestFormat()));
     }
 
     public function testUnsupportedAcceptHeader(): void
@@ -287,7 +287,7 @@ class AddFormatListenerTest extends TestCase
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
 
-        $this->assertSame('json', $request->getRequestFormat());
+        $this->assertEquals('json', $request->getRequestFormat());
     }
 
     public function testInvalidRouteFormat(): void
@@ -335,7 +335,7 @@ class AddFormatListenerTest extends TestCase
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
 
-        $this->assertSame('csv', $request->getRequestFormat());
-        $this->assertSame('text/csv', $request->getMimeType($request->getRequestFormat()));
+        $this->assertEquals('csv', $request->getRequestFormat());
+        $this->assertEquals('text/csv', $request->getMimeType($request->getRequestFormat()));
     }
 }

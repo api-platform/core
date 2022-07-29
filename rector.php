@@ -13,9 +13,16 @@ declare(strict_types=1);
 
 use Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector;
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector;
+use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
+use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\PHPUnit\Rector\Class_\AddSeeTestAnnotationRector;
+use Rector\PHPUnit\Rector\MethodCall\AssertEqualsToSameRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
+use Rector\TypeDeclaration\Rector\ClassMethod\ArrayShapeFromConstantArrayReturnRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -23,10 +30,21 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__.'/tests',
     ]);
     $rectorConfig->skip([
-        // "Class PHPUnit\Framework\* not found."
-        __DIR__.'/src/Symfony/Bundle/Test',
         __DIR__.'/tests/Fixtures/app/var',
-        __DIR__.'/tests/ProphecyTrait.php',
+        AddSeeTestAnnotationRector::class,
+        ArrayShapeFromConstantArrayReturnRector::class,
+        NullToStrictStringFuncCallArgRector::class,
+        ReadOnlyPropertyRector::class => [
+            __DIR__.'/tests/Fixtures/TestBundle/Document',
+            __DIR__.'/tests/Fixtures/TestBundle/Entity',
+        ],
+        RemoveParentCallWithoutParentRector::class => [
+            __DIR__.'/tests/Symfony/Validator/Metadata/Property/Restriction/PropertySchemaChoiceRestrictionTest.php',
+        ],
+        RenameMethodRector::class => [
+            __DIR__.'/tests/Symfony/Validator/Metadata/Property/Restriction/PropertySchemaChoiceRestrictionTest.php',
+        ],
+        AssertEqualsToSameRector::class,
     ]);
     $rectorConfig->phpstanConfig(__DIR__.'/phpstan.neon.dist');
     $rectorConfig->importNames();

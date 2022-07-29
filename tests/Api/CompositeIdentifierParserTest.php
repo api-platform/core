@@ -48,7 +48,7 @@ class CompositeIdentifierParserTest extends TestCase
     public function testStringify(array $identifiers): void
     {
         foreach ($identifiers as $string => $arr) {
-            $this->assertSame(CompositeIdentifierParser::stringify($arr), $string);
+            $this->assertEquals(CompositeIdentifierParser::stringify($arr), $string);
         }
     }
 

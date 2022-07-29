@@ -273,7 +273,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        $filterFactory = [$this, 'buildSearchFilter'];
+        $filterFactory = $this->buildSearchFilter(...);
 
         return array_merge_recursive(
             $this->provideApplyTestArguments(),

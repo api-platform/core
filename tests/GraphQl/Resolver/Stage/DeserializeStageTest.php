@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -30,8 +31,8 @@ class DeserializeStageTest extends TestCase
     use ProphecyTrait;
 
     private DeserializeStage $deserializeStage;
-    private $denormalizerProphecy;
-    private $serializerContextBuilderProphecy;
+    private ObjectProphecy $denormalizerProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}
@@ -59,7 +60,7 @@ class DeserializeStageTest extends TestCase
         $operation = (new Query())->withName('item_query')->withClass($resourceClass)->withDeserialize(false);
         $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operation, []);
 
-        $this->assertSame($objectToPopulate, $result);
+        $this->assertEquals($objectToPopulate, $result);
     }
 
     /**
@@ -82,7 +83,7 @@ class DeserializeStageTest extends TestCase
 
         $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operation, $context);
 
-        $this->assertSame($denormalizedData, $result);
+        $this->assertEquals($denormalizedData, $result);
     }
 
     public function objectToPopulateProvider(): array

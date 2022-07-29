@@ -32,15 +32,9 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  */
 class ConfigurationTest extends TestCase
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    private Configuration $configuration;
 
-    /**
-     * @var Processor
-     */
-    private $processor;
+    private Processor $processor;
 
     protected function setUp(): void
     {
@@ -48,7 +42,7 @@ class ConfigurationTest extends TestCase
         $this->processor = new Processor();
     }
 
-    public function testDefaultConfig()
+    public function testDefaultConfig(): void
     {
         $this->runDefaultConfigTests();
     }
@@ -56,12 +50,12 @@ class ConfigurationTest extends TestCase
     /**
      * @group mongodb
      */
-    public function testDefaultConfigWithMongoDbOdm()
+    public function testDefaultConfigWithMongoDbOdm(): void
     {
         $this->runDefaultConfigTests(['orm', 'odm']);
     }
 
-    private function runDefaultConfigTests(array $doctrineIntegrationsToLoad = ['orm'])
+    private function runDefaultConfigTests(array $doctrineIntegrationsToLoad = ['orm']): void
     {
         $treeBuilder = $this->configuration->getConfigTreeBuilder();
         $config = $this->processor->processConfiguration($this->configuration, [
@@ -235,7 +229,7 @@ class ConfigurationTest extends TestCase
      *
      * @param mixed $invalidHttpStatusCode
      */
-    public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode)
+    public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches('/The HTTP status code ".+" is not valid\\./');
@@ -266,7 +260,7 @@ class ConfigurationTest extends TestCase
      *
      * @param mixed $invalidHttpStatusCodeValue
      */
-    public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue)
+    public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue): void
     {
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessageMatches('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected "?int"?, but got .+\\./');
@@ -283,7 +277,7 @@ class ConfigurationTest extends TestCase
     /**
      * Test config for api keys.
      */
-    public function testApiKeysConfig()
+    public function testApiKeysConfig(): void
     {
         $exampleConfig = [
             'name' => 'Authorization',
@@ -299,13 +293,13 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertArrayHasKey('api_keys', $config['swagger']);
-        $this->assertSame($exampleConfig, $config['swagger']['api_keys'][0]);
+        $this->assertEquals($exampleConfig, $config['swagger']['api_keys'][0]);
     }
 
     /**
      * Test config for disabled swagger versions.
      */
-    public function testDisabledSwaggerVersionConfig()
+    public function testDisabledSwaggerVersionConfig(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -323,7 +317,7 @@ class ConfigurationTest extends TestCase
     /**
      * Test config for swagger versions.
      */
-    public function testSwaggerVersionConfig()
+    public function testSwaggerVersionConfig(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -334,7 +328,7 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertArrayHasKey('versions', $config['swagger']);
-        $this->assertSame([3], $config['swagger']['versions']);
+        $this->assertEquals([3], $config['swagger']['versions']);
 
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -345,7 +339,7 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertArrayHasKey('versions', $config['swagger']);
-        $this->assertSame([2], $config['swagger']['versions']);
+        $this->assertEquals([2], $config['swagger']['versions']);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches('/Only the versions .+ are supported. Got .+./');
@@ -362,20 +356,20 @@ class ConfigurationTest extends TestCase
     /**
      * Test config for empty title and description.
      */
-    public function testEmptyTitleDescriptionConfig()
+    public function testEmptyTitleDescriptionConfig(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [],
         ]);
 
-        $this->assertSame('', $config['title']);
-        $this->assertSame('', $config['description']);
+        $this->assertEquals('', $config['title']);
+        $this->assertEquals('', $config['description']);
     }
 
     /**
      * @requires PHP >= 7.4
      */
-    public function testEnableElasticsearch()
+    public function testEnableElasticsearch(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [

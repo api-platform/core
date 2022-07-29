@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class GroupFilterTest extends TestCase
 {
-    public function testApply()
+    public function testApply(): void
     {
         $request = new Request(['groups' => ['foo', 'bar', 'baz']]);
         $context = [AbstractNormalizer::GROUPS => ['foo', 'qux']];
@@ -35,7 +35,7 @@ class GroupFilterTest extends TestCase
         $this->assertEquals([AbstractNormalizer::GROUPS => ['foo', 'qux', 'foo', 'bar', 'baz']], $context);
     }
 
-    public function testApplyWithOverriding()
+    public function testApplyWithOverriding(): void
     {
         $request = new Request(['custom_groups' => ['foo', 'bar', 'baz']]);
         $context = [AbstractNormalizer::GROUPS => ['foo', 'qux']];
@@ -46,7 +46,7 @@ class GroupFilterTest extends TestCase
         $this->assertEquals([AbstractNormalizer::GROUPS => ['foo', 'bar', 'baz']], $context);
     }
 
-    public function testApplyWithoutGroupsInRequest()
+    public function testApplyWithoutGroupsInRequest(): void
     {
         $context = [AbstractNormalizer::GROUPS => ['foo', 'bar']];
 
@@ -56,7 +56,7 @@ class GroupFilterTest extends TestCase
         $this->assertEquals([AbstractNormalizer::GROUPS => ['foo', 'bar']], $context);
     }
 
-    public function testApplyWithGroupsWhitelist()
+    public function testApplyWithGroupsWhitelist(): void
     {
         $request = new Request(['groups' => ['foo', 'bar', 'baz']]);
         $context = [AbstractNormalizer::GROUPS => 'qux'];
@@ -67,7 +67,7 @@ class GroupFilterTest extends TestCase
         $this->assertEquals([AbstractNormalizer::GROUPS => ['qux', 'foo', 'baz']], $context);
     }
 
-    public function testApplyWithGroupsWhitelistWithOverriding()
+    public function testApplyWithGroupsWhitelistWithOverriding(): void
     {
         $request = new Request(['groups' => ['foo', 'bar', 'baz']]);
         $context = [AbstractNormalizer::GROUPS => 'qux'];
@@ -78,7 +78,7 @@ class GroupFilterTest extends TestCase
         $this->assertEquals([AbstractNormalizer::GROUPS => ['foo', 'baz']], $context);
     }
 
-    public function testApplyWithGroupsInFilterAttribute()
+    public function testApplyWithGroupsInFilterAttribute(): void
     {
         $request = new Request(['groups' => ['foo', 'bar', 'baz']], [], ['_api_filters' => ['groups' => ['fooz']]]);
         $context = ['groups' => ['foo', 'qux']];
@@ -89,7 +89,7 @@ class GroupFilterTest extends TestCase
         $this->assertEquals(['groups' => ['foo', 'qux', 'fooz']], $context);
     }
 
-    public function testApplyWithInvalidGroupsInRequest()
+    public function testApplyWithInvalidGroupsInRequest(): void
     {
         $request = new Request(['groups' => 'foo,bar,baz']);
         $context = [AbstractNormalizer::GROUPS => ['foo', 'bar']];
@@ -100,7 +100,7 @@ class GroupFilterTest extends TestCase
         $this->assertEquals([AbstractNormalizer::GROUPS => ['foo', 'bar']], $context);
     }
 
-    public function testApplyWithInvalidGroupsInContext()
+    public function testApplyWithInvalidGroupsInContext(): void
     {
         $request = new Request(['custom_groups' => ['foo', 'bar', 'baz']]);
         $context = [AbstractNormalizer::GROUPS => 'qux'];
@@ -111,7 +111,7 @@ class GroupFilterTest extends TestCase
         $this->assertEquals([AbstractNormalizer::GROUPS => ['qux', 'foo', 'bar', 'baz']], $context);
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $groupFilter = new GroupFilter('custom_groups');
         $expectedDescription = [

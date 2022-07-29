@@ -35,7 +35,18 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Model;
+use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
+use ApiPlatform\OpenApi\Model\Info;
+use ApiPlatform\OpenApi\Model\MediaType;
+use ApiPlatform\OpenApi\Model\OAuthFlow;
+use ApiPlatform\OpenApi\Model\OAuthFlows;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\OpenApi\Model\Response;
+use ApiPlatform\OpenApi\Model\SecurityScheme;
+use ApiPlatform\OpenApi\Model\Server;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\State\Pagination\PaginationOptions;
@@ -289,21 +300,21 @@ class OpenApiFactoryTest extends TestCase
         $openApi = $factory(['base_url' => '/app_dev.php/']);
 
         $this->assertInstanceOf(OpenApi::class, $openApi);
-        $this->assertEquals($openApi->getInfo(), new Model\Info('Test API', '1.2.3', 'This is a test API.'));
-        $this->assertEquals($openApi->getServers(), [new Model\Server('/app_dev.php/')]);
+        $this->assertEquals($openApi->getInfo(), new Info('Test API', '1.2.3', 'This is a test API.'));
+        $this->assertEquals($openApi->getServers(), [new Server('/app_dev.php/')]);
 
         $components = $openApi->getComponents();
-        $this->assertInstanceOf(Model\Components::class, $components);
+        $this->assertInstanceOf(Components::class, $components);
 
         $this->assertEquals($components->getSchemas(), new \ArrayObject(['Dummy' => $dummySchema->getDefinitions(), 'Dummy.OutputDto' => $dummySchema->getDefinitions()]));
 
         $this->assertEquals($components->getSecuritySchemes(), new \ArrayObject([
-            'oauth' => new Model\SecurityScheme('oauth2', 'OAuth 2.0 authorization code Grant', null, null, null, null, new Model\OAuthFlows(null, null, null, new Model\OAuthFlow('/oauth/v2/auth', '/oauth/v2/token', '/oauth/v2/refresh', new \ArrayObject(['scope param'])))),
-            'header' => new Model\SecurityScheme('apiKey', 'Value for the Authorization header parameter.', 'Authorization', 'header'),
-            'query' => new Model\SecurityScheme('apiKey', 'Value for the key query parameter.', 'key', 'query'),
+            'oauth' => new SecurityScheme('oauth2', 'OAuth 2.0 authorization code Grant', null, null, null, null, new OAuthFlows(null, null, null, new OAuthFlow('/oauth/v2/auth', '/oauth/v2/token', '/oauth/v2/refresh', new \ArrayObject(['scope param'])))),
+            'header' => new SecurityScheme('apiKey', 'Value for the Authorization header parameter.', 'Authorization', 'header'),
+            'query' => new SecurityScheme('apiKey', 'Value for the key query parameter.', 'key', 'query'),
         ]));
 
-        $this->assertSame([
+        $this->assertEquals([
             ['oauth' => []],
             ['header' => []],
             ['query' => []],
@@ -316,12 +327,12 @@ class OpenApiFactoryTest extends TestCase
             $this->assertNull($dummiesPath->{'get'.$method}());
         }
 
-        $this->assertEquals(new Model\Operation(
+        $this->assertEquals(new Operation(
             'getDummyCollection',
             ['Dummy'],
             [
-                '200' => new Model\Response('Dummy collection', new \ArrayObject([
-                    'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject([
+                '200' => new Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([
                         'type' => 'array',
                         'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
                     ]))),
@@ -331,44 +342,44 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Model\Parameter('page', 'query', 'Test modified collection page number', false, false, true, [
+                new Parameter('page', 'query', 'Test modified collection page number', false, false, true, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
-                new Model\Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
                     'type' => 'integer',
                     'default' => 30,
                     'minimum' => 0,
                 ]),
-                new Model\Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
                     'type' => 'boolean',
                 ]),
             ]
         ), $dummiesPath->getGet());
 
-        $this->assertEquals(new Model\Operation(
+        $this->assertEquals(new Operation(
             'postDummyCollection',
             ['Dummy'],
             [
-                '201' => new Model\Response(
+                '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
                 ),
-                '400' => new Model\Response('Invalid input'),
-                '422' => new Model\Response('Unprocessable entity'),
+                '400' => new Response('Invalid input'),
+                '422' => new Response('Unprocessable entity'),
             ],
             'Creates a Dummy resource.',
             'Creates a Dummy resource.',
             null,
             [],
-            new Model\RequestBody(
+            new RequestBody(
                 'The new Dummy resource',
                 new \ArrayObject([
-                    'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
+                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
                 ]),
                 true
             )
@@ -380,72 +391,72 @@ class OpenApiFactoryTest extends TestCase
             $this->assertNull($dummyPath->{'get'.$method}());
         }
 
-        $this->assertEquals(new Model\Operation(
+        $this->assertEquals(new Operation(
             'getDummyItem',
             ['Dummy'],
             [
-                '200' => new Model\Response(
+                '200' => new Response(
                     'Dummy resource',
                     new \ArrayObject([
-                        'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
                     ])
                 ),
-                '404' => new Model\Response('Resource not found'),
+                '404' => new Response('Resource not found'),
             ],
             'Retrieves a Dummy resource.',
             'Retrieves a Dummy resource.',
             null,
-            [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
         ), $dummyPath->getGet());
 
-        $this->assertEquals(new Model\Operation(
+        $this->assertEquals(new Operation(
             'putDummyItem',
             ['Dummy'],
             [
-                '200' => new Model\Response(
+                '200' => new Response(
                     'Dummy resource updated',
                     new \ArrayObject([
-                        'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
+                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$request.path.id']), null, 'This is a dummy')])
                 ),
-                '400' => new Model\Response('Invalid input'),
-                '422' => new Model\Response('Unprocessable entity'),
-                '404' => new Model\Response('Resource not found'),
+                '400' => new Response('Invalid input'),
+                '422' => new Response('Unprocessable entity'),
+                '404' => new Response('Resource not found'),
             ],
             'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
-            [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
-            new Model\RequestBody(
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
+            new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
-                    'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
                 ]),
                 true
             )
         ), $dummyPath->getPut());
 
-        $this->assertEquals(new Model\Operation(
+        $this->assertEquals(new Operation(
             'deleteDummyItem',
             ['Dummy'],
             [
-                '204' => new Model\Response('Dummy resource deleted'),
-                '404' => new Model\Response('Resource not found'),
+                '204' => new Response('Dummy resource deleted'),
+                '404' => new Response('Resource not found'),
             ],
             'Removes the Dummy resource.',
             'Removes the Dummy resource.',
             null,
-            [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
         ), $dummyPath->getDelete());
 
         $customPath = $paths->getPath('/foo/{id}');
-        $this->assertEquals(new Model\Operation(
+        $this->assertEquals(new Operation(
             'customDummyItem',
             ['Dummy', 'Profile'],
             [
-                '202' => new Model\Response('Success', new \ArrayObject([
+                '202' => new Response('Success', new \ArrayObject([
                     'application/json' => [
                         'schema' => ['$ref' => '#/components/schemas/Dummy'],
                     ],
@@ -454,14 +465,14 @@ class OpenApiFactoryTest extends TestCase
                 ]), new \ArrayObject([
                     'Foo' => ['$ref' => '#/components/schemas/Dummy'],
                 ])),
-                '205' => new Model\Response(),
-                '404' => new Model\Response('Resource not found'),
+                '205' => new Response(),
+                '404' => new Response('Resource not found'),
             ],
             'Dummy',
             'Custom description',
             new ExternalDocumentation('See also', 'http://schema.example.com/Dummy'),
-            [new Model\Parameter('param', 'path', 'Test parameter', true), new Model\Parameter('id', 'path', 'Replace parameter', true, false, false, ['type' => 'string', 'format' => 'uuid'])],
-            new Model\RequestBody('Custom request body', new \ArrayObject([
+            [new Parameter('param', 'path', 'Test parameter', true), new Parameter('id', 'path', 'Replace parameter', true, false, false, ['type' => 'string', 'format' => 'uuid'])],
+            new RequestBody('Custom request body', new \ArrayObject([
                 'multipart/form-data' => [
                     'schema' => [
                         'type' => 'object',
@@ -485,44 +496,44 @@ class OpenApiFactoryTest extends TestCase
         $this->assertNotNull($prefixPath);
 
         $formattedPath = $paths->getPath('/formatted/{id}');
-        $this->assertEquals(new Model\Operation(
+        $this->assertEquals(new Operation(
             'formatsDummyItem',
             ['Dummy'],
             [
-                '200' => new Model\Response(
+                '200' => new Response(
                     'Dummy resource updated',
                     new \ArrayObject([
-                        'application/json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
-                        'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
+                        'application/json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
+                        'text/csv' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$request.path.id']), null, 'This is a dummy')])
                 ),
-                '400' => new Model\Response('Invalid input'),
-                '422' => new Model\Response('Unprocessable entity'),
-                '404' => new Model\Response('Resource not found'),
+                '400' => new Response('Invalid input'),
+                '422' => new Response('Unprocessable entity'),
+                '404' => new Response('Resource not found'),
             ],
             'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
-            [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
-            new Model\RequestBody(
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
+            new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
-                    'application/json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
-                    'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    'application/json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    'text/csv' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
                 ]),
                 true
             )
         ), $formattedPath->getPut());
 
         $filteredPath = $paths->getPath('/filtered');
-        $this->assertEquals(new Model\Operation(
+        $this->assertEquals(new Operation(
             'filteredDummyCollection',
             ['Dummy'],
             [
-                '200' => new Model\Response('Dummy collection', new \ArrayObject([
-                    'application/ld+json' => new Model\MediaType(new \ArrayObject([
+                '200' => new Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject([
                         'type' => 'array',
                         'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
                     ])),
@@ -532,29 +543,29 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
+                new Parameter('page', 'query', 'The collection page number', false, false, true, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
-                new Model\Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
                     'type' => 'integer',
                     'default' => 30,
                     'minimum' => 0,
                 ]),
-                new Model\Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
                     'type' => 'boolean',
                 ]),
-                new Model\Parameter('name', 'query', '', true, true, true, [
+                new Parameter('name', 'query', '', true, true, true, [
                     'type' => 'string',
                 ], 'form', true, true, 'bar'),
-                new Model\Parameter('ha', 'query', '', false, false, true, [
+                new Parameter('ha', 'query', '', false, false, true, [
                     'type' => 'integer',
                 ]),
-                new Model\Parameter('toto', 'query', '', true, false, true, [
+                new Parameter('toto', 'query', '', true, false, true, [
                     'type' => 'array',
                     'items' => ['type' => 'string'],
                 ], 'deepObject', true),
-                new Model\Parameter('order[name]', 'query', '', false, false, true, [
+                new Parameter('order[name]', 'query', '', false, false, true, [
                     'type' => 'string',
                     'enum' => ['asc', 'desc'],
                 ]),
@@ -562,12 +573,12 @@ class OpenApiFactoryTest extends TestCase
         ), $filteredPath->getGet());
 
         $paginatedPath = $paths->getPath('/paginated');
-        $this->assertEquals(new Model\Operation(
+        $this->assertEquals(new Operation(
             'paginatedDummyCollection',
             ['Dummy'],
             [
-                '200' => new Model\Response('Dummy collection', new \ArrayObject([
-                    'application/ld+json' => new Model\MediaType(new \ArrayObject([
+                '200' => new Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject([
                         'type' => 'array',
                         'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
                     ])),
@@ -577,17 +588,17 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
+                new Parameter('page', 'query', 'The collection page number', false, false, true, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
-                new Model\Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
                     'type' => 'integer',
                     'default' => 20,
                     'minimum' => 0,
                     'maximum' => 80,
                 ]),
-                new Model\Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
                     'type' => 'boolean',
                 ]),
             ]

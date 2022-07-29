@@ -28,6 +28,7 @@ use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -38,9 +39,9 @@ class ReadStageTest extends TestCase
     use ProphecyTrait;
 
     private ReadStage $readStage;
-    private $iriConverterProphecy;
-    private $providerProphecy;
-    private $serializerContextBuilderProphecy;
+    private ObjectProphecy $iriConverterProphecy;
+    private ObjectProphecy $providerProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}
@@ -72,7 +73,7 @@ class ReadStageTest extends TestCase
 
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     public function contextProvider(): array
@@ -115,7 +116,7 @@ class ReadStageTest extends TestCase
 
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     public function itemProvider(): array
@@ -165,7 +166,7 @@ class ReadStageTest extends TestCase
 
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     public function itemMutationOrSubscriptionProvider(): array
@@ -213,7 +214,7 @@ class ReadStageTest extends TestCase
 
         $result = ($this->readStage)($resourceClass, $rootClass, $operation, $context);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     public function testPreserveOrderOfOrderFiltersIfNested(): void

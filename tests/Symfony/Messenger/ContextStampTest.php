@@ -22,12 +22,12 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  */
 class ContextStampTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(StampInterface::class, new ContextStamp());
     }
 
-    public function testGetContext()
+    public function testGetContext(): void
     {
         $contextStamp = new ContextStamp();
         $this->assertIsArray($contextStamp->getContext());

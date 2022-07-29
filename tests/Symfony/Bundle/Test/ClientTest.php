@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Test;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Response;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Runner\Version;
 use Symfony\Component\HttpKernel\Profiler\Profile;
@@ -30,7 +31,7 @@ class ClientTest extends ApiTestCase
          * @var EntityManagerInterface
          */
         $manager = static::getContainer()->get('doctrine')->getManager();
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
+        /** @var ClassMetadata[] $classes */
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);
 
@@ -42,12 +43,12 @@ class ClientTest extends ApiTestCase
     {
         $client = self::createClient();
         $client->getKernelBrowser();
-        $this->assertSame(static::$kernel, $client->getKernel());
+        $this->assertEquals(static::$kernel, $client->getKernel());
 
         $client->enableProfiler();
         $response = $client->request('GET', '/');
 
-        $this->assertSame('/contexts/Entrypoint', $response->toArray()['@context']);
+        $this->assertEquals('/contexts/Entrypoint', $response->toArray()['@context']);
         $this->assertInstanceOf(Profile::class, $client->getProfile());
         $this->assertInstanceOf(Response::class, $response);
     }
@@ -65,10 +66,10 @@ class ClientTest extends ApiTestCase
             'body' => '{"name": "Kevin"}',
         ]);
         $server = $client->getKernelBrowser()->getInternalRequest()->getServer();
-        $this->assertSame('application/json', $server['CONTENT_TYPE']);
-        $this->assertSame('10.10.10.10', $server['REMOTE_ADDR']);
-        $this->assertSame('text/xml', $server['HTTP_ACCEPT']);
-        $this->assertSame('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertEquals('application/json', $server['CONTENT_TYPE']);
+        $this->assertEquals('10.10.10.10', $server['REMOTE_ADDR']);
+        $this->assertEquals('text/xml', $server['HTTP_ACCEPT']);
+        $this->assertEquals('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
         $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
         $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
     }
@@ -87,7 +88,7 @@ class ClientTest extends ApiTestCase
             'body' => '{"name": "Kevin"}',
         ]);
 
-        $this->assertSame('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertEquals('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
         $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
         $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
     }
@@ -102,7 +103,7 @@ class ClientTest extends ApiTestCase
         $client = self::createClient();
         $client->enableReboot();
         $response = $client->request('GET', '/secured_dummies', ['auth_basic' => $basic]);
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
         $this->assertResponseIsSuccessful();
     }
 

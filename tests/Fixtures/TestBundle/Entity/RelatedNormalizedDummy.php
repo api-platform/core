@@ -79,7 +79,7 @@ class RelatedNormalizedDummy
         return $this->customNormalizedDummy;
     }
 
-    public function setCustomNormalizedDummy($customNormalizedDummy): void
+    public function setCustomNormalizedDummy(Collection $customNormalizedDummy): void
     {
         $this->customNormalizedDummy = $customNormalizedDummy;
     }

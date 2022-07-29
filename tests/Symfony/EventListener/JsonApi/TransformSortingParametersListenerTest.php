@@ -26,14 +26,14 @@ class TransformSortingParametersListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $listener;
+    private TransformSortingParametersListener $listener;
 
     protected function setUp(): void
     {
         $this->listener = new TransformSortingParametersListener();
     }
 
-    public function testOnKernelRequestWithInvalidFormat()
+    public function testOnKernelRequestWithInvalidFormat(): void
     {
         $expectedRequest = new Request();
         $expectedRequest->setRequestFormat('badformat');
@@ -48,7 +48,7 @@ class TransformSortingParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidFilter()
+    public function testOnKernelRequestWithInvalidFilter(): void
     {
         $eventProphecy = $this->prophesize(RequestEvent::class);
 
@@ -70,7 +70,7 @@ class TransformSortingParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $request = new Request(['sort' => 'foo,-bar,-baz,qux']);
         $request->setRequestFormat('jsonapi');

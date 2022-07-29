@@ -123,7 +123,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
-        $this->assertSame('SELECT o FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o LEFT JOIN o.colors colors WHERE o IN(SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2 LEFT JOIN o_2.colors colors_2 WHERE o_2.colors = :foo)', $qb->getDQL());
+        $this->assertEquals('SELECT o FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o LEFT JOIN o.colors colors WHERE o IN(SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2 LEFT JOIN o_2.colors colors_2 WHERE o_2.colors = :foo)', $qb->getDQL());
     }
 
     public function testApplyCollectionWithManualJoin(): void
@@ -168,7 +168,7 @@ WHERE o IN(
 )
 SQL;
 
-        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testApplyCollectionCorrectlyReplacesJoinCondition(): void
@@ -208,7 +208,7 @@ WHERE o IN(
 )
 SQL;
 
-        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     /**
@@ -246,7 +246,7 @@ WHERE o IN(
 ) ORDER BY _o_dateCreated_null_rank DESC ASC
 SQL;
 
-        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testGroupBy(): void
@@ -285,7 +285,7 @@ GROUP BY o.colors HAVING counter > 3
 ORDER BY o.colors ASC
 SQL;
 
-        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testCompositeIdentifiers(): void
@@ -338,7 +338,7 @@ WHERE o.item IN(
 )
 SQL;
 
-        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testFetchEagerWithNoForceEager(): void
@@ -408,7 +408,7 @@ WHERE o.item IN(
 )
 DQL;
 
-        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testCompositeIdentifiersWithAssociation(): void
@@ -463,7 +463,7 @@ WHERE (o.item IN(
 ))
 SQL;
 
-        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testCompositeIdentifiersWithoutAssociation(): void
@@ -502,7 +502,7 @@ INNER JOIN o.compositeLabel label
 WHERE item.field1 = :foo AND o.bar = :bar
 SQL;
 
-        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testCompositeIdentifiersWithForeignIdentifiers(): void
@@ -541,7 +541,7 @@ WHERE o.id IN(
 )
 SQL;
 
-        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     private function toDQLString(string $dql): string

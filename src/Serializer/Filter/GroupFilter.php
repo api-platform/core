@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 final class GroupFilter implements FilterInterface
 {
-    public function __construct(private string $parameterName = 'groups', private readonly bool $overrideDefaultGroups = false, private readonly ?array $whitelist = null)
+    public function __construct(private readonly string $parameterName = 'groups', private readonly bool $overrideDefaultGroups = false, private readonly ?array $whitelist = null)
     {
     }
 

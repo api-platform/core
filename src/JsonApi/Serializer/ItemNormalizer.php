@@ -243,7 +243,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = []): bool
+    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
     {
         return preg_match('/^\\w[-\\w_]*$/', (string) $attribute) && parent::isAllowedAttribute($classOrObject, $attribute, $format, $context);
     }

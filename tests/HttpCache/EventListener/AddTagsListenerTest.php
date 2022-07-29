@@ -141,7 +141,7 @@ class AddTagsListenerTest extends TestCase
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertSame('/foo,/bar', $response->headers->get('Cache-Tags'));
+        $this->assertEquals('/foo,/bar', $response->headers->get('Cache-Tags'));
     }
 
     public function testAddCollectionIri(): void
@@ -164,7 +164,7 @@ class AddTagsListenerTest extends TestCase
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
+        $this->assertEquals('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
     }
 
     public function testAddCollectionIriWhenCollectionIsEmpty(): void
@@ -187,7 +187,7 @@ class AddTagsListenerTest extends TestCase
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertSame('/dummies', $response->headers->get('Cache-Tags'));
+        $this->assertEquals('/dummies', $response->headers->get('Cache-Tags'));
     }
 
     public function testAddTagsWithXKey(): void
@@ -217,7 +217,7 @@ class AddTagsListenerTest extends TestCase
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(), $purgerProphecy->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertSame('/foo /bar /dummies', $response->headers->get('xkey'));
+        $this->assertEquals('/foo /bar /dummies', $response->headers->get('xkey'));
     }
 
     public function testAddTagsWithoutHeader(): void

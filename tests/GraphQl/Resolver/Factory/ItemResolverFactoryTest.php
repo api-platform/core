@@ -23,6 +23,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -33,12 +34,12 @@ class ItemResolverFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $itemResolverFactory;
-    private $readStageProphecy;
-    private $securityStageProphecy;
-    private $securityPostDenormalizeStageProphecy;
-    private $serializeStageProphecy;
-    private $queryResolverLocatorProphecy;
+    private ItemResolverFactory $itemResolverFactory;
+    private ObjectProphecy $readStageProphecy;
+    private ObjectProphecy $securityStageProphecy;
+    private ObjectProphecy $securityPostDenormalizeStageProphecy;
+    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $queryResolverLocatorProphecy;
 
     /**
      * {@inheritdoc}
@@ -92,7 +93,7 @@ class ItemResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($readStageItem, $determinedResourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertSame($serializeStageData, ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertEquals($serializeStageData, ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function itemResourceProvider(): array
@@ -110,7 +111,7 @@ class ItemResolverFactoryTest extends TestCase
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $info->fieldName = 'nested';
 
-        $this->assertSame(['already_serialized'], ($this->itemResolverFactory)('resourceClass')($source, [], null, $info));
+        $this->assertEquals(['already_serialized'], ($this->itemResolverFactory)('resourceClass')($source, [], null, $info));
     }
 
     public function testResolveNestedNullValue(): void
@@ -215,7 +216,7 @@ class ItemResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($customItem, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertSame($serializeStageData, ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertEquals($serializeStageData, ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveCustomBadItem(): void

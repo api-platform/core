@@ -30,43 +30,37 @@ class ProcessorTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testPersist()
+    public function testPersist(): void
     {
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
-            return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
-        }))->willReturn(new Envelope($dummy))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
         $processor = new Processor($messageBus->reveal());
-        $this->assertSame($dummy, $processor->process($dummy, new Get()));
+        $this->assertEquals($dummy, $processor->process($dummy, new Get()));
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
 
-        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
-            return $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class);
-        }))->willReturn(new Envelope($dummy))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class)))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
         $processor = new Processor($messageBus->reveal());
         $processor->process($dummy, new Delete());
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
-            return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
-        }))->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
 
         $processor = new Processor($messageBus->reveal());
-        $this->assertSame($dummy, $processor->process($dummy, new Get()));
+        $this->assertEquals($dummy, $processor->process($dummy, new Get()));
     }
 }

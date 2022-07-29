@@ -43,8 +43,8 @@ class ConfiguredDocumentMetadataFactoryTest extends TestCase
         $configuredDocumentMetadata = (new ConfiguredDocumentMetadataFactory([Foo::class => ['index' => 'foo', 'type' => 'bar']], $decoratedProphecy->reveal()))->create(Foo::class);
 
         self::assertNotSame($originalDocumentMetadata, $configuredDocumentMetadata);
-        self::assertSame('foo', $configuredDocumentMetadata->getIndex());
-        self::assertSame('bar', $configuredDocumentMetadata->getType());
+        self::assertEquals('foo', $configuredDocumentMetadata->getIndex());
+        self::assertEquals('bar', $configuredDocumentMetadata->getType());
     }
 
     public function testCreateWithEmptyMapping(): void
@@ -56,7 +56,7 @@ class ConfiguredDocumentMetadataFactoryTest extends TestCase
 
         $configuredDocumentMetadata = (new ConfiguredDocumentMetadataFactory([], $decoratedProphecy->reveal()))->create(Foo::class);
 
-        self::assertSame($originalDocumentMetadata, $configuredDocumentMetadata);
+        self::assertEquals($originalDocumentMetadata, $configuredDocumentMetadata);
     }
 
     public function testCreateWithEmptyMappingAndNoParentDocumentMetadata(): void

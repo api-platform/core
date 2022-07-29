@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ReservedAttributeNameConverterTest extends TestCase
 {
-    private $reservedAttributeNameConverter;
+    private ReservedAttributeNameConverter $reservedAttributeNameConverter;
 
     protected function setUp(): void
     {
@@ -54,7 +54,7 @@ class ReservedAttributeNameConverterTest extends TestCase
      */
     public function testNormalize($propertyName, $expectedPropertyName): void
     {
-        $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->normalize($propertyName));
+        $this->assertEquals($expectedPropertyName, $this->reservedAttributeNameConverter->normalize($propertyName));
     }
 
     /**
@@ -65,6 +65,6 @@ class ReservedAttributeNameConverterTest extends TestCase
      */
     public function testDenormalize($expectedPropertyName, $propertyName): void
     {
-        $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->denormalize($propertyName));
+        $this->assertEquals($expectedPropertyName, $this->reservedAttributeNameConverter->denormalize($propertyName));
     }
 }

@@ -21,6 +21,7 @@ use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -32,7 +33,7 @@ class SecurityStageTest extends TestCase
     use ProphecyTrait;
 
     private SecurityStage $securityStage;
-    private $resourceAccessCheckerProphecy;
+    private ObjectProphecy $resourceAccessCheckerProphecy;
 
     /**
      * {@inheritdoc}

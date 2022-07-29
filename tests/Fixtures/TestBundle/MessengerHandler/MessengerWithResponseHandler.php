@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class MessengerWithResponseHandler implements MessageHandlerInterface
 {
-    public function __invoke(MessengerResponseInput $data)
+    public function __invoke(MessengerResponseInput $data): Response
     {
         $response = new Response();
         $response->setContent(json_encode([

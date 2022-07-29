@@ -34,20 +34,20 @@ class IdentifierTraitTest extends TestCase
     {
         $identifierTrait = $this->getIdentifierTraitImplementation();
 
-        $this->assertSame('foo', $identifierTrait->getIdentifierFromContext(['args' => ['id' => 'foo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false]));
+        $this->assertEquals('foo', $identifierTrait->getIdentifierFromContext(['args' => ['id' => 'foo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false]));
     }
 
     public function testGetIdentifierFromMutationContext(): void
     {
         $identifierTrait = $this->getIdentifierTraitImplementation();
 
-        $this->assertSame('foo', $identifierTrait->getIdentifierFromContext(['args' => ['input' => ['id' => 'foo']], 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false]));
+        $this->assertEquals('foo', $identifierTrait->getIdentifierFromContext(['args' => ['input' => ['id' => 'foo']], 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false]));
     }
 
     public function testGetIdentifierFromSubscriptionContext(): void
     {
         $identifierTrait = $this->getIdentifierTraitImplementation();
 
-        $this->assertSame('foo', $identifierTrait->getIdentifierFromContext(['args' => ['input' => ['id' => 'foo']], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]));
+        $this->assertEquals('foo', $identifierTrait->getIdentifierFromContext(['args' => ['input' => ['id' => 'foo']], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]));
     }
 }

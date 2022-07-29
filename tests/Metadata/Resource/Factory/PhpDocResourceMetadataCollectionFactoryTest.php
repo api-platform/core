@@ -34,7 +34,7 @@ class PhpDocResourceMetadataCollectionFactoryTest extends TestCase
         $decorated = $decoratedProphecy->reveal();
 
         $factory = new PhpDocResourceMetadataCollectionFactory($decorated);
-        $this->assertSame($resourceCollection[0], $factory->create('Foo')[0]);
+        $this->assertEquals($resourceCollection[0], $factory->create('Foo')[0]);
     }
 
     public function testNoDocBlock(): void
@@ -45,7 +45,7 @@ class PhpDocResourceMetadataCollectionFactoryTest extends TestCase
         $decorated = $decoratedProphecy->reveal();
 
         $factory = new PhpDocResourceMetadataCollectionFactory($decorated);
-        $this->assertSame($resourceCollection[0], $factory->create(ClassWithNoDocBlock::class)[0]);
+        $this->assertEquals($resourceCollection[0], $factory->create(ClassWithNoDocBlock::class)[0]);
     }
 
     public function testExtractDescription(): void
@@ -56,6 +56,6 @@ class PhpDocResourceMetadataCollectionFactoryTest extends TestCase
         $decorated = $decoratedProphecy->reveal();
 
         $factory = new PhpDocResourceMetadataCollectionFactory($decorated);
-        $this->assertSame('My dummy entity.', $factory->create(DummyEntity::class)[0]->getDescription());
+        $this->assertEquals('My dummy entity.', $factory->create(DummyEntity::class)[0]->getDescription());
     }
 }

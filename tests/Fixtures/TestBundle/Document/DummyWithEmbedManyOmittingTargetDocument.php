@@ -32,7 +32,7 @@ class DummyWithEmbedManyOmittingTargetDocument
      * @var EmbeddableDummy[]|Collection
      */
     #[ODM\EmbedMany]
-    private readonly array|Collection $embeddedDummies;
+    private array|Collection $embeddedDummies;
 
     public function __construct()
     {

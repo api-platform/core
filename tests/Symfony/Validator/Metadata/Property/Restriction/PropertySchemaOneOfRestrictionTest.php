@@ -32,7 +32,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaOneOfRestriction;
+    private PropertySchemaOneOfRestriction $propertySchemaOneOfRestriction;
 
     protected function setUp(): void
     {
@@ -47,7 +47,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
      */
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
-        self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->supports($constraint, $propertyMetadata));
+        self::assertEquals($expectedResult, $this->propertySchemaOneOfRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
@@ -69,7 +69,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
             self::markTestSkipped();
         }
 
-        self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
+        self::assertEquals($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
     }
 
     public function createProvider(): \Generator

@@ -27,6 +27,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -37,12 +38,12 @@ class SubscriptionManagerTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $subscriptionsCacheProphecy;
-    private $subscriptionIdentifierGeneratorProphecy;
-    private $serializeStageProphecy;
-    private $iriConverterProphecy;
-    private $subscriptionManager;
-    private $resourceMetadataCollectionFactory;
+    private ObjectProphecy $subscriptionsCacheProphecy;
+    private ObjectProphecy $subscriptionIdentifierGeneratorProphecy;
+    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $iriConverterProphecy;
+    private SubscriptionManager $subscriptionManager;
+    private ObjectProphecy $resourceMetadataCollectionFactory;
 
     /**
      * {@inheritdoc}
@@ -84,7 +85,7 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
-        $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, $result));
+        $this->assertEquals($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, $result));
     }
 
     public function testRetrieveSubscriptionIdHitNotCached(): void
@@ -109,7 +110,7 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
-        $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, $result));
+        $this->assertEquals($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, $result));
     }
 
     public function testRetrieveSubscriptionIdHitCached(): void
@@ -130,7 +131,7 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields)->shouldNotBeCalled();
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
 
-        $this->assertSame('subscriptionIdBar', $this->subscriptionManager->retrieveSubscriptionId($context, $result));
+        $this->assertEquals('subscriptionIdBar', $this->subscriptionManager->retrieveSubscriptionId($context, $result));
     }
 
     public function testRetrieveSubscriptionIdHitCachedDifferentFieldsOrder(): void
@@ -167,7 +168,7 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields)->shouldNotBeCalled();
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
 
-        $this->assertSame('subscriptionIdFoo', $this->subscriptionManager->retrieveSubscriptionId($context, $result));
+        $this->assertEquals('subscriptionIdFoo', $this->subscriptionManager->retrieveSubscriptionId($context, $result));
     }
 
     public function testGetPushPayloadsNoHit(): void
@@ -184,7 +185,7 @@ class SubscriptionManagerTest extends TestCase
         $cacheItemProphecy->isHit()->willReturn(false);
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn($cacheItemProphecy->reveal());
 
-        $this->assertSame([], $this->subscriptionManager->getPushPayloads($object));
+        $this->assertEquals([], $this->subscriptionManager->getPushPayloads($object));
     }
 
     public function testGetPushPayloadsHit(): void
@@ -208,6 +209,6 @@ class SubscriptionManagerTest extends TestCase
         $this->serializeStageProphecy->__invoke($object, Dummy::class, (new Subscription())->withName('update_subscription')->withShortName('Dummy'), ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['newResultFoo', 'clientSubscriptionId' => 'client-subscription-id']);
         $this->serializeStageProphecy->__invoke($object, Dummy::class, (new Subscription())->withName('update_subscription')->withShortName('Dummy'), ['fields' => ['fieldsBar'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['resultBar', 'clientSubscriptionId' => 'client-subscription-id']);
 
-        $this->assertSame([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object));
+        $this->assertEquals([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object));
     }
 }

@@ -33,6 +33,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -43,10 +44,10 @@ class WriteListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $processorProphecy;
-    private $iriConverterProphecy;
-    private $resourceMetadataCollectionFactory;
-    private $resourceClassResolver;
+    private ObjectProphecy $processorProphecy;
+    private ObjectProphecy $iriConverterProphecy;
+    private ObjectProphecy $resourceMetadataCollectionFactory;
+    private ObjectProphecy $resourceClassResolver;
 
     public static function noopProcessor($data)
     {
@@ -55,15 +56,13 @@ class WriteListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->processorProphecy = $this->prophesize(ProcessorInterface::class);
         $this->iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $this->resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
     }
 
-    public function testOnKernelViewWithControllerResultAndPersist()
+    public function testOnKernelViewWithControllerResultAndPersist(): void
     {
         $operationResource = new OperationResource(1, 'foo');
 
@@ -93,12 +92,12 @@ class WriteListenerTest extends TestCase
             $request->attributes->set('_api_operation_name', sprintf('_api_%s_%s%s', 'OperationResource', strtolower($httpMethod), 'POST' === $httpMethod ? '_collection' : ''));
 
             (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
-            $this->assertSame($operationResource, $event->getControllerResult());
+            $this->assertEquals($operationResource, $event->getControllerResult());
             $this->assertEquals('/operation_resources/1', $request->attributes->get('_api_write_item_iri'));
         }
     }
 
-    public function testOnKernelViewDoNotCallIriConverterWhenOutputClassDisabled()
+    public function testOnKernelViewDoNotCallIriConverterWhenOutputClassDisabled(): void
     {
         $operationResource = new OperationResource(1, 'foo');
 
@@ -126,7 +125,7 @@ class WriteListenerTest extends TestCase
         (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    public function testOnKernelViewWithControllerResultAndRemove()
+    public function testOnKernelViewWithControllerResultAndRemove(): void
     {
         $operationResource = new OperationResource(1, 'foo');
 
@@ -152,7 +151,7 @@ class WriteListenerTest extends TestCase
         (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    public function testOnKernelViewWithSafeMethod()
+    public function testOnKernelViewWithSafeMethod(): void
     {
         $operationResource = new OperationResource(1, 'foo');
         $operation = (new Get())->withName('_api_OperationResource_get');
@@ -180,7 +179,7 @@ class WriteListenerTest extends TestCase
         (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    public function testDoNotWriteWhenControllerResultIsResponse()
+    public function testDoNotWriteWhenControllerResultIsResponse(): void
     {
         $this->processorProphecy->process(Argument::cetera())->shouldNotBeCalled();
 
@@ -198,7 +197,7 @@ class WriteListenerTest extends TestCase
         (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    public function testDoNotWriteWhenCant()
+    public function testDoNotWriteWhenCant(): void
     {
         $operationResource = new OperationResource(1, 'foo');
 
@@ -223,7 +222,7 @@ class WriteListenerTest extends TestCase
         (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    public function testOnKernelViewWithNoResourceClass()
+    public function testOnKernelViewWithNoResourceClass(): void
     {
         $operationResource = new OperationResource(1, 'foo');
 
@@ -245,7 +244,7 @@ class WriteListenerTest extends TestCase
         (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    public function testOnKernelViewInvalidIdentifiers()
+    public function testOnKernelViewInvalidIdentifiers(): void
     {
         $attributeResource = new AttributeResource(1, 'name');
 

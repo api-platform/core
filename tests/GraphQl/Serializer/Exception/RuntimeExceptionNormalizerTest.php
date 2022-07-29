@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class RuntimeExceptionNormalizerTest extends TestCase
 {
-    private $runtimeExceptionNormalizer;
+    private RuntimeExceptionNormalizer $runtimeExceptionNormalizer;
 
     /**
      * {@inheritdoc}
@@ -39,8 +39,8 @@ class RuntimeExceptionNormalizerTest extends TestCase
         $error = new Error('test message', null, null, [], null, $exception);
 
         $normalizedError = $this->runtimeExceptionNormalizer->normalize($error);
-        $this->assertSame($exceptionMessage, $normalizedError['message']);
-        $this->assertSame(Error::CATEGORY_INTERNAL, $normalizedError['extensions']['category']);
+        $this->assertEquals($exceptionMessage, $normalizedError['message']);
+        $this->assertEquals(Error::CATEGORY_INTERNAL, $normalizedError['extensions']['category']);
     }
 
     public function testSupportsNormalization(): void

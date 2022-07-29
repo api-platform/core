@@ -29,16 +29,14 @@ class GraphQlTypePassTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $filterPass = new GraphQlTypePass();
 
         $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $typeLocatorDefinitionProphecy = $this->prophesize(Definition::class);
-        $typeLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
-            return !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference;
-        }))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $typeLocatorDefinitionProphecy->addArgument(Argument::that(fn (array $arg) => !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $typesFactoryDefinitionProphecy = $this->prophesize(Definition::class);
         $typesFactoryDefinitionProphecy->addArgument(['my_id'])->willReturn($typesFactoryDefinitionProphecy->reveal())->shouldBeCalled();
@@ -52,16 +50,14 @@ class GraphQlTypePassTest extends TestCase
         $filterPass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testIdNotExist()
+    public function testIdNotExist(): void
     {
         $filterPass = new GraphQlTypePass();
 
         $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $typeLocatorDefinitionProphecy = $this->prophesize(Definition::class);
-        $typeLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
-            return !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference;
-        }))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $typeLocatorDefinitionProphecy->addArgument(Argument::that(fn (array $arg) => !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $typesFactoryDefinitionProphecy = $this->prophesize(Definition::class);
         $typesFactoryDefinitionProphecy->addArgument(['bar'])->willReturn($typesFactoryDefinitionProphecy->reveal())->shouldBeCalled();
@@ -75,7 +71,7 @@ class GraphQlTypePassTest extends TestCase
         $filterPass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testDisabled()
+    public function testDisabled(): void
     {
         $filterPass = new GraphQlTypePass();
 

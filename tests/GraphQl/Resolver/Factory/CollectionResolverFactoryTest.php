@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,13 +36,13 @@ class CollectionResolverFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $collectionResolverFactory;
-    private $readStageProphecy;
-    private $securityStageProphecy;
-    private $securityPostDenormalizeStageProphecy;
-    private $serializeStageProphecy;
-    private $queryResolverLocatorProphecy;
-    private $requestStackProphecy;
+    private CollectionResolverFactory $collectionResolverFactory;
+    private ObjectProphecy $readStageProphecy;
+    private ObjectProphecy $securityStageProphecy;
+    private ObjectProphecy $securityPostDenormalizeStageProphecy;
+    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $queryResolverLocatorProphecy;
+    private ObjectProphecy $requestStackProphecy;
 
     /**
      * {@inheritdoc}
@@ -102,7 +103,7 @@ class CollectionResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($readStageCollection, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertSame($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertEquals($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveFieldNotInSource(): void
@@ -172,7 +173,7 @@ class CollectionResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($readStageCollection, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertSame($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertEquals($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveNullResourceClass(): void
@@ -254,6 +255,6 @@ class CollectionResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($customCollection, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertSame($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertEquals($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 }

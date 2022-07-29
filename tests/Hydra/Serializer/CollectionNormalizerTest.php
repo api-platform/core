@@ -367,7 +367,7 @@ class CollectionNormalizerTest extends TestCase
             'resource_class' => Foo::class,
         ]);
 
-        $this->assertSame([
+        $this->assertEquals([
             '@context' => '/contexts/Foo',
             '@id' => '/foos',
             '@type' => 'hydra:Collection',
@@ -420,7 +420,7 @@ class CollectionNormalizerTest extends TestCase
             'resource_class' => Foo::class,
         ]);
 
-        $this->assertSame([
+        $this->assertEquals([
             '@context' => [
                 '@vocab' => 'http://localhost:8080/docs.jsonld#',
                 'hydra' => 'http://www.w3.org/ns/hydra/core#',

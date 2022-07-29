@@ -55,41 +55,29 @@ class FieldsBuilderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ObjectProphecy */
-    private $propertyNameCollectionFactoryProphecy;
+    private ObjectProphecy $propertyNameCollectionFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $propertyMetadataFactoryProphecy;
+    private ObjectProphecy $propertyMetadataFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $resourceMetadataCollectionFactoryProphecy;
+    private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $typesContainerProphecy;
+    private ObjectProphecy $typesContainerProphecy;
 
-    /** @var ObjectProphecy */
-    private $typeBuilderProphecy;
+    private ObjectProphecy $typeBuilderProphecy;
 
-    /** @var ObjectProphecy */
-    private $typeConverterProphecy;
+    private ObjectProphecy $typeConverterProphecy;
 
-    /** @var ObjectProphecy */
-    private $itemResolverFactoryProphecy;
+    private ObjectProphecy $itemResolverFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $collectionResolverFactoryProphecy;
+    private ObjectProphecy $collectionResolverFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $itemMutationResolverFactoryProphecy;
+    private ObjectProphecy $itemMutationResolverFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $itemSubscriptionResolverFactoryProphecy;
+    private ObjectProphecy $itemSubscriptionResolverFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $filterLocatorProphecy;
+    private ObjectProphecy $filterLocatorProphecy;
 
-    /** @var ObjectProphecy */
-    private $resourceClassResolverProphecy;
+    private ObjectProphecy $resourceClassResolverProphecy;
 
     private FieldsBuilder $fieldsBuilder;
 
@@ -132,14 +120,14 @@ class FieldsBuilderTest extends TestCase
         $this->assertArrayHasKey('args', $nodeQueryFields);
         $this->assertArrayHasKey('resolve', $nodeQueryFields);
 
-        $this->assertSame($nodeInterfaceType, $nodeQueryFields['type']);
+        $this->assertEquals($nodeInterfaceType, $nodeQueryFields['type']);
         $this->assertArrayHasKey('id', $nodeQueryFields['args']);
         $this->assertArrayHasKey('type', $nodeQueryFields['args']['id']);
         $this->assertInstanceOf(NonNull::class, $nodeQueryFields['args']['id']['type']);
         /** @var NonNull $idType */
         $idType = $nodeQueryFields['args']['id']['type'];
-        $this->assertSame(GraphQLType::id(), $idType->getWrappedType());
-        $this->assertSame($itemResolver, $nodeQueryFields['resolve']);
+        $this->assertEquals(GraphQLType::id(), $idType->getWrappedType());
+        $this->assertEquals($itemResolver, $nodeQueryFields['resolve']);
     }
 
     /**
@@ -844,7 +832,7 @@ class FieldsBuilderTest extends TestCase
         $operation = (new Query())->withName('operation')->withShortName('shortName');
         $args = $this->fieldsBuilder->resolveResourceArgs($args, $operation);
 
-        $this->assertSame($expectedResolvedArgs, $args);
+        $this->assertEquals($expectedResolvedArgs, $args);
     }
 
     public function resolveResourceArgsProvider(): array

@@ -23,7 +23,7 @@ class VoDummyDriver
 {
     use VoDummyIdAwareTrait;
 
-    public function __construct(#[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $firstName, #[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $lastName)
+    public function __construct(#[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $firstName, #[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $lastName)
     {
     }
 

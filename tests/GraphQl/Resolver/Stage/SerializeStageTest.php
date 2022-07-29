@@ -30,6 +30,7 @@ use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -39,8 +40,8 @@ class SerializeStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $normalizerProphecy;
-    private $serializerContextBuilderProphecy;
+    private ObjectProphecy $normalizerProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}
@@ -63,7 +64,7 @@ class SerializeStageTest extends TestCase
 
         $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operation, $context);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     public function applyDisabledProvider(): array
@@ -104,7 +105,7 @@ class SerializeStageTest extends TestCase
 
         $result = ($this->createSerializeStage($paginationEnabled))($itemOrCollection, $resourceClass, $operation, $context);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     public function applyProvider(): array
@@ -153,7 +154,7 @@ class SerializeStageTest extends TestCase
 
         $result = ($this->createSerializeStage(true))($collection, $resourceClass, $operation, $context);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     public function applyCollectionWithPaginationProvider(): array

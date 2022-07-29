@@ -65,11 +65,11 @@ final class EntrypointAction
             $executionResult = $this->executor
                 ->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operationName)
                 ->setErrorsHandler($this->errorHandler)
-                ->setErrorFormatter([$this->normalizer, 'normalize']);
+                ->setErrorFormatter($this->normalizer->normalize(...));
         } catch (\Exception $exception) {
             $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, [], null, $exception)]))
                 ->setErrorsHandler($this->errorHandler)
-                ->setErrorFormatter([$this->normalizer, 'normalize']);
+                ->setErrorFormatter($this->normalizer->normalize(...));
         }
 
         return new JsonResponse($executionResult->toArray($this->debug));
