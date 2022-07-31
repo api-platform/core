@@ -32,6 +32,7 @@ use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -41,6 +42,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -499,6 +501,34 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.graphql.type');
         $container->registerForAutoconfiguration(ErrorHandlerInterface::class)
             ->addTag('api_platform.graphql.error_handler');
+
+        if (!$container->getParameter('kernel.debug')) {
+            return;
+        }
+
+        $requestStack = new Reference('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $collectionDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
+            ->setDecoratedService('api_platform.graphql.resolver.factory.collection')
+            ->setArguments([new Reference('api_platform.graphql.data_collector.resolver.factory.collection.inner'), $requestStack]);
+
+        $itemDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
+            ->setDecoratedService('api_platform.graphql.resolver.factory.item')
+            ->setArguments([new Reference('api_platform.graphql.data_collector.resolver.factory.item.inner'), $requestStack]);
+
+        $itemMutationDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
+            ->setDecoratedService('api_platform.graphql.resolver.factory.item_mutation')
+            ->setArguments([new Reference('api_platform.graphql.data_collector.resolver.factory.item_mutation.inner'), $requestStack]);
+
+        $itemSubscriptionDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
+            ->setDecoratedService('api_platform.graphql.resolver.factory.item_subscription')
+            ->setArguments([new Reference('api_platform.graphql.data_collector.resolver.factory.item_subscription.inner'), $requestStack]);
+
+        $container->addDefinitions([
+            'api_platform.graphql.data_collector.resolver.factory.collection' => $collectionDataCollectorResolverFactory,
+            'api_platform.graphql.data_collector.resolver.factory.item' => $itemDataCollectorResolverFactory,
+            'api_platform.graphql.data_collector.resolver.factory.item_mutation' => $itemMutationDataCollectorResolverFactory,
+            'api_platform.graphql.data_collector.resolver.factory.item_subscription' => $itemSubscriptionDataCollectorResolverFactory,
+        ]);
     }
 
     private function registerCacheConfiguration(ContainerBuilder $container): void

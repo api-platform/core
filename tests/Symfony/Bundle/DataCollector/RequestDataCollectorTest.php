@@ -73,11 +73,8 @@ class RequestDataCollectorTest extends TestCase
         );
 
         $this->assertEquals([], $dataCollector->getRequestAttributes());
-        $this->assertEquals([], $dataCollector->getFilters());
-        $this->assertEquals(['ignored_filters' => 0], $dataCollector->getCounters());
         $this->assertEquals(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
-        $this->assertNull($dataCollector->getResourceClass());
-        $this->assertEmpty($dataCollector->getResourceMetadataCollection()->getValue());
+        $this->assertEquals([], $dataCollector->getResources());
     }
 
     public function testNotCallingCollect(): void
@@ -92,10 +89,7 @@ class RequestDataCollectorTest extends TestCase
 
         $this->assertEquals([], $dataCollector->getRequestAttributes());
         $this->assertEquals([], $dataCollector->getAcceptableContentTypes());
-        $this->assertEquals([], $dataCollector->getFilters());
-        $this->assertEquals([], $dataCollector->getCounters());
-        $this->assertNull($dataCollector->getResourceClass());
-        $this->assertNull($dataCollector->getResourceMetadataCollection());
+        $this->assertEquals([], $dataCollector->getResources());
     }
 
     public function testWithResource(): void
@@ -126,10 +120,12 @@ class RequestDataCollectorTest extends TestCase
             'persist' => true,
         ], $dataCollector->getRequestAttributes());
         $this->assertEquals(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
-        $this->assertSame(DummyEntity::class, $dataCollector->getResourceClass());
-        $this->assertEquals([['foo' => null, 'a_filter' => \stdClass::class]], $dataCollector->getFilters());
-        $this->assertEquals(['ignored_filters' => 1], $dataCollector->getCounters());
-        $this->assertInstanceOf(Data::class, $dataCollector->getResourceMetadataCollection());
+
+        $resource = $dataCollector->getResources()[0];
+        $this->assertSame(DummyEntity::class, $resource->getResourceClass());
+        $this->assertEquals([['foo' => null, 'a_filter' => \stdClass::class]], $resource->getFilters());
+        $this->assertEquals(['ignored_filters' => 1], $resource->getCounters());
+        $this->assertInstanceOf(Data::class, $resource->getResourceMetadataCollection());
     }
 
     public function testWithResourceWithTraceables(): void
@@ -199,7 +195,8 @@ class RequestDataCollectorTest extends TestCase
     private function apiResourceClassWillReturn(?string $data, array $context = []): void
     {
         $this->attributes->get('_api_resource_class')->shouldBeCalled()->willReturn($data);
-        $this->attributes->all()->shouldBeCalled()->willReturn([
+        $this->attributes->get('_graphql', false)->shouldBeCalled()->willReturn(false);
+        $this->attributes->all()->willReturn([
             '_api_resource_class' => $data,
         ] + $context);
         $this->request->attributes = $this->attributes->reveal();
