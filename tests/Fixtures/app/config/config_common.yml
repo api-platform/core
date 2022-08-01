@@ -113,6 +113,10 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyExceptionToStatusProvider:
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
     # related_questions.state_provider:
     #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelatedQuestionsProvider'
     #     public: false

@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as LegacyExceptionListener;
 
 /**
