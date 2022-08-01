@@ -75,8 +75,6 @@
             <argument type="service" id="api_platform.pagination_options" />
             <argument type="service" id="api_platform.router" />
         </service>
-
-        <service id="ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface" alias="api_platform.openapi.factory" />
     </services>
 
 </container>
