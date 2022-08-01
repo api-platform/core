@@ -17,7 +17,6 @@ use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Documentation\DocumentationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
-use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -31,7 +30,7 @@ final class DocumentationAction
     private string $title;
     private string $description;
     private string $version;
-    private OpenApiFactoryInterface $openApiFactory;
+    private OpenApiFactoryInterface|null $openApiFactory;
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', OpenApiFactoryInterface $openApiFactory = null)
     {
@@ -50,8 +49,6 @@ final class DocumentationAction
                 $context['api_gateway'] = true;
             }
             $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
-
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
         }
 
         if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory) {
