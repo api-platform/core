@@ -127,6 +127,13 @@ final class TypeFactory implements TypeFactoryInterface
             ];
         }
 
+        if (is_a($className, \BackedEnum::class, true)) {
+            return [
+                'type' => 'string',
+                'format' => 'enum',
+            ];
+        }        
+        
         // Skip if $schema is null (filters only support basic types)
         if (null === $schema) {
             return ['type' => 'string'];
