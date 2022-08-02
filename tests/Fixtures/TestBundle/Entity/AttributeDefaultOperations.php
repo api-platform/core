@@ -19,16 +19,16 @@ use ApiPlatform\Metadata\ApiResource;
 #[ApiResource(paginationItemsPerPage: 10, graphQlOperations: [], cacheHeaders: ['shared_max_age' => 60])]
 final class AttributeDefaultOperations
 {
-    public function __construct(#[ApiProperty(identifier: true)] private readonly int $identifier, private readonly string $name)
+    public function __construct(#[ApiProperty(identifier: true)] private int $identifier, private string $name)
     {
     }
 
-    public function getIdentifier()
+    public function getIdentifier(): int
     {
         return $this->identifier;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

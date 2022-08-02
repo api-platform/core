@@ -29,7 +29,7 @@ final class GraphQlMutationResolverPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->getParameter('api_platform.graphql.enabled')) {
             return;

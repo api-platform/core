@@ -43,7 +43,7 @@ class AddLinkHeaderListenerTest extends TestCase
     /**
      * @dataProvider addProvider
      */
-    public function testAddLinkHeader(string $expected, Request $request)
+    public function testAddLinkHeader(string $expected, Request $request): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
@@ -83,7 +83,7 @@ class AddLinkHeaderListenerTest extends TestCase
     /**
      * @dataProvider doNotAddProvider
      */
-    public function testDoNotAddHeader(Request $request)
+    public function testDoNotAddHeader(Request $request): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [

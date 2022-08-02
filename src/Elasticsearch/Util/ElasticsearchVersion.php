@@ -17,7 +17,7 @@ use Elasticsearch\Client;
 
 class ElasticsearchVersion
 {
-    public const REGEX_PATTERN = '/\d(.*)/';
+    final public const REGEX_PATTERN = '/\d(.*)/';
 
     /**
      * Detect whether the current ES version supports passing mapping type as a search parameter.

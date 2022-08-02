@@ -50,20 +50,17 @@ class EmbeddedDummy
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Assert\DateTime]
-    public $dummyDate;
-    /**
-     * @var EmbeddableDummy
-     */
+    public ?\DateTime $dummyDate = null;
     #[ORM\Embedded(class: EmbeddableDummy::class)]
     #[Groups(['embed'])]
-    public $embeddedDummy;
+    public ?EmbeddableDummy $embeddedDummy = null;
     /**
      * @var RelatedDummy|null A related dummy
      */
     #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
-    public $relatedDummy;
+    public ?RelatedDummy $relatedDummy = null;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -72,7 +69,7 @@ class EmbeddedDummy
         $this->embeddedDummy = new EmbeddableDummy();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -82,7 +79,7 @@ class EmbeddedDummy
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -92,7 +89,7 @@ class EmbeddedDummy
         return $this->embeddedDummy;
     }
 
-    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
+    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy): void
     {
         $this->embeddedDummy = $embeddedDummy;
     }
@@ -102,7 +99,7 @@ class EmbeddedDummy
         return $this->dummyDate;
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate): void
     {
         $this->dummyDate = $dummyDate;
     }
@@ -112,7 +109,7 @@ class EmbeddedDummy
         return $this->relatedDummy;
     }
 
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }

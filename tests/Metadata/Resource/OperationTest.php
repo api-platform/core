@@ -30,19 +30,19 @@ use PHPUnit\Framework\TestCase;
 
 final class OperationTest extends TestCase
 {
-    public function testWithResourceTrait()
+    public function testWithResourceTrait(): void
     {
         $operation = (new GetCollection())->withOperation((new HttpOperation())->withShortName('test')->withRead(false));
 
-        $this->assertEquals($operation->getShortName(), 'test');
-        $this->assertEquals($operation->canRead(), false);
-        $this->assertEquals($operation instanceof CollectionOperationInterface, true);
+        $this->assertSame($operation->getShortName(), 'test');
+        $this->assertSame($operation->canRead(), false);
+        $this->assertSame($operation instanceof CollectionOperationInterface, true);
     }
 
     /**
      * @dataProvider operationProvider
      */
-    public function testOperationConstructor(Operation $operation)
+    public function testOperationConstructor(Operation $operation): void
     {
         $this->assertInstanceOf(Operation::class, $operation);
     }

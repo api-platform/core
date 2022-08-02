@@ -23,14 +23,11 @@ final class RemoveProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
 
-    private ManagerRegistry $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry)
     {
-        $this->managerRegistry = $managerRegistry;
     }
 
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
         if (!$manager = $this->getManager($data)) {
             return;

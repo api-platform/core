@@ -30,7 +30,7 @@ trait ExistsFilterTrait
     /**
      * @var string Keyword used to retrieve the value
      */
-    private string $existsParameterName;
+    private readonly string $existsParameterName;
 
     /**
      * {@inheritdoc}

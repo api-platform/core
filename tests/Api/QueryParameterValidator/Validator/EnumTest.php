@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class EnumTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $filter = new Enum();
 
@@ -30,7 +30,7 @@ class EnumTest extends TestCase
         );
     }
 
-    public function testEmptyQueryParameter()
+    public function testEmptyQueryParameter(): void
     {
         $filter = new Enum();
 
@@ -39,7 +39,7 @@ class EnumTest extends TestCase
         );
     }
 
-    public function testNonMatchingParameter()
+    public function testNonMatchingParameter(): void
     {
         $filter = new Enum();
 
@@ -55,7 +55,7 @@ class EnumTest extends TestCase
         );
     }
 
-    public function testMatchingParameter()
+    public function testMatchingParameter(): void
     {
         $filter = new Enum();
 

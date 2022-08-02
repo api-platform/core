@@ -59,33 +59,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
 ])]
 class DummyCustomMutation
 {
-    /**
-     * @var int|null
-     */
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private ?int $id = null;
 
-    /**
-     * @var int|null
-     */
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $operandA;
+    private ?int $operandA = null;
 
-    /**
-     * @var int|null
-     */
     #[Groups(['sum'])]
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $operandB;
+    private ?int $operandB = null;
 
-    /**
-     * @var int|null
-     */
     #[Groups(['result'])]
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $result;
+    private ?int $result = null;
 
     public function getId(): ?int
     {

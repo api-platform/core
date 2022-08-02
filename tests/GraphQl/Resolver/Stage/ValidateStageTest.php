@@ -22,6 +22,7 @@ use ApiPlatform\Validator\ValidatorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -30,9 +31,8 @@ class ValidateStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ValidateStage */
-    private $validateStage;
-    private $validatorProphecy;
+    private ValidateStage $validateStage;
+    private ObjectProphecy $validatorProphecy;
 
     /**
      * {@inheritdoc}

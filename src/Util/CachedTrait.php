@@ -33,7 +33,7 @@ trait CachedTrait
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-        } catch (CacheException $e) {
+        } catch (CacheException) {
             return $this->localCache[$cacheKey] = $getValue();
         }
 

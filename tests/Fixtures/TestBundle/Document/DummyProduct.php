@@ -38,14 +38,14 @@ class DummyProduct
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     #[ODM\ReferenceMany(targetDocument: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
-    private \Doctrine\Common\Collections\Collection $offers;
+    private Collection|iterable $offers;
     /**
      * @var string The tour name
      */
     #[ODM\Field]
-    private $name;
+    private string $name;
     #[ODM\ReferenceMany(targetDocument: self::class, mappedBy: 'parent')]
-    private \Doctrine\Common\Collections\Collection $relatedProducts;
+    private Collection|iterable $relatedProducts;
     #[ODM\ReferenceOne(targetDocument: self::class, inversedBy: 'relatedProducts')]
     private $parent;
 
@@ -55,23 +55,23 @@ class DummyProduct
         $this->relatedProducts = new ArrayCollection();
     }
 
-    public function getOffers(): Collection
+    public function getOffers(): Collection|iterable
     {
         return $this->offers;
     }
 
-    public function setOffers($offers)
+    public function setOffers(Collection|iterable $offers): void
     {
         $this->offers = $offers;
     }
 
-    public function addOffer(DummyAggregateOffer $offer)
+    public function addOffer(DummyAggregateOffer $offer): void
     {
         $this->offers->add($offer);
         $offer->setProduct($this);
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -81,22 +81,22 @@ class DummyProduct
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    public function getRelatedProducts(): Collection
+    public function getRelatedProducts(): Collection|iterable
     {
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(iterable $relatedProducts): void
+    public function setRelatedProducts(Collection|iterable $relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }
 
-    public function addRelatedProduct(self $relatedProduct)
+    public function addRelatedProduct(self $relatedProduct): void
     {
         $this->relatedProducts->add($relatedProduct);
         $relatedProduct->setParent($this);
@@ -107,7 +107,7 @@ class DummyProduct
         return $this->parent;
     }
 
-    public function setParent(self $product)
+    public function setParent(self $product): void
     {
         $this->parent = $product;
     }

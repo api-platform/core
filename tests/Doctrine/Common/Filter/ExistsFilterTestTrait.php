@@ -18,7 +18,7 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait ExistsFilterTestTrait
 {
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = $filter = $this->buildFilter(['name' => null, 'description' => null]);
 

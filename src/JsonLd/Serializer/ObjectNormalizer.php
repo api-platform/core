@@ -29,21 +29,14 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     public const FORMAT = 'jsonld';
 
-    private $decorated;
-    private $iriConverter;
-    private $anonymousContextBuilder;
-
-    public function __construct(NormalizerInterface $decorated, IriConverterInterface $iriConverter, AnonymousContextBuilderInterface $anonymousContextBuilder)
+    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter, private AnonymousContextBuilderInterface $anonymousContextBuilder)
     {
-        $this->decorated = $decorated;
-        $this->iriConverter = $iriConverter;
-        $this->anonymousContextBuilder = $anonymousContextBuilder;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $this->decorated->supportsNormalization($data, $format, $context);
     }
@@ -58,10 +51,8 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];
@@ -88,7 +79,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         if (isset($originalResource)) {
             try {
                 $context['output']['iri'] = $this->iriConverter->getIriFromResource($originalResource);
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException) {
                 // The original resource has no identifiers
             }
             $context['api_resource'] = $originalResource;

@@ -30,7 +30,7 @@ trait CloneTrait
 
         try {
             return (new \ReflectionClass($data))->isCloneable() ? clone $data : null;
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             return null;
         }
     }

@@ -27,11 +27,9 @@ trait AttributeFilterExtractorTrait
     /**
      * Filters annotations to get back only ApiFilter annotations.
      *
-     * @param \ReflectionClass|\ReflectionProperty $reflector
-     *
      * @return \Iterator only ApiFilter annotations
      */
-    private function getFilterAttributes(\Reflector $reflector): \Iterator
+    private function getFilterAttributes(\ReflectionClass|\ReflectionProperty $reflector): \Iterator
     {
         $attributes = $reflector->getAttributes(ApiFilter::class);
 

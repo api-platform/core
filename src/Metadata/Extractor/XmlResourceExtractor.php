@@ -42,7 +42,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             // Ensure it's not a resource
             try {
                 simplexml_import_dom(XmlUtils::loadFile($path, XmlPropertyExtractor::SCHEMA));
-            } catch (\InvalidArgumentException $error) {
+            } catch (\InvalidArgumentException) {
                 throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
             }
 
@@ -161,7 +161,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         $uriVariables = [];
         foreach ($resource->uriVariables->uriVariable as $data) {
             $parameterName = (string) $data['parameterName'];
-            if (1 === \count($data->attributes())) {
+            if (1 === (null === $data->attributes() ? 0 : \count($data->attributes()))) {
                 $uriVariables[$parameterName] = $parameterName;
                 continue;
             }

@@ -29,15 +29,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     public const API_GATEWAY = 'api_gateway';
-
-    private $documentationNormalizer;
-    private $defaultContext = [
+    private array $defaultContext = [
         self::API_GATEWAY => false,
     ];
 
-    public function __construct(NormalizerInterface $documentationNormalizer, $defaultContext = [])
+    public function __construct(private readonly NormalizerInterface $documentationNormalizer, $defaultContext = [])
     {
-        $this->documentationNormalizer = $documentationNormalizer;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
@@ -45,10 +42,8 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
      * {@inheritdoc}
      *
      * @throws UnexpectedValueException
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
         if (!\is_array($data)) {
@@ -67,7 +62,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
             foreach ($operations as $operation => $options) {
                 if (isset($options['parameters'])) {
                     foreach ($options['parameters'] as $key => $parameter) {
-                        if (!preg_match('/^[a-zA-Z0-9._$-]+$/', $parameter['name'])) {
+                        if (!preg_match('/^[a-zA-Z0-9._$-]+$/', (string) $parameter['name'])) {
                             unset($data['paths'][$path][$operation]['parameters'][$key]);
                         }
                         if (isset($parameter['schema']['$ref']) && $this->isLocalRef($parameter['schema']['$ref'])) {
@@ -120,7 +115,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $this->documentationNormalizer->supportsNormalization($data, $format);
     }
@@ -135,7 +130,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
 
     private function isLocalRef(string $ref): bool
     {
-        return '#/' === substr($ref, 0, 2);
+        return str_starts_with($ref, '#/');
     }
 
     private function normalizeRef(string $ref): string

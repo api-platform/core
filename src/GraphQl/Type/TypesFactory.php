@@ -23,16 +23,11 @@ use Psr\Container\ContainerInterface;
  */
 final class TypesFactory implements TypesFactoryInterface
 {
-    private $typeLocator;
-    private $typeIds;
-
     /**
      * @param string[] $typeIds
      */
-    public function __construct(ContainerInterface $typeLocator, array $typeIds)
+    public function __construct(private readonly ContainerInterface $typeLocator, private readonly array $typeIds)
     {
-        $this->typeLocator = $typeLocator;
-        $this->typeIds = $typeIds;
     }
 
     public function getTypes(): array

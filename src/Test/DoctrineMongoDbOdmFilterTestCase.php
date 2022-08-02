@@ -75,7 +75,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
         $pipeline = [];
         try {
             $pipeline = $aggregationBuilder->getPipeline();
-        } catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException) {
         }
 
         $this->assertEquals($expectedPipeline, $pipeline);

@@ -41,13 +41,13 @@ final class ReflectionClassRecursiveIterator
             foreach ($iterator as $file) {
                 $sourceFile = $file[0];
 
-                if (!preg_match('(^phar:)i', $sourceFile)) {
+                if (!preg_match('(^phar:)i', (string) $sourceFile)) {
                     $sourceFile = realpath($sourceFile);
                 }
 
                 try {
                     require_once $sourceFile;
-                } catch (\Throwable $t) {
+                } catch (\Throwable) {
                     // invalid PHP file (example: missing parent class)
                     continue;
                 }
@@ -60,7 +60,7 @@ final class ReflectionClassRecursiveIterator
         sort($sortedClasses);
         $sortedInterfaces = get_declared_interfaces();
         sort($sortedInterfaces);
-        $declared = array_merge($sortedClasses, $sortedInterfaces);
+        $declared = [...$sortedClasses, ...$sortedInterfaces];
         foreach ($declared as $className) {
             $reflectionClass = new \ReflectionClass($className);
             $sourceFile = $reflectionClass->getFileName();

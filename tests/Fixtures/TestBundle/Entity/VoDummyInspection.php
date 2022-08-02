@@ -24,39 +24,26 @@ class VoDummyInspection
 {
     use VoDummyIdAwareTrait;
 
-    #[ORM\Column(type: 'boolean')]
-    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
-    private bool $accepted;
-
-    #[ORM\ManyToOne(targetEntity: VoDummyCar::class, inversedBy: 'inspections')]
-    #[Groups(['inspection_read', 'inspection_write'])]
-    private ?VoDummyCar $car;
-
     #[ORM\Column(type: 'datetime')]
     #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
     private \DateTime $performed;
 
-    private $attributeWithoutConstructorEquivalent;
-
-    public function __construct(bool $accepted, VoDummyCar $car, DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
+    public function __construct(#[ORM\Column(type: 'boolean')] #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private bool $accepted, #[ORM\ManyToOne(targetEntity: VoDummyCar::class, inversedBy: 'inspections')] #[Groups(['inspection_read', 'inspection_write'])] private ?VoDummyCar $car, DateTime $performed = null, private string $attributeWithoutConstructorEquivalent = '')
     {
-        $this->accepted = $accepted;
-        $this->car = $car;
         $this->performed = $performed ?: new DateTime();
-        $this->attributeWithoutConstructorEquivalent = $parameterWhichIsNotClassAttribute;
     }
 
-    public function isAccepted()
+    public function isAccepted(): bool
     {
         return $this->accepted;
     }
 
-    public function getCar()
+    public function getCar(): ?VoDummyCar
     {
         return $this->car;
     }
 
-    public function getPerformed()
+    public function getPerformed(): DateTime
     {
         return $this->performed;
     }

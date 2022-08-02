@@ -28,6 +28,8 @@ use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Andx;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -89,7 +91,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
 
         $qb = $this->prophesize(QueryBuilder::class);
-        $qb->getDQLPart('where')->shouldBeCalled()->willReturn(new Expr\Andx());
+        $qb->getDQLPart('where')->shouldBeCalled()->willReturn(new Andx());
         $qb->getDQLPart('join')->shouldBeCalled()->willReturn(null);
         $qb->getRootAliases()->shouldBeCalled()->willReturn(['o']);
         $qb->getEntityManager()->willReturn($em);
@@ -121,7 +123,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
-        $this->assertEquals('SELECT o FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o LEFT JOIN o.colors colors WHERE o IN(SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2 LEFT JOIN o_2.colors colors_2 WHERE o_2.colors = :foo)', $qb->getDQL());
+        $this->assertSame('SELECT o FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o LEFT JOIN o.colors colors WHERE o IN(SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2 LEFT JOIN o_2.colors colors_2 WHERE o_2.colors = :foo)', $qb->getDQL());
     }
 
     public function testApplyCollectionWithManualJoin(): void
@@ -138,7 +140,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $qb->select('o')
             ->from(DummyCar::class, 'o')
             ->leftJoin('o.colors', 'colors')
-            ->join(DummyTravel::class, 't_a3', Expr\Join::WITH, 'o.id = t_a3.car AND t_a3.passenger = :user')
+            ->join(DummyTravel::class, 't_a3', Join::WITH, 'o.id = t_a3.car AND t_a3.passenger = :user')
             ->where('o.colors = :foo')
             ->andwhere('t_a3.confirmed = :confirmation')
             ->setParameter('foo', 1)
@@ -166,7 +168,7 @@ WHERE o IN(
 )
 SQL;
 
-        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testApplyCollectionCorrectlyReplacesJoinCondition(): void
@@ -206,7 +208,7 @@ WHERE o IN(
 )
 SQL;
 
-        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
 
     /**
@@ -244,7 +246,7 @@ WHERE o IN(
 ) ORDER BY _o_dateCreated_null_rank DESC ASC
 SQL;
 
-        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testGroupBy(): void
@@ -283,7 +285,7 @@ GROUP BY o.colors HAVING counter > 3
 ORDER BY o.colors ASC
 SQL;
 
-        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testCompositeIdentifiers(): void
@@ -336,7 +338,7 @@ WHERE o.item IN(
 )
 SQL;
 
-        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testFetchEagerWithNoForceEager(): void
@@ -355,8 +357,8 @@ SQL;
 
         $qb = new QueryBuilder($em->reveal());
 
-        $carJoin = new Expr\Join(
-            Expr\Join::LEFT_JOIN,
+        $carJoin = new Join(
+            Join::LEFT_JOIN,
             DummyCar::class,
             'car',
             'WITH',
@@ -406,7 +408,7 @@ WHERE o.item IN(
 )
 DQL;
 
-        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testCompositeIdentifiersWithAssociation(): void
@@ -461,7 +463,7 @@ WHERE (o.item IN(
 ))
 SQL;
 
-        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testCompositeIdentifiersWithoutAssociation(): void
@@ -500,7 +502,7 @@ INNER JOIN o.compositeLabel label
 WHERE item.field1 = :foo AND o.bar = :bar
 SQL;
 
-        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
 
     public function testCompositeIdentifiersWithForeignIdentifiers(): void
@@ -539,7 +541,7 @@ WHERE o.id IN(
 )
 SQL;
 
-        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+        $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
 
     private function toDQLString(string $dql): string

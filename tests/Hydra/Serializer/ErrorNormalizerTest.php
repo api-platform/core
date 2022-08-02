@@ -17,7 +17,7 @@ use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Hydra\Serializer\ErrorNormalizer;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -27,7 +27,7 @@ class ErrorNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
@@ -50,7 +50,7 @@ class ErrorNormalizerTest extends TestCase
      * @param string $originalMessage original message of the Exception
      * @param bool   $debug           simulates kernel debug variable
      */
-    public function testErrorServerNormalize(int $status, string $originalMessage, bool $debug)
+    public function testErrorServerNormalize(int $status, string $originalMessage, bool $debug): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'])->willReturn('/context/foo')->shouldBeCalled();
@@ -69,22 +69,20 @@ class ErrorNormalizerTest extends TestCase
             $expected['trace'] = $exception->getTrace();
         }
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, null, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, null, ['statusCode' => $status]));
     }
 
-    public function providerStatusCode()
+    public function providerStatusCode(): \Iterator
     {
-        return [
-            [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', false],
-            [Response::HTTP_GATEWAY_TIMEOUT, 'Sensitive server error displayed', false],
-            [Response::HTTP_BAD_REQUEST, 'Bad Request Message', false],
-            [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', true],
-            [Response::HTTP_GATEWAY_TIMEOUT, 'Sensitive server error displayed', true],
-            [Response::HTTP_BAD_REQUEST, 'Bad Request Message', true],
-        ];
+        yield [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', false];
+        yield [Response::HTTP_GATEWAY_TIMEOUT, 'Sensitive server error displayed', false];
+        yield [Response::HTTP_BAD_REQUEST, 'Bad Request Message', false];
+        yield [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', true];
+        yield [Response::HTTP_GATEWAY_TIMEOUT, 'Sensitive server error displayed', true];
+        yield [Response::HTTP_BAD_REQUEST, 'Bad Request Message', true];
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'])->willReturn('/context/foo')->shouldBeCalled();

@@ -21,11 +21,11 @@ use PHPUnit\Framework\TestCase;
  */
 class PlaceholderActionTest extends TestCase
 {
-    public function testAction()
+    public function testAction(): void
     {
         $action = new PlaceholderAction();
 
         $expected = new \stdClass();
-        $this->assertEquals($expected, $action($expected));
+        $this->assertSame($expected, $action($expected));
     }
 }

@@ -25,11 +25,8 @@ final class PersistProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
 
-    private ManagerRegistry $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry)
     {
-        $this->managerRegistry = $managerRegistry;
     }
 
     public function process($data, Operation $operation, array $uriVariables = [], array $context = [])

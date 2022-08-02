@@ -31,9 +31,9 @@ class PaginatorTest extends TestCase
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
-        $this->assertEquals($currentPage, $paginator->getCurrentPage());
-        $this->assertEquals($lastPage, $paginator->getLastPage());
-        $this->assertEquals($maxResults, $paginator->getItemsPerPage());
+        $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
+        $this->assertSame((float) $lastPage, $paginator->getLastPage());
+        $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
     }
 
     public function testInitializeWithQueryFirstResultNotApplied(): void
@@ -59,7 +59,7 @@ class PaginatorTest extends TestCase
         $this->assertSame($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
     }
 
-    private function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42): Paginator
+    private function getPaginator(int $firstResult = 1, int $maxResults = 15, int $totalItems = 42): Paginator
     {
         $query = $this->prophesize(Query::class);
         $query->getFirstResult()->willReturn($firstResult)->shouldBeCalled();
@@ -70,14 +70,12 @@ class PaginatorTest extends TestCase
         $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
         $doctrinePaginator->count()->willReturn($totalItems);
 
-        $doctrinePaginator->getIterator()->will(function () {
-            return new \ArrayIterator();
-        });
+        $doctrinePaginator->getIterator()->will(fn (): \ArrayIterator => new \ArrayIterator());
 
         return new Paginator($doctrinePaginator->reveal());
     }
 
-    private function getPaginatorWithMalformedQuery($maxResults = false): void
+    private function getPaginatorWithMalformedQuery(bool $maxResults = false): void
     {
         $query = $this->prophesize(Query::class);
         $query->getFirstResult()->willReturn($maxResults ? 42 : null)->shouldBeCalled();

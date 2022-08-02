@@ -36,7 +36,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testNormalizeDoesNotChangeSubLevel()
+    public function testNormalizeDoesNotChangeSubLevel(): void
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->normalize(Argument::any(), null, ['jsonld_sub_level' => true])->willReturn(['foo' => 'bar'])->shouldBeCalled();
@@ -46,7 +46,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['jsonld_sub_level' => true]));
     }
 
-    public function testNormalizeDoesNotChangeWhenNoFilterNorPagination()
+    public function testNormalizeDoesNotChangeWhenNoFilterNorPagination(): void
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->normalize(Argument::any(), null, Argument::type('array'))->willReturn(['foo' => 'bar'])->shouldBeCalled();
@@ -56,7 +56,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['request_uri' => '/?page=1&pagination=1']));
     }
 
-    public function testNormalizePaginator()
+    public function testNormalizePaginator(): void
     {
         $this->assertEquals(
             [
@@ -75,7 +75,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizePartialPaginator()
+    public function testNormalizePartialPaginator(): void
     {
         $this->assertEquals(
             [
@@ -158,7 +158,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         return $normalizer->normalize($paginatorProphecy->reveal(), null, ['resource_class' => SoMany::class, 'operation_name' => 'get']);
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
@@ -171,7 +171,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testSetNormalizer()
+    public function testSetNormalizer(): void
     {
         $injectedNormalizer = $this->prophesize(NormalizerInterface::class)->reveal();
 

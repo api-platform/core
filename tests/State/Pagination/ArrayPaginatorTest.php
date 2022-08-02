@@ -31,15 +31,15 @@ class ArrayPaginatorTest extends TestCase
      * @param mixed $currentPage
      * @param mixed $lastPage
      */
-    public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage)
+    public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage): void
     {
         $paginator = new ArrayPaginator($results, $firstResult, $maxResults);
 
-        $this->assertEquals($totalItems, $paginator->getTotalItems());
-        $this->assertEquals($currentPage, $paginator->getCurrentPage());
-        $this->assertEquals($lastPage, $paginator->getLastPage());
-        $this->assertEquals($maxResults, $paginator->getItemsPerPage());
-        $this->assertEquals($currentItems, $paginator->count());
+        $this->assertSame((float) $totalItems, $paginator->getTotalItems());
+        $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
+        $this->assertSame((float) $lastPage, $paginator->getLastPage());
+        $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
+        $this->assertCount($currentItems, $paginator);
     }
 
     public function initializeProvider()

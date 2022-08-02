@@ -26,11 +26,8 @@ use Symfony\Component\Serializer\Encoder\CsvEncoder;
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
-    private $resourceMetadataFactory;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -47,8 +44,8 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $context['operation_name'] = $operation->getName();
         $context['operation'] = $operation;
         $context['resource_class'] = $attributes['resource_class'];
-        $context['skip_null_values'] = $context['skip_null_values'] ?? true;
-        $context['iri_only'] = $context['iri_only'] ?? false;
+        $context['skip_null_values'] ??= true;
+        $context['iri_only'] ??= false;
         $context['request_uri'] = $request->getRequestUri();
         $context['uri'] = $request->getUri();
         $context['input'] = $operation->getInput();
@@ -71,7 +68,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 $context['api_allow_update'] = \in_array($method = $request->getMethod(), ['PUT', 'PATCH'], true);
 
                 if ($context['api_allow_update'] && 'PATCH' === $method) {
-                    $context['deep_object_to_populate'] = $context['deep_object_to_populate'] ?? true;
+                    $context['deep_object_to_populate'] ??= true;
                 }
             }
 

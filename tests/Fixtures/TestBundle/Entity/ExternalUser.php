@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
 class ExternalUser extends AbstractUser
 {
     #[ORM\Column]
-    private $externalId;
+    private ?string $externalId = null;
 
     public function getExternalId(): ?string
     {

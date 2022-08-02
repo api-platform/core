@@ -35,7 +35,7 @@ class AddFormatListenerTest extends TestCase
     use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    public function testNoResourceClass()
+    public function testNoResourceClass(): void
     {
         $request = new Request();
 

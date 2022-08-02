@@ -73,7 +73,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
         $filterCallable = $filterFactory($this->managerRegistry, $properties);
         $filterCallable->apply($queryBuilder, new QueryNameGenerator(), $resourceClass, null, ['filters' => $filterParameters]);
 
-        $this->assertEquals($expectedDql, $queryBuilder->getQuery()->getDQL());
+        $this->assertSame($expectedDql, $queryBuilder->getQuery()->getDQL());
 
         if (null === $expectedParameters) {
             return;

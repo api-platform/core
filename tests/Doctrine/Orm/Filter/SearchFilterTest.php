@@ -116,14 +116,14 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
             ],
             'dummyDate' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
             'dummyDate[]' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => true,
@@ -227,7 +227,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 WHERE relateddummy_a1.symfony = :symfony_p1', $this->alias, Dummy::class));
-        $this->assertEquals($actual, $expected);
+        $this->assertSame($actual, $expected);
     }
 
     public function testTripleJoin(): void
@@ -243,7 +243,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 inner join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', $this->alias, Dummy::class));
-        $this->assertEquals($actual, $expected);
+        $this->assertSame($actual, $expected);
     }
 
     public function testJoinLeft(): void
@@ -258,7 +258,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT %s FROM %s %1$s left join %1$s.relatedDummy relateddummy_a1 left join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', $this->alias, Dummy::class));
-        $this->assertEquals($actual, $expected);
+        $this->assertSame($actual, $expected);
     }
 
     public function testApplyWithAnotherAlias(): void
@@ -271,12 +271,12 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
 
         $expectedDql = sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', 'somealias', Dummy::class);
-        $this->assertEquals($expectedDql, $queryBuilder->getQuery()->getDQL());
+        $this->assertSame($expectedDql, $queryBuilder->getQuery()->getDQL());
     }
 
     public function provideApplyTestData(): array
     {
-        $filterFactory = [$this, 'buildSearchFilter'];
+        $filterFactory = $this->buildSearchFilter(...);
 
         return array_merge_recursive(
             $this->provideApplyTestArguments(),
@@ -496,13 +496,13 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         );
     }
 
-    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)
+    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null): SearchFilter
     {
         $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
         $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
-            if (false !== strpos($args[0], '/related_dummies')) {
+            if (str_contains((string) $args[0], '/related_dummies')) {
                 $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
 
                 return $relatedDummyProphecy->reveal();

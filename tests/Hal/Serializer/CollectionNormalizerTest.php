@@ -33,7 +33,7 @@ class CollectionNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportsNormalize()
+    public function testSupportsNormalize(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -46,7 +46,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizeApiSubLevel()
+    public function testNormalizeApiSubLevel(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass()->shouldNotBeCalled();
@@ -61,7 +61,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals(['foo' => 22], $normalizer->normalize(['foo' => 'bar'], null, ['api_sub_level' => true]));
     }
 
-    public function testNormalizePaginator()
+    public function testNormalizePaginator(): void
     {
         $this->assertEquals(
             [
@@ -92,7 +92,7 @@ class CollectionNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizePartialPaginator()
+    public function testNormalizePartialPaginator(): void
     {
         $this->assertEquals(
             [
@@ -120,7 +120,7 @@ class CollectionNormalizerTest extends TestCase
         );
     }
 
-    private function normalizePaginator($partial = false)
+    private function normalizePaginator(bool $partial = false)
     {
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
         if ($partial) {
@@ -129,10 +129,10 @@ class CollectionNormalizerTest extends TestCase
 
         $paginatorProphecy->getCurrentPage()->willReturn(3);
         $paginatorProphecy->getItemsPerPage()->willReturn(12);
-        $paginatorProphecy->rewind()->will(function () {});
+        $paginatorProphecy->rewind()->will(function (): void {});
         $paginatorProphecy->valid()->willReturn(true, false);
         $paginatorProphecy->current()->willReturn('foo');
-        $paginatorProphecy->next()->will(function () {});
+        $paginatorProphecy->next()->will(function (): void {});
 
         if (!$partial) {
             $paginatorProphecy->getLastPage()->willReturn(7);

@@ -26,13 +26,13 @@ abstract class AbstractUser
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private ?int $id = null;
     #[ORM\Column]
-    private $firstname;
+    private ?string $firstname = null;
     #[ORM\Column]
-    private $lastname;
+    private ?string $lastname = null;
     #[ORM\Column]
-    private $email;
+    private ?string $email = null;
 
     public function getId(): ?int
     {

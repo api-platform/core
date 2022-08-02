@@ -27,19 +27,17 @@ use Behatch\Json\Json;
 use Behatch\Json\JsonInspector;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use JsonSchema\Validator;
 use PHPUnit\Framework\ExpectationFailedException;
 
 final class JsonApiContext implements Context
 {
-    /**
-     * @var RestContext
-     */
-    private $restContext;
-    private $validator;
-    private $inspector;
-    private $jsonApiSchemaFile;
-    private $manager;
+    private ?RestContext $restContext = null;
+    private readonly Validator $validator;
+    private readonly JsonInspector $inspector;
+    private readonly string $jsonApiSchemaFile;
+    private readonly ObjectManager $manager;
 
     public function __construct(ManagerRegistry $doctrine, string $jsonApiSchemaFile)
     {
@@ -58,7 +56,7 @@ final class JsonApiContext implements Context
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /**
          * @var InitializedContextEnvironment $environment
@@ -93,7 +91,7 @@ final class JsonApiContext implements Context
     {
         $actual = $this->getValueOfNode($node);
         if (null !== $actual && [] !== $actual) {
-            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
+            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual, \JSON_THROW_ON_ERROR)));
         }
     }
 
@@ -105,7 +103,7 @@ final class JsonApiContext implements Context
     public function theJsonNodeShouldBeANumber($node)
     {
         if (!is_numeric($actual = $this->getValueOfNode($node))) {
-            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
+            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual, \JSON_THROW_ON_ERROR)));
         }
     }
 
@@ -146,7 +144,7 @@ final class JsonApiContext implements Context
     /**
      * @Given there is a RelatedDummy
      */
-    public function thereIsARelatedDummy()
+    public function thereIsARelatedDummy(): void
     {
         $relatedDummy = $this->buildRelatedDummy();
         $relatedDummy->setName('RelatedDummy with no friends');
@@ -158,7 +156,7 @@ final class JsonApiContext implements Context
     /**
      * @Given there is a DummyFriend
      */
-    public function thereIsADummyFriend()
+    public function thereIsADummyFriend(): void
     {
         $friend = $this->buildDummyFriend();
         $friend->setName('DummyFriend');
@@ -170,7 +168,7 @@ final class JsonApiContext implements Context
     /**
      * @Given there is a CircularReference
      */
-    public function thereIsACircularReference()
+    public function thereIsACircularReference(): void
     {
         $circularReference = $this->buildCircularReference();
         $circularReference->parent = $circularReference;
@@ -191,12 +189,12 @@ final class JsonApiContext implements Context
         return $this->inspector->evaluate($this->getJson(), $node);
     }
 
-    private function getJson()
+    private function getJson(): Json
     {
         return new Json($this->getContent());
     }
 
-    private function getContent()
+    private function getContent(): string
     {
         return $this->restContext->getMink()->getSession()->getDriver()->getContent();
     }
@@ -206,26 +204,17 @@ final class JsonApiContext implements Context
         return $this->manager instanceof EntityManagerInterface;
     }
 
-    /**
-     * @return CircularReference|CircularReferenceDocument
-     */
-    private function buildCircularReference()
+    private function buildCircularReference(): CircularReference|CircularReferenceDocument
     {
         return $this->isOrm() ? new CircularReference() : new CircularReferenceDocument();
     }
 
-    /**
-     * @return DummyFriend|DummyFriendDocument
-     */
-    private function buildDummyFriend()
+    private function buildDummyFriend(): DummyFriend|DummyFriendDocument
     {
         return $this->isOrm() ? new DummyFriend() : new DummyFriendDocument();
     }
 
-    /**
-     * @return RelatedDummy|RelatedDummyDocument
-     */
-    private function buildRelatedDummy()
+    private function buildRelatedDummy(): RelatedDummy|RelatedDummyDocument
     {
         return $this->isOrm() ? new RelatedDummy() : new RelatedDummyDocument();
     }

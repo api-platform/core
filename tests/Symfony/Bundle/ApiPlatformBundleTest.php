@@ -37,7 +37,7 @@ class ApiPlatformBundleTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testBuild()
+    public function testBuild(): void
     {
         $containerProphecy = $this->prophesize(ContainerBuilder::class);
         $containerProphecy->addCompilerPass(Argument::type(DataProviderPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();

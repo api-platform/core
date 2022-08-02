@@ -24,11 +24,11 @@ class VoDummyInsuranceCompany
     use VoDummyIdAwareTrait;
 
     public function __construct(
-        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $name
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $name
     ) {
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

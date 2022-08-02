@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class ArrayTraitTest extends TestCase
 {
-    private $arrayTraitClass;
+    private object $arrayTraitClass;
 
     protected function setUp(): void
     {

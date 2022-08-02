@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Problem\Serializer;
 
-use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -31,23 +30,20 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     public const FORMAT = 'jsonproblem';
     public const TYPE = 'type';
     public const TITLE = 'title';
-
-    private $debug;
-    private $defaultContext = [
+    private array $defaultContext = [
         self::TYPE => 'https://tools.ietf.org/html/rfc2616#section-10',
         self::TITLE => 'An error occurred',
     ];
 
-    public function __construct(bool $debug = false, array $defaultContext = [])
+    public function __construct(private readonly bool $debug = false, array $defaultContext = [])
     {
-        $this->debug = $debug;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         $data = [
             'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE],
@@ -65,9 +61,9 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException || $data instanceof LegacyFlattenException);
+        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 
     /**

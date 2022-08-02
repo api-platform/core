@@ -28,7 +28,7 @@ class ResourceWithInteger
     #[ODM\Field(type: 'int')]
     private int $myIntegerField = 0;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

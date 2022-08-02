@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Type\Schema;
 
@@ -31,19 +32,8 @@ use GraphQL\Type\Schema;
  */
 final class SchemaBuilder implements SchemaBuilderInterface
 {
-    private $resourceNameCollectionFactory;
-    private $resourceMetadataCollectionFactory;
-    private $typesFactory;
-    private $typesContainer;
-    private $fieldsBuilder;
-
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, TypesFactoryInterface $typesFactory, TypesContainerInterface $typesContainer, FieldsBuilderInterface $fieldsBuilder)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly TypesFactoryInterface $typesFactory, private readonly TypesContainerInterface $typesContainer, private readonly FieldsBuilderInterface $fieldsBuilder)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->typesFactory = $typesFactory;
-        $this->typesContainer = $typesContainer;
-        $this->fieldsBuilder = $fieldsBuilder;
     }
 
     public function getSchema(): Schema
@@ -91,7 +81,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 'name' => 'Query',
                 'fields' => $queryFields,
             ]),
-            'typeLoader' => function ($name) {
+            'typeLoader' => function ($name): Type {
                 $type = $this->typesContainer->get($name);
 
                 if ($type instanceof WrappingType) {

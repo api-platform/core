@@ -28,12 +28,9 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
 
     public const CACHE_KEY = 'resource_name_collection';
 
-    private $decorated;
-
-    public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceNameCollectionFactoryInterface $decorated)
+    public function __construct(CacheItemPoolInterface $cacheItemPool, private readonly ResourceNameCollectionFactoryInterface $decorated)
     {
         $this->cacheItemPool = $cacheItemPool;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -41,8 +38,6 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
      */
     public function create(): ResourceNameCollection
     {
-        return $this->getCached(self::CACHE_KEY, function () {
-            return $this->decorated->create();
-        });
+        return $this->getCached(self::CACHE_KEY, fn (): ResourceNameCollection => $this->decorated->create());
     }
 }

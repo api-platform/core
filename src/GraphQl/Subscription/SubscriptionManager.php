@@ -36,19 +36,8 @@ final class SubscriptionManager implements SubscriptionManagerInterface
     use ResourceClassInfoTrait;
     use SortTrait;
 
-    private $subscriptionsCache;
-    private $subscriptionIdentifierGenerator;
-    private $serializeStage;
-    private $iriConverter;
-    private $resourceMetadataCollectionFactory;
-
-    public function __construct(CacheItemPoolInterface $subscriptionsCache, SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, SerializeStageInterface $serializeStage, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly SerializeStageInterface $serializeStage, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
-        $this->subscriptionsCache = $subscriptionsCache;
-        $this->subscriptionIdentifierGenerator = $subscriptionIdentifierGenerator;
-        $this->serializeStage = $serializeStage;
-        $this->iriConverter = $iriConverter;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function retrieveSubscriptionId(array $context, ?array $result): ?string

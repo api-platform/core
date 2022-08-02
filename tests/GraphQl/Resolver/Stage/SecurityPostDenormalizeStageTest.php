@@ -21,6 +21,7 @@ use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -31,9 +32,8 @@ class SecurityPostDenormalizeStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var SecurityPostDenormalizeStage */
-    private $securityPostDenormalizeStage;
-    private $resourceAccessCheckerProphecy;
+    private SecurityPostDenormalizeStage $securityPostDenormalizeStage;
+    private ObjectProphecy $resourceAccessCheckerProphecy;
 
     /**
      * {@inheritdoc}

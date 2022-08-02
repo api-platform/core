@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Controller\MongoDbOdm;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\CustomActionDummy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -24,7 +25,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class CustomActionController extends AbstractController
 {
     #[Route(methods: ['GET'], name: 'custom_normalization', path: '/custom/{id}/normalization', defaults: ['_api_resource_class' => CustomActionDummy::class, '_api_operation_name' => 'custom_normalization'])]
-    public function customNormalizationAction(CustomActionDummy $data)
+    public function customNormalizationAction(CustomActionDummy $data): JsonResponse
     {
         $data->setFoo('foo');
 
@@ -32,7 +33,7 @@ class CustomActionController extends AbstractController
     }
 
     #[Route(methods: ['POST'], name: 'custom_denormalization', path: '/custom/denormalization', defaults: ['_api_resource_class' => CustomActionDummy::class, '_api_operation_name' => 'custom_denormalization', '_api_receive' => false])]
-    public function customDenormalizationAction(Request $request)
+    public function customDenormalizationAction(Request $request): CustomActionDummy
     {
         if ($request->attributes->has('data')) {
             throw new \RuntimeException('The "data" attribute must not be set.');
@@ -44,7 +45,7 @@ class CustomActionController extends AbstractController
     }
 
     #[Route(methods: ['GET'], name: 'short_custom_normalization', path: '/short_custom/{id}/normalization', defaults: ['_api_resource_class' => CustomActionDummy::class, '_api_operation_name' => 'custom_normalization'])]
-    public function shortCustomNormalizationAction(CustomActionDummy $data)
+    public function shortCustomNormalizationAction(CustomActionDummy $data): JsonResponse
     {
         $data->setFoo('short');
 
@@ -52,7 +53,7 @@ class CustomActionController extends AbstractController
     }
 
     #[Route(methods: ['POST'], name: 'short_custom_denormalization', path: '/short_custom/denormalization', defaults: ['_api_resource_class' => CustomActionDummy::class, '_api_operation_name' => 'custom_denormalization', '_api_receive' => false])]
-    public function shortCustomDenormalizationAction(Request $request)
+    public function shortCustomDenormalizationAction(Request $request): CustomActionDummy
     {
         if ($request->attributes->has('data')) {
             throw new \RuntimeException('The "data" attribute must not be set.');

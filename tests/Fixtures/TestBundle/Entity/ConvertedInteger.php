@@ -37,7 +37,7 @@ class ConvertedInteger
     #[ORM\Column(type: 'integer')]
     public $nameConverted;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

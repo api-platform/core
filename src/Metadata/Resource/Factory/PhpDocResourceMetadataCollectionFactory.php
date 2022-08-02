@@ -27,13 +27,11 @@ use phpDocumentor\Reflection\Types\ContextFactory;
  */
 final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $decorated;
-    private $docBlockFactory;
-    private $contextFactory;
+    private readonly DocBlockFactoryInterface $docBlockFactory;
+    private readonly ContextFactory $contextFactory;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated, DocBlockFactoryInterface $docBlockFactory = null)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated, DocBlockFactoryInterface $docBlockFactory = null)
     {
-        $this->decorated = $decorated;
         $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
         $this->contextFactory = new ContextFactory();
     }
@@ -80,7 +78,7 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
                 }
 
                 $resourceMetadataCollection[$key] = $resourceMetadataCollection[$key]->withGraphQlOperations($graphQlOperations);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // Ignore empty DocBlocks
             }
         }

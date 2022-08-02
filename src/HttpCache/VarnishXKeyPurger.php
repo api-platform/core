@@ -26,24 +26,17 @@ final class VarnishXKeyPurger implements PurgerInterface
 {
     private const VARNISH_MAX_HEADER_LENGTH = 8000;
 
-    private $clients;
-    private $maxHeaderLength;
-    private $xkeyGlue;
-
     /**
      * @param HttpClientInterface[] $clients
      */
-    public function __construct(array $clients, int $maxHeaderLength = self::VARNISH_MAX_HEADER_LENGTH, string $xkeyGlue = ' ')
+    public function __construct(private readonly array $clients, private readonly int $maxHeaderLength = self::VARNISH_MAX_HEADER_LENGTH, private readonly string $xkeyGlue = ' ')
     {
-        $this->clients = $clients;
-        $this->maxHeaderLength = $maxHeaderLength;
-        $this->xkeyGlue = $xkeyGlue;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function purge(array $iris)
+    public function purge(array $iris): void
     {
         if (!$iris) {
             return;
@@ -92,7 +85,7 @@ final class VarnishXKeyPurger implements PurgerInterface
         $currentHeader = '';
 
         foreach ($keys as $position => $key) {
-            if (\strlen($key) > $this->maxHeaderLength) {
+            if (\strlen((string) $key) > $this->maxHeaderLength) {
                 throw new \Exception(sprintf('IRI "%s" is too long to fit current max header length (currently set to "%s"). You can increase it using the "api_platform.http_cache.invalidation.max_header_length" parameter.', $key, $this->maxHeaderLength));
             }
 

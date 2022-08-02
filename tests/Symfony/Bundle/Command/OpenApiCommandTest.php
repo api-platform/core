@@ -25,10 +25,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class OpenApiCommandTest extends KernelTestCase
 {
-    /**
-     * @var ApplicationTester
-     */
-    private $tester;
+    private ApplicationTester $tester;
 
     protected function setUp(): void
     {
@@ -41,14 +38,14 @@ class OpenApiCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->tester->run(['command' => 'api:openapi:export']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
-    public function testExecuteWithYaml()
+    public function testExecuteWithYaml(): void
     {
         $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
 
@@ -92,7 +89,7 @@ YAML;
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
     }
 
-    public function testWriteToFile()
+    public function testWriteToFile(): void
     {
         /** @var string $tmpFile */
         $tmpFile = tempnam(sys_get_temp_dir(), 'test_write_to_file');
@@ -103,10 +100,7 @@ YAML;
         @unlink($tmpFile);
     }
 
-    /**
-     * @param string $data
-     */
-    private function assertYaml($data)
+    private function assertYaml(string $data): void
     {
         try {
             Yaml::parse($data);

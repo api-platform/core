@@ -25,7 +25,7 @@ class DummyObjectWithoutConstructor
         return $this->foo;
     }
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }

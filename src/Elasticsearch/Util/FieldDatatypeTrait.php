@@ -29,9 +29,9 @@ use Symfony\Component\PropertyInfo\Type;
  */
 trait FieldDatatypeTrait
 {
-    private PropertyMetadataFactoryInterface $propertyMetadataFactory;
+    private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory;
 
-    private ResourceClassResolverInterface $resourceClassResolver;
+    private readonly ResourceClassResolverInterface $resourceClassResolver;
 
     /**
      * Is the decomposed given property of the given resource class potentially mapped as a nested field in Elasticsearch?
@@ -55,7 +55,7 @@ trait FieldDatatypeTrait
 
         try {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $currentProperty);
-        } catch (PropertyNotFoundException $e) {
+        } catch (PropertyNotFoundException) {
             return null;
         }
 
@@ -77,7 +77,7 @@ trait FieldDatatypeTrait
         }
 
         if (
-            null !== ($type = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType())
+            null !== ($type = $type->getCollectionValueTypes()[0] ?? null)
             && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
             && null !== ($className = $type->getClassName())
             && $this->resourceClassResolver->isResourceClass($className)

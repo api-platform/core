@@ -49,7 +49,7 @@ class CustomMultipleIdentifierDummy
         return $this->firstId;
     }
 
-    public function setFirstId(int $firstId)
+    public function setFirstId(int $firstId): void
     {
         $this->firstId = $firstId;
     }
@@ -59,7 +59,7 @@ class CustomMultipleIdentifierDummy
         return $this->secondId;
     }
 
-    public function setSecondId(int $secondId)
+    public function setSecondId(int $secondId): void
     {
         $this->secondId = $secondId;
     }
@@ -69,7 +69,7 @@ class CustomMultipleIdentifierDummy
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }

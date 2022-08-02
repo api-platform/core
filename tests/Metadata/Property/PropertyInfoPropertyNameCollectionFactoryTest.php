@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
  */
 class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
 {
-    public function testCreateMethodReturnsEmptyPropertyNameCollectionForObjectWithOnlyPrivateProperty()
+    public function testCreateMethodReturnsEmptyPropertyNameCollectionForObjectWithOnlyPrivateProperty(): void
     {
         $factory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([
             new ReflectionExtractor(),
@@ -44,7 +44,7 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
         self::assertCount(0, $collection->getIterator());
     }
 
-    public function testCreateMethodReturnsEmptyPropertyNameCollectionForObjectWithoutProperties()
+    public function testCreateMethodReturnsEmptyPropertyNameCollectionForObjectWithoutProperties(): void
     {
         $factory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([
             new ReflectionExtractor(),
@@ -55,7 +55,7 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
         self::assertCount(0, $collection->getIterator());
     }
 
-    public function testCreateMethodReturnsProperPropertyNameCollectionForObjectWithPublicAndPrivateProperty()
+    public function testCreateMethodReturnsProperPropertyNameCollectionForObjectWithPublicAndPrivateProperty(): void
     {
         $factory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([
             new ReflectionExtractor(),
@@ -66,7 +66,7 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
         self::assertCount(1, $collection->getIterator());
     }
 
-    public function testCreateMethodReturnsProperPropertyNameCollectionForObjectWithPublicProperty()
+    public function testCreateMethodReturnsProperPropertyNameCollectionForObjectWithPublicProperty(): void
     {
         $factory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([
             new ReflectionExtractor(),

@@ -25,15 +25,13 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ValidationExceptionNormalizerTest extends TestCase
 {
-    private $validationExceptionNormalizer;
+    private ValidationExceptionNormalizer $validationExceptionNormalizer;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->validationExceptionNormalizer = new ValidationExceptionNormalizer();
     }
 
@@ -51,7 +49,7 @@ class ValidationExceptionNormalizerTest extends TestCase
         $this->assertSame(422, $normalizedError['extensions']['status']);
         $this->assertSame('user', $normalizedError['extensions']['category']);
         $this->assertArrayHasKey('violations', $normalizedError['extensions']);
-        $this->assertSame([
+        $this->assertEquals([
             [
                 'path' => 'field 1',
                 'message' => 'message 1',

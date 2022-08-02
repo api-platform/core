@@ -26,15 +26,8 @@ use Symfony\Component\Finder\Finder;
  */
 final class ElasticsearchContext implements Context
 {
-    private $client;
-    private $elasticsearchMappingsPath;
-    private $elasticsearchFixturesPath;
-
-    public function __construct(Client $client, string $elasticsearchMappingsPath, string $elasticsearchFixturesPath)
+    public function __construct(private readonly Client $client, private readonly string $elasticsearchMappingsPath, private readonly string $elasticsearchFixturesPath)
     {
-        $this->client = $client;
-        $this->elasticsearchMappingsPath = $elasticsearchMappingsPath;
-        $this->elasticsearchFixturesPath = $elasticsearchFixturesPath;
     }
 
     /**
@@ -87,7 +80,7 @@ final class ElasticsearchContext implements Context
         foreach ($finder as $file) {
             $this->client->indices()->create([
                 'index' => $file->getBasename('.json'),
-                'body' => json_decode($file->getContents(), true),
+                'body' => json_decode($file->getContents(), true, 512, \JSON_THROW_ON_ERROR),
             ]);
         }
     }
@@ -120,7 +113,7 @@ final class ElasticsearchContext implements Context
             $index = $file->getBasename('.json');
             $bulk = [];
 
-            foreach (json_decode($file->getContents(), true) as $document) {
+            foreach (json_decode($file->getContents(), true, 512, \JSON_THROW_ON_ERROR) as $document) {
                 if (null === ($document['id'] ?? null)) {
                     $bulk[] = ['index' => ['_index' => $index, '_type' => DocumentMetadata::DEFAULT_TYPE]];
                 } else {

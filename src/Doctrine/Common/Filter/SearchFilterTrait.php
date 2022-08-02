@@ -32,7 +32,7 @@ trait SearchFilterTrait
 
     protected IriConverterInterface $iriConverter;
     protected PropertyAccessorInterface $propertyAccessor;
-    protected ?IdentifiersExtractorInterface $identifiersExtractor;
+    protected ?IdentifiersExtractorInterface $identifiersExtractor = null;
 
     /**
      * {@inheritdoc}
@@ -125,7 +125,7 @@ trait SearchFilterTrait
             $item = $iriConverter->getResourceFromIri($value, ['fetch_data' => false]);
 
             return $this->getPropertyAccessor()->getValue($item, 'id');
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             // Do nothing, return the raw value
         }
 

@@ -48,7 +48,7 @@ class DummyEntityWithConstructor
     public function __construct(
         #[ODM\Field] private string $foo,
         #[ODM\Field] private string $bar,
-        private readonly array $items
+        private array $items
     ) {
     }
 
@@ -80,7 +80,7 @@ class DummyEntityWithConstructor
         return $this->baz;
     }
 
-    public function setBaz(string $baz)
+    public function setBaz(string $baz): void
     {
         $this->baz = $baz;
     }

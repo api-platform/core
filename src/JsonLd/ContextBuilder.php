@@ -16,9 +16,6 @@ namespace ApiPlatform\JsonLd;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -34,21 +31,8 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
 
     public const FORMAT = 'jsonld';
 
-    private $resourceNameCollectionFactory;
-    private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory;
-    private PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory;
-    private PropertyMetadataFactoryInterface $propertyMetadataFactory;
-    private UrlGeneratorInterface $urlGenerator;
-    private ?NameConverterInterface $nameConverter = null;
-
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private $resourceMetadataFactory, private $propertyNameCollectionFactory, private $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?NameConverterInterface $nameConverter = null)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->urlGenerator = $urlGenerator;
-        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -166,7 +150,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             $jsonldContext = $propertyMetadata->getJsonldContext() ?? [];
 
             if ($id = $propertyMetadata->getIris()) {
-                $id = 1 === \count($id) ? $id[0] : $id;
+                $id = 1 === (is_countable($id) ? \count($id) : 0) ? $id[0] : $id;
             }
 
             if (!$id) {

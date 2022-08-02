@@ -26,11 +26,8 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class InputOutputResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $decorated;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated)
     {
-        $this->decorated = $decorated;
     }
 
     /**
@@ -58,12 +55,7 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
         return $resourceMetadataCollection;
     }
 
-    /**
-     * @param Operations|array $operations
-     *
-     * @return Operations|array
-     */
-    private function getTransformedOperations($operations, ApiResource $resourceMetadata)
+    private function getTransformedOperations(Operations|array $operations, ApiResource $resourceMetadata): Operations|array
     {
         foreach ($operations as $key => $operation) {
             $operation = $operation->withInput(null !== $operation->getInput() ? $this->transformInputOutput($operation->getInput()) : $resourceMetadata->getInput());

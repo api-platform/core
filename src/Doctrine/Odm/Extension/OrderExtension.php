@@ -36,13 +36,8 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     use MongoDbOdmPropertyHelperTrait;
     use PropertyHelperTrait;
 
-    private ?string $order;
-    private ?ManagerRegistry $managerRegistry;
-
-    public function __construct(string $order = null, ManagerRegistry $managerRegistry = null)
+    public function __construct(private readonly ?string $order = null, private readonly ?ManagerRegistry $managerRegistry = null)
     {
-        $this->order = $order;
-        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -107,7 +102,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
                     // If at least one stage is sort, then it has sorting
                     return true;
                 }
-            } catch (OutOfRangeException $outOfRangeException) {
+            } catch (OutOfRangeException) {
                 // There is no more stages on the aggregation builder
                 $shouldStop = true;
             }

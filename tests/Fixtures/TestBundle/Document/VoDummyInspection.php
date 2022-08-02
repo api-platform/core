@@ -32,17 +32,17 @@ class VoDummyInspection
         $this->performed = $performed ?: new DateTime();
     }
 
-    public function isAccepted()
+    public function isAccepted(): bool
     {
         return $this->accepted;
     }
 
-    public function getCar()
+    public function getCar(): VoDummyCar
     {
         return $this->car;
     }
 
-    public function getPerformed()
+    public function getPerformed(): DateTime
     {
         return $this->performed;
     }

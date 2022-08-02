@@ -55,7 +55,7 @@ abstract class ApiTestCase extends KernelTestCase
              * @var Client
              */
             $client = $kernel->getContainer()->get('test.api_platform.client');
-        } catch (ServiceNotFoundException $e) {
+        } catch (ServiceNotFoundException) {
             if (!class_exists(AbstractBrowser::class) || !trait_exists(HttpClientTrait::class)) {
                 throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit and HttpClient components are not available. Try running "composer require --dev symfony/browser-kit symfony/http-client".');
             }
@@ -76,11 +76,7 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected function findIriBy(string $resourceClass, array $criteria): ?string
     {
-        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container; // @phpstan-ignore-line
-
-        if (!isset(static::$container) && !method_exists(static::class, 'getContainer')) {
-            throw new \RuntimeException(sprintf('The container is not available. You must call "bootKernel()" or "createClient()" before calling "%s".', __METHOD__));
-        }
+        $container = static::getContainer();
 
         if (
             (

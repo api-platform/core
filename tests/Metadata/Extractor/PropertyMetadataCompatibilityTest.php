@@ -123,8 +123,6 @@ final class PropertyMetadataCompatibilityTest extends TestCase
 
     private function withBuiltinTypes(array $values, array $fixtures): array
     {
-        return array_map(function (string $builtinType): Type {
-            return new Type($builtinType);
-        }, $values);
+        return array_map(fn (string $builtinType): Type => new Type($builtinType), $values);
     }
 }

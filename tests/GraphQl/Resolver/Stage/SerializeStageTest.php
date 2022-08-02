@@ -30,6 +30,7 @@ use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -39,8 +40,8 @@ class SerializeStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $normalizerProphecy;
-    private $serializerContextBuilderProphecy;
+    private ObjectProphecy $normalizerProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}
@@ -100,7 +101,7 @@ class SerializeStageTest extends TestCase
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
+        $this->normalizerProphecy->normalize(Argument::type(\stdClass::class), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
         $result = ($this->createSerializeStage($paginationEnabled))($itemOrCollection, $resourceClass, $operation, $context);
 
@@ -144,7 +145,7 @@ class SerializeStageTest extends TestCase
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
+        $this->normalizerProphecy->normalize(Argument::type(\stdClass::class), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
         if ($expectedExceptionClass) {
             $this->expectException($expectedExceptionClass);
@@ -189,7 +190,7 @@ class SerializeStageTest extends TestCase
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(new \stdClass());
+        $this->normalizerProphecy->normalize(Argument::type(\stdClass::class), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(new \stdClass());
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected serialized data to be a nullable array.');

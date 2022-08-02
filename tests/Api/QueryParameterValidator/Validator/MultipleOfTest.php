@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class MultipleOfTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $filter = new MultipleOf();
 
@@ -30,7 +30,7 @@ class MultipleOfTest extends TestCase
         );
     }
 
-    public function testEmptyQueryParameter()
+    public function testEmptyQueryParameter(): void
     {
         $request = ['some_filter' => ''];
         $filter = new MultipleOf();
@@ -40,7 +40,7 @@ class MultipleOfTest extends TestCase
         );
     }
 
-    public function testNonMatchingParameter()
+    public function testNonMatchingParameter(): void
     {
         $request = ['some_filter' => '8'];
         $filter = new MultipleOf();
@@ -57,7 +57,7 @@ class MultipleOfTest extends TestCase
         );
     }
 
-    public function testMatchingParameter()
+    public function testMatchingParameter(): void
     {
         $request = ['some_filter' => '8'];
         $filter = new MultipleOf();

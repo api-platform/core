@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -28,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ApiResource]
 #[ODM\Document]
-class DummyFriend
+class DummyFriend implements \Stringable
 {
     /**
      * @var int|null The id
@@ -39,7 +38,7 @@ class DummyFriend
      * @var string|null The dummy name
      */
     #[Assert\NotBlank]
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[Groups(['fakemanytomany', 'friends'])]
     #[ODM\Field(type: 'string')]
     private ?string $name = null;
@@ -57,7 +56,7 @@ class DummyFriend
      *
      * @param int $id the value to set
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -75,12 +74,12 @@ class DummyFriend
      *
      * @param string $name the value to set
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->getId();
     }

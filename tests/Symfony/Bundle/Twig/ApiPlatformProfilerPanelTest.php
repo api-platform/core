@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Twig;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -25,16 +26,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class ApiPlatformProfilerPanelTest extends WebTestCase
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $manager;
-    private $schemaTool;
-    private $env;
+    private EntityManagerInterface $manager;
+    private SchemaTool $schemaTool;
+    private string $env;
 
     protected function setUp(): void
     {
-        parent::setUp();
         $kernel = self::bootKernel();
         $this->env = $kernel->getEnvironment();
 
@@ -44,7 +41,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $manager = $doctrine->getManager();
         $this->manager = $manager;
         $this->schemaTool = new SchemaTool($this->manager);
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
+        /** @var ClassMetadata[] $classes */
         $classes = $this->manager->getMetadataFactory()->getAllMetadata();
         $this->schemaTool->dropSchema($classes);
         $this->manager->clear();
@@ -60,18 +57,18 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         parent::tearDown();
     }
 
-    public function testDebugBarContentNotResourceClass()
+    public function testDebugBarContentNotResourceClass(): void
     {
         $client = static::createClient();
         $client->enableProfiler();
         // Using html to get default Swagger UI
         $client->request('GET', '/');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
         /** @var string $token */
         $token = $client->getResponse()->headers->get('X-Debug-Token');
         $crawler = $client->request('GET', "/_wdt/$token");
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
         $block = $crawler->filter('div[class*=sf-toolbar-block-api_platform]');
 
         // Check extra info content
@@ -79,17 +76,17 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('Not an API Platform resource', $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    public function testDebugBarContent()
+    public function testDebugBarContent(): void
     {
         $client = static::createClient();
         $client->enableProfiler();
         $client->request('GET', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
         /** @var string $token */
         $token = $client->getResponse()->headers->get('X-Debug-Token');
 
         $crawler = $client->request('GET', "/_wdt/$token");
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
         $block = $crawler->filter('div[class*=sf-toolbar-block-api_platform]');
 
         // Check extra info content
@@ -97,15 +94,15 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    public function testProfilerGeneralLayoutNotResourceClass()
+    public function testProfilerGeneralLayoutNotResourceClass(): void
     {
         $client = static::createClient();
         $client->enableProfiler();
         // Using html to get default Swagger UI
         $client->request('GET', '/');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
         $crawler = $client->request('GET', '/_profiler/latest?panel=api_platform.data_collector.request', [], [], []);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         // Check that the Api-Platform sidebar link is active
         $this->assertNotEmpty($menuLink = $crawler->filter('a[href$="panel=api_platform.data_collector.request"]'));
@@ -118,14 +115,14 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertEmpty($crawler->filter('.sf-tabs .tab'), 'Tabs must not be presents on the panel.');
     }
 
-    public function testProfilerGeneralLayout()
+    public function testProfilerGeneralLayout(): void
     {
         $client = static::createClient();
         $client->enableProfiler();
         $client->request('GET', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
         $crawler = $client->request('GET', '/_profiler/latest?panel=api_platform.data_collector.request', [], [], []);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         // Check that the Api-Platform sidebar link is active
         $this->assertNotEmpty($menuLink = $crawler->filter('a[href$="panel=api_platform.data_collector.request"]'));

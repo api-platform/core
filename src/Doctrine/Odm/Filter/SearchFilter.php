@@ -102,7 +102,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         if ($metadata->hasField($field) && !$metadata->hasAssociation($field)) {
             if ('id' === $field) {
-                $values = array_map([$this, 'getIdFromValue'], $values);
+                $values = array_map($this->getIdFromValue(...), $values);
             }
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
@@ -123,7 +123,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             return;
         }
 
-        $values = array_map([$this, 'getIdFromValue'], $values);
+        $values = array_map($this->getIdFromValue(...), $values);
 
         $associationResourceClass = $metadata->getAssociationTargetClass($field);
         $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];
@@ -142,10 +142,8 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     /**
      * Add equality match stage according to the strategy.
-     *
-     * @param mixed $values
      */
-    private function addEqualityMatchStrategy(string $strategy, Builder $aggregationBuilder, string $field, string $matchField, $values, bool $caseSensitive, ClassMetadata $metadata): void
+    private function addEqualityMatchStrategy(string $strategy, Builder $aggregationBuilder, string $field, string $matchField, array $values, bool $caseSensitive, ClassMetadata $metadata): void
     {
         $inValues = [];
         foreach ($values as $inValue) {
@@ -161,13 +159,9 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     /**
      * Get equality match value according to the strategy.
      *
-     * @param mixed $value
-     *
      * @throws InvalidArgumentException If strategy does not exist
-     *
-     * @return Regex|string
      */
-    private function getEqualityMatchStrategyValue(string $strategy, string $field, $value, bool $caseSensitive, ClassMetadata $metadata)
+    private function getEqualityMatchStrategyValue(string $strategy, string $field, mixed $value, bool $caseSensitive, ClassMetadata $metadata): mixed
     {
         $type = $metadata->getTypeOfField($field);
 
@@ -202,20 +196,12 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      */
     protected function getType(string $doctrineType): string
     {
-        switch ($doctrineType) {
-            case MongoDbType::INT:
-            case MongoDbType::INTEGER:
-                return 'int';
-            case MongoDbType::BOOL:
-            case MongoDbType::BOOLEAN:
-                return 'bool';
-            case MongoDbType::DATE:
-            case MongoDbType::DATE_IMMUTABLE:
-                return \DateTimeInterface::class;
-            case MongoDbType::FLOAT:
-                return 'float';
-        }
-
-        return 'string';
+        return match ($doctrineType) {
+            MongoDbType::INT, MongoDbType::INTEGER => 'int',
+            MongoDbType::BOOL, MongoDbType::BOOLEAN => 'bool',
+            MongoDbType::DATE, MongoDbType::DATE_IMMUTABLE => \DateTimeInterface::class,
+            MongoDbType::FLOAT => 'float',
+            default => 'string',
+        };
     }
 }

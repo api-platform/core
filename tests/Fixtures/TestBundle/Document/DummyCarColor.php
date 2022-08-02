@@ -38,7 +38,7 @@ class DummyCarColor
     #[ODM\Field(nullable: false)]
     private string $prop = '';
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

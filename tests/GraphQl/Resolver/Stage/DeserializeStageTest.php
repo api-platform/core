@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -29,10 +30,9 @@ class DeserializeStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var DeserializeStage */
-    private $deserializeStage;
-    private $denormalizerProphecy;
-    private $serializerContextBuilderProphecy;
+    private DeserializeStage $deserializeStage;
+    private ObjectProphecy $denormalizerProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}

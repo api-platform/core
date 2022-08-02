@@ -30,7 +30,7 @@ class ValidatorTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testValid()
+    public function testValid(): void
     {
         $data = new DummyEntity();
 
@@ -45,7 +45,7 @@ class ValidatorTest extends TestCase
         $validator->validate(new DummyEntity());
     }
 
-    public function testInvalid()
+    public function testInvalid(): void
     {
         $this->expectException(ValidationException::class);
 
@@ -64,7 +64,7 @@ class ValidatorTest extends TestCase
         $validator->validate(new DummyEntity());
     }
 
-    public function testGetGroupsFromCallable()
+    public function testGetGroupsFromCallable(): void
     {
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
@@ -77,9 +77,7 @@ class ValidatorTest extends TestCase
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
 
         $validator = new Validator($symfonyValidator);
-        $validator->validate(new DummyEntity(), ['groups' => function ($data) use ($expectedValidationGroups): array {
-            return $data instanceof DummyEntity ? $expectedValidationGroups : [];
-        }]);
+        $validator->validate(new DummyEntity(), ['groups' => fn ($data): array => $data instanceof DummyEntity ? $expectedValidationGroups : []]);
     }
 
     public function testValidateGetGroupsFromService(): void
@@ -105,7 +103,7 @@ class ValidatorTest extends TestCase
         $validator->validate(new DummyEntity(), ['groups' => 'groups_builder']);
     }
 
-    public function testValidatorWithScalarGroup()
+    public function testValidatorWithScalarGroup(): void
     {
         $data = new DummyEntity();
         $expectedValidationGroups = ['foo'];

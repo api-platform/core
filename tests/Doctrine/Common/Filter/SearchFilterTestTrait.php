@@ -94,14 +94,14 @@ trait SearchFilterTestTrait
             ],
             'dummyDate' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
             'dummyDate[]' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => true,
@@ -150,14 +150,14 @@ trait SearchFilterTestTrait
             ],
             'relatedDummies.dummyDate' => [
                 'property' => 'relatedDummies.dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
             'relatedDummies.dummyDate[]' => [
                 'property' => 'relatedDummies.dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => true,

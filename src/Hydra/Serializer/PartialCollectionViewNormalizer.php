@@ -32,27 +32,17 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class PartialCollectionViewNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
-    private $collectionNormalizer;
-    private $pageParameterName;
-    private $enabledParameterName;
-    private $resourceMetadataFactory;
-    private $propertyAccessor;
+    private readonly PropertyAccessorInterface $propertyAccessor;
 
-    public function __construct(NormalizerInterface $collectionNormalizer, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly string $pageParameterName = 'page', private string $enabledParameterName = 'pagination', private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->collectionNormalizer = $collectionNormalizer;
-        $this->pageParameterName = $pageParameterName;
-        $this->enabledParameterName = $enabledParameterName;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
         if (!\is_array($data)) {
@@ -108,7 +98,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
@@ -124,14 +114,14 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     /**
      * {@inheritdoc}
      */
-    public function setNormalizer(NormalizerInterface $normalizer)
+    public function setNormalizer(NormalizerInterface $normalizer): void
     {
         if ($this->collectionNormalizer instanceof NormalizerAwareInterface) {
             $this->collectionNormalizer->setNormalizer($normalizer);
         }
     }
 
-    private function cursorPaginationFields(array $fields, int $direction, $object)
+    private function cursorPaginationFields(array $fields, int $direction, $object): array
     {
         $paginationFilters = [];
 
@@ -149,7 +139,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $paginationFilters;
     }
 
-    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, $cursorPaginationAttribute): array
+    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, ?array $cursorPaginationAttribute): array
     {
         $objects = iterator_to_array($object);
         $firstObject = current($objects);

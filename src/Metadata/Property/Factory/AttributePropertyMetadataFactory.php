@@ -24,11 +24,8 @@ use ApiPlatform\Util\Reflection;
  */
 final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    private $decorated;
-
-    public function __construct(PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly ?PropertyMetadataFactoryInterface $decorated = null)
     {
-        $this->decorated = $decorated;
     }
 
     /**
@@ -40,20 +37,20 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
         if ($this->decorated) {
             try {
                 $parentPropertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-            } catch (PropertyNotFoundException $propertyNotFoundException) {
+            } catch (PropertyNotFoundException) {
                 // Ignore not found exception from decorated factories
             }
         }
 
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
         }
 
         if ($reflectionClass->hasProperty($property)) {
             $reflectionProperty = $reflectionClass->getProperty($property);
-            if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionProperty->getAttributes(ApiProperty::class)) {
+            if ($attributes = $reflectionProperty->getAttributes(ApiProperty::class)) {
                 return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
             }
         }
@@ -69,7 +66,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
                 continue;
             }
 
-            if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionMethod->getAttributes(ApiProperty::class)) {
+            if ($attributes = $reflectionMethod->getAttributes(ApiProperty::class)) {
                 return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
             }
         }
@@ -80,11 +77,9 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param ApiProperty|null $parentPropertyMetadata
-     *
      * @throws PropertyNotFoundException
      */
-    private function handleNotFound($parentPropertyMetadata, string $resourceClass, string $property): ApiProperty
+    private function handleNotFound(?ApiProperty $parentPropertyMetadata, string $resourceClass, string $property): ApiProperty
     {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -100,7 +95,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         foreach (get_class_methods(ApiProperty::class) as $method) {
-            if (preg_match('/^(?:get|is)(.*)/', $method, $matches) && null !== $val = $attribute->{$method}()) {
+            if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches) && null !== $val = $attribute->{$method}()) {
                 $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
             }
         }

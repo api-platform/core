@@ -33,13 +33,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class PaginationExtension implements AggregationResultCollectionExtensionInterface
 {
-    private ManagerRegistry $managerRegistry;
-    private Pagination $pagination;
-
-    public function __construct(ManagerRegistry $managerRegistry, Pagination $pagination)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly Pagination $pagination)
     {
-        $this->managerRegistry = $managerRegistry;
-        $this->pagination = $pagination;
     }
 
     /**

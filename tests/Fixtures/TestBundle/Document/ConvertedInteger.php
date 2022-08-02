@@ -35,7 +35,7 @@ class ConvertedInteger
     #[ODM\Field(type: 'int')]
     public $nameConverted;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

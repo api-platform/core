@@ -24,15 +24,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class LinkFactory implements LinkFactoryInterface
 {
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-    private $resourceClassResolver;
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver)
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface $resourceClassResolver)
     {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     /**
@@ -83,10 +76,6 @@ final class LinkFactory implements LinkFactoryInterface
      */
     public function createLinksFromAttributes($operation): array
     {
-        if (\PHP_VERSION_ID < 80000) {
-            return [];
-        }
-
         $links = [];
         try {
             $reflectionClass = new \ReflectionClass($resourceClass = $operation->getClass());
@@ -106,7 +95,7 @@ final class LinkFactory implements LinkFactoryInterface
                     $links[] = $attributeLink;
                 }
             }
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
         }
 
         return $links;
@@ -121,7 +110,7 @@ final class LinkFactory implements LinkFactoryInterface
             $link = $link->withIdentifiers($this->getIdentifiersFromResourceClass($link->getFromClass()));
         }
 
-        if (1 < \count($link->getIdentifiers())) {
+        if (1 < \count((array) $link->getIdentifiers())) {
             $link = $link->withCompositeIdentifier(true);
         }
 
@@ -156,7 +145,7 @@ final class LinkFactory implements LinkFactoryInterface
     {
         foreach ($types ?? [] as $type) {
             if ($type->isCollection()) {
-                return $this->getPropertyClassType(method_exists(Type::class, 'getCollectionValueTypes') ? $type->getCollectionValueTypes() : ($type->getCollectionValueType() ? [$type->getCollectionValueType()] : null));
+                return $this->getPropertyClassType($type->getCollectionValueTypes());
             }
 
             if ($class = $type->getClassName()) {

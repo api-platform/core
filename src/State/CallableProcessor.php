@@ -19,11 +19,8 @@ use Psr\Container\ContainerInterface;
 
 final class CallableProcessor implements ProcessorInterface
 {
-    private $locator;
-
-    public function __construct(ContainerInterface $locator)
+    public function __construct(private readonly ContainerInterface $locator)
     {
-        $this->locator = $locator;
     }
 
     /**

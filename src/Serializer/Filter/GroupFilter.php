@@ -23,21 +23,14 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 final class GroupFilter implements FilterInterface
 {
-    private $overrideDefaultGroups;
-    private $parameterName;
-    private $whitelist;
-
-    public function __construct(string $parameterName = 'groups', bool $overrideDefaultGroups = false, array $whitelist = null)
+    public function __construct(private readonly string $parameterName = 'groups', private readonly bool $overrideDefaultGroups = false, private readonly ?array $whitelist = null)
     {
-        $this->overrideDefaultGroups = $overrideDefaultGroups;
-        $this->parameterName = $parameterName;
-        $this->whitelist = $whitelist;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(Request $request, bool $normalization, array $attributes, array &$context)
+    public function apply(Request $request, bool $normalization, array $attributes, array &$context): void
     {
         if (\array_key_exists($this->parameterName, $commonAttribute = $request->attributes->get('_api_filters', []))) {
             $groups = $commonAttribute[$this->parameterName];

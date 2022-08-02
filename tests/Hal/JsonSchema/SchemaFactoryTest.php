@@ -35,7 +35,7 @@ class SchemaFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $schemaFactory;
+    private \ApiPlatform\Hal\JsonSchema\SchemaFactory $schemaFactory;
 
     protected function setUp(): void
     {
@@ -68,7 +68,7 @@ class SchemaFactoryTest extends TestCase
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class);
 
         $this->assertTrue($resultSchema->isDefined());
-        $this->assertEquals('Dummy.jsonhal', $resultSchema->getRootDefinitionKey());
+        $this->assertSame('Dummy.jsonhal', $resultSchema->getRootDefinitionKey());
     }
 
     public function testCustomFormatBuildSchema(): void
@@ -76,7 +76,7 @@ class SchemaFactoryTest extends TestCase
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'json');
 
         $this->assertTrue($resultSchema->isDefined());
-        $this->assertEquals('Dummy', $resultSchema->getRootDefinitionKey());
+        $this->assertSame('Dummy', $resultSchema->getRootDefinitionKey());
     }
 
     public function testHasRootDefinitionKeyBuildSchema(): void
@@ -85,11 +85,13 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
-        $this->assertArrayHasKey($rootDefinitionKey, $definitions);
-        $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
+        // @noRector
+        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
+        // @noRector
+        $this->assertTrue(isset($definitions[$rootDefinitionKey]['properties']));
         $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
         $this->assertArrayHasKey('_links', $properties);
-        $this->assertSame(
+        $this->assertEquals(
             [
                 'type' => 'object',
                 'properties' => [
@@ -114,7 +116,8 @@ class SchemaFactoryTest extends TestCase
         $definitionName = 'Dummy.jsonhal';
 
         $this->assertNull($resultSchema->getRootDefinitionKey());
-        $this->assertArrayHasKey('properties', $resultSchema);
+        // @noRector
+        $this->assertTrue(isset($resultSchema['properties']));
         $this->assertArrayHasKey('_embedded', $resultSchema['properties']);
         $this->assertArrayHasKey('totalItems', $resultSchema['properties']);
         $this->assertArrayHasKey('itemsPerPage', $resultSchema['properties']);
@@ -125,7 +128,8 @@ class SchemaFactoryTest extends TestCase
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonhal', Schema::TYPE_OUTPUT, null, null, null, true);
 
         $this->assertNull($resultSchema->getRootDefinitionKey());
-        $this->assertArrayHasKey('properties', $resultSchema);
+        // @noRector
+        $this->assertTrue(isset($resultSchema['properties']));
         $this->assertArrayHasKey('_embedded', $resultSchema['properties']);
         $this->assertArrayHasKey('totalItems', $resultSchema['properties']);
         $this->assertArrayHasKey('itemsPerPage', $resultSchema['properties']);

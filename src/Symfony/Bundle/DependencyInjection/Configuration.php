@@ -51,13 +51,8 @@ final class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        if (method_exists(TreeBuilder::class, 'getRootNode')) {
-            $treeBuilder = new TreeBuilder('api_platform');
-            $rootNode = $treeBuilder->getRootNode();
-        } else {
-            $treeBuilder = new TreeBuilder();
-            $rootNode = $treeBuilder->root('api_platform');
-        }
+        $treeBuilder = new TreeBuilder('api_platform');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->beforeNormalization()
@@ -265,7 +260,7 @@ final class Configuration implements ConfigurationInterface
                             ->info('The active versions of Open API to be exported or used in the swagger_ui. The first value is the default.')
                             ->defaultValue($defaultVersions)
                             ->beforeNormalization()
-                                ->always(static function ($v) {
+                                ->always(static function ($v): array {
                                     if (!\is_array($v)) {
                                         $v = [$v];
                                     }
@@ -278,9 +273,7 @@ final class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->validate()
-                                ->ifTrue(static function ($v) use ($defaultVersions) {
-                                    return $v !== array_intersect($v, $defaultVersions);
-                                })
+                                ->ifTrue(static fn($v): bool => $v !== array_intersect($v, $defaultVersions))
                                 ->thenInvalid(sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $defaultVersions), '%s'))
                             ->end()
                             ->prototype('scalar')->end()
@@ -301,7 +294,7 @@ final class Configuration implements ConfigurationInterface
                         ->variableNode('swagger_ui_extra_configuration')
                             ->defaultValue([])
                             ->validate()
-                                ->ifTrue(static function ($v) { return false === \is_array($v); })
+                                ->ifTrue(static fn($v): bool => false === \is_array($v))
                                 ->thenInvalid('The swagger_ui_extra_configuration parameter must be an array.')
                             ->end()
                             ->info('To pass extra configuration to Swagger UI, like docExpansion or filter.')
@@ -335,7 +328,7 @@ final class Configuration implements ConfigurationInterface
                                 ->variableNode('request_options')
                                     ->defaultValue([])
                                     ->validate()
-                                        ->ifTrue(static function ($v) { return false === \is_array($v); })
+                                        ->ifTrue(static fn($v): bool => false === \is_array($v))
                                         ->thenInvalid('The request_options parameter must be an array.')
                                     ->end()
                                     ->info('To pass options to the client charged with the request.')
@@ -442,7 +435,6 @@ final class Configuration implements ConfigurationInterface
                                 ->scalarNode('email')->defaultNull()->info('The email address of the contact person/organization. MUST be in the format of an email address.')->end()
                             ->end()
                         ->end()
-                        ->booleanNode('backward_compatibility_layer')->defaultTrue()->info('Enable this to decorate the "api_platform.swagger.normalizer.documentation" instead of decorating the OpenAPI factory.')->end()
                         ->scalarNode('termsOfService')->defaultNull()->info('A URL to the Terms of Service for the API. MUST be in the format of a URL.')->end()
                         ->arrayNode('license')
                         ->addDefaultsIfNotSet()
@@ -454,7 +446,7 @@ final class Configuration implements ConfigurationInterface
                         ->variableNode('swagger_ui_extra_configuration')
                             ->defaultValue([])
                             ->validate()
-                                ->ifTrue(static function ($v) { return false === \is_array($v); })
+                                ->ifTrue(static fn($v): bool => false === \is_array($v))
                                 ->thenInvalid('The swagger_ui_extra_configuration parameter must be an array.')
                             ->end()
                             ->info('To pass extra configuration to Swagger UI, like docExpansion or filter.')
@@ -484,7 +476,7 @@ final class Configuration implements ConfigurationInterface
                     ->prototype('integer')->end()
                     ->validate()
                         ->ifArray()
-                        ->then(static function (array $exceptionToStatus) {
+                        ->then(static function (array $exceptionToStatus): array {
                             foreach ($exceptionToStatus as $httpStatusCode) {
                                 if ($httpStatusCode < 100 || $httpStatusCode >= 600) {
                                     throw new InvalidConfigurationException(sprintf('The HTTP status code "%s" is not valid.', $httpStatusCode));
@@ -538,7 +530,7 @@ final class Configuration implements ConfigurationInterface
         $defaultsNode
             ->ignoreExtraKeys(false)
             ->beforeNormalization()
-            ->always(static function (array $defaults) use ($nameConverter) {
+            ->always(static function (array $defaults) use ($nameConverter): array {
                 $normalizedDefaults = [];
                 foreach ($defaults as $option => $value) {
                     $option = $nameConverter->normalize($option);

@@ -202,7 +202,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $paginationOptions = [];
 
         foreach ($defaults as $key => $value) {
-            if (0 !== strpos($key, 'pagination_')) {
+            if (!str_starts_with($key, 'pagination_')) {
                 continue;
             }
 
@@ -322,7 +322,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
 
             if ($container->fileExists($path, false)) {
-                if (!preg_match('/\.(xml|ya?ml)$/', $path, $matches)) {
+                if (!preg_match('/\.(xml|ya?ml)$/', (string) $path, $matches)) {
                     throw new RuntimeException(sprintf('Unsupported mapping type in "%s", supported types are XML & YAML.', $path));
                 }
 

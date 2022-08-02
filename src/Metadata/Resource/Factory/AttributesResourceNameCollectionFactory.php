@@ -26,16 +26,11 @@ use ApiPlatform\Util\ReflectionClassRecursiveIterator;
  */
 final class AttributesResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
-    private $paths;
-    private $decorated;
-
     /**
      * @param string[] $paths
      */
-    public function __construct(array $paths, ResourceNameCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly array $paths, private readonly ?ResourceNameCollectionFactoryInterface $decorated = null)
     {
-        $this->paths = $paths;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -52,7 +47,7 @@ final class AttributesResourceNameCollectionFactory implements ResourceNameColle
         }
 
         foreach (ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories($this->paths) as $className => $reflectionClass) {
-            if (\PHP_VERSION_ID >= 80000 && $this->isResource($reflectionClass)) {
+            if ($this->isResource($reflectionClass)) {
                 $classes[$className] = true;
             }
         }

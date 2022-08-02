@@ -30,7 +30,7 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreateWithItemHit()
+    public function testCreateWithItemHit(): void
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);
         $cacheItem->isHit()->willReturn(true)->shouldBeCalled();
@@ -49,7 +49,7 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
         $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
-    public function testCreateWithItemNotHit()
+    public function testCreateWithItemNotHit(): void
     {
         $resourceNameCollection = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
 
@@ -72,7 +72,7 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
         $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
-    public function testCreateWithGetCacheItemThrowsCacheException()
+    public function testCreateWithGetCacheItemThrowsCacheException(): void
     {
         $decoratedPropertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $decoratedPropertyNameCollectionFactory->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummy']))->shouldBeCalled();

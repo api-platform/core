@@ -26,21 +26,15 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 {
     public const FORMAT = 'jsonld';
 
-    private $urlGenerator;
-
-    public function __construct(UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
     {
         parent::__construct($serializePayloadFields, $nameConverter);
-
-        $this->urlGenerator = $urlGenerator;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         [$messages, $violations] = $this->getMessagesAndViolations($object);
 

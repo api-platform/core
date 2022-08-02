@@ -24,14 +24,12 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 final class PayloadArgumentResolver implements ArgumentValueResolverInterface
 {
     use OperationRequestInitiatorTrait;
-    private $serializationContextBuilder;
 
     public function __construct(
         ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
-        SerializerContextBuilderInterface $serializationContextBuilder
+        private readonly SerializerContextBuilderInterface $serializationContextBuilder
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->serializationContextBuilder = $serializationContextBuilder;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument): bool

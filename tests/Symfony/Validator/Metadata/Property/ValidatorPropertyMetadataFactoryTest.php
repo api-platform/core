@@ -62,7 +62,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $validatorClassMetadata;
+    private ClassMetadata $validatorClassMetadata;
 
     protected function setUp(): void
     {
@@ -70,7 +70,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($this->validatorClassMetadata);
     }
 
-    public function testCreateWithPropertyWithRequiredConstraints()
+    public function testCreateWithPropertyWithRequiredConstraints(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy')->withReadable(true)->withWritable(true);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(true);
@@ -91,11 +91,11 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithNotRequiredConstraints()
+    public function testCreateWithPropertyWithNotRequiredConstraints(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy')->withReadable(true)->withWritable(true);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(false);
-        $expectedPropertyMetadata = $expectedPropertyMetadata->withTypes(['http://schema.org/Date']);
+        $expectedPropertyMetadata = $expectedPropertyMetadata->withTypes(['https://schema.org/Date']);
 
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyDate', [])->willReturn($propertyMetadata)->shouldBeCalled();
@@ -113,7 +113,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithoutConstraints()
+    public function testCreateWithPropertyWithoutConstraints(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy')->withReadable(true)->withWritable(true)->withIdentifier(true);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(false);
@@ -134,7 +134,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithRightValidationGroupsAndRequiredConstraints()
+    public function testCreateWithPropertyWithRightValidationGroupsAndRequiredConstraints(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy group')->withReadable(true)->withWritable(true);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(true);
@@ -155,7 +155,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithBadValidationGroupsAndRequiredConstraints()
+    public function testCreateWithPropertyWithBadValidationGroupsAndRequiredConstraints(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy group')->withReadable(true)->withWritable(true);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(false);
@@ -176,7 +176,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithNonStringValidationGroupsAndRequiredConstraints()
+    public function testCreateWithPropertyWithNonStringValidationGroupsAndRequiredConstraints(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy group')->withReadable(true)->withWritable(true);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(false);
@@ -197,10 +197,10 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithRequiredByDecorated()
+    public function testCreateWithRequiredByDecorated(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy group')->withReadable(true)->withRequired(true)->withTypes(['foo:bar']);
-        $expectedPropertyMetadata = (clone $propertyMetadata)->withTypes(['foo:bar', 'http://schema.org/Date']);
+        $expectedPropertyMetadata = (clone $propertyMetadata)->withTypes(['foo:bar', 'https://schema.org/Date']);
 
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyDate', [])->willReturn($propertyMetadata)->shouldBeCalled();
@@ -218,26 +218,26 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithValidationConstraints()
+    public function testCreateWithPropertyWithValidationConstraints(): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyIriWithValidationEntity::class);
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
 
         $types = [
-            'dummyUrl' => 'http://schema.org/url',
-            'dummyEmail' => 'http://schema.org/email',
-            'dummyUuid' => 'http://schema.org/identifier',
-            'dummyCardScheme' => 'http://schema.org/identifier',
-            'dummyBic' => 'http://schema.org/identifier',
-            'dummyIban' => 'http://schema.org/identifier',
-            'dummyDate' => 'http://schema.org/Date',
-            'dummyDateTime' => 'http://schema.org/DateTime',
-            'dummyTime' => 'http://schema.org/Time',
-            'dummyImage' => 'http://schema.org/image',
-            'dummyFile' => 'http://schema.org/MediaObject',
-            'dummyCurrency' => 'http://schema.org/priceCurrency',
-            'dummyIsbn' => 'http://schema.org/isbn',
-            'dummyIssn' => 'http://schema.org/issn',
+            'dummyUrl' => 'https://schema.org/url',
+            'dummyEmail' => 'https://schema.org/email',
+            'dummyUuid' => 'https://schema.org/identifier',
+            'dummyCardScheme' => 'https://schema.org/identifier',
+            'dummyBic' => 'https://schema.org/identifier',
+            'dummyIban' => 'https://schema.org/identifier',
+            'dummyDate' => 'https://schema.org/Date',
+            'dummyDateTime' => 'https://schema.org/DateTime',
+            'dummyTime' => 'https://schema.org/Time',
+            'dummyImage' => 'https://schema.org/image',
+            'dummyFile' => 'https://schema.org/MediaObject',
+            'dummyCurrency' => 'https://schema.org/priceCurrency',
+            'dummyIsbn' => 'https://schema.org/isbn',
+            'dummyIssn' => 'https://schema.org/issn',
         ];
 
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -256,7 +256,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         foreach ($types as $property => $iri) {
             $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyIriWithValidationEntity::class, $property);
-            $this->assertSame($iri, $resultedPropertyMetadata->getTypes()[0]);
+            $this->assertEquals($iri, $resultedPropertyMetadata->getTypes()[0]);
         }
     }
 
@@ -337,7 +337,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $schema = $validationPropertyMetadataFactory->create($class, $property)->getSchema();
 
-        $this->assertSame($expectedSchema, $schema);
+        $this->assertEquals($expectedSchema, $schema);
     }
 
     public function providePropertySchemaFormatCases(): \Generator
@@ -446,7 +446,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $this->assertNotNull($schema);
         $this->assertArrayHasKey('oneOf', $schema);
-        $this->assertSame([
+        $this->assertEquals([
             ['pattern' => '^(.*#.*)$'],
             ['minLength' => 10],
         ], $schema['oneOf']);
@@ -475,7 +475,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyUniqueValidatedEntity::class, 'dummyItems')->getSchema();
 
-        $this->assertSame(['uniqueItems' => true], $schema);
+        $this->assertEquals(['uniqueItems' => true], $schema);
     }
 
     /**
@@ -502,7 +502,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $schema = $validationPropertyMetadataFactory->create(DummyRangeValidatedEntity::class, $property)->getSchema();
 
-        $this->assertSame($expectedSchema, $schema);
+        $this->assertEquals($expectedSchema, $schema);
     }
 
     public function provideRangeConstraintCases(): \Generator
@@ -540,7 +540,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyValidatedChoiceEntity::class, $property)->getSchema();
 
-        $this->assertSame($expectedSchema, $schema);
+        $this->assertEquals($expectedSchema, $schema);
     }
 
     public function provideChoiceConstraintCases(): \Generator
@@ -579,7 +579,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyCountValidatedEntity::class, $property)->getSchema();
 
-        $this->assertSame($expectedSchema, $schema);
+        $this->assertEquals($expectedSchema, $schema);
     }
 
     public function provideCountConstraintCases(): \Generator
@@ -631,7 +631,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyCollectionValidatedEntity::class, 'dummyData')->getSchema();
 
-        $this->assertSame([
+        $this->assertEquals([
             'type' => 'object',
             'properties' => [
                 'name' => [],
@@ -682,7 +682,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyNumericValidatedEntity::class, $property)->getSchema();
 
-        $this->assertSame($expectedSchema, $schema);
+        $this->assertEquals($expectedSchema, $schema);
     }
 
     public function provideNumericConstraintCases(): \Generator

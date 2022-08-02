@@ -42,14 +42,9 @@ final class AddTagsListener
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
-    private IriConverterInterface $iriConverter;
-    private ?PurgerInterface $purger;
-
-    public function __construct(IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, PurgerInterface $purger = null)
+    public function __construct(private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?PurgerInterface $purger = null)
     {
-        $this->iriConverter = $iriConverter;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->purger = $purger;
     }
 
     /**

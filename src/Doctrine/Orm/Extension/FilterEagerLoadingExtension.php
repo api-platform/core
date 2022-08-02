@@ -29,13 +29,8 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class FilterEagerLoadingExtension implements QueryCollectionExtensionInterface
 {
-    private ?ResourceClassResolverInterface $resourceClassResolver;
-    private bool $forceEager;
-
-    public function __construct(bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(private readonly bool $forceEager = true, private readonly ?ResourceClassResolverInterface $resourceClassResolver = null)
     {
-        $this->forceEager = $forceEager;
-        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     /**
@@ -200,8 +195,6 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 
     private function buildReplacePatterns(array $aliases): array
     {
-        return array_map(static function (string $alias): string {
-            return '/\b'.preg_quote($alias, '/').'/';
-        }, $aliases);
+        return array_map(static fn (string $alias): string => '/\b'.preg_quote($alias, '/').'/', $aliases);
     }
 }

@@ -36,7 +36,7 @@ class ValidationExceptionListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testNotValidationException()
+    public function testNotValidationException(): void
     {
         if (!class_exists(Countries::class)) {
             $this->markTestSkipped('symfony/intl not installed');
@@ -51,7 +51,7 @@ class ValidationExceptionListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
-    public function testValidationException()
+    public function testValidationException(): void
     {
         $exceptionJson = '{"foo": "bar"}';
         $list = new ConstraintViolationList([]);
@@ -77,13 +77,9 @@ class ValidationExceptionListenerTest extends TestCase
         $serializedConstraintViolationList = '{"foo": "bar"}';
         $constraintViolationList = new ConstraintViolationList([]);
         $exception = new class($constraintViolationList) extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface {
-            private $constraintViolationList;
-
-            public function __construct(ConstraintViolationListInterface $constraintViolationList, $message = '', $code = 0, \Throwable $previous = null)
+            public function __construct(private readonly ConstraintViolationListInterface $constraintViolationList, $message = '', $code = 0, \Throwable $previous = null)
             {
                 parent::__construct($message, $code, $previous);
-
-                $this->constraintViolationList = $constraintViolationList;
             }
 
             public function getConstraintViolationList(): ConstraintViolationListInterface
@@ -105,7 +101,7 @@ class ValidationExceptionListenerTest extends TestCase
         (new ValidationExceptionListener(
             $serializerProphecy->reveal(),
             ['hydra' => ['application/ld+json']],
-            [\get_class($exception) => Response::HTTP_BAD_REQUEST]
+            [$exception::class => Response::HTTP_BAD_REQUEST]
         ))->onKernelException($exceptionEvent);
 
         $response = $exceptionEvent->getResponse();
@@ -118,7 +114,7 @@ class ValidationExceptionListenerTest extends TestCase
         self::assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 
-    public function testValidationFilterException()
+    public function testValidationFilterException(): void
     {
         $exceptionJson = '{"message": "my message"}';
         $exception = new FilterValidationException([], 'my message');

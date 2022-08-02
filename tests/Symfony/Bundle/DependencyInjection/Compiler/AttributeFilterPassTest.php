@@ -50,9 +50,7 @@ class AttributeFilterPassTest extends TestCase
         $containerBuilderProphecy->findDefinition(BooleanFilter::class)->willReturn(new Definition(BooleanFilter::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition(Argument::type('string'), Argument::allOf(
             Argument::type(Definition::class),
-            Argument::that(function (Definition $definition): bool {
-                return BooleanFilter::class === $definition->getClass();
-            })
+            Argument::that(fn (Definition $definition): bool => BooleanFilter::class === $definition->getClass())
         ))->willReturn(new Definition(BooleanFilter::class))->shouldBeCalled();
 
         $attributeFilterPass = new AttributeFilterPass();

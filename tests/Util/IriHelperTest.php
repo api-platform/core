@@ -26,7 +26,7 @@ class IriHelperTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    public function testHelpers()
+    public function testHelpers(): void
     {
         $parsed = [
             'parts' => [
@@ -39,11 +39,11 @@ class IriHelperTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($parsed, IriHelper::parseIri('/hello.json?foo=bar&page=2&bar=3', 'page'));
-        $this->assertEquals('/hello.json?foo=bar&bar=3&page=2', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2.));
+        $this->assertSame($parsed, IriHelper::parseIri('/hello.json?foo=bar&page=2&bar=3', 'page'));
+        $this->assertSame('/hello.json?foo=bar&bar=3&page=2', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2.));
     }
 
-    public function testHelpersWithNetworkPath()
+    public function testHelpersWithNetworkPath(): void
     {
         $parsed = [
             'parts' => [
@@ -62,18 +62,18 @@ class IriHelperTest extends TestCase
             ],
         ];
 
-        $this->assertEquals('//foo:bar@localhost:8080/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
+        $this->assertSame('//foo:bar@localhost:8080/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
 
         unset($parsed['parts']['scheme']);
 
-        $this->assertEquals('//foo:bar@localhost:8080/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
+        $this->assertSame('//foo:bar@localhost:8080/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
 
         $parsed['parts']['port'] = 443;
 
-        $this->assertEquals('//foo:bar@localhost:443/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
+        $this->assertSame('//foo:bar@localhost:443/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
     }
 
-    public function testParseIriWithInvalidUrl()
+    public function testParseIriWithInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The request URI "http:///" is malformed.');

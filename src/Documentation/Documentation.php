@@ -22,17 +22,8 @@ use ApiPlatform\Metadata\Resource\ResourceNameCollection;
  */
 final class Documentation implements DocumentationInterface
 {
-    private $resourceNameCollection;
-    private $title;
-    private $description;
-    private $version;
-
-    public function __construct(ResourceNameCollection $resourceNameCollection, string $title = '', string $description = '', string $version = '')
+    public function __construct(private readonly ResourceNameCollection $resourceNameCollection, private readonly string $title = '', private readonly string $description = '', private readonly string $version = '')
     {
-        $this->resourceNameCollection = $resourceNameCollection;
-        $this->title = $title;
-        $this->description = $description;
-        $this->version = $version;
     }
 
     public function getVersion(): string

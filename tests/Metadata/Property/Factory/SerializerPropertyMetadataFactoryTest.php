@@ -47,7 +47,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
      * @param mixed $readGroups
      * @param mixed $writeGroups
      */
-    public function testCreate($readGroups, $writeGroups)
+    public function testCreate($readGroups, $writeGroups): void
     {
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
         $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);

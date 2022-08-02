@@ -23,7 +23,7 @@ use Symfony\Component\HttpClient\HttpClientTrait;
 
 final class TestClientPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (
             !class_exists(AbstractBrowser::class) ||

@@ -18,17 +18,14 @@ use PHPUnit\Framework\TestCase;
 
 class ResourceListTest extends TestCase
 {
-    /**
-     * @var ResourceList
-     */
-    private $resourceList;
+    private ResourceList $resourceList;
 
     protected function setUp(): void
     {
         $this->resourceList = new ResourceList();
     }
 
-    public function testImplementsArrayObject()
+    public function testImplementsArrayObject(): void
     {
         $this->assertInstanceOf(\ArrayObject::class, $this->resourceList);
     }

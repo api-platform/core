@@ -32,15 +32,8 @@ final class SerializeStage implements SerializeStageInterface
 {
     use IdentifierTrait;
 
-    private $normalizer;
-    private $serializerContextBuilder;
-    private $pagination;
-
-    public function __construct(NormalizerInterface $normalizer, SerializerContextBuilderInterface $serializerContextBuilder, Pagination $pagination)
+    public function __construct(private readonly NormalizerInterface $normalizer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private readonly Pagination $pagination)
     {
-        $this->normalizer = $normalizer;
-        $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->pagination = $pagination;
     }
 
     /**

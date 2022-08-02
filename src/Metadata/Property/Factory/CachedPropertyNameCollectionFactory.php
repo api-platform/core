@@ -28,12 +28,9 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
 
     public const CACHE_KEY_PREFIX = 'property_name_collection_';
 
-    private $decorated;
-
-    public function __construct(CacheItemPoolInterface $cacheItemPool, PropertyNameCollectionFactoryInterface $decorated)
+    public function __construct(CacheItemPoolInterface $cacheItemPool, private readonly PropertyNameCollectionFactoryInterface $decorated)
     {
         $this->cacheItemPool = $cacheItemPool;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -43,8 +40,6 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $options]));
 
-        return $this->getCached($cacheKey, function () use ($resourceClass, $options) {
-            return $this->decorated->create($resourceClass, $options);
-        });
+        return $this->getCached($cacheKey, fn (): PropertyNameCollection => $this->decorated->create($resourceClass, $options));
     }
 }

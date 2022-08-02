@@ -32,13 +32,8 @@ final class AddFormatListener
 {
     use OperationRequestInitiatorTrait;
 
-    private $negotiator;
-    private $formats = [];
-
-    public function __construct(Negotiator $negotiator, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $formats = [])
+    public function __construct(private readonly Negotiator $negotiator, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [])
     {
-        $this->negotiator = $negotiator;
-        $this->formats = $formats;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 

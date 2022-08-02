@@ -26,17 +26,17 @@ class CompositeRelation
 {
     #[ORM\Column(type: 'string', nullable: true)]
     #[Groups(['default'])]
-    private $value;
+    private ?string $value = null;
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: CompositeItem::class, inversedBy: 'compositeValues')]
     #[ORM\JoinColumn(name: 'composite_item_id', referencedColumnName: 'id', nullable: false)]
     #[Groups(['default'])]
-    private $compositeItem;
+    private CompositeItem $compositeItem;
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: CompositeLabel::class)]
     #[ORM\JoinColumn(name: 'composite_label_id', referencedColumnName: 'id', nullable: false)]
     #[Groups(['default'])]
-    private $compositeLabel;
+    private CompositeLabel $compositeLabel;
 
     /**
      * Gets value.
@@ -51,7 +51,7 @@ class CompositeRelation
      *
      * @param string|null $value the value to set
      */
-    public function setValue($value = null)
+    public function setValue($value = null): void
     {
         $this->value = $value;
     }
@@ -69,7 +69,7 @@ class CompositeRelation
      *
      * @param CompositeItem $compositeItem the value to set
      */
-    public function setCompositeItem(CompositeItem $compositeItem)
+    public function setCompositeItem(CompositeItem $compositeItem): void
     {
         $this->compositeItem = $compositeItem;
     }
@@ -87,7 +87,7 @@ class CompositeRelation
      *
      * @param CompositeLabel $compositeLabel the value to set
      */
-    public function setCompositeLabel(CompositeLabel $compositeLabel)
+    public function setCompositeLabel(CompositeLabel $compositeLabel): void
     {
         $this->compositeLabel = $compositeLabel;
     }

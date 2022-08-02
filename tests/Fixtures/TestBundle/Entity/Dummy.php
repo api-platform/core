@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -27,8 +28,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource(filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'])]
-#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()])]
-#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy.{_format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()])]
 #[ORM\Entity]
 class Dummy
 {
@@ -78,7 +79,7 @@ class Dummy
      */
     #[ORM\Column(type: 'boolean', nullable: true)]
 
-    public $dummyBoolean;
+    public ?bool $dummyBoolean = null;
     /**
      * @var \DateTime|null A dummy date
      */
@@ -100,25 +101,22 @@ class Dummy
 
     #[ApiProperty(push: true)]
     #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
-    public ?RelatedDummy $relatedDummy;
+    public ?RelatedDummy $relatedDummy = null;
 
-    /**
-     * @var ArrayCollection<int, RelatedDummy> Several dummies
-     */
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
-    public $relatedDummies;
+    public Collection|iterable $relatedDummies;
 
     /**
      * @var array|null serialize data
      */
     #[ORM\Column(type: 'json', nullable: true)]
-    public $jsonData;
+    public $jsonData = [];
 
     /**
      * @var array|null
      */
     #[ORM\Column(type: 'simple_array', nullable: true)]
-    public $arrayData;
+    public $arrayData = [];
 
     /**
      * @var string|null
@@ -138,15 +136,13 @@ class Dummy
     #[ORM\OneToOne(targetEntity: RelatedOwningDummy::class, cascade: ['persist'], inversedBy: 'ownedDummy')]
     public $relatedOwningDummy;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
-        $this->jsonData = [];
-        $this->arrayData = [];
     }
 
     public function getId()
@@ -154,12 +150,12 @@ class Dummy
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -169,7 +165,7 @@ class Dummy
         return $this->name;
     }
 
-    public function setAlias($alias)
+    public function setAlias($alias): void
     {
         $this->alias = $alias;
     }
@@ -179,7 +175,7 @@ class Dummy
         return $this->alias;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
@@ -189,21 +185,21 @@ class Dummy
         return $this->description;
     }
 
-    public function fooBar($baz)
+    public function fooBar($baz): void
     {
     }
 
-    public function getFoo()
+    public function getFoo(): ?array
     {
         return $this->foo;
     }
 
-    public function setFoo(array $foo = null)
+    public function setFoo(array $foo = null): void
     {
         $this->foo = $foo;
     }
 
-    public function setDummyDate(\DateTime $dummyDate = null)
+    public function setDummyDate(\DateTime $dummyDate = null): void
     {
         $this->dummyDate = $dummyDate;
     }
@@ -225,7 +221,7 @@ class Dummy
         return $this->dummyPrice;
     }
 
-    public function setJsonData($jsonData)
+    public function setJsonData($jsonData): void
     {
         $this->jsonData = $jsonData;
     }
@@ -235,7 +231,7 @@ class Dummy
         return $this->jsonData;
     }
 
-    public function setArrayData($arrayData)
+    public function setArrayData($arrayData): void
     {
         $this->arrayData = $arrayData;
     }
@@ -245,17 +241,17 @@ class Dummy
         return $this->arrayData;
     }
 
-    public function getRelatedDummy()
+    public function getRelatedDummy(): ?RelatedDummy
     {
         return $this->relatedDummy;
     }
 
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }
 
-    public function addRelatedDummy(RelatedDummy $relatedDummy)
+    public function addRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummies->add($relatedDummy);
     }
@@ -265,7 +261,7 @@ class Dummy
         return $this->relatedOwnedDummy;
     }
 
-    public function setRelatedOwnedDummy(RelatedOwnedDummy $relatedOwnedDummy)
+    public function setRelatedOwnedDummy(RelatedOwnedDummy $relatedOwnedDummy): void
     {
         $this->relatedOwnedDummy = $relatedOwnedDummy;
         if ($this !== $this->relatedOwnedDummy->getOwningDummy()) {
@@ -278,7 +274,7 @@ class Dummy
         return $this->relatedOwningDummy;
     }
 
-    public function setRelatedOwningDummy(RelatedOwningDummy $relatedOwningDummy)
+    public function setRelatedOwningDummy(RelatedOwningDummy $relatedOwningDummy): void
     {
         $this->relatedOwningDummy = $relatedOwningDummy;
     }
@@ -291,12 +287,12 @@ class Dummy
     /**
      * @param bool $dummyBoolean
      */
-    public function setDummyBoolean($dummyBoolean)
+    public function setDummyBoolean($dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }
 
-    public function setDummy($dummy = null)
+    public function setDummy($dummy = null): void
     {
         $this->dummy = $dummy;
     }
@@ -306,7 +302,7 @@ class Dummy
         return $this->dummy;
     }
 
-    public function getRelatedDummies()
+    public function getRelatedDummies(): Collection|iterable
     {
         return $this->relatedDummies;
     }

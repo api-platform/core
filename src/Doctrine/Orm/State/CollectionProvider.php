@@ -34,18 +34,11 @@ final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerTrait;
 
-    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
-    private ManagerRegistry $managerRegistry;
-    private iterable $collectionExtensions;
-
     /**
      * @param QueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, iterable $collectionExtensions = [])
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $collectionExtensions = [])
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->managerRegistry = $managerRegistry;
-        $this->collectionExtensions = $collectionExtensions;
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = [])

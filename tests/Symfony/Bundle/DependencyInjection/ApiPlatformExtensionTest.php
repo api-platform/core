@@ -13,19 +13,38 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Api\FilterInterface;
+use ApiPlatform\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider as MongoDbCollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider as MongoDbItemProvider;
+use ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension;
+use ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
+use ApiPlatform\Doctrine\Orm\Extension\FilterExtension;
+use ApiPlatform\Doctrine\Orm\Extension\OrderExtension;
+use ApiPlatform\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
+use ApiPlatform\Elasticsearch\Filter\MatchFilter;
+use ApiPlatform\Elasticsearch\Filter\TermFilter;
+use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\State\CollectionProvider as ElasticsearchCollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider as ElasticsearchItemProvider;
 use ApiPlatform\Exception\ExceptionInterface;
@@ -36,8 +55,22 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\JsonSchema\TypeFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\OpenApi\Options;
+use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
+use ApiPlatform\Serializer\Filter\GroupFilter;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
+use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Symfony\Messenger\Processor as MessengerProcessor;
+use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
@@ -53,14 +86,13 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Yaml\Yaml;
 
 class ApiPlatformExtensionTest extends TestCase
 {
     use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    public const DEFAULT_CONFIG = ['api_platform' => [
+    final public const DEFAULT_CONFIG = ['api_platform' => [
         'title' => 'title',
         'description' => 'description',
         'version' => 'version',
@@ -134,8 +166,7 @@ class ApiPlatformExtensionTest extends TestCase
         'enable_docs' => true,
     ]];
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
     protected function setUp(): void
     {
@@ -158,7 +189,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->container = new ContainerBuilder($containerParameterBag);
     }
 
-    private function assertContainerHas(array $services, array $aliases = [])
+    private function assertContainerHas(array $services, array $aliases = []): void
     {
         foreach ($services as $service) {
             $this->assertTrue($this->container->hasDefinition($service), sprintf('Definition "%s" not found.', $service));
@@ -169,17 +200,17 @@ class ApiPlatformExtensionTest extends TestCase
         }
     }
 
-    private function assertNotContainerHasService(string $service)
+    private function assertNotContainerHasService(string $service): void
     {
         $this->assertFalse($this->container->hasDefinition($service), sprintf('Service "%s" found.', $service));
     }
 
-    private function assertContainerHasAlias(string $alias)
+    private function assertContainerHasAlias(string $alias): void
     {
         $this->assertTrue($this->container->hasAlias($alias), sprintf('Alias "%s" not found.', $alias));
     }
 
-    private function assertServiceHasTags($service, $tags = [])
+    private function assertServiceHasTags(string $service, array $tags = []): void
     {
         $serviceTags = $this->container->getDefinition($service)->getTags();
 
@@ -225,16 +256,16 @@ class ApiPlatformExtensionTest extends TestCase
         ];
 
         $aliases = [
-            'ApiPlatform\Action\NotFoundAction',
-            'ApiPlatform\Api\IdentifiersExtractorInterface',
-            'ApiPlatform\Api\IriConverterInterface',
-            'ApiPlatform\Api\ResourceClassResolverInterface',
-            'ApiPlatform\Api\UrlGeneratorInterface',
-            'ApiPlatform\Serializer\Filter\GroupFilter',
-            'ApiPlatform\Serializer\Filter\PropertyFilter',
-            'ApiPlatform\Serializer\SerializerContextBuilderInterface',
-            'ApiPlatform\State\Pagination\Pagination',
-            'ApiPlatform\State\Pagination\PaginationOptions',
+            NotFoundAction::class,
+            IdentifiersExtractorInterface::class,
+            IriConverterInterface::class,
+            ResourceClassResolverInterface::class,
+            UrlGeneratorInterface::class,
+            GroupFilter::class,
+            PropertyFilter::class,
+            SerializerContextBuilderInterface::class,
+            Pagination::class,
+            PaginationOptions::class,
             'api_platform.action.delete_item',
             'api_platform.action.get_collection',
             'api_platform.action.get_item',
@@ -286,12 +317,10 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.symfony.uri_variables.transformer.uuid', ['api_platform.uri_variables.transformer']);
     }
 
-    public function dataProviderCommonConfigurationAliasNameConverter()
+    public function dataProviderCommonConfigurationAliasNameConverter(): \Iterator
     {
-        return [
-            ['dummyValue', true],
-            [null, false],
-        ];
+        yield ['dummyValue', true];
+        yield [null, false];
     }
 
     /**
@@ -300,7 +329,7 @@ class ApiPlatformExtensionTest extends TestCase
      * @param mixed $nameConverterConfig
      * @param mixed $aliasIsExected
      */
-    public function testCommonConfigurationAliasNameConverter($nameConverterConfig, $aliasIsExected)
+    public function testCommonConfigurationAliasNameConverter($nameConverterConfig, $aliasIsExected): void
     {
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['name_converter'] = $nameConverterConfig;
@@ -376,23 +405,23 @@ class ApiPlatformExtensionTest extends TestCase
         $aliases = [
             // metadata/property_name.xml
             'api_platform.metadata.property.name_collection_factory',
-            'ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface',
+            PropertyNameCollectionFactoryInterface::class,
 
             // metadata/property.xml
             'api_platform.metadata.property.identifier_metadata_factory',
 
             // metadata/property_name.xml
             'api_platform.metadata.property.name_collection_factory',
-            'ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface',
+            PropertyNameCollectionFactoryInterface::class,
 
             // metadata/resource.xml
             'api_platform.metadata.resource.metadata_collection_factory',
             'api_platform.metadata.resource.metadata_collection_factory.retro_compatible',
-            'ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface',
+            ResourceMetadataCollectionFactoryInterface::class,
 
             // metadata/resource_name.xml
             'api_platform.metadata.resource.name_collection_factory',
-            'ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface',
+            ResourceNameCollectionFactoryInterface::class,
 
             // metadata/backward_compatibility.xml
             'api_platform.metadata.property.metadata_factory',
@@ -410,7 +439,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.cache.metadata.resource', ['cache.pool']);
     }
 
-    public function testMetadataConfigurationDocBlockFactoryInterface()
+    public function testMetadataConfigurationDocBlockFactoryInterface(): void
     {
         if (!interface_exists(DocBlockFactoryInterface::class)) {
             $this->markTestSkipped('class phpDocumentor\Reflection\DocBlockFactoryInterface does not exist');
@@ -427,7 +456,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContainerHas($services, []);
     }
 
-    public function testSwaggerConfiguration()
+    public function testSwaggerConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['enable_swagger'] = true;
@@ -459,18 +488,18 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // json_schema.xml
-            'ApiPlatform\JsonSchema\TypeFactoryInterface',
-            'ApiPlatform\JsonSchema\SchemaFactoryInterface',
+            TypeFactoryInterface::class,
+            SchemaFactoryInterface::class,
 
             // openapi.xml
-            'ApiPlatform\OpenApi\Serializer\OpenApiNormalizer',
-            'ApiPlatform\OpenApi\Options',
+            OpenApiNormalizer::class,
+            Options::class,
 
             // swagger_ui.xml
             'api_platform.swagger_ui.listener',
 
             // v3/openapi.xml
-            'ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface',
+            OpenApiFactoryInterface::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -669,7 +698,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // v3/graphql.xml
-            'ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface',
+            \ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -785,17 +814,17 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // doctrine_orm.xml
-            'ApiPlatform\Doctrine\Orm\Filter\OrderFilter',
-            'ApiPlatform\Doctrine\Orm\Filter\RangeFilter',
-            'ApiPlatform\Doctrine\Orm\Filter\DateFilter',
-            'ApiPlatform\Doctrine\Orm\Filter\BooleanFilter',
-            'ApiPlatform\Doctrine\Orm\Filter\NumericFilter',
-            'ApiPlatform\Doctrine\Orm\Filter\ExistsFilter',
-            'ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension',
-            'ApiPlatform\Doctrine\Orm\Extension\FilterExtension',
-            'ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension',
-            'ApiPlatform\Doctrine\Orm\Extension\PaginationExtension',
-            'ApiPlatform\Doctrine\Orm\Extension\OrderExtension',
+            OrderFilter::class,
+            RangeFilter::class,
+            DateFilter::class,
+            BooleanFilter::class,
+            NumericFilter::class,
+            ExistsFilter::class,
+            EagerLoadingExtension::class,
+            FilterExtension::class,
+            FilterEagerLoadingExtension::class,
+            PaginationExtension::class,
+            OrderExtension::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -842,16 +871,16 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // doctrine_mongo_odm.xml
-            'ApiPlatform\Doctrine\Odm\Filter\SearchFilter',
-            'ApiPlatform\Doctrine\Odm\Filter\BooleanFilter',
-            'ApiPlatform\Doctrine\Odm\Filter\DateFilter',
-            'ApiPlatform\Doctrine\Odm\Filter\ExistsFilter',
-            'ApiPlatform\Doctrine\Odm\Filter\NumericFilter',
-            'ApiPlatform\Doctrine\Odm\Filter\OrderFilter',
-            'ApiPlatform\Doctrine\Odm\Filter\RangeFilter',
-            'ApiPlatform\Doctrine\Odm\Extension\FilterExtension',
-            'ApiPlatform\Doctrine\Odm\Extension\PaginationExtension',
-            'ApiPlatform\Doctrine\Odm\Extension\OrderExtension',
+            SearchFilter::class,
+            \ApiPlatform\Doctrine\Odm\Filter\BooleanFilter::class,
+            \ApiPlatform\Doctrine\Odm\Filter\DateFilter::class,
+            \ApiPlatform\Doctrine\Odm\Filter\ExistsFilter::class,
+            \ApiPlatform\Doctrine\Odm\Filter\NumericFilter::class,
+            \ApiPlatform\Doctrine\Odm\Filter\OrderFilter::class,
+            \ApiPlatform\Doctrine\Odm\Filter\RangeFilter::class,
+            \ApiPlatform\Doctrine\Odm\Extension\FilterExtension::class,
+            \ApiPlatform\Doctrine\Odm\Extension\PaginationExtension::class,
+            \ApiPlatform\Doctrine\Odm\Extension\OrderExtension::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -900,7 +929,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertContainerHasAlias('api_platform.http_cache.purger.varnish');
 
-        $this->assertSame([
+        $this->assertEquals([
             ['event' => 'preUpdate'],
             ['event' => 'onFlush'],
             ['event' => 'postFlush'],
@@ -942,7 +971,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // symfony/validator.xml
-            'ApiPlatform\Validator\ValidatorInterface',
+            \ApiPlatform\Validator\ValidatorInterface::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -1029,12 +1058,12 @@ class ApiPlatformExtensionTest extends TestCase
         // v3/doctrine_odm_mercure_publisher.xml
         $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.listener.mercure.publish', ['doctrine_mongodb.odm.event_listener']);
 
-        $this->assertSame([
+        $this->assertEquals([
             ['event' => 'onFlush'],
             ['event' => 'postFlush'],
         ], $this->container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->getTag('doctrine.event_listener'));
 
-        $this->assertSame([
+        $this->assertEquals([
             ['event' => 'onFlush'],
             ['event' => 'postFlush'],
         ], $this->container->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->getTag('doctrine_mongodb.odm.event_listener'));
@@ -1092,10 +1121,10 @@ class ApiPlatformExtensionTest extends TestCase
         $aliases = [
             // elasticsearch.xml
             'api_platform.elasticsearch.metadata.document.metadata_factory',
-            'ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface',
-            'ApiPlatform\Elasticsearch\Filter\TermFilter',
-            'ApiPlatform\Elasticsearch\Filter\MatchFilter',
-            'ApiPlatform\Elasticsearch\Filter\OrderFilter',
+            DocumentMetadataFactoryInterface::class,
+            TermFilter::class,
+            MatchFilter::class,
+            \ApiPlatform\Elasticsearch\Filter\OrderFilter::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -1129,7 +1158,7 @@ class ApiPlatformExtensionTest extends TestCase
         $aliases = [
             // security.xml
             'api_platform.security.expression_language',
-            'ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface',
+            ResourceAccessCheckerInterface::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -1138,7 +1167,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.security.listener.request.deny_access', ['kernel.event_listener']);
         $this->assertServiceHasTags('api_platform.security.expression_language_provider', ['security.expression_language_provider']);
 
-        $this->assertSame([
+        $this->assertEquals([
             ['event' => 'kernel.request', 'method' => 'onSecurity', 'priority' => 3],
             ['event' => 'kernel.request', 'method' => 'onSecurityPostDenormalize', 'priority' => 1],
             ['event' => 'kernel.view', 'method' => 'onSecurityPostValidation', 'priority' => 63],
@@ -1199,7 +1228,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertEmpty(array_diff(array_keys($interfaces), $has), 'Not all expected interfaces are autoconfigurable.');
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['defaults'] = [

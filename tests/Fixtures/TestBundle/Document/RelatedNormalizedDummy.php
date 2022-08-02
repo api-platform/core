@@ -40,17 +40,14 @@ class RelatedNormalizedDummy
      * @var string|null The dummy name
      */
     #[Assert\NotBlank]
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[Groups(['related_output', 'related_input'])]
     #[ODM\Field]
     private ?string $name = null;
 
-    /**
-     * @var iterable Several Normalized dummies
-     */
     #[Groups(['related_output', 'related_input'])]
     #[ODM\ReferenceMany(targetDocument: CustomNormalizedDummy::class)]
-    public $customNormalizedDummy;
+    public Collection|iterable $customNormalizedDummy;
 
     public function __construct()
     {
@@ -65,7 +62,7 @@ class RelatedNormalizedDummy
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -75,12 +72,12 @@ class RelatedNormalizedDummy
         return $this->name;
     }
 
-    public function getCustomNormalizedDummy(): Collection
+    public function getCustomNormalizedDummy(): Collection|iterable
     {
         return $this->customNormalizedDummy;
     }
 
-    public function setCustomNormalizedDummy(iterable $customNormalizedDummy): void
+    public function setCustomNormalizedDummy(Collection|iterable $customNormalizedDummy): void
     {
         $this->customNormalizedDummy = $customNormalizedDummy;
     }

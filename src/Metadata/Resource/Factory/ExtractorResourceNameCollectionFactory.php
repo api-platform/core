@@ -25,13 +25,8 @@ use ApiPlatform\Metadata\Resource\ResourceNameCollection;
  */
 final class ExtractorResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
-    private $extractor;
-    private $decorated;
-
-    public function __construct(ResourceExtractorInterface $extractor, ResourceNameCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceNameCollectionFactoryInterface $decorated = null)
     {
-        $this->extractor = $extractor;
-        $this->decorated = $decorated;
     }
 
     /**

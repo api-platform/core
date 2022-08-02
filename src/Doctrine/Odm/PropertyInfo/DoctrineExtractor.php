@@ -34,11 +34,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
-    private ObjectManager $objectManager;
-
-    public function __construct(ObjectManager $objectManager)
+    public function __construct(private readonly ObjectManager $objectManager)
     {
-        $this->objectManager = $objectManager;
     }
 
     /**
@@ -100,9 +97,9 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
 
             switch ($typeOfField) {
                 case MongoDbType::DATE:
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, \DateTime::class)];
                 case MongoDbType::DATE_IMMUTABLE:
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, \DateTimeImmutable::class)];
                 case MongoDbType::HASH:
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
                 case MongoDbType::COLLECTION:
@@ -145,7 +142,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
     {
         try {
             return $this->objectManager->getClassMetadata($class);
-        } catch (MappingException $exception) {
+        } catch (MappingException) {
             return null;
         }
     }

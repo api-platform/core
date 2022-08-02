@@ -33,7 +33,7 @@ class ConvertedBoolean
     #[ORM\Column(type: 'boolean')]
     public $nameConverted;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

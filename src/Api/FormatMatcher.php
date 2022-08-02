@@ -23,7 +23,7 @@ final class FormatMatcher
     /**
      * @var array<string, string[]>
      */
-    private $formats;
+    private readonly array $formats;
 
     /**
      * @param array<string, string[]|string> $formats

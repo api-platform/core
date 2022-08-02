@@ -28,15 +28,8 @@ use Symfony\Component\Routing\Route;
  */
 final class UriTemplateResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $linkFactory;
-    private $pathSegmentNameGenerator;
-    private $decorated;
-
-    public function __construct(LinkFactoryInterface $linkFactory, PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, ResourceMetadataCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly LinkFactoryInterface $linkFactory, private readonly PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
-        $this->linkFactory = $linkFactory;
-        $this->pathSegmentNameGenerator = $pathSegmentNameGenerator;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -110,12 +103,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         return sprintf('%s.{_format}', $uriTemplate);
     }
 
-    /**
-     * @param ApiResource|HttpOperation $operation
-     *
-     * @return ApiResource|HttpOperation
-     */
-    private function configureUriVariables($operation)
+    private function configureUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation
     {
         // We will generate the collection route, don't initialize variables here
         if ($operation instanceof HttpOperation && (
@@ -149,9 +137,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         $operation = $operation->withUriVariables($uriVariables);
 
         $route = (new Route($uriTemplate))->compile();
-        $variables = array_filter($route->getPathVariables(), function ($v) {
-            return '_format' !== $v;
-        });
+        $variables = array_filter($route->getPathVariables(), fn ($v): bool => '_format' !== $v);
 
         if (\count($variables) !== \count($uriVariables)) {
             $newUriVariables = [];
@@ -170,12 +156,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         return $operation;
     }
 
-    /**
-     * @param ApiResource|HttpOperation $operation
-     *
-     * @return ApiResource|HttpOperation
-     */
-    private function normalizeUriVariables($operation)
+    private function normalizeUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation
     {
         $uriVariables = (array) ($operation->getUriVariables() ?? []);
 

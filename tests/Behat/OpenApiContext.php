@@ -22,17 +22,14 @@ use PHPUnit\Framework\ExpectationFailedException;
 
 final class OpenApiContext implements Context
 {
-    /**
-     * @var RestContext
-     */
-    private $restContext;
+    private ?RestContext $restContext = null;
 
     /**
      * Gives access to the Behatch context.
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /**
          * @var InitializedContextEnvironment $environment
@@ -76,7 +73,7 @@ final class OpenApiContext implements Context
     {
         try {
             $this->getClassInfo($className);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             return;
         }
 
@@ -90,7 +87,7 @@ final class OpenApiContext implements Context
     {
         try {
             $this->getClassInfo($className, 3);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             return;
         }
 
@@ -101,7 +98,7 @@ final class OpenApiContext implements Context
      * @Then the Swagger path :arg1 exists
      * @Then the OpenAPI path :arg1 exists
      */
-    public function assertThePathExist(string $path)
+    public function assertThePathExist(string $path): void
     {
         $json = $this->getLastJsonResponse();
 
@@ -226,7 +223,7 @@ final class OpenApiContext implements Context
      */
     private function getLastJsonResponse(): \stdClass
     {
-        if (null === ($decoded = json_decode($this->restContext->getMink()->getSession()->getDriver()->getContent()))) {
+        if (null === ($decoded = json_decode($this->restContext->getMink()->getSession()->getDriver()->getContent(), null, 512, \JSON_THROW_ON_ERROR))) {
             throw new \RuntimeException('JSON response seems to be invalid');
         }
 

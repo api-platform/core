@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class MessengerWithInputHandler implements MessageHandlerInterface
 {
-    public function __invoke(MessengerInput $data)
+    public function __invoke(MessengerInput $data): MessengerWithInput
     {
         $object = new MessengerWithInput();
         $object->name = 'test';

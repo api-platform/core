@@ -23,8 +23,8 @@ use ApiPlatform\Metadata\Operation;
  */
 final class Pagination
 {
-    private array $options;
-    private array $graphQlOptions;
+    private readonly array $options;
+    private readonly array $graphQlOptions;
 
     public function __construct(array $options = [], array $graphQlOptions = [])
     {

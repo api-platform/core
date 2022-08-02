@@ -36,9 +36,9 @@ class PaginatorTest extends TestCase
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
-        $this->assertEquals($currentPage, $paginator->getCurrentPage());
-        $this->assertEquals($lastPage, $paginator->getLastPage());
-        $this->assertEquals($maxResults, $paginator->getItemsPerPage());
+        $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
+        $this->assertSame((float) $lastPage, $paginator->getLastPage());
+        $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
     }
 
     public function testInitializeWithFacetStageNotApplied(): void
@@ -85,18 +85,18 @@ class PaginatorTest extends TestCase
     {
         $paginator = $this->getPaginator(0, 5, 0, true);
 
-        $this->assertEquals(1, $paginator->getCurrentPage());
-        $this->assertEquals(1, $paginator->getLastPage());
-        $this->assertEquals(0, $paginator->getItemsPerPage());
+        $this->assertSame(1., $paginator->getCurrentPage());
+        $this->assertSame(1., $paginator->getLastPage());
+        $this->assertSame(0., $paginator->getItemsPerPage());
     }
 
     public function testInitializeWithNoCount(): void
     {
         $paginator = $this->getPaginatorWithNoCount();
 
-        $this->assertEquals(1, $paginator->getCurrentPage());
-        $this->assertEquals(1, $paginator->getLastPage());
-        $this->assertEquals(15, $paginator->getItemsPerPage());
+        $this->assertSame(1., $paginator->getCurrentPage());
+        $this->assertSame(1., $paginator->getLastPage());
+        $this->assertSame(15., $paginator->getItemsPerPage());
     }
 
     public function testGetIterator(): void
@@ -106,7 +106,7 @@ class PaginatorTest extends TestCase
         $this->assertSame($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
     }
 
-    private function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42, $limitZero = false): Paginator
+    private function getPaginator(int $firstResult = 1, int $maxResults = 15, int $totalItems = 42, bool $limitZero = false): Paginator
     {
         $iterator = $this->prophesize(Iterator::class);
         $pipeline = [
@@ -140,7 +140,7 @@ class PaginatorTest extends TestCase
         return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
     }
 
-    private function getPaginatorWithMissingStage($facet = false, $results = false, $count = false, $maxResults = false): Paginator
+    private function getPaginatorWithMissingStage(bool $facet = false, bool $results = false, bool $count = false, bool $maxResults = false): Paginator
     {
         $pipeline = [];
 

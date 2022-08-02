@@ -41,29 +41,14 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 {
     public const FORMAT = 'jsonld';
 
-    private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory;
-    private PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory;
-    private PropertyMetadataFactoryInterface $propertyMetadataFactory;
-    private ResourceClassResolverInterface $resourceClassResolver;
-    private UrlGeneratorInterface $urlGenerator;
-    private ?NameConverterInterface $nameConverter;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?NameConverterInterface $nameConverter = null)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->resourceClassResolver = $resourceClassResolver;
-        $this->urlGenerator = $urlGenerator;
-        $this->nameConverter = $nameConverter;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $classes = [];
         $entrypointProperties = [];
@@ -84,7 +69,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Populates entrypoint properties.
      */
-    private function populateEntrypointProperties(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, ?ResourceMetadataCollection $resourceMetadataCollection = null)
+    private function populateEntrypointProperties(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, ?ResourceMetadataCollection $resourceMetadataCollection = null): void
     {
         $hydraCollectionOperations = $this->getHydraOperations($resourceClass, $resourceMetadata, $prefixedShortName, true, $resourceMetadataCollection);
         if (empty($hydraCollectionOperations)) {
@@ -339,7 +324,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return null;
         }
 
-        if ($type->isCollection() && null !== $collectionType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) {
+        if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
             $type = $collectionType;
         }
 
@@ -464,7 +449,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private function getProperty(ApiProperty $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
         if ($iri = $propertyMetadata->getIris()) {
-            $iri = 1 === \count($iri) ? $iri[0] : $iri;
+            $iri = 1 === (is_countable($iri) ? \count($iri) : 0) ? $iri[0] : $iri;
         }
 
         if (!isset($iri)) {
@@ -554,7 +539,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof Documentation;
     }

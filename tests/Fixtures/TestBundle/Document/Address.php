@@ -28,7 +28,7 @@ class Address
     #[ODM\Field(type: 'string')]
     public $name;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

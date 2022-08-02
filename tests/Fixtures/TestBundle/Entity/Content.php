@@ -35,14 +35,14 @@ class Content implements \JsonSerializable
      */
     #[ORM\OneToMany(targetEntity: Field::class, mappedBy: 'content', cascade: ['persist'], orphanRemoval: true, indexBy: 'name')]
     #[ORM\OrderBy(['id' => 'ASC'])]
-    private \Doctrine\Common\Collections\Collection $fields;
+    private Collection|iterable $fields;
     #[ORM\Column(type: 'string')]
-    private readonly string $status;
+    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
+    private string $status = ContentStatus::DRAFT;
 
     public function __construct()
     {
         $this->fields = new ArrayCollection();
-        $this->status = ContentStatus::DRAFT;
     }
 
     #[Groups(['get_content'])]
@@ -112,11 +112,8 @@ class Content implements \JsonSerializable
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return ['id' => $this->id, 'contentType' => $this->contentType, 'fields' => $this->fields];
     }

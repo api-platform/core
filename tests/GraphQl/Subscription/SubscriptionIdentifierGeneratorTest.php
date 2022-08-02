@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SubscriptionIdentifierGeneratorTest extends TestCase
 {
-    private $subscriptionIdentifierGenerator;
+    private SubscriptionIdentifierGenerator $subscriptionIdentifierGenerator;
 
     /**
      * {@inheritdoc}

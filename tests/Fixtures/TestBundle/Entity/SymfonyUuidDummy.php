@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV4;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
@@ -27,9 +28,9 @@ class SymfonyUuidDummy
     #[ORM\Id]
     #[ORM\Column(type: 'symfony_uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'NONE')]
-    private $id;
+    private Uuid|UuidV4 $id;
     #[ORM\Column(nullable: true)]
-    private $number;
+    private ?string $number = null;
 
     public function __construct(?Uuid $id = null)
     {

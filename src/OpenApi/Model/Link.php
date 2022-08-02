@@ -17,19 +17,8 @@ final class Link
 {
     use ExtensionTrait;
 
-    private $operationId;
-    private $parameters;
-    private $requestBody;
-    private $description;
-    private $server;
-
-    public function __construct(string $operationId, \ArrayObject $parameters = null, $requestBody = null, string $description = '', Server $server = null)
+    public function __construct(private string $operationId, private ?\ArrayObject $parameters = null, private $requestBody = null, private string $description = '', private ?Server $server = null)
     {
-        $this->operationId = $operationId;
-        $this->parameters = $parameters;
-        $this->requestBody = $requestBody;
-        $this->description = $description;
-        $this->server = $server;
     }
 
     public function getOperationId(): string

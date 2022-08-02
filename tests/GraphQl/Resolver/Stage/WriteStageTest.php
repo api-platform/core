@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -29,10 +30,9 @@ class WriteStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var WriteStage */
-    private $writeStage;
-    private $processorProphecy;
-    private $serializerContextBuilderProphecy;
+    private WriteStage $writeStage;
+    private ObjectProphecy $processorProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}

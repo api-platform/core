@@ -38,7 +38,7 @@ class CustomNormalizedDummy
     /**
      * @var string|null The dummy name
      */
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[Assert\NotBlank]
     #[Groups(['input', 'output'])]
     #[ODM\Field]
@@ -47,7 +47,7 @@ class CustomNormalizedDummy
     /**
      * @var string|null The dummy name alias
      */
-    #[ApiProperty(types: ['http://schema.org/alternateName'])]
+    #[ApiProperty(types: ['https://schema.org/alternateName'])]
     #[Groups(['input', 'output'])]
     #[ODM\Field(nullable: true)]
     private ?string $alias = null;
@@ -60,7 +60,7 @@ class CustomNormalizedDummy
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -78,7 +78,7 @@ class CustomNormalizedDummy
     /**
      * @param string $alias
      */
-    public function setAlias($alias)
+    public function setAlias($alias): void
     {
         $this->alias = $alias;
     }
@@ -91,7 +91,7 @@ class CustomNormalizedDummy
     /**
      * @param string $value
      */
-    public function setPersonalizedAlias($value)
+    public function setPersonalizedAlias($value): void
     {
         $this->alias = $value;
     }

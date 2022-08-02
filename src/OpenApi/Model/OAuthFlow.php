@@ -17,17 +17,8 @@ final class OAuthFlow
 {
     use ExtensionTrait;
 
-    private $authorizationUrl;
-    private $tokenUrl;
-    private $refreshUrl;
-    private $scopes;
-
-    public function __construct(string $authorizationUrl = null, string $tokenUrl = null, string $refreshUrl = null, \ArrayObject $scopes = null)
+    public function __construct(private ?string $authorizationUrl = null, private ?string $tokenUrl = null, private ?string $refreshUrl = null, private ?\ArrayObject $scopes = null)
     {
-        $this->authorizationUrl = $authorizationUrl;
-        $this->tokenUrl = $tokenUrl;
-        $this->refreshUrl = $refreshUrl;
-        $this->scopes = $scopes;
     }
 
     public function getAuthorizationUrl(): ?string

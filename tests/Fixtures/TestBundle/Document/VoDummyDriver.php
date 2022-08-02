@@ -24,17 +24,17 @@ class VoDummyDriver
     use VoDummyIdAwareTrait;
 
     public function __construct(
-        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $firstName,
-        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $lastName
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $firstName,
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $lastName
     ) {
     }
 
-    public function getFirstName()
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
 
-    public function getLastName()
+    public function getLastName(): string
     {
         return $this->lastName;
     }

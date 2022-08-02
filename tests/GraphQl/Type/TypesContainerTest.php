@@ -26,10 +26,7 @@ class TypesContainerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @var TypesContainer
-     */
-    private $typesContainer;
+    private TypesContainer $typesContainer;
 
     /**
      * {@inheritdoc}
@@ -68,7 +65,7 @@ class TypesContainerTest extends TestCase
         $type = $this->prophesize(GraphQLType::class)->reveal();
 
         $this->typesContainer->set('test', $type);
-        $this->assertSame(['test' => $type], $this->typesContainer->all());
+        $this->assertEquals(['test' => $type], $this->typesContainer->all());
     }
 
     public function testHas(): void

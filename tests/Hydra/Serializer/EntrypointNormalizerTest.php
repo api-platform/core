@@ -36,7 +36,7 @@ class EntrypointNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $collection = new ResourceNameCollection();
         $entrypoint = new Entrypoint($collection);
@@ -53,7 +53,7 @@ class EntrypointNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizeWithResourceMetadata()
+    public function testNormalizeWithResourceMetadata(): void
     {
         $collection = new ResourceNameCollection([FooDummy::class, Dummy::class]);
         $entrypoint = new Entrypoint($collection);
@@ -87,10 +87,10 @@ class EntrypointNormalizerTest extends TestCase
             'dummy' => '/api/dummies',
             'fooDummy' => '/api/foo_dummies',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }
 
-    public function testNormalizeWithResourceCollection()
+    public function testNormalizeWithResourceCollection(): void
     {
         $collection = new ResourceNameCollection([FooDummy::class, Dummy::class]);
         $entrypoint = new Entrypoint($collection);
@@ -125,6 +125,6 @@ class EntrypointNormalizerTest extends TestCase
             'dummy' => '/api/dummies',
             'fooDummy' => '/api/foo_dummies',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }
 }

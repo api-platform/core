@@ -33,24 +33,13 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
     use ClassInfoTrait;
     use CloneTrait;
 
-    private $readStage;
-    private $securityStage;
-    private $serializeStage;
-    private $subscriptionManager;
-    private $mercureSubscriptionIriGenerator;
-
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SerializeStageInterface $serializeStage, SubscriptionManagerInterface $subscriptionManager, ?MercureSubscriptionIriGeneratorInterface $mercureSubscriptionIriGenerator)
+    public function __construct(private readonly ReadStageInterface $readStage, private readonly SecurityStageInterface $securityStage, private readonly SerializeStageInterface $serializeStage, private readonly SubscriptionManagerInterface $subscriptionManager, private readonly ?MercureSubscriptionIriGeneratorInterface $mercureSubscriptionIriGenerator)
     {
-        $this->readStage = $readStage;
-        $this->securityStage = $securityStage;
-        $this->serializeStage = $serializeStage;
-        $this->subscriptionManager = $subscriptionManager;
-        $this->mercureSubscriptionIriGenerator = $mercureSubscriptionIriGenerator;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {
-        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
+        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation): ?array {
             if (null === $resourceClass || null === $operation) {
                 return null;
             }

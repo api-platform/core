@@ -50,7 +50,7 @@ final class JsonContext extends BaseJsonContext
         foreach ($actualContent as $itemContent) {
             try {
                 $this->assertEquals($expected->getContent(), $itemContent, ' ');
-            } catch (ExpectationException $e) {
+            } catch (ExpectationException) {
                 continue;
             }
 
@@ -88,7 +88,7 @@ final class JsonContext extends BaseJsonContext
 
         try {
             $expected = new Json($content);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             throw new ExpectationException('The expected JSON is not valid.', $this->getSession()->getDriver());
         }
 
@@ -102,10 +102,10 @@ final class JsonContext extends BaseJsonContext
     /**
      * @Then /^the JSON should be a superset of:$/
      */
-    public function theJsonIsASupersetOf(PyStringNode $content)
+    public function theJsonIsASupersetOf(PyStringNode $content): void
     {
-        $array = json_decode($this->httpCallResultPool->getResult()->getValue(), true);
-        $subset = json_decode($content->getRaw(), true);
+        $array = json_decode($this->httpCallResultPool->getResult()->getValue(), true, 512, \JSON_THROW_ON_ERROR);
+        $subset = json_decode($content->getRaw(), true, 512, \JSON_THROW_ON_ERROR);
 
         method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array); // @phpstan-ignore-line Compatibility with PHPUnit 7
     }

@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 /**
  * @author Mahmood Bazdar <mahmood@bazdar.me>
  */
-#[ApiResource(graphQlOperations: [new Mutation(name: 'upload', resolver: 'app.graphql.mutation_resolver.upload_media_object', args: ['file' => ['type' => 'Upload!', 'description' => 'Upload a file']]), new Mutation(name: 'uploadMultiple', resolver: 'app.graphql.mutation_resolver.upload_multiple_media_object', args: ['files' => ['type' => '[Upload!]!', 'description' => 'Upload multiple files']])], types: ['http://schema.org/MediaObject'])]
+#[ApiResource(graphQlOperations: [new Mutation(name: 'upload', resolver: 'app.graphql.mutation_resolver.upload_media_object', args: ['file' => ['type' => 'Upload!', 'description' => 'Upload a file']]), new Mutation(name: 'uploadMultiple', resolver: 'app.graphql.mutation_resolver.upload_multiple_media_object', args: ['files' => ['type' => '[Upload!]!', 'description' => 'Upload multiple files']])], types: ['https://schema.org/MediaObject'])]
 class MediaObject
 {
     #[ApiProperty(identifier: true)]

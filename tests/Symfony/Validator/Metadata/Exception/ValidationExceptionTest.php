@@ -25,7 +25,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ValidationExceptionTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $e = new ValidationException(new ConstraintViolationList([
             new ConstraintViolation('message 1', '', [], '', '', 'invalid'),
@@ -35,7 +35,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertInstanceOf(RuntimeException::class, $e);
         $this->assertInstanceOf(\RuntimeException::class, $e);
 
-        $this->assertEquals(str_replace(\PHP_EOL, "\n", <<<TXT
+        $this->assertSame(str_replace(\PHP_EOL, "\n", <<<TXT
 message 1
 foo: message 2
 TXT

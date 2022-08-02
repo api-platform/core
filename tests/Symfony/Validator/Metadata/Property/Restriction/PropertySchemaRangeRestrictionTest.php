@@ -29,7 +29,7 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaRangeRestriction;
+    private PropertySchemaRangeRestriction $propertySchemaRangeRestriction;
 
     protected function setUp(): void
     {

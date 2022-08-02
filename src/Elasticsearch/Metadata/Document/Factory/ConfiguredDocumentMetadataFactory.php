@@ -25,13 +25,8 @@ use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
  */
 final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    private array $mapping;
-    private ?DocumentMetadataFactoryInterface $decorated;
-
-    public function __construct(array $mapping, ?DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly array $mapping, private readonly ?DocumentMetadataFactoryInterface $decorated = null)
     {
-        $this->mapping = $mapping;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -44,7 +39,7 @@ final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactory
         if ($this->decorated) {
             try {
                 $documentMetadata = $this->decorated->create($resourceClass);
-            } catch (IndexNotFoundException $e) {
+            } catch (IndexNotFoundException) {
             }
         }
 
@@ -56,7 +51,7 @@ final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactory
             throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
         }
 
-        $documentMetadata = $documentMetadata ?? new DocumentMetadata();
+        $documentMetadata ??= new DocumentMetadata();
 
         if (isset($index['index'])) {
             $documentMetadata = $documentMetadata->withIndex($index['index']);

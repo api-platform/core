@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class BoundsTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $filter = new Bounds();
 
@@ -30,7 +30,7 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testEmptyQueryParameter()
+    public function testEmptyQueryParameter(): void
     {
         $filter = new Bounds();
 
@@ -39,7 +39,7 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testNonMatchingMinimum()
+    public function testNonMatchingMinimum(): void
     {
         $request = ['some_filter' => '9'];
         $filter = new Bounds();
@@ -80,7 +80,7 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testMatchingMinimum()
+    public function testMatchingMinimum(): void
     {
         $request = ['some_filter' => '10'];
         $filter = new Bounds();
@@ -107,7 +107,7 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testNonMatchingMaximum()
+    public function testNonMatchingMaximum(): void
     {
         $request = ['some_filter' => '11'];
         $filter = new Bounds();
@@ -148,7 +148,7 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testMatchingMaximum()
+    public function testMatchingMaximum(): void
     {
         $request = ['some_filter' => '10'];
         $filter = new Bounds();

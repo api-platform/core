@@ -17,7 +17,6 @@ use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Util\ResourceClassInfoTrait;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 
@@ -31,13 +30,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 {
     use ResourceClassInfoTrait;
 
-    private $serializerClassMetadataFactory;
-    private $decorated;
-
-    public function __construct(SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(private readonly SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null)
     {
-        $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
-        $this->decorated = $decorated;
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
@@ -58,7 +52,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             if ($denormalizationGroups && !\is_array($denormalizationGroups)) {
                 $denormalizationGroups = [$denormalizationGroups];
             }
-        } catch (ResourceClassNotFoundException $e) {
+        } catch (ResourceClassNotFoundException) {
             // TODO: for input/output classes, the serializer groups must be read from the actual resource class
             return $propertyMetadata;
         }
@@ -87,7 +81,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     {
         $serializerAttributeMetadata = $this->getSerializerAttributeMetadata($resourceClass, $propertyName);
         $groups = $serializerAttributeMetadata ? $serializerAttributeMetadata->getGroups() : [];
-        $ignored = $serializerAttributeMetadata && method_exists($serializerAttributeMetadata, 'isIgnored') ? $serializerAttributeMetadata->isIgnored() : false;
+        $ignored = $serializerAttributeMetadata && $serializerAttributeMetadata->isIgnored();
 
         if (false !== $propertyMetadata->isReadable()) {
             $propertyMetadata = $propertyMetadata->withReadable(!$ignored && (null === $normalizationGroups || array_intersect($normalizationGroups, $groups)));
@@ -125,7 +119,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         if (
             $type->isCollection() &&
-            $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+            $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
         ) {
             $relatedClass = $collectionValueType->getClassName();
         } else {

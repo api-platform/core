@@ -30,7 +30,7 @@ final class PropertySchemaFormatTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaFormatRestriction;
+    private PropertySchemaFormat $propertySchemaFormatRestriction;
 
     protected function setUp(): void
     {

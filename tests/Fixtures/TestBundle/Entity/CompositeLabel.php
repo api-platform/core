@@ -27,10 +27,10 @@ class CompositeLabel implements \Stringable
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private ?int $id = null;
     #[ORM\Column(type: 'string', nullable: true)]
     #[Groups(['default'])]
-    private $value;
+    private ?string $value = null;
 
     /**
      * Gets id.
@@ -53,7 +53,7 @@ class CompositeLabel implements \Stringable
      *
      * @param string|null $value the value to set
      */
-    public function setValue(?string $value = null)
+    public function setValue(?string $value = null): void
     {
         $this->value = $value;
     }

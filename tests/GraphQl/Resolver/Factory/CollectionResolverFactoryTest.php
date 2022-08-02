@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,13 +36,13 @@ class CollectionResolverFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $collectionResolverFactory;
-    private $readStageProphecy;
-    private $securityStageProphecy;
-    private $securityPostDenormalizeStageProphecy;
-    private $serializeStageProphecy;
-    private $queryResolverLocatorProphecy;
-    private $requestStackProphecy;
+    private CollectionResolverFactory $collectionResolverFactory;
+    private ObjectProphecy $readStageProphecy;
+    private ObjectProphecy $securityStageProphecy;
+    private ObjectProphecy $securityPostDenormalizeStageProphecy;
+    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $queryResolverLocatorProphecy;
+    private ObjectProphecy $requestStackProphecy;
 
     /**
      * {@inheritdoc}
@@ -67,7 +68,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolve(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -107,7 +108,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveFieldNotInSource(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -138,7 +139,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveNullSource(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -190,7 +191,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveNullRootClass(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = null;
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -203,7 +204,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveBadReadStageCollection(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -223,7 +224,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveCustom(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withResolver('query_resolver_id')->withName($operationName);
@@ -237,9 +238,7 @@ class CollectionResolverFactoryTest extends TestCase
 
         $customCollection = [new \stdClass()];
         $customCollection[0]->field = 'foo';
-        $this->queryResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(function () use ($customCollection) {
-            return $customCollection;
-        });
+        $this->queryResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(fn (): array => $customCollection);
 
         $this->securityStageProphecy->__invoke($resourceClass, $operation, $resolverContext + [
             'extra_variables' => [

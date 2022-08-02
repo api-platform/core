@@ -17,7 +17,7 @@ use Symfony\Component\Mercure\Update;
 
 class DummyMercureUpdateHandler
 {
-    private $updates = [];
+    private array $updates = [];
 
     public function __invoke(Update $update): string
     {

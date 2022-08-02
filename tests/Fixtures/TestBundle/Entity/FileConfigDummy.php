@@ -40,12 +40,12 @@ class FileConfigDummy
     #[ORM\Column]
     private $foo;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -55,7 +55,7 @@ class FileConfigDummy
         return $this->name;
     }
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }

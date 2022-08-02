@@ -15,25 +15,8 @@ namespace ApiPlatform\Symfony\Bundle\SwaggerUi;
 
 final class SwaggerUiContext
 {
-    private $swaggerUiEnabled;
-    private $showWebby;
-    private $reDocEnabled;
-    private $graphQlEnabled;
-    private $graphiQlEnabled;
-    private $graphQlPlaygroundEnabled;
-    private $assetPackage;
-    private $extraConfiguration;
-
-    public function __construct(bool $swaggerUiEnabled = false, bool $showWebby = true, bool $reDocEnabled = false, bool $graphQlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, $assetPackage = null, array $extraConfiguration = [])
+    public function __construct(private readonly bool $swaggerUiEnabled = false, private readonly bool $showWebby = true, private readonly bool $reDocEnabled = false, private readonly bool $graphQlEnabled = false, private readonly bool $graphiQlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false, private $assetPackage = null, private readonly array $extraConfiguration = [])
     {
-        $this->swaggerUiEnabled = $swaggerUiEnabled;
-        $this->showWebby = $showWebby;
-        $this->reDocEnabled = $reDocEnabled;
-        $this->graphQlEnabled = $graphQlEnabled;
-        $this->graphiQlEnabled = $graphiQlEnabled;
-        $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
-        $this->assetPackage = $assetPackage;
-        $this->extraConfiguration = $extraConfiguration;
     }
 
     public function isSwaggerUiEnabled(): bool

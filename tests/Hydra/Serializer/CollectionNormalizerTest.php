@@ -38,7 +38,7 @@ class CollectionNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportsNormalize()
+    public function testSupportsNormalize(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $iriConvert = $this->prophesize(IriConverterInterface::class);
@@ -55,7 +55,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizeResourceCollection()
+    public function testNormalizeResourceCollection(): void
     {
         $fooOne = new Foo();
         $fooOne->id = 1;
@@ -118,7 +118,7 @@ class CollectionNormalizerTest extends TestCase
         ], $actual);
     }
 
-    public function testNormalizeNonResourceCollection()
+    public function testNormalizeNonResourceCollection(): void
     {
         $notAResourceA = new NotAResource('A', 'buzz');
         $notAResourceB = new NotAResource('B', 'bzzt');
@@ -158,7 +158,7 @@ class CollectionNormalizerTest extends TestCase
         ], $actual);
     }
 
-    public function testNormalizeSubLevelResourceCollection()
+    public function testNormalizeSubLevelResourceCollection(): void
     {
         $fooOne = new Foo();
         $fooOne->id = 1;
@@ -213,7 +213,7 @@ class CollectionNormalizerTest extends TestCase
         ], $actual);
     }
 
-    public function testNormalizeSubLevelNonResourceCollection()
+    public function testNormalizeSubLevelNonResourceCollection(): void
     {
         $notAResourceA = new NotAResource('A', 'buzz');
         $notAResourceB = new NotAResource('B', 'bzzt');
@@ -253,7 +253,7 @@ class CollectionNormalizerTest extends TestCase
         ], $actual);
     }
 
-    public function testNormalizePaginator()
+    public function testNormalizePaginator(): void
     {
         $this->assertEquals(
             [
@@ -272,7 +272,7 @@ class CollectionNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizePartialPaginator()
+    public function testNormalizePartialPaginator(): void
     {
         $this->assertEquals(
             [
@@ -290,7 +290,7 @@ class CollectionNormalizerTest extends TestCase
         );
     }
 
-    private function normalizePaginator($partial = false)
+    private function normalizePaginator(bool $partial = false): array
     {
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
         if ($partial) {
@@ -301,10 +301,10 @@ class CollectionNormalizerTest extends TestCase
             $paginatorProphecy->getTotalItems()->willReturn(1312);
         }
 
-        $paginatorProphecy->rewind()->will(function () {});
+        $paginatorProphecy->rewind()->will(function (): void {});
         $paginatorProphecy->valid()->willReturn(true, false);
         $paginatorProphecy->current()->willReturn('foo');
-        $paginatorProphecy->next()->will(function () {});
+        $paginatorProphecy->next()->will(function (): void {});
 
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->willImplement(NormalizerInterface::class);
@@ -367,7 +367,7 @@ class CollectionNormalizerTest extends TestCase
             'resource_class' => Foo::class,
         ]);
 
-        $this->assertSame([
+        $this->assertEquals([
             '@context' => '/contexts/Foo',
             '@id' => '/foos',
             '@type' => 'hydra:Collection',
@@ -420,7 +420,7 @@ class CollectionNormalizerTest extends TestCase
             'resource_class' => Foo::class,
         ]);
 
-        $this->assertSame([
+        $this->assertEquals([
             '@context' => [
                 '@vocab' => 'http://localhost:8080/docs.jsonld#',
                 'hydra' => 'http://www.w3.org/ns/hydra/core#',

@@ -33,7 +33,7 @@ class DenyAccessListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testNoResourceClass()
+    public function testNoResourceClass(): void
     {
         $request = new Request();
 
@@ -49,7 +49,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onSecurity($event);
     }
 
-    public function testNoIsGrantedAttribute()
+    public function testNoIsGrantedAttribute(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
 
@@ -68,7 +68,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onSecurity($event);
     }
 
-    public function testIsGranted()
+    public function testIsGranted(): void
     {
         $data = new \stdClass();
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', 'data' => $data]);
@@ -91,7 +91,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onSecurity($event);
     }
 
-    public function testIsNotGranted()
+    public function testIsNotGranted(): void
     {
         $this->expectException(AccessDeniedException::class);
 
@@ -115,7 +115,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onSecurity($event);
     }
 
-    public function testSecurityMessage()
+    public function testSecurityMessage(): void
     {
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('You are not admin.');
@@ -140,7 +140,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onSecurity($event);
     }
 
-    public function testSecurityComponentNotAvailable()
+    public function testSecurityComponentNotAvailable(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
 
@@ -155,7 +155,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onSecurity($event);
     }
 
-    private function getListener(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    private function getListener(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null): DenyAccessListener
     {
         if (null === $resourceAccessChecker) {
             $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class)->reveal();

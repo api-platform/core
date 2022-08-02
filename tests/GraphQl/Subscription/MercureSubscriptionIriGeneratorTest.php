@@ -25,11 +25,11 @@ use Symfony\Component\Routing\RequestContext;
  */
 class MercureSubscriptionIriGeneratorTest extends TestCase
 {
-    private $requestContext;
-    private $defaultHub;
-    private $managedHub;
-    private $registry;
-    private $mercureSubscriptionIriGenerator;
+    private RequestContext $requestContext;
+    private Hub $defaultHub;
+    private Hub $managedHub;
+    private HubRegistry $registry;
+    private MercureSubscriptionIriGenerator $mercureSubscriptionIriGenerator;
 
     /**
      * {@inheritdoc}

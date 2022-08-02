@@ -25,6 +25,7 @@ use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -33,12 +34,12 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $itemSubscriptionResolverFactory;
-    private $readStageProphecy;
-    private $securityStageProphecy;
-    private $serializeStageProphecy;
-    private $subscriptionManagerProphecy;
-    private $mercureSubscriptionIriGeneratorProphecy;
+    private ItemSubscriptionResolverFactory $itemSubscriptionResolverFactory;
+    private ObjectProphecy $readStageProphecy;
+    private ObjectProphecy $securityStageProphecy;
+    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $subscriptionManagerProphecy;
+    private ObjectProphecy $mercureSubscriptionIriGeneratorProphecy;
 
     /**
      * {@inheritdoc}
@@ -62,7 +63,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolve(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'update';
         $operation = (new Subscription())->withMercure(true)->withName($operationName);
@@ -106,7 +107,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolveNullOperationName(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $source = ['source'];
         $args = ['args'];
@@ -117,7 +118,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolveBadReadStageItem(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'update';
         $operation = (new Subscription())->withName($operationName);
@@ -137,7 +138,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolveNoSubscriptionId(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'update';
         $operation = (new Subscription())->withName($operationName)->withMercure(true);
@@ -161,7 +162,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
     public function testResolveNoMercureSubscriptionIriGenerator(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'update';
         /** @var Operation $operation */

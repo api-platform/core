@@ -35,11 +35,8 @@ class Pet
     #[ORM\Column(type: 'string')]
     #[Groups(['people.pets'])]
     public $name;
-    /**
-     * @var Collection<int, PersonToPet>
-     */
     #[ORM\OneToMany(targetEntity: PersonToPet::class, mappedBy: 'pet')]
-    public $people;
+    public Collection|iterable $people;
 
     public function __construct()
     {

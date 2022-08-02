@@ -18,35 +18,9 @@ final class PathItem
     use ExtensionTrait;
 
     public static $methods = ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH', 'TRACE'];
-    private $ref;
-    private $summary;
-    private $description;
-    private $get;
-    private $put;
-    private $post;
-    private $delete;
-    private $options;
-    private $head;
-    private $patch;
-    private $trace;
-    private $servers;
-    private $parameters;
 
-    public function __construct(string $ref = null, string $summary = null, string $description = null, Operation $get = null, Operation $put = null, Operation $post = null, Operation $delete = null, Operation $options = null, Operation $head = null, Operation $patch = null, Operation $trace = null, ?array $servers = null, array $parameters = [])
+    public function __construct(private ?string $ref = null, private ?string $summary = null, private ?string $description = null, private ?Operation $get = null, private ?Operation $put = null, private ?Operation $post = null, private ?Operation $delete = null, private ?Operation $options = null, private ?Operation $head = null, private ?Operation $patch = null, private ?Operation $trace = null, private ?array $servers = null, private array $parameters = [])
     {
-        $this->ref = $ref;
-        $this->summary = $summary;
-        $this->description = $description;
-        $this->get = $get;
-        $this->put = $put;
-        $this->post = $post;
-        $this->delete = $delete;
-        $this->options = $options;
-        $this->head = $head;
-        $this->patch = $patch;
-        $this->trace = $trace;
-        $this->servers = $servers;
-        $this->parameters = $parameters;
     }
 
     public function getRef(): ?string

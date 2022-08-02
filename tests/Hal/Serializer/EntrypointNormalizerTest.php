@@ -34,7 +34,7 @@ class EntrypointNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $collection = new ResourceNameCollection();
         $entrypoint = new Entrypoint($collection);
@@ -51,7 +51,7 @@ class EntrypointNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $collection = new ResourceNameCollection([Dummy::class]);
         $entrypoint = new Entrypoint($collection);
@@ -83,6 +83,6 @@ class EntrypointNormalizerTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }
 }

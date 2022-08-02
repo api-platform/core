@@ -30,7 +30,7 @@ class CachedPropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreateWithItemHit()
+    public function testCreateWithItemHit(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('a dummy')->withReadable(true)->withWritable(true);
         $cacheItem = $this->prophesize(CacheItemInterface::class);
@@ -49,7 +49,7 @@ class CachedPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($propertyMetadata, $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy'), 'Trigger the local cache');
     }
 
-    public function testCreateWithItemNotHit()
+    public function testCreateWithItemNotHit(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('a dummy')->withReadable(true)->withWritable(true);
 
@@ -71,7 +71,7 @@ class CachedPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($propertyMetadata, $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy'), 'Trigger the local cache');
     }
 
-    public function testCreateWithGetCacheItemThrowsCacheException()
+    public function testCreateWithGetCacheItemThrowsCacheException(): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('a dummy')->withReadable(true)->withWritable(true);
 

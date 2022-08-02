@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\JsonApi\Serializer;
 use ApiPlatform\JsonApi\Serializer\ErrorNormalizer;
 use ApiPlatform\Tests\Mock\Exception\ErrorCodeSerializable;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ErrorNormalizerTest extends TestCase
 {
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $normalizer = new ErrorNormalizer();
 
@@ -45,7 +45,7 @@ class ErrorNormalizerTest extends TestCase
      * @param string $originalMessage original message of the Exception
      * @param bool   $debug           simulates kernel debug variable
      */
-    public function testNormalize($status, $originalMessage, $debug)
+    public function testNormalize($status, $originalMessage, $debug): void
     {
         $normalizer = new ErrorNormalizer($debug);
         $exception = FlattenException::create(new \Exception($originalMessage), $status);
@@ -59,7 +59,7 @@ class ErrorNormalizerTest extends TestCase
             $expected['trace'] = $exception->getTrace();
         }
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
     public function testNormalizeAnExceptionWithCustomErrorCode(): void
@@ -77,7 +77,7 @@ class ErrorNormalizerTest extends TestCase
             'code' => ErrorCodeSerializable::getErrorCode(),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
     public function testNormalizeAFlattenExceptionWithCustomErrorCode(): void
@@ -95,7 +95,7 @@ class ErrorNormalizerTest extends TestCase
             'code' => ErrorCodeSerializable::getErrorCode(),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
     public function errorProvider()

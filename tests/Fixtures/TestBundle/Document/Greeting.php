@@ -19,12 +19,12 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ApiResource]
-#[ApiResource(uriTemplate: '/people/{id}/sent_greetings.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Person::class, identifiers: ['id'], toProperty: 'sender')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/people/{id}/sent_greetings.{_format}', uriVariables: ['id' => new Link(fromClass: Person::class, identifiers: ['id'], toProperty: 'sender')], status: 200, operations: [new GetCollection()])]
 #[ODM\Document]
 class Greeting
 {
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
-    private $id;
+    private ?int $id = null;
     #[ODM\Field]
     public $message = '';
     #[ODM\ReferenceOne(targetDocument: Person::class, inversedBy: 'sentGreetings', storeAs: 'id')]

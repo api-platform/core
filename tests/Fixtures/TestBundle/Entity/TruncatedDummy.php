@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource]
@@ -24,7 +23,7 @@ class TruncatedDummy
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private ?int $id = null;
     #[ORM\Column(type: 'decimal', precision: 4, scale: 1, nullable: false)]
     public $value;
 

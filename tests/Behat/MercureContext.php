@@ -24,11 +24,8 @@ use Psr\Container\ContainerInterface;
  */
 final class MercureContext implements Context
 {
-    private $driverContainer;
-
-    public function __construct(ContainerInterface $driverContainer)
+    public function __construct(private readonly ContainerInterface $driverContainer)
     {
-        $this->driverContainer = $driverContainer;
     }
 
     /**
@@ -37,7 +34,7 @@ final class MercureContext implements Context
     public function theFollowingMercureUpdateShouldHaveBeenSent(string $topics, PyStringNode $update): void
     {
         $topics = explode(',', $topics);
-        $update = json_decode($update->getRaw(), true);
+        $update = json_decode($update->getRaw(), true, 512, \JSON_THROW_ON_ERROR);
 
         $updateHandler = $this->driverContainer->get('mercure.hub.default.message_handler');
 
@@ -45,7 +42,7 @@ final class MercureContext implements Context
             $toMatchTopics = \count($topics);
             foreach ($sentUpdate->getTopics() as $sentTopic) {
                 foreach ($topics as $topic) {
-                    if (preg_match("@$topic@", $sentTopic)) {
+                    if (preg_match("@$topic@", (string) $sentTopic)) {
                         --$toMatchTopics;
                     }
                 }
@@ -55,7 +52,7 @@ final class MercureContext implements Context
                 continue;
             }
 
-            if ($sentUpdate->getData() === json_encode($update)) {
+            if ($sentUpdate->getData() === json_encode($update, \JSON_THROW_ON_ERROR)) {
                 return;
             }
         }

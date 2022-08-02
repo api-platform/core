@@ -26,10 +26,7 @@ use Doctrine\Inflector\InflectorFactory;
  */
 final class Inflector
 {
-    /**
-     * @var InflectorObject|null
-     */
-    private static $instance;
+    private static ?InflectorObject $instance = null;
 
     private static function getInstance(): InflectorObject
     {

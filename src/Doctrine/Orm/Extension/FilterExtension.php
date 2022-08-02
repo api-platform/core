@@ -29,11 +29,8 @@ use Psr\Container\ContainerInterface;
  */
 final class FilterExtension implements QueryCollectionExtensionInterface
 {
-    private ContainerInterface $filterLocator;
-
-    public function __construct(ContainerInterface $filterLocator)
+    public function __construct(private readonly ContainerInterface $filterLocator)
     {
-        $this->filterLocator = $filterLocator;
     }
 
     /**
@@ -62,13 +59,13 @@ final class FilterExtension implements QueryCollectionExtensionInterface
                     continue;
                 }
 
-                $context['filters'] = $context['filters'] ?? [];
+                $context['filters'] ??= [];
                 $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
             }
         }
 
         foreach ($orderFilters as $orderFilter) {
-            $context['filters'] = $context['filters'] ?? [];
+            $context['filters'] ??= [];
             $orderFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
         }
     }

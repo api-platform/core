@@ -59,12 +59,8 @@ final class SchemaFactory implements SchemaFactoryInterface
         ],
     ] + self::BASE_PROPS;
 
-    private $schemaFactory;
-
-    public function __construct(SchemaFactoryInterface $schemaFactory)
+    public function __construct(private readonly SchemaFactoryInterface $schemaFactory)
     {
-        $this->schemaFactory = $schemaFactory;
-
         $this->addDistinctFormat('jsonld');
     }
 

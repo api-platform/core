@@ -33,7 +33,7 @@ class ConvertedOwner
     #[ORM\ManyToOne(targetEntity: ConvertedRelated::class)]
     public $nameConverted;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

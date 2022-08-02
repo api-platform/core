@@ -30,12 +30,12 @@ class PersistProcessorTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(ProcessorInterface::class, new PersistProcessor($this->prophesize(ManagerRegistry::class)->reveal()));
     }
 
-    public function testPersist()
+    public function testPersist(): void
     {
         $dummy = new Dummy();
 
@@ -52,7 +52,7 @@ class PersistProcessorTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function testPersistIfEntityAlreadyManaged()
+    public function testPersistIfEntityAlreadyManaged(): void
     {
         $dummy = new Dummy();
 
@@ -70,7 +70,7 @@ class PersistProcessorTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function testPersistWithNullManager()
+    public function testPersistWithNullManager(): void
     {
         $dummy = new Dummy();
 
@@ -98,7 +98,7 @@ class PersistProcessorTest extends TestCase
      * @param mixed $deferredExplicit
      * @param mixed $persisted
      */
-    public function testTrackingPolicy($metadataClass, $deferredExplicit, $persisted)
+    public function testTrackingPolicy($metadataClass, $deferredExplicit, $persisted): void
     {
         $dummy = new Dummy();
 

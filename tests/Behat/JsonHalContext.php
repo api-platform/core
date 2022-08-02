@@ -23,12 +23,9 @@ use PHPUnit\Framework\ExpectationFailedException;
 
 final class JsonHalContext implements Context
 {
-    /**
-     * @var RestContext
-     */
-    private $restContext;
-    private $validator;
-    private $schemaFile;
+    private ?RestContext $restContext = null;
+    private readonly Validator $validator;
+    private readonly string $schemaFile;
 
     public function __construct(string $schemaFile)
     {
@@ -45,7 +42,7 @@ final class JsonHalContext implements Context
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /**
          * @var InitializedContextEnvironment $environment
@@ -71,12 +68,12 @@ final class JsonHalContext implements Context
         }
     }
 
-    private function getJson()
+    private function getJson(): Json
     {
         return new Json($this->getContent());
     }
 
-    private function getContent()
+    private function getContent(): string
     {
         return $this->restContext->getMink()->getSession()->getDriver()->getContent();
     }

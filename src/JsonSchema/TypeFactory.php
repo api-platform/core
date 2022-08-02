@@ -31,10 +31,7 @@ final class TypeFactory implements TypeFactoryInterface
 {
     use ResourceClassInfoTrait;
 
-    /**
-     * @var SchemaFactoryInterface|null
-     */
-    private $schemaFactory;
+    private ?SchemaFactoryInterface $schemaFactory = null;
 
     public function __construct(ResourceClassResolverInterface $resourceClassResolver = null)
     {
@@ -52,8 +49,8 @@ final class TypeFactory implements TypeFactoryInterface
     public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
     {
         if ($type->isCollection()) {
-            $keyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
-            $subType = (method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
+            $keyType = $type->getCollectionKeyTypes()[0] ?? null;
+            $subType = ($type->getCollectionValueTypes()[0] ?? null) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
 
             if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
                 return $this->addNullabilityToTypeDefinition([
@@ -73,18 +70,13 @@ final class TypeFactory implements TypeFactoryInterface
 
     private function makeBasicType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
     {
-        switch ($type->getBuiltinType()) {
-            case Type::BUILTIN_TYPE_INT:
-                return ['type' => 'integer'];
-            case Type::BUILTIN_TYPE_FLOAT:
-                return ['type' => 'number'];
-            case Type::BUILTIN_TYPE_BOOL:
-                return ['type' => 'boolean'];
-            case Type::BUILTIN_TYPE_OBJECT:
-                return $this->getClassType($type->getClassName(), $format, $readableLink, $serializerContext, $schema);
-            default:
-                return ['type' => 'string'];
-        }
+        return match ($type->getBuiltinType()) {
+            Type::BUILTIN_TYPE_INT => ['type' => 'integer'],
+            Type::BUILTIN_TYPE_FLOAT => ['type' => 'number'],
+            Type::BUILTIN_TYPE_BOOL => ['type' => 'boolean'],
+            Type::BUILTIN_TYPE_OBJECT => $this->getClassType($type->getClassName(), $format, $readableLink, $serializerContext, $schema),
+            default => ['type' => 'string'],
+        };
     }
 
     /**
@@ -182,16 +174,13 @@ final class TypeFactory implements TypeFactoryInterface
         }
 
         if ($schema && Schema::VERSION_JSON_SCHEMA === $schema->getVersion()) {
-            return array_merge(
-                $jsonSchema,
-                [
-                    'type' => \is_array($jsonSchema['type'])
-                        ? array_merge($jsonSchema['type'], ['null'])
-                        : [$jsonSchema['type'], 'null'],
-                ]
-            );
+            return [...$jsonSchema, ...[
+                'type' => \is_array($jsonSchema['type'])
+                    ? array_merge($jsonSchema['type'], ['null'])
+                    : [$jsonSchema['type'], 'null'],
+            ]];
         }
 
-        return array_merge($jsonSchema, ['nullable' => true]);
+        return [...$jsonSchema, ...['nullable' => true]];
     }
 }

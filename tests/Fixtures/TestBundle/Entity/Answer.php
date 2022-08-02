@@ -29,8 +29,8 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  * Answer.
  */
 #[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(normalizationContext: ['groups' => ['foobar']])])]
-#[ApiResource(uriTemplate: '/answers/{id}/related_questions/{relatedQuestions}/answer.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'], toProperty: 'answer'), 'relatedQuestions' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
-#[ApiResource(uriTemplate: '/questions/{id}/answer.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/answers/{id}/related_questions/{relatedQuestions}/answer.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'], toProperty: 'answer'), 'relatedQuestions' => new Link(fromClass: Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/questions/{id}/answer.{_format}', uriVariables: ['id' => new Link(fromClass: Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
 #[ORM\Entity]
 class Answer
 {
@@ -38,19 +38,19 @@ class Answer
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[Serializer\Groups(['foobar'])]
-    private $id;
+    private ?int $id = null;
     #[ORM\Column(nullable: false)]
     #[Serializer\Groups(['foobar'])]
-    private $content;
+    private ?string $content = null;
     #[ORM\OneToOne(targetEntity: Question::class, mappedBy: 'answer')]
     #[Serializer\Groups(['foobar'])]
-    private $question;
+    private ?Question $question = null;
     /**
      * @var Collection<int, Question>
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'answer')]
     #[Serializer\Groups(['foobar'])]
-    private Collection $relatedQuestions;
+    private Collection|iterable $relatedQuestions;
 
     public function __construct()
     {
@@ -106,12 +106,12 @@ class Answer
     /**
      * Get related question.
      */
-    public function getRelatedQuestions(): Collection
+    public function getRelatedQuestions(): Collection|iterable
     {
         return $this->relatedQuestions;
     }
 
-    public function addRelatedQuestion(Question $question)
+    public function addRelatedQuestion(Question $question): void
     {
         $this->relatedQuestions->add($question);
     }

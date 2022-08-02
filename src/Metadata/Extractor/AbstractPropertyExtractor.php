@@ -23,18 +23,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
  */
 abstract class AbstractPropertyExtractor implements PropertyExtractorInterface
 {
-    protected $paths;
     protected $properties;
-    private $container;
-    private $collectedParameters = [];
+    private array $collectedParameters = [];
 
     /**
      * @param string[] $paths
      */
-    public function __construct(array $paths, ContainerInterface $container = null)
+    public function __construct(protected array $paths, private readonly ?ContainerInterface $container = null)
     {
-        $this->paths = $paths;
-        $this->container = $container;
     }
 
     /**

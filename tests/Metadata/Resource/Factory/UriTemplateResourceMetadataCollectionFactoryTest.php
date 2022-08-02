@@ -41,7 +41,7 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Argument::cetera())->willReturn(new PropertyNameCollection());

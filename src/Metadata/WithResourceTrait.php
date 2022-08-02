@@ -20,18 +20,13 @@ trait WithResourceTrait
         return $this->copyFrom($resource);
     }
 
-    /**
-     * @param ApiResource|Operation $resource
-     *
-     * @return ApiResource|Operation
-     */
-    protected function copyFrom($resource)
+    protected function copyFrom(ApiResource|Operation $resource): ApiResource|Operation
     {
         $self = clone $this;
         foreach (get_class_methods($resource) as $method) {
             if (
                 method_exists($self, $method) &&
-                preg_match('/^(?:get|is|can)(.*)/', $method, $matches) &&
+                preg_match('/^(?:get|is|can)(.*)/', (string) $method, $matches) &&
                 null === $self->{$method}() &&
                 null !== $val = $resource->{$method}()
             ) {

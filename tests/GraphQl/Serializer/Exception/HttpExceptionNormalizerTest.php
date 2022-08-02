@@ -25,15 +25,13 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  */
 class HttpExceptionNormalizerTest extends TestCase
 {
-    private $httpExceptionNormalizer;
+    private HttpExceptionNormalizer $httpExceptionNormalizer;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->httpExceptionNormalizer = new HttpExceptionNormalizer();
     }
 

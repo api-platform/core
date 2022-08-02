@@ -140,8 +140,8 @@ class DoctrineExtractorTest extends TestCase
             ['binUuid', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['binUuidRfc4122', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['timestamp', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
-            ['dateImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
+            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class)]],
+            ['dateImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)]],
             ['float', [new Type(Type::BUILTIN_TYPE_FLOAT)]],
             ['bool', [new Type(Type::BUILTIN_TYPE_BOOL)]],
             ['int', [new Type(Type::BUILTIN_TYPE_INT)]],
@@ -191,7 +191,7 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
     }
 
-    public function testGeneratedValueNotWritable()
+    public function testGeneratedValueNotWritable(): void
     {
         $extractor = $this->createExtractor();
         $this->assertFalse($extractor->isWritable(DoctrineGeneratedValue::class, 'id'));

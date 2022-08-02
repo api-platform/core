@@ -22,15 +22,13 @@ use PHPUnit\Framework\TestCase;
  */
 class ErrorNormalizerTest extends TestCase
 {
-    private $errorNormalizer;
+    private ErrorNormalizer $errorNormalizer;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->errorNormalizer = new ErrorNormalizer();
     }
 

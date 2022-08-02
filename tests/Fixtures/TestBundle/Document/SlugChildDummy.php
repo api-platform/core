@@ -20,8 +20,8 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ApiResource]
-#[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugParentDummy::class, identifiers: ['slug'], toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
-#[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], fromProperty: 'parentDummy'), 'parentDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugParentDummy::class, identifiers: [], expandedValue: 'parent_dummy', toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: SlugParentDummy::class, identifiers: ['slug'], toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], fromProperty: 'parentDummy'), 'parentDummy' => new Link(fromClass: SlugParentDummy::class, identifiers: [], expandedValue: 'parent_dummy', toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
 #[ODM\Document]
 class SlugChildDummy
 {
@@ -40,7 +40,7 @@ class SlugChildDummy
     private ?string $slug = null;
 
     #[ODM\ReferenceOne(targetDocument: SlugParentDummy::class, inversedBy: 'childDummies', storeAs: 'id')]
-    private $parentDummy;
+    private SlugParentDummy $parentDummy;
 
     public function getId(): ?int
     {
@@ -52,7 +52,7 @@ class SlugChildDummy
         return $this->slug;
     }
 
-    public function setSlug(string $slug)
+    public function setSlug(string $slug): void
     {
         $this->slug = $slug;
     }

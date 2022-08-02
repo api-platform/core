@@ -32,7 +32,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaOneOfRestriction;
+    private PropertySchemaOneOfRestriction $propertySchemaOneOfRestriction;
 
     protected function setUp(): void
     {

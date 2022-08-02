@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class WebTestCaseTest extends TestCase
 {
-    public function testAssertResponseIsSuccessful()
+    public function testAssertResponseIsSuccessful(): void
     {
         $this->getResponseTester(new Response())->assertResponseIsSuccessful();
         $this->expectException(AssertionFailedError::class);
@@ -37,7 +37,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response('', 404))->assertResponseIsSuccessful();
     }
 
-    public function testAssertResponseStatusCodeSame()
+    public function testAssertResponseStatusCodeSame(): void
     {
         $this->getResponseTester(new Response())->assertResponseStatusCodeSame(200);
         $this->getResponseTester(new Response('', 404))->assertResponseStatusCodeSame(404);
@@ -46,7 +46,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response('', 404))->assertResponseStatusCodeSame(200);
     }
 
-    public function testAssertResponseRedirects()
+    public function testAssertResponseRedirects(): void
     {
         $this->getResponseTester(new Response('', 301))->assertResponseRedirects();
         $this->expectException(AssertionFailedError::class);
@@ -54,7 +54,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response())->assertResponseRedirects();
     }
 
-    public function testAssertResponseRedirectsWithLocation()
+    public function testAssertResponseRedirectsWithLocation(): void
     {
         $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('https://example.com/');
         $this->expectException(AssertionFailedError::class);
@@ -62,7 +62,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response('', 301))->assertResponseRedirects('https://example.com/');
     }
 
-    public function testAssertResponseRedirectsWithStatusCode()
+    public function testAssertResponseRedirectsWithStatusCode(): void
     {
         $this->getResponseTester(new Response('', 302))->assertResponseRedirects(null, 302);
         $this->expectException(AssertionFailedError::class);
@@ -70,7 +70,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response('', 302))->assertResponseRedirects(null, 301);
     }
 
-    public function testAssertResponseRedirectsWithLocationAndStatusCode()
+    public function testAssertResponseRedirectsWithLocationAndStatusCode(): void
     {
         $this->getResponseTester(new Response('', 302, ['Location' => 'https://example.com/']))->assertResponseRedirects('https://example.com/', 302);
         $this->expectException(AssertionFailedError::class);
@@ -78,7 +78,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response('', 302))->assertResponseRedirects('https://example.com/', 301);
     }
 
-    public function testAssertResponseHasHeader()
+    public function testAssertResponseHasHeader(): void
     {
         $this->getResponseTester(new Response())->assertResponseHasHeader('Date');
         $this->expectException(AssertionFailedError::class);
@@ -86,7 +86,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response())->assertResponseHasHeader('X-Date');
     }
 
-    public function testAssertResponseNotHasHeader()
+    public function testAssertResponseNotHasHeader(): void
     {
         $this->getResponseTester(new Response())->assertResponseNotHasHeader('X-Date');
         $this->expectException(AssertionFailedError::class);
@@ -94,7 +94,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response())->assertResponseNotHasHeader('Date');
     }
 
-    public function testAssertResponseHeaderSame()
+    public function testAssertResponseHeaderSame(): void
     {
         $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'no-cache, private');
         $this->expectException(AssertionFailedError::class);
@@ -102,7 +102,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'public');
     }
 
-    public function testAssertResponseHeaderNotSame()
+    public function testAssertResponseHeaderNotSame(): void
     {
         $this->getResponseTester(new Response())->assertResponseHeaderNotSame('Cache-Control', 'public');
         $this->expectException(AssertionFailedError::class);
@@ -110,7 +110,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response())->assertResponseHeaderNotSame('Cache-Control', 'no-cache, private');
     }
 
-    public function testAssertResponseHasCookie()
+    public function testAssertResponseHasCookie(): void
     {
         $response = new Response();
         $response->headers->setCookie(HttpFoundationCookie::create('foo', 'bar'));
@@ -121,7 +121,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester($response)->assertResponseHasCookie('bar');
     }
 
-    public function testAssertResponseNotHasCookie()
+    public function testAssertResponseNotHasCookie(): void
     {
         $response = new Response();
         $response->headers->setCookie(HttpFoundationCookie::create('foo', 'bar'));
@@ -132,7 +132,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester($response)->assertResponseNotHasCookie('foo');
     }
 
-    public function testAssertResponseCookieValueSame()
+    public function testAssertResponseCookieValueSame(): void
     {
         $response = new Response();
         $response->headers->setCookie(HttpFoundationCookie::create('foo', 'bar'));
@@ -143,7 +143,7 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester($response)->assertResponseCookieValueSame('bar', 'bar');
     }
 
-    public function testAssertBrowserHasCookie()
+    public function testAssertBrowserHasCookie(): void
     {
         $this->getClientTester()->assertBrowserHasCookie('foo', '/path');
         $this->expectException(AssertionFailedError::class);
@@ -151,7 +151,7 @@ class WebTestCaseTest extends TestCase
         $this->getClientTester()->assertBrowserHasCookie('bar');
     }
 
-    public function testAssertBrowserNotHasCookie()
+    public function testAssertBrowserNotHasCookie(): void
     {
         $this->getClientTester()->assertBrowserNotHasCookie('bar');
         $this->expectException(AssertionFailedError::class);
@@ -159,7 +159,7 @@ class WebTestCaseTest extends TestCase
         $this->getClientTester()->assertBrowserNotHasCookie('foo', '/path');
     }
 
-    public function testAssertBrowserCookieValueSame()
+    public function testAssertBrowserCookieValueSame(): void
     {
         $this->getClientTester()->assertBrowserCookieValueSame('foo', 'bar', false, '/path');
         $this->expectException(AssertionFailedError::class);
@@ -167,7 +167,7 @@ class WebTestCaseTest extends TestCase
         $this->getClientTester()->assertBrowserCookieValueSame('foo', 'babar', false, '/path');
     }
 
-    public function testAssertRequestAttributeValueSame()
+    public function testAssertRequestAttributeValueSame(): void
     {
         $this->getRequestTester()->assertRequestAttributeValueSame('foo', 'bar');
         $this->expectException(AssertionFailedError::class);
@@ -175,7 +175,7 @@ class WebTestCaseTest extends TestCase
         $this->getRequestTester()->assertRequestAttributeValueSame('foo', 'baz');
     }
 
-    public function testAssertRouteSame()
+    public function testAssertRouteSame(): void
     {
         $this->getRequestTester()->assertRouteSame('homepage', ['foo' => 'bar']);
         $this->expectException(AssertionFailedError::class);
@@ -186,7 +186,7 @@ class WebTestCaseTest extends TestCase
     private function getResponseTester(Response $response): WebTestCase
     {
         $client = $this->createMock(KernelBrowser::class);
-        $client->expects($this->any())->method('getResponse')->willReturn($response);
+        $client->method('getResponse')->willReturn($response);
 
         return $this->getTester($client);
     }
@@ -196,7 +196,7 @@ class WebTestCaseTest extends TestCase
         $client = $this->createMock(KernelBrowser::class);
         $jar = new CookieJar();
         $jar->set(new Cookie('foo', 'bar', null, '/path', 'example.com'));
-        $client->expects($this->any())->method('getCookieJar')->willReturn($jar);
+        $client->method('getCookieJar')->willReturn($jar);
 
         return $this->getTester($client);
     }
@@ -207,7 +207,7 @@ class WebTestCaseTest extends TestCase
         $request = new Request();
         $request->attributes->set('foo', 'bar');
         $request->attributes->set('_route', 'homepage');
-        $client->expects($this->any())->method('getRequest')->willReturn($request);
+        $client->method('getRequest')->willReturn($request);
 
         return $this->getTester($client);
     }

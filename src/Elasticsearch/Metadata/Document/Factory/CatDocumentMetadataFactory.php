@@ -31,15 +31,8 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
  */
 final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    private Client $client;
-    private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory;
-    private ?DocumentMetadataFactoryInterface $decorated;
-
-    public function __construct(Client $client, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly Client $client, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ?DocumentMetadataFactoryInterface $decorated = null)
     {
-        $this->client = $client;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -52,7 +45,7 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
         if ($this->decorated) {
             try {
                 $documentMetadata = $this->decorated->create($resourceClass);
-            } catch (IndexNotFoundException $e) {
+            } catch (IndexNotFoundException) {
             }
         }
 
@@ -71,7 +64,7 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
 
         try {
             $this->client->cat()->indices(['index' => $index]);
-        } catch (Missing404Exception $e) {
+        } catch (Missing404Exception) {
             return $this->handleNotFound($documentMetadata, $resourceClass);
         }
 

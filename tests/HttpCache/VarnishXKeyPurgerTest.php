@@ -31,7 +31,7 @@ class VarnishXKeyPurgerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testPurge()
+    public function testPurge(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo']])->willReturn(new Response())->shouldBeCalled();
@@ -63,7 +63,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $purger->purge(['/foo' => '/foo', '/bar' => '/bar']);
     }
 
-    public function testEmptyTags()
+    public function testEmptyTags(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request()->shouldNotBeCalled();
@@ -74,7 +74,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $purger->purge([]);
     }
 
-    public function testHeaderTooLong()
+    public function testHeaderTooLong(): void
     {
         $this->expectExceptionMessage('IRI "/foobar-long-foobar-toolong-foofoo-barbar" is too long to fit current max header length (currently set to "20"). You can increase it using the "api_platform.http_cache.invalidation.max_header_length" parameter.');
 
@@ -87,7 +87,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $purger->purge(['/foobar-long-foobar-toolong-foofoo-barbar']);
     }
 
-    public function testCustomGlue()
+    public function testCustomGlue(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo,/bar,/baz']])->willReturn(new Response())->shouldBeCalled();

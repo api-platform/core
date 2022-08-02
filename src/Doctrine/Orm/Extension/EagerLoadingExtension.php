@@ -41,21 +41,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    private PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory;
-    private PropertyMetadataFactoryInterface $propertyMetadataFactory;
-    private ?ClassMetadataFactoryInterface $classMetadataFactory;
-    private int $maxJoins;
-    private bool $forceEager;
-    private bool $fetchPartial;
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, int $maxJoins = 30, bool $forceEager = true, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly int $maxJoins = 30, private readonly bool $forceEager = true, private readonly bool $fetchPartial = false, private readonly ?ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->classMetadataFactory = $classMetadataFactory;
-        $this->maxJoins = $maxJoins;
-        $this->forceEager = $forceEager;
-        $this->fetchPartial = $fetchPartial;
     }
 
     /**
@@ -141,11 +128,11 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             try {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $options);
-            } catch (PropertyNotFoundException $propertyNotFoundException) {
+            } catch (PropertyNotFoundException) {
                 // skip properties not found
                 continue;
                 // @phpstan-ignore-next-line indeed this can be thrown by the SerializerPropertyMetadataFactory
-            } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
+            } catch (ResourceClassNotFoundException) {
                 // skip associations that are not resource classes
                 continue;
             }
@@ -207,7 +194,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             if (true === $fetchPartial) {
                 try {
                     $this->addSelect($queryBuilder, $mapping['targetEntity'], $associationAlias, $options);
-                } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
+                } catch (ResourceClassNotFoundException) {
                     continue;
                 }
             } else {
@@ -283,9 +270,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
     private function addSelectOnce(QueryBuilder $queryBuilder, string $alias): void
     {
-        $existingSelects = array_reduce($queryBuilder->getDQLPart('select') ?? [], function ($existing, $dqlSelect) {
-            return ($dqlSelect instanceof Select) ? array_merge($existing, $dqlSelect->getParts()) : $existing;
-        }, []);
+        $existingSelects = array_reduce($queryBuilder->getDQLPart('select') ?? [], fn ($existing, $dqlSelect) => ($dqlSelect instanceof Select) ? array_merge($existing, $dqlSelect->getParts()) : $existing, []);
 
         if (!\in_array($alias, $existingSelects, true)) {
             $queryBuilder->addSelect($alias);

@@ -25,10 +25,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class CompositeLabel implements \Stringable
 {
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
-    private $id;
+    private ?int $id = null;
     #[Groups(['default'])]
     #[ODM\Field(type: 'string', nullable: true)]
-    private $value;
+    private ?string $value = null;
 
     /**
      * Gets id.
@@ -51,7 +51,7 @@ class CompositeLabel implements \Stringable
      *
      * @param string|null $value the value to set
      */
-    public function setValue($value = null)
+    public function setValue($value = null): void
     {
         $this->value = $value;
     }

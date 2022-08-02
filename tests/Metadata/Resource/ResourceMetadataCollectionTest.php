@@ -26,24 +26,24 @@ final class ResourceMetadataCollectionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testGetOperation()
+    public function testGetOperation(): void
     {
         $operation = new Get();
         $query = new Query();
         $resource = (new ApiResource())->withUriTemplate('/dummies/{id}')->withOperations(new Operations(['name' => $operation]))->withGraphQlOperations(['query' => $query]);
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
-        $this->assertEquals($operation, $resourceMetadataCollection->getOperation('name'));
-        $this->assertEquals($query, $resourceMetadataCollection->getOperation('query'));
+        $this->assertSame($operation, $resourceMetadataCollection->getOperation('name'));
+        $this->assertSame($query, $resourceMetadataCollection->getOperation('query'));
     }
 
-    public function testOperationNotFound()
+    public function testOperationNotFound(): void
     {
         $this->expectException(OperationNotFoundException::class);
         $operation = new Get();
         $resource = (new ApiResource())->withUriTemplate('/dummies/{id}')->withOperations(new Operations(['name' => $operation]));
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
-        $this->assertEquals($operation, $resourceMetadataCollection->getOperation('noname'));
+        $this->assertSame($operation, $resourceMetadataCollection->getOperation('noname'));
     }
 }

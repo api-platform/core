@@ -28,7 +28,7 @@ final class PropertySchemaCountRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaCountRestriction;
+    private PropertySchemaCountRestriction $propertySchemaCountRestriction;
 
     protected function setUp(): void
     {

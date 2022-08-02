@@ -18,7 +18,6 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder as BaseJsonEncoder;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 
 /**
  * A JSON encoder with appropriate default options to embed the generated document into HTML.
@@ -27,29 +26,18 @@ use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
  */
 final class JsonEncoder implements EncoderInterface, DecoderInterface
 {
-    private $format;
-    private $jsonEncoder;
-
-    public function __construct(string $format, BaseJsonEncoder $jsonEncoder = null)
+    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
+    public function __construct(private readonly string $format, private ?BaseJsonEncoder $jsonEncoder = null)
     {
-        $this->format = $format;
-        $this->jsonEncoder = $jsonEncoder;
-
         if (null !== $this->jsonEncoder) {
             return;
         }
 
-        // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
-        $jsonEncodeOptions = \JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_UNESCAPED_UNICODE;
-        if (interface_exists(AdvancedNameConverterInterface::class)) {
-            $jsonEncode = new JsonEncode(['json_encode_options' => $jsonEncodeOptions]);
-            $jsonDecode = new JsonDecode(['json_decode_associative' => true]);
-        } else {
-            $jsonEncode = new JsonEncode($jsonEncodeOptions);
-            $jsonDecode = new JsonDecode(true);
-        }
-
-        $this->jsonEncoder = new BaseJsonEncoder($jsonEncode, $jsonDecode);
+        $this->jsonEncoder = new BaseJsonEncoder(
+            // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
+            new JsonEncode(['json_encode_options' => \JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_UNESCAPED_UNICODE]),
+            new JsonDecode(['json_decode_associative' => true])
+        );
     }
 
     /**

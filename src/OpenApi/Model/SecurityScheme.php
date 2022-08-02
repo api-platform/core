@@ -17,25 +17,8 @@ final class SecurityScheme
 {
     use ExtensionTrait;
 
-    private $type;
-    private $description;
-    private $name;
-    private $in;
-    private $scheme;
-    private $bearerFormat;
-    private $flows;
-    private $openIdConnectUrl;
-
-    public function __construct(string $type = null, string $description = '', string $name = null, string $in = null, string $scheme = null, string $bearerFormat = null, OAuthFlows $flows = null, string $openIdConnectUrl = null)
+    public function __construct(private ?string $type = null, private string $description = '', private ?string $name = null, private ?string $in = null, private ?string $scheme = null, private ?string $bearerFormat = null, private ?OAuthFlows $flows = null, private ?string $openIdConnectUrl = null)
     {
-        $this->type = $type;
-        $this->description = $description;
-        $this->name = $name;
-        $this->in = $in;
-        $this->scheme = $scheme;
-        $this->bearerFormat = $bearerFormat;
-        $this->flows = $flows;
-        $this->openIdConnectUrl = $openIdConnectUrl;
     }
 
     public function getType(): string

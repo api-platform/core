@@ -29,21 +29,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 final class CommandContext implements Context
 {
-    private $kernel;
+    private ?Application $application = null;
 
-    /**
-     * @var Application
-     */
-    private $application;
+    private ?CommandTester $commandTester = null;
 
-    /**
-     * @var CommandTester
-     */
-    private $commandTester;
-
-    public function __construct(KernelInterface $kernel)
+    public function __construct(private KernelInterface $kernel)
     {
-        $this->kernel = $kernel;
     }
 
     /**

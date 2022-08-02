@@ -29,7 +29,7 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaChoiceRestriction;
+    private PropertySchemaChoiceRestriction $propertySchemaChoiceRestriction;
 
     protected function setUp(): void
     {
@@ -80,8 +80,8 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
         yield 'multi float choice max' => [new Choice(['choices' => [1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
         yield 'multi float choice min/max' => [new Choice(['choices' => [1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
 
-        yield 'single choice callback' => [new Choice(['callback' => [ChoiceCallback::class, 'getChoices']]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), ['enum' => ['a', 'b', 'c', 'd']]];
-        yield 'multi choice callback' => [new Choice(['callback' => [ChoiceCallback::class, 'getChoices'], 'multiple' => true]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]];
+        yield 'single choice callback' => [new Choice(['callback' => ChoiceCallback::getChoices(...)]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), ['enum' => ['a', 'b', 'c', 'd']]];
+        yield 'multi choice callback' => [new Choice(['callback' => ChoiceCallback::getChoices(...), 'multiple' => true]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]];
     }
 }
 

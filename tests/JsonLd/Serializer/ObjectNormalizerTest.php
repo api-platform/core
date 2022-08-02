@@ -30,7 +30,7 @@ class ObjectNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -63,7 +63,7 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }
 
-    public function testNormalizeEmptyArray()
+    public function testNormalizeEmptyArray(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -86,7 +86,7 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals([], $normalizer->normalize($dummy));
     }
 
-    public function testNormalizeWithOutput()
+    public function testNormalizeWithOutput(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -116,7 +116,7 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['api_resource' => $dummy]));
     }
 
-    public function testNormalizeWithContext()
+    public function testNormalizeWithContext(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');

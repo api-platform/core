@@ -33,6 +33,7 @@ use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -43,15 +44,13 @@ class PaginationExtensionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $managerRegistryProphecy;
+    private ObjectProphecy $managerRegistryProphecy;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
     }
 
@@ -408,7 +407,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    private function mockAggregationBuilder($expectedOffset, $expectedLimit)
+    private function mockAggregationBuilder(int $expectedOffset, int $expectedLimit)
     {
         $skipProphecy = $this->prophesize(Skip::class);
         if ($expectedLimit > 0) {

@@ -35,16 +35,10 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  */
 final class ExtractorResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $extractor;
-    private $decorated;
-    private $defaults;
-    private $camelCaseToSnakeCaseNameConverter;
+    private readonly CamelCaseToSnakeCaseNameConverter $camelCaseToSnakeCaseNameConverter;
 
-    public function __construct(ResourceExtractorInterface $extractor, ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [])
+    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, private readonly array $defaults = [])
     {
-        $this->extractor = $extractor;
-        $this->decorated = $decorated;
-        $this->defaults = $defaults;
         $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
@@ -192,7 +186,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         foreach (get_class_methods($resource) as $methodName) {
-            if (0 !== strpos($methodName, 'get')) {
+            if (!str_starts_with($methodName, 'get')) {
                 continue;
             }
 

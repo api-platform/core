@@ -27,7 +27,7 @@ class RequestParserTest extends TestCase
     public function testParseRequestParams(string $source, array $expected): void
     {
         $actual = RequestParser::parseRequestParams($source);
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function parseRequestParamsProvider(): array

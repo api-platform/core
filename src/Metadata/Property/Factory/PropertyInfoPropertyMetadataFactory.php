@@ -24,13 +24,8 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
  */
 final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    private $propertyInfo;
-    private $decorated;
-
-    public function __construct(PropertyInfoExtractorInterface $propertyInfo, PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly PropertyInfoExtractorInterface $propertyInfo, private readonly ?PropertyMetadataFactoryInterface $decorated = null)
     {
-        $this->propertyInfo = $propertyInfo;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -43,7 +38,7 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
         } else {
             try {
                 $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-            } catch (PropertyNotFoundException $propertyNotFoundException) {
+            } catch (PropertyNotFoundException) {
                 $propertyMetadata = new ApiProperty();
             }
         }
@@ -64,20 +59,9 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
             $propertyMetadata = $propertyMetadata->withWritable($writable);
         }
 
-        if (method_exists($this->propertyInfo, 'isInitializable')) {
-            if (null === $propertyMetadata->isInitializable() && null !== $initializable = $this->propertyInfo->isInitializable($resourceClass, $property, $options)) {
-                $propertyMetadata = $propertyMetadata->withInitializable($initializable);
-            }
-        } else {
-            // BC layer for Symfony < 4.2
-            $ref = new \ReflectionClass($resourceClass);
-            if ($ref->isInstantiable() && $constructor = $ref->getConstructor()) {
-                foreach ($constructor->getParameters() as $constructorParameter) {
-                    if ($constructorParameter->name === $property && null === $propertyMetadata->isInitializable()) {
-                        $propertyMetadata = $propertyMetadata->withInitializable(true);
-                    }
-                }
-            }
+        /* @phpstan-ignore-next-line */
+        if (null === $propertyMetadata->isInitializable() && null !== $initializable = $this->propertyInfo->isInitializable($resourceClass, $property, $options)) {
+            $propertyMetadata = $propertyMetadata->withInitializable($initializable);
         }
 
         return $propertyMetadata;

@@ -29,10 +29,11 @@ class ProductProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         if ($operation instanceof CollectionOperationInterface) {
-            dd('todo');
+            // todo Handle collection of products
+            return null;
         }
 
         return $this->managerRegistry->getRepository($this->orm ? Product::class : ProductDocument::class)->findOneBy([

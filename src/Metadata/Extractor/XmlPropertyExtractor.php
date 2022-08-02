@@ -37,7 +37,7 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
             // Ensure it's not a resource
             try {
                 simplexml_import_dom(XmlUtils::loadFile($path, XmlResourceExtractor::SCHEMA));
-            } catch (\InvalidArgumentException $error) {
+            } catch (\InvalidArgumentException) {
                 throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
             }
 
@@ -128,17 +128,12 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
             return $default;
         }
 
-        switch ($type) {
-            case 'bool|string':
-                return \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string');
-            case 'string':
-                return (string) $resource[$key];
-            case 'integer':
-                return (int) $resource[$key];
-            case 'bool':
-                return (bool) XmlUtils::phpize($resource[$key]);
-        }
-
-        return null;
+        return match ($type) {
+            'bool|string' => \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string'),
+            'string' => (string) $resource[$key],
+            'integer' => (int) $resource[$key],
+            'bool' => (bool) XmlUtils::phpize($resource[$key]),
+            default => null,
+        };
     }
 }

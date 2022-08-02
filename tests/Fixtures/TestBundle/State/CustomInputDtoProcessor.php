@@ -17,10 +17,11 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 
 final class CustomInputDtoProcessor implements ProcessorInterface
 {
-    public function __construct(private ProcessorInterface $decorated)
+    public function __construct(private readonly ProcessorInterface $decorated)
     {
     }
 
@@ -34,7 +35,7 @@ final class CustomInputDtoProcessor implements ProcessorInterface
         }
 
         /**
-         * @var \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom|\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoCustom
+         * @var DummyDtoCustom|\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoCustom
          */
         $resourceObject = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? new $context['resource_class']();
         $resourceObject->lorem = $data->foo;

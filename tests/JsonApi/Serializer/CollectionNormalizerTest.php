@@ -34,7 +34,7 @@ class CollectionNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportsNormalize()
+    public function testSupportsNormalize(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -48,15 +48,15 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizePaginator()
+    public function testNormalizePaginator(): void
     {
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
         $paginatorProphecy->getCurrentPage()->willReturn(3.);
         $paginatorProphecy->getLastPage()->willReturn(7.);
         $paginatorProphecy->getItemsPerPage()->willReturn(12.);
         $paginatorProphecy->getTotalItems()->willReturn(1312.);
-        $paginatorProphecy->rewind()->will(function () {});
-        $paginatorProphecy->next()->will(function () {});
+        $paginatorProphecy->rewind()->will(function (): void {});
+        $paginatorProphecy->next()->will(function (): void {});
         $paginatorProphecy->current()->willReturn('foo');
         $paginatorProphecy->valid()->willReturn(true, false);
 
@@ -126,13 +126,13 @@ class CollectionNormalizerTest extends TestCase
         ]));
     }
 
-    public function testNormalizePartialPaginator()
+    public function testNormalizePartialPaginator(): void
     {
         $paginatorProphecy = $this->prophesize(PartialPaginatorInterface::class);
         $paginatorProphecy->getCurrentPage()->willReturn(3.);
         $paginatorProphecy->getItemsPerPage()->willReturn(12.);
-        $paginatorProphecy->rewind()->will(function () {});
-        $paginatorProphecy->next()->will(function () {});
+        $paginatorProphecy->rewind()->will(function (): void {});
+        $paginatorProphecy->next()->will(function (): void {});
         $paginatorProphecy->current()->willReturn('foo');
         $paginatorProphecy->valid()->willReturn(true, false);
         $paginatorProphecy->count()->willReturn(1312);
@@ -200,7 +200,7 @@ class CollectionNormalizerTest extends TestCase
         ]));
     }
 
-    public function testNormalizeArray()
+    public function testNormalizeArray(): void
     {
         $data = ['foo'];
 
@@ -256,7 +256,7 @@ class CollectionNormalizerTest extends TestCase
         ]));
     }
 
-    public function testNormalizeIncludedData()
+    public function testNormalizeIncludedData(): void
     {
         $data = ['foo'];
 
@@ -334,7 +334,7 @@ class CollectionNormalizerTest extends TestCase
         ]));
     }
 
-    public function testNormalizeWithoutDataKey()
+    public function testNormalizeWithoutDataKey(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('The JSON API document must contain a "data" key.');

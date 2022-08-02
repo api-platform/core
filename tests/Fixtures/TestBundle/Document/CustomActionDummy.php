@@ -41,7 +41,7 @@ class CustomActionDummy
         return $this->foo;
     }
 
-    public function setFoo(string $foo)
+    public function setFoo(string $foo): void
     {
         $this->foo = $foo;
     }

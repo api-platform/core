@@ -28,21 +28,14 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 final class RequestDataCollector extends DataCollector
 {
-    private $metadataFactory;
-    private $filterLocator;
-
-    public function __construct(
-        ResourceMetadataCollectionFactoryInterface $metadataFactory,
-        ContainerInterface $filterLocator,
-    ) {
-        $this->metadataFactory = $metadataFactory;
-        $this->filterLocator = $filterLocator;
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $metadataFactory, private readonly ContainerInterface $filterLocator)
+    {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $resourceClass = $request->attributes->get('_api_resource_class');
         $resourceMetadataCollection = $resourceClass ? $this->metadataFactory->create($resourceClass) : [];
@@ -79,7 +72,7 @@ final class RequestDataCollector extends DataCollector
     {
         foreach ($resourceMetadata->getFilters() ?? [] as $id) {
             if ($this->filterLocator->has($id)) {
-                $filters[$index][$id] = \get_class($this->filterLocator->get($id));
+                $filters[$index][$id] = $this->filterLocator->get($id)::class;
                 continue;
             }
 
@@ -125,7 +118,7 @@ final class RequestDataCollector extends DataCollector
         }
 
         $version = Versions::getVersion('api-platform/core');
-        preg_match('/^v(.*?)@/', $version, $output);
+        preg_match('/^v(.*?)@/', (string) $version, $output);
 
         return $output[1] ?? strtok($version, '@');
     }
@@ -141,7 +134,7 @@ final class RequestDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }

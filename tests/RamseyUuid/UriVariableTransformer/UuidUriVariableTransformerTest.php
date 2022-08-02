@@ -20,7 +20,7 @@ use Ramsey\Uuid\Uuid;
 
 class UuidUriVariableTransformerTest extends TestCase
 {
-    public function testDenormalizeUuid()
+    public function testDenormalizeUuid(): void
     {
         $uuid = Uuid::uuid4();
         $normalizer = new UuidUriVariableTransformer();
@@ -28,14 +28,14 @@ class UuidUriVariableTransformerTest extends TestCase
         $this->assertEquals($uuid, $normalizer->transform($uuid->toString(), [Uuid::class]));
     }
 
-    public function testNoSupportDenormalizeUuid()
+    public function testNoSupportDenormalizeUuid(): void
     {
         $uuid = 'notanuuid';
         $normalizer = new UuidUriVariableTransformer();
         $this->assertFalse($normalizer->supportsTransformation($uuid, ['']));
     }
 
-    public function testFailDenormalizeUuid()
+    public function testFailDenormalizeUuid(): void
     {
         $this->expectException(InvalidUriVariableException::class);
 
@@ -45,7 +45,7 @@ class UuidUriVariableTransformerTest extends TestCase
         $normalizer->transform($uuid, [Uuid::class]);
     }
 
-    public function testDoNotSupportNotString()
+    public function testDoNotSupportNotString(): void
     {
         $uuid = Uuid::uuid4();
         $normalizer = new UuidUriVariableTransformer();

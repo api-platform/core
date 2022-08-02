@@ -31,7 +31,7 @@ class AttributePropertyMetadataFactoryTest extends TestCase
     /**
      * @requires PHP 8.0
      */
-    public function testCreateAttribute()
+    public function testCreateAttribute(): void
     {
         $factory = new AttributePropertyMetadataFactory();
 
@@ -43,7 +43,7 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $this->assertSame('a foo', $metadata->getDescription());
     }
 
-    public function testClassNotFound()
+    public function testClassNotFound(): void
     {
         $this->expectException(PropertyNotFoundException::class);
         $this->expectExceptionMessage('Property "foo" of class "\\DoNotExist" not found.');
@@ -52,7 +52,7 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $factory->create('\DoNotExist', 'foo');
     }
 
-    public function testClassNotFoundButParentFound()
+    public function testClassNotFoundButParentFound(): void
     {
         $propertyMetadata = new ApiProperty();
 
@@ -60,13 +60,13 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $decoratedProphecy->create('\DoNotExist', 'foo', [])->willReturn($propertyMetadata);
 
         $factory = new AttributePropertyMetadataFactory($decoratedProphecy->reveal());
-        $this->assertEquals($propertyMetadata, $factory->create('\DoNotExist', 'foo'));
+        $this->assertSame($propertyMetadata, $factory->create('\DoNotExist', 'foo'));
     }
 
     /**
      * @requires PHP 8.0
      */
-    public function testClassFoundAndParentFound()
+    public function testClassFoundAndParentFound(): void
     {
         $parentPropertyMetadata = (new ApiProperty('Desc', true, false, true, false, true, false, 'Default', 'Example'))->withTypes(['https://example.com']);
 
@@ -86,6 +86,6 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $this->assertFalse($metadata->isIdentifier());
         $this->assertSame('Default', $metadata->getDefault());
         $this->assertSame('Example', $metadata->getExample());
-        $this->assertSame(['https://example.com'], $metadata->getTypes());
+        $this->assertEquals(['https://example.com'], $metadata->getTypes());
     }
 }

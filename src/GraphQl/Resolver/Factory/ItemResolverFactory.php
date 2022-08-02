@@ -37,19 +37,8 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     use ClassInfoTrait;
     use CloneTrait;
 
-    private $readStage;
-    private $securityStage;
-    private $securityPostDenormalizeStage;
-    private $serializeStage;
-    private $queryResolverLocator;
-
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator)
+    public function __construct(private readonly ReadStageInterface $readStage, private readonly SecurityStageInterface $securityStage, private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, private readonly SerializeStageInterface $serializeStage, private readonly ContainerInterface $queryResolverLocator)
     {
-        $this->readStage = $readStage;
-        $this->securityStage = $securityStage;
-        $this->securityPostDenormalizeStage = $securityPostDenormalizeStage;
-        $this->serializeStage = $serializeStage;
-        $this->queryResolverLocator = $queryResolverLocator;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
@@ -99,11 +88,9 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     }
 
     /**
-     * @param object|null $item
-     *
      * @throws \UnexpectedValueException
      */
-    private function getResourceClass($item, ?string $resourceClass, string $errorMessage = 'Resolver only handles items of class %s but retrieved item is of class %s.'): string
+    private function getResourceClass(?object $item, ?string $resourceClass, string $errorMessage = 'Resolver only handles items of class %s but retrieved item is of class %s.'): string
     {
         if (null === $item) {
             if (null === $resourceClass) {

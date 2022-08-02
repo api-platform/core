@@ -28,11 +28,8 @@ final class ResourceFieldResolver
 {
     use ClassInfoTrait;
 
-    private $iriConverter;
-
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(private readonly IriConverterInterface $iriConverter)
     {
-        $this->iriConverter = $iriConverter;
     }
 
     public function __invoke(?array $source, array $args, $context, ResolveInfo $info)

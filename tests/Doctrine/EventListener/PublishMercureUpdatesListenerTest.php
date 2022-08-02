@@ -159,10 +159,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->onFlush($eventArgs);
         $listener->postFlush();
 
-        $this->assertSame(['1', '2', 'mercure_custom_data', 'mercure_options', '{"@id":"\/dummies\/3"}', '{"@id":"\/dummy_friends\/4"}', '{"@id":"\/dummy_offers\/5"}'], $data);
-        $this->assertSame(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4', 'http://example.com/custom_topics/1'], $topics);
-        $this->assertSame([false, false, false, false, false, true, false], $private);
-        $this->assertSame([null, null, null, null, null, 10, null], $retry);
+        $this->assertEquals(['1', '2', 'mercure_custom_data', 'mercure_options', '{"@id":"\/dummies\/3"}', '{"@id":"\/dummy_friends\/4"}', '{"@id":"\/dummy_offers\/5"}'], $data);
+        $this->assertEquals(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4', 'http://example.com/custom_topics/1'], $topics);
+        $this->assertEquals([false, false, false, false, false, true, false], $private);
+        $this->assertEquals([null, null, null, null, null, 10, null], $retry);
     }
 
     public function testPublishGraphQlUpdates(): void
@@ -233,10 +233,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->onFlush($eventArgs);
         $listener->postFlush();
 
-        $this->assertSame(['http://example.com/dummies/2', 'subscription-topic-iri'], $topics);
-        $this->assertSame([false, false], $private);
-        $this->assertSame([null, null], $retry);
-        $this->assertSame(['2', '["data"]'], $data);
+        $this->assertEquals(['http://example.com/dummies/2', 'subscription-topic-iri'], $topics);
+        $this->assertEquals([false, false], $private);
+        $this->assertEquals([null, null], $retry);
+        $this->assertEquals(['2', '["data"]'], $data);
     }
 
     private function createMockHub(callable $callable): HubInterface

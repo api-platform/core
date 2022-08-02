@@ -70,7 +70,7 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistry, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals($result, $dataProvider->provide($operation, ['id' => 1], $context));
+        $this->assertSame($result, $dataProvider->provide($operation, ['id' => 1], $context));
     }
 
     public function testGetItemWithExecuteOptions(): void
@@ -104,7 +104,7 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistry, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals($result, $dataProvider->provide($operation, ['id' => 1], $context));
+        $this->assertSame($result, $dataProvider->provide($operation, ['id' => 1], $context));
     }
 
     public function testGetItemDoubleIdentifier(): void
@@ -138,7 +138,7 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistry, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals($result, $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
+        $this->assertSame($result, $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
     }
 
     public function testAggregationResultExtension(): void

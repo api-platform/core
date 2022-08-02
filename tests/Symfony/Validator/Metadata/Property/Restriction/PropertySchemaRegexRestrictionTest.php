@@ -28,7 +28,7 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaRegexRestriction;
+    private PropertySchemaRegexRestriction $propertySchemaRegexRestriction;
 
     protected function setUp(): void
     {

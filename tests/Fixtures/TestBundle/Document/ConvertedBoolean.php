@@ -31,7 +31,7 @@ class ConvertedBoolean
     #[ODM\Field(type: 'bool')]
     public $nameConverted;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

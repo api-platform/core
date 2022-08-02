@@ -22,15 +22,13 @@ use PHPUnit\Framework\TestCase;
  */
 class RuntimeExceptionNormalizerTest extends TestCase
 {
-    private $runtimeExceptionNormalizer;
+    private RuntimeExceptionNormalizer $runtimeExceptionNormalizer;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->runtimeExceptionNormalizer = new RuntimeExceptionNormalizer();
     }
 

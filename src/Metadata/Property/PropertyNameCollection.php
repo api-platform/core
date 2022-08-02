@@ -21,22 +21,15 @@ namespace ApiPlatform\Metadata\Property;
 final class PropertyNameCollection implements \IteratorAggregate, \Countable
 {
     /**
-     * @var string[]
-     */
-    private $properties;
-
-    /**
      * @param string[] $properties
      */
-    public function __construct(array $properties = [])
+    public function __construct(private readonly array $properties = [])
     {
-        $this->properties = $properties;
     }
 
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->properties);
@@ -45,7 +38,6 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
     public function count(): int
     {
         return \count($this->properties);

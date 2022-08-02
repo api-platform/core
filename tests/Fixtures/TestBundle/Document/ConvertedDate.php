@@ -31,7 +31,7 @@ class ConvertedDate
     #[ODM\Field(type: 'date')]
     public $nameConverted;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

@@ -44,12 +44,12 @@ class FooDummy
     #[ORM\ManyToOne(targetEntity: Dummy::class, cascade: ['persist'])]
     private ?Dummy $dummy = null;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -59,12 +59,12 @@ class FooDummy
         return $this->name;
     }
 
-    public function getDummy()
+    public function getDummy(): ?Dummy
     {
         return $this->dummy;
     }
 
-    public function setDummy(Dummy $dummy)
+    public function setDummy(Dummy $dummy): void
     {
         $this->dummy = $dummy;
     }

@@ -37,7 +37,7 @@ class CustomWritableIdentifierDummy
     /**
      * @param string $slug
      */
-    public function setSlug($slug)
+    public function setSlug($slug): void
     {
         $this->slug = $slug;
     }
@@ -55,7 +55,7 @@ class CustomWritableIdentifierDummy
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

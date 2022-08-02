@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -27,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ApiResource]
 #[ORM\Entity]
-class DummyFriend
+class DummyFriend implements \Stringable
 {
     /**
      * @var int|null The id
@@ -40,7 +39,7 @@ class DummyFriend
     /**
      * @var string The dummy name
      */
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Groups(['fakemanytomany', 'friends'])]
@@ -77,12 +76,12 @@ class DummyFriend
      *
      * @param string $name the value to set
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->getId();
     }

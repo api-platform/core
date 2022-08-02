@@ -29,7 +29,7 @@ trait ClassInfoTrait
      */
     private function getObjectClass($object): string
     {
-        return $this->getRealClassName(\get_class($object));
+        return $this->getRealClassName($object::class);
     }
 
     /**

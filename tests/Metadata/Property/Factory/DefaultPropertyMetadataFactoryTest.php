@@ -25,15 +25,15 @@ class DefaultPropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $factory = new DefaultPropertyMetadataFactory();
         $metadata = $factory->create(DummyPropertyWithDefaultValue::class, 'foo');
 
-        $this->assertEquals($metadata->getDefault(), 'foo');
+        $this->assertSame($metadata->getDefault(), 'foo');
     }
 
-    public function testClassDoesNotExist()
+    public function testClassDoesNotExist(): void
     {
         $factory = new DefaultPropertyMetadataFactory();
         $metadata = $factory->create('\DoNotExist', 'foo');
@@ -41,7 +41,7 @@ class DefaultPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals(new ApiProperty(), $metadata);
     }
 
-    public function testPropertyDoesNotExist()
+    public function testPropertyDoesNotExist(): void
     {
         $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decoratedProphecy->create(DummyPropertyWithDefaultValue::class, 'doNotExist', [])->willThrow(new PropertyNotFoundException());

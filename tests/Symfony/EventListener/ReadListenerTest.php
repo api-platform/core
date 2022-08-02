@@ -35,7 +35,7 @@ class ReadListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testNotAnApiPlatformRequest()
+    public function testNotAnApiPlatformRequest(): void
     {
         $event = $this->prophesize(RequestEvent::class);
         $event->getRequest()->willReturn(new Request())->shouldBeCalled();
@@ -49,7 +49,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function testDoNotReadWhenReceiveFlagIsFalse()
+    public function testDoNotReadWhenReceiveFlagIsFalse(): void
     {
         $request = new Request([], [], ['id' => 1, 'data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_operation_name' => 'put', '_api_receive' => false]);
         $request->setMethod('PUT');
@@ -71,7 +71,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function testDoNotReadWhenReadIsFalse()
+    public function testDoNotReadWhenReadIsFalse(): void
     {
         $request = new Request([], [], ['id' => 1, 'data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_operation_name' => 'put']);
         $request->setMethod('PUT');
@@ -93,7 +93,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function readWithIdentifiers()
+    public function readWithIdentifiers(): void
     {
         $request = new Request([], [], ['id' => '1', 'data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']);
         $request->setMethod('GET');

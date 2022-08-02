@@ -27,22 +27,22 @@ abstract class VoDummyVehicle
      */
     #[ORM\ManyToMany(targetEntity: VoDummyDriver::class, cascade: ['persist'])]
     #[Groups(['car_read', 'car_write'])]
-    private \Doctrine\Common\Collections\Collection $drivers;
+    private Collection|iterable $drivers;
 
     public function __construct(
-        #[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $make,
-        #[ORM\ManyToOne(targetEntity: VoDummyInsuranceCompany::class, cascade: ['persist'])] #[Groups(['car_read', 'car_write'])] private readonly ?VoDummyInsuranceCompany $insuranceCompany,
+        #[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $make,
+        #[ORM\ManyToOne(targetEntity: VoDummyInsuranceCompany::class, cascade: ['persist'])] #[Groups(['car_read', 'car_write'])] private ?VoDummyInsuranceCompany $insuranceCompany,
         array $drivers
     ) {
         $this->drivers = new ArrayCollection($drivers);
     }
 
-    public function getMake()
+    public function getMake(): string
     {
         return $this->make;
     }
 
-    public function getInsuranceCompany()
+    public function getInsuranceCompany(): ?VoDummyInsuranceCompany
     {
         return $this->insuranceCompany;
     }
@@ -50,7 +50,7 @@ abstract class VoDummyVehicle
     /**
      * @return Collection<VoDummyDriver>
      */
-    public function getDrivers()
+    public function getDrivers(): Collection|iterable
     {
         return $this->drivers;
     }

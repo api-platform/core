@@ -28,7 +28,7 @@ final class PropertySchemaUniqueRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaUniqueRestriction;
+    private PropertySchemaUniqueRestriction $propertySchemaUniqueRestriction;
 
     protected function setUp(): void
     {
@@ -52,6 +52,6 @@ final class PropertySchemaUniqueRestrictionTest extends TestCase
 
     public function testCreate(): void
     {
-        self::assertSame(['uniqueItems' => true], $this->propertySchemaUniqueRestriction->create(new Unique(), new ApiProperty()));
+        self::assertEquals(['uniqueItems' => true], $this->propertySchemaUniqueRestriction->create(new Unique(), new ApiProperty()));
     }
 }

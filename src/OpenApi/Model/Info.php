@@ -17,23 +17,8 @@ final class Info
 {
     use ExtensionTrait;
 
-    private $title;
-    private $description;
-    private $termsOfService;
-    private $contact;
-    private $license;
-    private $version;
-    private $summary;
-
-    public function __construct(string $title, string $version, string $description = '', string $termsOfService = null, Contact $contact = null, License $license = null, string $summary = null)
+    public function __construct(private string $title, private string $version, private string $description = '', private ?string $termsOfService = null, private ?Contact $contact = null, private ?License $license = null, private ?string $summary = null)
     {
-        $this->title = $title;
-        $this->version = $version;
-        $this->description = $description;
-        $this->termsOfService = $termsOfService;
-        $this->contact = $contact;
-        $this->license = $license;
-        $this->summary = $summary;
     }
 
     public function getTitle(): string

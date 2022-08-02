@@ -30,7 +30,7 @@ class Address
     #[Groups(['order_read'])]
     public $name;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

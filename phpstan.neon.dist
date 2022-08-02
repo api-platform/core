@@ -40,6 +40,11 @@ parameters:
 	ignoreErrors:
 		# False positives
 		-
+			message: '#but database expects#'
+			paths:
+				- tests/Fixtures/TestBundle/Entity/
+		- '#Cannot call method add\(\) on iterable.#'
+		-
 			message: '#is never read, only written.#'
 			paths:
 				- tests/Fixtures/TestBundle/Document/
@@ -49,14 +54,20 @@ parameters:
 			message: '#is never written, only read.#'
 			paths:
 				- tests/Fixtures/TestBundle/Document/
-				- tests/Fixtures/TestBundle/Entity/
+		-
+			message: '#Parameter \#1 \$constraint of method#'
+			paths:
+				- tests/Symfony/Validator/Metadata/Property/Restriction/
+		-
+			message: '#expects ApiPlatform\\Metadata\\GraphQl\\Operation\|null, ApiPlatform\\Metadata\\Operation given#'
+			paths:
+				- tests/GraphQl/Resolver/Factory/
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
 			path: src/Symfony/EventListener/AddFormatListener.php
 		- '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
-		- '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
 		-
 			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
 			path: tests/GraphQl/Type/TypeBuilderTest.php
@@ -74,9 +85,6 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
-		-
-			message: "#Dead catch - JsonException is never thrown in the try block.#"
-			path: src/Symfony/Bundle/Test/Response.php
 		# See https://github.com/phpstan/phpstan-symfony/issues/27
 		-
 			message: '#^Service "[^"]+" is private.$#'
@@ -84,13 +92,3 @@ parameters:
 		-
 			message: '#^Property .+ is unused.$#'
 			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php
-		-
-			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionValueType\(\)#'
-			path: src
-		-
-			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
-			path: src
-		# Skipped tests, we do this on purpose
-		-
-			message: "#Access to an undefined static property static\\([^)]+\\)::\\$container.$#"
-			path: tests

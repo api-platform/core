@@ -22,7 +22,7 @@ final class DummyForAdditionalFieldsInput
     #[ApiProperty(identifier: true)]
     public $id;
 
-    public function __construct(private readonly string $dummyName)
+    public function __construct(private string $dummyName)
     {
     }
 

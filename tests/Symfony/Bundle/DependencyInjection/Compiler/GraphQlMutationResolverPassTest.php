@@ -29,16 +29,14 @@ class GraphQlMutationResolverPassTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $filterPass = new GraphQlMutationResolverPass();
 
         $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $typeLocatorDefinitionProphecy = $this->prophesize(Definition::class);
-        $typeLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
-            return !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference;
-        }))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $typeLocatorDefinitionProphecy->addArgument(Argument::that(fn (array $arg) => !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.graphql.enabled')->willReturn(true)->shouldBeCalled();
@@ -48,7 +46,7 @@ class GraphQlMutationResolverPassTest extends TestCase
         $filterPass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testDisabled()
+    public function testDisabled(): void
     {
         $filterPass = new GraphQlMutationResolverPass();
 

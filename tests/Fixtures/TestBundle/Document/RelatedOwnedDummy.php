@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -34,23 +33,20 @@ class RelatedOwnedDummy
      */
     #[ODM\Field(type: 'string')]
     public $name;
-    /**
-     * @var Dummy|null
-     */
     #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], inversedBy: 'relatedOwnedDummy', storeAs: 'id')]
-    public $owningDummy;
+    public ?Dummy $owningDummy = null;
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

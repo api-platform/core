@@ -21,11 +21,8 @@ use ApiPlatform\Metadata\ApiProperty;
  */
 final class DefaultPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    private $decorated;
-
-    public function __construct(PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly ?PropertyMetadataFactoryInterface $decorated = null)
     {
-        $this->decorated = $decorated;
     }
 
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
@@ -35,14 +32,14 @@ final class DefaultPropertyMetadataFactory implements PropertyMetadataFactoryInt
         } else {
             try {
                 $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-            } catch (PropertyNotFoundException $propertyNotFoundException) {
+            } catch (PropertyNotFoundException) {
                 $propertyMetadata = new ApiProperty();
             }
         }
 
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             return $propertyMetadata;
         }
 

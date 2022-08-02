@@ -28,7 +28,7 @@ class ResourceWithString
     #[ODM\Field(type: 'string')]
     private string $myStringField = '';
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

@@ -24,11 +24,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 final class TransformSortingParametersListener
 {
-    private $orderParameterName;
-
-    public function __construct(string $orderParameterName = 'order')
+    public function __construct(private string $orderParameterName = 'order')
     {
-        $this->orderParameterName = $orderParameterName;
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -44,7 +41,7 @@ final class TransformSortingParametersListener
             return;
         }
 
-        $orderParametersArray = explode(',', $orderParameter);
+        $orderParametersArray = explode(',', (string) $orderParameter);
         $transformedOrderParametersArray = [];
 
         foreach ($orderParametersArray as $orderParameter) {

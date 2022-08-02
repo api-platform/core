@@ -40,20 +40,15 @@ class TypeConverterTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ObjectProphecy */
-    private $typeBuilderProphecy;
+    private ObjectProphecy $typeBuilderProphecy;
 
-    /** @var ObjectProphecy */
-    private $typesContainerProphecy;
+    private ObjectProphecy $typesContainerProphecy;
 
-    /** @var ObjectProphecy */
-    private $resourceMetadataCollectionFactoryProphecy;
+    private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
 
-    /** @var ObjectProphecy */
-    private $propertyMetadataFactoryProphecy;
+    private ObjectProphecy $propertyMetadataFactoryProphecy;
 
-    /** @var TypeConverter */
-    private $typeConverter;
+    private TypeConverter $typeConverter;
 
     /**
      * {@inheritdoc}
@@ -79,7 +74,7 @@ class TypeConverterTest extends TestCase
         /** @var Operation $operation */
         $operation = (new Query())->withName('test');
         $graphqlType = $this->typeConverter->convertType($type, $input, $operation, 'resourceClass', 'rootClass', null, $depth);
-        $this->assertEquals($expectedGraphqlType, $graphqlType);
+        $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
     public function convertTypeProvider(): array
@@ -152,7 +147,7 @@ class TypeConverterTest extends TestCase
         /** @var Operation $operation */
         $operation = (new Query())->withName('test');
         $graphqlType = $this->typeConverter->convertType($type, true, $operation, 'dummy', 'rootClass', 'dummyProperty', 1);
-        $this->assertEquals(GraphQLType::string(), $graphqlType);
+        $this->assertSame(GraphQLType::string(), $graphqlType);
     }
 
     public function testConvertTypeInputResource(): void
@@ -169,7 +164,7 @@ class TypeConverterTest extends TestCase
         $this->typeBuilderProphecy->getResourceObjectType('dummy', $graphqlResourceMetadata, $operation, true, false, 1)->shouldBeCalled()->willReturn($expectedGraphqlType);
 
         $graphqlType = $this->typeConverter->convertType($type, true, $operation, 'dummy', 'rootClass', 'dummyProperty', 1);
-        $this->assertEquals($expectedGraphqlType, $graphqlType);
+        $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
     /**
@@ -188,7 +183,7 @@ class TypeConverterTest extends TestCase
         /** @var Operation $rootOperation */
         $rootOperation = (new Query())->withName('test');
         $graphqlType = $this->typeConverter->convertType($type, false, $rootOperation, 'resourceClass', 'rootClass', null, 0);
-        $this->assertEquals($expectedGraphqlType, $graphqlType);
+        $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
     public function convertTypeResourceProvider(): array
@@ -201,13 +196,11 @@ class TypeConverterTest extends TestCase
 
     /**
      * @dataProvider resolveTypeProvider
-     *
-     * @param string|GraphQLType $expectedGraphqlType
      */
-    public function testResolveType(string $type, $expectedGraphqlType): void
+    public function testResolveType(string $type, string|GraphQLType $expectedGraphqlType): void
     {
-        $this->typesContainerProphecy->has('DateTime')->willReturn(true);
-        $this->typesContainerProphecy->get('DateTime')->willReturn(new DateTimeType());
+        $this->typesContainerProphecy->has(\DateTime::class)->willReturn(true);
+        $this->typesContainerProphecy->get(\DateTime::class)->willReturn(new DateTimeType());
 
         $this->assertEquals($expectedGraphqlType, $this->typeConverter->resolveType($type));
     }
@@ -223,7 +216,7 @@ class TypeConverterTest extends TestCase
             ['[Int!]', GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::int()))],
             ['Float', GraphQLType::float()],
             ['[Float]!', GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::float()))],
-            ['DateTime', new DateTimeType()],
+            [\DateTime::class, new DateTimeType()],
             ['[DateTime!]!', GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(new DateTimeType())))],
         ];
     }

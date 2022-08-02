@@ -16,9 +16,9 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Test;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Response;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Runner\Version;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
@@ -30,8 +30,8 @@ class ClientTest extends ApiTestCase
         /**
          * @var EntityManagerInterface
          */
-        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager();
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        /** @var ClassMetadata[] $classes */
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);
 
@@ -164,10 +164,6 @@ JSON
 
     public function testLoginUser(): void
     {
-        if (!method_exists(KernelBrowser::class, 'loginUser')) {
-            $this->markTestSkipped('symfony/framework-bundle 5.1 is required to test this function');
-        }
-
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
 

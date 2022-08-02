@@ -33,17 +33,10 @@ abstract class AbstractFilter implements FilterInterface
 {
     use FieldDatatypeTrait { getNestedFieldPath as protected; }
 
-    protected ?array $properties;
-    protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory;
-    protected ?NameConverterInterface $nameConverter;
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
+    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected ?NameConverterInterface $nameConverter = null, protected ?array $properties = null)
     {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->nameConverter = $nameConverter;
-        $this->properties = $properties;
     }
 
     /**
@@ -57,7 +50,7 @@ abstract class AbstractFilter implements FilterInterface
 
         try {
             yield from $this->propertyNameCollectionFactory->create($resourceClass);
-        } catch (ResourceClassNotFoundException $e) {
+        } catch (ResourceClassNotFoundException) {
         }
     }
 
@@ -96,7 +89,7 @@ abstract class AbstractFilter implements FilterInterface
         foreach ($properties as $index => $currentProperty) {
             try {
                 $propertyMetadata = $this->propertyMetadataFactory->create($currentResourceClass, $currentProperty);
-            } catch (PropertyNotFoundException $e) {
+            } catch (PropertyNotFoundException) {
                 return $noop;
             }
 
@@ -117,7 +110,7 @@ abstract class AbstractFilter implements FilterInterface
                 return $noop;
             }
 
-            if ($type->isCollection() && null === $type = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) {
+            if ($type->isCollection() && null === $type = $type->getCollectionValueTypes()[0] ?? null) {
                 return $noop;
             }
 

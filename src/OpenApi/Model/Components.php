@@ -17,33 +17,15 @@ final class Components
 {
     use ExtensionTrait;
 
-    private $schemas;
-    private $responses;
-    private $parameters;
-    private $examples;
-    private $requestBodies;
-    private $headers;
-    private $securitySchemes;
-    private $links;
-    private $callbacks;
-    private $pathItems;
+    private ?\ArrayObject $schemas;
 
-    public function __construct(\ArrayObject $schemas = null, \ArrayObject $responses = null, \ArrayObject $parameters = null, \ArrayObject $examples = null, \ArrayObject $requestBodies = null, \ArrayObject $headers = null, \ArrayObject $securitySchemes = null, \ArrayObject $links = null, \ArrayObject $callbacks = null, \ArrayObject $pathItems = null)
+    public function __construct(\ArrayObject $schemas = null, private ?\ArrayObject $responses = null, private ?\ArrayObject $parameters = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $requestBodies = null, private ?\ArrayObject $headers = null, private ?\ArrayObject $securitySchemes = null, private ?\ArrayObject $links = null, private ?\ArrayObject $callbacks = null, private ?\ArrayObject $pathItems = null)
     {
         if ($schemas) {
             $schemas->ksort();
         }
 
         $this->schemas = $schemas;
-        $this->responses = $responses;
-        $this->parameters = $parameters;
-        $this->examples = $examples;
-        $this->requestBodies = $requestBodies;
-        $this->headers = $headers;
-        $this->securitySchemes = $securitySchemes;
-        $this->links = $links;
-        $this->callbacks = $callbacks;
-        $this->pathItems = $pathItems;
     }
 
     public function getSchemas(): ?\ArrayObject

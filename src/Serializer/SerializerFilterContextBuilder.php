@@ -27,15 +27,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class SerializerFilterContextBuilder implements SerializerContextBuilderInterface
 {
-    private $decorated;
-    private $filterLocator;
-    private $resourceMetadataCollectionFactory;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ContainerInterface $filterLocator, SerializerContextBuilderInterface $decorated)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ContainerInterface $filterLocator, private readonly SerializerContextBuilderInterface $decorated)
     {
-        $this->decorated = $decorated;
-        $this->filterLocator = $filterLocator;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**

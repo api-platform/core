@@ -30,7 +30,7 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaLessThanRestriction;
+    private PropertySchemaLessThanRestriction $propertySchemaLessThanRestriction;
 
     protected function setUp(): void
     {
@@ -56,7 +56,7 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
 
     public function testCreate(): void
     {
-        self::assertSame([
+        self::assertEquals([
             'maximum' => 10,
             'exclusiveMaximum' => true,
         ], $this->propertySchemaLessThanRestriction->create(new LessThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));

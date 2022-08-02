@@ -45,8 +45,7 @@ class SortTraitTest extends TestCase
 
         $sortTrait->arrayRecursiveSort($array, 'sort');
 
-        // @phpstan-ignore-next-line
-        $this->assertSame([
+        $this->assertEquals([
             'first',
             'second',
             [

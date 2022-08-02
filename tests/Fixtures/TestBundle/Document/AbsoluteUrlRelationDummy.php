@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::ABS_URL)]
@@ -25,7 +26,7 @@ class AbsoluteUrlRelationDummy
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
     #[ODM\ReferenceMany(targetDocument: AbsoluteUrlDummy::class, mappedBy: 'absoluteUrlRelationDummy')]
-    public $absoluteUrlDummies;
+    public Collection|iterable $absoluteUrlDummies;
 
     public function __construct()
     {

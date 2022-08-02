@@ -25,11 +25,11 @@ class DummyBoolean
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    public function __construct(#[ORM\Column(type: 'boolean', nullable: true)] private readonly ?bool $isDummyBoolean)
+    public function __construct(#[ORM\Column(type: 'boolean', nullable: true)] private ?bool $isDummyBoolean)
     {
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

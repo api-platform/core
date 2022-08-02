@@ -25,8 +25,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Custom Identifier Dummy With Subresource.
  */
 #[ApiResource(uriVariables: 'slug')]
-#[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies/{childDummies}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], toProperty: 'parentDummy'), 'childDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
-#[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies/{childDummies}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], toProperty: 'parentDummy'), 'childDummies' => new Link(fromClass: SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
 #[ODM\Document]
 class SlugParentDummy
 {
@@ -48,7 +48,7 @@ class SlugParentDummy
      * @var Collection<int,SlugChildDummy>
      */
     #[ODM\ReferenceMany(targetDocument: SlugChildDummy::class, mappedBy: 'parentDummy')]
-    private Collection $childDummies;
+    private Collection|iterable $childDummies;
 
     public function __construct()
     {
@@ -65,7 +65,7 @@ class SlugParentDummy
         return $this->slug;
     }
 
-    public function setSlug(string $slug)
+    public function setSlug(string $slug): void
     {
         $this->slug = $slug;
     }
@@ -73,7 +73,7 @@ class SlugParentDummy
     /**
      * @return Collection<int, SlugChildDummy>
      */
-    public function getChildDummies(): Collection
+    public function getChildDummies(): Collection|iterable
     {
         return $this->childDummies;
     }

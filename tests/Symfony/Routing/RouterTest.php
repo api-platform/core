@@ -30,7 +30,7 @@ class RouterTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testContextAccessor()
+    public function testContextAccessor(): void
     {
         $context = new RequestContext();
 
@@ -40,10 +40,10 @@ class RouterTest extends TestCase
 
         $router = new Router($mockedRouter->reveal());
         $router->setContext($context);
-        $this->assertSame($context, $router->getContext());
+        $this->assertEquals($context, $router->getContext());
     }
 
-    public function testGetRouteCollection()
+    public function testGetRouteCollection(): void
     {
         $routeCollection = new RouteCollection();
 
@@ -51,10 +51,10 @@ class RouterTest extends TestCase
         $mockedRouter->getRouteCollection()->willReturn($routeCollection)->shouldBeCalled();
 
         $router = new Router($mockedRouter->reveal());
-        $this->assertSame($routeCollection, $router->getRouteCollection());
+        $this->assertEquals($routeCollection, $router->getRouteCollection());
     }
 
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $mockedRouter = $this->prophesize(RouterInterface::class);
         $mockedRouter->generate('foo', [], RouterInterface::ABSOLUTE_PATH)->willReturn('/bar')->shouldBeCalled();
@@ -63,7 +63,7 @@ class RouterTest extends TestCase
         $this->assertSame('/bar', $router->generate('foo'));
     }
 
-    public function testGenerateWithDefaultStrategy()
+    public function testGenerateWithDefaultStrategy(): void
     {
         $mockedRouter = $this->prophesize(RouterInterface::class);
         $mockedRouter->generate('foo', [], UrlGeneratorInterface::ABS_URL)->willReturn('/bar')->shouldBeCalled();
@@ -72,7 +72,7 @@ class RouterTest extends TestCase
         $this->assertSame('/bar', $router->generate('foo'));
     }
 
-    public function testGenerateWithStrategy()
+    public function testGenerateWithStrategy(): void
     {
         $mockedRouter = $this->prophesize(RouterInterface::class);
         $mockedRouter->generate('foo', [], UrlGeneratorInterface::ABS_URL)->willReturn('/bar')->shouldBeCalled();
@@ -81,7 +81,7 @@ class RouterTest extends TestCase
         $this->assertSame('/bar', $router->generate('foo', [], UrlGeneratorInterface::ABS_URL));
     }
 
-    public function testMatch()
+    public function testMatch(): void
     {
         $context = new RequestContext('/app_dev.php', 'GET', 'localhost', 'https');
 
@@ -96,7 +96,7 @@ class RouterTest extends TestCase
         $this->assertEquals(['bar'], $router->match('/app_dev.php/foo'));
     }
 
-    public function testMatchWithInvalidContext()
+    public function testMatchWithInvalidContext(): void
     {
         $this->expectException(RoutingExceptionInterface::class);
         $this->expectExceptionMessage('Invalid request context.');
@@ -109,7 +109,7 @@ class RouterTest extends TestCase
         $router->match('28-01-2018 10:10');
     }
 
-    public function testMatchDuplicatedBaseUrl()
+    public function testMatchDuplicatedBaseUrl(): void
     {
         $context = new RequestContext('/app', 'GET', 'localhost', 'https');
 
@@ -123,7 +123,7 @@ class RouterTest extends TestCase
         $this->assertEquals(['bar'], $router->match('/app/api/app_crm/resource'));
     }
 
-    public function testMatchEmptyBaseUrl()
+    public function testMatchEmptyBaseUrl(): void
     {
         $context = new RequestContext('', 'GET', 'localhost', 'https');
 

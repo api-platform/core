@@ -31,12 +31,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class JsonSchemaGenerateCommand extends Command
 {
-    private SchemaFactoryInterface $schemaFactory;
-    private $formats;
+    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
+    private array $formats;
 
-    public function __construct($schemaFactory, array $formats)
+    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, array $formats)
     {
-        $this->schemaFactory = $schemaFactory;
         $this->formats = array_keys($formats);
 
         parent::__construct();
@@ -45,7 +44,7 @@ final class JsonSchemaGenerateCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Generates the JSON Schema for a resource operation.')

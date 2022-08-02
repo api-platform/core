@@ -17,15 +17,8 @@ final class License
 {
     use ExtensionTrait;
 
-    private $name;
-    private $url;
-    private $identifier;
-
-    public function __construct(string $name, string $url = null, string $identifier = null)
+    public function __construct(private string $name, private ?string $url = null, private ?string $identifier = null)
     {
-        $this->name = $name;
-        $this->url = $url;
-        $this->identifier = $identifier;
     }
 
     public function getName(): string

@@ -23,14 +23,14 @@ class Site
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private ?int $id = null;
     #[ORM\Column]
-    private $title;
+    private ?string $title = null;
     #[ORM\Column]
-    private $description;
+    private ?string $description = null;
     #[ORM\OneToOne(targetEntity: AbstractUser::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private $owner;
+    private ?AbstractUser $owner = null;
 
     public function getId(): ?int
     {

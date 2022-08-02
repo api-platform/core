@@ -36,10 +36,9 @@ class MakeStateProviderTest extends KernelTestCase
         $tester->execute($isInteractive ? [] : $inputs);
 
         $this->assertFileExists($newProviderFile);
-        $fixtureFile = \PHP_VERSION_ID < 80000 ? 'CustomStateProviderPhp7.php' : 'CustomStateProviderPhp8.php';
 
         // Unify line endings
-        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__."/../../Fixtures/Symfony/Maker/$fixtureFile"));
+        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/CustomStateProvider.php'));
         $result = preg_replace('~\R~u', "\r\n", file_get_contents($newProviderFile));
         $this->assertSame($expected, $result);
 

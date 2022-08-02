@@ -35,8 +35,6 @@ trait ArrayTrait
 
     public function arrayContainsOnly(array $array, string $type): bool
     {
-        return $array === array_filter($array, static function ($item) use ($type): bool {
-            return $type === \gettype($item);
-        });
+        return $array === array_filter($array, static fn ($item): bool => $type === \gettype($item));
     }
 }

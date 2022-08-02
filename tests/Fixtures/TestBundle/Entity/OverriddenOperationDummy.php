@@ -44,7 +44,7 @@ class OverriddenOperationDummy
     /**
      * @var string The dummy name
      */
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Groups(['overridden_operation_dummy_read', 'overridden_operation_dummy_write', 'overridden_operation_dummy_get'])]
@@ -53,7 +53,7 @@ class OverriddenOperationDummy
     /**
      * @var string|null The dummy name alias
      */
-    #[ApiProperty(types: ['http://schema.org/alternateName'])]
+    #[ApiProperty(types: ['https://schema.org/alternateName'])]
     #[ORM\Column(nullable: true)]
     #[Groups(['overridden_operation_dummy_read', 'overridden_operation_dummy_put', 'overridden_operation_dummy_get'])]
     private $alias;
@@ -61,7 +61,7 @@ class OverriddenOperationDummy
     /**
      * @var string|null A short description of the item
      */
-    #[ApiProperty(types: ['http://schema.org/description'])]
+    #[ApiProperty(types: ['https://schema.org/description'])]
     #[ORM\Column(nullable: true)]
     #[Groups(['overridden_operation_dummy_read', 'overridden_operation_dummy_write', 'overridden_operation_dummy_get', 'overridden_operation_dummy_put'])]
     public $description;
@@ -70,12 +70,12 @@ class OverriddenOperationDummy
     #[Groups(['overridden_operation_dummy_write'])]
     public $notGettable;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -85,7 +85,7 @@ class OverriddenOperationDummy
         return $this->name;
     }
 
-    public function setAlias($alias)
+    public function setAlias($alias): void
     {
         $this->alias = $alias;
     }
@@ -95,7 +95,7 @@ class OverriddenOperationDummy
         return $this->alias;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }

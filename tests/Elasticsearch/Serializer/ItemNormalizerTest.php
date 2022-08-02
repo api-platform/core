@@ -30,7 +30,7 @@ final class ItemNormalizerTest extends TestCase
     use ProphecyTrait;
 
     private $normalizerProphecy;
-    private $itemNormalizer;
+    private ItemNormalizer $itemNormalizer;
 
     protected function setUp(): void
     {
@@ -64,7 +64,7 @@ final class ItemNormalizerTest extends TestCase
     {
         $this->normalizerProphecy->denormalize('foo', 'string', 'json', ['groups' => 'foo'])->willReturn('foo')->shouldBeCalledOnce();
 
-        self::assertSame('foo', $this->itemNormalizer->denormalize('foo', 'string', 'json', ['groups' => 'foo']));
+        self::assertEquals('foo', $this->itemNormalizer->denormalize('foo', 'string', 'json', ['groups' => 'foo']));
     }
 
     public function testSupportsDenormalization(): void
@@ -80,7 +80,7 @@ final class ItemNormalizerTest extends TestCase
     {
         $this->normalizerProphecy->normalize($object = (object) ['foo'], 'json', ['groups' => 'foo'])->willReturn(['foo'])->shouldBeCalledOnce();
 
-        self::assertSame(['foo'], $this->itemNormalizer->normalize($object, 'json', ['groups' => 'foo']));
+        self::assertEquals(['foo'], $this->itemNormalizer->normalize($object, 'json', ['groups' => 'foo']));
     }
 
     public function testSupportsNormalization(): void

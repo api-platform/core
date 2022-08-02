@@ -47,17 +47,14 @@ class TypeBuilderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ObjectProphecy */
-    private $typesContainerProphecy;
+    private ObjectProphecy $typesContainerProphecy;
 
     /** @var callable */
     private $defaultFieldResolver;
 
-    /** @var ObjectProphecy */
-    private $fieldsBuilderLocatorProphecy;
+    private ObjectProphecy $fieldsBuilderLocatorProphecy;
 
-    /** @var TypeBuilder */
-    private $typeBuilder;
+    private TypeBuilder $typeBuilder;
 
     /**
      * {@inheritdoc}
@@ -65,7 +62,7 @@ class TypeBuilderTest extends TestCase
     protected function setUp(): void
     {
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
-        $this->defaultFieldResolver = function () {
+        $this->defaultFieldResolver = function (): void {
         };
         $this->fieldsBuilderLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $this->typeBuilder = new TypeBuilder(
@@ -127,7 +124,7 @@ class TypeBuilderTest extends TestCase
     /**
      * @dataProvider resourceObjectTypeQuerySerializationGroupsProvider
      */
-    public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, Operation $operation, string $shortName)
+    public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, Operation $operation, string $shortName): void
     {
         $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
             'item_query' => (new Query())->withShortName('shortName')->withNormalizationContext(['groups' => [$itemSerializationGroup]]),
@@ -267,7 +264,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
-        $this->assertSame([], $resourceObjectType->config['interfaces']);
+        $this->assertEquals([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         // Recursive call (not using wrapped type)
@@ -299,7 +296,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
-        $this->assertSame([], $resourceObjectType->config['interfaces']);
+        $this->assertEquals([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         // Recursive call (using wrapped type)
@@ -369,7 +366,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
-        $this->assertSame([], $resourceObjectType->config['interfaces']);
+        $this->assertEquals([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         // Recursive call (not using wrapped type)
@@ -403,7 +400,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
-        $this->assertSame([], $resourceObjectType->config['interfaces']);
+        $this->assertEquals([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         // Recursive call (using wrapped type)

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Problem\Serializer;
 
 use ApiPlatform\Exception\ErrorCodeSerializableInterface;
-use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,7 +27,7 @@ trait ErrorNormalizerTrait
             return $message;
         }
 
-        if ($object instanceof FlattenException || $object instanceof LegacyFlattenException) {
+        if ($object instanceof FlattenException) {
             $statusCode = $context['statusCode'] ?? $object->getStatusCode();
             if ($statusCode >= 500 && $statusCode < 600) {
                 $message = Response::$statusTexts[$statusCode] ?? Response::$statusTexts[Response::HTTP_INTERNAL_SERVER_ERROR];
@@ -40,10 +39,10 @@ trait ErrorNormalizerTrait
 
     private function getErrorCode($object): ?string
     {
-        if ($object instanceof FlattenException || $object instanceof LegacyFlattenException) {
+        if ($object instanceof FlattenException) {
             $exceptionClass = $object->getClass();
         } else {
-            $exceptionClass = \get_class($object);
+            $exceptionClass = $object::class;
         }
 
         if (is_a($exceptionClass, ErrorCodeSerializableInterface::class, true)) {

@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -43,38 +44,26 @@ class DummyCar
      */
     #[ORM\Id]
     #[ORM\OneToOne(targetEntity: DummyCarIdentifier::class, cascade: ['persist'])]
-    private readonly \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCarIdentifier $id;
-    /**
-     * @var mixed Something else
-     */
+    private DummyCarIdentifier $id;
     #[ApiFilter(SearchFilter::class, properties: ['colors.prop' => 'ipartial', 'colors' => 'exact'])]
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
     #[Serializer\Groups(['colors'])]
-    private $colors;
-    /**
-     * @var mixed Something else
-     */
+    private Collection|iterable $colors;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
     #[Serializer\Groups(['colors'])]
-    private mixed $secondColors = null;
-    /**
-     * @var mixed Something else
-     */
+    private Collection|iterable|null $secondColors = null;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
     #[Serializer\Groups(['colors'])]
-    private mixed $thirdColors = null;
-    /**
-     * @var mixed Something else
-     */
+    private Collection|iterable|null $thirdColors = null;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[ORM\ManyToMany(targetEntity: UuidIdentifierDummy::class, indexBy: 'uuid')]
     #[ORM\JoinColumn(name: 'car_id', referencedColumnName: 'id_id')]
     #[ORM\InverseJoinColumn(name: 'uuid_uuid', referencedColumnName: 'uuid')]
     #[ORM\JoinTable(name: 'uuid_cars')]
     #[Serializer\Groups(['colors'])]
-    private $uuid = null;
+    private Collection|iterable|null $uuid = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     #[ORM\Column(type: 'string')]
@@ -97,49 +86,49 @@ class DummyCar
         $this->info = new DummyCarInfo();
     }
 
-    public function getId()
+    public function getId(): DummyCarIdentifier
     {
         return $this->id;
     }
 
-    public function getColors()
+    public function getColors(): Collection|iterable
     {
         return $this->colors;
     }
 
-    public function setColors($colors): self
+    public function setColors(Collection|iterable $colors): self
     {
         $this->colors = $colors;
 
         return $this;
     }
 
-    public function getSecondColors()
+    public function getSecondColors(): ?iterable
     {
         return $this->secondColors;
     }
 
-    public function setSecondColors($secondColors)
+    public function setSecondColors($secondColors): void
     {
         $this->secondColors = $secondColors;
     }
 
-    public function getThirdColors()
+    public function getThirdColors(): ?iterable
     {
         return $this->thirdColors;
     }
 
-    public function setThirdColors($thirdColors)
+    public function setThirdColors($thirdColors): void
     {
         $this->thirdColors = $thirdColors;
     }
 
-    public function getUuid()
+    public function getUuid(): ?iterable
     {
         return $this->uuid;
     }
 
-    public function setUuid($uuid)
+    public function setUuid($uuid): void
     {
         $this->uuid = $uuid;
     }
@@ -152,7 +141,7 @@ class DummyCar
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -162,7 +151,7 @@ class DummyCar
         return $this->canSell;
     }
 
-    public function setCanSell(bool $canSell)
+    public function setCanSell(bool $canSell): void
     {
         $this->canSell = $canSell;
     }
@@ -172,7 +161,7 @@ class DummyCar
         return $this->availableAt;
     }
 
-    public function setAvailableAt(\DateTime $availableAt)
+    public function setAvailableAt(\DateTime $availableAt): void
     {
         $this->availableAt = $availableAt;
     }

@@ -155,9 +155,7 @@ class PaginatorTest extends TestCase
 
         self::assertEquals(
             array_map(
-                function (array $document): Foo {
-                    return $this->denormalizeFoo($document['_source']);
-                },
+                fn (array $document): Foo => $this->denormalizeFoo($document['_source']),
                 self::DOCUMENTS['hits']['hits']
             ),
             iterator_to_array($this->paginator)

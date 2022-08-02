@@ -31,7 +31,7 @@ final class DataProviderPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $services = $container->findTaggedServiceIds('api_platform.state_provider', true);
 

@@ -18,7 +18,7 @@ final class ContentStatus implements \JsonSerializable
     public const DRAFT = 'draft';
     public const PUBLISHED = 'published';
 
-    private $value;
+    private readonly string $value;
 
     public function __construct(string $value)
     {
@@ -39,9 +39,6 @@ final class ContentStatus implements \JsonSerializable
         return $this->value;
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function toArray(): array
     {
         return [
@@ -62,11 +59,8 @@ final class ContentStatus implements \JsonSerializable
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'key' => $this->getKey(),

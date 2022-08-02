@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::ABS_URL)]
@@ -27,7 +28,7 @@ class AbsoluteUrlRelationDummy
     #[ORM\Column(type: 'integer')]
     private $id;
     #[ORM\OneToMany(targetEntity: AbsoluteUrlDummy::class, mappedBy: 'absoluteUrlRelationDummy')]
-    public $absoluteUrlDummies;
+    public Collection|iterable $absoluteUrlDummies;
 
     public function __construct()
     {

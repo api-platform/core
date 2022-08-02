@@ -50,7 +50,7 @@ class ConstantScoreFilterExtensionTest extends TestCase
 
         $constantScoreFilterExtension = new ConstantScoreFilterExtension($containerProphecy->reveal());
 
-        self::assertSame(['query' => ['constant_score' => ['filter' => ['bool' => ['must' => [['terms' => ['name' => ['Kilian', 'Xavier', 'François']]]]]]]]], $constantScoreFilterExtension->applyToCollection([], Foo::class, $operation, ['filters' => ['name' => ['Kilian', 'Xavier', 'François']]]));
+        self::assertEquals(['query' => ['constant_score' => ['filter' => ['bool' => ['must' => [['terms' => ['name' => ['Kilian', 'Xavier', 'François']]]]]]]]], $constantScoreFilterExtension->applyToCollection([], Foo::class, $operation, ['filters' => ['name' => ['Kilian', 'Xavier', 'François']]]));
     }
 
     public function testApplyToCollectionWithNoFilters(): void

@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Type;
 
 /**
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>
@@ -38,7 +39,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaCollectionRestriction;
+    private PropertySchemaCollectionRestriction $propertySchemaCollectionRestriction;
 
     protected function setUp(): void
     {
@@ -87,11 +88,11 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
                 new Email(['mode' => Email::VALIDATION_MODE_LOOSE]),
             ],
             'phone' => new Optional([
-                new \Symfony\Component\Validator\Constraints\Type(['type' => 'string']),
+                new Type(['type' => 'string']),
                 new Regex(['pattern' => '/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/']),
             ]),
             'age' => new Optional([
-                new \Symfony\Component\Validator\Constraints\Type(['type' => 'int']),
+                new Type(['type' => 'int']),
             ]),
             'social' => new Collection([
                 'fields' => [

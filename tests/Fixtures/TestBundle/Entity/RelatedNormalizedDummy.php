@@ -42,7 +42,7 @@ class RelatedNormalizedDummy
     /**
      * @var string The dummy name
      */
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(types: ['https://schema.org/name'])]
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Groups(['related_output', 'related_input'])]
@@ -52,7 +52,7 @@ class RelatedNormalizedDummy
      */
     #[ORM\ManyToMany(targetEntity: CustomNormalizedDummy::class)]
     #[Groups(['related_output', 'related_input'])]
-    public $customNormalizedDummy;
+    public Collection|iterable $customNormalizedDummy;
 
     public function __construct()
     {
@@ -74,12 +74,12 @@ class RelatedNormalizedDummy
         return $this->name;
     }
 
-    public function getCustomNormalizedDummy(): Collection
+    public function getCustomNormalizedDummy(): Collection|iterable
     {
         return $this->customNormalizedDummy;
     }
 
-    public function setCustomNormalizedDummy($customNormalizedDummy): void
+    public function setCustomNormalizedDummy(Collection|iterable $customNormalizedDummy): void
     {
         $this->customNormalizedDummy = $customNormalizedDummy;
     }

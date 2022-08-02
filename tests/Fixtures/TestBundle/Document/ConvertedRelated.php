@@ -28,7 +28,7 @@ class ConvertedRelated
     #[ODM\Field]
     public $nameConverted;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

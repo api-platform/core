@@ -41,7 +41,7 @@ class ItemNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');

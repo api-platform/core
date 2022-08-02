@@ -47,16 +47,16 @@ final class AttributeResource
     #[Link('dummyId')]
     public $dummy = null;
 
-    public function __construct(#[ApiProperty(identifier: true)] private readonly int $identifier, public string $name)
+    public function __construct(#[ApiProperty(identifier: true)] private int $identifier, public string $name)
     {
     }
 
-    public function getIdentifier()
+    public function getIdentifier(): int
     {
         return $this->identifier;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

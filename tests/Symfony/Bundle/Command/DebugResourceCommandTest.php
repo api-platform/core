@@ -16,6 +16,8 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Command;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Symfony\Bundle\Command\DebugResourceCommand;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AlternateResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -45,14 +47,14 @@ class DebugResourceCommandTest extends TestCase
     /**
      * @requires PHP 8.0
      */
-    public function testDebugResource()
+    public function testDebugResource(): void
     {
         $varDumper = $this->prophesize(DataDumperInterface::class);
         $commandTester = $this->getCommandTester($varDumper->reveal());
         $varDumper->dump(Argument::any())->shouldBeCalledTimes(1);
         $commandTester->setInputs(['0', '0']);
         $commandTester->execute([
-            'class' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource',
+            'class' => AttributeResource::class,
         ]);
 
         $this->assertStringContainsString('Successfully dumped the selected resource', $commandTester->getDisplay());
@@ -61,7 +63,7 @@ class DebugResourceCommandTest extends TestCase
     /**
      * @requires PHP 8.0
      */
-    public function testDebugOperation()
+    public function testDebugOperation(): void
     {
         $varDumper = $this->prophesize(DataDumperInterface::class);
         $commandTester = $this->getCommandTester($varDumper->reveal());
@@ -69,7 +71,7 @@ class DebugResourceCommandTest extends TestCase
         $commandTester->setInputs(['0', '1']);
 
         $commandTester->execute([
-            'class' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource',
+            'class' => AttributeResource::class,
         ]);
 
         $this->assertStringContainsString('Successfully dumped the selected operation', $commandTester->getDisplay());
@@ -78,7 +80,7 @@ class DebugResourceCommandTest extends TestCase
     /**
      * @requires PHP 8.0
      */
-    public function testWithOnlyOneResource()
+    public function testWithOnlyOneResource(): void
     {
         $varDumper = $this->prophesize(DataDumperInterface::class);
         $commandTester = $this->getCommandTester($varDumper->reveal());
@@ -86,7 +88,7 @@ class DebugResourceCommandTest extends TestCase
         $commandTester->setInputs(['1']);
 
         $commandTester->execute([
-            'class' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\AlternateResource',
+            'class' => AlternateResource::class,
         ]);
 
         $this->assertStringContainsString('declares 1 resource', $commandTester->getDisplay());
@@ -96,7 +98,7 @@ class DebugResourceCommandTest extends TestCase
     /**
      * @requires PHP 8.0
      */
-    public function testExecuteWithNotExistingClass()
+    public function testExecuteWithNotExistingClass(): void
     {
         $this->expectException(ResourceClassNotFoundException::class);
         $commandTester = $this->getCommandTester();

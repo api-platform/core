@@ -31,29 +31,16 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     public const LIMIT_ZERO_MARKER_FIELD = '___';
     public const LIMIT_ZERO_MARKER = 'limit0';
 
-    private Iterator $mongoDbOdmIterator;
+    private ?\ArrayIterator $iterator = null;
 
-    private array $pipeline;
+    private readonly int $firstResult;
 
-    private UnitOfWork $unitOfWork;
+    private readonly int $maxResults;
 
-    private string $resourceClass;
+    private readonly int $totalItems;
 
-    private ?\ArrayIterator $iterator;
-
-    private int $firstResult;
-
-    private int $maxResults;
-
-    private int $totalItems;
-
-    public function __construct(Iterator $mongoDbOdmIterator, UnitOfWork $unitOfWork, string $resourceClass, array $pipeline)
+    public function __construct(private readonly Iterator $mongoDbOdmIterator, private readonly UnitOfWork $unitOfWork, private string $resourceClass, private readonly array $pipeline)
     {
-        $this->mongoDbOdmIterator = $mongoDbOdmIterator;
-        $this->unitOfWork = $unitOfWork;
-        $this->resourceClass = $resourceClass;
-        $this->pipeline = $pipeline;
-
         $resultsFacetInfo = $this->getFacetInfo('results');
         $this->getFacetInfo('count');
 
@@ -111,9 +98,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function getIterator(): \Traversable
     {
-        return $this->iterator ?? $this->iterator = new \ArrayIterator(array_map(function ($result) {
-            return $this->unitOfWork->getOrCreateDocument($this->resourceClass, $result);
-        }, $this->mongoDbOdmIterator->toArray()[0]['results']));
+        return $this->iterator ?? $this->iterator = new \ArrayIterator(array_map(fn ($result): object => $this->unitOfWork->getOrCreateDocument($this->resourceClass, $result), $this->mongoDbOdmIterator->toArray()[0]['results']));
     }
 
     /**
@@ -121,7 +106,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function count(): int
     {
-        return \count($this->mongoDbOdmIterator->toArray()[0]['results']);
+        return is_countable($this->mongoDbOdmIterator->toArray()[0]['results']) ? \count($this->mongoDbOdmIterator->toArray()[0]['results']) : 0;
     }
 
     /**

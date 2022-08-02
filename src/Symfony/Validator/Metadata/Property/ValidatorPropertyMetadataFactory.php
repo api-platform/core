@@ -52,37 +52,27 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     public const REQUIRED_CONSTRAINTS = [NotBlank::class, NotNull::class];
 
     public const SCHEMA_MAPPED_CONSTRAINTS = [
-        Url::class => 'http://schema.org/url',
-        Email::class => 'http://schema.org/email',
-        Uuid::class => 'http://schema.org/identifier',
-        CardScheme::class => 'http://schema.org/identifier',
-        Bic::class => 'http://schema.org/identifier',
-        Iban::class => 'http://schema.org/identifier',
-        Date::class => 'http://schema.org/Date',
-        DateTime::class => 'http://schema.org/DateTime',
-        Time::class => 'http://schema.org/Time',
-        Image::class => 'http://schema.org/image',
-        File::class => 'http://schema.org/MediaObject',
-        Currency::class => 'http://schema.org/priceCurrency',
-        Isbn::class => 'http://schema.org/isbn',
-        Issn::class => 'http://schema.org/issn',
+        Url::class => 'https://schema.org/url',
+        Email::class => 'https://schema.org/email',
+        Uuid::class => 'https://schema.org/identifier',
+        CardScheme::class => 'https://schema.org/identifier',
+        Bic::class => 'https://schema.org/identifier',
+        Iban::class => 'https://schema.org/identifier',
+        Date::class => 'https://schema.org/Date',
+        DateTime::class => 'https://schema.org/DateTime',
+        Time::class => 'https://schema.org/Time',
+        Image::class => 'https://schema.org/image',
+        File::class => 'https://schema.org/MediaObject',
+        Currency::class => 'https://schema.org/priceCurrency',
+        Isbn::class => 'https://schema.org/isbn',
+        Issn::class => 'https://schema.org/issn',
     ];
-
-    private $decorated;
-    private $validatorMetadataFactory;
-    /**
-     * @var iterable<PropertySchemaRestrictionMetadataInterface>
-     */
-    private $restrictionsMetadata;
 
     /**
      * @param PropertySchemaRestrictionMetadataInterface[] $restrictionsMetadata
      */
-    public function __construct(ValidatorMetadataFactoryInterface $validatorMetadataFactory, PropertyMetadataFactoryInterface $decorated, iterable $restrictionsMetadata = [])
+    public function __construct(private readonly ValidatorMetadataFactoryInterface $validatorMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, private readonly iterable $restrictionsMetadata = [])
     {
-        $this->validatorMetadataFactory = $validatorMetadataFactory;
-        $this->decorated = $decorated;
-        $this->restrictionsMetadata = $restrictionsMetadata;
     }
 
     /**
@@ -108,7 +98,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
         $validationGroups = $this->getValidationGroups($validatorClassMetadata, $options);
         $restrictions = [];
-        $types = $types ?? [];
+        $types ??= [];
 
         foreach ($validatorClassMetadata->getPropertyMetadata($property) as $validatorPropertyMetadata) {
             foreach ($this->getPropertyConstraints($validatorPropertyMetadata, $validationGroups) as $constraint) {
@@ -116,7 +106,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
                     $required = true;
                 }
 
-                $type = self::SCHEMA_MAPPED_CONSTRAINTS[\get_class($constraint)] ?? null;
+                $type = self::SCHEMA_MAPPED_CONSTRAINTS[$constraint::class] ?? null;
 
                 if ($type && !\in_array($type, $types, true)) {
                     $types[] = $type;
@@ -180,7 +170,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
             foreach ($validatorPropertyMetadata->findConstraints($validationGroup) as $propertyConstraint) {
                 if ($propertyConstraint instanceof Sequentially || $propertyConstraint instanceof Compound) {
-                    $constraints[] = method_exists($propertyConstraint, 'getNestedContraints') ? $propertyConstraint->getNestedContraints() : $propertyConstraint->getNestedConstraints();
+                    $constraints[] = $propertyConstraint->getNestedConstraints();
                 } else {
                     $constraints[] = [$propertyConstraint];
                 }

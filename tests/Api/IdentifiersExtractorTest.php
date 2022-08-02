@@ -33,7 +33,7 @@ class IdentifiersExtractorTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testGetIdentifiersFromItem()
+    public function testGetIdentifiersFromItem(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -60,7 +60,7 @@ class IdentifiersExtractorTest extends TestCase
         $this->assertEquals([], $identifiersExtractor->getIdentifiersFromItem($item, $operation->reveal()));
     }
 
-    public function testGetIdentifiersFromItemWithId()
+    public function testGetIdentifiersFromItemWithId(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -84,6 +84,6 @@ class IdentifiersExtractorTest extends TestCase
 
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
 
-        $this->assertEquals(['id' => '1'], $identifiersExtractor->getIdentifiersFromItem($item, $operation));
+        $this->assertEquals(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($item, $operation));
     }
 }

@@ -21,7 +21,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 
 class DummyDtoNoInputsProcessor implements ProcessorInterface
 {
-    public function __construct(private ProcessorInterface $decorated)
+    public function __construct(private readonly ProcessorInterface $decorated)
     {
     }
 

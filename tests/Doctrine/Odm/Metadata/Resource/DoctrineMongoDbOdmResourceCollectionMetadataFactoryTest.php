@@ -86,10 +86,10 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         $managerRegistry->getManagerForClass($operation->getClass())->willReturn($objectManager->reveal());
         $resourceMetadataCollectionFactory = new DoctrineMongoDbOdmResourceCollectionMetadataFactory($managerRegistry->reveal(), $this->getResourceMetadataCollectionFactory($operation));
         $resourceMetadataCollection = $resourceMetadataCollectionFactory->create($operation->getClass());
-        $this->assertEquals($expectedProvider, $resourceMetadataCollection->getOperation($operation->getName())->getProvider());
-        $this->assertEquals($expectedProvider, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProvider());
-        $this->assertEquals($expectedProcessor, $resourceMetadataCollection->getOperation($operation->getName())->getProcessor());
-        $this->assertEquals($expectedProcessor, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProcessor());
+        $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation($operation->getName())->getProvider());
+        $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProvider());
+        $this->assertSame($expectedProcessor, $resourceMetadataCollection->getOperation($operation->getName())->getProcessor());
+        $this->assertSame($expectedProcessor, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProcessor());
     }
 
     public function operationProvider(): iterable

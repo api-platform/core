@@ -30,14 +30,15 @@ class ElasticsearchClientPassTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(CompilerPassInterface::class, new ElasticsearchClientPass());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
+        // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
         $clientDefinitionProphecy->setFactory([ClientBuilder::class, 'fromConfig'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
         $clientDefinitionProphecy->setArguments(
             Argument::allOf(
@@ -60,9 +61,10 @@ class ElasticsearchClientPassTest extends TestCase
         (new ElasticsearchClientPass())->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessWithoutConfiguration()
+    public function testProcessWithoutConfiguration(): void
     {
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
+        // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
         $clientDefinitionProphecy->setFactory([ClientBuilder::class, 'build'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
@@ -74,7 +76,7 @@ class ElasticsearchClientPassTest extends TestCase
         (new ElasticsearchClientPass())->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessWithElasticsearchDisabled()
+    public function testProcessWithElasticsearchDisabled(): void
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(false)->shouldBeCalled();
