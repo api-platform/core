@@ -74,7 +74,7 @@ class OpenApiNormalizerTest extends TestCase
 
         $array = $normalizer->normalize($openApi);
 
-        $this->assertEquals(array_keys($array['components']['schemas']), ['b', 'z']);
+        $this->assertSame(array_keys($array['components']['schemas']), ['b', 'z']);
     }
 
     public function testNormalizeWithEmptySchemas(): void
@@ -252,9 +252,9 @@ class OpenApiNormalizerTest extends TestCase
         $openApiAsArray = $normalizer->normalize($openApi);
 
         // Just testing normalization specifics
-        $this->assertEquals($openApiAsArray['x-key'], 'Custom x-key value');
-        $this->assertEquals($openApiAsArray['x-value'], 'Custom x-value value');
-        $this->assertEquals($openApiAsArray['info']['x-info-key'], 'Info value');
+        $this->assertSame($openApiAsArray['x-key'], 'Custom x-key value');
+        $this->assertSame($openApiAsArray['x-value'], 'Custom x-value value');
+        $this->assertSame($openApiAsArray['info']['x-info-key'], 'Info value');
         $this->assertArrayNotHasKey('extensionProperties', $openApiAsArray);
         // this key is null, should not be in the output
         $this->assertArrayNotHasKey('termsOfService', $openApiAsArray['info']);
@@ -268,7 +268,7 @@ class OpenApiNormalizerTest extends TestCase
         $this->assertEquals(['url' => '/test'], $openApiAsArray['paths']['/dummies']['post']['servers']);
 
         // Make sure things are sorted
-        $this->assertEquals(array_keys($openApiAsArray['paths']), ['/dummies', '/dummies/{id}', '/zorros', '/zorros/{id}']);
+        $this->assertSame(array_keys($openApiAsArray['paths']), ['/dummies', '/dummies/{id}', '/zorros', '/zorros/{id}']);
         // Test name converter doesn't rename this property
         $this->assertArrayHasKey('requestBody', $openApiAsArray['paths']['/dummies']['post']);
     }

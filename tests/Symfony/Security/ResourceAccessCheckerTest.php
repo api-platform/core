@@ -53,7 +53,7 @@ class ResourceAccessCheckerTest extends TestCase
         $tokenStorageProphecy->getToken()->willReturn($token);
 
         $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
-        $this->assertEquals($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
+        $this->assertSame($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
     }
 
     public function getGranted(): array

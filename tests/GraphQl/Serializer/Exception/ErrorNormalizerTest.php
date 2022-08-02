@@ -38,8 +38,8 @@ class ErrorNormalizerTest extends TestCase
         $error = new Error($errorMessage);
 
         $normalizedError = $this->errorNormalizer->normalize($error);
-        $this->assertEquals($errorMessage, $normalizedError['message']);
-        $this->assertEquals(Error::CATEGORY_GRAPHQL, $normalizedError['extensions']['category']);
+        $this->assertSame($errorMessage, $normalizedError['message']);
+        $this->assertSame(Error::CATEGORY_GRAPHQL, $normalizedError['extensions']['category']);
     }
 
     public function testSupportsNormalization(): void

@@ -89,7 +89,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $mercureUrl = 'mercure-url';
         $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl($subscriptionId, null)->shouldBeCalled()->willReturn($mercureUrl);
 
-        $this->assertEquals($serializeStageData + ['mercureUrl' => $mercureUrl], ($this->itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertSame($serializeStageData + ['mercureUrl' => $mercureUrl], ($this->itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveNullResourceClass(): void
@@ -157,7 +157,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
         $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl(Argument::any())->shouldNotBeCalled();
 
-        $this->assertEquals($serializeStageData, ($this->itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertSame($serializeStageData, ($this->itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveNoMercureSubscriptionIriGenerator(): void

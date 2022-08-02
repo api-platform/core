@@ -92,8 +92,8 @@ class WriteListenerTest extends TestCase
             $request->attributes->set('_api_operation_name', sprintf('_api_%s_%s%s', 'OperationResource', strtolower($httpMethod), 'POST' === $httpMethod ? '_collection' : ''));
 
             (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
-            $this->assertEquals($operationResource, $event->getControllerResult());
-            $this->assertEquals('/operation_resources/1', $request->attributes->get('_api_write_item_iri'));
+            $this->assertSame($operationResource, $event->getControllerResult());
+            $this->assertSame('/operation_resources/1', $request->attributes->get('_api_write_item_iri'));
         }
     }
 

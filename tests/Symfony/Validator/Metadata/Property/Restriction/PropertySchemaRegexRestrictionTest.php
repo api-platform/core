@@ -40,7 +40,7 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
      */
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
-        self::assertEquals($expectedResult, $this->propertySchemaRegexRestriction->supports($constraint, $propertyMetadata));
+        self::assertSame($expectedResult, $this->propertySchemaRegexRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
@@ -55,7 +55,7 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
      */
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
-        self::assertEquals($expectedResult, $this->propertySchemaRegexRestriction->create($constraint, $propertyMetadata));
+        self::assertSame($expectedResult, $this->propertySchemaRegexRestriction->create($constraint, $propertyMetadata));
     }
 
     public function createProvider(): \Generator

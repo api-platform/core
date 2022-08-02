@@ -76,7 +76,7 @@ final class ItemProviderTest extends TestCase
 
         $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $denormalizerProphecy->reveal());
 
-        self::assertEquals($foo, $itemDataProvider->provide((new Get())->withClass(Foo::class), ['id' => 1]));
+        self::assertSame($foo, $itemDataProvider->provide((new Get())->withClass(Foo::class), ['id' => 1]));
     }
 
     public function testGetItemWithMissing404Exception(): void

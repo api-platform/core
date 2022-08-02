@@ -59,7 +59,7 @@ class ErrorNormalizerTest extends TestCase
             $expected['trace'] = $exception->getTrace();
         }
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
     public function testNormalizeAnExceptionWithCustomErrorCode(): void
@@ -77,7 +77,7 @@ class ErrorNormalizerTest extends TestCase
             'code' => ErrorCodeSerializable::getErrorCode(),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
     public function testNormalizeAFlattenExceptionWithCustomErrorCode(): void
@@ -95,7 +95,7 @@ class ErrorNormalizerTest extends TestCase
             'code' => ErrorCodeSerializable::getErrorCode(),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
     public function errorProvider()

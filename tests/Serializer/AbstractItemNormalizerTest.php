@@ -146,7 +146,7 @@ class AbstractItemNormalizerTest extends TestCase
             'relatedDummy' => '/dummies/2',
             'relatedDummies' => ['/dummies/2'],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, null, [
+        $this->assertSame($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
             'ignored_attributes' => ['alias'],
         ]));
@@ -205,7 +205,7 @@ class AbstractItemNormalizerTest extends TestCase
         $expected = [
             'title' => 'myPublicTitle',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, null, [
+        $this->assertSame($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
         ]));
     }
@@ -571,7 +571,7 @@ class AbstractItemNormalizerTest extends TestCase
             'relatedDummy' => ['foo' => 'hello'],
             'relatedDummies' => [['foo' => 'hello']],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, null, [
+        $this->assertSame($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
         ]));
     }
@@ -689,7 +689,7 @@ class AbstractItemNormalizerTest extends TestCase
         // $actual = $normalizer->denormalize($data, DummyForAdditionalFields::class, 'json', $context);
         //
         // $this->assertInstanceOf(DummyForAdditionalFields::class, $actual);
-        // $this->assertEquals('Dummy Name', $actual->getName());
+        // $this->assertSame('Dummy Name', $actual->getName());
     }
 
     public function testDenormalizeWritableLinks(): void

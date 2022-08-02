@@ -28,15 +28,15 @@ class ErrorFormatGuesserTest extends TestCase
         $request->setRequestFormat('jsonld');
 
         $format = ErrorFormatGuesser::guessErrorFormat($request, ['xml' => ['text/xml'], 'jsonld' => ['application/ld+json', 'application/json']]);
-        $this->assertEquals('jsonld', $format['key']);
-        $this->assertEquals('application/ld+json', $format['value'][0]);
+        $this->assertSame('jsonld', $format['key']);
+        $this->assertSame('application/ld+json', $format['value'][0]);
     }
 
     public function testFallback(): void
     {
         $format = ErrorFormatGuesser::guessErrorFormat(new Request(), ['xml' => ['text/xml'], 'jsonld' => ['application/ld+json', 'application/json']]);
-        $this->assertEquals('xml', $format['key']);
-        $this->assertEquals('text/xml', $format['value'][0]);
+        $this->assertSame('xml', $format['key']);
+        $this->assertSame('text/xml', $format['value'][0]);
     }
 
     public function testFallbackWhenNotSupported(): void
@@ -45,8 +45,8 @@ class ErrorFormatGuesserTest extends TestCase
         $request->setRequestFormat('html');
 
         $format = ErrorFormatGuesser::guessErrorFormat($request, ['xml' => ['text/xml'], 'jsonld' => ['application/ld+json', 'application/json']]);
-        $this->assertEquals('xml', $format['key']);
-        $this->assertEquals('text/xml', $format['value'][0]);
+        $this->assertSame('xml', $format['key']);
+        $this->assertSame('text/xml', $format['value'][0]);
     }
 
     public function testGuessCustomErrorFormat(): void
@@ -55,7 +55,7 @@ class ErrorFormatGuesserTest extends TestCase
         $request->setRequestFormat('custom_json_format');
 
         $format = ErrorFormatGuesser::guessErrorFormat($request, ['xml' => ['text/xml'], 'custom_json_format' => ['application/json']]);
-        $this->assertEquals('custom_json_format', $format['key']);
-        $this->assertEquals('application/json', $format['value'][0]);
+        $this->assertSame('custom_json_format', $format['key']);
+        $this->assertSame('application/json', $format['value'][0]);
     }
 }

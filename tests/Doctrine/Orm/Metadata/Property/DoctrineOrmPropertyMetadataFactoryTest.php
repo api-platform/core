@@ -43,7 +43,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrineOrmPropertyMetadataFactory = new DoctrineOrmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
 
-        $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
+        $this->assertSame($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
     public function testCreateIsIdentifier(): void
@@ -64,7 +64,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrineOrmPropertyMetadataFactory = new DoctrineOrmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
 
-        $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
+        $this->assertSame($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
     public function testCreateIsWritable(): void
@@ -89,8 +89,8 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), false);
     }
 
     public function testCreateWithDefaultOption(): void
@@ -116,7 +116,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(DummyPropertyWithDefaultValue::class, 'dummyDefaultOption');
 
-        $this->assertEquals($doctrinePropertyMetadata->getDefault(), 'default value');
+        $this->assertSame($doctrinePropertyMetadata->getDefault(), 'default value');
     }
 
     public function testCreateClassMetadataInfo(): void
@@ -141,8 +141,8 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), true);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), true);
     }
 
     public function testCreateClassMetadata(): void
@@ -165,7 +165,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), false);
     }
 }

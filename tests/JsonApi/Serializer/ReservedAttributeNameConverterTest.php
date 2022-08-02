@@ -54,7 +54,7 @@ class ReservedAttributeNameConverterTest extends TestCase
      */
     public function testNormalize($propertyName, $expectedPropertyName): void
     {
-        $this->assertEquals($expectedPropertyName, $this->reservedAttributeNameConverter->normalize($propertyName));
+        $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->normalize($propertyName));
     }
 
     /**
@@ -65,6 +65,6 @@ class ReservedAttributeNameConverterTest extends TestCase
      */
     public function testDenormalize($expectedPropertyName, $propertyName): void
     {
-        $this->assertEquals($expectedPropertyName, $this->reservedAttributeNameConverter->denormalize($propertyName));
+        $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->denormalize($propertyName));
     }
 }

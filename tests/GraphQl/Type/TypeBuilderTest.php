@@ -85,9 +85,9 @@ class TypeBuilderTest extends TestCase
         $operation = (new Query())->withShortName('shortName')->withDescription('description');
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadataCollection, $operation, false);
-        $this->assertEquals('shortName', $resourceObjectType->name);
-        $this->assertEquals('description', $resourceObjectType->description);
-        $this->assertEquals($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
+        $this->assertSame('shortName', $resourceObjectType->name);
+        $this->assertSame('description', $resourceObjectType->description);
+        $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
@@ -109,9 +109,9 @@ class TypeBuilderTest extends TestCase
         $operation = (new Query())->withShortName('shortName')->withDescription('description')->withOutput(['class' => 'outputClass']);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
-        $this->assertEquals('shortName', $resourceObjectType->name);
-        $this->assertEquals('description', $resourceObjectType->description);
-        $this->assertEquals($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
+        $this->assertSame('shortName', $resourceObjectType->name);
+        $this->assertSame('description', $resourceObjectType->description);
+        $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
@@ -137,7 +137,7 @@ class TypeBuilderTest extends TestCase
 
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
-        $this->assertEquals($shortName, $resourceObjectType->name);
+        $this->assertSame($shortName, $resourceObjectType->name);
     }
 
     public function resourceObjectTypeQuerySerializationGroupsProvider(): array
@@ -179,8 +179,8 @@ class TypeBuilderTest extends TestCase
         /** @var InputObjectType $wrappedType */
         $wrappedType = $resourceObjectType->getWrappedType();
         $this->assertInstanceOf(InputObjectType::class, $wrappedType);
-        $this->assertEquals('customShortNameInput', $wrappedType->name);
-        $this->assertEquals('description', $wrappedType->description);
+        $this->assertSame('customShortNameInput', $wrappedType->name);
+        $this->assertSame('description', $wrappedType->description);
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
@@ -205,8 +205,8 @@ class TypeBuilderTest extends TestCase
         /** @var InputObjectType $wrappedType */
         $wrappedType = $resourceObjectType->getWrappedType();
         $this->assertInstanceOf(InputObjectType::class, $wrappedType);
-        $this->assertEquals('customShortNameNestedInput', $wrappedType->name);
-        $this->assertEquals('description', $wrappedType->description);
+        $this->assertSame('customShortNameNestedInput', $wrappedType->name);
+        $this->assertSame('description', $wrappedType->description);
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
@@ -231,8 +231,8 @@ class TypeBuilderTest extends TestCase
         /** @var InputObjectType $wrappedType */
         $wrappedType = $resourceObjectType->getWrappedType();
         $this->assertInstanceOf(InputObjectType::class, $wrappedType);
-        $this->assertEquals('customShortNameInput', $wrappedType->name);
-        $this->assertEquals('description', $wrappedType->description);
+        $this->assertSame('customShortNameInput', $wrappedType->name);
+        $this->assertSame('description', $wrappedType->description);
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
@@ -260,9 +260,9 @@ class TypeBuilderTest extends TestCase
         $operation = (new Mutation())->withName('create')->withShortName('shortName')->withDescription('description');
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
-        $this->assertEquals('createShortNamePayload', $resourceObjectType->name);
-        $this->assertEquals('description', $resourceObjectType->description);
-        $this->assertEquals($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
+        $this->assertSame('createShortNamePayload', $resourceObjectType->name);
+        $this->assertSame('description', $resourceObjectType->description);
+        $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertEquals([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
@@ -274,7 +274,7 @@ class TypeBuilderTest extends TestCase
         $fieldsType = $resourceObjectType->config['fields']();
         $this->assertArrayHasKey('shortName', $fieldsType);
         $this->assertArrayHasKey('clientMutationId', $fieldsType);
-        $this->assertEquals(GraphQLType::string(), $fieldsType['clientMutationId']);
+        $this->assertSame(GraphQLType::string(), $fieldsType['clientMutationId']);
     }
 
     public function testGetResourceObjectTypeMutationWrappedType(): void
@@ -292,9 +292,9 @@ class TypeBuilderTest extends TestCase
         $operation = (new Mutation())->withName('create')->withShortName('shortName')->withDescription('description')->withNormalizationContext(['groups' => ['create']]);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
-        $this->assertEquals('createShortNamePayload', $resourceObjectType->name);
-        $this->assertEquals('description', $resourceObjectType->description);
-        $this->assertEquals($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
+        $this->assertSame('createShortNamePayload', $resourceObjectType->name);
+        $this->assertSame('description', $resourceObjectType->description);
+        $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertEquals([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
@@ -306,13 +306,13 @@ class TypeBuilderTest extends TestCase
         $fieldsType = $resourceObjectType->config['fields']();
         $this->assertArrayHasKey('shortName', $fieldsType);
         $this->assertArrayHasKey('clientMutationId', $fieldsType);
-        $this->assertEquals(GraphQLType::string(), $fieldsType['clientMutationId']);
+        $this->assertSame(GraphQLType::string(), $fieldsType['clientMutationId']);
 
         /** @var ObjectType $wrappedType */
         $wrappedType = $fieldsType['shortName'];
-        $this->assertEquals('createShortNamePayloadData', $wrappedType->name);
-        $this->assertEquals('description', $wrappedType->description);
-        $this->assertEquals($this->defaultFieldResolver, $wrappedType->resolveFieldFn);
+        $this->assertSame('createShortNamePayloadData', $wrappedType->name);
+        $this->assertSame('description', $wrappedType->description);
+        $this->assertSame($this->defaultFieldResolver, $wrappedType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
@@ -334,9 +334,9 @@ class TypeBuilderTest extends TestCase
         $operation = (new Mutation())->withName('create')->withShortName('shortName')->withDescription('description');
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false, false, 1);
-        $this->assertEquals('createShortNameNestedPayload', $resourceObjectType->name);
-        $this->assertEquals('description', $resourceObjectType->description);
-        $this->assertEquals($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
+        $this->assertSame('createShortNameNestedPayload', $resourceObjectType->name);
+        $this->assertSame('description', $resourceObjectType->description);
+        $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
@@ -362,9 +362,9 @@ class TypeBuilderTest extends TestCase
         $operation = (new Subscription())->withName('update')->withShortName('shortName')->withDescription('description')->withMercure(true);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
-        $this->assertEquals('updateShortNameSubscriptionPayload', $resourceObjectType->name);
-        $this->assertEquals('description', $resourceObjectType->description);
-        $this->assertEquals($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
+        $this->assertSame('updateShortNameSubscriptionPayload', $resourceObjectType->name);
+        $this->assertSame('description', $resourceObjectType->description);
+        $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertEquals([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
@@ -377,8 +377,8 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('shortName', $fieldsType);
         $this->assertArrayHasKey('clientSubscriptionId', $fieldsType);
         $this->assertArrayHasKey('mercureUrl', $fieldsType);
-        $this->assertEquals(GraphQLType::string(), $fieldsType['clientSubscriptionId']);
-        $this->assertEquals(GraphQLType::string(), $fieldsType['mercureUrl']);
+        $this->assertSame(GraphQLType::string(), $fieldsType['clientSubscriptionId']);
+        $this->assertSame(GraphQLType::string(), $fieldsType['mercureUrl']);
     }
 
     public function testGetResourceObjectTypeSubscriptionWrappedType(): void
@@ -396,9 +396,9 @@ class TypeBuilderTest extends TestCase
         $operation = (new Subscription())->withName('update')->withShortName('shortName')->withDescription('description')->withNormalizationContext(['groups' => ['update']]);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
-        $this->assertEquals('updateShortNameSubscriptionPayload', $resourceObjectType->name);
-        $this->assertEquals('description', $resourceObjectType->description);
-        $this->assertEquals($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
+        $this->assertSame('updateShortNameSubscriptionPayload', $resourceObjectType->name);
+        $this->assertSame('description', $resourceObjectType->description);
+        $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertEquals([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
@@ -411,13 +411,13 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('shortName', $fieldsType);
         $this->assertArrayHasKey('clientSubscriptionId', $fieldsType);
         $this->assertArrayNotHasKey('mercureUrl', $fieldsType);
-        $this->assertEquals(GraphQLType::string(), $fieldsType['clientSubscriptionId']);
+        $this->assertSame(GraphQLType::string(), $fieldsType['clientSubscriptionId']);
 
         /** @var ObjectType $wrappedType */
         $wrappedType = $fieldsType['shortName'];
-        $this->assertEquals('updateShortNameSubscriptionPayloadData', $wrappedType->name);
-        $this->assertEquals('description', $wrappedType->description);
-        $this->assertEquals($this->defaultFieldResolver, $wrappedType->resolveFieldFn);
+        $this->assertSame('updateShortNameSubscriptionPayloadData', $wrappedType->name);
+        $this->assertSame('description', $wrappedType->description);
+        $this->assertSame($this->defaultFieldResolver, $wrappedType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
@@ -439,9 +439,9 @@ class TypeBuilderTest extends TestCase
         $operation = (new Subscription())->withName('update')->withShortName('shortName')->withDescription('description')->withMercure(true);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false, false, 1);
-        $this->assertEquals('updateShortNameSubscriptionNestedPayload', $resourceObjectType->name);
-        $this->assertEquals('description', $resourceObjectType->description);
-        $this->assertEquals($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
+        $this->assertSame('updateShortNameSubscriptionNestedPayload', $resourceObjectType->name);
+        $this->assertSame('description', $resourceObjectType->description);
+        $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
@@ -457,8 +457,8 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         $nodeInterface = $this->typeBuilder->getNodeInterface();
-        $this->assertEquals('Node', $nodeInterface->name);
-        $this->assertEquals('A node, according to the Relay specification.', $nodeInterface->description);
+        $this->assertSame('Node', $nodeInterface->name);
+        $this->assertSame('A node, according to the Relay specification.', $nodeInterface->description);
         $this->assertArrayHasKey('id', $nodeInterface->getFields());
 
         $this->assertNull($nodeInterface->resolveType([], [], $this->prophesize(ResolveInfo::class)->reveal()));
@@ -470,7 +470,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->get('Dummy')->shouldBeCalled()->willReturn(GraphQLType::string());
         /** @var GraphQLType $resolvedType */
         $resolvedType = $nodeInterface->resolveType([ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => Dummy::class], [], $this->prophesize(ResolveInfo::class)->reveal());
-        $this->assertEquals(GraphQLType::string(), $resolvedType);
+        $this->assertSame(GraphQLType::string(), $resolvedType);
     }
 
     public function testCursorBasedGetResourcePaginatedCollectionType(): void
@@ -484,8 +484,8 @@ class TypeBuilderTest extends TestCase
 
         /** @var ObjectType $resourcePaginatedCollectionType */
         $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', $operation);
-        $this->assertEquals('StringCursorConnection', $resourcePaginatedCollectionType->name);
-        $this->assertEquals('Cursor connection for String.', $resourcePaginatedCollectionType->description);
+        $this->assertSame('StringCursorConnection', $resourcePaginatedCollectionType->name);
+        $this->assertSame('Cursor connection for String.', $resourcePaginatedCollectionType->description);
 
         $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
         $this->assertArrayHasKey('edges', $resourcePaginatedCollectionTypeFields);
@@ -496,37 +496,37 @@ class TypeBuilderTest extends TestCase
         $edgesType = $resourcePaginatedCollectionTypeFields['edges']->getType();
         /** @var ObjectType $wrappedType */
         $wrappedType = $edgesType->getWrappedType();
-        $this->assertEquals('StringEdge', $wrappedType->name);
-        $this->assertEquals('Edge of String.', $wrappedType->description);
+        $this->assertSame('StringEdge', $wrappedType->name);
+        $this->assertSame('Edge of String.', $wrappedType->description);
         $edgeObjectTypeFields = $wrappedType->getFields();
         $this->assertArrayHasKey('node', $edgeObjectTypeFields);
         $this->assertArrayHasKey('cursor', $edgeObjectTypeFields);
-        $this->assertEquals(GraphQLType::string(), $edgeObjectTypeFields['node']->getType());
+        $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['node']->getType());
         $this->assertInstanceOf(NonNull::class, $edgeObjectTypeFields['cursor']->getType());
-        $this->assertEquals(GraphQLType::string(), $edgeObjectTypeFields['cursor']->getType()->getWrappedType());
+        $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['cursor']->getType()->getWrappedType());
 
         /** @var NonNull $pageInfoType */
         $pageInfoType = $resourcePaginatedCollectionTypeFields['pageInfo']->getType();
         /** @var ObjectType $wrappedType */
         $wrappedType = $pageInfoType->getWrappedType();
-        $this->assertEquals('StringPageInfo', $wrappedType->name);
-        $this->assertEquals('Information about the current page.', $wrappedType->description);
+        $this->assertSame('StringPageInfo', $wrappedType->name);
+        $this->assertSame('Information about the current page.', $wrappedType->description);
         $pageInfoObjectTypeFields = $wrappedType->getFields();
         $this->assertArrayHasKey('endCursor', $pageInfoObjectTypeFields);
         $this->assertArrayHasKey('startCursor', $pageInfoObjectTypeFields);
         $this->assertArrayHasKey('hasNextPage', $pageInfoObjectTypeFields);
         $this->assertArrayHasKey('hasPreviousPage', $pageInfoObjectTypeFields);
-        $this->assertEquals(GraphQLType::string(), $pageInfoObjectTypeFields['endCursor']->getType());
-        $this->assertEquals(GraphQLType::string(), $pageInfoObjectTypeFields['startCursor']->getType());
+        $this->assertSame(GraphQLType::string(), $pageInfoObjectTypeFields['endCursor']->getType());
+        $this->assertSame(GraphQLType::string(), $pageInfoObjectTypeFields['startCursor']->getType());
         $this->assertInstanceOf(NonNull::class, $pageInfoObjectTypeFields['hasNextPage']->getType());
-        $this->assertEquals(GraphQLType::boolean(), $pageInfoObjectTypeFields['hasNextPage']->getType()->getWrappedType());
+        $this->assertSame(GraphQLType::boolean(), $pageInfoObjectTypeFields['hasNextPage']->getType()->getWrappedType());
         $this->assertInstanceOf(NonNull::class, $pageInfoObjectTypeFields['hasPreviousPage']->getType());
-        $this->assertEquals(GraphQLType::boolean(), $pageInfoObjectTypeFields['hasPreviousPage']->getType()->getWrappedType());
+        $this->assertSame(GraphQLType::boolean(), $pageInfoObjectTypeFields['hasPreviousPage']->getType()->getWrappedType());
 
         /** @var NonNull $totalCountType */
         $totalCountType = $resourcePaginatedCollectionTypeFields['totalCount']->getType();
         $this->assertInstanceOf(NonNull::class, $totalCountType);
-        $this->assertEquals(GraphQLType::int(), $totalCountType->getWrappedType());
+        $this->assertSame(GraphQLType::int(), $totalCountType->getWrappedType());
     }
 
     public function testPageBasedGetResourcePaginatedCollectionType(): void
@@ -539,8 +539,8 @@ class TypeBuilderTest extends TestCase
 
         /** @var ObjectType $resourcePaginatedCollectionType */
         $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', $operation);
-        $this->assertEquals('StringPageConnection', $resourcePaginatedCollectionType->name);
-        $this->assertEquals('Page connection for String.', $resourcePaginatedCollectionType->description);
+        $this->assertSame('StringPageConnection', $resourcePaginatedCollectionType->name);
+        $this->assertSame('Page connection for String.', $resourcePaginatedCollectionType->description);
 
         $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
         $this->assertArrayHasKey('collection', $resourcePaginatedCollectionTypeFields);
@@ -550,18 +550,18 @@ class TypeBuilderTest extends TestCase
         $paginationInfoType = $resourcePaginatedCollectionTypeFields['paginationInfo']->getType();
         /** @var ObjectType $wrappedType */
         $wrappedType = $paginationInfoType->getWrappedType();
-        $this->assertEquals('StringPaginationInfo', $wrappedType->name);
-        $this->assertEquals('Information about the pagination.', $wrappedType->description);
+        $this->assertSame('StringPaginationInfo', $wrappedType->name);
+        $this->assertSame('Information about the pagination.', $wrappedType->description);
         $paginationInfoObjectTypeFields = $wrappedType->getFields();
         $this->assertArrayHasKey('itemsPerPage', $paginationInfoObjectTypeFields);
         $this->assertArrayHasKey('lastPage', $paginationInfoObjectTypeFields);
         $this->assertArrayHasKey('totalCount', $paginationInfoObjectTypeFields);
         $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['itemsPerPage']->getType());
-        $this->assertEquals(GraphQLType::int(), $paginationInfoObjectTypeFields['itemsPerPage']->getType()->getWrappedType());
+        $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['itemsPerPage']->getType()->getWrappedType());
         $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['lastPage']->getType());
-        $this->assertEquals(GraphQLType::int(), $paginationInfoObjectTypeFields['lastPage']->getType()->getWrappedType());
+        $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['lastPage']->getType()->getWrappedType());
         $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['totalCount']->getType());
-        $this->assertEquals(GraphQLType::int(), $paginationInfoObjectTypeFields['totalCount']->getType()->getWrappedType());
+        $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['totalCount']->getType()->getWrappedType());
     }
 
     /**
@@ -569,7 +569,7 @@ class TypeBuilderTest extends TestCase
      */
     public function testIsCollection(Type $type, bool $expectedIsCollection): void
     {
-        $this->assertEquals($expectedIsCollection, $this->typeBuilder->isCollection($type));
+        $this->assertSame($expectedIsCollection, $this->typeBuilder->isCollection($type));
     }
 
     public function typesProvider(): array

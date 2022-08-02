@@ -65,11 +65,11 @@ class ValidationExceptionListenerTest extends TestCase
 
         $response = $event->getResponse();
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals($exceptionJson, $response->getContent());
-        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
-        $this->assertEquals('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
-        $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
-        $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
+        $this->assertSame($exceptionJson, $response->getContent());
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $this->assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 
     public function testOnKernelValidationExceptionWithCustomStatus(): void
@@ -107,11 +107,11 @@ class ValidationExceptionListenerTest extends TestCase
         $response = $exceptionEvent->getResponse();
 
         self::assertInstanceOf(Response::class, $response);
-        self::assertEquals($serializedConstraintViolationList, $response->getContent());
-        self::assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        self::assertEquals('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
-        self::assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
-        self::assertEquals('deny', $response->headers->get('X-Frame-Options'));
+        self::assertSame($serializedConstraintViolationList, $response->getContent());
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
+        self::assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        self::assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 
     public function testValidationFilterException(): void
@@ -128,10 +128,10 @@ class ValidationExceptionListenerTest extends TestCase
 
         $response = $event->getResponse();
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals($exceptionJson, $response->getContent());
-        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
-        $this->assertEquals('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
-        $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
-        $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
+        $this->assertSame($exceptionJson, $response->getContent());
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $this->assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 }

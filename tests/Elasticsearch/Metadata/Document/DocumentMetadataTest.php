@@ -22,20 +22,20 @@ class DocumentMetadataTest extends TestCase
     {
         $documentMetadataOne = new DocumentMetadata('foo', 'bar');
 
-        self::assertEquals('foo', $documentMetadataOne->getIndex());
-        self::assertEquals('bar', $documentMetadataOne->getType());
+        self::assertSame('foo', $documentMetadataOne->getIndex());
+        self::assertSame('bar', $documentMetadataOne->getType());
 
         $documentMetadataTwo = $documentMetadataOne->withIndex('baz');
 
         self::assertNotSame($documentMetadataTwo, $documentMetadataOne);
-        self::assertEquals('baz', $documentMetadataTwo->getIndex());
-        self::assertEquals('bar', $documentMetadataTwo->getType());
+        self::assertSame('baz', $documentMetadataTwo->getIndex());
+        self::assertSame('bar', $documentMetadataTwo->getType());
 
         $documentMetadataThree = $documentMetadataTwo->withType(DocumentMetadata::DEFAULT_TYPE);
 
         self::assertNotSame($documentMetadataThree, $documentMetadataOne);
         self::assertNotSame($documentMetadataThree, $documentMetadataTwo);
-        self::assertEquals('baz', $documentMetadataThree->getIndex());
-        self::assertEquals(DocumentMetadata::DEFAULT_TYPE, $documentMetadataThree->getType());
+        self::assertSame('baz', $documentMetadataThree->getIndex());
+        self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadataThree->getType());
     }
 }

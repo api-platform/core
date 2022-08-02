@@ -86,7 +86,7 @@ class ConstraintViolationNormalizerTest extends TestCase
             $expected['violations'][0]['payload'] = $result;
         }
 
-        $this->assertEquals($expected, $normalizer->normalize($list));
+        $this->assertSame($expected, $normalizer->normalize($list));
     }
 
     public function payloadFieldsProvider(): iterable

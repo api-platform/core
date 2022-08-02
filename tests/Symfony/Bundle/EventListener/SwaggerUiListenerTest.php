@@ -37,7 +37,7 @@ class SwaggerUiListenerTest extends TestCase
         $listener = new SwaggerUiListener();
         $listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($controller, $request->attributes->get('_controller'));
+        $this->assertSame($controller, $request->attributes->get('_controller'));
     }
 
     public function getParameters()

@@ -35,7 +35,7 @@ class IterableTypeTest extends TestCase
     {
         $iterableType = new IterableType();
 
-        $this->assertEquals('Iterable', $iterableType->getName());
+        $this->assertSame('Iterable', $iterableType->getName());
     }
 
     public function testSerialize(): void

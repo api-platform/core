@@ -148,7 +148,7 @@ class SerializeListenerTest extends TestCase
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
 
-        $this->assertEquals('bar', $event->getControllerResult());
+        $this->assertSame('bar', $event->getControllerResult());
     }
 
     public function testSerializeCollectionOperationWithOutputClassDisabled(): void
@@ -208,7 +208,7 @@ class SerializeListenerTest extends TestCase
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
 
-        $this->assertEquals('bar', $event->getControllerResult());
+        $this->assertSame('bar', $event->getControllerResult());
     }
 
     public function testEncode(): void
@@ -233,6 +233,6 @@ class SerializeListenerTest extends TestCase
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
 
-        $this->assertEquals('bar', $event->getControllerResult());
+        $this->assertSame('bar', $event->getControllerResult());
     }
 }

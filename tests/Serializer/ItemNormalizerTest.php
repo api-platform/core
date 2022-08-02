@@ -233,7 +233,7 @@ class ItemNormalizerTest extends TestCase
 
         $object = $normalizer->denormalize(['id' => '42', 'name' => 'hello'], Dummy::class, null, $context);
         $this->assertInstanceOf(Dummy::class, $object);
-        $this->assertEquals('42', $object->getId());
-        $this->assertEquals('hello', $object->getName());
+        $this->assertSame('42', $object->getId());
+        $this->assertSame('hello', $object->getName());
     }
 }

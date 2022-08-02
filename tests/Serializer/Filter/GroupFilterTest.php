@@ -123,6 +123,6 @@ class GroupFilterTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedDescription, $groupFilter->getDescription(DummyGroup::class));
+        $this->assertSame($expectedDescription, $groupFilter->getDescription(DummyGroup::class));
     }
 }

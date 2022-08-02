@@ -31,9 +31,9 @@ class PaginatorTest extends TestCase
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
-        $this->assertEquals((float) $currentPage, $paginator->getCurrentPage());
-        $this->assertEquals((float) $lastPage, $paginator->getLastPage());
-        $this->assertEquals((float) $maxResults, $paginator->getItemsPerPage());
+        $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
+        $this->assertSame((float) $lastPage, $paginator->getLastPage());
+        $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
     }
 
     public function testInitializeWithQueryFirstResultNotApplied(): void
@@ -56,7 +56,7 @@ class PaginatorTest extends TestCase
     {
         $paginator = $this->getPaginator();
 
-        $this->assertEquals($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
+        $this->assertSame($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
     }
 
     private function getPaginator(int $firstResult = 1, int $maxResults = 15, int $totalItems = 42): Paginator

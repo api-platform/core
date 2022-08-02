@@ -53,7 +53,7 @@ class QueryBuilderHelperTest extends TestCase
             $originAliasForJoinOnce
         );
 
-        $this->assertEquals($expectedAlias,
+        $this->assertSame($expectedAlias,
             $queryBuilder->getDQLPart('join')[$originAliasForJoinOnce ?? 'f'][0]->getAlias());
     }
 
@@ -80,7 +80,7 @@ class QueryBuilderHelperTest extends TestCase
             'f_8'
         );
 
-        $this->assertEquals('f_8',
+        $this->assertSame('f_8',
             $queryBuilder->getDQLPart('join')['f'][0]->getAlias());
     }
 
@@ -108,7 +108,7 @@ class QueryBuilderHelperTest extends TestCase
 
         $actual = QueryBuilderHelper::getEntityClassByAlias('a_1', $queryBuilder, $managerRegistryProphecy->reveal());
 
-        $this->assertEquals(RelatedDummy::class, $actual);
+        $this->assertSame(RelatedDummy::class, $actual);
     }
 
     public function testGetEntityClassByAliasWithJoinByClass(): void
@@ -127,7 +127,7 @@ class QueryBuilderHelperTest extends TestCase
 
         $actual = QueryBuilderHelper::getEntityClassByAlias('a_1', $queryBuilder, $managerRegistryProphecy->reveal());
 
-        $this->assertEquals(RelatedDummy::class, $actual);
+        $this->assertSame(RelatedDummy::class, $actual);
     }
 
     public function provideAddJoinOnce(): \Iterator

@@ -60,7 +60,7 @@ class DeserializeStageTest extends TestCase
         $operation = (new Query())->withName('item_query')->withClass($resourceClass)->withDeserialize(false);
         $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operation, []);
 
-        $this->assertEquals($objectToPopulate, $result);
+        $this->assertSame($objectToPopulate, $result);
     }
 
     /**
@@ -83,7 +83,7 @@ class DeserializeStageTest extends TestCase
 
         $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operation, $context);
 
-        $this->assertEquals($denormalizedData, $result);
+        $this->assertSame($denormalizedData, $result);
     }
 
     public function objectToPopulateProvider(): array

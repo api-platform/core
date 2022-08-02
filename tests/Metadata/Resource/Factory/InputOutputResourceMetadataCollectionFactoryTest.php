@@ -39,7 +39,7 @@ class InputOutputResourceMetadataCollectionFactoryTest extends TestCase
         $decorated = $decoratedProphecy->reveal();
 
         $factory = new InputOutputResourceMetadataCollectionFactory($decorated);
-        $this->assertEquals($expected, $factory->create('Foo')[0]->getInput());
+        $this->assertSame($expected, $factory->create('Foo')[0]->getInput());
     }
 
     public function getAttributes(): array

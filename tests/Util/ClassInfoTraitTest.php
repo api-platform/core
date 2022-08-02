@@ -32,20 +32,20 @@ class ClassInfoTraitTest extends TestCase
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 
-        $this->assertEquals(Dummy::class, $classInfo->getRealClassName('Proxies\__CG__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy'));
+        $this->assertSame(Dummy::class, $classInfo->getRealClassName('Proxies\__CG__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy'));
     }
 
     public function testProxyManagerRealClassName(): void
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 
-        $this->assertEquals(Dummy::class, $classInfo->getRealClassName('MongoDBODMProxies\__PM__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy\Generated'));
+        $this->assertSame(Dummy::class, $classInfo->getRealClassName('MongoDBODMProxies\__PM__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy\Generated'));
     }
 
     public function testUnmarkedRealClassName(): void
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 
-        $this->assertEquals(Dummy::class, $classInfo->getRealClassName(Dummy::class));
+        $this->assertSame(Dummy::class, $classInfo->getRealClassName(Dummy::class));
     }
 }

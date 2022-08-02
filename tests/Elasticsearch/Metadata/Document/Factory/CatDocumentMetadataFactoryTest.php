@@ -76,8 +76,8 @@ class CatDocumentMetadataFactoryTest extends TestCase
 
         $documentMetadata = (new CatDocumentMetadataFactory($clientProphecy->reveal(), $resourceMetadataFactory->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
 
-        self::assertEquals('foo', $documentMetadata->getIndex());
-        self::assertEquals(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
+        self::assertSame('foo', $documentMetadata->getIndex());
+        self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
     public function testCreateWithIndexAlreadySet(): void
@@ -89,9 +89,9 @@ class CatDocumentMetadataFactoryTest extends TestCase
 
         $documentMetadata = (new CatDocumentMetadataFactory($this->prophesize(Client::class)->reveal(), $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
 
-        self::assertEquals($originalDocumentMetadata, $documentMetadata);
-        self::assertEquals('foo', $documentMetadata->getIndex());
-        self::assertEquals(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
+        self::assertSame($originalDocumentMetadata, $documentMetadata);
+        self::assertSame('foo', $documentMetadata->getIndex());
+        self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
     public function testCreateWithNoResourceShortName(): void
@@ -108,9 +108,9 @@ class CatDocumentMetadataFactoryTest extends TestCase
 
         $documentMetadata = (new CatDocumentMetadataFactory($this->prophesize(Client::class)->reveal(), $resourceMetadataFactory->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
 
-        self::assertEquals($originalDocumentMetadata, $documentMetadata);
+        self::assertSame($originalDocumentMetadata, $documentMetadata);
         self::assertNull($documentMetadata->getIndex());
-        self::assertEquals(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
+        self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
     public function testCreateWithIndexNotFound(): void

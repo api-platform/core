@@ -120,14 +120,14 @@ class FieldsBuilderTest extends TestCase
         $this->assertArrayHasKey('args', $nodeQueryFields);
         $this->assertArrayHasKey('resolve', $nodeQueryFields);
 
-        $this->assertEquals($nodeInterfaceType, $nodeQueryFields['type']);
+        $this->assertSame($nodeInterfaceType, $nodeQueryFields['type']);
         $this->assertArrayHasKey('id', $nodeQueryFields['args']);
         $this->assertArrayHasKey('type', $nodeQueryFields['args']['id']);
         $this->assertInstanceOf(NonNull::class, $nodeQueryFields['args']['id']['type']);
         /** @var NonNull $idType */
         $idType = $nodeQueryFields['args']['id']['type'];
-        $this->assertEquals(GraphQLType::id(), $idType->getWrappedType());
-        $this->assertEquals($itemResolver, $nodeQueryFields['resolve']);
+        $this->assertSame(GraphQLType::id(), $idType->getWrappedType());
+        $this->assertSame($itemResolver, $nodeQueryFields['resolve']);
     }
 
     /**
@@ -377,7 +377,7 @@ class FieldsBuilderTest extends TestCase
 
         $mutationFields = $this->fieldsBuilder->getMutationFields($resourceClass, $operation);
 
-        $this->assertEquals($expectedMutationFields, $mutationFields);
+        $this->assertSame($expectedMutationFields, $mutationFields);
     }
 
     public function mutationFieldsProvider(): array
@@ -441,7 +441,7 @@ class FieldsBuilderTest extends TestCase
 
         $subscriptionFields = $this->fieldsBuilder->getSubscriptionFields($resourceClass, $operation);
 
-        $this->assertEquals($expectedSubscriptionFields, $subscriptionFields);
+        $this->assertSame($expectedSubscriptionFields, $subscriptionFields);
     }
 
     public function subscriptionFieldsProvider(): array
@@ -832,7 +832,7 @@ class FieldsBuilderTest extends TestCase
         $operation = (new Query())->withName('operation')->withShortName('shortName');
         $args = $this->fieldsBuilder->resolveResourceArgs($args, $operation);
 
-        $this->assertEquals($expectedResolvedArgs, $args);
+        $this->assertSame($expectedResolvedArgs, $args);
     }
 
     public function resolveResourceArgsProvider(): array

@@ -196,7 +196,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
 
         $arguments = $argumentsResolver->getArguments($request, $controller);
 
-        self::assertEquals($expectedArguments, $arguments);
+        self::assertSame($expectedArguments, $arguments);
     }
 
     public function provideIntegrationCases(): iterable

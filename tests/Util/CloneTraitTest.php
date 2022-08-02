@@ -25,7 +25,7 @@ class CloneTraitTest extends TestCase
 
     public function testScalarClone(): void
     {
-        $this->assertEquals(5, $this->clone(5));
+        $this->assertSame(5, $this->clone(5));
     }
 
     public function testObjectClone(): void

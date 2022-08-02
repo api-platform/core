@@ -43,7 +43,7 @@ final class PropertySchemaGreaterThanRestrictionTest extends TestCase
      */
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
-        self::assertEquals($expectedResult, $this->propertySchemaGreaterThanRestriction->supports($constraint, $propertyMetadata));
+        self::assertSame($expectedResult, $this->propertySchemaGreaterThanRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator

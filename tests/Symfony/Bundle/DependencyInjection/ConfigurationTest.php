@@ -293,7 +293,7 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertArrayHasKey('api_keys', $config['swagger']);
-        $this->assertEquals($exampleConfig, $config['swagger']['api_keys'][0]);
+        $this->assertSame($exampleConfig, $config['swagger']['api_keys'][0]);
     }
 
     /**
@@ -362,8 +362,8 @@ class ConfigurationTest extends TestCase
             'api_platform' => [],
         ]);
 
-        $this->assertEquals('', $config['title']);
-        $this->assertEquals('', $config['description']);
+        $this->assertSame('', $config['title']);
+        $this->assertSame('', $config['description']);
     }
 
     /**

@@ -30,7 +30,7 @@ class DefaultPropertyMetadataFactoryTest extends TestCase
         $factory = new DefaultPropertyMetadataFactory();
         $metadata = $factory->create(DummyPropertyWithDefaultValue::class, 'foo');
 
-        $this->assertEquals($metadata->getDefault(), 'foo');
+        $this->assertSame($metadata->getDefault(), 'foo');
     }
 
     public function testClassDoesNotExist(): void

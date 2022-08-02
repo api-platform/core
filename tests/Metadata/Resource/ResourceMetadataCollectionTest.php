@@ -33,8 +33,8 @@ final class ResourceMetadataCollectionTest extends TestCase
         $resource = (new ApiResource())->withUriTemplate('/dummies/{id}')->withOperations(new Operations(['name' => $operation]))->withGraphQlOperations(['query' => $query]);
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
-        $this->assertEquals($operation, $resourceMetadataCollection->getOperation('name'));
-        $this->assertEquals($query, $resourceMetadataCollection->getOperation('query'));
+        $this->assertSame($operation, $resourceMetadataCollection->getOperation('name'));
+        $this->assertSame($query, $resourceMetadataCollection->getOperation('query'));
     }
 
     public function testOperationNotFound(): void
@@ -44,6 +44,6 @@ final class ResourceMetadataCollectionTest extends TestCase
         $resource = (new ApiResource())->withUriTemplate('/dummies/{id}')->withOperations(new Operations(['name' => $operation]));
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
-        $this->assertEquals($operation, $resourceMetadataCollection->getOperation('noname'));
+        $this->assertSame($operation, $resourceMetadataCollection->getOperation('noname'));
     }
 }

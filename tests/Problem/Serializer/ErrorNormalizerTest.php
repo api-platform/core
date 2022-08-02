@@ -81,7 +81,7 @@ class ErrorNormalizerTest extends TestCase
             $expected['trace'] = $exception->getTrace();
         }
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, null, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, null, ['statusCode' => $status]));
     }
 
     public function providerStatusCode(): \Iterator
@@ -106,6 +106,6 @@ class ErrorNormalizerTest extends TestCase
             'detail' => Response::$statusTexts[502],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, null, ['statusCode' => 502]));
+        $this->assertSame($expected, $normalizer->normalize($exception, null, ['statusCode' => 502]));
     }
 }

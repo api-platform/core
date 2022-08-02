@@ -125,7 +125,7 @@ class RequestDataCollectorTest extends TestCase
             'persist' => true,
         ], $dataCollector->getRequestAttributes());
         $this->assertEquals(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
-        $this->assertEquals(DummyEntity::class, $dataCollector->getResourceClass());
+        $this->assertSame(DummyEntity::class, $dataCollector->getResourceClass());
         $this->assertEquals([['foo' => null, 'a_filter' => \stdClass::class]], $dataCollector->getFilters());
         $this->assertEquals(['ignored_filters' => 1], $dataCollector->getCounters());
         $this->assertInstanceOf(Data::class, $dataCollector->getResourceMetadataCollection());
@@ -166,7 +166,7 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertEquals(null !== $dataCollector->getVersion(), class_exists(Versions::class));
+        $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Versions::class));
     }
 
     public function testWithPreviousData(): void

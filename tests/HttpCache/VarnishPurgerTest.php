@@ -108,7 +108,7 @@ class VarnishPurgerTest extends TestCase
         $purger = new VarnishPurger([$client], $maxHeaderLength);
         $purger->purge($iris);
 
-        self::assertEquals($regexesToSend, $client->sentRegexes); // @phpstan-ignore-line
+        self::assertSame($regexesToSend, $client->sentRegexes); // @phpstan-ignore-line
     }
 
     public function provideChunkHeaderCases()

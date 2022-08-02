@@ -117,7 +117,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($writeStageItem, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertEquals($serializeStageData, ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertSame($serializeStageData, ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveNullResourceClass(): void
@@ -243,7 +243,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($writeStageItem, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertEquals($serializeStageData, ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertSame($serializeStageData, ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveCustom(): void
@@ -290,7 +290,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($writeStageItem, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertEquals($serializeStageData, ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertSame($serializeStageData, ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveCustomBadItem(): void

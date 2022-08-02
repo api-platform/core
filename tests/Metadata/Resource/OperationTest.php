@@ -34,9 +34,9 @@ final class OperationTest extends TestCase
     {
         $operation = (new GetCollection())->withOperation((new HttpOperation())->withShortName('test')->withRead(false));
 
-        $this->assertEquals($operation->getShortName(), 'test');
-        $this->assertEquals($operation->canRead(), false);
-        $this->assertEquals($operation instanceof CollectionOperationInterface, true);
+        $this->assertSame($operation->getShortName(), 'test');
+        $this->assertSame($operation->canRead(), false);
+        $this->assertSame($operation instanceof CollectionOperationInterface, true);
     }
 
     /**

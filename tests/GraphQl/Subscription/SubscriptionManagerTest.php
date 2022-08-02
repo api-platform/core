@@ -85,7 +85,7 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
-        $this->assertEquals($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, $result));
+        $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, $result));
     }
 
     public function testRetrieveSubscriptionIdHitNotCached(): void
@@ -110,7 +110,7 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
-        $this->assertEquals($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, $result));
+        $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, $result));
     }
 
     public function testRetrieveSubscriptionIdHitCached(): void
@@ -131,7 +131,7 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields)->shouldNotBeCalled();
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
 
-        $this->assertEquals('subscriptionIdBar', $this->subscriptionManager->retrieveSubscriptionId($context, $result));
+        $this->assertSame('subscriptionIdBar', $this->subscriptionManager->retrieveSubscriptionId($context, $result));
     }
 
     public function testRetrieveSubscriptionIdHitCachedDifferentFieldsOrder(): void
@@ -168,7 +168,7 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields)->shouldNotBeCalled();
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
 
-        $this->assertEquals('subscriptionIdFoo', $this->subscriptionManager->retrieveSubscriptionId($context, $result));
+        $this->assertSame('subscriptionIdFoo', $this->subscriptionManager->retrieveSubscriptionId($context, $result));
     }
 
     public function testGetPushPayloadsNoHit(): void

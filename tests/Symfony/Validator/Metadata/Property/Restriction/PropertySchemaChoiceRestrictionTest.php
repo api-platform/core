@@ -41,7 +41,7 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
      */
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
-        self::assertEquals($expectedResult, $this->propertySchemaChoiceRestriction->supports($constraint, $propertyMetadata));
+        self::assertSame($expectedResult, $this->propertySchemaChoiceRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
@@ -57,7 +57,7 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
      */
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
-        self::assertEquals($expectedResult, $this->propertySchemaChoiceRestriction->create($constraint, $propertyMetadata));
+        self::assertSame($expectedResult, $this->propertySchemaChoiceRestriction->create($constraint, $propertyMetadata));
     }
 
     public function createProvider(): \Generator

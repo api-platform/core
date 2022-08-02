@@ -64,7 +64,7 @@ class SerializeStageTest extends TestCase
 
         $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operation, $context);
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertSame($expectedResult, $result);
     }
 
     public function applyDisabledProvider(): array
@@ -105,7 +105,7 @@ class SerializeStageTest extends TestCase
 
         $result = ($this->createSerializeStage($paginationEnabled))($itemOrCollection, $resourceClass, $operation, $context);
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertSame($expectedResult, $result);
     }
 
     public function applyProvider(): array
@@ -154,7 +154,7 @@ class SerializeStageTest extends TestCase
 
         $result = ($this->createSerializeStage(true))($collection, $resourceClass, $operation, $context);
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertSame($expectedResult, $result);
     }
 
     public function applyCollectionWithPaginationProvider(): array

@@ -93,7 +93,7 @@ class ItemResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($readStageItem, $determinedResourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertEquals($serializeStageData, ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertSame($serializeStageData, ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function itemResourceProvider(): array
@@ -216,7 +216,7 @@ class ItemResolverFactoryTest extends TestCase
         $serializeStageData = ['serialized'];
         $this->serializeStageProphecy->__invoke($customItem, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
-        $this->assertEquals($serializeStageData, ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+        $this->assertSame($serializeStageData, ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveCustomBadItem(): void

@@ -20,7 +20,7 @@ class IntegerUriVariableTransformerTest extends TestCase
 {
     public function testTransform(): void
     {
-        $this->assertEquals(2, (new IntegerUriVariableTransformer())->transform('2', ['int']));
+        $this->assertSame(2, (new IntegerUriVariableTransformer())->transform('2', ['int']));
     }
 
     public function testSupportsTransformation(): void

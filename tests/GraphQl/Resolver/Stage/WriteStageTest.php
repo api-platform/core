@@ -70,7 +70,7 @@ class WriteStageTest extends TestCase
         $data = new \stdClass();
         $result = ($this->writeStage)($data, $resourceClass, $operation, []);
 
-        $this->assertEquals($data, $result);
+        $this->assertSame($data, $result);
     }
 
     public function testApply(): void
@@ -90,6 +90,6 @@ class WriteStageTest extends TestCase
 
         $result = ($this->writeStage)($data, $resourceClass, $operation, $context);
 
-        $this->assertEquals($processedData, $result);
+        $this->assertSame($processedData, $result);
     }
 }

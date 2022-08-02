@@ -38,7 +38,7 @@ class InnerFieldsNameConverterTest extends TestCase
 
         $innerFieldsNameConverter = new InnerFieldsNameConverter($decoratedProphecy->reveal());
 
-        self::assertEquals('foo_bar.baz_qux', $innerFieldsNameConverter->normalize('fooBar.bazQux'));
+        self::assertSame('foo_bar.baz_qux', $innerFieldsNameConverter->normalize('fooBar.bazQux'));
     }
 
     public function testDenormalize(): void
@@ -49,6 +49,6 @@ class InnerFieldsNameConverterTest extends TestCase
 
         $innerFieldsNameConverter = new InnerFieldsNameConverter($decoratedProphecy->reveal());
 
-        self::assertEquals('fooBar.bazQux', $innerFieldsNameConverter->denormalize('foo_bar.baz_qux'));
+        self::assertSame('fooBar.bazQux', $innerFieldsNameConverter->denormalize('foo_bar.baz_qux'));
     }
 }

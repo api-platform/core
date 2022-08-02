@@ -38,7 +38,7 @@ class ProcessorTest extends TestCase
         $messageBus->dispatch(Argument::that(fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
         $processor = new Processor($messageBus->reveal());
-        $this->assertEquals($dummy, $processor->process($dummy, new Get()));
+        $this->assertSame($dummy, $processor->process($dummy, new Get()));
     }
 
     public function testRemove(): void
@@ -61,6 +61,6 @@ class ProcessorTest extends TestCase
         $messageBus->dispatch(Argument::that(fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
 
         $processor = new Processor($messageBus->reveal());
-        $this->assertEquals($dummy, $processor->process($dummy, new Get()));
+        $this->assertSame($dummy, $processor->process($dummy, new Get()));
     }
 }

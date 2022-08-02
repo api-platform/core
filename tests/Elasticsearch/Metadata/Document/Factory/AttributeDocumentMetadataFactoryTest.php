@@ -56,8 +56,8 @@ class AttributeDocumentMetadataFactoryTest extends TestCase
         $documentMetadata = (new AttributeDocumentMetadataFactory($resourceMetadataFactoryProphecy->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
 
         self::assertNotSame($originalDocumentMetadata, $documentMetadata);
-        self::assertEquals('foo', $documentMetadata->getIndex());
-        self::assertEquals('bar', $documentMetadata->getType());
+        self::assertSame('foo', $documentMetadata->getIndex());
+        self::assertSame('bar', $documentMetadata->getType());
     }
 
     public function testCreateWithNoParentDocumentMetadataAndNoAttributes(): void

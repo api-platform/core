@@ -94,8 +94,8 @@ class SchemaBuilderTest extends TestCase
         $this->assertEquals($expectedQueryType, $schema->getQueryType());
         $this->assertEquals($expectedMutationType, $schema->getMutationType());
         $this->assertEquals($expectedSubscriptionType, $schema->getSubscriptionType());
-        $this->assertEquals($type, $schema->getType('MyType'));
-        $this->assertEquals($typeFoo, $schema->getType('Foo'));
+        $this->assertSame($type, $schema->getType('MyType'));
+        $this->assertSame($typeFoo, $schema->getType('Foo'));
     }
 
     public function schemaProvider(): array

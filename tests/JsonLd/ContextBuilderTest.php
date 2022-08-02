@@ -185,7 +185,7 @@ class ContextBuilderTest extends TestCase
         $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal());
 
         $context = $contextBuilder->getAnonymousResourceContext($dummy);
-        $this->assertEquals('Dummy', $context['@type']);
+        $this->assertSame('Dummy', $context['@type']);
         $this->assertStringStartsWith('/.well-known/genid', $context['@id']);
         $this->assertEquals([
             '@vocab' => '#',

@@ -23,7 +23,7 @@ class ElasticsearchVersionTest extends TestCase
      */
     public function testSupportsDocumentType(string $version, bool $expected): void
     {
-        self::assertEquals($expected, ElasticsearchVersion::supportsMappingType($version));
+        self::assertSame($expected, ElasticsearchVersion::supportsMappingType($version));
     }
 
     public function supportsDocumentTypeProvider(): \Generator

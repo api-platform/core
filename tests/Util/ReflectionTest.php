@@ -26,7 +26,7 @@ class ReflectionTest extends TestCase
         $methodName = 'addGerard';
         $reflection = new Reflection();
         $return = $reflection->getProperty($methodName);
-        $this->assertEquals($return, 'Gerard');
+        $this->assertSame($return, 'Gerard');
     }
 
     public function testWithBadMethodName(): void
@@ -35,6 +35,6 @@ class ReflectionTest extends TestCase
         $reflection = new Reflection();
         $return = $reflection->getProperty($methodName);
         $this->assertNotEquals($return, 'Gerard');
-        $this->assertEquals($return, null);
+        $this->assertSame($return, null);
     }
 }

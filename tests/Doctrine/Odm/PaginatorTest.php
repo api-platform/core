@@ -36,9 +36,9 @@ class PaginatorTest extends TestCase
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
-        $this->assertEquals((float) $currentPage, $paginator->getCurrentPage());
-        $this->assertEquals((float) $lastPage, $paginator->getLastPage());
-        $this->assertEquals((float) $maxResults, $paginator->getItemsPerPage());
+        $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
+        $this->assertSame((float) $lastPage, $paginator->getLastPage());
+        $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
     }
 
     public function testInitializeWithFacetStageNotApplied(): void
@@ -85,25 +85,25 @@ class PaginatorTest extends TestCase
     {
         $paginator = $this->getPaginator(0, 5, 0, true);
 
-        $this->assertEquals(1., $paginator->getCurrentPage());
-        $this->assertEquals(1., $paginator->getLastPage());
-        $this->assertEquals(0., $paginator->getItemsPerPage());
+        $this->assertSame(1., $paginator->getCurrentPage());
+        $this->assertSame(1., $paginator->getLastPage());
+        $this->assertSame(0., $paginator->getItemsPerPage());
     }
 
     public function testInitializeWithNoCount(): void
     {
         $paginator = $this->getPaginatorWithNoCount();
 
-        $this->assertEquals(1., $paginator->getCurrentPage());
-        $this->assertEquals(1., $paginator->getLastPage());
-        $this->assertEquals(15., $paginator->getItemsPerPage());
+        $this->assertSame(1., $paginator->getCurrentPage());
+        $this->assertSame(1., $paginator->getLastPage());
+        $this->assertSame(15., $paginator->getItemsPerPage());
     }
 
     public function testGetIterator(): void
     {
         $paginator = $this->getPaginator();
 
-        $this->assertEquals($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
+        $this->assertSame($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
     }
 
     private function getPaginator(int $firstResult = 1, int $maxResults = 15, int $totalItems = 42, bool $limitZero = false): Paginator

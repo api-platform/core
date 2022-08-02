@@ -26,6 +26,6 @@ class PlaceholderActionTest extends TestCase
         $action = new PlaceholderAction();
 
         $expected = new \stdClass();
-        $this->assertEquals($expected, $action($expected));
+        $this->assertSame($expected, $action($expected));
     }
 }

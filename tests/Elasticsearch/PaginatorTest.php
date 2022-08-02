@@ -96,22 +96,22 @@ class PaginatorTest extends TestCase
 
     public function testGetLastPage(): void
     {
-        self::assertEquals(2., $this->paginator->getLastPage());
+        self::assertSame(2., $this->paginator->getLastPage());
     }
 
     public function testGetLastPageWithZeroAsLimit(): void
     {
-        self::assertEquals(1., $this->getPaginator(0, 0)->getLastPage());
+        self::assertSame(1., $this->getPaginator(0, 0)->getLastPage());
     }
 
     public function testGetLastPageWithNegativeLimit(): void
     {
-        self::assertEquals(1., $this->getPaginator(-1, 0)->getLastPage());
+        self::assertSame(1., $this->getPaginator(-1, 0)->getLastPage());
     }
 
     public function testGetTotalItems(): void
     {
-        self::assertEquals(8., $this->paginator->getTotalItems());
+        self::assertSame(8., $this->paginator->getTotalItems());
     }
 
     public function testGetTotalItemsForElasticSearch7(): void
@@ -125,27 +125,27 @@ class PaginatorTest extends TestCase
 
         $paginator = $this->getPaginator(self::LIMIT, self::OFFSET, $documents);
 
-        self::assertEquals(8., $paginator->getTotalItems());
+        self::assertSame(8., $paginator->getTotalItems());
     }
 
     public function testGetCurrentPage(): void
     {
-        self::assertEquals(2., $this->paginator->getCurrentPage());
+        self::assertSame(2., $this->paginator->getCurrentPage());
     }
 
     public function testGetCurrentPageWithZeroAsLimit(): void
     {
-        self::assertEquals(1., $this->getPaginator(0, 0)->getCurrentPage());
+        self::assertSame(1., $this->getPaginator(0, 0)->getCurrentPage());
     }
 
     public function testGetCurrentPageWithNegativeLimit(): void
     {
-        self::assertEquals(1., $this->getPaginator(-1, 0)->getCurrentPage());
+        self::assertSame(1., $this->getPaginator(-1, 0)->getCurrentPage());
     }
 
     public function testGetItemsPerPage(): void
     {
-        self::assertEquals(4., $this->paginator->getItemsPerPage());
+        self::assertSame(4., $this->paginator->getItemsPerPage());
     }
 
     public function testGetIterator(): void

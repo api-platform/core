@@ -38,7 +38,7 @@ class JsonEncoderTest extends TestCase
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals('{"foo":"bar"}', $this->encoder->encode($data, 'json'));
+        $this->assertSame('{"foo":"bar"}', $this->encoder->encode($data, 'json'));
     }
 
     public function testSupportDecoding(): void

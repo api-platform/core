@@ -168,7 +168,7 @@ class ItemNormalizerTest extends TestCase
             ];
         }
 
-        $this->assertEquals('/circular_references/1', $normalizer->normalize($circularReferenceEntity, ItemNormalizer::FORMAT, $context));
+        $this->assertSame('/circular_references/1', $normalizer->normalize($circularReferenceEntity, ItemNormalizer::FORMAT, $context));
     }
 
     public function testNormalizeNonExistentProperty(): void

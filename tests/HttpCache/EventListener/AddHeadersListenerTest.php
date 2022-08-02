@@ -115,8 +115,8 @@ class AddHeadersListenerTest extends TestCase
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('"9893532233caff98cd083a116b013c0b"', $response->getEtag());
-        $this->assertEquals('max-age=100, public, s-maxage=200, stale-if-error=30, stale-while-revalidate=15', $response->headers->get('Cache-Control'));
+        $this->assertSame('"9893532233caff98cd083a116b013c0b"', $response->getEtag());
+        $this->assertSame('max-age=100, public, s-maxage=200, stale-if-error=30, stale-while-revalidate=15', $response->headers->get('Cache-Control'));
         $this->assertEquals(['Accept', 'Cookie', 'Accept-Encoding'], $response->getVary());
     }
 
@@ -141,8 +141,8 @@ class AddHeadersListenerTest extends TestCase
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('"etag"', $response->getEtag());
-        $this->assertEquals('max-age=300, public, s-maxage=400, stale-if-error=30, stale-while-revalidate=15', $response->headers->get('Cache-Control'));
+        $this->assertSame('"etag"', $response->getEtag());
+        $this->assertSame('max-age=300, public, s-maxage=400, stale-if-error=30, stale-while-revalidate=15', $response->headers->get('Cache-Control'));
         $this->assertEquals(['Accept', 'Cookie', 'Accept-Encoding'], $response->getVary());
     }
 
@@ -163,7 +163,7 @@ class AddHeadersListenerTest extends TestCase
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('max-age=123, public, s-maxage=456, stale-if-error=70, stale-while-revalidate=928', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=123, public, s-maxage=456, stale-if-error=70, stale-while-revalidate=928', $response->headers->get('Cache-Control'));
         $this->assertEquals(['Accept', 'Cookie', 'Vary-1', 'Vary-2'], $response->getVary());
     }
 
@@ -189,7 +189,7 @@ class AddHeadersListenerTest extends TestCase
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('max-age=123, private', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=123, private', $response->headers->get('Cache-Control'));
 
         // resource's cache marked as private must not contain s-maxage
         $this->assertStringNotContainsString('s-maxage', $response->headers->get('Cache-Control'));
@@ -217,7 +217,7 @@ class AddHeadersListenerTest extends TestCase
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
     }
 
     public function testSetHeadersFromResourceMetadataWithNoPrivacy(): void
@@ -241,7 +241,7 @@ class AddHeadersListenerTest extends TestCase
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
     }
 
     public function testSetHeadersFromResourceMetadataWithNoPrivacyDefaultsPrivate(): void
@@ -265,7 +265,7 @@ class AddHeadersListenerTest extends TestCase
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], false, $factory->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('max-age=123, private', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=123, private', $response->headers->get('Cache-Control'));
 
         // resource's cache marked as private must not contain s-maxage
         $this->assertStringNotContainsString('s-maxage', $response->headers->get('Cache-Control'));

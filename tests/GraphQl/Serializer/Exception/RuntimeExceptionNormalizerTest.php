@@ -39,8 +39,8 @@ class RuntimeExceptionNormalizerTest extends TestCase
         $error = new Error('test message', null, null, [], null, $exception);
 
         $normalizedError = $this->runtimeExceptionNormalizer->normalize($error);
-        $this->assertEquals($exceptionMessage, $normalizedError['message']);
-        $this->assertEquals(Error::CATEGORY_INTERNAL, $normalizedError['extensions']['category']);
+        $this->assertSame($exceptionMessage, $normalizedError['message']);
+        $this->assertSame(Error::CATEGORY_INTERNAL, $normalizedError['extensions']['category']);
     }
 
     public function testSupportsNormalization(): void

@@ -83,6 +83,6 @@ class EntrypointNormalizerTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }
 }

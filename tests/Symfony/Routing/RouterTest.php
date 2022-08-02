@@ -60,7 +60,7 @@ class RouterTest extends TestCase
         $mockedRouter->generate('foo', [], RouterInterface::ABSOLUTE_PATH)->willReturn('/bar')->shouldBeCalled();
 
         $router = new Router($mockedRouter->reveal());
-        $this->assertEquals('/bar', $router->generate('foo'));
+        $this->assertSame('/bar', $router->generate('foo'));
     }
 
     public function testGenerateWithDefaultStrategy(): void
@@ -69,7 +69,7 @@ class RouterTest extends TestCase
         $mockedRouter->generate('foo', [], UrlGeneratorInterface::ABS_URL)->willReturn('/bar')->shouldBeCalled();
 
         $router = new Router($mockedRouter->reveal(), UrlGeneratorInterface::ABS_URL);
-        $this->assertEquals('/bar', $router->generate('foo'));
+        $this->assertSame('/bar', $router->generate('foo'));
     }
 
     public function testGenerateWithStrategy(): void
@@ -78,7 +78,7 @@ class RouterTest extends TestCase
         $mockedRouter->generate('foo', [], UrlGeneratorInterface::ABS_URL)->willReturn('/bar')->shouldBeCalled();
 
         $router = new Router($mockedRouter->reveal());
-        $this->assertEquals('/bar', $router->generate('foo', [], UrlGeneratorInterface::ABS_URL));
+        $this->assertSame('/bar', $router->generate('foo', [], UrlGeneratorInterface::ABS_URL));
     }
 
     public function testMatch(): void

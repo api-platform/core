@@ -73,7 +73,7 @@ class ReadStageTest extends TestCase
 
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertSame($expectedResult, $result);
     }
 
     public function contextProvider(): array
@@ -116,7 +116,7 @@ class ReadStageTest extends TestCase
 
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertSame($expectedResult, $result);
     }
 
     public function itemProvider(): array
@@ -166,7 +166,7 @@ class ReadStageTest extends TestCase
 
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertSame($expectedResult, $result);
     }
 
     public function itemMutationOrSubscriptionProvider(): array
@@ -214,7 +214,7 @@ class ReadStageTest extends TestCase
 
         $result = ($this->readStage)($resourceClass, $rootClass, $operation, $context);
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertSame($expectedResult, $result);
     }
 
     public function testPreserveOrderOfOrderFiltersIfNested(): void

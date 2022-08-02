@@ -87,7 +87,7 @@ class EntrypointNormalizerTest extends TestCase
             'dummy' => '/api/dummies',
             'fooDummy' => '/api/foo_dummies',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }
 
     public function testNormalizeWithResourceCollection(): void
@@ -125,6 +125,6 @@ class EntrypointNormalizerTest extends TestCase
             'dummy' => '/api/dummies',
             'fooDummy' => '/api/foo_dummies',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }
 }

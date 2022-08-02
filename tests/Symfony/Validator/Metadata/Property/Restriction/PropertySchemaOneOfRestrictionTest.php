@@ -47,7 +47,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
      */
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
-        self::assertEquals($expectedResult, $this->propertySchemaOneOfRestriction->supports($constraint, $propertyMetadata));
+        self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
@@ -69,7 +69,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
             self::markTestSkipped();
         }
 
-        self::assertEquals($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
+        self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
     }
 
     public function createProvider(): \Generator

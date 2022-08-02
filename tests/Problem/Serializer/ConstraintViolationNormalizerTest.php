@@ -75,6 +75,6 @@ class ConstraintViolationNormalizerTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($list));
+        $this->assertSame($expected, $normalizer->normalize($list));
     }
 }

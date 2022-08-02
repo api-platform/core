@@ -336,7 +336,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         (new ApiPlatformExtension())->load($config, $this->container);
 
-        $this->assertEquals($aliasIsExected, $this->container->hasAlias('api_platform.name_converter'));
+        $this->assertSame($aliasIsExected, $this->container->hasAlias('api_platform.name_converter'));
     }
 
     public function testMetadataConfiguration(): void

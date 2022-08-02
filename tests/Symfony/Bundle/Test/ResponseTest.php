@@ -32,14 +32,14 @@ class ResponseTest extends TestCase
 
         $response = new Response($httpFoundationResponse, $browserKitResponse, []);
 
-        $this->assertEquals($httpFoundationResponse, $response->getKernelResponse());
-        $this->assertEquals($browserKitResponse, $response->getBrowserKitResponse());
+        $this->assertSame($httpFoundationResponse, $response->getKernelResponse());
+        $this->assertSame($browserKitResponse, $response->getBrowserKitResponse());
 
-        $this->assertEquals(200, $response->getInfo('http_code'));
-        $this->assertEquals(200, $response->getInfo()['http_code']);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('application/json', $response->getHeaders()['content-type'][0]);
-        $this->assertEquals('', $response->getContent());
+        $this->assertSame(200, $response->getInfo('http_code'));
+        $this->assertSame(200, $response->getInfo()['http_code']);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('application/json', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('', $response->getContent());
     }
 
     /**
@@ -121,6 +121,6 @@ class ResponseTest extends TestCase
         $response = new Response(new HttpFoundationResponse(), new BrowserKitResponse(), []);
         $response->cancel();
 
-        $this->assertEquals('Response has been canceled.', $response->getInfo('error'));
+        $this->assertSame('Response has been canceled.', $response->getInfo('error'));
     }
 }

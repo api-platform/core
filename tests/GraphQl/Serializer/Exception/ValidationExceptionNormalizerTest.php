@@ -45,9 +45,9 @@ class ValidationExceptionNormalizerTest extends TestCase
         $error = new Error('test message', null, null, [], null, $exception);
 
         $normalizedError = $this->validationExceptionNormalizer->normalize($error);
-        $this->assertEquals($exceptionMessage, $normalizedError['message']);
-        $this->assertEquals(422, $normalizedError['extensions']['status']);
-        $this->assertEquals('user', $normalizedError['extensions']['category']);
+        $this->assertSame($exceptionMessage, $normalizedError['message']);
+        $this->assertSame(422, $normalizedError['extensions']['status']);
+        $this->assertSame('user', $normalizedError['extensions']['category']);
         $this->assertArrayHasKey('violations', $normalizedError['extensions']);
         $this->assertEquals([
             [

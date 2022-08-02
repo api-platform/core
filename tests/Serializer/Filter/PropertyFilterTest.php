@@ -239,6 +239,6 @@ class PropertyFilterTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedDescription, $propertyFilter->getDescription(DummyProperty::class));
+        $this->assertSame($expectedDescription, $propertyFilter->getDescription(DummyProperty::class));
     }
 }

@@ -43,7 +43,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
         $doctrineMongoDbOdmPropertyMetadataFactory = new DoctrineMongoDbOdmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
 
-        $this->assertEquals($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
+        $this->assertSame($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
     public function testCreateIsIdentifier(): void
@@ -64,7 +64,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
         $doctrineMongoDbOdmPropertyMetadataFactory = new DoctrineMongoDbOdmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
 
-        $this->assertEquals($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
+        $this->assertSame($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
     public function testCreateIsWritable(): void
@@ -88,8 +88,8 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), false);
     }
 
     public function testCreateClassMetadata(): void
@@ -112,7 +112,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), false);
     }
 }

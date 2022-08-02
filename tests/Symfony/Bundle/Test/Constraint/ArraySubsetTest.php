@@ -84,7 +84,7 @@ class ArraySubsetTest extends TestCase
     {
         $constraint = new ArraySubset($subset, $strict);
 
-        $this->assertEquals($expected, $constraint->evaluate($other, '', true));
+        $this->assertSame($expected, $constraint->evaluate($other, '', true));
     }
 
     public function testEvaluateWithArrayAccess(): void

@@ -43,12 +43,12 @@ class ClientTest extends ApiTestCase
     {
         $client = self::createClient();
         $client->getKernelBrowser();
-        $this->assertEquals(static::$kernel, $client->getKernel());
+        $this->assertSame(static::$kernel, $client->getKernel());
 
         $client->enableProfiler();
         $response = $client->request('GET', '/');
 
-        $this->assertEquals('/contexts/Entrypoint', $response->toArray()['@context']);
+        $this->assertSame('/contexts/Entrypoint', $response->toArray()['@context']);
         $this->assertInstanceOf(Profile::class, $client->getProfile());
         $this->assertInstanceOf(Response::class, $response);
     }
@@ -66,10 +66,10 @@ class ClientTest extends ApiTestCase
             'body' => '{"name": "Kevin"}',
         ]);
         $server = $client->getKernelBrowser()->getInternalRequest()->getServer();
-        $this->assertEquals('application/json', $server['CONTENT_TYPE']);
-        $this->assertEquals('10.10.10.10', $server['REMOTE_ADDR']);
-        $this->assertEquals('text/xml', $server['HTTP_ACCEPT']);
-        $this->assertEquals('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/json', $server['CONTENT_TYPE']);
+        $this->assertSame('10.10.10.10', $server['REMOTE_ADDR']);
+        $this->assertSame('text/xml', $server['HTTP_ACCEPT']);
+        $this->assertSame('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
         $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
         $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
     }
@@ -88,7 +88,7 @@ class ClientTest extends ApiTestCase
             'body' => '{"name": "Kevin"}',
         ]);
 
-        $this->assertEquals('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
         $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
         $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
     }
@@ -103,7 +103,7 @@ class ClientTest extends ApiTestCase
         $client = self::createClient();
         $client->enableReboot();
         $response = $client->request('GET', '/secured_dummies', ['auth_basic' => $basic]);
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertResponseIsSuccessful();
     }
 

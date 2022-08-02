@@ -69,7 +69,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $listener = new AddLinkHeaderListener($discovery, $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelResponse($event);
-        $this->assertEquals($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
+        $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
     }
 
     public function addProvider(): array
