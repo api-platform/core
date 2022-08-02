@@ -130,6 +130,7 @@ class AppKernel extends Kernel
             ],
             'messenger' => $messengerConfig,
             'router' => ['utf8' => true],
+            'http_method_override' => false,
         ]);
 
         $alg = class_exists(NativePasswordHasher::class, false) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';
