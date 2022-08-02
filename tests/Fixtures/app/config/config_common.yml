@@ -1,16 +1,15 @@
 doctrine:
     dbal:
-        driver:                       'pdo_sqlite'
-        path:                         '%kernel.cache_dir%/db.sqlite'
-        charset:                      'UTF8'
+        driver: 'pdo_sqlite'
+        charset: 'UTF8'
         types:
-            uuid:  Ramsey\Uuid\Doctrine\UuidType
+            uuid: Ramsey\Uuid\Doctrine\UuidType
             symfony_uuid: Symfony\Bridge\Doctrine\Types\UuidType
 
     orm:
-        auto_generate_proxy_classes:   '%kernel.debug%'
+        auto_generate_proxy_classes: '%kernel.debug%'
         mappings:
-            TestBundle: 
+            TestBundle:
                 type: 'attribute'
 
 web_profiler:
