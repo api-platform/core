@@ -733,6 +733,10 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // doctrine_orm.xml
+            'api_platform.doctrine.orm.state.remove_processor',
+            'api_platform.doctrine.orm.state.persist_processor',
+            'api_platform.doctrine.orm.state.collection_provider',
+            'api_platform.doctrine.orm.state.item_provider',
             OrderFilter::class,
             RangeFilter::class,
             DateFilter::class,
@@ -767,7 +771,7 @@ class ApiPlatformExtensionTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $services = [
-            // doctrine_mongo_odm.xml
+            // doctrine_mongodb_odm.xml
             'api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor',
             'api_platform.doctrine.metadata_factory',
             RemoveProcessor::class,
@@ -789,7 +793,11 @@ class ApiPlatformExtensionTest extends TestCase
         ];
 
         $aliases = [
-            // doctrine_mongo_odm.xml
+            // doctrine_mongodb_odm.xml
+            'api_platform.doctrine_mongodb.odm.state.remove_processor',
+            'api_platform.doctrine_mongodb.odm.state.persist_processor',
+            'api_platform.doctrine_mongodb.odm.state.collection_provider',
+            'api_platform.doctrine_mongodb.odm.state.item_provider',
             SearchFilter::class,
             \ApiPlatform\Doctrine\Odm\Filter\BooleanFilter::class,
             \ApiPlatform\Doctrine\Odm\Filter\DateFilter::class,
@@ -808,7 +816,6 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags(PersistProcessor::class, ['api_platform.state_processor']);
         $this->assertServiceHasTags(MongoDbCollectionProvider::class, ['api_platform.state_provider']);
         $this->assertServiceHasTags(MongoDbItemProvider::class, ['api_platform.state_provider']);
-        // doctrine_mongo_odm.xml
         $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor', ['property_info.list_extractor', 'property_info.type_extractor']);
         $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.aggregation_extension.filter', ['api_platform.doctrine_mongodb.odm.aggregation_extension.collection']);
         $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.aggregation_extension.pagination', ['api_platform.doctrine_mongodb.odm.aggregation_extension.collection']);
