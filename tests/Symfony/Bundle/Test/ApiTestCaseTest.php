@@ -18,6 +18,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaContextDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -154,6 +155,26 @@ JSON;
         $manager->flush();
         self::createClient()->request('GET', '/dummy_dto_input_outputs/1');
         $this->assertMatchesResourceItemJsonSchema(DummyDtoInputOutput::class);
+    }
+
+    public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithContext(): void
+    {
+        $this->recreateSchema();
+
+        /** @var EntityManagerInterface $manager */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        $user = new User();
+        $user->setFullname('Grégoire');
+        $user->setPlainPassword('password');
+
+        $manager->persist($user);
+        $manager->flush();
+
+        self::createClient()->request('GET', "/users-with-groups/{$user->getId()}");
+        $this->assertMatchesResourceItemJsonSchema(User::class, null, 'jsonld', ['groups' => ['api-test-case-group']]);
+
+        self::createClient()->request('GET', '/users-with-groups');
+        $this->assertMatchesResourceCollectionJsonSchema(User::class, null, 'jsonld', ['groups' => ['api-test-case-group']]);
     }
 
     // Next tests have been imported from dms/phpunit-arraysubset-asserts, because the original constraint has been deprecated.
