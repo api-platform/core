@@ -14,12 +14,14 @@
 
             <tag name="api_platform.state_processor" priority="-100" />
         </service>
+        <service id="api_platform.doctrine.orm.state.remove_processor" alias="ApiPlatform\Doctrine\Common\State\RemoveProcessor" />
 
         <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" class="ApiPlatform\Doctrine\Common\State\PersistProcessor">
             <argument type="service" id="doctrine" />
 
             <tag name="api_platform.state_processor" priority="-100" />
         </service>
+        <service id="api_platform.doctrine.orm.state.persist_processor" alias="ApiPlatform\Doctrine\Common\State\PersistProcessor" />
 
         <!-- Filter -->
 
@@ -134,6 +136,7 @@
 
             <tag name="api_platform.state_provider" priority="-100" />
         </service>
+        <service id="api_platform.doctrine.orm.state.collection_provider" alias="ApiPlatform\Doctrine\Orm\State\CollectionProvider" />
 
         <service id="ApiPlatform\Doctrine\Orm\State\ItemProvider" class="ApiPlatform\Doctrine\Orm\State\ItemProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
@@ -142,6 +145,7 @@
 
             <tag name="api_platform.state_provider" priority="-100" />
         </service>
+        <service id="api_platform.doctrine.orm.state.item_provider" alias="ApiPlatform\Doctrine\Orm\State\ItemProvider" />
 
         <service id="api_platform.doctrine.orm.search_filter" class="ApiPlatform\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
