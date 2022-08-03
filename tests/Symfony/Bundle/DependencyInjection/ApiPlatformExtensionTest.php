@@ -889,6 +889,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property_schema.unique_restriction',
 
             // symfony/validator.xml
+            'api_platform.validator_locator',
             'api_platform.validator',
             'api_platform.listener.view.validate',
             'api_platform.validator.query_parameter_validator',
@@ -918,6 +919,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.metadata.property_schema.unique_restriction', ['api_platform.metadata.property_schema_restriction']);
 
         // symfony/validator.xml
+        $this->assertServiceHasTags('api_platform.validator_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.listener.view.validate', ['kernel.event_listener']);
         $this->assertServiceHasTags('api_platform.listener.view.validate_query_parameters', ['kernel.event_listener']);
     }

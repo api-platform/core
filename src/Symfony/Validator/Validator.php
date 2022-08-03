@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidator
  */
 class Validator implements ValidatorInterface
 {
-    public function __construct(private readonly SymfonyValidatorInterface $validator, private readonly ?ContainerInterface $container = null)
+    public function __construct(private readonly SymfonyValidatorInterface $validator, private readonly ContainerInterface $locator)
     {
     }
 
@@ -39,10 +39,9 @@ class Validator implements ValidatorInterface
     {
         if (null !== $validationGroups = $context['groups'] ?? null) {
             if (
-                $this->container &&
                 \is_string($validationGroups) &&
-                $this->container->has($validationGroups) &&
-                ($service = $this->container->get($validationGroups)) &&
+                $this->locator->has($validationGroups) &&
+                ($service = $this->locator->get($validationGroups)) &&
                 \is_callable($service)
             ) {
                 $validationGroups = $service($data);

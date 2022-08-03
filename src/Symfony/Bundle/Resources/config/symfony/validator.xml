@@ -5,9 +5,13 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.validator_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
+            <tag name="container.service_locator" />
+        </service>
+
         <service id="api_platform.validator" class="ApiPlatform\Symfony\Validator\Validator">
             <argument type="service" id="validator" />
-            <argument type="service" id="service_container" />
+            <argument type="service" id="api_platform.validator_locator" />
         </service>
         <service id="ApiPlatform\Validator\ValidatorInterface" alias="api_platform.validator" />
 
