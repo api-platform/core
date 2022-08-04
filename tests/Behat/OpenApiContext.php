@@ -45,7 +45,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the Swagger class :class exists
      */
-    public function assertTheSwaggerClassExist(string $className)
+    public function assertTheSwaggerClassExist(string $className): void
     {
         try {
             $this->getClassInfo($className);
@@ -57,7 +57,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the OpenAPI class :class exists
      */
-    public function assertTheOpenApiClassExist(string $className)
+    public function assertTheOpenApiClassExist(string $className): void
     {
         try {
             $this->getClassInfo($className, 3);
@@ -69,7 +69,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the Swagger class :class doesn't exist
      */
-    public function assertTheSwaggerClassNotExist(string $className)
+    public function assertTheSwaggerClassNotExist(string $className): void
     {
         try {
             $this->getClassInfo($className);
@@ -83,7 +83,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the OpenAPI class :class doesn't exist
      */
-    public function assertTheOpenAPIClassNotExist(string $className)
+    public function assertTheOpenAPIClassNotExist(string $className): void
     {
         try {
             $this->getClassInfo($className, 3);
@@ -108,7 +108,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the :prop property exists for the Swagger class :class
      */
-    public function assertThePropertyExistForTheSwaggerClass(string $propertyName, string $className)
+    public function assertThePropertyExistForTheSwaggerClass(string $propertyName, string $className): void
     {
         try {
             $this->getPropertyInfo($propertyName, $className);
@@ -120,7 +120,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the :prop property exists for the OpenAPI class :class
      */
-    public function assertThePropertyExistForTheOpenApiClass(string $propertyName, string $className)
+    public function assertThePropertyExistForTheOpenApiClass(string $propertyName, string $className): void
     {
         try {
             $this->getPropertyInfo($propertyName, $className, 3);
@@ -132,7 +132,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the :prop property is required for the Swagger class :class
      */
-    public function assertThePropertyIsRequiredForTheSwaggerClass(string $propertyName, string $className)
+    public function assertThePropertyIsRequiredForTheSwaggerClass(string $propertyName, string $className): void
     {
         if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
@@ -142,7 +142,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the :prop property is required for the OpenAPI class :class
      */
-    public function assertThePropertyIsRequiredForTheOpenAPIClass(string $propertyName, string $className)
+    public function assertThePropertyIsRequiredForTheOpenAPIClass(string $propertyName, string $className): void
     {
         if (!\in_array($propertyName, $this->getClassInfo($className, 3)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
@@ -152,7 +152,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the :prop property is not read only for the Swagger class :class
      */
-    public function assertThePropertyIsNotReadOnlyForTheSwaggerClass(string $propertyName, string $className)
+    public function assertThePropertyIsNotReadOnlyForTheSwaggerClass(string $propertyName, string $className): void
     {
         $propertyInfo = $this->getPropertyInfo($propertyName, $className);
         if (property_exists($propertyInfo, 'readOnly') && $propertyInfo->readOnly) {
@@ -163,7 +163,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the :prop property is not read only for the OpenAPI class :class
      */
-    public function assertThePropertyIsNotReadOnlyForTheOpenAPIClass(string $propertyName, string $className)
+    public function assertThePropertyIsNotReadOnlyForTheOpenAPIClass(string $propertyName, string $className): void
     {
         $propertyInfo = $this->getPropertyInfo($propertyName, $className, 3);
         if (property_exists($propertyInfo, 'readOnly') && $propertyInfo->readOnly) {

@@ -422,7 +422,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []): void
     {
         $this->setValue($object, $attribute, $this->createAttributeValue($attribute, $value, $format, $context));
     }
@@ -430,11 +430,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Validates the type of the value. Allows using integers as floats for JSON formats.
      *
-     * @param mixed $value
-     *
      * @throws InvalidArgumentException
      */
-    protected function validateType(string $attribute, Type $type, $value, string $format = null)
+    protected function validateType(string $attribute, Type $type, $value, string $format = null): void
     {
         $builtinType = $type->getBuiltinType();
         if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && str_contains($format, 'json')) {
@@ -450,8 +448,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Denormalizes a collection of objects.
-     *
-     * @param mixed $value
      *
      * @throws InvalidArgumentException
      */
@@ -478,8 +474,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Denormalizes a relation.
-     *
-     * @param mixed $value
      *
      * @throws LogicException
      * @throws UnexpectedValueException
@@ -554,8 +548,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @throws UnexpectedValueException
      * @throws LogicException
-     *
-     * @return mixed
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
@@ -820,7 +812,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Sets a value of the object using the PropertyAccess component.
      *
      * @param object $object
-     * @param mixed  $value
      */
     private function setValue($object, string $attributeName, $value): void
     {

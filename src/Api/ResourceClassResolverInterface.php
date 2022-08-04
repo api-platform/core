@@ -27,7 +27,6 @@ interface ResourceClassResolverInterface
      *
      * @param string $resourceClass The expected resource class
      * @param bool   $strict        If true, value must match the expected resource class
-     * @param mixed  $value
      *
      * @throws InvalidArgumentException
      */

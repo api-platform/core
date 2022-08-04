@@ -94,7 +94,7 @@ class AppKernel extends Kernel
         return __DIR__;
     }
 
-    protected function configureRoutes($routes)
+    protected function configureRoutes($routes): void
     {
         $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
 
@@ -103,7 +103,7 @@ class AppKernel extends Kernel
         }
     }
 
-    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
+    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->setParameter('kernel.project_dir', __DIR__);
 

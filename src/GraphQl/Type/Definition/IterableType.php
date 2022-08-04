@@ -47,8 +47,6 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
     public function serialize($value)
     {
@@ -61,8 +59,6 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
     public function parseValue($value)
     {
@@ -77,8 +73,6 @@ final class IterableType extends ScalarType implements TypeInterface
      * {@inheritdoc}
      *
      * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
-     *
-     * @return mixed
      */
     public function parseLiteral($valueNode, ?array $variables = null)
     {

@@ -54,8 +54,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Passes a property through the filter.
-     *
-     * @param mixed $value
      */
     abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []);
 

@@ -97,7 +97,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @throws LogicException
      */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         if (!$this->decorated instanceof SerializerAwareInterface) {
             throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));

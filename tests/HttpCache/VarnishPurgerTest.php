@@ -71,7 +71,7 @@ class VarnishPurgerTest extends TestCase
     /**
      * @dataProvider provideChunkHeaderCases
      */
-    public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $regexesToSend)
+    public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $regexesToSend): void
     {
         /** @var HttpClientInterface $client */
         $client = new class() implements ClientInterface {
@@ -99,7 +99,7 @@ class VarnishPurgerTest extends TestCase
                 throw new LogicException('Not implemented');
             }
 
-            public function getConfig($option = null)
+            public function getConfig($option = null): void
             {
                 throw new LogicException('Not implemented');
             }

@@ -29,7 +29,7 @@ final class HttpCacheContext implements Context
     /**
      * @Then :iris IRIs should be purged
      */
-    public function irisShouldBePurged(string $iris)
+    public function irisShouldBePurged(string $iris): void
     {
         $purger = $this->kernel->getContainer()->get('behat.driver.service_container')->get('test.api_platform.http_cache.purger');
 

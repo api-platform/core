@@ -50,7 +50,7 @@ final class HydraContext implements Context
     /**
      * @Then the Hydra class :class exists
      */
-    public function assertTheHydraClassExist(string $className)
+    public function assertTheHydraClassExist(string $className): void
     {
         try {
             $this->getClassInfo($className);
@@ -62,7 +62,7 @@ final class HydraContext implements Context
     /**
      * @Then the Hydra class :class doesn't exist
      */
-    public function assertTheHydraClassNotExist(string $className)
+    public function assertTheHydraClassNotExist(string $className): void
     {
         try {
             $this->getClassInfo($className);
@@ -159,7 +159,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property doesn't exist for the Hydra class :class
      */
-    public function assertPropertyNotExist(string $propertyName, string $className)
+    public function assertPropertyNotExist(string $propertyName, string $className): void
     {
         try {
             $this->getPropertyInfo($propertyName, $className);
@@ -173,7 +173,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is readable for Hydra class :class
      */
-    public function assertPropertyIsReadable(string $propertyName, string $className)
+    public function assertPropertyIsReadable(string $propertyName, string $className): void
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not readable', $propertyName, $className));
@@ -183,7 +183,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is not readable for Hydra class :class
      */
-    public function assertPropertyIsNotReadable(string $propertyName, string $className)
+    public function assertPropertyIsNotReadable(string $propertyName, string $className): void
     {
         if ($this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is readable', $propertyName, $className));
@@ -193,7 +193,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is writable for Hydra class :class
      */
-    public function assertPropertyIsWritable(string $propertyName, string $className)
+    public function assertPropertyIsWritable(string $propertyName, string $className): void
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:writeable'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not writable', $propertyName, $className));
@@ -203,7 +203,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is required for Hydra class :class
      */
-    public function assertPropertyIsRequired(string $propertyName, string $className)
+    public function assertPropertyIsRequired(string $propertyName, string $className): void
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
@@ -213,7 +213,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is not required for Hydra class :class
      */
-    public function assertPropertyIsNotRequired(string $propertyName, string $className)
+    public function assertPropertyIsNotRequired(string $propertyName, string $className): void
     {
         if ($this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is required', $propertyName, $className));

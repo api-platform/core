@@ -229,8 +229,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets the IRI of the given relation.
      *
-     * @param mixed $rel
-     *
      * @throws UnexpectedValueException
      */
     private function getRelationIri($rel): string

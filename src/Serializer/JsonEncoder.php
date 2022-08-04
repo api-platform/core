@@ -66,8 +66,6 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
     public function decode($data, $format, array $context = [])
     {

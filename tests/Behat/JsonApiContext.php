@@ -72,7 +72,7 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON should be valid according to the JSON API schema
      */
-    public function theJsonShouldBeValidAccordingToTheJsonApiSchema()
+    public function theJsonShouldBeValidAccordingToTheJsonApiSchema(): void
     {
         $json = $this->getJson()->getContent();
         $this->validator->validate($json, (object) ['$ref' => "file://{$this->jsonApiSchemaFile}"]);
@@ -84,10 +84,8 @@ final class JsonApiContext implements Context
 
     /**
      * @Then the JSON node :node should be an empty array
-     *
-     * @param mixed $node
      */
-    public function theJsonNodeShouldBeAnEmptyArray($node)
+    public function theJsonNodeShouldBeAnEmptyArray($node): void
     {
         $actual = $this->getValueOfNode($node);
         if (null !== $actual && [] !== $actual) {
@@ -97,10 +95,8 @@ final class JsonApiContext implements Context
 
     /**
      * @Then the JSON node :node should be a number
-     *
-     * @param mixed $node
      */
-    public function theJsonNodeShouldBeANumber($node)
+    public function theJsonNodeShouldBeANumber($node): void
     {
         if (!is_numeric($actual = $this->getValueOfNode($node))) {
             throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual, \JSON_THROW_ON_ERROR)));
@@ -109,10 +105,8 @@ final class JsonApiContext implements Context
 
     /**
      * @Then the JSON node :node should not be an empty string
-     *
-     * @param mixed $node
      */
-    public function theJsonNodeShouldNotBeAnEmptyString($node)
+    public function theJsonNodeShouldNotBeAnEmptyString($node): void
     {
         if ('' === $actual = $this->getValueOfNode($node)) {
             throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
@@ -122,10 +116,8 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON node :node should be sorted
      * @Then the JSON should be sorted
-     *
-     * @param mixed $node
      */
-    public function theJsonNodeShouldBeSorted($node = '')
+    public function theJsonNodeShouldBeSorted($node = ''): void
     {
         $actual = (array) $this->getValueOfNode($node);
 

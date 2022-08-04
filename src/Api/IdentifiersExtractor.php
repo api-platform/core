@@ -83,8 +83,6 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
 
     /**
      * Gets the value of the given class property.
-     *
-     * @param mixed $item
      */
     private function getIdentifierValue($item, string $class, string $property, string $parameterName)
     {
