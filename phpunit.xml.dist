@@ -28,8 +28,6 @@
             <directory>tests</directory>
             <directory>vendor</directory>
             <file>.php-cs-fixer.dist.php</file>
-            <file>src/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php</file>
-            <file>src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php</file>
         </exclude>
     </coverage>
 
