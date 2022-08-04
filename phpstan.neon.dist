@@ -19,15 +19,8 @@ parameters:
 		# Symfony cache
 		- tests/Fixtures/app/var/
 		- tests/Fixtures/Symfony/Maker
-		# BC layer
-		- src/deprecated_interfaces.php
-		- tests/Fixtures/TestBundle/BrowserKit/Client.php
 		# The Symfony Configuration API isn't good enough to be analysed
 		- src/Symfony/Bundle/DependencyInjection/Configuration.php
-		# Phpstan runs on phpunit > 9, a signature changed in this file
-		- src/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
-		# Imported code (temporary)
-		- src/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
 		# Templates for Maker
 		- src/Symfony/Maker/Resources/skeleton
 	earlyTerminatingMethodCalls:
