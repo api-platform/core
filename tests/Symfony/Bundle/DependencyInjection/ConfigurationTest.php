@@ -143,7 +143,7 @@ class ConfigurationTest extends TestCase
                 'pkce' => false,
             ],
             'swagger' => [
-                'versions' => [2, 3],
+                'versions' => [3],
                 'api_keys' => [],
                 'swagger_ui_extra_configuration' => [],
             ],
@@ -329,17 +329,6 @@ class ConfigurationTest extends TestCase
 
         $this->assertArrayHasKey('versions', $config['swagger']);
         $this->assertEquals([3], $config['swagger']['versions']);
-
-        $config = $this->processor->processConfiguration($this->configuration, [
-            'api_platform' => [
-                'swagger' => [
-                    'versions' => 2,
-                ],
-            ],
-        ]);
-
-        $this->assertArrayHasKey('versions', $config['swagger']);
-        $this->assertEquals([2], $config['swagger']['versions']);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches('/Only the versions .+ are supported. Got .+./');
