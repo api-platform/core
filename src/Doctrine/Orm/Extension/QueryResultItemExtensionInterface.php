@@ -22,7 +22,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Antoine BLUCHET <soyuka@gmail.com>
  *
- * @template T
+ * @template T of object
  */
 interface QueryResultItemExtensionInterface extends QueryItemExtensionInterface
 {
