@@ -18,7 +18,7 @@ namespace ApiPlatform\State\Pagination;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  *
- * @template T
+ * @template T of object
  *
  * @extends \Traversable<T>
  */
