@@ -38,13 +38,13 @@ final class DenyAccessListener
 
     public function onSecurity(RequestEvent $event): void
     {
-        $this->checkSecurity($event->getRequest(), 'security', false);
+        $this->checkSecurity($event->getRequest(), 'security');
     }
 
     public function onSecurityPostDenormalize(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        $this->checkSecurity($request, 'security_post_denormalize', true, [
+        $this->checkSecurity($request, 'security_post_denormalize', [
             'previous_object' => $request->attributes->get('previous_data'),
         ]);
     }
@@ -52,7 +52,7 @@ final class DenyAccessListener
     public function onSecurityPostValidation(ViewEvent $event): void
     {
         $request = $event->getRequest();
-        $this->checkSecurity($request, 'security_post_validation', false, [
+        $this->checkSecurity($request, 'security_post_validation', [
             'previous_object' => $request->attributes->get('previous_data'),
         ]);
     }
@@ -60,15 +60,11 @@ final class DenyAccessListener
     /**
      * @throws AccessDeniedException
      */
-    private function checkSecurity(Request $request, string $attribute, bool $backwardCompatibility, array $extraVariables = []): void
+    private function checkSecurity(Request $request, string $attribute, array $extraVariables = []): void
     {
         if (!$this->resourceAccessChecker || !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             return;
         }
-
-        $resourceMetadata = null;
-        $isGranted = null;
-        $message = $attributes[$attribute.'_message'] ?? 'Access Denied.';
 
         $operation = $this->initializeOperation($request);
         if (!$operation) {
