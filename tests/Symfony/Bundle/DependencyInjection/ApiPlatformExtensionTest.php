@@ -836,7 +836,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.listener.http_cache.purge',
 
             // http_cache_tags.xml
-            'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.purger.varnish.xkey',
             'api_platform.http_cache.purger.varnish.ban',
             'api_platform.http_cache.listener.response.add_tags',
