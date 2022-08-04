@@ -28,7 +28,6 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
 		# Imported code (temporary)
 		- src/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
-		- tests/Symfony/Bundle/Test/WebTestCaseTest.php
 		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
 		# Templates for Maker
 		- src/Symfony/Maker/Resources/skeleton
