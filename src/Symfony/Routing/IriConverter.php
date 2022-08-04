@@ -86,12 +86,10 @@ final class IriConverter implements IriConverterInterface
         }
         $attributes = AttributesExtractor::extractAttributes($parameters);
 
-        if ($operation instanceof HttpOperation) {
-            try {
-                $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
-            } catch (InvalidIdentifierException $e) {
-                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-            }
+        try {
+            $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
+        } catch (InvalidIdentifierException $e) {
+            throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
         if ($item = $this->provider->provide($operation, $uriVariables, $context)) {
@@ -134,7 +132,7 @@ final class IriConverter implements IriConverterInterface
             $forceCollection = $operation instanceof CollectionOperationInterface;
             try {
                 $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
-            } catch (OperationNotFoundException $e) {
+            } catch (OperationNotFoundException) {
             }
         }
 

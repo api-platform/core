@@ -39,7 +39,7 @@ class UploadMultipleMediaObjectResolver implements MutationResolverInterface
 
         // Some process to save the files.
 
-        foreach ($context['args']['input']['files'] as $key => $uploadedFile) {
+        foreach ($uploadedFiles as $key => $uploadedFile) {
             $mediaObject = new MediaObject();
             $mediaObject->id = $key;
             $mediaObject->contentUrl = $uploadedFile->getFilename();

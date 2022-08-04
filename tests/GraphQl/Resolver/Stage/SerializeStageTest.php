@@ -57,7 +57,6 @@ class SerializeStageTest extends TestCase
      */
     public function testApplyDisabled(array $context, bool $paginationEnabled, ?array $expectedResult): void
     {
-        $operationName = 'item_query';
         $resourceClass = 'myResource';
         /** @var Operation $operation */
         $operation = (new Query())->withSerialize(false);

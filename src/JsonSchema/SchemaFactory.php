@@ -295,7 +295,6 @@ final class SchemaFactory implements SchemaFactoryInterface
             }
         }
 
-        $attribute = Schema::TYPE_OUTPUT === $type ? 'output' : 'input';
         $inputOrOutput = ['class' => $className];
 
         if ($operation) {

@@ -15,7 +15,6 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
 use ApiPlatform\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,7 +51,6 @@ final class ValidateListener
             $controllerResult instanceof Response
             || $request->isMethodSafe()
             || $request->isMethod('DELETE')
-            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
         ) {
             return;
         }

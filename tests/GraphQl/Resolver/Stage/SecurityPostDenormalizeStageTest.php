@@ -49,7 +49,6 @@ class SecurityPostDenormalizeStageTest extends TestCase
 
     public function testNoSecurity(): void
     {
-        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $operation = new Query();
 
