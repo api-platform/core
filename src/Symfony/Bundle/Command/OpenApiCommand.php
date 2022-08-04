@@ -15,7 +15,6 @@ namespace ApiPlatform\Symfony\Bundle\Command;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,19 +51,6 @@ final class OpenApiCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // Backwards compatibility
-        if (2 === $specVersion = (int) $input->getOption('spec-version')) {
-            $command = $this->getApplication()->find('api:swagger:export');
-
-            return $command->run(new ArrayInput([
-                'command' => 'api:swagger:export',
-                '--spec-version' => $specVersion,
-                '--yaml' => $input->getOption('yaml'),
-                '--output' => $input->getOption('output'),
-                '--api-gateway' => $input->getOption('api-gateway'),
-            ]), $output);
-        }
-
         $filesystem = new Filesystem();
         $io = new SymfonyStyle($input, $output);
         $data = $this->normalizer->normalize($this->openApiFactory->__invoke(), 'json');

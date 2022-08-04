@@ -248,7 +248,7 @@ final class Configuration implements ConfigurationInterface
 
     private function addSwaggerSection(ArrayNodeDefinition $rootNode): void
     {
-        $defaultVersions = [2, 3];
+        $supportedVersions = [3];
 
         $rootNode
             ->children()
@@ -256,8 +256,8 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('versions')
-                            ->info('The active versions of Open API to be exported or used in the swagger_ui. The first value is the default.')
-                            ->defaultValue($defaultVersions)
+                            ->info('The active versions of OpenAPI to be exported or used in Swagger UI. The first value is the default.')
+                            ->defaultValue($supportedVersions)
                             ->beforeNormalization()
                                 ->always(static function ($v): array {
                                     if (!\is_array($v)) {
@@ -272,8 +272,8 @@ final class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->validate()
-                                ->ifTrue(static fn($v): bool => $v !== array_intersect($v, $defaultVersions))
-                                ->thenInvalid(sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $defaultVersions), '%s'))
+                                ->ifTrue(static fn($v): bool => $v !== array_intersect($v, $supportedVersions))
+                                ->thenInvalid(sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $supportedVersions), '%s'))
                             ->end()
                             ->prototype('scalar')->end()
                         ->end()
