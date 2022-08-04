@@ -22,7 +22,7 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  *
- * @template T
+ * @template T of object
  */
 interface ProviderInterface
 {
