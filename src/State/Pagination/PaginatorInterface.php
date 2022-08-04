@@ -18,6 +18,10 @@ namespace ApiPlatform\State\Pagination;
  * current page, as an integer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @template T
+ *
+ * @extends PartialPaginatorInterface<T>
  */
 interface PaginatorInterface extends PartialPaginatorInterface
 {
