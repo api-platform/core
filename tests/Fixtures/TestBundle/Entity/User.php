@@ -23,9 +23,10 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
-use ApiPlatform\Tests\Fixtures\TestBundle\Security\AbstractSecurityUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\RecoverPasswordProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -52,7 +53,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 ], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]
 #[ORM\Entity]
 #[ORM\Table(name: 'user_test')]
-class User extends AbstractSecurityUser
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]

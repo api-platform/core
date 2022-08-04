@@ -23,8 +23,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
-use ApiPlatform\Tests\Fixtures\TestBundle\Security\AbstractSecurityUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -35,7 +36,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 #[ApiResource(operations: [new Get(), new Put(), new Delete(), new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}'), new Post(), new GetCollection(), new Post(uriTemplate: '/users/password_reset_request', messenger: 'input', input: PasswordResetRequest::class, output: PasswordResetRequestResult::class, normalizationContext: ['groups' => ['user_password_reset_request']], denormalizationContext: ['groups' => ['user_password_reset_request']])], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]
 #[ODM\Document(collection: 'user_test')]
-class User extends AbstractSecurityUser
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     protected ?int $id = null;
