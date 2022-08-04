@@ -167,7 +167,10 @@ class ConfigurationTest extends TestCase
                 ],
             ],
             'mapping' => [
-                'paths' => [],
+                'paths' => [
+                    '%kernel.project_dir%/src/ApiResource',
+                    '%kernel.project_dir%/src/Entity',
+                ],
             ],
             'http_cache' => [
                 'invalidation' => [

@@ -129,6 +129,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('paths')
+                            ->defaultValue(['%kernel.project_dir%/src/ApiResource', '%kernel.project_dir%/src/Entity'])
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
