@@ -577,8 +577,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('symfony/validator.xml');
 
             $container->registerForAutoconfiguration(ValidationGroupsGeneratorInterface::class)
-                ->addTag('api_platform.validation_groups_generator')
-                ->setPublic(true); // this line should be removed in 3.0
+                ->addTag('api_platform.validation_groups_generator');
             $container->registerForAutoconfiguration(PropertySchemaRestrictionMetadataInterface::class)
                 ->addTag('api_platform.metadata.property_schema_restriction');
         }

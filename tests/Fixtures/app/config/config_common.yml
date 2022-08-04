@@ -240,7 +240,8 @@ services:
 
     app.dummy_validation.group_generator:
         class: ApiPlatform\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
-        public: true
+        tags:
+            - name: 'api_platform.validation_groups_generator'
 
     mercure.hub.default.message_handler:
         class: ApiPlatform\Tests\Fixtures\DummyMercureUpdateHandler
