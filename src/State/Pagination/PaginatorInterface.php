@@ -19,7 +19,7 @@ namespace ApiPlatform\State\Pagination;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @template T
+ * @template T of object
  *
  * @extends PartialPaginatorInterface<T>
  */
