@@ -41,9 +41,7 @@ class ValidatorTest extends TestCase
         $symfonyValidatorProphecy->validate($data, null, null)->willReturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
 
-        $containerProphecy = $this->prophesize(ContainerInterface::class);
-
-        $validator = new Validator($symfonyValidator, $containerProphecy->reveal());
+        $validator = new Validator($symfonyValidator);
         $validator->validate(new DummyEntity());
     }
 
@@ -62,9 +60,7 @@ class ValidatorTest extends TestCase
         $symfonyValidatorProphecy->validate($data, null, null)->willReturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
 
-        $containerProphecy = $this->prophesize(ContainerInterface::class);
-
-        $validator = new Validator($symfonyValidator, $containerProphecy->reveal());
+        $validator = new Validator($symfonyValidator);
         $validator->validate(new DummyEntity());
     }
 
@@ -80,9 +76,7 @@ class ValidatorTest extends TestCase
         $symfonyValidatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
 
-        $containerProphecy = $this->prophesize(ContainerInterface::class);
-
-        $validator = new Validator($symfonyValidator, $containerProphecy->reveal());
+        $validator = new Validator($symfonyValidator);
         $validator->validate(new DummyEntity(), ['groups' => fn ($data): array => $data instanceof DummyEntity ? $expectedValidationGroups : []]);
     }
 

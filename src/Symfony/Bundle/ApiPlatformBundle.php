@@ -23,7 +23,6 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolver
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ValidationGroupsGeneratorPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -53,6 +52,5 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new MetadataAwareNameConverterPass());
         $container->addCompilerPass(new TestClientPass());
         $container->addCompilerPass(new AuthenticatorManagerPass());
-        $container->addCompilerPass(new ValidationGroupsGeneratorPass());
     }
 }
