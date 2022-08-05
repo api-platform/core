@@ -39,12 +39,12 @@ final class LinkFactoryTest extends TestCase
     /**
      * @dataProvider provideCreateLinksFromIdentifiersCases
      */
-    public function testCreateLinksFromIdentifiers(array $propertyNames, bool $compositeIdentifier, array $expectedLinks): void
+    public function testCreateLinksFromIdentifiers(array $propertyNames, bool $compositeIdentifier, array $expectedLinks, ?bool $idAsIdentifier = null): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Argument::cetera())->willReturn(new PropertyNameCollection($propertyNames));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'id')->willReturn(new ApiProperty());
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'id')->willReturn(null === $idAsIdentifier ? new ApiProperty() : new ApiProperty(identifier: $idAsIdentifier));
         $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'name')->willReturn((new ApiProperty())->withIdentifier(true));
         $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'slug')->willReturn(new ApiProperty());
         $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'composite1')->willReturn((new ApiProperty())->withIdentifier(true));
@@ -65,10 +65,22 @@ final class LinkFactoryTest extends TestCase
             'compositeIdentifier' => false,
             [],
         ];
-        yield 'no identifiers' => [
+        yield 'id detected as identifier' => [
             ['id'],
             'compositeIdentifier' => false,
             [(new Link())->withFromClass(AttributeResource::class)->withParameterName('id')->withIdentifiers(['id'])],
+        ];
+        yield 'id forced as identifier' => [
+            ['id'],
+            'compositeIdentifier' => false,
+            [(new Link())->withFromClass(AttributeResource::class)->withParameterName('id')->withIdentifiers(['id'])],
+            true,
+        ];
+        yield 'id forced as no identifier' => [
+            ['id'],
+            'compositeIdentifier' => false,
+            [],
+            false,
         ];
         yield 'name identifier' => [
             ['id', 'name'],
