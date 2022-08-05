@@ -188,8 +188,6 @@ class PurgeHttpCacheListenerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(Argument::type(ContainNonResource::class))->willReturn(ContainNonResource::class)->shouldBeCalled();
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false)->shouldBeCalled();
 
-        $emProphecy = $this->prophesize(EntityManagerInterface::class);
-
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([$containNonResource])->shouldBeCalled();
         $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();

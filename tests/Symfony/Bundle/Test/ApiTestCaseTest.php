@@ -122,7 +122,7 @@ JSON
 }
 JSON;
 
-        $res = self::createClient()->request('GET', '/');
+        self::createClient()->request('GET', '/');
         $this->assertMatchesJsonSchema($jsonSchema);
         $this->assertMatchesJsonSchema(json_decode($jsonSchema, true));
     }

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Routing;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -280,8 +279,6 @@ class IriConverterTest extends TestCase
         if (!$resourceMetadataCollectionFactoryProphecy) {
             $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         }
-
-        $iriConverter = $this->prophesize(IriConverterInterface::class);
 
         return new IriConverter($stateProviderProphecy->reveal(), $routerProphecy->reveal(), $identifiersExtractorProphecy->reveal(), $this->getResourceClassResolver(), $resourceMetadataCollectionFactoryProphecy->reveal(), $uriVariablesConverter);
     }

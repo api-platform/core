@@ -51,7 +51,6 @@ class WriteStageTest extends TestCase
     public function testNoData(): void
     {
         $resourceClass = 'myResource';
-        $operationName = 'item_query';
         /** @var Operation $operation */
         $operation = (new Query())->withName('item_query');
 
@@ -62,7 +61,6 @@ class WriteStageTest extends TestCase
 
     public function testApplyDisabled(): void
     {
-        $operationName = 'item_query';
         $resourceClass = 'myResource';
         /** @var Operation $operation */
         $operation = (new Query())->withName('item_query')->withWrite(false);

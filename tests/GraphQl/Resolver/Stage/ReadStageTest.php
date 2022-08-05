@@ -18,7 +18,6 @@ use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -202,8 +201,6 @@ class ReadStageTest extends TestCase
             'source' => $source,
         ];
 
-        $collectionOperation = (new GetCollection())->withFilters($expectedFilters);
-
         /** @var Operation $operation */
         $operation = (new QueryCollection())->withName($operationName);
         $normalizationContext = ['normalization' => true, 'operation' => $operation];
@@ -237,7 +234,7 @@ class ReadStageTest extends TestCase
             'info' => $info,
             'source' => null,
         ];
-        $collectionOperation = (new GetCollection());
+
         /** @var Operation $operation */
         $operation = (new QueryCollection())->withName($operationName);
 

@@ -124,8 +124,7 @@ class ItemMutationResolverFactoryTest extends TestCase
     {
         $resourceClass = null;
         $rootClass = 'rootClass';
-        $operationName = 'create';
-        $operation = (new Mutation())->withName($operationName);
+        $operation = (new Mutation())->withName('create');
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -133,11 +132,10 @@ class ItemMutationResolverFactoryTest extends TestCase
         $this->assertNull(($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
-    public function testResolveNullOperationName(): void
+    public function testResolveNullOperation(): void
     {
         $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
-        $operationName = null;
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();

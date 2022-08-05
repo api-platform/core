@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\FormatMatcher;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -56,7 +55,6 @@ final class AddFormatListener
             return;
         }
 
-        $attributes = RequestAttributesExtractor::extractAttributes($request);
         $formats = $operation?->getOutputFormats() ?? $this->formats;
 
         $this->addRequestFormats($request, $formats);
