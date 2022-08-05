@@ -3,6 +3,10 @@ properties:
         foo:
             identifier: true
 
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\Chair:
+        id:
+            identifier: false
+
 resources:
     ApiPlatform\Tests\Fixtures\TestBundle\Model\DummyAddress:
         operations:
@@ -19,5 +23,42 @@ resources:
         operations:
             ApiPlatform\Metadata\GetCollection: ~
             ApiPlatform\Metadata\Get: ~
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\Chair:
+        graphQlOperations: [ ]
+        operations:
+            ApiPlatform\Metadata\GetCollection:
+                provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\Fork:
+        -   graphQlOperations: [ ]
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
+        -   uriTemplate: /fourchettes
+            graphQlOperations: [ ]
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\Spoon:
+        -   graphQlOperations: null
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
+        -   graphQlOperations: ~
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    uriTemplate: /cuillers
+                    provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
+                ApiPlatform\Metadata\Get:
+                    uriTemplate: /cuillers/{id}
+                    provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\Table:
+        graphQlOperations: [ ]
+        operations:
+            ApiPlatform\Metadata\GetCollection:
+                provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
 
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\FlexConfig: ~

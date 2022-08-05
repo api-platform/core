@@ -165,9 +165,14 @@ final class IriConverter implements IriConverterInterface
             }
         }
 
-        // TODO: call the Skolem IRI generator
         if (!$operation->getName()) {
-            return null;
+            // Generate Skolem uri for unnamed operation
+            $operation = $operation->withName('api_genid');
+        }
+
+        if ('api_genid' === $operation->getName()) {
+            // If $item is not an object (can be a class name), generate a random id
+            $identifiers = ['id' => \is_object($item) ? spl_object_hash($item) : bin2hex(random_bytes(10))];
         }
 
         try {

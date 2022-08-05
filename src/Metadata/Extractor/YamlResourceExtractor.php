@@ -283,12 +283,16 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
 
     private function buildGraphQlOperations(array $resource, array $root): ?array
     {
-        if (!\array_key_exists('graphQlOperations', $resource)) {
+        if (!\array_key_exists('graphQlOperations', $resource) || !\is_array($resource['graphQlOperations'])) {
             return null;
         }
 
         $data = [];
         foreach (['mutations' => Mutation::class, 'queries' => Query::class, 'subscriptions' => Subscription::class] as $type => $class) {
+            if (!\array_key_exists($type, $resource['graphQlOperations'])) {
+                continue;
+            }
+
             foreach ($resource['graphQlOperations'][$type] as $operation) {
                 $datum = $this->buildBase($operation);
                 foreach ($datum as $key => $value) {
@@ -322,6 +326,6 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             }
         }
 
-        return $data;
+        return $data ?: null;
     }
 }

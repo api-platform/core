@@ -141,6 +141,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
+            // Skolem IRI
+            if ('api_genid' === $operation->getRouteName()) {
+                continue;
+            }
+
             $uriVariables = $operation->getUriVariables();
             $resourceClass = $operation->getClass() ?? $resource->getClass();
             $routeName = $operation->getRouteName() ?? $operation->getName();
@@ -389,6 +394,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $operation instanceof CollectionOperationInterface ||
                     HttpOperation::METHOD_GET !== ($method ?? null)
                 ) {
+                    continue;
+                }
+
+                // Skolem IRI
+                if ('api_genid' === $operation->getRouteName()) {
                     continue;
                 }
 

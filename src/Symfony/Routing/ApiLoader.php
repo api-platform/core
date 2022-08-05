@@ -183,6 +183,8 @@ final class ApiLoader extends Loader
      */
     private function loadExternalFiles(RouteCollection $routeCollection): void
     {
+        $routeCollection->addCollection($this->fileLoader->load('genid.xml'));
+
         if ($this->entrypointEnabled) {
             $routeCollection->addCollection($this->fileLoader->load('api.xml'));
         }

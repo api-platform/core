@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Util\SkolemTrait;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -31,6 +32,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     use ClassInfoTrait;
+    use SkolemTrait;
 
     public const FORMAT = 'jsonapi';
 
@@ -102,7 +104,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
             ];
         } else {
             $resourceData = [
-                'id' => '/.well-known/genid/'.bin2hex(random_bytes(10)),
+                'id' => $this->generateSkolemIri($object),
                 'type' => (new \ReflectionClass($this->getObjectClass($object)))->getShortName(),
             ];
         }

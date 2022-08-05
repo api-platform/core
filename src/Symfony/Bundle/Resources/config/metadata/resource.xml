@@ -23,6 +23,11 @@
             <argument>%api_platform.defaults%</argument>
         </service>
 
+        <service id="api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation" class="ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="700" public="false">
+            <argument type="service" id="api_platform.metadata.resource.link_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation.inner" />
+        </service>
+
         <service id="api_platform.metadata.resource.metadata_collection_factory.uri_template" class="ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="500" public="false">
             <argument type="service" id="api_platform.metadata.resource.link_factory" />
             <argument type="service" id="api_platform.path_segment_name_generator" />

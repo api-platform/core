@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Util\SkolemTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -36,6 +37,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class ContextBuilder implements AnonymousContextBuilderInterface
 {
     use ClassInfoTrait;
+    use SkolemTrait;
 
     public const FORMAT = 'jsonld';
 
@@ -188,7 +190,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         ];
 
         if (!isset($context['iri']) || false !== $context['iri']) {
-            $jsonLdContext['@id'] = $context['iri'] ?? '/.well-known/genid/'.bin2hex(random_bytes(10));
+            $jsonLdContext['@id'] = $context['iri'] ?? $this->generateSkolemIri($object);
         }
 
         if ($context['has_context'] ?? false) {

@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -155,6 +156,21 @@ class IriConverterTest extends TestCase
 
         $iriConverter = $this->getIriConverter(null, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy);
         $this->assertEquals('/dummies', $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation));
+    }
+
+    public function testGetGenidIriFromUnnamedOperation()
+    {
+        $operation = new NotExposed();
+        $route = '/.well-known/genid/42';
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('api_genid', Argument::type('array'), UrlGeneratorInterface::ABS_PATH)->shouldBeCalled()->willReturn($route);
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, []));
+
+        $iriConverter = $this->getIriConverter(null, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy);
+        $this->assertEquals($route, $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation));
     }
 
     public function testGetIriFromResourceClassWithIdentifiers()
