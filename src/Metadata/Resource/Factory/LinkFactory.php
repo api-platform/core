@@ -139,7 +139,7 @@ final class LinkFactory implements LinkFactoryInterface
                 $hasIdProperty = 'id' === $property;
             }
 
-            if (true === $isIdentifier) {
+            if ($isIdentifier) {
                 $identifiers[] = $property;
             }
         }
