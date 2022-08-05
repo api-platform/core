@@ -47,10 +47,8 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function serialize($value)
+    public function serialize($value): iterable
     {
         if (!is_iterable($value)) {
             throw new Error(sprintf('`Iterable` cannot represent non iterable value: %s', Utils::printSafe($value)));
@@ -61,10 +59,8 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function parseValue($value)
+    public function parseValue($value): iterable
     {
         if (!is_iterable($value)) {
             throw new Error(sprintf('`Iterable` cannot represent non iterable value: %s', Utils::printSafeJson($value)));
@@ -77,10 +73,8 @@ final class IterableType extends ScalarType implements TypeInterface
      * {@inheritdoc}
      *
      * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
-     *
-     * @return mixed
      */
-    public function parseLiteral($valueNode, ?array $variables = null)
+    public function parseLiteral($valueNode, ?array $variables = null): float|array|bool|int|string|null
     {
         if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
             return $this->parseIterableLiteral($valueNode);
@@ -90,7 +84,7 @@ final class IterableType extends ScalarType implements TypeInterface
         throw new \Exception();
     }
 
-    private function parseIterableLiteral(StringValueNode|BooleanValueNode|IntValueNode|FloatValueNode|ObjectValueNode|ListValueNode|ValueNode $valueNode)
+    private function parseIterableLiteral(StringValueNode|BooleanValueNode|IntValueNode|FloatValueNode|ObjectValueNode|ListValueNode|ValueNode $valueNode): float|array|bool|int|string|null
     {
         switch ($valueNode) {
             case $valueNode instanceof StringValueNode:

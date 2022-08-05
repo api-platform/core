@@ -101,7 +101,7 @@ class VarnishXKeyPurgerTest extends TestCase
     /**
      * @dataProvider provideChunkHeaderCases
      */
-    public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $keysToSend)
+    public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $keysToSend): void
     {
         /** @var HttpClientInterface */
         $client = new class() implements ClientInterface {
@@ -129,7 +129,7 @@ class VarnishXKeyPurgerTest extends TestCase
                 throw new LogicException('Not implemented');
             }
 
-            public function getConfig($option = null)
+            public function getConfig($option = null): void
             {
                 throw new LogicException('Not implemented');
             }

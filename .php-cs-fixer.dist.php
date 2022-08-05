@@ -75,10 +75,9 @@ return (new PhpCsFixer\Config())
             ],
         ],
         'no_superfluous_elseif' => true,
-        // To re-enable in API Platform 3: https://github.com/symfony/symfony/issues/43021
-        //'no_superfluous_phpdoc_tags' => [
-        //    'allow_mixed' => false,
-        //],
+        'no_superfluous_phpdoc_tags' => [
+            'allow_mixed' => false,
+        ],
         'no_unset_cast' => true,
         'no_unset_on_property' => true,
         'no_useless_else' => true,
@@ -114,6 +113,5 @@ return (new PhpCsFixer\Config())
                 'property',
             ],
         ],
-        'void_return' => false, // BC breaks; to be done in API Platform 3.0
     ])
     ->setFinder($finder);

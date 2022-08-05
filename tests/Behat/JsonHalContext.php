@@ -58,7 +58,7 @@ final class JsonHalContext implements Context
     /**
      * @Then the JSON should be valid according to the JSON HAL schema
      */
-    public function theJsonShouldBeValidAccordingToTheJsonHALSchema()
+    public function theJsonShouldBeValidAccordingToTheJsonHALSchema(): void
     {
         $json = $this->getJson()->getContent();
         $this->validator->validate($json, (object) ['$ref' => "file://{$this->schemaFile}"]);

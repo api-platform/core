@@ -29,9 +29,6 @@ use function sys_get_temp_dir;
  */
 class DoctrineMongoDbOdmTestCase extends TestCase
 {
-    /**
-     * @param mixed $paths
-     */
     public static function createTestDocumentManager($paths = []): DocumentManager
     {
         $config = new Configuration();

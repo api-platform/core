@@ -108,8 +108,6 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
 
     /**
      * Adds the match stage according to the chosen null management.
-     *
-     * @param mixed $value
      */
     private function addMatch(Builder $aggregationBuilder, string $field, string $operator, $value, string $nullManagement = null): void
     {

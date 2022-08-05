@@ -23,10 +23,8 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, $format = null, array $context = []): mixed
     {
         $resource = new $class();
         $resource->bar = $data['bar'];

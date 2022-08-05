@@ -95,8 +95,6 @@ class ClientTest extends ApiTestCase
 
     /**
      * @dataProvider authBasicProvider
-     *
-     * @param mixed $basic
      */
     public function testAuthBasic($basic): void
     {

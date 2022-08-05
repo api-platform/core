@@ -41,10 +41,8 @@ final class UploadType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function serialize($value)
+    public function serialize($value): void
     {
         throw new Error('`Upload` cannot be serialized.');
     }
@@ -65,10 +63,8 @@ final class UploadType extends ScalarType implements TypeInterface
      * {@inheritdoc}
      *
      * @param Node $valueNode
-     *
-     * @return mixed
      */
-    public function parseLiteral($valueNode, array $variables = null)
+    public function parseLiteral($valueNode, array $variables = null): void
     {
         throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification.', $valueNode);
     }

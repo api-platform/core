@@ -100,7 +100,7 @@ final class GraphqlContext implements Context
     /**
      * @Given I have the following file(s) for a GraphQL request:
      */
-    public function iHaveTheFollowingFilesForAGraphqlRequest(TableNode $table)
+    public function iHaveTheFollowingFilesForAGraphqlRequest(TableNode $table): void
     {
         $files = [];
 
@@ -148,7 +148,7 @@ final class GraphqlContext implements Context
     /**
      * @Then the GraphQL field :fieldName is deprecated for the reason :reason
      */
-    public function theGraphQLFieldIsDeprecatedForTheReason(string $fieldName, string $reason)
+    public function theGraphQLFieldIsDeprecatedForTheReason(string $fieldName, string $reason): void
     {
         foreach (json_decode($this->request->getContent(), true, 512, \JSON_THROW_ON_ERROR)['data']['__type']['fields'] as $field) { // @phpstan-ignore-line
             if ($fieldName === $field['name'] && $field['isDeprecated'] && $reason === $field['deprecationReason']) {

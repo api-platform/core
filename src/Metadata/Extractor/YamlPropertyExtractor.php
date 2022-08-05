@@ -27,7 +27,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
     /**
      * {@inheritdoc}
      */
-    protected function extractPath(string $path)
+    protected function extractPath(string $path): void
     {
         try {
             $propertiesYaml = Yaml::parse((string) file_get_contents($path), Yaml::PARSE_CONSTANT);

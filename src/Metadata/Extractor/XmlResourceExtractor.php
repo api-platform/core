@@ -33,7 +33,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
     /**
      * {@inheritdoc}
      */
-    protected function extractPath(string $path)
+    protected function extractPath(string $path): void
     {
         try {
             /** @var \SimpleXMLElement $xml */

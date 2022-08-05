@@ -230,7 +230,7 @@ final class DoctrineContext implements Context
     /**
      * @Then the DQL should be equal to:
      */
-    public function theDqlShouldBeEqualTo(PyStringNode $dql)
+    public function theDqlShouldBeEqualTo(PyStringNode $dql): void
     {
         /** @var EntityManager $manager */
         $manager = $this->doctrine->getManager();
@@ -327,8 +327,6 @@ final class DoctrineContext implements Context
 
     /**
      * @Given there are :nb fooDummy objects with fake names
-     *
-     * @param mixed $nb
      */
     public function thereAreFooDummyObjectsWithFakeNames($nb): void
     {
@@ -785,7 +783,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy objects with dummyDate and dummyBoolean :bool
      */
-    public function thereAreDummyObjectsWithDummyDateAndDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithDummyDateAndDummyBoolean(int $nb, string $bool): void
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -957,7 +955,7 @@ final class DoctrineContext implements Context
      * @Given there are :nb dummy objects with dummyBoolean :bool
      * @Given there is :nb dummy object with dummyBoolean :bool
      */
-    public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool): void
     {
         if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -985,7 +983,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb embedded dummy objects with embeddedDummy.dummyBoolean :bool
      */
-    public function thereAreDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool): void
     {
         if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -1012,7 +1010,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean :bool
      */
-    public function thereAreDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool): void
     {
         if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -1399,7 +1397,7 @@ final class DoctrineContext implements Context
     /**
      * @Then the password :password for user :user should be hashed
      */
-    public function thePasswordForUserShouldBeHashed(string $password, string $user)
+    public function thePasswordForUserShouldBeHashed(string $password, string $user): void
     {
         $user = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find($user);
         if (!$this->passwordHasher->isPasswordValid($user, $password)) {
@@ -1703,8 +1701,6 @@ final class DoctrineContext implements Context
 
     /**
      * @Given there are :nb DummyDtoCustom
-     *
-     * @param mixed $nb
      */
     public function thereAreNbDummyDtoCustom($nb): void
     {

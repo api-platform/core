@@ -60,10 +60,8 @@ final class DateTimeType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function parseValue($value)
+    public function parseValue($value): string
     {
         if (!\is_string($value)) {
             throw new Error(sprintf('DateTime cannot represent non string value: %s', Utils::printSafeJson($value)));
@@ -79,10 +77,8 @@ final class DateTimeType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function parseLiteral(Node $valueNode, ?array $variables = null)
+    public function parseLiteral(Node $valueNode, ?array $variables = null): string
     {
         if ($valueNode instanceof StringValueNode && false !== \DateTime::createFromFormat(\DateTime::ATOM, $valueNode->value)) {
             return $valueNode->value;
