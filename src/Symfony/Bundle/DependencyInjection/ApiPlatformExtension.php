@@ -275,16 +275,22 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $bundlesResourcesPaths = [];
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
-            $paths = [];
             $dirname = $bundle['path'];
+            $paths = [
+                "$dirname/ApiResource",
+                "$dirname/src/ApiResource",
+            ];
             foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
                 $paths[] = "$dirname/Resources/config/api_resources$extension";
+                $paths[] = "$dirname/config/api_resources$extension";
             }
             if ($this->isConfigEnabled($container, $config['doctrine'])) {
                 $paths[] = "$dirname/Entity";
+                $paths[] = "$dirname/src/Entity";
             }
             if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
                 $paths[] = "$dirname/Document";
+                $paths[] = "$dirname/src/Document";
             }
 
             foreach ($paths as $path) {
