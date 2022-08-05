@@ -41,7 +41,7 @@ class DummyPlainIdentifierDenormalizer implements DenormalizerInterface, Denorma
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, $format = null, array $context = []): mixed
     {
         $relatedDummyClass = DummyEntity::class === $class ? RelatedDummyEntity::class : RelatedDummyDocument::class;
         if (!empty($data['relatedDummy'])) {

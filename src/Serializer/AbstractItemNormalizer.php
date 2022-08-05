@@ -549,7 +549,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * @throws UnexpectedValueException
      * @throws LogicException
      */
-    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = []): mixed
     {
         $context['api_attribute'] = $attribute;
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));

@@ -41,7 +41,7 @@ class RelatedDummyPlainIdentifierDenormalizer implements DenormalizerAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, $format = null, array $context = []): mixed
     {
         $iriConverterContext = ['uri_variables' => ['id' => $data['thirdLevel']]] + $context;
 
