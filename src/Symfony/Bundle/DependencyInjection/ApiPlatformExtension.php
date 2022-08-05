@@ -307,15 +307,32 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $paths = array_unique(array_merge($this->getBundlesResourcesPaths($container, $config), $config['mapping']['paths']));
 
-        // Flex structure (only if nothing specified)
-        $projectDir = $container->getParameter('kernel.project_dir');
-        if (!$paths && is_dir($dir = "$projectDir/config/api_platform")) {
-            $paths = [$dir];
+        // Default paths
+        if (!$paths) {
+            $projectDir = $container->getParameter('kernel.project_dir');
+            if ($this->isConfigEnabled($container, $config['doctrine']) && is_dir($dir = "$projectDir/src/Entity")) {
+                $paths[] = $dir;
+            }
+            if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm']) && is_dir($dir = "$projectDir/src/Document")) {
+                $paths[] = $dir;
+            }
+
+            // Flex structure
+            if (is_dir($dir = "$projectDir/config/api_platform")) {
+                $paths[] = $dir;
+            }
         }
 
         $resources = ['yml' => [], 'xml' => [], 'dir' => []];
 
         foreach ($paths as $path) {
+            // Replace parameters in path
+            if (preg_match_all('/%([^%]+)%/', $path, $matches)) {
+                foreach ($matches[1] as $match) {
+                    $path = str_ireplace("%$match%", $container->getParameter($match), $path);
+                }
+            }
+
             if (is_dir($path)) {
                 foreach (Finder::create()->followLinks()->files()->in($path)->name('/\.(xml|ya?ml)$/')->sortByName() as $file) {
                     $resources['yaml' === ($extension = $file->getExtension()) ? 'yml' : $extension][] = $file->getRealPath();
