@@ -307,10 +307,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $paths = array_unique(array_merge($this->getBundlesResourcesPaths($container, $config), $config['mapping']['paths']));
 
-        // Flex structure (only if nothing specified)
-        $projectDir = $container->getParameter('kernel.project_dir');
-        if (!$paths && is_dir($dir = "$projectDir/config/api_platform")) {
-            $paths = [$dir];
+        // Default paths
+        if (!$paths) {
+            $projectDir = $container->getParameter('kernel.project_dir');
+            foreach (["$projectDir/config/api_platform", "$projectDir/src/ApiResource", "$projectDir/src/Document", "$projectDir/src/Entity"] as $dir) {
+                if (is_dir($dir)) {
+                    $paths[] = $dir;
+                }
+            }
         }
 
         $resources = ['yml' => [], 'xml' => [], 'dir' => []];
