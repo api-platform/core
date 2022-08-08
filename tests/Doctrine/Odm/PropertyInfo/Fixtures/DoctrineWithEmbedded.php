@@ -19,29 +19,20 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\EmbedOne;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
 
 /**
- * @Document
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
+#[Document]
 class DoctrineWithEmbedded
 {
-    /**
-     * @Id
-     */
+    #[Id]
     public $id;
 
-    /**
-     * @EmbedOne(targetDocument=DoctrineEmbeddable::class)
-     */
+    #[EmbedOne(targetDocument: DoctrineEmbeddable::class)]
     protected $embedOne;
 
-    /**
-     * @EmbedMany(targetDocument=DoctrineEmbeddable::class)
-     */
+    #[EmbedMany(targetDocument: DoctrineEmbeddable::class)]
     protected $embedMany;
 
-    /**
-     * @EmbedMany
-     */
+    #[EmbedMany]
     protected $embedManyOmittingTargetDocument;
 }

@@ -15,9 +15,9 @@ namespace ApiPlatform\Tests\GraphQl\Type;
 
 use ApiPlatform\GraphQl\Type\TypeNotFoundException;
 use ApiPlatform\GraphQl\Type\TypesContainer;
-use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>

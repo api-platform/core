@@ -26,5 +26,5 @@ interface AnonymousContextBuilderInterface extends ContextBuilderInterface
      * Creates a JSON-LD context based on the given object.
      * Usually this is used with an Input or Output DTO object.
      */
-    public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array;
+    public function getAnonymousResourceContext(object $object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array;
 }

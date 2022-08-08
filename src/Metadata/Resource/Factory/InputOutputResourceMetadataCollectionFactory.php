@@ -85,7 +85,7 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
         return $operations;
     }
 
-    private function transformInputOutput($attribute): ?array
+    private function transformInputOutput(mixed $attribute): ?array
     {
         if (false === $attribute) {
             return ['class' => null];

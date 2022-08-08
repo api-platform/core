@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Symfony\EventListener\ExceptionListener;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -44,7 +44,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertInstanceOf(Response::class, $event->getResponse());
     }
 
-    public function getRequest()
+    public function getRequest(): array
     {
         return [
             [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get'])],

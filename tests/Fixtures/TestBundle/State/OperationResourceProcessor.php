@@ -56,7 +56,7 @@ final class OperationResourceProcessor implements ProcessorInterface
         $manager->flush();
     }
 
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if ($operation instanceof DeleteOperationInterface) {
             $this->remove($data);

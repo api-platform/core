@@ -18,7 +18,6 @@ use ApiPlatform\Symfony\Bundle\Test\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
-use PHPUnit\Runner\Version;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
@@ -113,10 +112,6 @@ class ClientTest extends ApiTestCase
 
     public function testComplexScenario(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         self::createClient()->request('GET', '/secured_dummies', ['auth_basic' => ['dunglas', 'kevin']]);
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');

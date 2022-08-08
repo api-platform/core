@@ -21,10 +21,9 @@ use ApiPlatform\Tests\Fixtures\DummyIgnoreProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata as SerializerAttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata as SerializerClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
@@ -115,11 +114,6 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateWithIgnoredProperty(): void
     {
-        // symfony/serializer < 5.1
-        if (!class_exists(Ignore::class)) {
-            self::markTestSkipped();
-        }
-
         $ignoredSerializerAttributeMetadata = new SerializerAttributeMetadata('ignored');
         $ignoredSerializerAttributeMetadata->addGroup('dummy');
         $ignoredSerializerAttributeMetadata->addGroup('dummy');

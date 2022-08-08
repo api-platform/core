@@ -47,7 +47,7 @@ final class OperationTest extends TestCase
         $this->assertInstanceOf(Operation::class, $operation);
     }
 
-    public function operationProvider()
+    public function operationProvider(): \Generator
     {
         $args = [];
 

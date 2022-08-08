@@ -212,7 +212,7 @@ class DoctrineExtractorTest extends TestCase
 
     private function createExtractor(): DoctrineExtractor
     {
-        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR], true);
+        $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR], true);
         $documentManager = DocumentManager::create(null, $config);
 
         if (!MongoDbType::hasType('custom_foo')) {

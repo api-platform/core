@@ -19,10 +19,10 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
-use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 
 /**
@@ -47,7 +47,7 @@ class SerializerContextBuilderTest extends TestCase
         return new SerializerContextBuilder($advancedNameConverter ?? new CustomConverter());
     }
 
-    private function buildOperationFromContext(bool $isMutation, bool $isSubscription, array $expectedContext, bool $isNormalization = true, ?string $resourceClass = null)
+    private function buildOperationFromContext(bool $isMutation, bool $isSubscription, array $expectedContext, bool $isNormalization = true, ?string $resourceClass = null): Operation
     {
         $operation = !$isMutation && !$isSubscription ? new Query() : new Mutation();
         if ($isSubscription) {
@@ -76,6 +76,8 @@ class SerializerContextBuilderTest extends TestCase
                 $operation = $operation->withOutput($expectedContext['output']);
             }
         }
+
+        \assert($operation instanceof Operation);
 
         return $operation;
     }
@@ -109,7 +111,6 @@ class SerializerContextBuilderTest extends TestCase
             $serializerContextBuilder = $this->buildSerializerContextBuilder($advancedNameConverter);
         }
 
-        /** @var Operation $operation */
         $context = $serializerContextBuilder->create($resourceClass, $operation, $resolverContext, true);
 
         unset($context['operation']);
@@ -249,7 +250,6 @@ class SerializerContextBuilderTest extends TestCase
     {
         $operation = $this->buildOperationFromContext(true, false, $expectedContext, false, $resourceClass);
 
-        /** @var Operation $operation */
         $context = $this->serializerContextBuilder->create($resourceClass, $operation, [], false);
 
         unset($context['operation']);

@@ -18,6 +18,7 @@ use GraphQL\Language\AST\BooleanValueNode;
 use GraphQL\Language\AST\FloatValueNode;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\ListValueNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NullValueNode;
 use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\StringValueNode;
@@ -48,7 +49,7 @@ final class IterableType extends ScalarType implements TypeInterface
     /**
      * {@inheritdoc}
      */
-    public function serialize($value): iterable
+    public function serialize(mixed $value): iterable
     {
         if (!is_iterable($value)) {
             throw new Error(sprintf('`Iterable` cannot represent non iterable value: %s', Utils::printSafe($value)));
@@ -60,7 +61,7 @@ final class IterableType extends ScalarType implements TypeInterface
     /**
      * {@inheritdoc}
      */
-    public function parseValue($value): iterable
+    public function parseValue(mixed $value): iterable
     {
         if (!is_iterable($value)) {
             throw new Error(sprintf('`Iterable` cannot represent non iterable value: %s', Utils::printSafeJson($value)));
@@ -74,7 +75,7 @@ final class IterableType extends ScalarType implements TypeInterface
      *
      * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
      */
-    public function parseLiteral($valueNode, ?array $variables = null): float|array|bool|int|string|null
+    public function parseLiteral(Node $valueNode, ?array $variables = null): float|array|bool|int|string|null
     {
         if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
             return $this->parseIterableLiteral($valueNode);

@@ -17,10 +17,10 @@ use ApiPlatform\Doctrine\Odm\Paginator;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @group mongodb
@@ -134,7 +134,7 @@ class PaginatorTest extends TestCase
         ]);
 
         $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
-        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([$fixturesPath], true);
+        $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([$fixturesPath], true);
         $documentManager = DocumentManager::create(null, $config);
 
         return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
@@ -165,7 +165,7 @@ class PaginatorTest extends TestCase
         $iterator = $this->prophesize(Iterator::class);
 
         $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
-        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([$fixturesPath], true);
+        $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([$fixturesPath], true);
         $documentManager = DocumentManager::create(null, $config);
 
         return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
@@ -195,7 +195,7 @@ class PaginatorTest extends TestCase
         ]);
 
         $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
-        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([$fixturesPath], true);
+        $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([$fixturesPath], true);
         $documentManager = DocumentManager::create(null, $config);
 
         return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);

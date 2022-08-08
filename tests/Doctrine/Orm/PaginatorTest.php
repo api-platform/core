@@ -16,9 +16,9 @@ namespace ApiPlatform\Tests\Doctrine\Orm;
 use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Tests\Fixtures\Query;
-use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class PaginatorTest extends TestCase
 {

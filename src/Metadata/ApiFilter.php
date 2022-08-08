@@ -17,7 +17,7 @@ use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 
 /**
- * Filter annotation.
+ * Filter attribute.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
@@ -25,67 +25,15 @@ use ApiPlatform\Exception\InvalidArgumentException;
 final class ApiFilter
 {
     /**
-     * @var string|null
-     */
-    public $id;
-
-    /**
-     * @var string|null
-     */
-    public $strategy;
-
-    /**
-     * @var string|FilterInterface
-     */
-    public $filterClass;
-
-    /**
-     * @var array
-     */
-    public $properties = [];
-
-    /**
-     * @var array raw arguments for the filter
-     */
-    public $arguments = [];
-
-    /**
-     * @param string $filterClass
-     * @param string $id
-     * @param string $strategy
+     * @param class-string<FilterInterface> $filterClass
      */
     public function __construct(
-        $filterClass,
-        ?string $id = null,
-        ?string $strategy = null,
-        array $properties = [],
-        array $arguments = []
+        public string $filterClass,
+        public ?string $id = null,
+        public ?string $strategy = null,
+        public array $properties = [],
+        public array $arguments = [],
     ) {
-        if (\is_array($filterClass)) { /** @phpstan-ignore-line Doctrine annotations */
-            $options = $filterClass;
-            $this->filterClass = $options['value'] ?? null; /* @phpstan-ignore-line Doctrine annotations */
-            unset($options['value']);
-
-            foreach ($options as $key => $value) {
-                if (!property_exists($this, $key)) {
-                    throw new InvalidArgumentException(sprintf('Property "%s" does not exist on the ApiFilter annotation.', $key));
-                }
-
-                $this->{$key} = $value;
-            }
-        } else {
-            // PHP attribute
-            $this->filterClass = $filterClass;
-            $this->id = $id;
-            $this->strategy = $strategy;
-            $this->properties = $properties;
-            $this->arguments = $arguments;
-        }
-
-        if (!\is_string($this->filterClass)) {
-            throw new InvalidArgumentException('This annotation needs a value representing the filter class.');
-        }
-
         if (!is_a($this->filterClass, FilterInterface::class, true)) {
             throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s". Did you forget a use statement?', $this->filterClass, FilterInterface::class));
         }

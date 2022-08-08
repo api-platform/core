@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 final class TransformSortingParametersListener
 {
-    public function __construct(private string $orderParameterName = 'order')
+    public function __construct(private readonly string $orderParameterName = 'order')
     {
     }
 

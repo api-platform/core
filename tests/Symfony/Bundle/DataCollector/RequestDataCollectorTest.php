@@ -20,9 +20,10 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\Bundle\DataCollector\RequestDataCollector;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
-use ApiPlatform\Tests\ProphecyTrait;
 use PackageVersions\Versions;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -38,8 +39,8 @@ class RequestDataCollectorTest extends TestCase
     use ProphecyTrait;
 
     private ObjectProphecy|Request $request;
-    private $response;
-    private $attributes;
+    private MockObject|Response $response;
+    private ObjectProphecy|ParameterBag $attributes;
     private ObjectProphecy|ResourceMetadataCollectionFactoryInterface $metadataFactory;
     private ObjectProphecy|ContainerInterface $filterLocator;
 

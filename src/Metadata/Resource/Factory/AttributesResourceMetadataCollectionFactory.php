@@ -199,7 +199,12 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             return [$operation->getName(), $operation];
         }
 
-        if ($operation instanceof HttpOperation && $operation->getRouteName()) {
+        if (!$operation instanceof HttpOperation) {
+            throw new RuntimeException(sprintf('Operation should be an instance of "%s"', HttpOperation::class));
+        }
+
+        if ($operation->getRouteName()) {
+            /** @var HttpOperation $operation */
             $operation = $operation->withName($operation->getRouteName());
         }
 
@@ -210,16 +215,22 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             }
 
             $this->logger->warning(sprintf('The operation "%s" already exists on the resource "%s", pick a different name or leave it empty. In the meantime we will generate a unique name.', $operation->getName(), $resource->getClass()));
+            /** @var HttpOperation $operation */
             $operation = $operation->withName('');
         }
 
         return [
-            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : ''),
+            sprintf(
+                '_api_%s_%s%s',
+                $operation->getUriTemplate() ?: $operation->getShortName(),
+                strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET),
+                $operation instanceof CollectionOperationInterface ? '_collection' : '',
+            ),
             $operation,
         ];
     }
 
-    private function addGlobalDefaults(ApiResource|HttpOperation|GraphQlOperation $operation)
+    private function addGlobalDefaults(ApiResource|HttpOperation|GraphQlOperation $operation): ApiResource|HttpOperation|GraphQlOperation
     {
         $extraProperties = [];
         foreach ($this->defaults as $key => $value) {

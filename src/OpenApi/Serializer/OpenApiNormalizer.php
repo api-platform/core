@@ -47,7 +47,7 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
         return $this->recursiveClean($this->decorated->normalize($object, $format, $context));
     }
 
-    private function recursiveClean($data): array
+    private function recursiveClean(array $data): array
     {
         foreach ($data as $key => $value) {
             if (self::EXTENSION_PROPERTIES_KEY === $key) {
@@ -75,9 +75,6 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
         return self::FORMAT === $format && $data instanceof OpenApi;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

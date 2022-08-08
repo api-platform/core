@@ -25,25 +25,17 @@ trait ResourceClassInfoTrait
 {
     use ClassInfoTrait;
 
-    /**
-     * @var ResourceClassResolverInterface|null
-     */
-    private $resourceClassResolver;
-
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface|null
-     */
-    private $resourceMetadataFactory;
+    private ?ResourceClassResolverInterface $resourceClassResolver = null;
+    private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null;
 
     /**
      * Gets the resource class of the given object.
      *
-     * @param object $object
-     * @param bool   $strict If true, object class is expected to be a resource class
+     * @param bool $strict If true, object class is expected to be a resource class
      *
      * @return string|null The resource class, or null if object class is not a resource class
      */
-    private function getResourceClass($object, bool $strict = false): ?string
+    private function getResourceClass(object $object, bool $strict = false): ?string
     {
         $objectClass = $this->getObjectClass($object);
 
@@ -65,7 +57,7 @@ trait ResourceClassInfoTrait
         }
 
         if ($this->resourceMetadataFactory) {
-            return \count($this->resourceMetadataFactory->create($class)) > 0 ? true : false;
+            return \count($this->resourceMetadataFactory->create($class)) > 0;
         }
 
         // assume that it's a resource class

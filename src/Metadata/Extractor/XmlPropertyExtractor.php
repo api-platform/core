@@ -106,7 +106,7 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
         return $data;
     }
 
-    private function buildArrayValue(?\SimpleXMLElement $resource, string $key, $default = null)
+    private function buildArrayValue(?\SimpleXMLElement $resource, string $key, mixed $default = null)
     {
         if (!isset($resource->{$key.'s'}->{$key})) {
             return $default;
@@ -117,12 +117,8 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
 
     /**
      * Transforms an XML attribute's value in a PHP value.
-     *
-     * @param mixed|null $default
-     *
-     * @return string|int|bool|array|null
      */
-    private function phpize(\SimpleXMLElement $resource, string $key, string $type, $default = null)
+    private function phpize(\SimpleXMLElement $resource, string $key, string $type, mixed $default = null): array|bool|int|string|null
     {
         if (!isset($resource[$key])) {
             return $default;

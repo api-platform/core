@@ -22,7 +22,7 @@ namespace ApiPlatform\Util;
  */
 trait CloneTrait
 {
-    public function clone($data)
+    public function clone(mixed $data): mixed
     {
         if (!\is_object($data)) {
             return $data;

@@ -29,7 +29,7 @@ class ProductProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): Product|ProductDocument|null
     {
         if ($operation instanceof CollectionOperationInterface) {
             // todo Handle collection of products

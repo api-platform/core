@@ -15,7 +15,7 @@
             <argument type="service" id="api_platform.serializer" />
             <argument>%api_platform.formats%</argument>
             <argument type="service" id="messenger.default_bus" on-invalid="ignore" />
-            <argument type="service" id="mercure.hub.default.publisher" />
+            <argument type="service" id="Symfony\Component\Mercure\HubRegistry" />
             <argument type="service" id="api_platform.graphql.subscription.subscription_manager" on-invalid="ignore" />
             <argument type="service" id="api_platform.graphql.subscription.mercure_iri_generator" on-invalid="ignore" />
 

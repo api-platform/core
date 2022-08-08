@@ -26,7 +26,6 @@ use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;
@@ -36,6 +35,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -62,7 +62,7 @@ class TypeBuilderTest extends TestCase
     protected function setUp(): void
     {
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
-        $this->defaultFieldResolver = function (): void {
+        $this->defaultFieldResolver = static function (): void {
         };
         $this->fieldsBuilderLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $this->typeBuilder = new TypeBuilder(
@@ -475,7 +475,7 @@ class TypeBuilderTest extends TestCase
 
     public function testCursorBasedGetResourcePaginatedCollectionType(): void
     {
-        /** @var Operation */
+        /** @var Operation $operation */
         $operation = (new Query())->withPaginationType('cursor');
         $this->typesContainerProphecy->has('StringCursorConnection')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('StringCursorConnection', Argument::type(ObjectType::class))->shouldBeCalled();

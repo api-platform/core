@@ -20,7 +20,6 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -46,7 +45,6 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
         $entrypoint = ['links' => ['self' => $this->urlGenerator->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)]];
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
-            /** @var ResourceMetadataCollection */
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             foreach ($resourceMetadata as $resource) {
@@ -76,9 +74,6 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
         return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

@@ -26,7 +26,7 @@ final class CallableProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|iterable|null
     {
         if (\is_callable($provider = $operation->getProvider())) {
             return $provider($operation, $uriVariables, $context);
@@ -37,10 +37,10 @@ final class CallableProvider implements ProviderInterface
                 throw new RuntimeException(sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
             }
 
-            /** @var ProviderInterface */
-            $provider = $this->locator->get($provider);
+            /** @var ProviderInterface $providerInstance */
+            $providerInstance = $this->locator->get($provider);
 
-            return $provider->provide($operation, $uriVariables, $context);
+            return $providerInstance->provide($operation, $uriVariables, $context);
         }
 
         throw new RuntimeException(sprintf('Provider not found on operation "%s"', $operation->getName()));

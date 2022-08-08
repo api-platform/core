@@ -26,5 +26,5 @@ interface FilterInterface extends BaseFilterInterface
     /**
      * Apply a filter to the serializer context.
      */
-    public function apply(Request $request, bool $normalization, array $attributes, array &$context);
+    public function apply(Request $request, bool $normalization, array $attributes, array &$context): void;
 }

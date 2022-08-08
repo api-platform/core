@@ -43,7 +43,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
         try {
-            [$normalizationGroups, $denormalizationGroups] = $this->getEffectiveSerializerGroups($options, $resourceClass);
+            [$normalizationGroups, $denormalizationGroups] = $this->getEffectiveSerializerGroups($options);
 
             if ($normalizationGroups && !\is_array($normalizationGroups)) {
                 $normalizationGroups = [$normalizationGroups];
@@ -74,10 +74,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
-     *
-     * @return ApiProperty $propertyMetadata
      */
-    private function transformReadWrite(ApiProperty $propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null)
+    private function transformReadWrite(ApiProperty $propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null): ApiProperty
     {
         $serializerAttributeMetadata = $this->getSerializerAttributeMetadata($resourceClass, $propertyName);
         $groups = $serializerAttributeMetadata ? $serializerAttributeMetadata->getGroups() : [];
@@ -103,7 +101,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
-    private function transformLinkStatus(ApiProperty $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null)
+    private function transformLinkStatus(ApiProperty $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null): ApiProperty
     {
         // No need to check link status if property is not readable and not writable
         if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
@@ -159,11 +157,9 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * - From metadata of the given operation ("operation_name" key).
      * - From metadata of the current resource.
      *
-     * @throws ResourceClassNotFoundException
-     *
      * @return (string[]|null|string)[]
      */
-    private function getEffectiveSerializerGroups(array $options, string $resourceClass): array
+    private function getEffectiveSerializerGroups(array $options): array
     {
         if (isset($options['serializer_groups'])) {
             $groups = (array) $options['serializer_groups'];

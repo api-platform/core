@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
  */
 abstract class AbstractResourceExtractor implements ResourceExtractorInterface
 {
-    protected $resources;
+    protected ?array $resources = null;
     private array $collectedParameters = [];
 
     /**
@@ -53,7 +53,7 @@ abstract class AbstractResourceExtractor implements ResourceExtractorInterface
     /**
      * Extracts metadata from a given path.
      */
-    abstract protected function extractPath(string $path);
+    abstract protected function extractPath(string $path): void;
 
     /**
      * Recursively replaces placeholders with the service container parameters.
@@ -69,7 +69,7 @@ abstract class AbstractResourceExtractor implements ResourceExtractorInterface
      * @return mixed The source with the placeholders replaced by the container
      *               parameters. Arrays are resolved recursively.
      */
-    protected function resolve($value)
+    protected function resolve(mixed $value): mixed
     {
         if (null === $this->container) {
             return $value;

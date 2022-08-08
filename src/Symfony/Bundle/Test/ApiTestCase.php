@@ -96,7 +96,7 @@ abstract class ApiTestCase extends KernelTestCase
             return null;
         }
 
-        /** @var IriConverterInterface */
+        /** @var IriConverterInterface $iriConverter */
         $iriConverter = $container->get('api_platform.iri_converter');
 
         return $iriConverter->getIriFromResource($item);

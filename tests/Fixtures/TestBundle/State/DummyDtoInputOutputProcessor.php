@@ -34,7 +34,7 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
      *
      * @param InputDto $data
      */
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         /** @var EntityManager */
         $manager = $this->registry->getManagerForClass($operation->getClass());

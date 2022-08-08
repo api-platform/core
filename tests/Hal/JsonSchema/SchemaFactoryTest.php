@@ -28,14 +28,14 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class SchemaFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private \ApiPlatform\Hal\JsonSchema\SchemaFactory $schemaFactory;
+    private SchemaFactory $schemaFactory;
 
     protected function setUp(): void
     {

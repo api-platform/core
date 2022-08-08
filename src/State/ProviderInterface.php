@@ -25,8 +25,6 @@ interface ProviderInterface
 {
     /**
      * Provides data.
-     *
-     * @return object|array|null
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []);
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|iterable|null;
 }

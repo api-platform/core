@@ -16,8 +16,8 @@ namespace ApiPlatform\Tests\Hal\Serializer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

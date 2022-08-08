@@ -33,7 +33,7 @@ final class DeserializeStage implements DeserializeStageInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke($objectToPopulate, string $resourceClass, Operation $operation, array $context)
+    public function __invoke(?object $objectToPopulate, string $resourceClass, Operation $operation, array $context): ?object
     {
         if (!($operation->canDeserialize() ?? true)) {
             return $objectToPopulate;

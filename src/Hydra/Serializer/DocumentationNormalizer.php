@@ -59,7 +59,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $resourceMetadata = $resourceMetadataCollection[0];
             $shortName = $resourceMetadata->getShortName();
             $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
-            $this->populateEntrypointProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $resourceMetadataCollection);
+            $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $resourceMetadataCollection);
             $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $resourceMetadataCollection);
         }
 
@@ -69,9 +69,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Populates entrypoint properties.
      */
-    private function populateEntrypointProperties(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, ?ResourceMetadataCollection $resourceMetadataCollection = null): void
+    private function populateEntrypointProperties(ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, ?ResourceMetadataCollection $resourceMetadataCollection = null): void
     {
-        $hydraCollectionOperations = $this->getHydraOperations($resourceClass, $resourceMetadata, $prefixedShortName, true, $resourceMetadataCollection);
+        $hydraCollectionOperations = $this->getHydraOperations(true, $resourceMetadataCollection);
         if (empty($hydraCollectionOperations)) {
             return;
         }
@@ -120,7 +120,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'rdfs:label' => $shortName,
             'hydra:title' => $shortName,
             'hydra:supportedProperty' => $this->getHydraProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context),
-            'hydra:supportedOperation' => $this->getHydraOperations($resourceClass, $resourceMetadata, $prefixedShortName, false, $resourceMetadataCollection),
+            'hydra:supportedOperation' => $this->getHydraOperations(false, $resourceMetadataCollection),
         ];
 
         if (null !== $description) {
@@ -220,16 +220,16 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets Hydra operations.
      */
-    private function getHydraOperations(string $resourceClass, ApiResource $resourceMetadata, string $prefixedShortName, bool $collection, ?ResourceMetadataCollection $resourceMetadataCollection = null): array
+    private function getHydraOperations(bool $collection, ?ResourceMetadataCollection $resourceMetadataCollection = null): array
     {
         $hydraOperations = [];
         foreach ($resourceMetadataCollection as $resourceMetadata) {
-            foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+            foreach ($resourceMetadata->getOperations() as $operation) {
                 if ((HttpOperation::METHOD_POST === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                     continue;
                 }
 
-                $hydraOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $operation, $operation->getTypes()[0] ?? "#{$operation->getShortName()}", null);
+                $hydraOperations[] = $this->getHydraOperation($operation, $operation->getTypes()[0] ?? "#{$operation->getShortName()}");
             }
         }
 
@@ -239,7 +239,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets and populates if applicable a Hydra operation.
      */
-    private function getHydraOperation(string $resourceClass, ApiResource $resourceMetadata, string $operationName, HttpOperation $operation, string $prefixedShortName, ?string $operationType = null): array
+    private function getHydraOperation(HttpOperation $operation, string $prefixedShortName): array
     {
         $method = $operation->getMethod() ?: HttpOperation::METHOD_GET;
 
@@ -544,9 +544,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return self::FORMAT === $format && $data instanceof Documentation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

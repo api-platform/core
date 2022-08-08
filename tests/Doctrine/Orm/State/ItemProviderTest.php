@@ -25,7 +25,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
-use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Types;
@@ -39,6 +38,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class ItemProviderTest extends TestCase
 {
@@ -46,9 +46,11 @@ class ItemProviderTest extends TestCase
 
     public function testGetItemSingleIdentifier(): void
     {
+        $returnObject = new \stdClass();
+
         $context = ['foo' => 'bar', 'fetch_data' => true];
         $queryProphecy = $this->prophesize(AbstractQuery::class);
-        $queryProphecy->getOneOrNullResult()->willReturn([])->shouldBeCalled();
+        $queryProphecy->getOneOrNullResult()->willReturn($returnObject)->shouldBeCalled();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
@@ -77,13 +79,15 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
 
-        $this->assertEquals([], $dataProvider->provide($operation, ['identifier' => 1], $context));
+        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['identifier' => 1], $context));
     }
 
     public function testGetItemDoubleIdentifier(): void
     {
+        $returnObject = new \stdClass();
+
         $queryProphecy = $this->prophesize(AbstractQuery::class);
-        $queryProphecy->getOneOrNullResult()->willReturn([])->shouldBeCalled();
+        $queryProphecy->getOneOrNullResult()->willReturn($returnObject)->shouldBeCalled();
 
         // $exprProphecy = $this->prophesize(Expr::class);
         // $exprProphecy->eq('o.ida', ':id_ida')->willReturn($comparisonProphecy)->shouldBeCalled();
@@ -127,11 +131,13 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
 
-        $this->assertEquals([], $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
+        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
     }
 
     public function testQueryResultExtension(): void
     {
+        $returnObject = new \stdClass();
+
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->andWhere('o.identifier = :identifier_p1')->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
@@ -156,11 +162,11 @@ class ItemProviderTest extends TestCase
         $extensionProphecy = $this->prophesize(QueryResultItemExtensionInterface::class);
         $extensionProphecy->applyToItem($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, ['identifier' => 1], $operation, $context)->shouldBeCalled();
         $extensionProphecy->supportsResult(OperationResource::class, $operation, $context)->willReturn(true)->shouldBeCalled();
-        $extensionProphecy->getResult($queryBuilder, OperationResource::class, $operation, $context)->willReturn([])->shouldBeCalled();
+        $extensionProphecy->getResult($queryBuilder, OperationResource::class, $operation, $context)->willReturn($returnObject)->shouldBeCalled();
 
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
 
-        $this->assertEquals([], $dataProvider->provide($operation, ['identifier' => 1], $context));
+        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['identifier' => 1], $context));
     }
 
     public function testCannotCreateQueryBuilder(): void
@@ -232,8 +238,10 @@ class ItemProviderTest extends TestCase
 
     public function testGetSubresourceFromProperty(): void
     {
+        $returnObject = new \stdClass();
+
         $queryProphecy = $this->prophesize(AbstractQuery::class);
-        $queryProphecy->getOneOrNullResult()->willReturn([])->shouldBeCalled();
+        $queryProphecy->getOneOrNullResult()->willReturn($returnObject)->shouldBeCalled();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->join(Employee::class, 'm_a1', 'WITH', 'o.id = m_a1.company')->shouldBeCalled();
@@ -272,6 +280,6 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
 
-        $this->assertEquals([], $dataProvider->provide($operation, ['employeeId' => 1]));
+        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['employeeId' => 1]));
     }
 }

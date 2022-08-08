@@ -18,8 +18,8 @@ use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -50,10 +50,8 @@ class DeserializeStageTest extends TestCase
 
     /**
      * @dataProvider objectToPopulateProvider
-     *
-     * @param object|null $objectToPopulate
      */
-    public function testApplyDisabled($objectToPopulate): void
+    public function testApplyDisabled(?object $objectToPopulate): void
     {
         $resourceClass = 'myResource';
         /** @var Operation $operation */
@@ -65,10 +63,8 @@ class DeserializeStageTest extends TestCase
 
     /**
      * @dataProvider objectToPopulateProvider
-     *
-     * @param object|null $objectToPopulate
      */
-    public function testApply($objectToPopulate, array $denormalizationContext): void
+    public function testApply(?object $objectToPopulate, array $denormalizationContext): void
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';

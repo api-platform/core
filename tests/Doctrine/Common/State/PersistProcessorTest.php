@@ -17,12 +17,12 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prediction\CallPrediction;
 use Prophecy\Prediction\NoCallsPrediction;
 
@@ -81,7 +81,7 @@ class PersistProcessorTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function getTrackingPolicyParameters()
+    public function getTrackingPolicyParameters(): array
     {
         return [
             'deferred explicit ORM' => [ClassMetadataInfo::class, true, true],
@@ -94,7 +94,7 @@ class PersistProcessorTest extends TestCase
     /**
      * @dataProvider getTrackingPolicyParameters
      */
-    public function testTrackingPolicy($metadataClass, $deferredExplicit, $persisted): void
+    public function testTrackingPolicy(string $metadataClass, bool $deferredExplicit, bool $persisted): void
     {
         $dummy = new Dummy();
 

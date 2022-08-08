@@ -18,12 +18,12 @@ use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\GraphQl\Resolver\ResourceFieldResolver;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class ResourceFieldResolverTest extends TestCase
 {

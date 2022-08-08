@@ -30,7 +30,7 @@ final class ValidateStage implements ValidateStageInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke($object, string $resourceClass, Operation $operation, array $context): void
+    public function __invoke(object $object, string $resourceClass, Operation $operation, array $context): void
     {
         if (!($operation->canValidate() ?? true)) {
             return;

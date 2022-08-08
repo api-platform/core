@@ -37,7 +37,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getPaginationData($object, array $context = []): array
+    protected function getPaginationData(iterable $object, array $context = []): array
     {
         [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems] = $this->getPaginationConfig($object, $context);
         $parsed = IriHelper::parseIri($context['uri'] ?? '/', $this->pageParameterName);
@@ -83,7 +83,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
      *
      * @throws UnexpectedValueException
      */
-    protected function getItemsData($object, string $format = null, array $context = []): array
+    protected function getItemsData(iterable $object, string $format = null, array $context = []): array
     {
         $data = [];
 

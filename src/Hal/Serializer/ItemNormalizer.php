@@ -51,7 +51,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $resourceClass = $this->getObjectClass($object);
-        if ($this->getOutputClass($resourceClass, $context)) {
+        if ($this->getOutputClass($context)) {
             return parent::normalize($object, $format, $context);
         }
 
@@ -116,10 +116,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * Gets HAL components of the resource: states, links and embedded.
-     *
-     * @param object $object
      */
-    private function getComponents($object, ?string $format, array $context): array
+    private function getComponents(object $object, ?string $format, array $context): array
     {
         $cacheKey = $this->getObjectClass($object).'-'.$context['cache_key'];
 
@@ -175,10 +173,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * Populates _links and _embedded keys.
-     *
-     * @param object $object
      */
-    private function populateRelation(array $data, $object, ?string $format, array $context, array $components, string $type): array
+    private function populateRelation(array $data, object $object, ?string $format, array $context, array $components, string $type): array
     {
         $class = $this->getObjectClass($object);
 
@@ -231,7 +227,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws UnexpectedValueException
      */
-    private function getRelationIri($rel): string
+    private function getRelationIri(mixed $rel): string
     {
         if (!(\is_array($rel) || \is_string($rel))) {
             throw new UnexpectedValueException('Expected relation to be an IRI or array');

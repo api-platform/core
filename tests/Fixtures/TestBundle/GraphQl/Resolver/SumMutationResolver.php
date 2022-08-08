@@ -24,12 +24,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomMutation;
  */
 class SumMutationResolver implements MutationResolverInterface
 {
-    /**
-     * @param DummyCustomMutation|DummyCustomMutationDocument|null $item
-     *
-     * @return DummyCustomMutation|DummyCustomMutationDocument
-     */
-    public function __invoke($item, array $context)
+    public function __invoke(?object $item, array $context): DummyCustomMutation|DummyCustomMutationDocument
     {
         if (null !== $operandC = $context['args']['input']['operandC'] ?? null) {
             $item->setResult((int) $operandC);

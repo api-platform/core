@@ -131,7 +131,7 @@ final class PurgeHttpCacheListener
         }
     }
 
-    private function addTagsFor($value): void
+    private function addTagsFor(mixed $value): void
     {
         if (!$value || \is_scalar($value)) {
             return;
@@ -152,7 +152,7 @@ final class PurgeHttpCacheListener
         }
     }
 
-    private function addTagForItem($value): void
+    private function addTagForItem(mixed $value): void
     {
         if (!$this->resourceClassResolver->isResourceClass($this->getObjectClass($value))) {
             return;

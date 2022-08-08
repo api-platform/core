@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 
@@ -98,10 +97,8 @@ trait PropertyHelperTrait
 
     /**
      * Gets the Doctrine Type of a given property/resourceClass.
-     *
-     * @return Type|string|null
      */
-    protected function getDoctrineFieldType(string $property, string $resourceClass)
+    protected function getDoctrineFieldType(string $property, string $resourceClass): ?string
     {
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);

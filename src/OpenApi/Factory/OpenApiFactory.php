@@ -20,7 +20,6 @@ use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -49,6 +48,7 @@ use ApiPlatform\OpenApi\Serializer\NormalizeOperationNameTrait;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -63,7 +63,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
     private readonly Options $openApiOptions;
     private readonly PaginationOptions $paginationOptions;
-    private $routeCollection;
+    private ?RouteCollection $routeCollection = null;
 
     public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, private readonly TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, private readonly array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
     {
@@ -285,7 +285,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     private function buildContent(array $responseMimeTypes, array $operationSchemas): \ArrayObject
     {
-        /** @var \ArrayObject<Model\MediaType> */
+        /** @var \ArrayObject<Model\MediaType> $content */
         $content = new \ArrayObject();
 
         foreach ($responseMimeTypes as $mimeType => $format) {
@@ -367,7 +367,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     private function getLinks(ResourceMetadataCollection $resourceMetadataCollection, HttpOperation $currentOperation): \ArrayObject
     {
-        /** @var \ArrayObject<Model\Link> */
+        /** @var \ArrayObject<Model\Link> $links */
         $links = new \ArrayObject();
 
         // Only compute get links for now
@@ -400,7 +400,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         continue;
                     }
 
-                    if (($uriVariableDefinition->getFromClass() ?? null) === $currentOperation->getClass()) {
+                    if ($uriVariableDefinition->getFromClass() === $currentOperation->getClass()) {
                         $parameters[$parameterName] = '$response.body#/'.$uriVariableDefinition->getIdentifiers()[0];
                     }
                 }

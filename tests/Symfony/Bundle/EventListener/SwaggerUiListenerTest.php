@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\EventListener;
 
 use ApiPlatform\Symfony\Bundle\EventListener\SwaggerUiListener;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -40,7 +40,7 @@ class SwaggerUiListenerTest extends TestCase
         $this->assertSame($controller, $request->attributes->get('_controller'));
     }
 
-    public function getParameters()
+    public function getParameters(): array
     {
         $respondRequest = new Request([], [], ['_api_respond' => true]);
         $respondRequest->setRequestFormat('html');

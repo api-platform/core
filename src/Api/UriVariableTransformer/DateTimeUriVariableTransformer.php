@@ -27,7 +27,7 @@ final class DateTimeUriVariableTransformer implements UriVariableTransformerInte
         $this->dateTimeNormalizer = new DateTimeNormalizer();
     }
 
-    public function transform($value, array $types, array $context = [])
+    public function transform(mixed $value, array $types, array $context = []): \DateTimeInterface
     {
         try {
             return $this->dateTimeNormalizer->denormalize($value, $types[0], null, $context);
@@ -36,7 +36,7 @@ final class DateTimeUriVariableTransformer implements UriVariableTransformerInte
         }
     }
 
-    public function supportsTransformation($value, array $types, array $context = []): bool
+    public function supportsTransformation(mixed $value, array $types, array $context = []): bool
     {
         return $this->dateTimeNormalizer->supportsDenormalization($value, $types[0]);
     }

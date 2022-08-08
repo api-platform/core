@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Test;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AttributeDriver;
@@ -38,11 +37,7 @@ class DoctrineMongoDbOdmTestCase extends TestCase
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setHydratorNamespace('SymfonyTests\Doctrine');
         $config->setMetadataDriverImpl(new AttributeDriver($paths, new AttributeReader())); // @phpstan-ignore-line
-        if (method_exists($config, 'setMetadataCache')) {
-            $config->setMetadataCache(new ArrayAdapter());
-        } else {
-            $config->setMetadataCacheImpl(new ArrayCache()); // @phpstan-ignore-line
-        }
+        $config->setMetadataCache(new ArrayAdapter());
 
         return DocumentManager::create(null, $config);
     }

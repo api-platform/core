@@ -15,9 +15,9 @@ namespace ApiPlatform\Tests\Symfony\Routing;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Symfony\Routing\Router;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;

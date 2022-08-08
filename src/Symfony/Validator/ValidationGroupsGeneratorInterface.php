@@ -23,9 +23,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 interface ValidationGroupsGeneratorInterface
 {
     /**
-     * @param object $object
-     *
      * @return GroupSequence|string[]
      */
-    public function __invoke($object);
+    public function __invoke(object $object): array|GroupSequence;
 }

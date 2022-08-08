@@ -20,9 +20,9 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 
@@ -63,10 +63,8 @@ class ItemResolverFactoryTest extends TestCase
 
     /**
      * @dataProvider itemResourceProvider
-     *
-     * @param object|null $readStageItem
      */
-    public function testResolve(?string $resourceClass, string $determinedResourceClass, $readStageItem): void
+    public function testResolve(?string $resourceClass, string $determinedResourceClass, ?object $readStageItem): void
     {
         $rootClass = 'rootClass';
         $operationName = 'item_query';

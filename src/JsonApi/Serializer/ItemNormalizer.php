@@ -70,7 +70,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $resourceClass = $this->getObjectClass($object);
-        if ($this->getOutputClass($resourceClass, $context)) {
+        if ($this->getOutputClass($context)) {
             return parent::normalize($object, $format, $context);
         }
 
@@ -78,7 +78,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
-        if ($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass)) {
+        if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         }
 
@@ -168,7 +168,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributes($object, $format = null, array $context = []): array
+    protected function getAttributes(object $object, ?string $format = null, array $context = []): array
     {
         return $this->getComponents($object, $format, $context)['attributes'];
     }
@@ -176,7 +176,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []): void
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
     {
         parent::setAttributeValue($object, $attribute, \is_array($value) && \array_key_exists('data', $value) ? $value['data'] : $value, $format, $context);
     }
@@ -189,7 +189,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * @throws RuntimeException
      * @throws NotNormalizableValueException
      */
-    protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, $value, ?string $format, array $context)
+    protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): object
     {
         if (!\is_array($value) || !isset($value['id'], $value['type'])) {
             throw new NotNormalizableValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
@@ -207,7 +207,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      */
-    protected function normalizeRelation(ApiProperty $propertyMetadata, ?object $relatedObject, string $resourceClass, ?string $format, array $context)
+    protected function normalizeRelation(ApiProperty $propertyMetadata, ?object $relatedObject, string $resourceClass, ?string $format, array $context): \ArrayObject|array|string|null
     {
         if (null !== $relatedObject) {
             $iri = $this->iriConverter->getIriFromResource($relatedObject);
@@ -245,15 +245,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
     {
-        return preg_match('/^\\w[-\\w_]*$/', (string) $attribute) && parent::isAllowedAttribute($classOrObject, $attribute, $format, $context);
+        return preg_match('/^\\w[-\\w_]*$/', $attribute) && parent::isAllowedAttribute($classOrObject, $attribute, $format, $context);
     }
 
     /**
      * Gets JSON API components of the resource: attributes, relationships, meta and links.
-     *
-     * @param object $object
      */
-    private function getComponents($object, ?string $format, array $context): array
+    private function getComponents(object $object, ?string $format, array $context): array
     {
         $cacheKey = $this->getObjectClass($object).'-'.$context['cache_key'];
 
@@ -315,11 +313,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Populates relationships keys.
      *
-     * @param object $object
-     *
      * @throws UnexpectedValueException
      */
-    private function getPopulatedRelations($object, ?string $format, array $context, array $relationships): array
+    private function getPopulatedRelations(object $object, ?string $format, array $context, array $relationships): array
     {
         $data = [];
 
@@ -369,7 +365,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Populates included keys.
      */
-    private function getRelatedResources($object, ?string $format, array $context, array $relationships): array
+    private function getRelatedResources(object $object, ?string $format, array $context, array $relationships): array
     {
         if (!isset($context['api_included'])) {
             return [];

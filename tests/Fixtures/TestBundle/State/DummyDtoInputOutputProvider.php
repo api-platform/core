@@ -29,7 +29,7 @@ final class DummyDtoInputOutputProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): OutputDto|OutputDtoDocument
     {
         /** @var DummyDtoInputOutput */
         $data = $this->decorated->provide($operation, $uriVariables, $context);

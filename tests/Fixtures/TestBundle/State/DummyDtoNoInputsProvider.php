@@ -30,7 +30,7 @@ final class DummyDtoNoInputsProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable|OutputDto|OutputDtoDocument
     {
         if ($operation instanceof CollectionOperationInterface) {
             $object = $this->collectionProvider->provide($operation, $uriVariables, $context);

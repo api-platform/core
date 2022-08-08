@@ -22,10 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 trait OperationRequestInitiatorTrait
 {
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface|null
-     */
-    private $resourceMetadataCollectionFactory;
+    private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null;
 
     /**
      * TODO: Kernel terminate remove the _api_operation attribute?
@@ -36,11 +33,11 @@ trait OperationRequestInitiatorTrait
             return $request->attributes->get('_api_operation');
         }
 
-        if (null === $request->attributes->get('_api_resource_class') || null === $this->resourceMetadataCollectionFactory) {
+        if (null === $this->resourceMetadataCollectionFactory || null === $request->attributes->get('_api_resource_class')) {
             return null;
         }
 
-        $operationName = $request->attributes->get('_api_operation_name') ?? null;
+        $operationName = $request->attributes->get('_api_operation_name');
         /** @var HttpOperation $operation */
         $operation = $this->resourceMetadataCollectionFactory->create($request->attributes->get('_api_resource_class'))->getOperation($operationName);
         $request->attributes->set('_api_operation', $operation);

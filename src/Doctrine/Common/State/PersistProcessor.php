@@ -29,7 +29,14 @@ final class PersistProcessor implements ProcessorInterface
     {
     }
 
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    /**
+     * @template T
+     *
+     * @param T $data
+     *
+     * @return T
+     */
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (!$manager = $this->getManager($data)) {
             return $data;

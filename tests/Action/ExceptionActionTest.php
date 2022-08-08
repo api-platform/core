@@ -21,9 +21,9 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Tests\ProphecyTrait;
 use DomainException;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -125,7 +125,7 @@ class ExceptionActionTest extends TestCase
         $this->assertTrue($response->headers->contains('X-Frame-Options', 'deny'));
     }
 
-    public function provideOperationExceptionToStatusCases()
+    public function provideOperationExceptionToStatusCases(): \Generator
     {
         yield 'no mapping' => [
             [],

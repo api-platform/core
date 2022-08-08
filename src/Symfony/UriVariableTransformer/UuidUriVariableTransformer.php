@@ -25,11 +25,11 @@ final class UuidUriVariableTransformer implements UriVariableTransformerInterfac
     /**
      * {@inheritdoc}
      */
-    public function transform($value, array $types, array $context = [])
+    public function transform(mixed $value, array $types, array $context = []): Uuid
     {
         try {
             return Uuid::fromString($value);
-        } catch (\InvalidArgumentException|\ValueError $e) { // catching ValueError will not be necessary anymore when https://github.com/symfony/symfony/pull/39636 will be released
+        } catch (\InvalidArgumentException $e) {
             throw new InvalidUriVariableException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -37,7 +37,7 @@ final class UuidUriVariableTransformer implements UriVariableTransformerInterfac
     /**
      * {@inheritdoc}
      */
-    public function supportsTransformation($value, array $types, array $context = []): bool
+    public function supportsTransformation(mixed $value, array $types, array $context = []): bool
     {
         return \is_string($value) && is_a($types[0], Uuid::class, true);
     }

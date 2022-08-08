@@ -222,10 +222,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         return $data;
     }
 
-    /**
-     * @return bool|string[]|null
-     */
-    private function buildMercure(\SimpleXMLElement $resource)
+    private function buildMercure(\SimpleXMLElement $resource): array|bool|null
     {
         if (!isset($resource->mercure)) {
             return null;

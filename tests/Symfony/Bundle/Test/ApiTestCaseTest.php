@@ -22,26 +22,17 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Runner\Version;
 
 class ApiTestCaseTest extends ApiTestCase
 {
     public function testAssertJsonContains(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         self::createClient()->request('GET', '/');
         $this->assertJsonContains(['@context' => '/contexts/Entrypoint']);
     }
 
     public function testAssertJsonContainsWithJsonObjectString(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         self::createClient()->request('GET', '/');
         $this->assertJsonContains(<<<JSON
 {
@@ -53,10 +44,6 @@ JSON
 
     public function testAssertJsonContainsWithJsonScalarString(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$subset must be array or string (JSON array or JSON object)');
 
@@ -158,20 +145,12 @@ JSON;
 
     public function testAssertArraySubsetPassesStrictConfig(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         $this->expectException(ExpectationFailedException::class);
         $this->assertArraySubset(['bar' => 0], ['bar' => '0'], true);
     }
 
     public function testAssertArraySubsetDoesNothingForValidScenario(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         $this->assertArraySubset([1, 2], [1, 2, 3]);
     }
 

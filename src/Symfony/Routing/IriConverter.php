@@ -61,7 +61,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null)
+    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
     {
         try {
             $parameters = $this->router->match($iri);
@@ -102,17 +102,17 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
+    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
-        $resourceClass = \is_string($item) ? $item : $this->getObjectClass($item);
+        $resourceClass = \is_string($resource) ? $resource : $this->getObjectClass($resource);
 
         if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
             return $this->generateSkolemIri($context);
         }
 
         // This is only for when a class (that is not a resource) extends another one that is a resource, we should remove this behavior
-        if (!\is_string($item)) {
-            $resourceClass = $this->getResourceClass($item, true);
+        if (!\is_string($resource)) {
+            $resourceClass = $this->getResourceClass($resource, true);
         }
 
         if (!$operation) {
@@ -138,9 +138,9 @@ final class IriConverter implements IriConverterInterface
 
         $identifiers = $context['uri_variables'] ?? [];
 
-        if (\is_object($item)) {
+        if (\is_object($resource)) {
             try {
-                $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation);
+                $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, $operation);
             } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers) {
@@ -160,7 +160,7 @@ final class IriConverter implements IriConverterInterface
         }
     }
 
-    private function generateSkolemIri(array $context = [])
+    private function generateSkolemIri(array $context = []): string
     {
         return $context['iri'] ?? '/.well-known/genid/'.bin2hex(random_bytes(10));
     }

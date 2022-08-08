@@ -35,7 +35,7 @@ class ArrayPaginatorTest extends TestCase
         $this->assertCount($currentItems, $paginator);
     }
 
-    public function initializeProvider()
+    public function initializeProvider(): array
     {
         return [
             'First of three pages of 3 items each' => [[0, 1, 2, 3, 4, 5, 6], 0, 3, 3, 7, 1, 3],

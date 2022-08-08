@@ -74,7 +74,7 @@ trait LinksHandlerTrait
         return $newLinks;
     }
 
-    private function getIdentifierValue(array &$identifiers, string $name = null)
+    private function getIdentifierValue(array &$identifiers, string $name = null): mixed
     {
         if (isset($identifiers[$name])) {
             $value = $identifiers[$name];

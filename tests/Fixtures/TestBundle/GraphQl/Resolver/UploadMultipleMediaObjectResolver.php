@@ -24,10 +24,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class UploadMultipleMediaObjectResolver implements MutationResolverInterface
 {
-    /**
-     * @param MediaObject|null $item
-     */
-    public function __invoke($item, array $context): MediaObject
+    public function __invoke(?object $item, array $context): MediaObject
     {
         $result = [];
         $mediaObject = null;

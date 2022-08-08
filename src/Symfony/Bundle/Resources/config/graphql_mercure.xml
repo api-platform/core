@@ -8,6 +8,7 @@
 
         <service id="api_platform.graphql.subscription.mercure_iri_generator" class="ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGenerator">
             <argument type="service" id="router.request_context" />
+            <argument type="service" id="Symfony\Component\Mercure\HubRegistry" />
         </service>
 
     </services>

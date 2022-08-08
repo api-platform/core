@@ -52,9 +52,6 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         return static::FORMAT === $format && is_iterable($data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
@@ -84,10 +81,8 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     /**
      * Normalizes a raw collection (not API resources).
-     *
-     * @param string|null $format
      */
-    protected function normalizeRawCollection($object, $format = null, array $context = []): array
+    protected function normalizeRawCollection(iterable $object, string $format = null, array $context = []): array
     {
         $data = [];
         foreach ($object as $index => $obj) {
@@ -99,10 +94,8 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     /**
      * Gets the pagination configuration.
-     *
-     * @param iterable $object
      */
-    protected function getPaginationConfig($object, array $context = []): array
+    protected function getPaginationConfig(iterable $object, array $context = []): array
     {
         $currentPage = $lastPage = $itemsPerPage = $pageTotalItems = $totalItems = null;
         $paginated = $paginator = false;
@@ -127,15 +120,11 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     /**
      * Gets the pagination data.
-     *
-     * @param iterable $object
      */
-    abstract protected function getPaginationData($object, array $context = []): array;
+    abstract protected function getPaginationData(iterable $object, array $context = []): array;
 
     /**
      * Gets items data.
-     *
-     * @param iterable $object
      */
-    abstract protected function getItemsData($object, string $format = null, array $context = []): array;
+    abstract protected function getItemsData(iterable $object, string $format = null, array $context = []): array;
 }

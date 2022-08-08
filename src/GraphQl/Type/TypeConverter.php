@@ -46,7 +46,7 @@ final class TypeConverter implements TypeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth)
+    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
     {
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_BOOL:
@@ -159,7 +159,7 @@ final class TypeConverter implements TypeConverterInterface
                 throw new OperationNotFoundException();
             }
         } catch (OperationNotFoundException) {
-            /** @var Operation */
+            /** @var Operation $operation */
             $operation = ($isCollection ? new QueryCollection() : new Query())
                 ->withResource($resourceMetadataCollection[0])
                 ->withName($operationName);
@@ -195,23 +195,13 @@ final class TypeConverter implements TypeConverterInterface
 
         $typeName = $astTypeNode->name->value;
 
-        switch ($typeName) {
-            case GraphQLType::STRING:
-                return GraphQLType::string();
-            case GraphQLType::INT:
-                return GraphQLType::int();
-            case GraphQLType::BOOLEAN:
-                return GraphQLType::boolean();
-            case GraphQLType::FLOAT:
-                return GraphQLType::float();
-            case GraphQLType::ID:
-                return GraphQLType::id();
-            default:
-                if ($this->typesContainer->has($typeName)) {
-                    return $this->typesContainer->get($typeName);
-                }
-
-                return null;
-        }
+        return match ($typeName) {
+            GraphQLType::STRING => GraphQLType::string(),
+            GraphQLType::INT => GraphQLType::int(),
+            GraphQLType::BOOLEAN => GraphQLType::boolean(),
+            GraphQLType::FLOAT => GraphQLType::float(),
+            GraphQLType::ID => GraphQLType::id(),
+            default => $this->typesContainer->has($typeName) ? $this->typesContainer->get($typeName) : null,
+        };
     }
 }

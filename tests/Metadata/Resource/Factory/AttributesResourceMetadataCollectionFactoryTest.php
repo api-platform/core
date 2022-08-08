@@ -33,8 +33,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResources;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExtraPropertiesResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProcessor;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>

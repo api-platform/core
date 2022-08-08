@@ -25,7 +25,7 @@ class ContainNonResourceProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object
     {
         $id = $uriVariables['id'] ?? null;
         if (!\is_scalar($id)) {

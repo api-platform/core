@@ -35,7 +35,7 @@ final class TypesContainer implements TypesContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function get($id): GraphQLType
+    public function get(string $id): GraphQLType
     {
         if ($this->has($id)) {
             return $this->graphqlTypes[$id];
@@ -55,7 +55,7 @@ final class TypesContainer implements TypesContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function has($id): bool
+    public function has(string $id): bool
     {
         return \array_key_exists($id, $this->graphqlTypes);
     }

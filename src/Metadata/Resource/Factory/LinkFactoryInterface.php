@@ -39,11 +39,9 @@ interface LinkFactoryInterface
     /**
      * Create Links by using PHP attribute Links found on properties.
      *
-     * @param ApiResource|Operation $operation
-     *
      * @return Link[]
      */
-    public function createLinksFromAttributes($operation): array;
+    public function createLinksFromAttributes(ApiResource|Operation $operation): array;
 
     /**
      * Complete a link with identifiers information.

@@ -89,24 +89,18 @@ trait ApiTestAssertionsTrait
      *
      * @see https://github.com/sebastianbergmann/phpunit/issues/3494
      *
-     * @param iterable $subset
-     * @param iterable $array
-     *
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws \Exception
      */
-    public static function assertArraySubset($subset, $array, bool $checkForObjectIdentity = false, string $message = ''): void
+    public static function assertArraySubset(iterable $subset, iterable $array, bool $checkForObjectIdentity = false, string $message = ''): void
     {
         $constraint = new ArraySubset($subset, $checkForObjectIdentity);
 
         static::assertThat($array, $constraint, $message);
     }
 
-    /**
-     * @param object|array|string $jsonSchema
-     */
-    public static function assertMatchesJsonSchema($jsonSchema, ?int $checkMode = null, string $message = ''): void
+    public static function assertMatchesJsonSchema(object|array|string $jsonSchema, ?int $checkMode = null, string $message = ''): void
     {
         $constraint = new MatchesJsonSchema($jsonSchema, $checkMode);
 

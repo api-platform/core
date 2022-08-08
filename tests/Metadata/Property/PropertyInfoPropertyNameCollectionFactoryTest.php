@@ -21,7 +21,6 @@ use ApiPlatform\Tests\Fixtures\DummyObjectWithoutProperty;
 use ApiPlatform\Tests\Fixtures\DummyObjectWithPublicAndPrivateProperty;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPass;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -79,11 +78,6 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
 
     public function testCreateMethodReturnsProperPropertyNameCollectionForObjectWithIgnoredProperties(): void
     {
-        // symfony/property-info < 5.2.1
-        if (!class_exists(PropertyInfoConstructorPass::class)) {
-            self::markTestSkipped();
-        }
-
         $factory = new PropertyInfoPropertyNameCollectionFactory(
             new PropertyInfoExtractor([
                 new SerializerExtractor(

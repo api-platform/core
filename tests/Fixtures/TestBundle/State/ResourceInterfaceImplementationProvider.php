@@ -23,7 +23,7 @@ final class ResourceInterfaceImplementationProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ResourceInterfaceImplementation|\Generator|null
     {
         if ($operation instanceof CollectionOperationInterface) {
             return (function (): \Generator {

@@ -113,12 +113,12 @@ trait SearchFilterTrait
 
     abstract protected function getPropertyAccessor(): PropertyAccessorInterface;
 
-    abstract protected function normalizePropertyName($property): string;
+    abstract protected function normalizePropertyName(string $property): string;
 
     /**
      * Gets the ID from an IRI or a raw ID.
      */
-    protected function getIdFromValue(string $value)
+    protected function getIdFromValue(string $value): mixed
     {
         try {
             $iriConverter = $this->getIriConverter();
@@ -156,12 +156,10 @@ trait SearchFilterTrait
 
     /**
      * When the field should be an integer, check that the given value is a valid one.
-     *
-     * @param mixed|null $type
      */
-    protected function hasValidValues(array $values, $type = null): bool
+    protected function hasValidValues(array $values, ?string $type = null): bool
     {
-        foreach ($values as $key => $value) {
+        foreach ($values as $value) {
             if (null !== $value && \in_array($type, (array) self::DOCTRINE_INTEGER_TYPE, true) && false === filter_var($value, \FILTER_VALIDATE_INT)) {
                 return false;
             }
