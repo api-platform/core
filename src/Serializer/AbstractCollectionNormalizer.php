@@ -15,7 +15,10 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -87,12 +90,19 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $context = $this->initContext($resourceClass, $context);
         $data = [];
+        $paginationData = $this->getPaginationData($object, $context);
 
-        return array_merge_recursive(
-            $data,
-            $this->getPaginationData($object, $context),
-            $this->getItemsData($object, $format, $context)
-        );
+        /** @var ResourceMetadata|ResourceMetadataCollection */
+        $metadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? '');
+        if ($metadata instanceof ResourceMetadataCollection && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && ($itemUriTemplate = $operation->getItemUriTemplate())) {
+            $context['operation'] = $metadata->matchOperation($itemUriTemplate);
+        } else {
+            unset($context['operation']);
+        }
+        unset($context['operation_type'], $context['operation_name']);
+        $itemsData = $this->getItemsData($object, $format, $context);
+
+        return array_merge_recursive($data, $paginationData, $itemsData);
     }
 
     /**

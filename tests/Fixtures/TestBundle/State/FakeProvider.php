@@ -31,7 +31,7 @@ final class FakeProvider implements ProviderInterface
             '67890' => new $className('67890', 'Grégoire'),
         ];
 
-        if ($uriVariables) {
+        if (isset($uriVariables['id'])) {
             return $data[$uriVariables['id']] ?? null;
         }
 

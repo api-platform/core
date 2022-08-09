@@ -62,3 +62,25 @@ resources:
                 provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
 
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\FlexConfig: ~
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\Car:
+        -   graphQlOperations: [ ]
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
+                ApiPlatform\Metadata\Post:
+                    processor: ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor
+                ApiPlatform\Metadata\Get: ~
+        -   graphQlOperations: [ ]
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
+                    uriTemplate: /brands/renault/cars
+                    itemUriTemplate: /brands/renault/cars/{id}
+                ApiPlatform\Metadata\Post:
+                    processor: ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor
+                    uriTemplate: /brands/renault/cars
+                    itemUriTemplate: /brands/renault/cars/{id}
+                ApiPlatform\Metadata\Get:
+                    provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
+                    uriTemplate: /brands/renault/cars/{id}

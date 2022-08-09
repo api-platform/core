@@ -134,6 +134,10 @@ final class IriConverter implements IriConverterInterface
         // Custom resources should have the same IRI as requested, it was not the case pre 2.7
         $isLegacyCustomResource = ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && ($operation->getExtraProperties()['user_defined_uri_template'] ?? false);
 
+        if ($operation instanceof HttpOperation && HttpOperation::METHOD_POST === $operation->getMethod() && ($itemUriTemplate = $operation->getItemUriTemplate())) {
+            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->matchOperation($itemUriTemplate);
+        }
+
         // In symfony the operation name is the route name, try to find one if none provided
         if (
             !$operation->getName()

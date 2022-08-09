@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\Post;
 use Symfony\Component\Config\Util\XmlUtils;
 
 /**
@@ -292,6 +294,10 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 if (null === $value) {
                     $datum[$key] = $root[$key];
                 }
+            }
+
+            if (\in_array((string) $operation['class'], [GetCollection::class, Post::class], true)) {
+                $datum['itemUriTemplate'] = $this->phpize($operation, 'itemUriTemplate', 'string');
             }
 
             $data[] = array_merge($datum, [

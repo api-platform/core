@@ -286,6 +286,7 @@ parameters:
 			paths:
 				- tests/Fixtures/TestBundle/Document/
 				- tests/Fixtures/TestBundle/Entity/
+		- '#Call to an undefined method ApiPlatform\\Metadata\\.+::getItemUriTemplate\(\)\.#'
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'

@@ -16,6 +16,8 @@ namespace ApiPlatform\Metadata;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Post extends HttpOperation
 {
+    private $itemUriTemplate;
+
     /**
      * {@inheritdoc}
      */
@@ -92,8 +94,23 @@ final class Post extends HttpOperation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        ?string $itemUriTemplate = null
     ) {
         parent::__construct(self::METHOD_POST, ...\func_get_args());
+        $this->itemUriTemplate = $itemUriTemplate;
+    }
+
+    public function getItemUriTemplate(): ?string
+    {
+        return $this->itemUriTemplate;
+    }
+
+    public function withItemUriTemplate(string $itemUriTemplate): self
+    {
+        $self = clone $this;
+        $self->itemUriTemplate = $itemUriTemplate;
+
+        return $self;
     }
 }

@@ -300,6 +300,7 @@ class YamlExtractorTest extends TestCase
                             'processor' => null,
                             'provider' => null,
                             'openapi' => null,
+                            'itemUriTemplate' => null,
                         ],
                         [
                             'name' => null,
