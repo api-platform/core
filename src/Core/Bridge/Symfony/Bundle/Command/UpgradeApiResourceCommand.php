@@ -31,13 +31,18 @@ use PhpParser\NodeTraverser;
 use PhpParser\Parser\Php7;
 use PhpParser\PrettyPrinter\Standard;
 use SebastianBergmann\Diff\Differ;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'api:upgrade-resource')]
 final class UpgradeApiResourceCommand extends Command
 {
+    /**
+     * @deprecated To be removed along with Symfony < 6.1 compatibility
+     */
     protected static $defaultName = 'api:upgrade-resource';
 
     private $resourceNameCollectionFactory;
