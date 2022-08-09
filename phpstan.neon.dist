@@ -291,6 +291,9 @@ parameters:
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'
 			path: src/Core/Bridge/Doctrine/Common/Util/IdentifierManagerTrait.php
+		-
+			message: '#Property Doctrine\\ORM\\Mapping\\ClassMetadataInfo<.+>::\$associationMappings .+ does not accept array#'
+			path: tests/Doctrine/
 		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
