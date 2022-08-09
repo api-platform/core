@@ -268,6 +268,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             $data[] = array_merge($datum, [
                 'read' => $this->phpize($operation, 'read', 'bool'),
                 'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
+                'openapi' => $this->phpize($operation, 'openapi', 'bool'),
                 'validate' => $this->phpize($operation, 'validate', 'bool'),
                 'write' => $this->phpize($operation, 'write', 'bool'),
                 'serialize' => $this->phpize($operation, 'serialize', 'bool'),

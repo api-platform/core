@@ -299,6 +299,7 @@ class YamlExtractorTest extends TestCase
                             'priority' => null,
                             'processor' => null,
                             'provider' => null,
+                            'openapi' => null,
                         ],
                         [
                             'name' => null,
@@ -375,6 +376,7 @@ class YamlExtractorTest extends TestCase
                             'priority' => null,
                             'processor' => null,
                             'provider' => null,
+                            'openapi' => null,
                         ],
                     ],
                     'graphQlOperations' => null,

@@ -51,6 +51,7 @@ final class NotExposed extends HttpOperation
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
+        ?bool $openapi = false,
         ?array $exceptionToStatus = null,
 
         ?bool $queryParameterValidationEnabled = null,
@@ -106,5 +107,6 @@ final class NotExposed extends HttpOperation
         $this->controller = $controller;
         $this->output = $output;
         $this->read = $read;
+        $this->openapi = $openapi;
     }
 }

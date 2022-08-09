@@ -69,6 +69,7 @@ class HttpOperation extends Operation
      */
     protected $hydraContext;
     protected $openapiContext;
+    protected $openapi;
 
     protected $exceptionToStatus;
 
@@ -145,6 +146,7 @@ class HttpOperation extends Operation
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
+        ?bool $openapi = null,
         ?array $exceptionToStatus = null,
 
         ?bool $queryParameterValidationEnabled = null,
@@ -225,6 +227,7 @@ class HttpOperation extends Operation
         $this->denormalizationContext = $denormalizationContext;
         $this->hydraContext = $hydraContext;
         $this->openapiContext = $openapiContext;
+        $this->openapi = $openapi;
         $this->validationContext = $validationContext;
         $this->filters = $filters;
         $this->elasticsearch = $elasticsearch;
@@ -582,6 +585,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->openapiContext = $openapiContext;
+
+        return $self;
+    }
+
+    public function getOpenapi(): ?bool
+    {
+        return $this->openapi;
+    }
+
+    public function withOpenapi(bool $openapi): self
+    {
+        $self = clone $this;
+        $self->openapi = $openapi;
 
         return $self;
     }

@@ -262,6 +262,7 @@ class XmlExtractorTest extends TestCase
                             'priority' => null,
                             'processor' => null,
                             'provider' => null,
+                            'openapi' => null,
                         ],
                         [
                             'name' => null,
@@ -357,6 +358,7 @@ class XmlExtractorTest extends TestCase
                             'priority' => null,
                             'processor' => null,
                             'provider' => null,
+                            'openapi' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
