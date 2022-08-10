@@ -84,3 +84,27 @@ resources:
                 ApiPlatform\Metadata\Get:
                     provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
                     uriTemplate: /brands/renault/cars/{id}
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\DummyCollectionDto:
+        graphQlOperations: [ ]
+        operations:
+            ApiPlatform\Metadata\GetCollection:
+                output: ApiPlatform\Tests\Fixtures\TestBundle\Dto\DummyCollectionDtoOutput
+                provider: ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\DummyFooCollectionDto:
+        graphQlOperations: [ ]
+        operations:
+            ApiPlatform\Metadata\GetCollection:
+                output: ApiPlatform\Tests\Fixtures\TestBundle\Dto\DummyCollectionDtoOutput
+                provider: ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider
+                itemUriTemplate: /dummy_foos/bar
+            ApiPlatform\Metadata\Get:
+                uriTemplate: /dummy_foos/bar
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\DummyIdCollectionDto:
+        graphQlOperations: [ ]
+        operations:
+            ApiPlatform\Metadata\GetCollection:
+                output: ApiPlatform\Tests\Fixtures\TestBundle\Dto\DummyIdCollectionDtoOutput
+                provider: ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider
