@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Utils\SchemaPrinter;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,8 +29,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
+#[AsCommand(name: 'api:graphql:export', description: 'Export the GraphQL schema in Schema Definition Language (SDL)')]
 class GraphQlExportCommand extends Command
 {
+    /**
+     * @deprecated To be removed along with Symfony <6.1 compatibility
+     */
+    protected static $defaultName = 'api:graphql:export';
+
     private $schemaBuilder;
 
     public function __construct(SchemaBuilderInterface $schemaBuilder)
@@ -76,10 +83,5 @@ class GraphQlExportCommand extends Command
         }
 
         return 0;
-    }
-
-    public static function getDefaultName(): string
-    {
-        return 'api:graphql:export';
     }
 }

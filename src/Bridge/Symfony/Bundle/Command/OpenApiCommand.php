@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,8 +28,14 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Dumps Open API documentation.
  */
+#[AsCommand(name: 'api:openapi:export', description: 'Dump the Open API documentation')]
 final class OpenApiCommand extends Command
 {
+    /**
+     * @deprecated To be removed along with Symfony <6.1 compatibility
+     */
+    protected static $defaultName = 'api:openapi:export';
+
     private $openApiFactory;
     private $normalizer;
 
@@ -88,10 +95,5 @@ final class OpenApiCommand extends Command
         $output->writeln($content);
 
         return 0;
-    }
-
-    public static function getDefaultName(): string
-    {
-        return 'api:openapi:export';
     }
 }

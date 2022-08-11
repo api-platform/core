@@ -17,6 +17,7 @@ use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,8 +32,14 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
+#[AsCommand(name: 'swagger:export', description: 'Dump the Swagger v2 documentation')]
 final class SwaggerCommand extends Command
 {
+    /**
+     * @deprecated To be removed along with Symfony <6.1 compatibility
+     */
+    protected static $defaultName = 'api:swagger:export';
+
     private $normalizer;
     private $resourceNameCollectionFactory;
     private $apiTitle;
@@ -106,10 +113,5 @@ final class SwaggerCommand extends Command
         }
 
         return 0;
-    }
-
-    public static function getDefaultName(): string
-    {
-        return 'api:swagger:export';
     }
 }
