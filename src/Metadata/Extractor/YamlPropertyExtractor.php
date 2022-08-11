@@ -97,7 +97,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
         }
     }
 
-    private function buildAttribute(array $resource, string $key, $default = null)
+    private function buildAttribute(array $resource, string $key, mixed $default = null)
     {
         if (empty($resource[$key])) {
             return $default;
@@ -112,12 +112,8 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
 
     /**
      * Transforms an XML attribute's value in a PHP value.
-     *
-     * @param mixed|null $default
-     *
-     * @return string|int|bool|array|null
      */
-    private function phpize(?array $resource, string $key, string $type, $default = null)
+    private function phpize(?array $resource, string $key, string $type, mixed $default = null): array|bool|int|string|null
     {
         if (!isset($resource[$key])) {
             return $default;

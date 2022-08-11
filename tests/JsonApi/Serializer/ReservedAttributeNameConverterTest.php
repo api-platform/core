@@ -29,7 +29,7 @@ class ReservedAttributeNameConverterTest extends TestCase
         $this->reservedAttributeNameConverter = new ReservedAttributeNameConverter(new CustomConverter());
     }
 
-    public function propertiesProvider()
+    public function propertiesProvider(): array
     {
         return [
             ['id', '_id'],
@@ -48,22 +48,16 @@ class ReservedAttributeNameConverterTest extends TestCase
 
     /**
      * @dataProvider propertiesProvider
-     *
-     * @param string $propertyName
-     * @param string $expectedPropertyName
      */
-    public function testNormalize($propertyName, $expectedPropertyName): void
+    public function testNormalize(string $propertyName, string $expectedPropertyName): void
     {
         $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->normalize($propertyName));
     }
 
     /**
      * @dataProvider propertiesProvider
-     *
-     * @param string $expectedPropertyName
-     * @param string $propertyName
      */
-    public function testDenormalize($expectedPropertyName, $propertyName): void
+    public function testDenormalize(string $expectedPropertyName, string $propertyName): void
     {
         $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->denormalize($propertyName));
     }

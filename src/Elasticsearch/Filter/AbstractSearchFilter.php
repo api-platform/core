@@ -35,17 +35,11 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractSearchFilter extends AbstractFilter implements ConstantScoreFilterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected IriConverterInterface $iriConverter, protected PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(array $clauseBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
     {
         $searches = [];
@@ -157,7 +151,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
     /**
      * Gets the ID from an IRI or a raw ID.
      */
-    protected function getIdentifierValue(string $iri, string $property)
+    protected function getIdentifierValue(string $iri, string $property): mixed
     {
         try {
             $item = $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => false]);

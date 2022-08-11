@@ -22,9 +22,10 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -32,8 +33,8 @@ class QueryParameterValidateListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $testedInstance;
-    private $queryParameterValidator;
+    private QueryParameterValidateListener $testedInstance;
+    private ObjectProphecy $queryParameterValidator;
 
     /**
      * unsafe method should not use filter validations.
@@ -48,9 +49,9 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $this->assertNull(
-            $this->testedInstance->onKernelRequest($eventProphecy->reveal())
-        );
+        $this->queryParameterValidator->validateFilters(Argument::cetera())->shouldNotBeCalled();
+
+        $this->testedInstance->onKernelRequest($eventProphecy->reveal());
     }
 
     public function testDoNotValidateWhenDisabledGlobally(): void
@@ -118,9 +119,7 @@ class QueryParameterValidateListenerTest extends TestCase
 
         $this->queryParameterValidator->validateFilters(Dummy::class, ['some_inexistent_filter'], [])->shouldBeCalled();
 
-        $this->assertNull(
-            $this->testedInstance->onKernelRequest($eventProphecy->reveal())
-        );
+        $this->testedInstance->onKernelRequest($eventProphecy->reveal());
     }
 
     /**
@@ -169,9 +168,7 @@ class QueryParameterValidateListenerTest extends TestCase
             ->validateFilters(Dummy::class, ['some_filter'], ['required' => 'foo'])
             ->shouldBeCalled();
 
-        $this->assertNull(
-            $this->testedInstance->onKernelRequest($eventProphecy->reveal())
-        );
+        $this->testedInstance->onKernelRequest($eventProphecy->reveal());
     }
 
     private function setUpWithFilters(array $filters = []): void

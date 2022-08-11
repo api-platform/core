@@ -23,10 +23,10 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -61,10 +61,8 @@ class ReadStageTest extends TestCase
 
     /**
      * @dataProvider contextProvider
-     *
-     * @param object|iterable|null $expectedResult
      */
-    public function testApplyDisabled(array $context, $expectedResult): void
+    public function testApplyDisabled(array $context, iterable|object|null $expectedResult): void
     {
         $resourceClass = 'myResource';
         /** @var Operation $operation */
@@ -85,11 +83,8 @@ class ReadStageTest extends TestCase
 
     /**
      * @dataProvider itemProvider
-     *
-     * @param object|null $item
-     * @param object|null $expectedResult
      */
-    public function testApplyItem(?string $identifier, $item, bool $throwNotFound, $expectedResult): void
+    public function testApplyItem(?string $identifier, ?object $item, bool $throwNotFound, ?object $expectedResult): void
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
@@ -131,11 +126,8 @@ class ReadStageTest extends TestCase
 
     /**
      * @dataProvider itemMutationOrSubscriptionProvider
-     *
-     * @param object|null $item
-     * @param object|null $expectedResult
      */
-    public function testApplyMutationOrSubscription(bool $isMutation, bool $isSubscription, string $resourceClass, ?string $identifier, $item, bool $throwNotFound, $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
+    public function testApplyMutationOrSubscription(bool $isMutation, bool $isSubscription, string $resourceClass, ?string $identifier, ?object $item, bool $throwNotFound, ?object $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $operationName = 'create';
         $info = $this->prophesize(ResolveInfo::class)->reveal();

@@ -1373,7 +1373,7 @@ final class DoctrineContext implements Context
         if ($this->isOrm()) {
             $count = $this->doctrine->getRepository(Comment::class)->count(['author' => $author]);
         } else {
-            /** @var Builder */
+            /** @var Builder $qb */
             $qb = $this->doctrine->getRepository(CommentDocument::class)
                                  ->createQueryBuilder('f');
 

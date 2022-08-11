@@ -18,8 +18,8 @@ use ApiPlatform\Metadata\Resource\Factory\InputOutputResourceMetadataCollectionF
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class InputOutputResourceMetadataCollectionFactoryTest extends TestCase
 {
@@ -28,7 +28,7 @@ class InputOutputResourceMetadataCollectionFactoryTest extends TestCase
     /**
      * @dataProvider getAttributes
      */
-    public function testInputOutputMetadata($input, $expected): void
+    public function testInputOutputMetadata(mixed $input, ?array $expected): void
     {
         $resourceCollection = new ResourceMetadataCollection('Foo', [new ApiResource(input: $input)]);
         $decoratedProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

@@ -39,7 +39,7 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
     public function convert(array $uriVariables, string $class, array $context = []): array
     {
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($class)->getOperation();
-        $context = $context + ['operation' => $operation];
+        $context += ['operation' => $operation];
         $uriVariablesDefinitions = $operation->getUriVariables() ?? [];
 
         foreach ($uriVariables as $parameterName => $value) {

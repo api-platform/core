@@ -43,10 +43,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     public const ITEM_RESOURCE_CLASS_KEY = '#itemResourceClass';
     public const ITEM_IDENTIFIERS_KEY = '#itemIdentifiers';
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, /**
-     * @var IdentifiersExtractorInterface
-     */
-        private $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, LoggerInterface $logger = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, LoggerInterface $logger = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $logger ?: new NullLogger(), $resourceMetadataCollectionFactory, $resourceAccessChecker);
     }
@@ -68,7 +65,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     {
         $resourceClass = $this->getObjectClass($object);
 
-        if ($this->getOutputClass($resourceClass, $context)) {
+        if ($this->getOutputClass($context)) {
             $context['graphql_identifiers'] = [
                 self::ITEM_RESOURCE_CLASS_KEY => $context['operation']->getClass(),
                 self::ITEM_IDENTIFIERS_KEY => $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null),
@@ -84,7 +81,7 @@ final class ItemNormalizer extends BaseItemNormalizer
         }
 
         if (isset($context['graphql_identifiers'])) {
-            $data = $data + $context['graphql_identifiers'];
+            $data += $context['graphql_identifiers'];
         } elseif (!($context['no_resolver_data'] ?? false)) {
             $data[self::ITEM_RESOURCE_CLASS_KEY] = $resourceClass;
             $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null);

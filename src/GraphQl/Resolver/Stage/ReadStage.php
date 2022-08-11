@@ -43,7 +43,7 @@ final class ReadStage implements ReadStageInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context)
+    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context): iterable|object|null
     {
         if (!($operation->canRead() ?? true)) {
             return $context['is_collection'] ? [] : null;
@@ -88,10 +88,7 @@ final class ReadStage implements ReadStageInterface
         return $this->provider->provide($operation, $uriVariables, $normalizationContext);
     }
 
-    /**
-     * @return object|null
-     */
-    private function getItem(?string $identifier, array $normalizationContext)
+    private function getItem(?string $identifier, array $normalizationContext): ?object
     {
         if (null === $identifier) {
             return null;

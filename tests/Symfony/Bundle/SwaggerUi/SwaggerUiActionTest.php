@@ -26,9 +26,9 @@ use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiAction;
 use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiContext;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -83,7 +83,7 @@ class SwaggerUiActionTest extends TestCase
         $action($request);
     }
 
-    public function getInvokeParameters()
+    public function getInvokeParameters(): array
     {
         $twigCollectionProphecy = $this->prophesize(TwigEnvironment::class);
         $twigCollectionProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [

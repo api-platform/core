@@ -17,7 +17,6 @@ use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -52,7 +51,6 @@ final class ContextAction
         }
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            /** @var ResourceMetadataCollection */
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
 
             try {

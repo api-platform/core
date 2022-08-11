@@ -103,9 +103,6 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();

@@ -48,8 +48,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Mercure\Discovery;
-use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -107,7 +105,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config);
-        $this->registerJsonHalConfiguration($formats, $loader, $config);
+        $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
         $this->registerGraphQlConfiguration($container, $config, $loader);
         $this->registerCacheConfiguration($container);
@@ -119,9 +117,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMercureConfiguration($container, $config, $loader);
         $this->registerMessengerConfiguration($container, $config, $loader);
         $this->registerElasticsearchConfiguration($container, $config, $loader);
-        $this->registerSecurityConfiguration($container, $loader, $config);
+        $this->registerSecurityConfiguration($container, $loader);
         $this->registerMakerConfiguration($container, $config, $loader);
-        $this->registerArgumentResolverConfiguration($container, $loader, $config);
+        $this->registerArgumentResolverConfiguration($loader);
 
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
@@ -430,7 +428,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader, array $config): void
+    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader): void
     {
         if (!isset($formats['jsonhal'])) {
             return;
@@ -625,31 +623,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('mercure.xml');
-        if (!class_exists(Discovery::class)) {
-            $container->getDefinition('api_platform.mercure.listener.response.add_link_header')->setArgument(1, $config['mercure']['hub_url'] ?? '%mercure.default_hub%');
-        }
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_mercure_publisher.xml');
-
-            if (class_exists(HubRegistry::class)) {
-                $container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->setArgument(6, new Reference(HubRegistry::class));
-            }
         }
         if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
             $loader->load('doctrine_odm_mercure_publisher.xml');
-            if (class_exists(HubRegistry::class)) {
-                $container->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->setArgument(6, new Reference(HubRegistry::class));
-            }
         }
 
         if ($this->isConfigEnabled($container, $config['graphql'])) {
             $loader->load('graphql_mercure.xml');
-            if (class_exists(HubRegistry::class)) {
-                $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument(new Reference(HubRegistry::class));
-            } else {
-                $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument($config['mercure']['hub_url'] ?? '%mercure.default_hub%');
-            }
         }
     }
 
@@ -681,7 +664,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
     }
 
-    private function registerSecurityConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $config): void
+    private function registerSecurityConfiguration(ContainerBuilder $container, XmlFileLoader $loader): void
     {
         /** @var string[] $bundles */
         $bundles = $container->getParameter('kernel.bundles');
@@ -714,7 +697,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('maker.xml');
     }
 
-    private function registerArgumentResolverConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $config): void
+    private function registerArgumentResolverConfiguration(XmlFileLoader $loader): void
     {
         $loader->load('argument_resolver.xml');
     }

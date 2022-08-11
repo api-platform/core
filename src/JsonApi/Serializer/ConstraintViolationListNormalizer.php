@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -60,15 +59,12 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
         return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
     }
 
-    private function getSourcePointerFromViolation(ConstraintViolationInterface $violation)
+    private function getSourcePointerFromViolation(ConstraintViolationInterface $violation): string
     {
         $fieldName = $violation->getPropertyPath();
 
@@ -77,7 +73,6 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
         }
 
         $class = $violation->getRoot()::class;
-        /** @var ApiProperty */
         $propertyMetadata = $this->propertyMetadataFactory
             ->create(
                 // Im quite sure this requires some thought in case of validations over relationships

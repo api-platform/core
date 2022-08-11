@@ -75,11 +75,11 @@ use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
-use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -327,7 +327,7 @@ class ApiPlatformExtensionTest extends TestCase
     /**
      * @dataProvider dataProviderCommonConfigurationAliasNameConverter
      */
-    public function testCommonConfigurationAliasNameConverter($nameConverterConfig, $aliasIsExected): void
+    public function testCommonConfigurationAliasNameConverter(?string $nameConverterConfig, bool $aliasIsExected): void
     {
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['name_converter'] = $nameConverterConfig;

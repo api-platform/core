@@ -32,10 +32,7 @@ final class GraphqlContext implements Context
 {
     private ?RestContext $restContext = null;
 
-    /**
-     * @var array
-     */
-    private $graphqlRequest;
+    private array $graphqlRequest;
 
     private ?int $graphqlLine = null; // @phpstan-ignore-line
 

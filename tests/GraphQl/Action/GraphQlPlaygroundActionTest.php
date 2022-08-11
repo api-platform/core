@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\GraphQl\Action;
 
 use ApiPlatform\GraphQl\Action\GraphQlPlaygroundAction;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

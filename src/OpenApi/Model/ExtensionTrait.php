@@ -15,9 +15,9 @@ namespace ApiPlatform\OpenApi\Model;
 
 trait ExtensionTrait
 {
-    private $extensionProperties = [];
+    private array $extensionProperties = [];
 
-    public function withExtensionProperty(string $key, $value)
+    public function withExtensionProperty(string $key, $value): mixed
     {
         if (!str_starts_with($key, 'x-')) {
             $key = 'x-'.$key;

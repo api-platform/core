@@ -214,7 +214,7 @@ class ConfigurationTest extends TestCase
         ], $config);
     }
 
-    public function invalidHttpStatusCodeProvider()
+    public function invalidHttpStatusCodeProvider(): array
     {
         return [
             [0],
@@ -241,7 +241,7 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
-    public function invalidHttpStatusCodeValueProvider()
+    public function invalidHttpStatusCodeValueProvider(): array
     {
         return [
             [true],
@@ -351,9 +351,6 @@ class ConfigurationTest extends TestCase
         $this->assertSame('', $config['description']);
     }
 
-    /**
-     * @requires PHP >= 7.4
-     */
     public function testEnableElasticsearch(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [

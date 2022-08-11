@@ -47,7 +47,7 @@ final class ResourceMetadataCollection extends \ArrayObject
         $metadata = null;
 
         while ($it->valid()) {
-            /** @var ApiResource */
+            /** @var ApiResource $metadata */
             $metadata = $it->current();
 
             foreach ($metadata->getOperations() ?? [] as $name => $operation) {
@@ -90,10 +90,8 @@ final class ResourceMetadataCollection extends \ArrayObject
     {
         // Hide the FQDN in the exception message if possible
         $shortName = $metadata ? $metadata->getShortName() : $this->resourceClass;
-        if (!$metadata) {
-            if (false !== $pos = strrpos($shortName, '\\')) {
-                $shortName = substr($shortName, $pos + 1);
-            }
+        if (!$metadata && false !== $pos = strrpos($shortName, '\\')) {
+            $shortName = substr($shortName, $pos + 1);
         }
 
         throw new OperationNotFoundException(sprintf('Operation "%s" not found for resource "%s".', $operationName, $shortName));

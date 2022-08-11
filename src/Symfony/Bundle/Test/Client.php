@@ -52,7 +52,7 @@ final class Client implements HttpClientInterface
         'extra' => [],
     ];
 
-    private $defaultOptions = self::API_OPTIONS_DEFAULTS;
+    private array $defaultOptions = self::API_OPTIONS_DEFAULTS;
 
     private ?Response $response = null;
 
@@ -123,7 +123,7 @@ final class Client implements HttpClientInterface
     /**
      * {@inheritdoc}
      */
-    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         throw new \LogicException('Not implemented yet');
     }

@@ -45,7 +45,7 @@ class ErrorNormalizerTest extends TestCase
      * @param string $originalMessage original message of the Exception
      * @param bool   $debug           simulates kernel debug variable
      */
-    public function testNormalize($status, $originalMessage, $debug): void
+    public function testNormalize(int $status, string $originalMessage, bool $debug): void
     {
         $normalizer = new ErrorNormalizer($debug);
         $exception = FlattenException::create(new \Exception($originalMessage), $status);
@@ -98,7 +98,7 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
-    public function errorProvider()
+    public function errorProvider(): array
     {
         return [
             [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', false],

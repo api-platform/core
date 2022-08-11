@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\HttpCache;
 
 use ApiPlatform\HttpCache\VarnishPurger;
-use ApiPlatform\Tests\ProphecyTrait;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use LogicException;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -75,7 +75,7 @@ class VarnishPurgerTest extends TestCase
     {
         /** @var HttpClientInterface $client */
         $client = new class() implements ClientInterface {
-            public $sentRegexes = [];
+            public array $sentRegexes = [];
 
             public function send(RequestInterface $request, array $options = []): ResponseInterface
             {
@@ -111,7 +111,7 @@ class VarnishPurgerTest extends TestCase
         self::assertSame($regexesToSend, $client->sentRegexes); // @phpstan-ignore-line
     }
 
-    public function provideChunkHeaderCases()
+    public function provideChunkHeaderCases(): \Generator
     {
         yield 'no iri' => [
             50,

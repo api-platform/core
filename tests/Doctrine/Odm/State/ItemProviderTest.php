@@ -21,7 +21,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ProviderEntity;
-use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\MatchStage as AggregationMatch;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -32,6 +31,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @group mongodb
@@ -143,6 +143,8 @@ class ItemProviderTest extends TestCase
 
     public function testAggregationResultExtension(): void
     {
+        $returnObject = new \stdClass();
+
         $matchProphecy = $this->prophesize(AggregationMatch::class);
         $matchProphecy->field('id')->willReturn($matchProphecy)->shouldBeCalled();
         $matchProphecy->equals(1)->shouldBeCalled();
@@ -162,11 +164,11 @@ class ItemProviderTest extends TestCase
         $extensionProphecy = $this->prophesize(AggregationResultItemExtensionInterface::class);
         $extensionProphecy->applyToItem($aggregationBuilder, ProviderEntity::class, ['id' => 1], $operation, $context)->shouldBeCalled();
         $extensionProphecy->supportsResult(ProviderEntity::class, $operation, $context)->willReturn(true)->shouldBeCalled();
-        $extensionProphecy->getResult($aggregationBuilder, ProviderEntity::class, $operation, $context)->willReturn([])->shouldBeCalled();
+        $extensionProphecy->getResult($aggregationBuilder, ProviderEntity::class, $operation, $context)->willReturn($returnObject)->shouldBeCalled();
 
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistry, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals([], $dataProvider->provide($operation, ['id' => 1], $context));
+        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['id' => 1], $context));
     }
 
     public function testCannotCreateAggregationBuilder(): void

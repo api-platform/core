@@ -47,7 +47,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
      *
      * TODO: 3.0 identifiers should be stringable?
      */
-    public function getIdentifiersFromItem($item, Operation $operation = null, array $context = []): array
+    public function getIdentifiersFromItem(object $item, Operation $operation = null, array $context = []): array
     {
         $identifiers = [];
 
@@ -84,7 +84,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     /**
      * Gets the value of the given class property.
      */
-    private function getIdentifierValue($item, string $class, string $property, string $parameterName)
+    private function getIdentifierValue(object $item, string $class, string $property, string $parameterName): float|bool|int|string
     {
         if ($item instanceof $class) {
             return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, $property), $parameterName);
@@ -124,10 +124,10 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
      *
      * @param mixed|\Stringable $identifierValue
      */
-    private function resolveIdentifierValue($identifierValue, string $parameterName)
+    private function resolveIdentifierValue(mixed $identifierValue, string $parameterName): float|bool|int|string
     {
         if (null === $identifierValue) {
-            throw new RuntimeException('No identifier value found, did you forgot to persist the entity?');
+            throw new RuntimeException('No identifier value found, did you forget to persist the entity?');
         }
 
         if (\is_scalar($identifierValue)) {

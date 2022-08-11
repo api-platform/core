@@ -26,10 +26,10 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -79,10 +79,8 @@ class SerializeStageTest extends TestCase
 
     /**
      * @dataProvider applyProvider
-     *
-     * @param object|iterable|null $itemOrCollection
      */
-    public function testApply($itemOrCollection, string $operationName, array $context, bool $paginationEnabled, ?array $expectedResult): void
+    public function testApply(iterable|object $itemOrCollection, string $operationName, array $context, bool $paginationEnabled, ?array $expectedResult): void
     {
         $resourceClass = 'myResource';
         $operation = $context['is_mutation'] ? new Mutation() : new Query();

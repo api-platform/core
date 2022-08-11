@@ -35,8 +35,6 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws LogicException
      */
     public function hasCacheableSupportsMethod(): bool

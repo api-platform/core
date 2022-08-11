@@ -17,8 +17,8 @@ use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Symfony\Validator\Validator;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidatorInterface;
@@ -93,9 +93,9 @@ class ValidatorTest extends TestCase
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('groups_builder')->willReturn(true);
         $containerProphecy->get('groups_builder')->willReturn(new class() implements ValidationGroupsGeneratorInterface {
-            public function __invoke($data): array
+            public function __invoke(object $object): array
             {
-                return $data instanceof DummyEntity ? ['a', 'b', 'c'] : [];
+                return $object instanceof DummyEntity ? ['a', 'b', 'c'] : [];
             }
         });
 

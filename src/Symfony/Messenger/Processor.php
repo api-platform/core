@@ -31,7 +31,7 @@ final class Processor implements ProcessorInterface
         $this->messageBus = $messageBus;
     }
 
-    private function persist($data, array $context = [])
+    private function persist(mixed $data, array $context = []): mixed
     {
         $envelope = $this->dispatch(
             (new Envelope($data))
@@ -46,7 +46,7 @@ final class Processor implements ProcessorInterface
         return $handledStamp->getResult();
     }
 
-    private function remove($data): void
+    private function remove(mixed $data): void
     {
         $this->dispatch(
             (new Envelope($data))
@@ -54,7 +54,7 @@ final class Processor implements ProcessorInterface
         );
     }
 
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if ($operation instanceof DeleteOperationInterface) {
             $this->remove($data);

@@ -17,8 +17,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -90,7 +90,7 @@ class CachedPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($propertyMetadata, $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy'), 'Trigger the local cache');
     }
 
-    private function generateCacheKey(string $resourceClass = Dummy::class, string $property = 'dummy', array $options = [])
+    private function generateCacheKey(string $resourceClass = Dummy::class, string $property = 'dummy', array $options = []): string
     {
         return CachedPropertyMetadataFactory::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $property, $options]));
     }

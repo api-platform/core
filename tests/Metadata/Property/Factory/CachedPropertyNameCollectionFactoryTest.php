@@ -17,8 +17,8 @@ use ApiPlatform\Metadata\Property\Factory\CachedPropertyNameCollectionFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -90,7 +90,7 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
         $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
-    private function generateCacheKey(string $resourceClass = Dummy::class, array $options = [])
+    private function generateCacheKey(string $resourceClass = Dummy::class, array $options = []): string
     {
         return CachedPropertyNameCollectionFactory::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $options]));
     }

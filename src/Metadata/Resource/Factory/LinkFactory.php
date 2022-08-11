@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -31,7 +33,7 @@ final class LinkFactory implements LinkFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromIdentifiers($operation): array
+    public function createLinksFromIdentifiers(ApiResource|Operation $operation): array
     {
         $identifiers = $this->getIdentifiersFromResourceClass($resourceClass = $operation->getClass());
 
@@ -53,7 +55,7 @@ final class LinkFactory implements LinkFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromRelations($operation): array
+    public function createLinksFromRelations(ApiResource|Operation $operation): array
     {
         $links = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass = $operation->getClass()) as $property) {
@@ -74,7 +76,7 @@ final class LinkFactory implements LinkFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromAttributes($operation): array
+    public function createLinksFromAttributes(ApiResource|Operation $operation): array
     {
         $links = [];
         try {

@@ -48,9 +48,6 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();

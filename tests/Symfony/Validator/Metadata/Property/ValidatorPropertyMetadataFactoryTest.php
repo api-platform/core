@@ -42,14 +42,11 @@ use ApiPlatform\Tests\Fixtures\DummyValidatedChoiceEntity;
 use ApiPlatform\Tests\Fixtures\DummyValidatedEntity;
 use ApiPlatform\Tests\Fixtures\DummyValidatedHostnameEntity;
 use ApiPlatform\Tests\Fixtures\DummyValidatedUlidEntity;
-use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Validator\Constraints\AtLeastOneOf;
-use Symfony\Component\Validator\Constraints\Compound;
 use Symfony\Component\Validator\Constraints\Hostname;
-use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Ulid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
@@ -357,10 +354,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateWithSequentiallyConstraint(): void
     {
-        if (!class_exists(Sequentially::class)) {
-            $this->markTestSkipped();
-        }
-
         $validatorClassMetadata = new ClassMetadata(DummySequentiallyValidatedEntity::class);
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
 
@@ -388,10 +381,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateWithCompoundConstraint(): void
     {
-        if (!class_exists(Compound::class)) {
-            $this->markTestSkipped();
-        }
-
         $validatorClassMetadata = new ClassMetadata(DummyCompoundValidatedEntity::class);
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
 
@@ -419,10 +408,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateWithAtLeastOneOfConstraint(): void
     {
-        if (!class_exists(AtLeastOneOf::class)) {
-            $this->markTestSkipped();
-        }
-
         $validatorClassMetadata = new ClassMetadata(DummyAtLeastOneOfValidatedEntity::class);
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
 

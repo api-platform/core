@@ -8,7 +8,7 @@ use ApiPlatform\State\ProviderInterface;
 
 class <?php echo $class_name; ?> implements ProviderInterface
 {
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|iterable|null
     {
         // Retrieve the state from somewhere
     }

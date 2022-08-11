@@ -18,9 +18,9 @@ use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFa
 use ApiPlatform\Symfony\Bundle\Command\DebugResourceCommand;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AlternateResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -44,9 +44,6 @@ class DebugResourceCommandTest extends TestCase
         return new CommandTester($command);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testDebugResource(): void
     {
         $varDumper = $this->prophesize(DataDumperInterface::class);
@@ -60,9 +57,6 @@ class DebugResourceCommandTest extends TestCase
         $this->assertStringContainsString('Successfully dumped the selected resource', $commandTester->getDisplay());
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testDebugOperation(): void
     {
         $varDumper = $this->prophesize(DataDumperInterface::class);
@@ -77,9 +71,6 @@ class DebugResourceCommandTest extends TestCase
         $this->assertStringContainsString('Successfully dumped the selected operation', $commandTester->getDisplay());
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testWithOnlyOneResource(): void
     {
         $varDumper = $this->prophesize(DataDumperInterface::class);
@@ -95,9 +86,6 @@ class DebugResourceCommandTest extends TestCase
         $this->assertStringContainsString('Successfully dumped the selected operation', $commandTester->getDisplay());
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testExecuteWithNotExistingClass(): void
     {
         $this->expectException(ResourceClassNotFoundException::class);

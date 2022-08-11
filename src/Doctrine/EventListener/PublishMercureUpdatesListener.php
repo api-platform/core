@@ -57,17 +57,15 @@ final class PublishMercureUpdatesListener
         'hub' => true,
         'enable_async_update' => true,
     ];
-    private $hubRegistry;
     private readonly ?ExpressionLanguage $expressionLanguage;
-    private $createdObjects;
-    private $updatedObjects;
-    private $deletedObjects;
+    private \SplObjectStorage $createdObjects;
+    private \SplObjectStorage $updatedObjects;
+    private \SplObjectStorage $deletedObjects;
 
     /**
      * @param array<string, string[]|string> $formats
-     * @param HubRegistry|callable           $hubRegistry
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly SerializerInterface $serializer, private readonly array $formats, MessageBusInterface $messageBus = null, $hubRegistry = null, private readonly ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, private readonly ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly SerializerInterface $serializer, private readonly array $formats, MessageBusInterface $messageBus = null, private readonly ?HubRegistry $hubRegistry = null, private readonly ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, private readonly ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $hubRegistry) {
             throw new InvalidArgumentException('A message bus or a hub registry must be provided.');
@@ -77,7 +75,6 @@ final class PublishMercureUpdatesListener
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->messageBus = $messageBus;
-        $this->hubRegistry = $hubRegistry;
         $this->expressionLanguage = $expressionLanguage ?? (class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null);
         $this->reset();
 
@@ -149,10 +146,7 @@ final class PublishMercureUpdatesListener
         $this->deletedObjects = new \SplObjectStorage();
     }
 
-    /**
-     * @param object $object
-     */
-    private function storeObjectToPublish($object, string $property): void
+    private function storeObjectToPublish(object $object, string $property): void
     {
         if (null === $resourceClass = $this->getResourceClass($object)) {
             return;
@@ -185,21 +179,8 @@ final class PublishMercureUpdatesListener
         }
 
         foreach ($options as $key => $value) {
-            if (0 === $key) {
-                if (method_exists(Update::class, 'isPrivate')) {
-                    throw new \InvalidArgumentException('Targets do not exist anymore since Mercure 0.10. Mark the update as private instead or downgrade the Mercure Component to version 0.3');
-                }
-
-                @trigger_error('Targets do not exist anymore since Mercure 0.10. Mark the update as private instead.', \E_USER_DEPRECATED);
-                break;
-            }
-
             if (!isset(self::ALLOWED_KEYS[$key])) {
                 throw new InvalidArgumentException(sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', self::ALLOWED_KEYS)));
-            }
-
-            if ('hub' === $key && !$this->hubRegistry instanceof HubRegistry) {
-                throw new InvalidArgumentException(sprintf('The option "hub" of the "mercure" attribute cannot be set on the "%s" resource . Try running "composer require symfony/mercure:^0.5".', $resourceClass));
             }
         }
 
@@ -240,10 +221,7 @@ final class PublishMercureUpdatesListener
         $this->{$property}[$object] = $options;
     }
 
-    /**
-     * @param object $object
-     */
-    private function publishUpdate($object, array $options, string $type): void
+    private function publishUpdate(object $object, array $options, string $type): void
     {
         if ($object instanceof \stdClass) {
             // By convention, if the object has been deleted, we send only its IRI.
@@ -268,16 +246,14 @@ final class PublishMercureUpdatesListener
                 continue;
             }
 
-            $this->hubRegistry instanceof HubRegistry ? $this->hubRegistry->getHub($options['hub'] ?? null)->publish($update) : ($this->hubRegistry)($update);
+            $this->hubRegistry->getHub($options['hub'] ?? null)->publish($update);
         }
     }
 
     /**
-     * @param object $object
-     *
      * @return Update[]
      */
-    private function getGraphQlSubscriptionUpdates($object, array $options, string $type): array
+    private function getGraphQlSubscriptionUpdates(object $object, array $options, string $type): array
     {
         if ('update' !== $type || !$this->graphQlSubscriptionManager || !$this->graphQlMercureSubscriptionIriGenerator) {
             return [];
@@ -302,11 +278,6 @@ final class PublishMercureUpdatesListener
      */
     private function buildUpdate(string|array $iri, string $data, array $options): Update
     {
-        if (method_exists(Update::class, 'isPrivate')) {
-            return new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
-        }
-
-        // Mercure Component < 0.4.
-        return new Update($iri, $data, $options); // @phpstan-ignore-line
+        return new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
     }
 }

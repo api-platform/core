@@ -28,5 +28,5 @@ interface AggregationResultCollectionExtensionInterface extends AggregationColle
 {
     public function supportsResult(string $resourceClass, Operation $operation = null, array $context = []): bool;
 
-    public function getResult(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array $context = []);
+    public function getResult(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array $context = []): iterable;
 }

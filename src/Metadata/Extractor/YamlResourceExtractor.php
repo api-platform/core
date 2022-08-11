@@ -206,7 +206,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
     /**
      * @return bool|string|string[]|null
      */
-    private function buildMercure(array $resource)
+    private function buildMercure(array $resource): array|bool|string|null
     {
         if (!\array_key_exists('mercure', $resource)) {
             return null;
@@ -219,10 +219,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         return $resource['mercure'];
     }
 
-    /**
-     * @return array|bool|string|null
-     */
-    private function buildMessenger(array $resource)
+    private function buildMessenger(array $resource): bool|array|string|null
     {
         if (!\array_key_exists('messenger', $resource)) {
             return null;

@@ -22,15 +22,12 @@ use Symfony\Component\Messenger\MessageBusInterface;
  */
 trait DispatchTrait
 {
-    /**
-     * @var MessageBusInterface|null
-     */
-    private $messageBus;
+    private ?MessageBusInterface $messageBus;
 
     /**
      * @param object|Envelope $message
      */
-    private function dispatch($message)
+    private function dispatch(object $message): Envelope
     {
         if (!$this->messageBus instanceof MessageBusInterface) {
             throw new \InvalidArgumentException('The message bus is not set.');

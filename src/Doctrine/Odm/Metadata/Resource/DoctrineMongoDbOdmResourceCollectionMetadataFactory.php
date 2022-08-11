@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -38,10 +39,12 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
+        /** @var ApiResource $resourceMetadata */
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();
 
             if ($operations) {
+                /** @var Operation $operation */
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     if (!$this->managerRegistry->getManagerForClass($operation->getClass()) instanceof DocumentManager) {
                         continue;
@@ -73,7 +76,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
         return $resourceMetadataCollection;
     }
 
-    private function addDefaults($operation): Operation
+    private function addDefaults(Operation $operation): Operation
     {
         if (null === $operation->getProvider()) {
             $operation = $operation->withProvider($this->getProvider($operation));

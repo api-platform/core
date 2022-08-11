@@ -157,7 +157,7 @@ final class PropertyFilter implements FilterInterface
         return $result;
     }
 
-    private function denormalizePropertyName($property)
+    private function denormalizePropertyName($property): string
     {
         return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
     }

@@ -27,7 +27,7 @@ final class CustomOutputDtoProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|iterable|null
     {
         if ($operation instanceof CollectionOperationInterface) {
             $object = $this->collectionProvider->provide($operation, $uriVariables, $context);

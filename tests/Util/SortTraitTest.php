@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SortTraitTest extends TestCase
 {
-    private function getSortTraitImplementation()
+    private function getSortTraitImplementation(): object
     {
         return new class() {
             use SortTrait {

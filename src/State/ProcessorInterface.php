@@ -26,5 +26,5 @@ interface ProcessorInterface
     /**
      * Handle the state.
      */
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = []);
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []);
 }

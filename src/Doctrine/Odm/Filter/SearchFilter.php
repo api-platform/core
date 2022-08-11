@@ -174,21 +174,14 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         $quotedValue = preg_quote($value);
 
-        switch ($strategy) {
-            case null:
-            case self::STRATEGY_EXACT:
-                return $caseSensitive ? $value : new Regex("^$quotedValue$", 'i');
-            case self::STRATEGY_PARTIAL:
-                return new Regex($quotedValue, $caseSensitive ? '' : 'i');
-            case self::STRATEGY_START:
-                return new Regex("^$quotedValue", $caseSensitive ? '' : 'i');
-            case self::STRATEGY_END:
-                return new Regex("$quotedValue$", $caseSensitive ? '' : 'i');
-            case self::STRATEGY_WORD_START:
-                return new Regex("(^$quotedValue.*|.*\s$quotedValue.*)", $caseSensitive ? '' : 'i');
-            default:
-                throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
-        }
+        return match ($strategy) {
+            self::STRATEGY_EXACT => $caseSensitive ? $value : new Regex("^$quotedValue$", 'i'),
+            self::STRATEGY_PARTIAL => new Regex($quotedValue, $caseSensitive ? '' : 'i'),
+            self::STRATEGY_START => new Regex("^$quotedValue", $caseSensitive ? '' : 'i'),
+            self::STRATEGY_END => new Regex("$quotedValue$", $caseSensitive ? '' : 'i'),
+            self::STRATEGY_WORD_START => new Regex("(^$quotedValue.*|.*\s$quotedValue.*)", $caseSensitive ? '' : 'i'),
+            default => throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy)),
+        };
     }
 
     /**

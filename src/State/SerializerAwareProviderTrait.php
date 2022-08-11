@@ -25,10 +25,8 @@ trait SerializerAwareProviderTrait
 {
     /**
      * @internal
-     *
-     * @var ContainerInterface
      */
-    private $serializerLocator;
+    private ContainerInterface $serializerLocator;
 
     public function setSerializerLocator(ContainerInterface $serializerLocator): void
     {
@@ -37,7 +35,6 @@ trait SerializerAwareProviderTrait
 
     private function getSerializer(): SerializerInterface
     {
-        /* @var SerializerInterface */
         return $this->serializerLocator->get('serializer');
     }
 }

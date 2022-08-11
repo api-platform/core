@@ -24,12 +24,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
  */
 class DummyCustomQueryNotRetrievedItemDocumentResolver implements QueryItemResolverInterface
 {
-    /**
-     * @param DummyCustomQuery|DummyCustomQueryDocument|null $item
-     *
-     * @return DummyCustomQuery|DummyCustomQueryDocument
-     */
-    public function __invoke($item, array $context)
+    public function __invoke(?object $item, array $context): DummyCustomQuery|DummyCustomQueryDocument
     {
         if (null === $item) {
             $item = new DummyCustomQueryDocument();

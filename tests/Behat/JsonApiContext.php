@@ -85,7 +85,7 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON node :node should be an empty array
      */
-    public function theJsonNodeShouldBeAnEmptyArray($node): void
+    public function theJsonNodeShouldBeAnEmptyArray(string $node): void
     {
         $actual = $this->getValueOfNode($node);
         if (null !== $actual && [] !== $actual) {
@@ -96,7 +96,7 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON node :node should be a number
      */
-    public function theJsonNodeShouldBeANumber($node): void
+    public function theJsonNodeShouldBeANumber(string $node): void
     {
         if (!is_numeric($actual = $this->getValueOfNode($node))) {
             throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual, \JSON_THROW_ON_ERROR)));
@@ -106,7 +106,7 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON node :node should not be an empty string
      */
-    public function theJsonNodeShouldNotBeAnEmptyString($node): void
+    public function theJsonNodeShouldNotBeAnEmptyString(string $node): void
     {
         if ('' === $actual = $this->getValueOfNode($node)) {
             throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
@@ -117,7 +117,7 @@ final class JsonApiContext implements Context
      * @Then the JSON node :node should be sorted
      * @Then the JSON should be sorted
      */
-    public function theJsonNodeShouldBeSorted($node = ''): void
+    public function theJsonNodeShouldBeSorted(string $node = ''): void
     {
         $actual = (array) $this->getValueOfNode($node);
 
@@ -176,7 +176,7 @@ final class JsonApiContext implements Context
         $this->manager->flush();
     }
 
-    private function getValueOfNode($node)
+    private function getValueOfNode(string $node)
     {
         return $this->inspector->evaluate($this->getJson(), $node);
     }

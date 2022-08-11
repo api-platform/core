@@ -67,7 +67,7 @@ final class DeserializeListener
 
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
 
-        $format = $this->getFormat($request, $operation->getInputFormats() ?? []);
+        $format = $this->getFormat($request, $operation?->getInputFormats() ?? []);
         $data = $request->attributes->get('data');
         if (null !== $data) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
@@ -86,9 +86,7 @@ final class DeserializeListener
      */
     private function getFormat(Request $request, array $formats): string
     {
-        /**
-         * @var string|null
-         */
+        /** @var ?string $contentType */
         $contentType = $request->headers->get('CONTENT_TYPE');
         if (null === $contentType) {
             throw new UnsupportedMediaTypeHttpException('The "Content-Type" header must exist.');

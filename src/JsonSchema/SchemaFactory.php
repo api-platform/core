@@ -318,7 +318,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         ];
     }
 
-    private function getSerializerContext(?Operation $operation, string $type = Schema::TYPE_OUTPUT): array
+    private function getSerializerContext(Operation $operation, string $type = Schema::TYPE_OUTPUT): array
     {
         return Schema::TYPE_OUTPUT === $type ? ($operation->getNormalizationContext() ?? []) : ($operation->getDenormalizationContext() ?? []);
     }

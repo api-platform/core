@@ -22,7 +22,6 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
-use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Facet;
@@ -33,6 +32,7 @@ use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -316,7 +316,7 @@ class PaginationExtensionTest extends TestCase
         $pagination = new Pagination();
 
         $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
-        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([$fixturesPath], true);
+        $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([$fixturesPath], true);
         $documentManager = DocumentManager::create(null, $config);
 
         $this->managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($documentManager);
@@ -364,7 +364,7 @@ class PaginationExtensionTest extends TestCase
         $pagination = new Pagination();
 
         $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
-        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([$fixturesPath], true);
+        $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([$fixturesPath], true);
         $documentManager = DocumentManager::create(null, $config);
 
         $this->managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($documentManager);
@@ -407,7 +407,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    private function mockAggregationBuilder(int $expectedOffset, int $expectedLimit)
+    private function mockAggregationBuilder(int $expectedOffset, int $expectedLimit): ObjectProphecy
     {
         $skipProphecy = $this->prophesize(Skip::class);
         if ($expectedLimit > 0) {

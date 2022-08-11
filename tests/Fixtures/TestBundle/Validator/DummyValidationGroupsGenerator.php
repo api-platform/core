@@ -21,7 +21,7 @@ final class DummyValidationGroupsGenerator implements ValidationGroupsGeneratorI
     /**
      * {@inheritdoc}
      */
-    public function __invoke($object): GroupSequence
+    public function __invoke(object $object): GroupSequence
     {
         return new GroupSequence(['b', 'a']);
     }

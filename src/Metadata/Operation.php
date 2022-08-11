@@ -17,13 +17,13 @@ abstract class Operation
 {
     use WithResourceTrait;
     /**
-     * @var null
+     * @var mixed|null
      */
-    protected $input;
+    protected mixed $input;
     /**
-     * @var null
+     * @var mixed|null
      */
-    protected $output;
+    protected mixed $output;
     /**
      * @var string|callable|null
      */
@@ -652,15 +652,12 @@ abstract class Operation
         return $self;
     }
 
-    /**
-     * @return string|callable|null
-     */
-    public function getProcessor()
+    public function getProcessor(): callable|string|null
     {
         return $this->processor;
     }
 
-    public function withProcessor($processor): self
+    public function withProcessor(callable|string|null $processor): self
     {
         $self = clone $this;
         $self->processor = $processor;
@@ -668,15 +665,12 @@ abstract class Operation
         return $self;
     }
 
-    /**
-     * @return string|callable|null
-     */
-    public function getProvider()
+    public function getProvider(): callable|string|null
     {
         return $this->provider;
     }
 
-    public function withProvider($provider): self
+    public function withProvider(callable|string|null $provider): self
     {
         $self = clone $this;
         $self->provider = $provider;

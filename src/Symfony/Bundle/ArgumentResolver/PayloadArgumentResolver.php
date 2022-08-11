@@ -65,7 +65,7 @@ final class PayloadArgumentResolver implements ArgumentValueResolverInterface
     private function getExpectedInputClass(Request $request): ?string
     {
         $operation = $this->initializeOperation($request);
-        if (Request::METHOD_DELETE === $request->getMethod() || $request->isMethodSafe() || !($operation->canDeserialize() ?? true)) {
+        if (Request::METHOD_DELETE === $request->getMethod() || $request->isMethodSafe() || !($operation?->canDeserialize() ?? true)) {
             return null;
         }
 

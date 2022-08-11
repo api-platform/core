@@ -55,7 +55,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Passes a property through the filter.
      */
-    abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []);
+    abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void;
 
     protected function getManagerRegistry(): ManagerRegistry
     {
@@ -85,7 +85,7 @@ abstract class AbstractFilter implements FilterInterface
         return \array_key_exists($property, $this->properties);
     }
 
-    protected function denormalizePropertyName($property): string
+    protected function denormalizePropertyName(string|int $property): string
     {
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;
@@ -94,12 +94,12 @@ abstract class AbstractFilter implements FilterInterface
         return implode('.', array_map($this->nameConverter->denormalize(...), explode('.', (string) $property)));
     }
 
-    protected function normalizePropertyName($property): string
+    protected function normalizePropertyName(string $property): string
     {
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;
         }
 
-        return implode('.', array_map($this->nameConverter->normalize(...), explode('.', (string) $property)));
+        return implode('.', array_map($this->nameConverter->normalize(...), explode('.', $property)));
     }
 }

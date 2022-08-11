@@ -54,8 +54,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     }
 
     /**
-     * {@inheritdoc}
-     *
      * The context may contain serialization groups which helps defining joined entities that are readable.
      */
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, Operation $operation = null, array $context = []): void

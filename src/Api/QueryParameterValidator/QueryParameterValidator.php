@@ -33,7 +33,7 @@ class QueryParameterValidator
 {
     use FilterLocatorTrait;
 
-    private $validators;
+    private array $validators;
 
     public function __construct(ContainerInterface $filterLocator)
     {

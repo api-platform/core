@@ -53,6 +53,7 @@
         "justinrainbow/json-schema": "^5.2.1",
         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0 || ^5.1",
         "phpdocumentor/type-resolver": "^0.3 || ^0.4 || ^1.4",
+        "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^1.1",
         "phpstan/phpstan-doctrine": "^1.0",

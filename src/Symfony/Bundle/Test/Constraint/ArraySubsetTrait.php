@@ -30,13 +30,8 @@ use SebastianBergmann\Comparator\ComparisonFailure;
  */
 trait ArraySubsetTrait
 {
-    private $subset;
-    private $strict;
-
-    public function __construct(iterable $subset, bool $strict = false)
+    public function __construct(private iterable $subset, private readonly bool $strict = false)
     {
-        $this->strict = $strict;
-        $this->subset = $subset;
     }
 
     private function _evaluate($other, string $description = '', bool $returnResult = false): ?bool

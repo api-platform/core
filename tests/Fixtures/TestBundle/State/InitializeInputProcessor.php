@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Operation;
 
 class InitializeInputProcessor
 {
-    public static function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $resourceObject = $context['previous_data'];
         $resourceObject->name = $data->name;

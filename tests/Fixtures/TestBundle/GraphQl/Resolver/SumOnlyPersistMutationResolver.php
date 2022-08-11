@@ -24,10 +24,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomMutation;
  */
 class SumOnlyPersistMutationResolver implements MutationResolverInterface
 {
-    /**
-     * @param DummyCustomMutation|null $item
-     */
-    public function __invoke($item, array $context): DummyCustomMutation
+    public function __invoke(?object $item, array $context): DummyCustomMutation
     {
         if (null !== $item) {
             throw new RuntimeException('Item should be null');

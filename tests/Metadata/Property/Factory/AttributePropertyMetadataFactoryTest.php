@@ -18,8 +18,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\AttributePropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPhp8ApiPropertyAttribute;
-use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -28,9 +28,6 @@ class AttributePropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testCreateAttribute(): void
     {
         $factory = new AttributePropertyMetadataFactory();
@@ -63,9 +60,6 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $this->assertSame($propertyMetadata, $factory->create('\DoNotExist', 'foo'));
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testClassFoundAndParentFound(): void
     {
         $parentPropertyMetadata = (new ApiProperty('Desc', true, false, true, false, true, false, 'Default', 'Example'))->withTypes(['https://example.com']);

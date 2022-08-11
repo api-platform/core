@@ -131,9 +131,6 @@ final class RequestDataCollector extends DataCollector
         return 'api_platform.data_collector.request';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset(): void
     {
         $this->data = [];

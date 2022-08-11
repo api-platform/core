@@ -37,7 +37,7 @@ trait ErrorNormalizerTrait
         return $message;
     }
 
-    private function getErrorCode($object): ?string
+    private function getErrorCode(object $object): ?string
     {
         if ($object instanceof FlattenException) {
             $exceptionClass = $object->getClass();

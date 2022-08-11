@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\HttpCache;
 
 use ApiPlatform\HttpCache\VarnishXKeyPurger;
-use ApiPlatform\Tests\ProphecyTrait;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use LogicException;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -103,9 +103,9 @@ class VarnishXKeyPurgerTest extends TestCase
      */
     public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $keysToSend): void
     {
-        /** @var HttpClientInterface */
+        /** @var HttpClientInterface $client */
         $client = new class() implements ClientInterface {
-            public $sentKeys = [];
+            public array $sentKeys = [];
 
             public function send(RequestInterface $request, array $options = []): ResponseInterface
             {
@@ -141,7 +141,7 @@ class VarnishXKeyPurgerTest extends TestCase
         self::assertSame($keysToSend, $client->sentKeys); // @phpstan-ignore-line
     }
 
-    public function provideChunkHeaderCases()
+    public function provideChunkHeaderCases(): \Generator
     {
         yield 'no iri' => [
             50,

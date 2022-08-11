@@ -28,7 +28,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 abstract class AbstractConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    public const FORMAT = null; // Must be overrode
+    public const FORMAT = null; // Must be overridden
 
     private readonly ?array $serializePayloadFields;
 
@@ -45,9 +45,6 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
         return static::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
