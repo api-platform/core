@@ -14,19 +14,22 @@ declare(strict_types=1);
 namespace ApiPlatform\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 
 /**
  * Retrieves data from a persistence layer.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
+ *
+ * @template T of object
  */
 interface ProviderInterface
 {
     /**
      * Provides data.
      *
-     * @return object|array|null
+     * @return T|PartialPaginatorInterface<T>|iterable<T>|null
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []);
 }

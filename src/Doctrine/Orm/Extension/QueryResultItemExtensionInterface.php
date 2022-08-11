@@ -21,13 +21,15 @@ use Doctrine\ORM\QueryBuilder;
  * for specific cases such as Query alteration.
  *
  * @author Antoine BLUCHET <soyuka@gmail.com>
+ *
+ * @template T of object
  */
 interface QueryResultItemExtensionInterface extends QueryItemExtensionInterface
 {
     public function supportsResult(string $resourceClass, Operation $operation = null, array $context = []): bool;
 
     /**
-     * @return object|null
+     * @return T|null
      */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, Operation $operation = null, array $context = []);
 }
