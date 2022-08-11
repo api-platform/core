@@ -301,7 +301,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 return $this->updatePostOperation($v3, $pathOperation, $requestMimeTypes, $responseMimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions, $links);
             case 'PATCH':
                 $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Updates the %s resource.', $resourceShortName);
-            // no break
+                // no break
             case 'PUT':
                 return $this->updatePutOperation($v3, $pathOperation, $requestMimeTypes, $responseMimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'DELETE':

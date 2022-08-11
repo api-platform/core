@@ -66,9 +66,9 @@ final class AddFormatListener
     {
         $request = $event->getRequest();
         if (
-                !($request->attributes->has('_api_resource_class')
-                || $request->attributes->getBoolean('_api_respond', false)
-                || $request->attributes->getBoolean('_graphql', false))
+            !($request->attributes->has('_api_resource_class')
+            || $request->attributes->getBoolean('_api_respond', false)
+            || $request->attributes->getBoolean('_graphql', false))
         ) {
             return;
         }
