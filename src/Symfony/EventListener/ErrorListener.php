@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the API Platform project.
  *
@@ -12,13 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
+use ApiPlatform\Action\ExceptionAction;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener as SymfonyErrorListener;
 
-final class ErrorListener extends \Symfony\Component\HttpKernel\EventListener\ErrorListener
+/**
+ * This error listener extends the Symfony one in order to add
+ * the `_api_operation` attribute when the request is duplicated.
+ * It will later be used to retrieve the exceptionToStatus from the operation ({@see ExceptionAction}).
+ */
+final class ErrorListener extends SymfonyErrorListener
 {
     protected function duplicateRequest(\Throwable $exception, Request $request): Request
     {
-        $dup =  parent::duplicateRequest($exception, $request);
+        $dup = parent::duplicateRequest($exception, $request);
         $dup->attributes->set('_api_operation', $request->attributes->get('_api_operation'));
 
         return $dup;

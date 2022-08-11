@@ -13,56 +13,57 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Exception\NotFoundException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredFilter;
-use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyExceptionToStatusProvider;
-use ApiPlatform\Tests\Fixtures\TestBundle\State\NotFound;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource(
-    operations: [
-        new Get(
-            exceptionToStatus: [
-                NotFound::class => 404
-            ],
-        ),
-        new Get(uriTemplate: '/dummy_exceptions/{id}'),
-        new GetCollection()
-    ],
-    exceptionToStatus: [
-        NotFound::class => 400
-    ],
-    provider: DummyExceptionToStatusProvider::class
-)]
-#[ApiFilter(RequiredFilter::class)]
-#[ORM\Entity]
+/**
+ * @ApiResource(
+ *     itemOperations={
+ *         "get"={"exception_to_status"={NotFoundException::class=404}},
+ *         "put"
+ *     },
+ *     collectionOperations={"get"},
+ *     exceptionToStatus={
+ *         NotFoundException::class=400
+ *     }
+ * )
+ * @ApiFilter(RequiredFilter::class)
+ * @ORM\Entity
+ */
 class DummyExceptionToStatus
 {
     /**
      * @var int|null The id
+     *
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    #[ORM\Column(type: 'integer')]
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private ?int $id = null;
+    private $id = null;
+
     /**
      * @var string|null The dummy name
+     *
+     * @ORM\Column(nullable=true)
      */
-    #[ORM\Column(nullable: true)]
-    private ?string $name = null;
+    private $name = null;
+
     /**
      * @var string|null The dummy title
+     *
+     * @ORM\Column(nullable=true)
      */
-    #[ORM\Column(nullable: true)]
-    private ?string $title = null;
+    private $title = null;
+
     /**
      * @var string The dummy code
+     *
+     * @ORM\Column
      */
-    #[ORM\Column]
-    private string $code;
+    private $code;
 
     public function getId(): ?int
     {
