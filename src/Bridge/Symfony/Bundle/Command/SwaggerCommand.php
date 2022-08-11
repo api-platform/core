@@ -32,7 +32,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-#[AsCommand(name: 'swagger:export', description: 'Dump the Swagger v2 documentation')]
+#[AsCommand(name: 'api:swagger:export', description: 'Dump the Swagger v2 documentation')]
 final class SwaggerCommand extends Command
 {
     /**

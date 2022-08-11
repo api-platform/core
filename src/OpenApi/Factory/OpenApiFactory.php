@@ -421,12 +421,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $data['openapi']['allowEmptyValue'] ?? true,
                     $schema,
                     'array' === $schema['type'] && \in_array($data['type'],
-                    [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form',
+                        [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form',
                     $data['openapi']['explode'] ?? ('array' === $schema['type']),
                     $data['openapi']['allowReserved'] ?? false,
                     $data['openapi']['example'] ?? null,
                     isset($data['openapi']['examples']
-                ) ? new \ArrayObject($data['openapi']['examples']) : null);
+                    ) ? new \ArrayObject($data['openapi']['examples']) : null);
             }
         }
 
