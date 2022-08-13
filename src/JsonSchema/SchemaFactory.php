@@ -26,6 +26,7 @@ use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * {@inheritdoc}
@@ -199,6 +200,9 @@ final class SchemaFactory implements SchemaFactoryInterface
         // TODO: 3.0 support multiple types
         $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
         if (null !== $type) {
+            if (is_a($type->getClassName(), GroupSequence::class, true)) {
+                return;
+            }
             if ($isCollection = $type->isCollection()) {
                 $keyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
                 $valueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
