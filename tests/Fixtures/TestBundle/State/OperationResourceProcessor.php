@@ -30,7 +30,7 @@ final class OperationResourceProcessor implements ProcessorInterface
     {
     }
 
-    private function persist($data, array $context = [])
+    private function persist(object $data, array $context = []): object
     {
         if (!$manager = $this->getManager($data)) {
             return $data;
@@ -56,7 +56,7 @@ final class OperationResourceProcessor implements ProcessorInterface
         $manager->flush();
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(object $data, Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         if ($operation instanceof DeleteOperationInterface) {
             $this->remove($data);

@@ -111,7 +111,7 @@ final class SerializeListener
      *
      * @throws RuntimeException
      */
-    private function serializeRawData(ViewEvent $event, Request $request, $controllerResult): void
+    private function serializeRawData(ViewEvent $event, Request $request, iterable|object|null $controllerResult): void
     {
         if (\is_object($controllerResult)) {
             $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $request->attributes->get('_api_normalization_context', [])));

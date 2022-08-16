@@ -25,7 +25,7 @@ class DummyDtoNoInputsProcessor implements ProcessorInterface
     {
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(object $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
         $object = $this->decorated->process($data, $operation, $uriVariables, $context);
 

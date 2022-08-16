@@ -17,7 +17,8 @@ use ApiPlatform\Metadata\Operation;
 
 class AttributeResourceProcessor
 {
-    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
+    public static function process(object $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
+        return $data;
     }
 }

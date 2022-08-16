@@ -7,8 +7,10 @@ use ApiPlatform\State\ProcessorInterface;
 
 class CustomStateProcessor implements ProcessorInterface
 {
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
+    public function process(object $data, Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         // Handle the state
+
+        return $data;
     }
 }

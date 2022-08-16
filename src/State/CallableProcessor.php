@@ -24,9 +24,9 @@ final class CallableProcessor implements ProcessorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(object $data, Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         if (!($processor = $operation->getProcessor())) {
             return null;

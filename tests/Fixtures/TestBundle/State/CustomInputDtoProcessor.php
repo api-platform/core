@@ -28,7 +28,7 @@ final class CustomInputDtoProcessor implements ProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(object $data, Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         if (!$data instanceof CustomInputDto) {
             throw new \InvalidArgumentException();

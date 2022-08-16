@@ -27,14 +27,19 @@ final class RemoveProcessor implements ProcessorInterface
     {
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
+    /**
+     * {@inheritdoc}
+     */
+    public function process(object $data, Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         if (!$manager = $this->getManager($data)) {
-            return;
+            return null;
         }
 
         $manager->remove($data);
         $manager->flush();
+
+        return null;
     }
 
     /**

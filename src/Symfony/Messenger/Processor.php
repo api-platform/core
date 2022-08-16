@@ -31,7 +31,7 @@ final class Processor implements ProcessorInterface
         $this->messageBus = $messageBus;
     }
 
-    private function persist(mixed $data, array $context = []): mixed
+    private function persist(object $data, array $context = []): ?object
     {
         $envelope = $this->dispatch(
             (new Envelope($data))
@@ -54,7 +54,7 @@ final class Processor implements ProcessorInterface
         );
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
+    public function process(object $data, Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         if ($operation instanceof DeleteOperationInterface) {
             $this->remove($data);

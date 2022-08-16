@@ -32,6 +32,9 @@ final class ResourceMetadataCollection extends \ArrayObject
         parent::__construct($input);
     }
 
+    /**
+     * @throws OperationNotFoundException
+     */
     public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
     {
         $operationName ??= '';

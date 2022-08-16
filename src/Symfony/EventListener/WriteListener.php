@@ -17,6 +17,7 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
@@ -57,18 +58,19 @@ final class WriteListener
         $operation = $this->initializeOperation($request);
 
         if (
-            $controllerResult instanceof Response
+            !$operation
+            || $controllerResult instanceof Response
             || $request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
         ) {
             return;
         }
 
-        if (!($operation?->canWrite() ?? true) || !$attributes['persist']) {
+        if (!($operation->canWrite() ?? true) || !$attributes['persist']) {
             return;
         }
 
-        if (!$operation?->getProcessor()) {
+        if (!$operation->getProcessor()) {
             return;
         }
 
@@ -85,10 +87,12 @@ final class WriteListener
             case 'POST':
                 $persistResult = $this->processor->process($controllerResult, $operation, $uriVariables, $context);
 
-                if ($persistResult) {
-                    $controllerResult = $persistResult;
-                    $event->setControllerResult($controllerResult);
+                if (null === $persistResult) {
+                    throw new RuntimeException('A processor should always return an object for a non-delete operation.');
                 }
+
+                $controllerResult = $persistResult;
+                $event->setControllerResult($controllerResult);
 
                 if ($controllerResult instanceof Response) {
                     break;
