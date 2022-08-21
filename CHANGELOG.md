@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.0-rc.3
+
+* Symfony: deprecate the `$exceptionOnNoToken` parameter in `ResourceAccessChecker::__construct()` (#4900)
+
 ## 2.7.0-beta.5
 
 * Serializer: ignore no-operation on SerializeListener (#4828)

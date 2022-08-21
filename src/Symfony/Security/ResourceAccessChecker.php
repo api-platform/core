@@ -43,7 +43,11 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
         $this->roleHierarchy = $roleHierarchy;
         $this->tokenStorage = $tokenStorage;
         $this->authorizationChecker = $authorizationChecker;
-        $this->exceptionOnNoToken = $exceptionOnNoToken;
+
+        if (5 < func_num_args()) {
+            $this->exceptionOnNoToken = $exceptionOnNoToken;
+            trigger_deprecation('api-platform/core', '2.7', 'The $exceptionOnNoToken parameter in "%s()" is deprecated and will always be false in 3.0, you should stop using it.', __METHOD__);
+        }
     }
 
     public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool
