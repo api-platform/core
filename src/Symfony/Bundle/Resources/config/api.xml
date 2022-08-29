@@ -175,5 +175,8 @@
             <tag name="api_platform.uri_variables.transformer" priority="-100" />
         </service>
 
+        <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener" parent="exception_listener">
+            <argument key="$controller">api_platform.action.exception</argument>
+        </service>
     </services>
 </container>

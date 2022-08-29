@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Symfony\EventListener\ExceptionListener;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -35,26 +35,29 @@ class ExceptionListenerTest extends TestCase
     public function testOnKernelException(Request $request)
     {
         $kernel = $this->prophesize(HttpKernelInterface::class);
-        $kernel->handle(Argument::type(Request::class), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response())->shouldBeCalled();
 
-        $listener = new ExceptionListener('foo:bar', null, false);
+        $errorListener = class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class) : null;
+
         $event = new ExceptionEvent($kernel->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
-        $listener->onKernelException($event);
 
-        $this->assertInstanceOf(Response::class, $event->getResponse());
+        if ($errorListener) {
+            $errorListener->onKernelException($event)->shouldBeCalled();
+        }
+
+        $listener = new ExceptionListener('foo:bar', null, false, $errorListener ? $errorListener->reveal() : null);
+        $listener->onKernelException($event);
     }
 
     public function getRequest()
     {
         return [
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get'])],
-            [new Request([], [], ['_api_respond' => true])],
+            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation' => new Get(), '_api_respond' => true])],
         ];
     }
 
     public function testDoNothingWhenNotAnApiCall()
     {
-        $listener = new ExceptionListener('foo:bar', null, false);
+        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
         $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
         $listener->onKernelException($event);
 
@@ -66,7 +69,7 @@ class ExceptionListenerTest extends TestCase
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('html');
 
-        $listener = new ExceptionListener('foo:bar', null, false);
+        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
         $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
         $listener->onKernelException($event);
 

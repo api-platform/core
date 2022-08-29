@@ -12,7 +12,7 @@ Feature: Using exception_to_status config
 
   Scenario: Configure status code via the resource exceptionToStatus to map custom NotFound error to 400
     When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "/dummy_exceptions/123" with body:
+    And I send a "PUT" request to "/dummy_exception_to_statuses/123" with body:
     """
     {
         "name": "black"

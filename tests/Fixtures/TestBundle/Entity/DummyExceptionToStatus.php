@@ -18,6 +18,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Exception\NotFoundException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredFilter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @ApiResource(
@@ -27,7 +28,7 @@ use Doctrine\ORM\Mapping as ORM;
  *     },
  *     collectionOperations={"get"},
  *     exceptionToStatus={
- *         NotFoundException::class=400
+ *         NotFoundHttpException::class=400
  *     }
  * )
  * @ApiFilter(RequiredFilter::class)

@@ -27,7 +27,9 @@ final class ErrorListener extends SymfonyErrorListener
     protected function duplicateRequest(\Throwable $exception, Request $request): Request
     {
         $dup = parent::duplicateRequest($exception, $request);
-        $dup->attributes->set('_api_operation', $request->attributes->get('_api_operation'));
+        if ($request->attributes->has('_api_operation')) {
+            $dup->attributes->set('_api_operation', $request->attributes->get('_api_operation'));
+        }
 
         return $dup;
     }
