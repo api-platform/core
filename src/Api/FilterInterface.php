@@ -28,7 +28,7 @@ interface FilterInterface
      *   - type: the type of the filter
      *   - required: if this filter is required
      *   - strategy (optional): the used strategy
-     *   - is_collection (optional): is this filter is collection
+     *   - is_collection (optional): is this filter a collection
      *   - swagger (optional): additional parameters for the path operation,
      *     e.g. 'swagger' => [
      *       'description' => 'My Description',
