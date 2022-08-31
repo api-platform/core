@@ -61,6 +61,10 @@ final class ResourceMetadataCollection extends \ArrayObject
                 if ($name === $operationName) {
                     return $this->operationCache[$operationName] = $operation;
                 }
+
+                if ($operation->getUriTemplate() === $operationName) {
+                    return $this->operationCache[$operationName] = $operation;
+                }
             }
 
             foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
@@ -78,30 +82,6 @@ final class ResourceMetadataCollection extends \ArrayObject
         }
 
         $this->handleNotFound($operationName, $metadata);
-    }
-
-    /**
-     * Find a Get operation which matches the uriTemplate.
-     */
-    public function matchOperation(string $uriTemplate): Operation
-    {
-        $it = $this->getIterator();
-        $metadata = null;
-
-        while ($it->valid()) {
-            /** @var ApiResource $metadata */
-            $metadata = $it->current();
-
-            foreach ($metadata->getOperations() ?? [] as $operation) {
-                if ($uriTemplate === $operation->getUriTemplate() && HttpOperation::METHOD_GET === $operation->getMethod() && !$operation instanceof CollectionOperationInterface) {
-                    return $operation;
-                }
-            }
-
-            $it->next();
-        }
-
-        $this->handleNotFound($uriTemplate, $metadata);
     }
 
     /**

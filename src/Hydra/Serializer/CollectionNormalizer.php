@@ -101,7 +101,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
 
         if ($this->resourceMetadataCollectionFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && ($itemUriTemplate = $operation->getItemUriTemplate())) {
-            $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->matchOperation($itemUriTemplate);
+            $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operation->getItemUriTemplate());
         } else {
             unset($context['operation']);
         }
