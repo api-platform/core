@@ -48,6 +48,8 @@ final class IriConverter implements IriConverterInterface
     use ResourceClassInfoTrait;
     use UriVariablesResolverTrait;
 
+    public static $skolemUriTemplate = '/.well-known/genid/{id}';
+
     private $provider;
     private $router;
     private $identifiersExtractor;
@@ -158,6 +160,11 @@ final class IriConverter implements IriConverterInterface
             $identifiers = [];
         }
 
+        if (!$operation->getName() || ($operation instanceof HttpOperation && self::$skolemUriTemplate === $operation->getUriTemplate())) {
+            // Use a skolem iri, the route is defined in genid.xml  random bytes as a hash map + virer les operation name == uri template sauf en interne dans symfony
+            return $this->router->generate('api_genid', ['id' => \is_object($item) ? spl_object_hash($item) : bin2hex(random_bytes(10))], $operation->getUrlGenerationStrategy() ?? $referenceType);
+        }
+
         if (\is_object($item)) {
             try {
                 $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation);
@@ -167,16 +174,6 @@ final class IriConverter implements IriConverterInterface
                     throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
                 }
             }
-        }
-
-        if (!$operation->getName()) {
-            // Generate Skolem uri for unnamed operation
-            $operation = $operation->withName('api_genid');
-        }
-
-        if ('api_genid' === $operation->getName()) {
-            // If $item is not an object (can be a class name), generate a random id
-            $identifiers = ['id' => \is_object($item) ? spl_object_hash($item) : bin2hex(random_bytes(10))];
         }
 
         try {

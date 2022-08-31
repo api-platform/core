@@ -111,6 +111,10 @@ final class ApiLoader extends Loader
                         continue;
                     }
 
+                    if ($operation->getUriTemplate() === IriConverter::$skolemUriTemplate) {
+                        continue;
+                    }
+
                     $legacyDefaults = [];
 
                     if ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) {

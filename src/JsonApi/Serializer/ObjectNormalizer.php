@@ -21,7 +21,6 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Util\ClassInfoTrait;
-use ApiPlatform\Util\SkolemTrait;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -32,7 +31,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     use ClassInfoTrait;
-    use SkolemTrait;
 
     public const FORMAT = 'jsonapi';
 
@@ -103,8 +101,9 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
                 'type' => $this->getResourceShortName($resourceClass),
             ];
         } else {
+            // Not using an IriConverter here is deprecated in 2.7, avoid spl_object_hash as it may collide
             $resourceData = [
-                'id' => $this->generateSkolemIri($object),
+                'id' => $this->iriConverter instanceof LegacyIriConverterInterface ? '/.well-known/genid/'.bin2hex(random_bytes(10)) : $this->iriConverter->getIriFromResource($object),
                 'type' => (new \ReflectionClass($this->getObjectClass($object)))->getShortName(),
             ];
         }

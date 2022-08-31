@@ -16,8 +16,11 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\NotExposed;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Symfony\Routing\IriConverter;
 
 /**
  * Adds a {@see NotExposed} operation with {@see NotFoundAction} on a resource which only has a GetCollection.
@@ -52,8 +55,8 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
             return $resourceMetadataCollection;
         }
 
+        /** @var ApiResource $resource */
         foreach ($resourceMetadataCollection as $resource) {
-            /** @var ApiResource $resource */
             $operations = $resource->getOperations();
 
             foreach ($operations as $operation) {
@@ -69,12 +72,14 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
 
         // No item operation has been found on all resources for resource class: generate one on the last resource
         // Helpful to generate an IRI for a resource without declaring the Get operation
-        // @phpstan-ignore-next-line
-        $operation = (new NotExposed())->withResource($resource)->withUriTemplate(null); // force uriTemplate to null to don't inherit it from resource
-        if (!$this->linkFactory->createLinksFromIdentifiers($resource)) { // @phpstan-ignore-line
-            $operation = $operation->withRouteName('api_genid');
+        /** @var HttpOperation $operation */
+        $operation = (new NotExposed())->withClass($resource->getClass())->withShortName($resource->getShortName()); // @phpstan-ignore-line $resource is defined if count > 0
+
+        if (!$this->linkFactory->createLinksFromIdentifiers($operation)) {
+            $operation = $operation->withUriTemplate(IriConverter::$skolemUriTemplate);
         }
-        $operations->add(sprintf('_api_%s_get', $resource->getShortName()), $operation)->sort(); // @phpstan-ignore-line
+
+        $operations->add(sprintf('_api_%s_get', $operation->getShortName()), $operation)->sort(); // @phpstan-ignore-line $operations exists
 
         return $resourceMetadataCollection;
     }
