@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Symfony\Routing\IriConverter;
+use ApiPlatform\Symfony\Routing\SkolemIriConverter;
 
 /**
  * Adds a {@see NotExposed} operation with {@see NotFoundAction} on a resource which only has a GetCollection.
@@ -76,7 +76,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
         $operation = (new NotExposed())->withClass($resource->getClass())->withShortName($resource->getShortName()); // @phpstan-ignore-line $resource is defined if count > 0
 
         if (!$this->linkFactory->createLinksFromIdentifiers($operation)) {
-            $operation = $operation->withUriTemplate(IriConverter::$skolemUriTemplate);
+            $operation = $operation->withUriTemplate(SkolemIriConverter::$skolemUriTemplate);
         }
 
         $operations->add(sprintf('_api_%s_get', $operation->getShortName()), $operation)->sort(); // @phpstan-ignore-line $operations exists

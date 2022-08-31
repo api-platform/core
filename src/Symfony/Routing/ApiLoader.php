@@ -111,7 +111,7 @@ final class ApiLoader extends Loader
                         continue;
                     }
 
-                    if ($operation->getUriTemplate() === IriConverter::$skolemUriTemplate) {
+                    if ($operation->getUriTemplate() === SkolemIriConverter::$skolemUriTemplate) {
                         continue;
                     }
 
