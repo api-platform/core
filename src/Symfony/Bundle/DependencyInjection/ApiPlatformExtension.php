@@ -43,6 +43,7 @@ use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Persistence\ManagerRegistry;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -63,7 +64,6 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
-use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * The extension of this bundle.

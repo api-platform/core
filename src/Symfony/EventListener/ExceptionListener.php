@@ -29,7 +29,8 @@ final class ExceptionListener
 {
     /**
      * @phpstan-ignore-next-line legacy may not exist
-     * @var ErrorListener|LegacyExceptionListener 
+     *
+     * @var ErrorListener|LegacyExceptionListener
      */
     private $exceptionListener;
 
