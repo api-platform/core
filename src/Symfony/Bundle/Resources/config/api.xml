@@ -142,7 +142,7 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.uri_variables.converter" />
-            <argument type="service" id="api_platform.symfony.iri_converter.skolem" on-invalid="null"></argument>
+            <argument type="service" id="api_platform.symfony.iri_converter.skolem" on-invalid="null" />
         </service>
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 

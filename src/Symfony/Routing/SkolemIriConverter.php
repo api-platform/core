@@ -54,12 +54,13 @@ final class SkolemIriConverter implements IriConverterInterface
      */
     public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
+        $referenceType = $operation ? ($operation->getUrlGenerationStrategy() ?? $referenceType) : $referenceType;
         if (($isObject = \is_object($item)) && $this->objectHashMap->contains($item)) {
-            return $this->router->generate('api_genid', ['id' => $this->objectHashMap[$item]], $operation?->getUrlGenerationStrategy() ?? $referenceType);
+            return $this->router->generate('api_genid', ['id' => $this->objectHashMap[$item]], $referenceType);
         }
 
         if (\is_string($item) && isset($this->classHashMap[$item])) {
-            return $this->router->generate('api_genid', ['id' => $this->classHashMap[$item]], $operation?->getUrlGenerationStrategy() ?? $referenceType);
+            return $this->router->generate('api_genid', ['id' => $this->classHashMap[$item]], $referenceType);
         }
 
         $id = bin2hex(random_bytes(10));

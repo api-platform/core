@@ -79,7 +79,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
             $operation = $operation->withUriTemplate(SkolemIriConverter::$skolemUriTemplate);
         }
 
-        $operations->add(sprintf('_api_%s_get', $operation->getShortName()), $operation)->sort(); // @phpstan-ignore-line $operations exists
+        $operations->add(sprintf('_api_%s_get', $operation->getShortName()), $operation)->sort(); // @phpstan-ignore-line $operation exists
 
         return $resourceMetadataCollection;
     }
