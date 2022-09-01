@@ -166,8 +166,8 @@ final class IriConverter implements IriConverterInterface
                 throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
             }
 
-            // Use a skolem iri, the route is defined in genid.xml  random bytes as a hash map + virer les operation name == uri template sauf en interne dans symfony
-            return $this->decorated->getIriFromResource($item, $referenceType = UrlGeneratorInterface::ABS_PATH, $operation, $context);
+            // Use a skolem iri, the route is defined in genid.xml
+            return $this->decorated->getIriFromResource($item, $operation->getUrlGenerationStrategy() ?? $referenceType, $operation, $context);
         }
 
         if (\is_object($item)) {
