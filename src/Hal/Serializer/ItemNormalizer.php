@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hal\Serializer;
 
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
@@ -64,7 +65,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $context = $this->initContext($resourceClass, $context);
-        $iri = $this->iriConverter->getIriFromResource($object);
+        $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 

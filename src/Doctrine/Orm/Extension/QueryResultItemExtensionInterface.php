@@ -21,6 +21,8 @@ use Doctrine\ORM\QueryBuilder;
  * for specific cases such as Query alteration.
  *
  * @author Antoine BLUCHET <soyuka@gmail.com>
+ *
+ * @template T of object
  */
 interface QueryResultItemExtensionInterface extends QueryItemExtensionInterface
 {

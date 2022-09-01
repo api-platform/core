@@ -43,6 +43,7 @@ final class Put extends HttpOperation
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
+        ?bool $openapi = null,
         ?array $exceptionToStatus = null,
 
         ?bool $queryParameterValidationEnabled = null,

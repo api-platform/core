@@ -70,7 +70,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
             ];
         } else {
             $resourceData = [
-                'id' => '/.well-known/genid/'.bin2hex(random_bytes(10)),
+                'id' => $this->iriConverter->getIriFromResource($object),
                 'type' => (new \ReflectionClass($this->getObjectClass($object)))->getShortName(),
             ];
         }

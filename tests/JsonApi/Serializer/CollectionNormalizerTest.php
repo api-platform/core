@@ -75,7 +75,6 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
-            'operation_name' => 'get',
             'uri' => 'http://example.com/foos?page=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
@@ -152,7 +151,6 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
-            'operation_name' => 'get',
             'uri' => 'http://example.com/foos?page=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
@@ -215,7 +213,6 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
-            'operation_name' => 'get',
             'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
@@ -273,7 +270,6 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
-            'operation_name' => 'get',
             'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
@@ -354,7 +350,6 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
-            'operation_name' => 'get',
             'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',

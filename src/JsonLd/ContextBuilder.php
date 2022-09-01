@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd;
 
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -34,7 +36,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
 
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null)
     {
     }
 
@@ -122,7 +124,11 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         ];
 
         if (!isset($context['iri']) || false !== $context['iri']) {
-            $jsonLdContext['@id'] = $context['iri'] ?? '/.well-known/genid/'.bin2hex(random_bytes(10));
+            if (!isset($context['iri']) && !$this->iriConverter) {
+                throw new RuntimeException('Can not guess an anonymous resource IRI without IRI Converter.');
+            }
+
+            $jsonLdContext['@id'] = $context['iri'] ?? $this->iriConverter->getIriFromResource($object);
         }
 
         if ($context['has_context'] ?? false) {

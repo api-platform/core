@@ -22,6 +22,8 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @template T of object
  */
 interface QueryResultCollectionExtensionInterface extends QueryCollectionExtensionInterface
 {

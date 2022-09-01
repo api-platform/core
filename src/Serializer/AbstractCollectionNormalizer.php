@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -71,12 +72,18 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $context = $this->initContext($resourceClass, $context);
         $data = [];
+        $paginationData = $this->getPaginationData($object, $context);
 
-        return array_merge_recursive(
-            $data,
-            $this->getPaginationData($object, $context),
-            $this->getItemsData($object, $format, $context)
-        );
+        $metadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? '');
+        if (($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
+            $context['operation'] = $metadata->getOperation($itemUriTemplate);
+        } else {
+            unset($context['operation']);
+        }
+        unset($context['operation_type'], $context['operation_name']);
+        $itemsData = $this->getItemsData($object, $format, $context);
+
+        return array_merge_recursive($data, $paginationData, $itemsData);
     }
 
     /**

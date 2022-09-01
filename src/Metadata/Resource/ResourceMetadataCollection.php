@@ -59,6 +59,10 @@ final class ResourceMetadataCollection extends \ArrayObject
                 if ($name === $operationName) {
                     return $this->operationCache[$operationName] = $operation;
                 }
+
+                if ($operation->getUriTemplate() === $operationName) {
+                    return $this->operationCache[$operationName] = $operation;
+                }
             }
 
             foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {

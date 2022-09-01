@@ -560,7 +560,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     $class = Subscription::class;
                     break;
                 default:
-                }
+            }
 
             foreach ($graphQlOperations as $value) {
                 $operation = new $class(); // @phpstan-ignore-line

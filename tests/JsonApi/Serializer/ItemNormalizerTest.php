@@ -64,7 +64,7 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, '\bad_property', Argument::any())->willReturn((new ApiProperty())->withReadable(true));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummies/10');
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/10');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
@@ -127,7 +127,7 @@ class ItemNormalizerTest extends TestCase
         $circularReferenceEntity->parent = $circularReferenceEntity;
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($circularReferenceEntity)->willReturn('/circular_references/1');
+        $iriConverterProphecy->getIriFromResource($circularReferenceEntity, Argument::cetera())->willReturn('/circular_references/1');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(CircularReference::class)->willReturn(true);
@@ -185,7 +185,7 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'bar', Argument::any())->willReturn((new ApiProperty())->withReadable(true));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummies/1');
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
