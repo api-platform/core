@@ -336,6 +336,7 @@ final class ApiLoader extends Loader
                 '_api_resource_class' => $resourceClass,
                 '_api_identifiers' => $operation['identifiers'] ?? [],
                 '_api_has_composite_identifier' => $operation['has_composite_identifier'] ?? true,
+                '_api_exception_to_status' => $operation['exception_to_status'] ?? $resourceMetadata->getAttribute('exception_to_status') ?? [],
                 '_api_operation_name' => RouteNameGenerator::generate($operationName, $resourceShortName, $operationType),
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),

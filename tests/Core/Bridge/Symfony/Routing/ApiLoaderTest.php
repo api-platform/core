@@ -328,6 +328,7 @@ class ApiLoaderTest extends TestCase
                 '_api_has_composite_identifier' => false,
                 sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $legacyOperationName,
                 '_api_operation_name' => $operationName,
+                '_api_exception_to_status' => [],
             ] + $extraDefaults,
             $requirements,
             $options,
