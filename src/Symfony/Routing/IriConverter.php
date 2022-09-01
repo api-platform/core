@@ -163,7 +163,7 @@ final class IriConverter implements IriConverterInterface
 
         if (!$operation->getName() || ($operation instanceof HttpOperation && SkolemIriConverter::$skolemUriTemplate === $operation->getUriTemplate())) {
             if (!$this->decorated) {
-                throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
+                throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
             }
 
             // Use a skolem iri, the route is defined in genid.xml  random bytes as a hash map + virer les operation name == uri template sauf en interne dans symfony

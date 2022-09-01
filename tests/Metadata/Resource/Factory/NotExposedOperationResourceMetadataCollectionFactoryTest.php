@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Metadata\Resource\Factory;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactoryInterface;
@@ -37,7 +38,7 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
     public function testItIgnoresClassesWithoutResources()
     {
         $linkFactoryProphecy = $this->prophesize(LinkFactoryInterface::class);
-        $linkFactoryProphecy->createLinksFromIdentifiers(Argument::type(ApiResource::class))->shouldNotBeCalled();
+        $linkFactoryProphecy->createLinksFromIdentifiers(Argument::type(HttpOperation::class))->shouldNotBeCalled();
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(AttributeResource::class)->willReturn(
@@ -54,7 +55,7 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
     public function testItIgnoresResourcesWithAnItemOperation()
     {
         $linkFactoryProphecy = $this->prophesize(LinkFactoryInterface::class);
-        $linkFactoryProphecy->createLinksFromIdentifiers(Argument::type(ApiResource::class))->shouldNotBeCalled();
+        $linkFactoryProphecy->createLinksFromIdentifiers(Argument::type(HttpOperation::class))->shouldNotBeCalled();
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(AttributeResource::class)->willReturn(
@@ -101,7 +102,7 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
     public function testItAddsANotExposedOperationWithoutRouteNameOnTheLastResource()
     {
         $linkFactoryProphecy = $this->prophesize(LinkFactoryInterface::class);
-        $linkFactoryProphecy->createLinksFromIdentifiers(Argument::type(ApiResource::class))->willReturn([new Link()])->shouldBeCalled();
+        $linkFactoryProphecy->createLinksFromIdentifiers(Argument::type(HttpOperation::class))->willReturn([new Link()])->shouldBeCalled();
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(AttributeResource::class)->willReturn(
@@ -133,7 +134,7 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     operations: [
                         '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
-                        '_api_AttributeResource_get' => new NotExposed(routeName: null, controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false),
+                        '_api_AttributeResource_get' => new NotExposed(controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false),
                     ],
                     class: AttributeResource::class
                 ),
@@ -145,7 +146,7 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
     public function testItAddsANotExposedOperationWithRouteNameOnTheLastResource()
     {
         $linkFactoryProphecy = $this->prophesize(LinkFactoryInterface::class);
-        $linkFactoryProphecy->createLinksFromIdentifiers(Argument::type(ApiResource::class))->willReturn([])->shouldBeCalled();
+        $linkFactoryProphecy->createLinksFromIdentifiers(Argument::type(HttpOperation::class))->willReturn([])->shouldBeCalled();
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(AttributeResource::class)->willReturn(
@@ -177,7 +178,7 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     operations: [
                         '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
-                        '_api_AttributeResource_get' => new NotExposed(routeName: 'api_genid', controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false),
+                        '_api_AttributeResource_get' => new NotExposed(uriTemplate: '/.well-known/genid/{id}', controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false),
                     ],
                     class: AttributeResource::class
                 ),

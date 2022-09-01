@@ -71,6 +71,6 @@ final class SkolemIriConverter implements IriConverterInterface
             $this->classHashMap[$item] = $id;
         }
 
-        return $this->router->generate('api_genid', ['id' => $id], $operation?->getUrlGenerationStrategy() ?? $referenceType);
+        return $this->router->generate('api_genid', ['id' => $id], $referenceType);
     }
 }
