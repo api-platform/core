@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd;
 
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
@@ -59,7 +60,9 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
      */
     private $nameConverter;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null)
+    private $iriConverter;
+
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null, IriConverterInterface $iriConverter = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -67,6 +70,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->urlGenerator = $urlGenerator;
         $this->nameConverter = $nameConverter;
+        $this->iriConverter = $iriConverter;
 
         if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
@@ -188,7 +192,12 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         ];
 
         if (!isset($context['iri']) || false !== $context['iri']) {
-            $jsonLdContext['@id'] = $context['iri'] ?? '/.well-known/genid/'.bin2hex(random_bytes(10));
+            // Not using an IriConverter here is deprecated in 2.7, avoid spl_object_hash as it may collide
+            if (isset($this->iriConverter)) {
+                $jsonLdContext['@id'] = $context['iri'] ?? $this->iriConverter->getIriFromResource($object);
+            } else {
+                $jsonLdContext['@id'] = $context['iri'] ?? '/.well-known/genid/'.bin2hex(random_bytes(10));
+            }
         }
 
         if ($context['has_context'] ?? false) {

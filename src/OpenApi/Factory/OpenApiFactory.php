@@ -141,6 +141,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
+            // Operation ignored from OpenApi
+            if ($operation instanceof HttpOperation && false === $operation->getOpenapi()) {
+                continue;
+            }
+
             $uriVariables = $operation->getUriVariables();
             $resourceClass = $operation->getClass() ?? $resource->getClass();
             $routeName = $operation->getRouteName() ?? $operation->getName();
@@ -389,6 +394,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $operation instanceof CollectionOperationInterface ||
                     HttpOperation::METHOD_GET !== ($method ?? null)
                 ) {
+                    continue;
+                }
+
+                // Operation ignored from OpenApi
+                if ($operation instanceof HttpOperation && false === $operation->getOpenapi()) {
                     continue;
                 }
 

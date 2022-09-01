@@ -20,6 +20,8 @@ use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\JsonLdContextTrait;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -46,11 +48,12 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     private $contextBuilder;
     private $resourceClassResolver;
     private $iriConverter;
+    private $resourceMetadataCollectionFactory;
     private $defaultContext = [
         self::IRI_ONLY => false,
     ];
 
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, $iriConverter, array $defaultContext = [])
+    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, $iriConverter, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $defaultContext = [])
     {
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
@@ -59,6 +62,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
         }
         $this->iriConverter = $iriConverter;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
@@ -95,7 +99,13 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data['@type'] = 'hydra:Collection';
         $data['hydra:member'] = [];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
-        unset($context['operation'], $context['operation_name'], $context['uri_variables']);
+
+        if ($this->resourceMetadataCollectionFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && ($itemUriTemplate = $operation->getItemUriTemplate())) {
+            $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operation->getItemUriTemplate());
+        } else {
+            unset($context['operation']);
+        }
+        unset($context['operation_name'], $context['uri_variables']);
 
         foreach ($object as $obj) {
             if ($iriOnly) {

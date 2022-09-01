@@ -52,8 +52,9 @@ final class IriConverter implements IriConverterInterface
     private $router;
     private $identifiersExtractor;
     private $resourceMetadataCollectionFactory;
+    private $decorated;
 
-    public function __construct(ProviderInterface $provider, RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null)
+    public function __construct(ProviderInterface $provider, RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null, IriConverterInterface $decorated = null)
     {
         $this->provider = $provider;
         $this->router = $router;
@@ -63,6 +64,7 @@ final class IriConverter implements IriConverterInterface
         // For the ResourceClassInfoTrait
         $this->resourceClassResolver = $resourceClassResolver;
         $this->resourceMetadataFactory = $resourceMetadataCollectionFactory;
+        $this->decorated = $decorated;
     }
 
     /**
@@ -134,6 +136,11 @@ final class IriConverter implements IriConverterInterface
         // Custom resources should have the same IRI as requested, it was not the case pre 2.7
         $isLegacyCustomResource = ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && ($operation->getExtraProperties()['user_defined_uri_template'] ?? false);
 
+        // FIXME: to avoid the method_exists we could create an interface for the Post operation, we can't guarantee that the user extended our ApiPlatform\Metadata\Post
+        if ($operation instanceof HttpOperation && HttpOperation::METHOD_POST === $operation->getMethod() && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
+            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($itemUriTemplate);
+        }
+
         // In symfony the operation name is the route name, try to find one if none provided
         if (
             !$operation->getName()
@@ -154,6 +161,15 @@ final class IriConverter implements IriConverterInterface
             $identifiers = [];
         }
 
+        if (!$operation->getName() || ($operation instanceof HttpOperation && SkolemIriConverter::$skolemUriTemplate === $operation->getUriTemplate())) {
+            if (!$this->decorated) {
+                throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
+            }
+
+            // Use a skolem iri, the route is defined in genid.xml  random bytes as a hash map + virer les operation name == uri template sauf en interne dans symfony
+            return $this->decorated->getIriFromResource($item, $referenceType = UrlGeneratorInterface::ABS_PATH, $operation, $context);
+        }
+
         if (\is_object($item)) {
             try {
                 $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation);
@@ -163,11 +179,6 @@ final class IriConverter implements IriConverterInterface
                     throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
                 }
             }
-        }
-
-        // TODO: call the Skolem IRI generator
-        if (!$operation->getName()) {
-            return null;
         }
 
         try {

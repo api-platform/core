@@ -44,6 +44,7 @@
         <xsd:attribute type="xsd:boolean" name="validate"/>
         <xsd:attribute type="xsd:boolean" name="write"/>
         <xsd:attribute type="xsd:boolean" name="serialize"/>
+        <xsd:attribute type="xsd:boolean" name="openapi"/>
         <xsd:attribute type="xsd:positiveInteger" name="priority"/>
         <xsd:attribute type="xsd:string" name="name"/>
     </xsd:complexType>

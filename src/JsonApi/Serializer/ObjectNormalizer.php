@@ -101,8 +101,9 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
                 'type' => $this->getResourceShortName($resourceClass),
             ];
         } else {
+            // Not using an IriConverter here is deprecated in 2.7, avoid spl_object_hash as it may collide
             $resourceData = [
-                'id' => '/.well-known/genid/'.bin2hex(random_bytes(10)),
+                'id' => $this->iriConverter instanceof LegacyIriConverterInterface ? '/.well-known/genid/'.bin2hex(random_bytes(10)) : $this->iriConverter->getIriFromResource($object),
                 'type' => (new \ReflectionClass($this->getObjectClass($object)))->getShortName(),
             ];
         }

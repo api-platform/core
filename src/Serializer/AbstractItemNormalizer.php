@@ -188,9 +188,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 return $this->serializer->normalize($transformed, $format, $context);
             }
 
-            unset($context['output']);
-            unset($context['operation']);
-            unset($context['operation_name']);
+            unset($context['output'], $context['operation_name']);
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface && !isset($context['operation'])) {
+                $context['operation'] = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation();
+            }
             $context['resource_class'] = $outputClass;
             $context['api_sub_level'] = true;
             $context[self::ALLOW_EXTRA_ATTRIBUTES] = false;

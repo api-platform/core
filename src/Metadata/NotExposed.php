@@ -13,15 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+/**
+ * A NotExposed operation is an operation declared for internal usage,
+ * for example to generate an IRI on a resource without item operations.
+ * It is ignored from OpenApi documentation and must return a HTTP 404.
+ *
+ * @internal
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-final class Post extends HttpOperation
+final class NotExposed extends HttpOperation
 {
-    private $itemUriTemplate;
-
     /**
      * {@inheritdoc}
      */
     public function __construct(
+        string $method = self::METHOD_GET,
         ?string $uriTemplate = null,
         ?array $types = null,
         $formats = null,
@@ -40,17 +46,16 @@ final class Post extends HttpOperation
         ?string $host = null,
         ?array $schemes = null,
         ?string $condition = null,
-        ?string $controller = null,
+        ?string $controller = 'api_platform.action.not_exposed',
         ?array $cacheHeaders = null,
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
-        ?bool $openapi = null,
+        ?bool $openapi = false,
         ?array $exceptionToStatus = null,
 
         ?bool $queryParameterValidationEnabled = null,
 
-        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -78,12 +83,12 @@ final class Post extends HttpOperation
         ?array $filters = null,
         ?array $validationContext = null,
         $input = null,
-        $output = null,
+        $output = false,
         $mercure = null,
         $messenger = null,
         ?bool $elasticsearch = null,
         ?int $urlGenerationStrategy = null,
-        ?bool $read = null,
+        ?bool $read = false,
         ?bool $deserialize = null,
         ?bool $validate = null,
         ?bool $write = null,
@@ -94,23 +99,14 @@ final class Post extends HttpOperation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = [],
-        ?string $itemUriTemplate = null
+        array $extraProperties = []
     ) {
-        parent::__construct(self::METHOD_POST, ...\func_get_args());
-        $this->itemUriTemplate = $itemUriTemplate;
-    }
+        parent::__construct(...\func_get_args());
 
-    public function getItemUriTemplate(): ?string
-    {
-        return $this->itemUriTemplate;
-    }
-
-    public function withItemUriTemplate(string $itemUriTemplate): self
-    {
-        $self = clone $this;
-        $self->itemUriTemplate = $itemUriTemplate;
-
-        return $self;
+        // Declare overridden parameters because "func_get_args" does not handle default values
+        $this->controller = $controller;
+        $this->output = $output;
+        $this->read = $read;
+        $this->openapi = $openapi;
     }
 }

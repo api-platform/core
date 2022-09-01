@@ -49,7 +49,7 @@ final class ResourceMetadataCollection extends \ArrayObject
         $metadata = null;
 
         while ($it->valid()) {
-            /** @var ApiResource */
+            /** @var ApiResource $metadata */
             $metadata = $it->current();
 
             foreach ($metadata->getOperations() ?? [] as $name => $operation) {
@@ -59,6 +59,10 @@ final class ResourceMetadataCollection extends \ArrayObject
                 }
 
                 if ($name === $operationName) {
+                    return $this->operationCache[$operationName] = $operation;
+                }
+
+                if ($operation->getUriTemplate() === $operationName) {
                     return $this->operationCache[$operationName] = $operation;
                 }
             }

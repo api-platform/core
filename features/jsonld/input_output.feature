@@ -321,7 +321,7 @@ Feature: JSON-LD DTO input and output
     """
 
   @createSchema
-  Scenario: Initialize input data with a DataTransformerInitializer 
+  Scenario: Initialize input data with a DataTransformerInitializer
     Given there is an InitializeInput object with id 1
     When I send a "PUT" request to "/initialize_inputs/1" with body:
     """
@@ -348,7 +348,7 @@ Feature: JSON-LD DTO input and output
     """
     {
       "foo": "test",
-      "bar": "test" 
+      "bar": "test"
     }
     """
     Then the response status code should be 400
@@ -356,7 +356,7 @@ Feature: JSON-LD DTO input and output
     And the JSON node "hydra:description" should be equal to "The input data is misformatted."
 
   @!mongodb
-  Scenario: Reset password through an input DTO without DataTransformer 
+  Scenario: Reset password through an input DTO without DataTransformer
     When I send a "POST" request to "/user-reset-password" with body:
     """
     {
@@ -369,7 +369,7 @@ Feature: JSON-LD DTO input and output
     And the JSON node "email" should be equal to "user@example.com"
 
   @!mongodb
-  Scenario: Reset password with an invalid payload through an input DTO without DataTransformer 
+  Scenario: Reset password with an invalid payload through an input DTO without DataTransformer
     And I send a "POST" request to "/user-reset-password" with body:
     """
     {
@@ -378,3 +378,122 @@ Feature: JSON-LD DTO input and output
     """
     Then the response status code should be 422
     And the response should be in JSON
+
+  @v3
+  Scenario: Get a collection with a custom output and without item operations, from a resource without identifier
+    When I send a "GET" request to "/dummy_collection_dtos"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["@context", "@id", "@type", "hydra:member", "hydra:totalItems"],
+      "properties": {
+        "@context": {"pattern": "^/contexts/DummyCollectionDto$"},
+        "@id": {"pattern": "^/dummy_collection_dtos$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["@id", "@type", "foo", "bar"],
+            "properties": {
+              "@id": {"pattern": "^/.well-known/genid/.+$"},
+              "@type": {"pattern": "^DummyCollectionDto$"},
+              "foo": {"type": "string"},
+              "bar": {"type": "integer"}
+            }
+          }
+        },
+        "hydra:totalItems": {"type": "integer", "minimum": 2, "maximum": 2}
+      }
+    }
+    """
+
+  @v3
+  # Cannot generate proper IRI because DTO does not support resource yet
+  # todo Change member IRI to `/dummy_foos/bar` once DTO support resource
+  Scenario: Get a collection with a custom output and itemUriTemplate, from a resource without identifier
+    When I send a "GET" request to "/dummy_foo_collection_dtos"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["@context", "@id", "@type", "hydra:member", "hydra:totalItems"],
+      "properties": {
+        "@context": {"pattern": "^/contexts/DummyFooCollectionDto$"},
+        "@id": {"pattern": "^/dummy_foo_collection_dtos$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["@id", "@type", "foo", "bar"],
+            "properties": {
+              "@id": {"pattern": "^/.well-known/genid/.+$"},
+              "@type": {"pattern": "^DummyFooCollectionDto$"},
+              "foo": {"type": "string"},
+              "bar": {"type": "integer"}
+            }
+          }
+        },
+        "hydra:totalItems": {"type": "integer", "minimum": 2, "maximum": 2}
+      }
+    }
+    """
+
+  @v3
+  # Cannot generate proper IRI because DTO does not support output yet
+  # todo Change member IRI to `/dummy_id_collection_dtos/.+` once DTO support @ApiProperty
+  Scenario: Get a collection with a custom output and without item operations, from a resource with an identifier
+    When I send a "GET" request to "/dummy_id_collection_dtos"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["@context", "@id", "@type", "hydra:member", "hydra:totalItems"],
+      "properties": {
+        "@context": {"pattern": "^/contexts/DummyIdCollectionDto$"},
+        "@id": {"pattern": "^/dummy_id_collection_dtos$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["@id", "@type", "id", "foo", "bar"],
+            "properties": {
+              "@id": {"pattern": "^/.well-known/genid/.+$"},
+              "@type": {"pattern": "^DummyIdCollectionDto$"},
+              "id": {"type": "integer"},
+              "foo": {"type": "string"},
+              "bar": {"type": "integer"}
+            }
+          }
+        },
+        "hydra:totalItems": {"type": "integer", "minimum": 2, "maximum": 2}
+      }
+    }
+    """

@@ -56,6 +56,7 @@
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="null" />
 
             <!-- Run after api_platform.jsonld.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->
             <tag name="serializer.normalizer" priority="-985" />

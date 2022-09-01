@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hal\Serializer;
 
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Metadata\ApiProperty;
@@ -70,7 +71,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $context = $this->initContext($resourceClass, $context);
-        $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object);
+        $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 

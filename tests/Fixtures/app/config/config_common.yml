@@ -107,6 +107,12 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
     # related_questions.state_provider:
     #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelatedQuestionsProvider'
     #     public: false
@@ -134,6 +140,15 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider'
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor'
+        tags:
+            -  { name: 'api_platform.state_processor' }
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider'

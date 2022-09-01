@@ -274,6 +274,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         foreach ($operations as $operationName => $operation) {
+            // Skolem IRI
+            if ('api_genid' === ($operation['route_name'] ?? null)) {
+                continue;
+            }
+
             if (isset($operation['uri_template'])) {
                 $path = str_replace('.{_format}', '', $operation['uri_template']);
                 if (0 !== strpos($path, '/')) {
@@ -408,7 +413,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 $parametersMemory = [];
                 $pathOperation['parameters'] = [];
 
-                foreach ($resourceMetadata->getAttributes()['identifiers'] as $parameterName => [$class, $identifier]) {
+                foreach ($resourceMetadata->getCollectionOperations()[$operationName]['identifiers'] as $parameterName => [$class, $identifier]) {
                     $parameter = ['name' => $parameterName, 'in' => 'path', 'required' => true];
                     $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
                     $pathOperation['parameters'][] = $parameter;
