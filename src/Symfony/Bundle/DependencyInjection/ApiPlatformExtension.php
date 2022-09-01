@@ -63,6 +63,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * The extension of this bundle.
@@ -655,6 +656,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if (!$this->isConfigEnabled($container, $config['doctrine'])) {
             return;
+        }
+
+        // For older versions of doctrine bridge this allows autoconfiguration for filters
+        if (!$container->has(ManagerRegistry::class)) {
+            $container->setAlias(ManagerRegistry::class, 'doctrine');
         }
 
         $container->registerForAutoconfiguration(QueryItemExtensionInterface::class)
