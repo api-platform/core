@@ -16,6 +16,8 @@ namespace ApiPlatform\Metadata;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class GetCollection extends HttpOperation implements CollectionOperationInterface
 {
+    private $itemUriTemplate;
+
     /**
      * {@inheritdoc}
      */
@@ -43,6 +45,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
+        ?bool $openapi = null,
         ?array $exceptionToStatus = null,
 
         ?bool $queryParameterValidationEnabled = null,
@@ -90,8 +93,23 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        ?string $itemUriTemplate = null
     ) {
         parent::__construct(self::METHOD_GET, ...\func_get_args());
+        $this->itemUriTemplate = $itemUriTemplate;
+    }
+
+    public function getItemUriTemplate(): ?string
+    {
+        return $this->itemUriTemplate;
+    }
+
+    public function withItemUriTemplate(string $itemUriTemplate): self
+    {
+        $self = clone $this;
+        $self->itemUriTemplate = $itemUriTemplate;
+
+        return $self;
     }
 }

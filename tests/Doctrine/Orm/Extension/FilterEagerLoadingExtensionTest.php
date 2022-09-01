@@ -346,6 +346,7 @@ SQL;
         $classMetadata = new ClassMetadataInfo(CompositeRelation::class);
         $classMetadata->isIdentifierComposite = true;
         $classMetadata->identifier = ['item', 'label'];
+        // @phpstan-ignore-next-line
         $classMetadata->associationMappings = [
             'item' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => CompositeItem::class],
             'label' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => CompositeLabel::class],

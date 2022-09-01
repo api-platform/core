@@ -154,7 +154,6 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'resource_class' => 'Foo',
-            'operation_name' => 'bar',
             'api_sub_level' => true,
         ])->willReturn(['_links' => ['self' => '/me'], 'name' => 'Kévin']);
 

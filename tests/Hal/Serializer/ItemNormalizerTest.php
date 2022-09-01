@@ -118,7 +118,7 @@ class ItemNormalizerTest extends TestCase
         );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummies/1');
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
         $iriConverterProphecy->getIriFromResource($relatedDummy)->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -181,7 +181,7 @@ class ItemNormalizerTest extends TestCase
         );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummies/1');
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
         $iriConverterProphecy->getIriFromResource($relatedDummy)->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -262,9 +262,9 @@ class ItemNormalizerTest extends TestCase
         );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($level1)->willReturn('/max_depth_dummies/1');
-        $iriConverterProphecy->getIriFromResource($level2)->willReturn('/max_depth_dummies/2');
-        $iriConverterProphecy->getIriFromResource($level3)->willReturn('/max_depth_dummies/3');
+        $iriConverterProphecy->getIriFromResource($level1, Argument::cetera())->willReturn('/max_depth_dummies/1');
+        $iriConverterProphecy->getIriFromResource($level2, Argument::cetera())->willReturn('/max_depth_dummies/2');
+        $iriConverterProphecy->getIriFromResource($level3, Argument::cetera())->willReturn('/max_depth_dummies/3');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($level1, null)->willReturn(MaxDepthDummy::class);

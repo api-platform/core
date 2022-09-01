@@ -50,12 +50,10 @@ final class IriConverter implements IriConverterInterface
     use ResourceClassInfoTrait;
     use UriVariablesResolverTrait;
 
-    public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null)
+    public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null)
     {
-        $this->uriVariablesConverter = $uriVariablesConverter;
-        // For the ResourceClassInfoTrait
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->resourceMetadataFactory = $resourceMetadataCollectionFactory;
+        $this->uriVariablesConverter = $uriVariablesConverter;
     }
 
     /**
@@ -107,7 +105,7 @@ final class IriConverter implements IriConverterInterface
         $resourceClass = \is_string($resource) ? $resource : $this->getObjectClass($resource);
 
         if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
-            return $this->generateSkolemIri($context);
+            return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }
 
         // This is only for when a class (that is not a resource) extends another one that is a resource, we should remove this behavior
@@ -122,6 +120,10 @@ final class IriConverter implements IriConverterInterface
         if ($operation instanceof HttpOperation && 301 === $operation->getStatus()) {
             $operation = ($operation instanceof CollectionOperationInterface ? new GetCollection() : new Get())->withClass($operation->getClass());
             unset($context['uri_variables']);
+        }
+
+        if ($operation instanceof HttpOperation && HttpOperation::METHOD_POST === $operation->getMethod() && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
+            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($itemUriTemplate);
         }
 
         // In symfony the operation name is the route name, try to find one if none provided
@@ -149,8 +151,8 @@ final class IriConverter implements IriConverterInterface
             }
         }
 
-        if (!$operation->getName()) {
-            return $this->generateSkolemIri($context);
+        if (!$operation->getName() || ($operation instanceof HttpOperation && SkolemIriConverter::$skolemUriTemplate === $operation->getUriTemplate())) {
+            return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }
 
         try {
@@ -160,8 +162,13 @@ final class IriConverter implements IriConverterInterface
         }
     }
 
-    private function generateSkolemIri(array $context = []): string
+    private function generateSkolemIri(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = [], string $resourceClass = null): string
     {
-        return $context['iri'] ?? '/.well-known/genid/'.bin2hex(random_bytes(10));
+        if (!$this->decorated) {
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
+        }
+
+        // Use a skolem iri, the route is defined in genid.xml
+        return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
     }
 }

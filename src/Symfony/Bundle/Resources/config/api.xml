@@ -80,7 +80,9 @@
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.not_found" class="ApiPlatform\Action\NotFoundAction" public="true" />
+        <service id="api_platform.action.not_exposed" class="ApiPlatform\Action\NotExposedAction" public="true" />
         <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
+        <service id="ApiPlatform\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
 
         <service id="api_platform.action.entrypoint" class="ApiPlatform\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
@@ -123,6 +125,10 @@
             <tag name="routing.loader" />
         </service>
 
+        <service id="api_platform.symfony.iri_converter.skolem" class="ApiPlatform\Symfony\Routing\SkolemIriConverter" public="false">
+            <argument type="service" id="api_platform.router" />
+        </service>
+
         <!-- Identifiers -->
         <service id="api_platform.api.identifiers_extractor" class="ApiPlatform\Api\IdentifiersExtractor" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
@@ -157,7 +163,7 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.uri_variables.converter" />
-            <argument>null</argument>
+            <argument type="service" id="api_platform.symfony.iri_converter.skolem" />
         </service>
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
     </services>

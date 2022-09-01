@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonLd;
 
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\ApiProperty;
@@ -46,6 +47,7 @@ class ContextBuilderTest extends TestCase
     private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
     private ObjectProphecy $propertyNameCollectionFactoryProphecy;
     private ObjectProphecy $propertyMetadataFactoryProphecy;
+    private ObjectProphecy $iriConverterProphecy;
     private ObjectProphecy $urlGeneratorProphecy;
 
     protected function setUp(): void
@@ -55,6 +57,7 @@ class ContextBuilderTest extends TestCase
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $this->propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $this->iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $this->urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
     }
 
@@ -187,8 +190,9 @@ class ContextBuilderTest extends TestCase
         $this->propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
         $this->propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyPropertyA', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('Dummy property A')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
         $this->urlGeneratorProphecy->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('');
+        $this->iriConverterProphecy->getIriFromResource($dummy)->willreturn('/.well-known/genid/1');
 
-        $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal());
+        $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal(), $this->iriConverterProphecy->reveal());
 
         $context = $contextBuilder->getAnonymousResourceContext($dummy);
         $this->assertSame('Dummy', $context['@type']);

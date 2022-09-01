@@ -62,6 +62,10 @@ final class ApiLoader extends Loader
                         continue;
                     }
 
+                    if (SkolemIriConverter::$skolemUriTemplate === $operation->getUriTemplate()) {
+                        continue;
+                    }
+
                     $path = ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate();
                     foreach ($operation->getUriVariables() ?? [] as $parameterName => $link) {
                         if (!$expandedValue = $link->getExpandedValue()) {
@@ -115,6 +119,8 @@ final class ApiLoader extends Loader
      */
     private function loadExternalFiles(RouteCollection $routeCollection): void
     {
+        $routeCollection->addCollection($this->fileLoader->load('genid.xml'));
+
         if ($this->entrypointEnabled) {
             $routeCollection->addCollection($this->fileLoader->load('api.xml'));
         }

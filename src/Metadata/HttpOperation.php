@@ -94,6 +94,7 @@ class HttpOperation extends Operation
 
         protected ?array $hydraContext = null,
         protected ?array $openapiContext = null,
+        protected ?bool $openapi = null,
         protected ?array $exceptionToStatus = null,
 
         protected ?bool $queryParameterValidationEnabled = null,
@@ -506,6 +507,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->openapiContext = $openapiContext;
+
+        return $self;
+    }
+
+    public function getOpenapi(): ?bool
+    {
+        return $this->openapi;
+    }
+
+    public function withOpenapi(bool $openapi): self
+    {
+        $self = clone $this;
+        $self->openapi = $openapi;
 
         return $self;
     }

@@ -87,6 +87,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $emProphecy = $this->prophesize(EntityManagerInterface::class);
         $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
         $dummyClassMetadata = new ClassMetadata(Dummy::class);
+        // @phpstan-ignore-next-line
         $dummyClassMetadata->associationMappings = [
             'relatedDummy' => [],
             'relatedOwningDummy' => [],
@@ -197,6 +198,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
 
         $dummyClassMetadata = new ClassMetadata(ContainNonResource::class);
+        // @phpstan-ignore-next-line
         $dummyClassMetadata->associationMappings = [
             'notAResource' => [],
         ];

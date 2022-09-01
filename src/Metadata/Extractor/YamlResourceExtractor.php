@@ -14,11 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\Post;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -262,9 +264,14 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 }
             }
 
+            if (\in_array((string) $class, [GetCollection::class, Post::class], true)) {
+                $datum['itemUriTemplate'] = $this->phpize($operation, 'itemUriTemplate', 'string');
+            }
+
             $data[] = array_merge($datum, [
                 'read' => $this->phpize($operation, 'read', 'bool'),
                 'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
+                'openapi' => $this->phpize($operation, 'openapi', 'bool'),
                 'validate' => $this->phpize($operation, 'validate', 'bool'),
                 'write' => $this->phpize($operation, 'write', 'bool'),
                 'serialize' => $this->phpize($operation, 'serialize', 'bool'),
@@ -280,12 +287,16 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
 
     private function buildGraphQlOperations(array $resource, array $root): ?array
     {
-        if (!\array_key_exists('graphQlOperations', $resource)) {
+        if (!\array_key_exists('graphQlOperations', $resource) || !\is_array($resource['graphQlOperations'])) {
             return null;
         }
 
         $data = [];
         foreach (['mutations' => Mutation::class, 'queries' => Query::class, 'subscriptions' => Subscription::class] as $type => $class) {
+            if (!\array_key_exists($type, $resource['graphQlOperations'])) {
+                continue;
+            }
+
             foreach ($resource['graphQlOperations'][$type] as $operation) {
                 $datum = $this->buildBase($operation);
                 foreach ($datum as $key => $value) {
@@ -319,6 +330,6 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             }
         }
 
-        return $data;
+        return $data ?: null;
     }
 }
