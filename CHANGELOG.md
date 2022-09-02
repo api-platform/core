@@ -1,6 +1,10 @@
 # Changelog
 =======
 
+## 3.0.0-rc.3
+
+* Symfony: removed the `$exceptionOnNoToken` parameter in `ResourceAccessChecker::__construct()` (#4900)
+
 ## 3.0.0-beta.2
 
 * ExpressionLanguage: deprecated class `ApiPlatform\Symfony\Security\ExpressionLanguage` has been removed in favor of `Symfony\Component\Security\Core\Authorization\ExpressionLanguage`.

@@ -28,7 +28,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 final class ResourceAccessChecker implements ResourceAccessCheckerInterface
 {
-    public function __construct(private readonly ?ExpressionLanguage $expressionLanguage = null, private readonly ?AuthenticationTrustResolverInterface $authenticationTrustResolver = null, private readonly ?RoleHierarchyInterface $roleHierarchy = null, private readonly ?TokenStorageInterface $tokenStorage = null, private readonly ?AuthorizationCheckerInterface $authorizationChecker = null, private readonly bool $exceptionOnNoToken = true)
+    public function __construct(private readonly ?ExpressionLanguage $expressionLanguage = null, private readonly ?AuthenticationTrustResolverInterface $authenticationTrustResolver = null, private readonly ?RoleHierarchyInterface $roleHierarchy = null, private readonly ?TokenStorageInterface $tokenStorage = null, private readonly ?AuthorizationCheckerInterface $authorizationChecker = null)
     {
     }
 
@@ -38,13 +38,7 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
             throw new \LogicException('The "symfony/security" library must be installed to use the "security" attribute.');
         }
         if (null === $token = $this->tokenStorage->getToken()) {
-            if ($this->exceptionOnNoToken) {
-                throw new \LogicException('The current token must be set to use the "security" attribute (is the URL behind a firewall?).');
-            }
-
-            if (class_exists(NullToken::class)) {
-                $token = new NullToken();
-            }
+            $token = new NullToken();
         }
         if (null === $this->expressionLanguage) {
             throw new \LogicException('The "symfony/expression-language" library must be installed to use the "security" attribute.');
