@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  * Creates a resource metadata from {@see Resource} annotations.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @experimental
  */
 final class OperationNameResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
