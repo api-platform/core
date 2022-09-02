@@ -35,7 +35,7 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
 
         $this->jsonEncoder = new BaseJsonEncoder(
             // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
-            new JsonEncode(['json_encode_options' => \JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_UNESCAPED_UNICODE]),
+            new JsonEncode(['json_encode_options' => \JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_UNESCAPED_UNICODE | \JSON_INVALID_UTF8_IGNORE]),
             new JsonDecode(['json_decode_associative' => true])
         );
     }

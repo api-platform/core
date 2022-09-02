@@ -30,6 +30,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  *       * operation input/output formats
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @experimental
  */
 final class FormatsResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface

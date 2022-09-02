@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  * Transforms the given input/output metadata to a normalized one.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @experimental
  */
 final class InputOutputResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
