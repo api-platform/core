@@ -205,7 +205,7 @@ class RequestDataCollectorTest extends TestCase
         $this->request->attributes = $this->attributes->reveal();
 
         if (!$data) {
-            $this->metadataFactory // @phpstan-ignore-line
+            $this->metadataFactory
                 ->create()
                 ->shouldNotBeCalled();
         } else {
