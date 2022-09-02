@@ -107,6 +107,7 @@ class ValidatorTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Using a public validation groups generator service not implementing "ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface" is deprecated since 2.6 and will be removed in 3.0.
      */
     public function testValidateGetGroupsFromLegacyService(): void

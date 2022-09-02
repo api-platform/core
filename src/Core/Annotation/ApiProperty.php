@@ -21,6 +21,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @Annotation
+ *
  * @Target({"METHOD", "PROPERTY"})
  * @Attributes(
  *     @Attribute("deprecationReason", type="string"),

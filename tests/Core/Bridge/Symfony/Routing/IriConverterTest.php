@@ -40,6 +40,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
  * @group legacy
  */
 class IriConverterTest extends TestCase

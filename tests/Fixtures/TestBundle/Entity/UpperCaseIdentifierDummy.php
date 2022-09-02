@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Exploit.cz <insekticid@exploit.cz>
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class UpperCaseIdentifierDummy

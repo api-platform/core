@@ -26,6 +26,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class DummyProduct
@@ -41,6 +42,7 @@ class DummyProduct
      * @var Collection
      *
      * @ApiSubresource
+     *
      * @ODM\ReferenceMany(targetDocument=DummyAggregateOffer::class, mappedBy="product", cascade={"persist"})
      */
     private $offers;
@@ -56,6 +58,7 @@ class DummyProduct
      * @var Collection
      *
      * @ApiSubresource
+     *
      * @ODM\ReferenceMany(targetDocument=DummyProduct::class, mappedBy="parent")
      */
     private $relatedProducts;

@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource
+ *
  * @ORM\Entity
  *
  * @author Kévin Dunglas <dunglas@gmail.com>

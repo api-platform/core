@@ -39,6 +39,7 @@ class FilterLocatorTraitTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
     public function testSetFilterLocatorWithDeprecatedFilterCollection()
@@ -115,6 +116,7 @@ class FilterLocatorTraitTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
     public function testGetFilterWithDeprecatedFilterCollection()
@@ -132,6 +134,7 @@ class FilterLocatorTraitTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
     public function testGetFilterWithNonexistentFilterIdAndDeprecatedFilterCollection()

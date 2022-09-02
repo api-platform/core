@@ -26,7 +26,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "groups"={"get_content"},
  *     },
  * )
- *
  * @ORM\Entity
  */
 class Content implements \JsonSerializable

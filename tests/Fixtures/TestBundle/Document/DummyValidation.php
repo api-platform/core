@@ -55,6 +55,7 @@ class DummyValidation
 
     /**
      * @var string|null The dummy code
+     *
      * @ODM\Field
      */
     private $code;

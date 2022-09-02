@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class WritableId

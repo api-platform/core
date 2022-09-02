@@ -20,6 +20,7 @@ use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity
+ *
  * @ApiResource
  */
 class RamseyUuidDummy

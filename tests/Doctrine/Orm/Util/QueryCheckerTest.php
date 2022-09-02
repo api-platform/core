@@ -207,6 +207,7 @@ class QueryCheckerTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
      */
     public function testHasOrderByOnToManyJoinWithoutJoin()
@@ -225,6 +226,7 @@ class QueryCheckerTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
      */
     public function testHasOrderByOnToManyJoinWithoutOrderBy()
@@ -243,6 +245,7 @@ class QueryCheckerTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
      */
     public function testHasOrderByOnToManyJoinNotFetchJoined()
@@ -279,6 +282,7 @@ class QueryCheckerTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
      */
     public function testHasOrderByOnToManyWithJoinByAssociation()

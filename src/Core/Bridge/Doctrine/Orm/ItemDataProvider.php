@@ -37,6 +37,7 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ *
  * @final
  */
 class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderInterface, RestrictedDataProviderInterface

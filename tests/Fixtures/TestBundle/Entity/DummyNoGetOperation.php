@@ -22,7 +22,6 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Grégoire Hébert gregoire@les-tilleuls.coop
  *
  * @ORM\Entity
- *
  * @ApiResource(
  *     collectionOperations={"post"},
  *     itemOperations={"put"}

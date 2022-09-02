@@ -19,6 +19,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ApiResource
+ *
  * @ODM\Document
  */
 class ReadableOnlyProperty

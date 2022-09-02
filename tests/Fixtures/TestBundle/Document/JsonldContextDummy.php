@@ -21,6 +21,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Jsonld Context Dummy.
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class JsonldContextDummy

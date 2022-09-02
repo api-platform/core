@@ -22,7 +22,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_immutable_date.mongodb.date"}
  * })
- *
  * @ODM\Document
  */
 class DummyImmutableDate

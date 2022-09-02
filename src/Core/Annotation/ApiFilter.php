@@ -22,6 +22,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @Annotation
+ *
  * @Target({"PROPERTY", "CLASS"})
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]

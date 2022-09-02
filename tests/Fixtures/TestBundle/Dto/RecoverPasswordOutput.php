@@ -19,6 +19,7 @@ class RecoverPasswordOutput
 {
     /**
      * @var \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy
+     *
      * @Groups({"user"})
      */
     public $dummy;

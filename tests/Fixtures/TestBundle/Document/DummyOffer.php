@@ -23,6 +23,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class DummyOffer

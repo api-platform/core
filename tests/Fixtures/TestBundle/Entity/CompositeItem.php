@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Composite Item.
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class CompositeItem

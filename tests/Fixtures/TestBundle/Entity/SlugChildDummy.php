@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class SlugChildDummy
@@ -28,7 +29,6 @@ class SlugChildDummy
      * @var int|null The identifier
      *
      * @ApiProperty(identifier=false)
-     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -39,7 +39,6 @@ class SlugChildDummy
      * @var string The slug used as API identifier
      *
      * @ApiProperty(identifier=true)
-     *
      * @ORM\Column(type="string", length=255, unique=true)
      */
     private $slug;

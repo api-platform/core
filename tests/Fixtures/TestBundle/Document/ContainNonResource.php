@@ -22,7 +22,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Resource linked to a standard object.
  *
  * @ODM\Document
- *
  * @ApiResource(
  *     attributes={
  *         "filters"={"my_dummy.property"}
@@ -38,7 +37,6 @@ class ContainNonResource
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
-     *
      * @Groups("contain_non_resource")
      */
     public $id;

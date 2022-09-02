@@ -53,6 +53,7 @@ class Person
 
     /**
      * @ApiSubresource
+     *
      * @ORM\OneToMany(targetEntity="Greeting", mappedBy="sender")
      */
     public $sentGreetings;

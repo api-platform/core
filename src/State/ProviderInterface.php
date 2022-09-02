@@ -20,6 +20,7 @@ use ApiPlatform\State\Pagination\PartialPaginatorInterface;
  * Retrieves data from a persistence layer.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @experimental
  *
  * @template T of object

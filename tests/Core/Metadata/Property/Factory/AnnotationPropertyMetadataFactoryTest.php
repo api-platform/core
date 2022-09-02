@@ -39,6 +39,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
      *
      * @param mixed $reader
      * @param mixed $decorated
+     *
      * @group legacy
      */
     public function testCreateProperty($reader, $decorated, string $description)
@@ -59,6 +60,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
 
     /**
      * @requires PHP 8.0
+     *
      * @group legacy
      */
     public function testCreateAttribute()

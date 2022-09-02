@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ApiResource
  */
 class Question
@@ -38,6 +39,7 @@ class Question
     /**
      * @ORM\OneToOne(targetEntity="Answer", inversedBy="question")
      * @ORM\JoinColumn(name="answer_id", referencedColumnName="id", unique=true)
+     *
      * @ApiSubresource
      */
     private $answer;

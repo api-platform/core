@@ -39,7 +39,9 @@ class RelatedDummy extends ParentDummy
 {
     /**
      * @ApiProperty(writable=false)
+     *
      * @ApiSubresource
+     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -77,6 +79,7 @@ class RelatedDummy extends ParentDummy
 
     /**
      * @ApiSubresource
+     *
      * @ORM\ManyToOne(targetEntity="ThirdLevel", cascade={"persist"})
      * @Groups({"barcelona", "chicago", "friends"})
      */
@@ -84,6 +87,7 @@ class RelatedDummy extends ParentDummy
 
     /**
      * @ApiSubresource
+     *
      * @ORM\OneToMany(targetEntity="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy")
      * @Groups({"fakemanytomany", "friends"})
      */

@@ -24,7 +24,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  *
  * @ORM\Entity
- *
  * @ApiResource(
  *     attributes={
  *         "normalization_context"={"groups"={"dummy_read"}},
@@ -54,7 +53,6 @@ class DummyProperty
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     *
      * @Groups({"dummy_read", "dummy_graphql_read"})
      */
     private $id;
@@ -63,7 +61,6 @@ class DummyProperty
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     *
      * @Groups({"dummy_read", "dummy_write"})
      */
     public $foo;
@@ -72,7 +69,6 @@ class DummyProperty
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     *
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $bar;
@@ -81,7 +77,6 @@ class DummyProperty
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     *
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $baz;
@@ -90,7 +85,6 @@ class DummyProperty
      * @var DummyGroup|null
      *
      * @ORM\ManyToOne(targetEntity=DummyGroup::class, cascade={"persist"})
-     *
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $group;
@@ -107,7 +101,6 @@ class DummyProperty
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     *
      * @Groups({"dummy_read"})
      */
     public $nameConverted;

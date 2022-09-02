@@ -95,7 +95,7 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
             ];
 
             foreach ($this->readApiFilters($this->reflectionClass) as $annotation) {
-                [$filterAnnotation,] = $annotation;
+                [$filterAnnotation] = $annotation;
                 if (isset($legacyNamespaces[$filterAnnotation->filterClass])) {
                     $namespaces[] = $legacyNamespaces[$filterAnnotation->filterClass];
                 }
@@ -103,7 +103,7 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
 
             foreach ($this->reflectionClass->getProperties() as $reflectionProperty) {
                 foreach ($this->readApiFilters($reflectionProperty) as $annotation) {
-                    [$filterAnnotation,] = $annotation;
+                    [$filterAnnotation] = $annotation;
                     if (isset($legacyNamespaces[$filterAnnotation->filterClass])) {
                         $namespaces[] = $legacyNamespaces[$filterAnnotation->filterClass];
                     }

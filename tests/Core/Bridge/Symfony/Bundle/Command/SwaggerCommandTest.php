@@ -22,6 +22,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ *
  * @group legacy
  */
 class SwaggerCommandTest extends KernelTestCase
@@ -50,6 +51,7 @@ class SwaggerCommandTest extends KernelTestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".
      */
     public function testExecuteWithAliasVersion3()
@@ -61,6 +63,7 @@ class SwaggerCommandTest extends KernelTestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".
      */
     public function testExecuteWithYamlVersion3()

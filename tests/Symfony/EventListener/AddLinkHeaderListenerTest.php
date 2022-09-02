@@ -33,6 +33,7 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @group legacy
  */
 class AddLinkHeaderListenerTest extends TestCase
@@ -72,6 +73,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
     /**
      * @dataProvider addProvider
+     *
      * @group legacy
      */
     public function testAddLinkHeaderWithLegacySignature(string $expected, Request $request)
@@ -152,6 +154,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
     /**
      * @dataProvider doNotAddProvider
+     *
      * @group legacy
      */
     public function testDoNotAddHeaderWithLegacySignature(Request $request)

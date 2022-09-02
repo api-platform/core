@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class ThirdLevel
@@ -54,6 +55,7 @@ class ThirdLevel
 
     /**
      * @ApiSubresource
+     *
      * @ORM\ManyToOne(targetEntity="FourthLevel", cascade={"persist"})
      * @Groups({"barcelona", "chicago", "friends"})
      */

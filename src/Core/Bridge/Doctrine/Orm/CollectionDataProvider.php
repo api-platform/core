@@ -29,6 +29,7 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ *
  * @final
  */
 class CollectionDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface

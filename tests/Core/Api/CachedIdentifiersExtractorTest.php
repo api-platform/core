@@ -28,6 +28,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @group legacy
  */
 class CachedIdentifiersExtractorTest extends TestCase

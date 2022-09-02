@@ -52,7 +52,6 @@ class DummyCar
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
-     *
      * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
      */
@@ -62,7 +61,6 @@ class DummyCar
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
-     *
      * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
@@ -72,7 +70,6 @@ class DummyCar
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
-     *
      * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
@@ -82,7 +79,6 @@ class DummyCar
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=UuidIdentifierDummy::class)
-     *
      * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
@@ -115,7 +111,6 @@ class DummyCar
      *
      * @Serializer\Groups({"colors"})
      * @Serializer\SerializedName("carBrand")
-     *
      * @ODM\Field
      */
     private $brand = 'DummyBrand';

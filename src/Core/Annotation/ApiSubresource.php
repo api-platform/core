@@ -19,6 +19,7 @@ namespace ApiPlatform\Core\Annotation;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @Annotation
+ *
  * @Target({"METHOD", "PROPERTY"})
  * @Attributes(
  *     @Attribute("maxDepth", type="int"),

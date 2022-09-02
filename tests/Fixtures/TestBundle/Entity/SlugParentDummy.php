@@ -32,7 +32,6 @@ class SlugParentDummy
      * @var int|null The database identifier
      *
      * @ApiProperty(identifier=false)
-     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -43,13 +42,13 @@ class SlugParentDummy
      * @var string The slug used a API identifier
      *
      * @ApiProperty(identifier=true)
-     *
      * @ORM\Column(type="string", length=255, unique=true)
      */
     private $slug;
 
     /**
      * @var Collection<int, SlugChildDummy>
+     *
      * @ORM\OneToMany(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugChildDummy", mappedBy="parentDummy")
      *
      * @ApiSubresource

@@ -26,6 +26,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class DummyAggregateOffer
@@ -43,6 +44,7 @@ class DummyAggregateOffer
      * @var Collection<int, DummyOffer>
      *
      * @ApiSubresource
+     *
      * @ORM\OneToMany(targetEntity="DummyOffer", mappedBy="aggregate", cascade={"persist"})
      */
     private $offers;

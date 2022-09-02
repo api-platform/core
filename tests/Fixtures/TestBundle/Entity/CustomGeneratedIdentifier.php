@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Custom identifier.
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class CustomGeneratedIdentifier

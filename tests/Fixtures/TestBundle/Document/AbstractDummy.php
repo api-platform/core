@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Abstract Dummy.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
  * @ApiResource(
  *     collectionOperations={"get", "post"},
  *     itemOperations={"get", "put", "delete"},

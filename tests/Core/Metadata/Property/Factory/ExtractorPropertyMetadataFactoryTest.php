@@ -30,6 +30,7 @@ use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ *
  * @group legacy
  */
 class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryProvider

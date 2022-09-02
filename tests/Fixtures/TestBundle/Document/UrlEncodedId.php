@@ -22,7 +22,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Resource with an ID that will be URL encoded
  *
  * @ODM\Document
- *
  * @ApiResource(
  *     itemOperations={
  *         "get"={

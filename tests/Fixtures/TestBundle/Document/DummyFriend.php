@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class DummyFriend

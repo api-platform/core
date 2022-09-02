@@ -34,6 +34,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @group legacy
  */
 class CollectionFiltersNormalizerTest extends TestCase
@@ -268,6 +269,7 @@ class CollectionFiltersNormalizerTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
     public function testNormalizeWithDeprecatedFilterCollection()

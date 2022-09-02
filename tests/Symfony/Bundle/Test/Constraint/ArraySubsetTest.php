@@ -78,6 +78,7 @@ class ArraySubsetTest extends TestCase
      *
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     *
      * @dataProvider evaluateDataProvider
      */
     public function testEvaluate(bool $expected, $subset, $other, $strict): void

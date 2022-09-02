@@ -23,7 +23,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  *
  * @ORM\Entity
- *
  * @ApiResource(
  *     attributes={
  *         "normalization_context"={"groups"={"dummy_read"}},
@@ -54,7 +53,6 @@ class DummyGroup
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     *
      * @Groups({"dummy", "dummy_read", "dummy_id"})
      */
     private $id;
@@ -63,7 +61,6 @@ class DummyGroup
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     *
      * @Groups({"dummy", "dummy_read", "dummy_write", "dummy_foo"})
      */
     public $foo;
@@ -72,7 +69,6 @@ class DummyGroup
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     *
      * @Groups({"dummy", "dummy_read", "dummy_write", "dummy_bar"})
      */
     public $bar;
@@ -81,7 +77,6 @@ class DummyGroup
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     *
      * @Groups({"dummy", "dummy_read", "dummy_baz"})
      */
     public $baz;
@@ -90,7 +85,6 @@ class DummyGroup
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     *
      * @Groups({"dummy", "dummy_write", "dummy_qux"})
      */
     public $qux;

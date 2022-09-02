@@ -45,6 +45,7 @@ class CustomOperationPathResolverTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Method ApiPlatform\PathResolver\CustomOperationPathResolver::resolveOperationPath() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.
      */
     public function testLegacyResolveOperationPath()

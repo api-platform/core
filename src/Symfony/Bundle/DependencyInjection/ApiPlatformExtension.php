@@ -286,7 +286,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $publicProperties = [];
 
         if ($compatibility) {
-            [$publicProperties,] = ApiResourceAnnotation::getConfigMetadata();
+            [$publicProperties] = ApiResourceAnnotation::getConfigMetadata();
         } else {
             $rc = new \ReflectionClass(ApiResource::class);
             foreach ($rc->getConstructor()->getParameters() as $param) {

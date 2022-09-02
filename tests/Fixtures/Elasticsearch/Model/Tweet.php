@@ -33,7 +33,6 @@ class Tweet
 {
     /**
      * @ApiProperty(identifier=true)
-     *
      * @Groups({"tweet:read", "user:read"})
      */
     private $id;

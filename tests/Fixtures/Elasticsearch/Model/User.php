@@ -31,7 +31,6 @@ class User
 {
     /**
      * @ApiProperty(identifier=true)
-     *
      * @Groups({"user:read", "tweet:read"})
      */
     private $id;

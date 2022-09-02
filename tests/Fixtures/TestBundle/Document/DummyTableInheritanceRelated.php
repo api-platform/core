@@ -34,7 +34,6 @@ class DummyTableInheritanceRelated
      * @var int The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     *
      * @Groups({"default"})
      */
     private $id;
@@ -43,7 +42,6 @@ class DummyTableInheritanceRelated
      * @var Collection Related children
      *
      * @ODM\ReferenceMany(targetDocument=DummyTableInheritance::class, mappedBy="parent")
-     *
      * @Groups({"default"})
      */
     private $children;

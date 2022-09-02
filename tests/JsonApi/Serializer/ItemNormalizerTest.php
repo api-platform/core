@@ -44,6 +44,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ *
  * @group legacy
  */
 class ItemNormalizerTest extends TestCase

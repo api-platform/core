@@ -22,6 +22,7 @@ use Doctrine\Common\Annotations\Reader;
  * Creates a resource metadata from {@see Resource} annotations.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @experimental
  */
 final class FiltersResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface

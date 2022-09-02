@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @experimental
  */
 final class AlternateUriResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface

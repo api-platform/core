@@ -82,6 +82,7 @@ class ChainSubresourcedataProviderTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Throwing a "ApiPlatform\Exception\ResourceClassNotSupportedException" in a data provider is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
     public function testLegacyGetSubresource()
@@ -108,6 +109,7 @@ class ChainSubresourcedataProviderTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Throwing a "ApiPlatform\Exception\ResourceClassNotSupportedException" in a data provider is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
     public function testLegacyGetCollectionExceptions()

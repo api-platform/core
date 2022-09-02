@@ -28,6 +28,7 @@ use Prophecy\Argument;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @group legacy
  */
 class AnnotationPropertyNameCollectionFactoryTest extends TestCase

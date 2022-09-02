@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     "dummyTableInheritanceDifferentChild"=DummyTableInheritanceDifferentChild::class,
  *     "dummyTableInheritanceNotApiResourceChild"=DummyTableInheritanceNotApiResourceChild::class
  * })
+ *
  * @ApiResource
  */
 class DummyTableInheritance
@@ -35,7 +36,6 @@ class DummyTableInheritance
      * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     *
      * @Groups({"default"})
      */
     private $id;
@@ -44,7 +44,6 @@ class DummyTableInheritance
      * @var string|null The dummy name
      *
      * @ODM\Field
-     *
      * @Groups({"default"})
      */
     private $name;

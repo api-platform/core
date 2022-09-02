@@ -32,6 +32,7 @@ class AbsoluteUrlRelationDummy
 
     /**
      * @ODM\ReferenceMany(targetDocument=AbsoluteUrlDummy::class, mappedBy="absoluteUrlRelationDummy")
+     *
      * @ApiSubresource
      */
     public $absoluteUrlDummies;

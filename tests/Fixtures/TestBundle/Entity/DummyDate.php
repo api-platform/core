@@ -33,7 +33,6 @@ use Doctrine\ORM\Mapping as ORM;
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
  *     "dateIncludeNullBeforeAndAfter"=DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER
  * })
- *
  * @ORM\Entity
  */
 class DummyDate

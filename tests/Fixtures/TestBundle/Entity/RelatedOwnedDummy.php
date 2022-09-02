@@ -46,6 +46,7 @@ class RelatedOwnedDummy
      *
      * @ORM\OneToOne(targetEntity="Dummy", cascade={"persist"}, inversedBy="relatedOwnedDummy")
      * @ORM\JoinColumn(nullable=false)
+     *
      * @ApiSubresource
      */
     public $owningDummy;

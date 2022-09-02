@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource
+ *
  * @ODM\Document
  */
 class DummyCarColor
@@ -47,7 +48,6 @@ class DummyCarColor
      * @ODM\Field(nullable=false)
      * @ApiFilter(SearchFilter::class)
      * @Assert\NotBlank
-     *
      * @Serializer\Groups({"colors"})
      */
     private $prop = '';

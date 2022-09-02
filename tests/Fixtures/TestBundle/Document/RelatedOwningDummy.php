@@ -44,6 +44,7 @@ class RelatedOwningDummy
      * @var Dummy
      *
      * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, mappedBy="relatedOwningDummy")
+     *
      * @ApiSubresource
      */
     public $ownedDummy;

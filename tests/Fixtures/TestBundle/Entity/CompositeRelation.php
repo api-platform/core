@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Composite Relation.
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class CompositeRelation

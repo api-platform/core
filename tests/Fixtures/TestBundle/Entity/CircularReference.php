@@ -37,14 +37,12 @@ class CircularReference
 
     /**
      * @ORM\ManyToOne(targetEntity="CircularReference", inversedBy="children")
-     *
      * @Groups({"circular"})
      */
     public $parent;
 
     /**
      * @ORM\OneToMany(targetEntity="CircularReference", mappedBy="parent")
-     *
      * @Groups({"circular"})
      */
     public $children;

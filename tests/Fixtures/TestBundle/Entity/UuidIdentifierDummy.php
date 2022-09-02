@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Custom identifier dummy.
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class UuidIdentifierDummy

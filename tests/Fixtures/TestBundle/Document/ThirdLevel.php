@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class ThirdLevel
@@ -53,6 +54,7 @@ class ThirdLevel
 
     /**
      * @ApiSubresource
+     *
      * @ODM\ReferenceOne(targetDocument=FourthLevel::class, cascade={"persist"}, storeAs="id")
      * @Groups({"barcelona", "chicago", "friends"})
      */

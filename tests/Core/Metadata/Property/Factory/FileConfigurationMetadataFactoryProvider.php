@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
  * Property metadata provider for file configured factories tests.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ *
  * @group legacy
  */
 abstract class FileConfigurationMetadataFactoryProvider extends TestCase

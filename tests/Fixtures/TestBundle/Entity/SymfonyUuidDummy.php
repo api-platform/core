@@ -22,6 +22,7 @@ use Symfony\Component\Uid\Uuid;
 if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidType::class)) {
     /**
      * @ORM\Entity
+     *
      * @ApiResource
      *
      * @author Vincent Chalamon <vincentchalamon@gmail.com>

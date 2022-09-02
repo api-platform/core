@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource
+ *
  * @ORM\Entity
  * @ApiFilter(NumericFilter::class, properties={"nameConverted"})
  * @ApiFilter(RangeFilter::class, properties={"nameConverted"})

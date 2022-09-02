@@ -22,7 +22,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Resource linked to a standard object.
  *
  * @ORM\Entity
- *
  * @ApiResource(
  *     attributes={
  *         "filters"={"my_dummy.property"}
@@ -40,7 +39,6 @@ class ContainNonResource
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     *
      * @Groups("contain_non_resource")
      */
     public $id;

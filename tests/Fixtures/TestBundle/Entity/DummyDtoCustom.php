@@ -22,7 +22,6 @@ use Doctrine\ORM\Mapping as ORM;
  * DummyDtoCustom.
  *
  * @ORM\Entity
- *
  * @ApiResource(
  *     collectionOperations={"post"={"input"=CustomInputDto::class}, "get", "custom_output"={"output"=CustomOutputDto::class, "path"="dummy_dto_custom_output", "method"="GET"}, "post_without_output"={"output"=false, "method"="POST", "path"="dummy_dto_custom_post_without_output"}},
  *     itemOperations={"get", "custom_output"={"output"=CustomOutputDto::class, "method"="GET", "path"="dummy_dto_custom_output/{id}"}, "put", "delete"}

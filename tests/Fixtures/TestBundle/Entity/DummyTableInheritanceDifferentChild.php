@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
+ *
  * @ApiResource
  */
 class DummyTableInheritanceDifferentChild extends DummyTableInheritance
@@ -27,7 +28,6 @@ class DummyTableInheritanceDifferentChild extends DummyTableInheritance
      * @var string The dummy email
      *
      * @ORM\Column
-     *
      * @Groups({"default"})
      */
     private $email;

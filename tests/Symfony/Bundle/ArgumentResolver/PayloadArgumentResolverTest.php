@@ -185,7 +185,9 @@ class PayloadArgumentResolverTest extends KernelTestCase
 
     /**
      * @requires PHP 8.0
+     *
      * @dataProvider provideIntegrationCases
+     *
      * @group legacy
      */
     public function testIntegration(Request $request, callable $controller, array $expectedArguments): void
