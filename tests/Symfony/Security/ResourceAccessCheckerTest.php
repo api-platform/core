@@ -20,6 +20,7 @@ use ApiPlatform\Tests\Fixtures\Serializable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -30,6 +31,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class ResourceAccessCheckerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     /**
@@ -56,7 +58,7 @@ class ResourceAccessCheckerTest extends TestCase
 
         $tokenStorageProphecy->getToken()->willReturn($token);
 
-        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
+        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), null, false);
         $this->assertSame($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
     }
 
@@ -70,7 +72,7 @@ class ResourceAccessCheckerTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "symfony/security" library must be installed to use the "security" attribute.');
 
-        $checker = new ResourceAccessChecker($this->prophesize(ExpressionLanguage::class)->reveal());
+        $checker = new ResourceAccessChecker($this->prophesize(ExpressionLanguage::class)->reveal(), null, null, null, null, false);
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
@@ -83,19 +85,23 @@ class ResourceAccessCheckerTest extends TestCase
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
         $tokenStorageProphecy->getToken()->willReturn($this->prophesize(TokenInterface::class)->willImplement(Serializable::class)->reveal());
 
-        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
+        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), null, false);
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
+    /**
+     * @group legacy
+     */
     public function testNotBehindAFirewall()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The $exceptionOnNoToken parameter in "ApiPlatform\Symfony\Security\ResourceAccessChecker::__construct()" is deprecated and will always be false in 3.0, you should stop using it.');
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The current token must be set to use the "security" attribute (is the URL behind a firewall?).');
 
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
 
-        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
+        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), null, true);
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
