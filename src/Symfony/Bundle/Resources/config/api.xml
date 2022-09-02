@@ -166,5 +166,9 @@
             <argument type="service" id="api_platform.symfony.iri_converter.skolem" />
         </service>
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
+
+        <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener" parent="exception_listener">
+            <argument key="$controller">api_platform.action.exception</argument>
+        </service>
     </services>
 </container>

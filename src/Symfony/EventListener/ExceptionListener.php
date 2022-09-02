@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Util\RequestAttributesExtractor;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 
@@ -26,11 +25,8 @@ use Symfony\Component\HttpKernel\EventListener\ErrorListener;
  */
 final class ExceptionListener
 {
-    private readonly ErrorListener $errorListener;
-
-    public function __construct(string|object|array|null $controller, LoggerInterface $logger = null, bool $debug = false)
+    public function __construct(private readonly ErrorListener $errorListener)
     {
-        $this->errorListener = new ErrorListener($controller, $logger, $debug);
     }
 
     public function onKernelException(ExceptionEvent $event): void
