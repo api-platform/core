@@ -18,6 +18,7 @@ parameters:
 	excludePaths:
 		- src/deprecation.php
 		- src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
+		- src/Util/ResponseTrait71.php
 		# Class ... extends final class cannot be ignored...
 		- src/Core/Action/EntrypointAction.php
 		- src/Core/Action/ExceptionAction.php

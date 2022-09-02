@@ -20,15 +20,11 @@ interface QueryNameGeneratorInterface
 {
     /**
      * Generates a cacheable alias for DQL join.
-     *
-     * @return literal-string
      */
     public function generateJoinAlias(string $association): string;
 
     /**
      * Generates a cacheable parameter name for DQL query.
-     *
-     * @return literal-string
      */
     public function generateParameterName(string $name): string;
 }
