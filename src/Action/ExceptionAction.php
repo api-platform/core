@@ -96,6 +96,11 @@ final class ExceptionAction
 
     private function getOperationExceptionToStatus(Request $request): array
     {
+        // TODO: remove legacy layer in 3.0
+        if ($request->attributes->has('_api_exception_to_status')) {
+            return $request->attributes->get('_api_exception_to_status');
+        }
+
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 
         if ([] === $attributes || null === $this->resourceMetadataFactory) {
