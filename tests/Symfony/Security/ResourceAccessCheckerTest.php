@@ -83,19 +83,7 @@ class ResourceAccessCheckerTest extends TestCase
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
-    public function testNotBehindAFirewall(): void
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The current token must be set to use the "security" attribute (is the URL behind a firewall?).');
-
-        $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
-        $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
-
-        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
-        $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
-    }
-
-    public function testWithoutAuthenticationTokenAndExceptionOnNoTokenIsFalse(): void
+    public function testWithoutAuthenticationToken(): void
     {
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);
         $expressionLanguageProphecy->evaluate('is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(true)->shouldBeCalled();
@@ -106,7 +94,7 @@ class ResourceAccessCheckerTest extends TestCase
 
         $tokenStorageProphecy->getToken()->willReturn(null);
 
-        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), $authorizationCheckerProphecy->reveal(), false);
+        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), $authorizationCheckerProphecy->reveal());
         self::assertTrue($checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
     }
 }
