@@ -34,6 +34,7 @@ class NetworkPathRelationDummy
 
     /**
      * @ORM\OneToMany(targetEntity="NetworkPathDummy", mappedBy="networkPathRelationDummy")
+     *
      * @ApiSubresource
      */
     public $networkPathDummies;

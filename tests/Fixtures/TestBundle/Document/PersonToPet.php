@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * PersonToPet.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @ODM\Document
  */
 class PersonToPet

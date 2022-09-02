@@ -27,6 +27,7 @@ class DummyIgnoreProperty
 
     /**
      * @Groups({"dummy"})
+     *
      * @Ignore
      */
     public $ignored;

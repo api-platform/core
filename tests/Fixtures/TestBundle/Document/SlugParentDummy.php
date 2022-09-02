@@ -32,7 +32,6 @@ class SlugParentDummy
      * @var int|null The database identifier
      *
      * @ApiProperty(identifier=false)
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
@@ -41,7 +40,6 @@ class SlugParentDummy
      * @var string|null The slug used a API identifier
      *
      * @ApiProperty(identifier=true)
-     *
      * @ODM\Field
      */
     private $slug;

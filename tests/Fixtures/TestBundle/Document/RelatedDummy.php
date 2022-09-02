@@ -40,7 +40,9 @@ class RelatedDummy extends ParentDummy
 {
     /**
      * @ApiProperty(writable=false)
+     *
      * @ApiSubresource
+     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      * @Groups({"chicago", "friends"})
      */
@@ -74,6 +76,7 @@ class RelatedDummy extends ParentDummy
 
     /**
      * @ApiSubresource
+     *
      * @ODM\ReferenceOne(targetDocument=ThirdLevel::class, cascade={"persist"}, nullable=true, storeAs="id")
      * @Groups({"barcelona", "chicago", "friends"})
      */
@@ -81,6 +84,7 @@ class RelatedDummy extends ParentDummy
 
     /**
      * @ApiSubresource
+     *
      * @ODM\ReferenceMany(targetDocument=RelatedToDummyFriend::class, cascade={"persist"}, mappedBy="relatedDummy", storeAs="id")
      * @Groups({"fakemanytomany", "friends"})
      */

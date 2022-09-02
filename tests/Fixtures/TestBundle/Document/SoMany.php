@@ -27,7 +27,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *         {"field"="id", "direction"="DESC"}
  *     }
  * })
- *
  * @ApiFilter(RangeFilter::class, properties={"id"})
  * @ApiFilter(OrderFilter::class, properties={"id"="DESC"})
  */

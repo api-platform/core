@@ -45,6 +45,7 @@ class RelatedOwningDummy
      * @var Dummy|null
      *
      * @ORM\OneToOne(targetEntity="Dummy", cascade={"persist"}, mappedBy="relatedOwningDummy")
+     *
      * @ApiSubresource
      */
     public $ownedDummy;

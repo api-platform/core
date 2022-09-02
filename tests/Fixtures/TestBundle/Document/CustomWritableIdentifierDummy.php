@@ -20,6 +20,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Custom Writable Identifier Dummy.
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class CustomWritableIdentifierDummy

@@ -53,7 +53,6 @@ class DummyCar
      * @var mixed Something else
      *
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
-     *
      * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
      */
@@ -63,7 +62,6 @@ class DummyCar
      * @var mixed Something else
      *
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
-     *
      * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
@@ -73,7 +71,6 @@ class DummyCar
      * @var mixed Something else
      *
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
-     *
      * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
@@ -119,7 +116,6 @@ class DummyCar
      *
      * @Serializer\Groups({"colors"})
      * @Serializer\SerializedName("carBrand")
-     *
      * @ORM\Column
      */
     private $brand = 'DummyBrand';

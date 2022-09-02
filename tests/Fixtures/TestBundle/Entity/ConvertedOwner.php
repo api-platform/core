@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource
+ *
  * @ORM\Entity
  * @ApiFilter(SearchFilter::class, properties={"nameConverted.nameConverted"="partial"})
  */

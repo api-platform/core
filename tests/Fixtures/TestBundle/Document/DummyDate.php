@@ -34,7 +34,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
  *     "dateIncludeNullBeforeAndAfter"=DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER
  * })
- *
  * @ODM\Document
  */
 class DummyDate

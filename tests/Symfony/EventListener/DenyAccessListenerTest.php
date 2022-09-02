@@ -36,6 +36,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @group legacy
  */
 class DenyAccessListenerTest extends TestCase

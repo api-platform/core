@@ -63,6 +63,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Anthony GRASSIOT <antograssiot@free.fr>
+ *
  * @group legacy
  */
 class DocumentationNormalizerV3Test extends TestCase
@@ -1589,6 +1590,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
     public function testFiltersWithDeprecatedFilterCollection(): void
@@ -2845,6 +2847,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.
      */
     public function testLegacyNormalizeWithPaginationCustomDefaultAndMaxItemsPerPage(): void
@@ -3229,6 +3232,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Using the swagger DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory, use the "openapi.backward_compatibility_layer" configuration to change this behavior.
      */
     public function testNormalizeOpenApi()

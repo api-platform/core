@@ -38,6 +38,7 @@ class DocumentationActionTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Not passing an instance of "ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface" as 7th parameter of the constructor of "ApiPlatform\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.6
      */
     public function testDocumentationAction(): void
@@ -86,6 +87,7 @@ class DocumentationActionTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 5th parameter of the constructor of "ApiPlatform\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.5
      */
     public function testDocumentationActionFormatDeprecation()

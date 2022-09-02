@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ODM\Document
+ *
  * @ApiResource
  */
 class DummyTableInheritanceChild extends DummyTableInheritance
@@ -27,7 +28,6 @@ class DummyTableInheritanceChild extends DummyTableInheritance
      * @var string The dummy nickname
      *
      * @ODM\Field
-     *
      * @Groups({"default"})
      */
     private $nickname;

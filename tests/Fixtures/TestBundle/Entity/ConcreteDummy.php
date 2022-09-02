@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Jérémy Derusse <jeremy@derusse.com>
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class ConcreteDummy extends AbstractDummy

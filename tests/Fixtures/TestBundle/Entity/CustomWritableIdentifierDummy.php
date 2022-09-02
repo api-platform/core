@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Custom Writable Identifier Dummy.
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class CustomWritableIdentifierDummy

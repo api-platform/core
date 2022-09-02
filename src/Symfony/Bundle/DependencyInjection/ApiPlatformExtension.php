@@ -286,7 +286,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $publicProperties = [];
 
         if ($compatibility) {
-            [$publicProperties,] = ApiResourceAnnotation::getConfigMetadata();
+            [$publicProperties] = ApiResourceAnnotation::getConfigMetadata();
         } else {
             $rc = new \ReflectionClass(ApiResource::class);
             foreach ($rc->getConstructor()->getParameters() as $param) {
@@ -670,6 +670,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(DoctrineOrmAbstractContextAwareFilter::class)
             ->setBindings(['$requestStack' => null]);
         $container->registerForAutoconfiguration(DoctrineOrmAbstractFilter::class);
+
+        // Legacy namespaces as strings we don't want to load the classes
+        $container->registerForAutoconfiguration('ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface')
+            ->addTag('api_platform.doctrine.orm.query_extension.item');
+        $container->registerForAutoconfiguration('ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\ContextAwareQueryCollectionExtensionInterface')
+            ->addTag('api_platform.doctrine.orm.query_extension.collection');
+        $container->registerForAutoconfiguration('ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface')
+            ->addTag('api_platform.doctrine.orm.query_extension.collection');
 
         $loader->load('doctrine_orm.xml');
         $loader->load('legacy/doctrine_orm.xml');

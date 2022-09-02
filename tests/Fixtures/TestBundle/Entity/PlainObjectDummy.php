@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class PlainObjectDummy

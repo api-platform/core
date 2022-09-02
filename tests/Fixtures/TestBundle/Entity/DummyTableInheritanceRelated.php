@@ -36,7 +36,6 @@ class DummyTableInheritanceRelated
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     *
      * @Groups({"default"})
      */
     private $id;
@@ -46,7 +45,6 @@ class DummyTableInheritanceRelated
      *
      * @ORM\OneToMany(targetEntity="DummyTableInheritance", mappedBy="parent")
      * @ORM\OrderBy({"id"="ASC"})
-     *
      * @Groups({"default"})
      */
     private $children;

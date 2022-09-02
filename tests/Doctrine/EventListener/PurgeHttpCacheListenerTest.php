@@ -38,6 +38,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @group legacy
  */
 class PurgeHttpCacheListenerTest extends TestCase

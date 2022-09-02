@@ -37,9 +37,7 @@ interface ProductInterface
 
     /**
      * @ApiProperty(identifier=true)
-     *
      * @Groups({"product_read"})
-     *
      * @Assert\NotBlank
      */
     public function getCode(): ?string;

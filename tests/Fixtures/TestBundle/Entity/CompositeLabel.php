@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Composite Label.
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class CompositeLabel

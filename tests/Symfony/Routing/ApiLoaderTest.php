@@ -48,6 +48,7 @@ use Symfony\Component\Routing\Route;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  *
  * TODO: in 3.0 just remove the IdentifiersExtractor
+ *
  * @group legacy
  */
 class ApiLoaderTest extends TestCase

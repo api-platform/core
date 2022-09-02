@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  * Creates a resource metadata from {@see Resource} extractors (XML, YAML).
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
  * @experimental
  */
 final class ExtractorResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface

@@ -19,6 +19,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ODM\Document
+ *
  * @ApiResource
  */
 class Question
@@ -35,6 +36,7 @@ class Question
 
     /**
      * @ODM\ReferenceOne(targetDocument=Answer::class, inversedBy="question", storeAs="id")
+     *
      * @ApiSubresource
      */
     private $answer;

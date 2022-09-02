@@ -20,6 +20,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Composite Primitive Item.
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class CompositePrimitiveItem

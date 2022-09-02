@@ -30,6 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @group legacy
  */
 class DeserializeListenerTest extends TestCase
@@ -352,6 +353,7 @@ class DeserializeListenerTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 3rd parameter of the constructor of "ApiPlatform\Symfony\EventListener\DeserializeListener" is deprecated since API Platform 2.5, pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead
      */
     public function testLegacyFormatsParameter(): void

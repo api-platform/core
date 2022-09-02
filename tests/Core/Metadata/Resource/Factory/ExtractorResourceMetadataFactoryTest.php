@@ -33,6 +33,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
  * Tests extractor resource metadata factory.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @group legacy
  */
 class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryProvider
@@ -86,7 +87,9 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @expectedDeprecation Configuring "%s" tags without using a parent "%ss" tag is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     *
      * @group legacy
+     *
      * @dataProvider legacyOperationsResourceMetadataProvider
      *
      * @param mixed $expectedResourceMetadata

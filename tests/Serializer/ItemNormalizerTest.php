@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @group legacy
  */
 class ItemNormalizerTest extends TestCase

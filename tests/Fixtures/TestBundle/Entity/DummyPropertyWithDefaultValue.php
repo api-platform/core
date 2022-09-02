@@ -21,7 +21,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * DummyPropertyWithDefaultValue.
  *
  * @ORM\Entity
- *
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"dummy_read"}},
  *     "denormalization_context"={"groups"={"dummy_write"}}
@@ -35,7 +34,6 @@ class DummyPropertyWithDefaultValue
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     *
      * @Groups("dummy_read")
      */
     private $id;
@@ -44,7 +42,6 @@ class DummyPropertyWithDefaultValue
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     *
      * @Groups({"dummy_read", "dummy_write"})
      */
     public $foo = 'foo';

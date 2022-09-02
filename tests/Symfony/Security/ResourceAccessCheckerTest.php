@@ -58,7 +58,7 @@ class ResourceAccessCheckerTest extends TestCase
 
         $tokenStorageProphecy->getToken()->willReturn($token);
 
-        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), null, false);
+        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), null);
         $this->assertSame($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
     }
 
@@ -72,7 +72,7 @@ class ResourceAccessCheckerTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "symfony/security" library must be installed to use the "security" attribute.');
 
-        $checker = new ResourceAccessChecker($this->prophesize(ExpressionLanguage::class)->reveal(), null, null, null, null, false);
+        $checker = new ResourceAccessChecker($this->prophesize(ExpressionLanguage::class)->reveal(), null, null, null, null);
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
@@ -85,7 +85,7 @@ class ResourceAccessCheckerTest extends TestCase
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
         $tokenStorageProphecy->getToken()->willReturn($this->prophesize(TokenInterface::class)->willImplement(Serializable::class)->reveal());
 
-        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), null, false);
+        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), null);
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
@@ -116,7 +116,7 @@ class ResourceAccessCheckerTest extends TestCase
 
         $tokenStorageProphecy->getToken()->willReturn(null);
 
-        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), $authorizationCheckerProphecy->reveal(), false);
+        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), $authorizationCheckerProphecy->reveal());
         self::assertTrue($checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
     }
 }

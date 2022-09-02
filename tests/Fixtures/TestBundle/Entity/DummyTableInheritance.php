@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     "dummyTableInheritanceDifferentChild"="DummyTableInheritanceDifferentChild",
  *     "dummyTableInheritanceNotApiResourceChild"="DummyTableInheritanceNotApiResourceChild"
  * })
+ *
  * @ApiResource
  */
 class DummyTableInheritance
@@ -37,7 +38,6 @@ class DummyTableInheritance
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     *
      * @Groups({"default"})
      */
     private $id;
@@ -46,7 +46,6 @@ class DummyTableInheritance
      * @var string The dummy name
      *
      * @ORM\Column
-     *
      * @Groups({"default"})
      */
     private $name;

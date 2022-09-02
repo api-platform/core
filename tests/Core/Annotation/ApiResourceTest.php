@@ -284,6 +284,7 @@ PHP
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Attribute "accessControl" is deprecated in annotation since API Platform 2.5, prefer using "security" attribute instead
      * @expectedDeprecation Attribute "accessControlMessage" is deprecated in annotation since API Platform 2.5, prefer using "securityMessage" attribute instead
      */

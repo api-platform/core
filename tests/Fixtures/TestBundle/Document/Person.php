@@ -50,6 +50,7 @@ class Person
 
     /**
      * @ApiSubresource
+     *
      * @ODM\ReferenceMany(targetDocument=Greeting::class, mappedBy="sender")
      */
     public $sentGreetings;

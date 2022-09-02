@@ -33,6 +33,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @group legacy
  */
 class SubresourceOperationFactoryTest extends TestCase

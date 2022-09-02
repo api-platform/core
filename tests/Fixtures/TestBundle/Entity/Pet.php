@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class Pet

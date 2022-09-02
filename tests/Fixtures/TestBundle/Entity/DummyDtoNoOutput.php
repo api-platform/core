@@ -23,7 +23,6 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ORM\Entity
- *
  * @ApiResource(
  *     attributes={
  *         "input"=InputDto::class,

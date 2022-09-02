@@ -22,7 +22,6 @@ use Doctrine\ORM\Mapping as ORM;
  * Resource with an ID that will be URL encoded
  *
  * @ORM\Entity
- *
  * @ApiResource(
  *     itemOperations={
  *         "get"={

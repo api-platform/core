@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource
+ *
  * @ODM\Document
  */
 class VoDummyInsuranceCompany

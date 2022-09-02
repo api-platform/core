@@ -19,7 +19,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ODM\Document
- *
  * @ApiResource(
  *     itemOperations={
  *         "get",

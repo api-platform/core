@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @group legacy
  */
 class RespondListenerTest extends TestCase

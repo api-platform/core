@@ -124,6 +124,7 @@ class WriteListenerTest extends TestCase
 
     /**
      * @expectedDeprecation The ApiPlatform\Doctrine\EventListener\WriteListener class is deprecated since version 2.2 and will be removed in 3.0. Use the ApiPlatform\Core\EventListener\WriteListener class instead.
+     *
      * @doesNotPerformAssertions
      */
     public function testOnKernelViewWithNoManager()

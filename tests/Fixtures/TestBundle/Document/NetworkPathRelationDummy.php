@@ -32,6 +32,7 @@ class NetworkPathRelationDummy
 
     /**
      * @ODM\ReferenceMany(targetDocument=NetworkPathDummy::class, mappedBy="networkPathRelationDummy")
+     *
      * @ApiSubresource
      */
     public $networkPathDummies;

@@ -51,6 +51,7 @@ class Answer
     /**
      * @ODM\ReferenceMany(targetDocument=Question::class, mappedBy="answer")
      * @Serializer\Groups({"foobar"})
+     *
      * @ApiSubresource
      */
     private $relatedQuestions;

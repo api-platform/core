@@ -101,6 +101,7 @@ class ChainItemDataProviderTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Throwing a "ApiPlatform\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
     public function testLegacyGetItem()
@@ -124,6 +125,7 @@ class ChainItemDataProviderTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Receiving "$id" as non-array in an item data provider is deprecated in 2.3 in favor of implementing "ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface".
      */
     public function testLegacyGetItemWithoutDenormalizedIdentifiersAndCompositeIdentifier()
@@ -144,6 +146,7 @@ class ChainItemDataProviderTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Throwing a "ApiPlatform\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
     public function testLegacyGetItemExceptions()

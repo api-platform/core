@@ -34,6 +34,7 @@ class AbsoluteUrlRelationDummy
 
     /**
      * @ORM\OneToMany(targetEntity="AbsoluteUrlDummy", mappedBy="absoluteUrlRelationDummy")
+     *
      * @ApiSubresource
      */
     public $absoluteUrlDummies;

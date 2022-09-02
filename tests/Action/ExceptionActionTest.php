@@ -71,6 +71,7 @@ class ExceptionActionTest extends TestCase
 
     /**
      * @dataProvider provideOperationExceptionToStatusCases
+     *
      * @group legacy
      */
     public function testLegacyActionWithOperationExceptionToStatus(

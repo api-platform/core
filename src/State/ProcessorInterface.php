@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Operation;
  * Process data: send an email, persist to storage, add to queue etc.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @experimental
  */
 interface ProcessorInterface

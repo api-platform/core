@@ -37,6 +37,7 @@ class DummyDtoInputOutput
 
     /**
      * @var int The id
+     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -45,18 +46,21 @@ class DummyDtoInputOutput
 
     /**
      * @var string
+     *
      * @ORM\Column(type="string")
      */
     public $str;
 
     /**
      * @var float
+     *
      * @ORM\Column(type="float")
      */
     public $num;
 
     /**
      * @var Collection<RelatedDummy>
+     *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      */
     public $relatedDummies;

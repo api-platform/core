@@ -20,6 +20,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Custom identifier dummy.
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class UuidIdentifierDummy

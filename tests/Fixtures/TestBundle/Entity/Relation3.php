@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class Relation3
@@ -33,6 +34,7 @@ class Relation3
 
     /**
      * @var Collection<int, Relation2>
+     *
      * @ORM\ManyToMany(targetEntity="Relation2", orphanRemoval=true)
      */
     private $relation2s;

@@ -58,6 +58,7 @@ class RouteNameResolverTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Using a boolean for the Operation Type is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      */
     public function testGetRouteNameForItemRouteLegacy()
@@ -122,6 +123,7 @@ class RouteNameResolverTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @expectedDeprecation Using a boolean for the Operation Type is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      */
     public function testGetRouteNameForCollectionRouteLegacy()

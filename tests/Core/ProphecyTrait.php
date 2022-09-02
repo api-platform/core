@@ -30,6 +30,7 @@ use Prophecy\Prophet;
  *
  * @copyright Christophe Coevoet <stof@notk.org>
  * @author Christophe Coevoet <stof@notk.org>
+ *
  * @mixin TestCase
  */
 trait ProphecyTrait
@@ -71,6 +72,7 @@ trait ProphecyTrait
 
     /**
      * @postCondition
+     *
      * @after
      */
     protected function verifyProphecyDoubles(): void

@@ -22,6 +22,7 @@ use Symfony\Component\Finder\Finder;
  * @experimental
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ *
  * @requires PHP <= 8.0
  */
 final class ElasticsearchContext implements Context

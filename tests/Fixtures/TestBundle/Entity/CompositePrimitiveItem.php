@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Composite Primitive Item.
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class CompositePrimitiveItem

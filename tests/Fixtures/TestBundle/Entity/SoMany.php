@@ -27,7 +27,6 @@ use Doctrine\ORM\Mapping as ORM;
  *         {"field"="id", "direction"="DESC"}
  *     }
  * })
- *
  * @ApiFilter(RangeFilter::class, properties={"id"})
  * @ApiFilter(OrderFilter::class, properties={"id"="DESC"})
  */

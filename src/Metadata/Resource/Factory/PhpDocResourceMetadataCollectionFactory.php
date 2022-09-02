@@ -23,6 +23,7 @@ use phpDocumentor\Reflection\Types\ContextFactory;
  * Extracts descriptions from PHPDoc.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @experimental
  */
 final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface

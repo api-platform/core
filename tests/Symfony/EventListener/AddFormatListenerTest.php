@@ -29,6 +29,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
  * @group legacy
  */
 class AddFormatListenerTest extends TestCase
@@ -363,6 +364,7 @@ class AddFormatListenerTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider legacyFormatsProvider
      *
      * @param mixed $formatsProvider

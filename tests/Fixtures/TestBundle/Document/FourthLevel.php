@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @ApiResource
+ *
  * @ODM\Document
  */
 class FourthLevel

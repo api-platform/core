@@ -44,7 +44,7 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
         $this->tokenStorage = $tokenStorage;
         $this->authorizationChecker = $authorizationChecker;
 
-        if (5 < func_num_args()) {
+        if (5 < \func_num_args()) {
             $this->exceptionOnNoToken = $exceptionOnNoToken;
             trigger_deprecation('api-platform/core', '2.7', 'The $exceptionOnNoToken parameter in "%s()" is deprecated and will always be false in 3.0, you should stop using it.', __METHOD__);
         }

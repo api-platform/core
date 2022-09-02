@@ -21,6 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Jsonld Context Dummy.
  *
  * @ApiResource
+ *
  * @ORM\Entity
  */
 class JsonldContextDummy

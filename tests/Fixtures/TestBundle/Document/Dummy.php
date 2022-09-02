@@ -132,6 +132,7 @@ class Dummy
      * @var Collection Several dummies
      *
      * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
+     *
      * @ApiSubresource
      */
     public $relatedDummies;
