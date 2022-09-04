@@ -12,6 +12,7 @@
 * Metadata: exception to status on operations (#4861)
 * Serializer: adds the JSON_INVALID_UTF8_IGNORE flag to JsonEncode (#4741)
 * Symfony: autoconfigure legacy Doctrine extensions (#4909)
+* Elasticsearch: skip metadata without ES nodes (#4913)
 
 Various cs fixes and PHPDoc to help upgrading to 3.0.
 
