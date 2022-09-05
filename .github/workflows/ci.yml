@@ -10,6 +10,14 @@ env:
   SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
 jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          configFile: .commitlintrc
+      - uses: wagoid/commitlint-github-action@v5
   php-cs-fixer:
     name: PHP-cs-fixer (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
