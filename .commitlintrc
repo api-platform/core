@@ -1,4 +1,5 @@
 {
+  "defaultIgnores": true,
   "parserPreset": "conventional-changelog-conventionalcommits",
   "rules": {
     "scope-enum": [
@@ -21,8 +22,7 @@
       ]
     ],
     "scope-empty": [
-      1,
-      "always"
+      0
     ],
     "body-leading-blank": [
       1,
