@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.0
+
+* Metadata: do not set id when identifier is `false` (#4880)
+* Metadata: automatic GET operation when none is declared (#4881)
+* Metadata: exception to status on operations (#4861)
+* Serializer: adds the JSON_INVALID_UTF8_IGNORE flag to JsonEncode (#4741)
+* Symfony: autoconfigure legacy Doctrine extensions (#4909)
+
+Various cs fixes and PHPDoc to help upgrading to 3.0.
+
 ## 2.7.0-rc.3
 
 * Symfony: deprecate the `$exceptionOnNoToken` parameter in `ResourceAccessChecker::__construct()` (#4900)
