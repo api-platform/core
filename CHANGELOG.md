@@ -20,7 +20,6 @@ Various cleanup in services and removal of backward compatibility layer.
 * Serializer: adds the JSON_INVALID_UTF8_IGNORE flag to JsonEncode (#4741)
 * Symfony: autoconfigure legacy Doctrine extensions (#4909)
 * Elasticsearch: skip metadata without ES nodes (#4913)
-* Symfony: deprecate the $exceptionOnNoToken parameter in ResourceAccessChecker::__construct() (#4900)
 * Symfony: deprecated the `$exceptionOnNoToken` parameter in `ResourceAccessChecker::__construct()` (#4900)
 
 Various cs fixes and PHPDoc to help upgrading to 3.0.

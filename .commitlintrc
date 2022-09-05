@@ -22,8 +22,7 @@
       ]
     ],
     "scope-empty": [
-      2,
-      "never"
+      0
     ],
     "body-leading-blank": [
       1,
