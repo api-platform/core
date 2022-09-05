@@ -445,6 +445,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return array_map(static fn (string $nested): string => substr($nested, strpos($nested, '.') + 1), $filtered);
     }
 
+    // TODO: this code is similar to the one used in JsonLd
     private function getResourceShortName(string $resourceClass): string
     {
         if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
