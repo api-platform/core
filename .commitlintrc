@@ -1,8 +1,5 @@
 {
-<<<<<<< HEAD
   "defaultIgnores": true,
-=======
->>>>>>> 89dd7017a (chore: add commitlint (#4915))
   "parserPreset": "conventional-changelog-conventionalcommits",
   "rules": {
     "scope-enum": [
@@ -25,8 +22,7 @@
       ]
     ],
     "scope-empty": [
-      1,
-      "always"
+      0
     ],
     "body-leading-blank": [
       1,
