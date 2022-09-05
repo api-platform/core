@@ -1,11 +1,39 @@
 # Changelog
 =======
 
-## 3.0.0-rc.3
+## 3.0.0
 
-* Symfony: removed the `$exceptionOnNoToken` parameter in `ResourceAccessChecker::__construct()` (#4900)
+* Symfony: 6.1 compatibility and remove 4.4 and 5.4 support (#4851)
+* Symfony: removed the $exceptionOnNoToken parameter in `ResourceAccessChecker::__construct()` (#4905)
+* Symfony: use conventional service names for Doctrine state providers and processors (#4859)
+* Symfony: adjust mapping paths to the SF best practices for Bundles **BC** `Resources/config/api_resources` to `config/api_resources`  (#4853)
+* Symfony: `src/ApiResource/` is the recommended place for API models (#4874)
+* Cache: remove guzzle from the Varnish purger (#4872)
 
-## 3.0.0-beta.2
+Various cleanup in services and removal of backward compatibility layer.
+
+## 2.7.0
+
+* Metadata: do not set id when identifier is `false` (#4880)
+* Metadata: automatic GET operation when none is declared (#4881)
+* Metadata: exception to status on operations (#4861)
+* Serializer: adds the JSON_INVALID_UTF8_IGNORE flag to JsonEncode (#4741)
+* Symfony: autoconfigure legacy Doctrine extensions (#4909)
+* Elasticsearch: skip metadata without ES nodes (#4913)
+* Symfony: deprecate the $exceptionOnNoToken parameter in ResourceAccessChecker::__construct() (#4900)
+* Symfony: deprecated the `$exceptionOnNoToken` parameter in `ResourceAccessChecker::__construct()` (#4900)
+
+Various cs fixes and PHPDoc to help upgrading to 3.0.
+
+## 3.0.0-rc.2 
+
+* JsonLd: correct the `api_jsonld_context` route format (#4844)
+* Metadata: remove metadata_backward_compatibility_layer option (#4843)
+* OpenApi: fixed required fields (in and name) within `ApiPlatform\OpenApi\Model\Parameter` **BC**
+
+Various cleanup, removed `Core` namespace leftovers and todos.
+
+## 3.0.0-beta.2 / 3.0.0-rc.1
 
 * ExpressionLanguage: deprecated class `ApiPlatform\Symfony\Security\ExpressionLanguage` has been removed in favor of `Symfony\Component\Security\Core\Authorization\ExpressionLanguage`.
 
@@ -20,6 +48,11 @@ Breaking changes:
 * Doctrine: `ContextAware` interfaces were merged with their child interfaces you can safely remove them (#4779)
 * Metadata: the `Core` namespace got removed (#4805)
 * Mercure: deprecation removed (#4805)
+
+## 2.7.0-rc.2 
+
+* Symfony: the upgrade command now updates ApiFilter as well (#4845)
+* Symfony: maker command to create a state Processor (#4423)
 
 ## 2.7.0-beta.5
 

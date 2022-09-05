@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Util\Inflector;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
@@ -87,6 +88,8 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
             return true;
         } catch (Missing404Exception) {
+            return false;
+        } catch (NoNodesAvailableException) {
             return false;
         }
     }

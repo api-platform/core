@@ -55,13 +55,13 @@ class SerializeStageTest extends TestCase
     /**
      * @dataProvider applyDisabledProvider
      */
-    public function testApplyDisabled(array $context, bool $paginationEnabled, ?array $expectedResult): void
+    public function testApplyDisabled(Operation $operation, bool $paginationEnabled, ?array $expectedResult): void
     {
         $resourceClass = 'myResource';
         /** @var Operation $operation */
-        $operation = (new Query())->withSerialize(false);
+        $operation = $operation->withSerialize(false);
 
-        $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operation, $context);
+        $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operation, []);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -69,11 +69,11 @@ class SerializeStageTest extends TestCase
     public function applyDisabledProvider(): array
     {
         return [
-            'item' => [['is_collection' => false, 'is_mutation' => false, 'is_subscription' => false], false, null],
-            'collection with pagination' => [['is_collection' => true, 'is_mutation' => false, 'is_subscription' => false], true, ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]]],
-            'collection without pagination' => [['is_collection' => true, 'is_mutation' => false, 'is_subscription' => false], false, []],
-            'mutation' => [['is_collection' => false, 'is_mutation' => true, 'is_subscription' => false], false, ['clientMutationId' => null]],
-            'subscription' => [['is_collection' => false, 'is_mutation' => false, 'is_subscription' => true], false, ['clientSubscriptionId' => null]],
+            'item' => [new Query(), false, null],
+            'collection with pagination' => [new QueryCollection(), true, ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]]],
+            'collection without pagination' => [new QueryCollection(), false, []],
+            'mutation' => [new Mutation(), false, ['clientMutationId' => null]],
+            'subscription' => [new Subscription(), false, ['clientSubscriptionId' => null]],
         ];
     }
 
