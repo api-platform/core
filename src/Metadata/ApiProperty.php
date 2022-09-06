@@ -29,7 +29,7 @@ final class ApiProperty
      * @param bool|null   $required                https://api-platform.com/docs/admin/validation/#client-side-validation
      * @param bool|null   $identifier              https://api-platform.com/docs/core/identifiers/
      * @param string|null $default
-     * @param string|null $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param mixed       $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param string|null $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param bool|null   $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
      * @param array|null  $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
@@ -50,7 +50,7 @@ final class ApiProperty
         private ?bool $required = null,
         private ?bool $identifier = null,
         private $default = null,
-        private $example = null,
+        private mixed $example = null,
         private ?string $deprecationReason = null,
         private ?bool $fetchable = null,
         private ?bool $fetchEager = null,
@@ -176,12 +176,12 @@ final class ApiProperty
         return $self;
     }
 
-    public function getExample()
+    public function getExample(): mixed
     {
         return $this->example;
     }
 
-    public function withExample($example): self
+    public function withExample(mixed $example): self
     {
         $self = clone $this;
         $self->example = $example;
