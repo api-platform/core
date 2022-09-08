@@ -35,10 +35,11 @@ trait LinksHandlerTrait
         }
 
         $newLinks = [];
+        $linkProperty = $context['linkProperty'];
 
         foreach ($links as $link) {
-            if ($linkClass === $link->getFromClass()) {
-                $newLinks[] = $link;
+            if (($linkClass === $link->getFromClass()) && ($linkProperty === $link->getFromProperty())) {
+                $newLinks[$linkClass][$linkProperty] = $link;
             }
         }
 
@@ -62,16 +63,16 @@ trait LinksHandlerTrait
         }
 
         foreach ($this->getOperationLinks($linkedOperation ?? null) as $link) {
-            if ($resourceClass === $link->getToClass()) {
-                $newLinks[] = $link;
+            if (($resourceClass === $link->getToClass()) && ($linkProperty === $link->getFromProperty())) {
+                $newLinks[$linkClass][$linkProperty] = $link;
             }
         }
 
-        if (!$newLinks) {
+        if ([] === $newLinks) {
             throw new RuntimeException(sprintf('The class "%s" cannot be retrieved from "%s".', $resourceClass, $linkClass));
         }
 
-        return $newLinks;
+        return array_values(...array_values($newLinks));
     }
 
     private function getIdentifierValue(array &$identifiers, string $name = null)
