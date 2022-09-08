@@ -87,7 +87,11 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     private function getIdentifierValue(object $item, string $class, string $property, string $parameterName): float|bool|int|string
     {
         if ($item instanceof $class) {
-            return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, $property), $parameterName);
+            try {
+                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, $property), $parameterName);
+            } catch (NoSuchPropertyException $e) {
+                throw new RuntimeException('Not able to retrieve identifiers.', $e->getCode(), $e);
+            }
         }
 
         $resourceClass = $this->getResourceClass($item, true);

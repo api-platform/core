@@ -138,6 +138,10 @@ final class IriConverter implements IriConverterInterface
             }
         }
 
+        if (!$operation->getName() || ($operation instanceof HttpOperation && SkolemIriConverter::$skolemUriTemplate === $operation->getUriTemplate())) {
+            return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
+        }
+
         $identifiers = $context['uri_variables'] ?? [];
 
         if (\is_object($resource)) {
@@ -149,10 +153,6 @@ final class IriConverter implements IriConverterInterface
                     throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
                 }
             }
-        }
-
-        if (!$operation->getName() || ($operation instanceof HttpOperation && SkolemIriConverter::$skolemUriTemplate === $operation->getUriTemplate())) {
-            return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }
 
         try {
