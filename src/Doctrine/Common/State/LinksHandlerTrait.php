@@ -72,7 +72,7 @@ trait LinksHandlerTrait
             throw new RuntimeException(sprintf('The class "%s" cannot be retrieved from "%s".', $resourceClass, $linkClass));
         }
 
-        return array_values(array_merge(...array_values($newLinks)));
+        return array_values(...array_values($newLinks));
     }
 
     private function getIdentifierValue(array &$identifiers, string $name = null): mixed
