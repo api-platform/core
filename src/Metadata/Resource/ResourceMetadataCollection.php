@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
@@ -101,7 +102,7 @@ final class ResourceMetadataCollection extends \ArrayObject
         return null;
     }
 
-    private function findGraphQlOperation(array $operations, string $operationName, bool $forceCollection, bool $httpOperation): ?Operation
+    private function findGraphQlOperation(array $operations, string $operationName, bool $forceCollection, bool $httpOperation): ?GraphQlOperation
     {
         foreach ($operations as $name => $operation) {
             $isCollection = $operation instanceof CollectionOperationInterface;
