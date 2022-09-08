@@ -91,6 +91,8 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
             return false;
         } catch (NoNodesAvailableException) {
             return false;
+        } catch (NoNodesAvailableException) {
+            return false;
         }
     }
 }
