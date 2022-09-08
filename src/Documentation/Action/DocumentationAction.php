@@ -88,7 +88,7 @@ final class DocumentationAction
         }
 
         if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory && 3 === ($context['spec_version'] ?? null)) {
-            return $this->openApiFactory->__invoke($context ?? []);
+            return $this->openApiFactory->__invoke($context);
         }
 
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
