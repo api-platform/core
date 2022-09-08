@@ -488,7 +488,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
         if ($this->typeBuilder->isCollection($type)) {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            $resolverOperation = $resourceMetadataCollection->getOperation(null, true);
+            $resolverOperation = $resourceMetadataCollection->getOperation(null, true, false, true);
 
             return $this->pagination->isGraphQlEnabled($resolverOperation) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $rootOperation) : GraphQLType::listOf($graphqlType);
         }

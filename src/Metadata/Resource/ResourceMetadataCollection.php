@@ -33,7 +33,7 @@ final class ResourceMetadataCollection extends \ArrayObject
         parent::__construct($input);
     }
 
-    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
+    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false, bool $priorizeGraphQl = false): Operation
     {
         $operationName ??= '';
         if (isset($this->operationCache[$operationName])) {
@@ -51,6 +51,19 @@ final class ResourceMetadataCollection extends \ArrayObject
             /** @var ApiResource $metadata */
             $metadata = $it->current();
 
+            if ($priorizeGraphQl) {
+                foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
+                    $isCollection = $operation instanceof CollectionOperationInterface;
+                    if ('' === $operationName && ($forceCollection ? $isCollection : !$isCollection) && false === $httpOperation) {
+                        return $this->operationCache['graphql_'.$operationName] = $operation;
+                    }
+
+                    if ($name === $operationName) {
+                        return $this->operationCache['graphql_'.$operationName] = $operation;
+                    }
+                }
+            }
+
             foreach ($metadata->getOperations() ?? [] as $name => $operation) {
                 $isCollection = $operation instanceof CollectionOperationInterface;
                 if ('' === $operationName && \in_array($operation->getMethod() ?? HttpOperation::METHOD_GET, [HttpOperation::METHOD_GET, HttpOperation::METHOD_OPTIONS, HttpOperation::METHOD_HEAD], true) && ($forceCollection ? $isCollection : !$isCollection)) {
@@ -66,14 +79,16 @@ final class ResourceMetadataCollection extends \ArrayObject
                 }
             }
 
-            foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
-                $isCollection = $operation instanceof CollectionOperationInterface;
-                if ('' === $operationName && ($forceCollection ? $isCollection : !$isCollection) && false === $httpOperation) {
-                    return $this->operationCache['graphql_'.$operationName] = $operation;
-                }
+            if (!$priorizeGraphQl) {
+                foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
+                    $isCollection = $operation instanceof CollectionOperationInterface;
+                    if ('' === $operationName && ($forceCollection ? $isCollection : !$isCollection) && false === $httpOperation) {
+                        return $this->operationCache['graphql_'.$operationName] = $operation;
+                    }
 
-                if ($name === $operationName) {
-                    return $this->operationCache['graphql_'.$operationName] = $operation;
+                    if ($name === $operationName) {
+                        return $this->operationCache['graphql_'.$operationName] = $operation;
+                    }
                 }
             }
 
