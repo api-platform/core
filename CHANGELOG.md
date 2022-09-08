@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.9
+
+* fix(serializer): remove 'iri' from context cache (#4925)
+
 ## 2.6.8
 
 * fix: serializing embedded non resource objects
