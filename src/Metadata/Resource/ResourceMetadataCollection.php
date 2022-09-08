@@ -54,7 +54,7 @@ final class ResourceMetadataCollection extends \ArrayObject
             /** @var ApiResource $metadata */
             $metadata = $it->current();
 
-            if ($priorizeGraphQl && ([] !== $graphQlOperations = $metadata->getGraphQlOperations())) {
+            if ($priorizeGraphQl && ([] !== $graphQlOperations = ($metadata->getGraphQlOperations() ?? []))) {
                 if (null !== $graphQlOperation = $this->findGraphQlOperation($graphQlOperations, $operationName, $forceCollection, $httpOperation)) {
                     return $graphQlOperation;
                 }
@@ -66,7 +66,7 @@ final class ResourceMetadataCollection extends \ArrayObject
                 }
             }
 
-            if (!$priorizeGraphQl && ([] !== $graphQlOperations = $metadata->getGraphQlOperations())) {
+            if (!$priorizeGraphQl && ([] !== $graphQlOperations = ($metadata->getGraphQlOperations() ?? []))) {
                 if (null !== $graphQlOperation = $this->findGraphQlOperation($graphQlOperations, $operationName, $forceCollection, $httpOperation)) {
                     return $graphQlOperation;
                 }
