@@ -40,7 +40,7 @@ final class DocumentationAction
             $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
         }
 
-        if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory) {
+        if ('json' === $request?->getRequestFormat() && null !== $this->openApiFactory) {
             return $this->openApiFactory->__invoke($context ?? []);
         }
 
