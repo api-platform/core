@@ -145,6 +145,10 @@ Doctrine: new interfaces for Filters and Extensions ready, switch to the `ApiPla
 * feat(test): add `Client::loginUser()` (#4588)
 * feat(http_cache): use symfony/http-client instead of guzzlehttp/guzzle, `ApiPlatform\Core\HttpCache\PurgerInterface` is deprecated in favor of `ApiPlatform\HttpCache\PurgerInterface`, new purger that uses PURGE (#4695)
 
+## 2.6.9
+
+* fix(serializer): remove 'iri' from context cache (#4925)
+
 ## 2.6.8
 
 * fix: serializing embedded non resource objects
