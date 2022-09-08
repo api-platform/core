@@ -62,7 +62,7 @@ trait LinksHandlerTrait
         }
 
         foreach ($this->getOperationLinks($linkedOperation ?? null) as $link) {
-            if ($resourceClass === $link->getToClass()) {
+            if (($resourceClass === $link->getToClass()) && ($context['linkProperty'] === $link->getFromProperty())) {
                 $newLinks[] = $link;
             }
         }
