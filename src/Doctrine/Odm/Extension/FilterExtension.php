@@ -21,8 +21,6 @@ use Psr\Container\ContainerInterface;
 /**
  * Applies filters on a resource aggregation.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */

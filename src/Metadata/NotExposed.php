@@ -18,7 +18,7 @@ namespace ApiPlatform\Metadata;
  * for example to generate an IRI on a resource without item operations.
  * It is ignored from OpenApi documentation and must return a HTTP 404.
  *
- * @internal
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class NotExposed extends HttpOperation

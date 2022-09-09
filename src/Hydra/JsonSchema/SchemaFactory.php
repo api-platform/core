@@ -22,8 +22,6 @@ use ApiPlatform\Metadata\Operation;
 /**
  * Decorator factory which adds Hydra properties to the JSON Schema document.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class SchemaFactory implements SchemaFactoryInterface

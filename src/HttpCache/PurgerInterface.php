@@ -17,8 +17,6 @@ namespace ApiPlatform\HttpCache;
  * Purges resources from the cache.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 interface PurgerInterface
 {

@@ -32,8 +32,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Request: GET /products?exists[brand]
  * Interpretation: filter products which have a brand
  *
- * @experimental
- *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

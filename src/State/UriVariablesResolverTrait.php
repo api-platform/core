@@ -18,9 +18,6 @@ use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\HttpOperation;
 
-/**
- * @experimental
- */
 trait UriVariablesResolverTrait
 {
     private ?UriVariablesConverterInterface $uriVariablesConverter = null;

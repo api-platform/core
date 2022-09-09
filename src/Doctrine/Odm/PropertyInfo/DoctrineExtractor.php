@@ -27,8 +27,6 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Extracts data using Doctrine MongoDB ODM metadata.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

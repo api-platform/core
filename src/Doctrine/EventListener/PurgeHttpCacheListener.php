@@ -34,8 +34,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * Purges responses containing modified entities from the proxy cache.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 final class PurgeHttpCacheListener
 {

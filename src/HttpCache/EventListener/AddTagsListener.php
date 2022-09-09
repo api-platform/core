@@ -34,8 +34,6 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  * @see https://docs.varnish-software.com/varnish-cache-plus/vmods/ykey/
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 final class AddTagsListener
 {

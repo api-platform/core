@@ -17,7 +17,9 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
- * @experimental
+ * Prepares graphql links.
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {

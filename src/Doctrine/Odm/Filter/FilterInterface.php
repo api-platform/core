@@ -20,8 +20,6 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 /**
  * Doctrine MongoDB ODM filter interface.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface FilterInterface extends BaseFilterInterface

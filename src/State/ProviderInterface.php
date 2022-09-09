@@ -20,8 +20,6 @@ use ApiPlatform\Metadata\Operation;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
- * @experimental
- *
  * @template T of object
  */
 interface ProviderInterface

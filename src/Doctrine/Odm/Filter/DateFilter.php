@@ -23,8 +23,6 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 /**
  * Filters the collection by date intervals.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>

@@ -41,8 +41,6 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  * Creates a resource metadata from {@see ApiResource} annotations.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @experimental
  */
 final class AttributesResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {

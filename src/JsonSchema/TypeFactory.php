@@ -23,8 +23,6 @@ use Symfony\Component\Uid\Uuid;
 /**
  * {@inheritdoc}
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class TypeFactory implements TypeFactoryInterface
