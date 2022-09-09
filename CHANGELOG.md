@@ -3,6 +3,7 @@
 
 ## 3.0.0
 
+* Metadata: CRUD on subresource with experimental write support (#4932)
 * Symfony: 6.1 compatibility and remove 4.4 and 5.4 support (#4851)
 * Symfony: removed the $exceptionOnNoToken parameter in `ResourceAccessChecker::__construct()` (#4905)
 * Symfony: use conventional service names for Doctrine state providers and processors (#4859)

@@ -107,6 +107,7 @@
 
             <tag name="api_platform.state_provider" priority="-100" />
         </service>
+        <service id="api_platform.state.item_provider" alias="ApiPlatform\Elasticsearch\State\ItemProvider" />
 
         <service id="ApiPlatform\Elasticsearch\State\CollectionProvider" class="ApiPlatform\Elasticsearch\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.elasticsearch.client" />

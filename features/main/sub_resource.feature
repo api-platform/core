@@ -561,3 +561,35 @@ Feature: Sub-resource support
       "foo": null
     }
     """
+
+  @!mongodb
+  @createSchema
+  Scenario: The generated crud should allow us to interact with the SubresourceEmployee
+    Given I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/subresource_organizations" with body:
+    """
+    {
+      "name": "Les Tilleuls"
+    }
+    """
+    Then the response status code should be 201
+    Given I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/subresource_organizations/1/subresource_employees" with body:
+    """
+    {
+      "name": "soyuka"
+    }
+    """
+    Then the response status code should be 201
+    And I send a "GET" request to "/subresource_organizations/1/subresource_employees/1"
+    Then the response status code should be 200
+    And I send a "GET" request to "/subresource_organizations/1/subresource_employees"
+    Then the response status code should be 200
+    Given I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/subresource_organizations/1/subresource_employees/1" with body:
+    """
+    {
+      "name": "ok"
+    }
+    """
+    Then the response status code should be 200

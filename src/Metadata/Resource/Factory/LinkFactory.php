@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
@@ -24,10 +25,26 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @internal
  */
-final class LinkFactory implements LinkFactoryInterface
+final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInterface
 {
     public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface $resourceClassResolver)
     {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createLinkFromProperty(ApiResource|Operation $operation, string $property): Link
+    {
+        $metadata = $this->propertyMetadataFactory->create($resourceClass = $operation->getClass(), $property);
+        $relationClass = $this->getPropertyClassType($metadata->getBuiltinTypes());
+        if (!$relationClass) {
+            throw new RuntimeException(sprintf('We could not find a class matching the uriVariable "%s" on "%s".', $property, $resourceClass));
+        }
+
+        $identifiers = $this->resourceClassResolver->isResourceClass($relationClass) ? $this->getIdentifiersFromResourceClass($relationClass) : ['id'];
+
+        return new Link(fromClass: $relationClass, toProperty: $property, identifiers: $identifiers, parameterName: $property);
     }
 
     /**

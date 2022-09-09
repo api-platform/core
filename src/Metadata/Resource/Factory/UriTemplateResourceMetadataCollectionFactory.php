@@ -53,7 +53,10 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 /** @var HttpOperation */
                 $operation = $this->configureUriVariables($operation);
 
-                if ($operation->getUriTemplate()) {
+                if (
+                    $operation->getUriTemplate()
+                    && !($operation->getExtraProperties()['generated_operation'] ?? false)
+                ) {
                     $operation = $operation->withExtraProperties($operation->getExtraProperties() + ['user_defined_uri_template' => true]);
                     if (!$operation->getName()) {
                         $operation = $operation->withName($key);
@@ -90,12 +93,15 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
     private function generateUriTemplate(HttpOperation $operation): string
     {
-        $uriTemplate = sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
+        $uriTemplate = $operation->getUriTemplate() ?? sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
         $uriVariables = $operation->getUriVariables() ?? [];
 
         if ($parameters = array_keys($uriVariables)) {
             foreach ($parameters as $parameterName) {
-                $uriTemplate .= sprintf('/{%s}', $parameterName);
+                $part = sprintf('/{%s}', $parameterName);
+                if (false === strpos($uriTemplate, $part)) {
+                    $uriTemplate .= sprintf('/{%s}', $parameterName);
+                }
             }
         }
 
@@ -107,7 +113,10 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         // We will generate the collection route, don't initialize variables here
         if ($operation instanceof HttpOperation && (
             [] === $operation->getUriVariables() ||
-            ($operation instanceof CollectionOperationInterface && null === $operation->getUriTemplate())
+            (
+                $operation instanceof CollectionOperationInterface
+                && null === $operation->getUriTemplate()
+            )
         )) {
             if (null === $operation->getUriVariables()) {
                 return $operation;
@@ -152,7 +161,24 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             return $operation->withUriVariables($newUriVariables);
         }
 
-        return $operation;
+        // When an operation is generated we need to find properties matching it's uri variables
+        if (!($operation->getExtraProperties()['generated_operation'] ?? false) || !$this->linkFactory instanceof PropertyLinkFactoryInterface) {
+            return $operation;
+        }
+
+        $diff = array_diff($variables, array_keys($uriVariables));
+        if (0 === \count($diff)) {
+            return $operation;
+        }
+
+        // We generated this operation but there're some missing identifiers
+        $uriVariables = HttpOperation::METHOD_POST === $operation->getMethod() || $operation instanceof CollectionOperationInterface ? [] : $operation->getUriVariables();
+
+        foreach ($diff as $key) {
+            $uriVariables[$key] = $this->linkFactory->createLinkFromProperty($operation, $key);
+        }
+
+        return $operation->withUriVariables($uriVariables);
     }
 
     private function normalizeUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation

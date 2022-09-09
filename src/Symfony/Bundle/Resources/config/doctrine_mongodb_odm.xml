@@ -138,6 +138,7 @@
             <tag name="api_platform.state_provider" priority="-100" />
         </service>
         <service id="api_platform.doctrine_mongodb.odm.state.item_provider" alias="ApiPlatform\Doctrine\Odm\State\ItemProvider" />
+        <service id="api_platform.state.item_provider" alias="ApiPlatform\Doctrine\Odm\State\ItemProvider" />
 
         <service id="api_platform.doctrine.odm.metadata.resource.metadata_collection_factory" class="ApiPlatform\Doctrine\Odm\Metadata\Resource\DoctrineMongoDbOdmResourceCollectionMetadataFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="40">
             <argument type="service" id="doctrine_mongodb" />
