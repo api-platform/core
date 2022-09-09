@@ -18,8 +18,6 @@ use ApiPlatform\Metadata\Operation;
 /**
  * Factory for creating the JSON Schema document corresponding to a PHP class.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface SchemaFactoryInterface

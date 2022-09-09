@@ -21,8 +21,6 @@ namespace ApiPlatform\JsonSchema;
  * @see https://json-schema.org/latest/json-schema-core.html
  * @see https://github.com/OAI/OpenAPI-Specification
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Schema extends \ArrayObject

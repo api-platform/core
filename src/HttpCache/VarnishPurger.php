@@ -19,8 +19,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * Purges Varnish.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 final class VarnishPurger implements PurgerInterface
 {

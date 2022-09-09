@@ -21,8 +21,6 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 /**
  * Filters the collection by range.
  *
- * @experimental
- *
  * @author Lee Siong Chan <ahlee2326@me.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

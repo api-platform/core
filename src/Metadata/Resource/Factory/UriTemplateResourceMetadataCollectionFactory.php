@@ -24,8 +24,6 @@ use Symfony\Component\Routing\Route;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @experimental
  */
 final class UriTemplateResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {

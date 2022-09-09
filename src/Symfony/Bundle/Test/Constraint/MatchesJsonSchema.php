@@ -20,8 +20,6 @@ use PHPUnit\Framework\Constraint\Constraint;
  * Asserts that a JSON document matches a given JSON Schema.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 final class MatchesJsonSchema extends Constraint
 {
