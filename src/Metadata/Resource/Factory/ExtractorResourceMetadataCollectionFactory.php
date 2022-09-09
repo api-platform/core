@@ -31,8 +31,6 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  * Creates a resource metadata from {@see Resource} extractors (XML, YAML).
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @experimental
  */
 final class ExtractorResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {

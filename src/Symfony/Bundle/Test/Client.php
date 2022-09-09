@@ -28,8 +28,6 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 /**
  * Convenient test client that makes requests to a Kernel object.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Client implements HttpClientInterface

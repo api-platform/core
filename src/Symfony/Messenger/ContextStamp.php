@@ -18,8 +18,6 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 /**
  * An envelope stamp with context which related to a message.
  *
- * @experimental
- *
  * @author Sergii Pavlenko <sergii.pavlenko.v@gmail.com>
  */
 final class ContextStamp implements StampInterface

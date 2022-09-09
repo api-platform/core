@@ -27,8 +27,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * Abstract class for easing the implementation of a filter.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 abstract class AbstractFilter implements FilterInterface

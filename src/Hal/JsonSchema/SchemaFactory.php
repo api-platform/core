@@ -20,8 +20,6 @@ use ApiPlatform\Metadata\Operation;
 /**
  * Decorator factory which adds HAL properties to the JSON Schema document.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Jachim Coudenys <jachimcoudenys@gmail.com>
  */

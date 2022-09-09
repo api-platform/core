@@ -32,8 +32,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @see \Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait
- *
- * @experimental
  */
 trait ApiTestAssertionsTrait
 {

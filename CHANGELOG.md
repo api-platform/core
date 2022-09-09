@@ -14,6 +14,7 @@ Various cleanup in services and removal of backward compatibility layer.
 
 ## 2.7.0
 
+* chore: remove @experimental phpdoc (#4933)
 * Metadata: do not set id when identifier is `false` (#4880)
 * Metadata: automatic GET operation when none is declared (#4881)
 * Metadata: exception to status on operations (#4861)

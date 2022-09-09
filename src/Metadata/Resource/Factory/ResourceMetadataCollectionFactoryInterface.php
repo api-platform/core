@@ -20,8 +20,6 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  * Creates a resource metadata value object.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @experimental
  */
 interface ResourceMetadataCollectionFactoryInterface
 {
