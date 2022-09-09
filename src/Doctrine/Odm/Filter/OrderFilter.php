@@ -31,8 +31,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * direction value is different from "asc" or "desc" (case insensitive), the property
  * is ignored.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>

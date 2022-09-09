@@ -21,8 +21,6 @@ use ApiPlatform\State\Pagination\PartialPaginatorInterface;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
- * @experimental
- *
  * @template T of object
  */
 interface ProviderInterface

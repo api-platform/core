@@ -27,8 +27,6 @@ use ApiPlatform\Symfony\Routing\SkolemIriConverter;
  * This operation helps to generate resource IRI for items.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @experimental
  */
 final class NotExposedOperationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {

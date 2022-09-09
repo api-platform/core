@@ -23,8 +23,6 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * {@inheritdoc}
  *
- * @experimental
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class SkolemIriConverter implements IriConverterInterface

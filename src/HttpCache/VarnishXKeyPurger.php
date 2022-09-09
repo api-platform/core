@@ -19,8 +19,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * Purges Varnish XKey.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 final class VarnishXKeyPurger implements PurgerInterface
 {

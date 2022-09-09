@@ -39,8 +39,6 @@ use Symfony\Component\Serializer\SerializerInterface;
  * Publishes resources updates to the Mercure hub.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 final class PublishMercureUpdatesListener
 {

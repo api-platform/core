@@ -23,8 +23,6 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  * Configures cache HTTP headers for the current response.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 final class AddHeadersListener
 {

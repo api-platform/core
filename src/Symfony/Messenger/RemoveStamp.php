@@ -18,8 +18,6 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 /**
  * Hints that the resource in the envelope must be removed.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class RemoveStamp implements StampInterface

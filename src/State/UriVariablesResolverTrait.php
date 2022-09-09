@@ -20,9 +20,6 @@ use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\HttpOperation;
 
-/**
- * @experimental
- */
 trait UriVariablesResolverTrait
 {
     /** @var ContextAwareIdentifierConverterInterface|IdentifierConverterInterface|UriVariablesConverterInterface|null */

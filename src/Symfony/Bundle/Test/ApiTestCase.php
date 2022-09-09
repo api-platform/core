@@ -22,8 +22,6 @@ use Symfony\Component\HttpClient\HttpClientTrait;
 /**
  * Base class for functional API tests.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 abstract class ApiTestCase extends KernelTestCase

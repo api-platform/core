@@ -30,8 +30,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 /**
  * {@inheritdoc}
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class SchemaFactory implements SchemaFactoryInterface

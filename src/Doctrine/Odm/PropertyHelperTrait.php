@@ -22,8 +22,6 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 /**
  * Helper trait regarding a property in a MongoDB document using the resource metadata.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 trait PropertyHelperTrait

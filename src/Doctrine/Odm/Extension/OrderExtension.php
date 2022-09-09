@@ -24,8 +24,6 @@ use OutOfRangeException;
 /**
  * Applies selected ordering while querying resource collection.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
