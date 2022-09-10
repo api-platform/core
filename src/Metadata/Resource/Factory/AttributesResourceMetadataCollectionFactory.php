@@ -33,6 +33,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\State\CreateProvider;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -130,8 +131,9 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         // Loop again and set default operations if none where found
         foreach ($resources as $index => $resource) {
             $operations = [];
-            foreach ($resource->getOperations() ?? [new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $i => $operation) {
-                [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
+
+            foreach ($resource->getOperations() ?? $this->getDefaultHttpOperations($resource) as $i => $operation) {
+                [$key, $operation] = $this->getOperationWithDefaults($resource, $operation, $resource->getOperations() ? false : true);
                 $operations[$key] = $operation;
             }
 
@@ -162,7 +164,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         return $resources;
     }
 
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): array
+    private function getOperationWithDefaults(ApiResource $resource, Operation $operation, bool $generated = false): array
     {
         // Inherit from resource defaults
         foreach (get_class_methods($resource) as $methodName) {
@@ -181,7 +183,11 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
 
-        $operation = $operation->withExtraProperties(array_merge($resource->getExtraProperties(), $operation->getExtraProperties()));
+        $operation = $operation->withExtraProperties(array_merge(
+            $resource->getExtraProperties(),
+            $operation->getExtraProperties(),
+            $generated ? ['generated_operation' => true] : []
+        ));
 
         // Add global defaults attributes to the operation
         $operation = $this->addGlobalDefaults($operation);
@@ -311,5 +317,15 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         }
 
         return $resource->withGraphQlOperations($graphQlOperations);
+    }
+
+    private function getDefaultHttpOperations($resource): iterable
+    {
+        $post = new Post();
+        if ($resource->getUriTemplate() && !$resource->getProvider()) {
+            $post = $post->withProvider(CreateProvider::class);
+        }
+
+        return [new Get(), new GetCollection(), $post, new Put(), new Patch(), new Delete()];
     }
 }

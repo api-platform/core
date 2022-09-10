@@ -143,4 +143,23 @@ final class LinkFactoryTest extends TestCase
             $linkFactory->completeLink((new Link())->withFromClass(AttributeResource::class))
         );
     }
+
+    public function testCreateLinkFromProperty(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $property = 'test';
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'test')->willReturn(new ApiProperty(builtinTypes: [new Type(builtinType: Type::BUILTIN_TYPE_OBJECT, class: RelatedDummy::class)]));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(false);
+
+        $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+
+        self::assertEquals(
+            new Link(fromClass: RelatedDummy::class, toProperty: 'test', identifiers: ['id'], parameterName: 'test'),
+            $linkFactory->createLinkFromProperty(new Get(class: Dummy::class), 'test')
+        );
+    }
 }
