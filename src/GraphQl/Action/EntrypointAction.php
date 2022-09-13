@@ -156,7 +156,7 @@ final class EntrypointAction
                 throw new BadRequestHttpException('GraphQL multipart request file has not been sent correctly.');
             }
 
-            foreach ($map[$key] as $mapValue) {
+            foreach ($value as $mapValue) {
                 $path = explode('.', (string) $mapValue);
 
                 if ('variables' !== $path[0]) {

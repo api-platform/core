@@ -26,7 +26,6 @@ class UploadMultipleMediaObjectResolver implements MutationResolverInterface
 {
     public function __invoke(?object $item, array $context): MediaObject
     {
-        $result = [];
         $mediaObject = null;
 
         /**
@@ -40,7 +39,6 @@ class UploadMultipleMediaObjectResolver implements MutationResolverInterface
             $mediaObject = new MediaObject();
             $mediaObject->id = $key;
             $mediaObject->contentUrl = $uploadedFile->getFilename();
-            $result[] = $mediaObject;
         }
 
         // Currently API Platform does not support custom mutation with collections so for now, we are returning the last created media object.
