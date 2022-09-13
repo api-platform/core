@@ -14,11 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\NotExposed;
-use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\Routing\SkolemIriConverter;
 
@@ -59,13 +57,10 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
             $operations = $resource->getOperations();
 
             foreach ($operations as $operation) {
-                // Ignore collection and GraphQL operations
-                if ($operation instanceof CollectionOperationInterface || $operation instanceof GraphQlOperation) {
-                    continue;
-                }
-
                 // An item operation has been found, nothing to do anymore in this factory
-                return $resourceMetadataCollection;
+                if ($operation instanceof Get) {
+                    return $resourceMetadataCollection;
+                }
             }
         }
 
