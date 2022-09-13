@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Command;
 
+use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -24,7 +25,7 @@ use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 
 final class DebugResourceCommand extends Command
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ClonerInterface $cloner, private $dumper)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceExtractorInterface $extractor, private readonly ClonerInterface $cloner, private $dumper)
     {
         parent::__construct();
     }
@@ -52,6 +53,10 @@ final class DebugResourceCommand extends Command
             $output->writeln(sprintf('<error>No resources found for class %s</error>', $resourceClass));
 
             return Command::INVALID;
+        }
+
+        if (!($this->extractor->getResources()[$resourceClass] ?? false)) {
+            $output->writeln(sprintf('<warning>Resource class "%s" is not configured correctly.</warning>', $resourceClass));
         }
 
         $shortName = (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
