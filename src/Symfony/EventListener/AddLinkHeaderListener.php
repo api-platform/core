@@ -18,10 +18,10 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Util\CorsTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\Mercure\Discovery;
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\Link;
 
 /**
  * Adds the HTTP Link header pointing to the Mercure hub for resources having their updates dispatched.
