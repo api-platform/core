@@ -60,7 +60,7 @@ final class ReadListener
             return;
         }
 
-        if (!$operation || !($operation->canRead() ?? true) || !$attributes['receive'] || (!$operation->getUriVariables() && !$request->isMethodSafe())) {
+        if (!$attributes['receive'] || !$operation || !($operation->canRead() ?? true) || (!$operation->getUriVariables() && !$request->isMethodSafe())) {
             return;
         }
 
