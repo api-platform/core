@@ -75,10 +75,8 @@ final class ApiLoader extends Loader
                         $path = str_replace(sprintf('{%s}', $parameterName), $expandedValue, $path);
                     }
 
-                    if ($controller = $operation->getController()) {
-                        if (!$this->container->has($controller)) {
-                            throw new RuntimeException(sprintf('There is no builtin action for the "%s" operation. You need to define the controller yourself.', $operationName));
-                        }
+                    if (($controller = $operation->getController()) && !$this->container->has($controller)) {
+                        throw new RuntimeException(sprintf('There is no builtin action for the "%s" operation. You need to define the controller yourself.', $operationName));
                     }
 
                     $route = new Route(

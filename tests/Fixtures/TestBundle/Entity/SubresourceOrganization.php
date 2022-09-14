@@ -75,11 +75,9 @@ class SubresourceOrganization
 
     public function removeSubresourceEmployee(SubresourceEmployee $employee): self
     {
-        if ($this->employees->removeElement($employee)) {
-            // set the owning side to null (unless already changed)
-            if ($employee->getSubresourceOrganization() === $this) {
-                $employee->setSubresourceOrganization(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->employees->removeElement($employee) && $employee->getSubresourceOrganization() === $this) {
+            $employee->setSubresourceOrganization(null);
         }
 
         return $this;

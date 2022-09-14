@@ -75,7 +75,8 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
 
-            $identifiers[$link->getParameterName()] = $this->getIdentifierValue($item, $link->getFromClass(), $link->getIdentifiers()[0], $link->getParameterName());
+            $parameterName = $link->getParameterName();
+            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass(), $link->getIdentifiers()[0], $parameterName);
         }
 
         return $identifiers;

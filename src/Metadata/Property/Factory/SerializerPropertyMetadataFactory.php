@@ -198,9 +198,9 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         $groups = [];
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            $groups = array_merge($groups, $serializerAttributeMetadata->getGroups());
+            $groups[] = $serializerAttributeMetadata->getGroups();
         }
 
-        return array_unique($groups);
+        return array_unique(array_merge(...$groups));
     }
 }

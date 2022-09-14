@@ -88,7 +88,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 continue;
             }
 
-            $denormalizedFields[$this->denormalizePropertyName((string) $key, $resourceClass, $context)] = \is_array($fields[$key]) ? $this->replaceIdKeys($fields[$key], $resourceClass, $context) : $value;
+            $denormalizedFields[$this->denormalizePropertyName((string) $key, $resourceClass, $context)] = \is_array($value) ? $this->replaceIdKeys($value, $resourceClass, $context) : $value;
         }
 
         return $denormalizedFields;

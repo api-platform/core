@@ -85,12 +85,13 @@ final class ExceptionAction
         $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($attributes['resource_class']);
         /** @var HttpOperation $operation */
         $operation = $resourceMetadataCollection->getOperation($attributes['operation_name'] ?? null);
-        $exceptionToStatus = $operation->getExceptionToStatus() ?: [];
+        $exceptionToStatus = [$operation->getExceptionToStatus() ?: []];
+
         foreach ($resourceMetadataCollection as $resourceMetadata) {
-            /** @var ApiResource $resourceMetadata */
-            $exceptionToStatus = array_merge($exceptionToStatus, $resourceMetadata->getExceptionToStatus() ?: []);
+            /* @var ApiResource $resourceMetadata */
+            $exceptionToStatus[] = $resourceMetadata->getExceptionToStatus() ?: [];
         }
 
-        return $exceptionToStatus;
+        return array_merge(...$exceptionToStatus);
     }
 }

@@ -263,7 +263,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                             throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
                         }
 
-                        $params = array_merge($params, $data[$paramName]);
+                        $params[] = $data[$paramName];
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
                     $params[] = $this->createConstructorArgument($data[$key], $key, $constructorParameter, $context, $format);

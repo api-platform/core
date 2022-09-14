@@ -410,7 +410,7 @@ Feature: Authorization checking
     """
     Then the response status code should be 200
     And the response should be in JSON
-    And the JSON node "data.securedDummy.ownerOnlyProperty" should be equal to the string ""
+    And the JSON node "data.securedDummy.ownerOnlyProperty" should be equal to ""
 
   Scenario: A user cannot retrieve an item they doesn't own
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
