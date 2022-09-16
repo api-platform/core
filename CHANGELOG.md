@@ -102,7 +102,7 @@ Doctrine: new interfaces for Filters and Extensions ready, switch to the `ApiPla
 
 * Swagger UI: Add `usePkceWithAuthorizationCodeGrant` to Swagger UI initOAuth (#4649)
 * **BC**: `mapping.paths` in configuration should override bundles configuration (#4465)
-* GraphQL: Add ability to use different pagination types for the queries of a resource (#4453)
+* GraphQL: Add the ability to use different pagination types for the queries of a resource (#4453)
 * Security: **BC** Fix `ApiProperty` `security` attribute expression being passed a class string for the `object` variable on updates/creates - null is now passed instead if the object is not available (#4184)
 * Security: `ApiProperty` now supports a `security_post_denormalize` attribute, which provides access to the `object` variable for the object being updated/created and `previous_object` for the object before it was updated (#4184)
 * Maker: Add `make:data-provider` and `make :data-persister` commands to generate a data provider / persister (#3850)
@@ -136,7 +136,7 @@ Doctrine: new interfaces for Filters and Extensions ready, switch to the `ApiPla
 * Metadata: deprecation of `ApiPlatform\Core\Annotation` (#4351)
 * Metadata: `ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface` is deprecated in favor of `ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface` (#4351)
 * Metadata: item and collection prefixes for operations are deprecated, as well as the `ApiPlatform\Core\Api\OperationType` class (#4351)
-* Graphql: `ApiPlatform\Metadata\GraphQl` follow the same metadata conventions (a Subscription operation is available and isn't hidden behind an update Mutation anymore), interfaces got simplified (beeing @experimental) (#4351)
+* Graphql: `ApiPlatform\Metadata\GraphQl` follow the same metadata conventions (a Subscription operation is available and isn't hidden behind an update Mutation anymore), interfaces got simplified (being @experimental) (#4351)
 * IriConverter: new interface for `ApiPlatform\Bridge\Symfony\Routing\IriConverter` that adds an operationName, same for `ApiPlatform\Api\IdentifiersExtractor` (#4351)
 * DataProvider: new `ApiPlatform\State\ProviderInterface` that replaces DataProviders (#4351)
 * DataPersister: new `ApiPlatform\State\ProcessorInterface` that replaces DataPersisters (#4351)
