@@ -39,6 +39,8 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class,
     ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class,
 
+    ApiPlatform\Core\Metadata\Resource\ResourceNameCollection::class => ApiPlatform\Metadata\Resource\ResourceNameCollection::class,
+
     // Test cases
     ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class => ApiPlatform\Symfony\Bundle\Test\ApiTestCase::class,
     ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase::class,

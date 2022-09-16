@@ -178,6 +178,7 @@ parameters:
 		- src/Core/Metadata/Property/Factory/CachedPropertyNameCollectionFactory.php
 		- src/Core/Metadata/Property/Factory/ExtractorPropertyNameCollectionFactory.php
 		- src/Core/Metadata/Property/PropertyNameCollection.php
+		- src/Core/Metadata/Resource/ResourceNameCollection.php
 		- src/Core/OpenApi/Model/Components.php
 		- src/Core/OpenApi/Model/Contact.php
 		- src/Core/OpenApi/Model/Encoding.php
