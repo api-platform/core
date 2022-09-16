@@ -16,14 +16,14 @@ namespace ApiPlatform\Tests\Hydra\EventListener;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Hydra\EventListener\AddLinkHeaderListener;
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\WebLink\Link;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
