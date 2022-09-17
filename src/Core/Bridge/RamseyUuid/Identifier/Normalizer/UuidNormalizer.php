@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer;
 
 use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\RamseyUuid\UriVariableTransformer\UuidUriVariableTransformer;
 use Ramsey\Uuid\Exception\InvalidUuidStringException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -26,6 +27,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class UuidNormalizer implements DenormalizerInterface
 {
+    public function __construct()
+    {
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The class "%s" will be replaced by "%s".', self::class, UuidUriVariableTransformer::class));
+    }
+
     /**
      * {@inheritdoc}
      *
