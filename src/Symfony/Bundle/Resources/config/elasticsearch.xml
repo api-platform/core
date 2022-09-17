@@ -19,6 +19,8 @@
 
         <service id="ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface" alias="api_platform.elasticsearch.metadata.document.metadata_factory" />
 
+        <service id="ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface" alias="api_platform.elasticsearch.metadata.document.metadata_factory" />
+
         <service id="api_platform.elasticsearch.metadata.document.metadata_factory.configured" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory" public="false">
             <argument>%api_platform.elasticsearch.mapping%</argument>
         </service>
