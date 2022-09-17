@@ -12,7 +12,6 @@
 
         <service id="api_platform.identifier.symfony_uuid_normalizer" class="ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer" public="false">
             <tag name="api_platform.identifier.denormalizer" />
-            <deprecated package="api-platform/core" version="2.7">The class "ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer".</deprecated>
         </service>
 
         <service id="api_platform.symfony.uri_variables.transformer.ulid" class="ApiPlatform\Symfony\UriVariableTransformer\UlidUriVariableTransformer" public="false">

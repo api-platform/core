@@ -7,7 +7,6 @@
     <services>
         <service id="api_platform.identifier.uuid_normalizer" class="ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer" public="false">
             <tag name="api_platform.identifier.denormalizer" priority="-100" />
-            <deprecated package="api-platform/core" version="2.7">The class "ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\RamseyUuid\UriVariableTransformer\UuidUriVariableTransformer".</deprecated>
         </service>
 
         <service id="api_platform.serializer.uuid_denormalizer" class="ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer" public="false">
