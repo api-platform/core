@@ -147,6 +147,7 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
                 $reflection = $this->reflectionClass->getProperty($node->props[0]->name->__toString());
             }
 
+            $filterAttributes = [];
             foreach ($this->readApiFilters($reflection) as $annotation) {
                 [$filterAnnotation, $isAnnotation] = $annotation;
                 if ($isAnnotation) {
@@ -172,12 +173,14 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
                     $arguments[$key] = $this->valueToNode($value);
                 }
 
-                $node->attrGroups[] = new Node\AttributeGroup([
-                    new Node\Attribute(
-                        new Node\Name('ApiFilter'),
-                        $this->arrayToArguments($arguments),
-                    ),
-                ]);
+                $filterAttributes[] = new Node\Attribute(
+                    new Node\Name('ApiFilter'),
+                    $this->arrayToArguments($arguments),
+                );
+            }
+
+            foreach ($filterAttributes as $filterAttribute) {
+                $node->attrGroups[] = new Node\AttributeGroup([$filterAttribute]);
             }
         }
     }
