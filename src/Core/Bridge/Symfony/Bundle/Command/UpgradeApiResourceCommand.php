@@ -89,6 +89,12 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
             return Command::INVALID;
         }
 
+        if (!class_exists(NodeTraverser::class)) {
+            $output->writeln('Run `composer require --dev `nikic/php-parser` or install phpunit to use this command.');
+
+            return Command::FAILURE;
+        }
+
         $subresources = $this->getSubresources();
 
         $prettyPrinter = new Standard();
@@ -140,6 +146,12 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
             if (!$input->getOption('force') && $input->getOption('dry-run')) {
                 if ($input->getOption('silent')) {
                     continue;
+                }
+
+                if (!class_exists(Differ::class)) {
+                    $output->writeln('Run `composer require --dev sebastian/diff` or install phpunit to print a diff.');
+
+                    return Command::FAILURE;
                 }
 
                 $this->printDiff($oldCode, $newCode, $output);
