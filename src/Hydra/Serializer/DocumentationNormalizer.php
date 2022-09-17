@@ -317,7 +317,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             foreach ($this->propertyNameCollectionFactory->create($class, $propertyNameContext) as $propertyName) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($class, $propertyName, $propertyContext);
 
-                if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {
+                if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable() && false === $propertyMetadata->isReadable()) {
                     continue;
                 }
 
