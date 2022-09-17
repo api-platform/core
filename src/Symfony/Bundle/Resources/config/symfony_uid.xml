@@ -7,7 +7,6 @@
     <services>
         <service id="api_platform.identifier.symfony_ulid_normalizer" class="ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UlidNormalizer" public="false">
             <tag name="api_platform.identifier.denormalizer" />
-            <deprecated package="api-platform/core" version="2.7">The class "ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UlidNormalizer" will be replaced by "ApiPlatform\Symfony\UriVariableTransformer\UlidUriVariableTransformer".</deprecated>
         </service>
 
         <service id="api_platform.identifier.symfony_uuid_normalizer" class="ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer" public="false">
