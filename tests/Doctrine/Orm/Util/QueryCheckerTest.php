@@ -175,7 +175,7 @@ class QueryCheckerTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
 
-        $this->assertFalse(QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
+        $this->assertTrue(QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
     public function testHasOrderByOnFetchJoinedToManyAssociationWithJoinByAssociation()
@@ -277,7 +277,7 @@ class QueryCheckerTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
 
-        $this->assertFalse(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
+        $this->assertTrue(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
     /**
