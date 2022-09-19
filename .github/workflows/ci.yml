@@ -11,13 +11,24 @@ env:
 
 jobs:
   commitlint:
+    if: github.event_name == 'pull_request'
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          configFile: .commitlintrc
-      - uses: wagoid/commitlint-github-action@v5
+      - name: Run commitlint
+        run: | 
+            commit=$(gh api \
+              -H "Accept: application/vnd.github+json" \
+              /repos/${{ github.repository }}/pulls/${{github.event.number}}/commits \
+              | jq -r '.[0].commit.message')
+            # we can't use npx see https://github.com/conventional-changelog/commitlint/issues/613
+            echo '{}' > package.json
+            npm install --no-fund --no-audit @commitlint/config-conventional @commitlint/cli
+            echo $commit | ./node_modules/.bin/commitlint -g .commitlintrc
   php-cs-fixer:
     name: PHP-cs-fixer (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
