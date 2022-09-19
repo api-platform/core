@@ -201,10 +201,22 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (class_exists(Uuid::class)) {
             $loader->load('ramsey_uuid.xml');
+            if ($container->hasDefinition('api_platform.identifier.uuid_normalizer')) {
+                $container->getDefinition('api_platform.identifier.uuid_normalizer')
+                    ->setDeprecated(...$this->buildDeprecationArgs('2.7', 'The "%service_id%" service is deprecated since 2.7 and will be removed in 3.0. Use the "api_platform.ramsey_uuid.uri_variables.transformer.uuid" service instead.'));
+            }
         }
 
         if (class_exists(AbstractUid::class)) {
             $loader->load('symfony_uid.xml');
+            if ($container->hasDefinition('api_platform.identifier.symfony_ulid_normalizer')) {
+                $container->getDefinition('api_platform.identifier.symfony_ulid_normalizer')
+                    ->setDeprecated(...$this->buildDeprecationArgs('2.7', 'The "%service_id%" service is deprecated since 2.7 and will be removed in 3.0. Use the "api_platform.symfony.uri_variables.transformer.ulid" service instead.'));
+            }
+            if ($container->hasDefinition('api_platform.identifier.symfony_uuid_normalizer')) {
+                $container->getDefinition('api_platform.identifier.symfony_uuid_normalizer')
+                    ->setDeprecated(...$this->buildDeprecationArgs('2.7', 'The "%service_id%" service is deprecated since 2.7 and will be removed in 3.0. Use the "api_platform.symfony.uri_variables.transformer.uuid" service instead.'));
+            }
         }
 
         $container->setParameter('api_platform.metadata_backward_compatibility_layer', $config['metadata_backward_compatibility_layer']);

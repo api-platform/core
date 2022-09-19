@@ -16,11 +16,17 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Identifier\Normalizer;
 use ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @group legacy
+ */
 final class UuidNormalizerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected function setUp(): void
     {
         if (!class_exists(AbstractUid::class)) {
@@ -30,6 +36,8 @@ final class UuidNormalizerTest extends TestCase
 
     public function testDenormalizeUuid()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The class "ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer".');
+
         $uuid = Uuid::v4();
         $normalizer = new UuidNormalizer();
         $this->assertTrue($normalizer->supportsDenormalization($uuid->__toString(), Uuid::class));
@@ -38,6 +46,7 @@ final class UuidNormalizerTest extends TestCase
 
     public function testNoSupportDenormalizeUuid()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The class "ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer".');
         $uuid = 'notanuuid';
         $normalizer = new UuidNormalizer();
         $this->assertFalse($normalizer->supportsDenormalization($uuid, ''));
@@ -45,6 +54,7 @@ final class UuidNormalizerTest extends TestCase
 
     public function testFailDenormalizeUuid()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The class "ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer".');
         $this->expectException(InvalidIdentifierException::class);
 
         $uuid = 'notanuuid';
@@ -55,6 +65,7 @@ final class UuidNormalizerTest extends TestCase
 
     public function testDoNotSupportNotString()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The class "ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer".');
         $uuid = Uuid::v4();
         $normalizer = new UuidNormalizer();
         $this->assertFalse($normalizer->supportsDenormalization($uuid, Uuid::class));

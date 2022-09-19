@@ -17,11 +17,18 @@ use ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
+/**
+ * @group legacy
+ */
 class UuidNormalizerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testDenormalizeUuid()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The class "ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\RamseyUuid\UriVariableTransformer\UuidUriVariableTransformer".');
         $uuid = Uuid::uuid4();
         $normalizer = new UuidNormalizer();
         $this->assertTrue($normalizer->supportsDenormalization($uuid->toString(), Uuid::class));
@@ -30,6 +37,7 @@ class UuidNormalizerTest extends TestCase
 
     public function testNoSupportDenormalizeUuid()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The class "ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\RamseyUuid\UriVariableTransformer\UuidUriVariableTransformer".');
         $uuid = 'notanuuid';
         $normalizer = new UuidNormalizer();
         $this->assertFalse($normalizer->supportsDenormalization($uuid, ''));
@@ -37,6 +45,7 @@ class UuidNormalizerTest extends TestCase
 
     public function testFailDenormalizeUuid()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The class "ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\RamseyUuid\UriVariableTransformer\UuidUriVariableTransformer".');
         $this->expectException(InvalidIdentifierException::class);
 
         $uuid = 'notanuuid';
@@ -47,6 +56,7 @@ class UuidNormalizerTest extends TestCase
 
     public function testDoNotSupportNotString()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The class "ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer" will be replaced by "ApiPlatform\RamseyUuid\UriVariableTransformer\UuidUriVariableTransformer".');
         $uuid = Uuid::uuid4();
         $normalizer = new UuidNormalizer();
         $this->assertFalse($normalizer->supportsDenormalization($uuid, Uuid::class));

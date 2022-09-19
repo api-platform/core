@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer;
 
 use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -22,6 +23,11 @@ use Symfony\Component\Uid\Uuid;
  */
 final class UuidNormalizer implements DenormalizerInterface
 {
+    public function __construct()
+    {
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The class "%s" will be replaced by "%s".', self::class, UuidUriVariableTransformer::class));
+    }
+
     /**
      * {@inheritdoc}
      *
