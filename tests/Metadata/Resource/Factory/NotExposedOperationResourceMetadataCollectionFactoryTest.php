@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCol
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Metadata\Get as CustomGet;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -68,8 +69,8 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
                 new ApiResource(
                     shortName: 'AttributeResource',
                     operations: [
-                        '_api_AttributeResource_get' => new Get(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
                         '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                        '_api_AttributeResource_get' => new Get(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
                     ],
                     uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
                     class: AttributeResource::class
@@ -88,8 +89,55 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
                 new ApiResource(
                     shortName: 'AttributeResource',
                     operations: [
-                        '_api_AttributeResource_get' => new Get(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
                         '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                        '_api_AttributeResource_get' => new Get(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                    ],
+                    uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
+                    class: AttributeResource::class
+                ),
+            ]),
+            $factory->create(AttributeResource::class)
+        );
+    }
+
+    public function testItIgnoresResourcesWithAnItemOperationUsingCustomClass()
+    {
+        $linkFactoryProphecy = $this->prophesize(LinkFactoryInterface::class);
+        $linkFactoryProphecy->createLinksFromIdentifiers(Argument::type(HttpOperation::class))->shouldNotBeCalled();
+
+        $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactoryProphecy->create(AttributeResource::class)->willReturn(
+            new ResourceMetadataCollection(AttributeResource::class, [
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    operations: [],
+                    class: AttributeResource::class
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    operations: [
+                        '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                        '_api_AttributeResource_get' => new CustomGet(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                    ],
+                    uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
+                    class: AttributeResource::class
+                ),
+            ]),
+        );
+
+        $factory = new NotExposedOperationResourceMetadataCollectionFactory($linkFactoryProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy->reveal());
+        $this->assertEquals(
+            new ResourceMetadataCollection(AttributeResource::class, [
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    operations: [],
+                    class: AttributeResource::class
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    operations: [
+                        '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                        '_api_AttributeResource_get' => new CustomGet(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
                     ],
                     uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
                     class: AttributeResource::class
