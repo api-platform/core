@@ -34,6 +34,7 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -494,6 +495,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if (!$this->isConfigEnabled($container, $config['doctrine'])) {
             return;
+        }
+
+        // For older versions of doctrine bridge this allows autoconfiguration for filters
+        if (!$container->has(ManagerRegistry::class)) {
+            $container->setAlias(ManagerRegistry::class, 'doctrine');
         }
 
         $container->registerForAutoconfiguration(QueryItemExtensionInterface::class)
