@@ -312,6 +312,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                     $paths[] = $dir;
                 }
             }
+
+            if ($this->isConfigEnabled($container, $config['doctrine']) && is_dir($doctrinePath = "$projectDir/src/Entity")) {
+                $paths[] = $doctrinePath;
+            }
+
+            if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm']) && is_dir($documentPath = "$projectDir/src/Document")) {
+                $paths[] = $documentPath;
+            }
         }
 
         $resources = ['yml' => [], 'xml' => [], 'dir' => []];
