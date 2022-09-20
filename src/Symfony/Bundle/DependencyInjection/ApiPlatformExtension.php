@@ -306,13 +306,20 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $paths = array_unique(array_merge($this->getBundlesResourcesPaths($container, $config), $config['mapping']['paths']));
 
-        // Default paths
-        if (!$paths) {
+        if (!$config['mapping']['paths']) {
             $projectDir = $container->getParameter('kernel.project_dir');
-            foreach (["$projectDir/config/api_platform", "$projectDir/src/ApiResource", "$projectDir/src/Document", "$projectDir/src/Entity"] as $dir) {
+            foreach (["$projectDir/config/api_platform", "$projectDir/src/ApiResource"] as $dir) {
                 if (is_dir($dir)) {
                     $paths[] = $dir;
                 }
+            }
+
+            if ($this->isConfigEnabled($container, $config['doctrine']) && is_dir($doctrinePath = "$projectDir/src/Entity")) {
+                $paths[] = $doctrinePath;
+            }
+
+            if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm']) && is_dir($documentPath = "$projectDir/src/Document")) {
+                $paths[] = $documentPath;
             }
         }
 

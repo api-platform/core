@@ -1160,4 +1160,23 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertEquals($this->container->getParameter('api_platform.defaults'), ['extra_properties' => ['else' => 'foo', 'something' => 'test']]);
     }
+
+    public function testConfigurationDirectories(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults'] = [
+            'something' => 'test',
+            'extra_properties' => ['else' => 'foo'],
+        ];
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $kernelProjectDir = realpath(__DIR__.'/../../../Fixtures/TestBundle');
+        $resourceClassDirectories = $this->container->getParameter('api_platform.resource_class_directories');
+
+        $this->assertContains($kernelProjectDir.'/Resources/config/api_resources', $resourceClassDirectories);
+        $this->assertContains($kernelProjectDir.'/Entity', $resourceClassDirectories);
+        $this->assertContains($kernelProjectDir.'/Document', $resourceClassDirectories);
+        $this->assertContains(realpath(__DIR__.'/../../../Symfony/Bundle/DependencyInjection').'/../../../Fixtures/app/config/api_platform', $resourceClassDirectories);
+    }
 }
