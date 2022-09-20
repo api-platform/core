@@ -486,16 +486,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerCacheConfiguration(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter('kernel.debug') || !$container->getParameter('kernel.debug')) {
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $container->register('api_platform.cache.metadata.property', ArrayAdapter::class)->addTag('cache.pool');
+            $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class)->addTag('cache.pool');
+            $container->register('api_platform.cache.metadata.resource_collection', ArrayAdapter::class)->addTag('cache.pool');
+            $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class)->addTag('cache.pool');
+            $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
+            $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
+        } else {
             $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
         }
-
-        $container->register('api_platform.cache.metadata.property', ArrayAdapter::class)->addTag('cache.pool');
-        $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class)->addTag('cache.pool');
-        $container->register('api_platform.cache.metadata.resource_collection', ArrayAdapter::class)->addTag('cache.pool');
-        $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class)->addTag('cache.pool');
-        $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
-        $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
     }
 
     private function registerDoctrineOrmConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
