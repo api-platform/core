@@ -73,7 +73,7 @@ final class UpgradeApiResourceCommand extends Command
             ->setDescription('The "api:upgrade-resource" command upgrades your API Platform metadata from versions below 2.6 to the new metadata from versions above 2.7.
 Once you executed this script, make sure that the "metadata_backward_compatibility_layer" flag is set to "false" in the API Platform configuration.
 This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute and use the "ApiPlatform\Metadata\ApiResource" attribute instead.')
-            ->addOption('dry-run', '-d', InputOption::VALUE_NEGATABLE, 'Dry mode outputs a diff instead of writing files.', true)
+            ->addOption('dry-run', '-d', InputOption::VALUE_NONE, 'Dry mode outputs a diff instead of writing files.')
             ->addOption('silent', '-s', InputOption::VALUE_NONE, 'Silent output.')
             ->addOption('force', '-f', InputOption::VALUE_NONE, 'Writes the files in place and skips PHP version check.');
     }
