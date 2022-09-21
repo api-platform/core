@@ -32,11 +32,6 @@ final class ErrorListener extends SymfonyErrorListener
             $dup->attributes->set('_api_operation', $request->attributes->get('_api_operation'));
         }
 
-        // TODO: remove legacy layer in 3.0
-        if ($request->attributes->has('_api_exception_to_status')) {
-            $dup->attributes->set('_api_exception_to_status', $request->attributes->get('_api_exception_to_status'));
-        }
-
         return $dup;
     }
 }
