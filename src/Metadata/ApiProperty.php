@@ -79,7 +79,7 @@ final class ApiProperty
     private $securityPostDenormalize;
 
     /**
-     * @var string[]
+     * @var string|string[]|null
      */
     private $types;
 
@@ -171,7 +171,7 @@ final class ApiProperty
         $this->security = $security;
         $this->openapiContext = $openapiContext;
         $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->types = $types;
+        $this->types = null === $types ? null : (array) $types;
         $this->builtinTypes = $builtinTypes;
         $this->schema = $schema;
         $this->initializable = $initializable;
