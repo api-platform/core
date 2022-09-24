@@ -33,8 +33,11 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     public const TITLE = 'title';
     private array $defaultContext = [self::TITLE => 'An error occurred'];
 
-    public function __construct(private readonly UrlGeneratorInterface $urlGenerator, private readonly bool $debug = false, array $defaultContext = [])
-    {
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly bool $debug = false,
+        array $defaultContext = [],
+    ) {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 

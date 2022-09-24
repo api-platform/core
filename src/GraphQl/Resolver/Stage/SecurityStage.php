@@ -24,9 +24,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 final class SecurityStage implements SecurityStageInterface
 {
-    public function __construct(private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker)
-    {
-    }
+    public function __construct(
+        private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker,
+    ) {}
 
     /**
      * {@inheritdoc}

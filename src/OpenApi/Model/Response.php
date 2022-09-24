@@ -17,9 +17,12 @@ final class Response
 {
     use ExtensionTrait;
 
-    public function __construct(private string $description = '', private ?\ArrayObject $content = null, private ?\ArrayObject $headers = null, private ?\ArrayObject $links = null)
-    {
-    }
+    public function __construct(
+        private string $description = '',
+        private ?\ArrayObject $content = null,
+        private ?\ArrayObject $headers = null,
+        private ?\ArrayObject $links = null,
+    ) {}
 
     public function getDescription(): string
     {

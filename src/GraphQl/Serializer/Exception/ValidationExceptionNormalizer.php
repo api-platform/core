@@ -28,9 +28,9 @@ use Symfony\Component\Validator\ConstraintViolation;
  */
 final class ValidationExceptionNormalizer implements NormalizerInterface
 {
-    public function __construct(private readonly array $exceptionToStatus = [])
-    {
-    }
+    public function __construct(
+        private readonly array $exceptionToStatus = [],
+    ) {}
 
     /**
      * {@inheritdoc}

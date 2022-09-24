@@ -36,8 +36,11 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 {
     private readonly CamelCaseToSnakeCaseNameConverter $camelCaseToSnakeCaseNameConverter;
 
-    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, private readonly array $defaults = [])
-    {
+    public function __construct(
+        private readonly ResourceExtractorInterface $extractor,
+        private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
+        private readonly array $defaults = [],
+    ) {
         $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 

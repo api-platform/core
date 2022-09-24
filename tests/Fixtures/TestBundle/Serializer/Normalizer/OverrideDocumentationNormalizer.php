@@ -22,9 +22,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class OverrideDocumentationNormalizer implements NormalizerInterface
 {
-    public function __construct(private readonly NormalizerInterface $documentationNormalizer)
-    {
-    }
+    public function __construct(
+        private readonly NormalizerInterface $documentationNormalizer,
+    ) {}
 
     /**
      * @param mixed|null $format

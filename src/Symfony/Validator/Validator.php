@@ -28,9 +28,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidator
  */
 class Validator implements ValidatorInterface
 {
-    public function __construct(private readonly SymfonyValidatorInterface $validator, private readonly ?ContainerInterface $container = null)
-    {
-    }
+    public function __construct(
+        private readonly SymfonyValidatorInterface $validator,
+        private readonly ?ContainerInterface $container = null,
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -33,9 +33,9 @@ final class CommandContext implements Context
 
     private ?CommandTester $commandTester = null;
 
-    public function __construct(private KernelInterface $kernel)
-    {
-    }
+    public function __construct(
+        private KernelInterface $kernel,
+    ) {}
 
     /**
      * @When I run the command :command

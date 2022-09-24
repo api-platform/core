@@ -33,9 +33,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class ItemProvider implements ProviderInterface
 {
-    public function __construct(private readonly Client $client, private readonly DocumentMetadataFactoryInterface $documentMetadataFactory, private readonly DenormalizerInterface $denormalizer)
-    {
-    }
+    public function __construct(
+        private readonly Client $client,
+        private readonly DocumentMetadataFactoryInterface $documentMetadataFactory,
+        private readonly DenormalizerInterface $denormalizer,
+    ) {}
 
     /**
      * {@inheritdoc}

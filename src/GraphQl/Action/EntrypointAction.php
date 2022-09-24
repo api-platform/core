@@ -34,8 +34,18 @@ final class EntrypointAction
 {
     private int $debug;
 
-    public function __construct(private readonly SchemaBuilderInterface $schemaBuilder, private readonly ExecutorInterface $executor, private readonly GraphiQlAction $graphiQlAction, private readonly GraphQlPlaygroundAction $graphQlPlaygroundAction, private readonly NormalizerInterface $normalizer, private readonly ErrorHandlerInterface $errorHandler, bool $debug = false, private readonly bool $graphiqlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false, private readonly ?string $defaultIde = null)
-    {
+    public function __construct(
+        private readonly SchemaBuilderInterface $schemaBuilder,
+        private readonly ExecutorInterface $executor,
+        private readonly GraphiQlAction $graphiQlAction,
+        private readonly GraphQlPlaygroundAction $graphQlPlaygroundAction,
+        private readonly NormalizerInterface $normalizer,
+        private readonly ErrorHandlerInterface $errorHandler,
+        bool $debug = false,
+        private readonly bool $graphiqlEnabled = false,
+        private readonly bool $graphQlPlaygroundEnabled = false,
+        private readonly ?string $defaultIde = null,
+    ) {
         $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
     }
 

@@ -22,9 +22,9 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class AlternateUriResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}

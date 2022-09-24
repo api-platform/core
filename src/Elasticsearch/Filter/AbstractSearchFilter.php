@@ -35,8 +35,15 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractSearchFilter extends AbstractFilter implements ConstantScoreFilterInterface
 {
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected IriConverterInterface $iriConverter, protected PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
-    {
+    public function __construct(
+        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        ResourceClassResolverInterface $resourceClassResolver,
+        protected IriConverterInterface $iriConverter,
+        protected PropertyAccessorInterface $propertyAccessor,
+        ?NameConverterInterface $nameConverter = null,
+        ?array $properties = null,
+    ) {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
     }
 

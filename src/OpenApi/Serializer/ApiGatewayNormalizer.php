@@ -33,8 +33,10 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
         self::API_GATEWAY => false,
     ];
 
-    public function __construct(private readonly NormalizerInterface $documentationNormalizer, $defaultContext = [])
-    {
+    public function __construct(
+        private readonly NormalizerInterface $documentationNormalizer,
+        $defaultContext = [],
+    ) {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 

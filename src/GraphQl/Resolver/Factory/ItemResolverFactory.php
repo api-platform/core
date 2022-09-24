@@ -37,9 +37,13 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     use ClassInfoTrait;
     use CloneTrait;
 
-    public function __construct(private readonly ReadStageInterface $readStage, private readonly SecurityStageInterface $securityStage, private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, private readonly SerializeStageInterface $serializeStage, private readonly ContainerInterface $queryResolverLocator)
-    {
-    }
+    public function __construct(
+        private readonly ReadStageInterface $readStage,
+        private readonly SecurityStageInterface $securityStage,
+        private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage,
+        private readonly SerializeStageInterface $serializeStage,
+        private readonly ContainerInterface $queryResolverLocator,
+    ) {}
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {

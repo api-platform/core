@@ -22,8 +22,10 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 final class TypeNotFoundException extends \InvalidArgumentException implements NotFoundExceptionInterface
 {
-    public function __construct(string $message, private readonly string $typeId)
-    {
+    public function __construct(
+        string $message,
+        private readonly string $typeId,
+    ) {
         parent::__construct($message);
     }
 

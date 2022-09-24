@@ -200,8 +200,10 @@ final class DoctrineContext implements Context
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
      */
-    public function __construct(private readonly ManagerRegistry $doctrine, private readonly mixed $passwordHasher)
-    {
+    public function __construct(
+        private readonly ManagerRegistry $doctrine,
+        private readonly mixed $passwordHasher,
+    ) {
         $this->manager = $doctrine->getManager();
         $this->schemaTool = $this->manager instanceof EntityManagerInterface ? new SchemaTool($this->manager) : null;
         $this->schemaManager = $this->manager instanceof DocumentManager ? $this->manager->getSchemaManager() : null;

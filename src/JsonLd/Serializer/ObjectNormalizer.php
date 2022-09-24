@@ -29,9 +29,11 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter, private AnonymousContextBuilderInterface $anonymousContextBuilder)
-    {
-    }
+    public function __construct(
+        private readonly NormalizerInterface $decorated,
+        private readonly IriConverterInterface $iriConverter,
+        private AnonymousContextBuilderInterface $anonymousContextBuilder,
+    ) {}
 
     /**
      * {@inheritdoc}

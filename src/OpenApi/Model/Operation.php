@@ -17,8 +17,21 @@ final class Operation
 {
     use ExtensionTrait;
 
-    public function __construct(private ?string $operationId = null, private array $tags = [], private array $responses = [], private string $summary = '', private string $description = '', private ?ExternalDocumentation $externalDocs = null, private array $parameters = [], private ?RequestBody $requestBody = null, private ?\ArrayObject $callbacks = null, private bool $deprecated = false, private ?array $security = null, private ?array $servers = null, array $extensionProperties = [])
-    {
+    public function __construct(
+        private ?string $operationId = null,
+        private array $tags = [],
+        private array $responses = [],
+        private string $summary = '',
+        private string $description = '',
+        private ?ExternalDocumentation $externalDocs = null,
+        private array $parameters = [],
+        private ?RequestBody $requestBody = null,
+        private ?\ArrayObject $callbacks = null,
+        private bool $deprecated = false,
+        private ?array $security = null,
+        private ?array $servers = null,
+        array $extensionProperties = [],
+    ) {
         $this->extensionProperties = $extensionProperties;
     }
 

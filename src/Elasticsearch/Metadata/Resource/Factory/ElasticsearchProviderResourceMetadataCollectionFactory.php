@@ -25,9 +25,10 @@ use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly Client $client,
+        private readonly ResourceMetadataCollectionFactoryInterface $decorated,
+    ) {}
 
     /**
      * {@inheritDoc}

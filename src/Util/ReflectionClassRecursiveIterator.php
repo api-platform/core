@@ -22,9 +22,7 @@ namespace ApiPlatform\Util;
  */
 final class ReflectionClassRecursiveIterator
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function getReflectionClassesFromDirectories(array $directories): \Iterator
     {

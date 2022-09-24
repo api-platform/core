@@ -46,8 +46,13 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         self::IRI_ONLY => false,
     ];
 
-    public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $defaultContext = [])
-    {
+    public function __construct(
+        private readonly ContextBuilderInterface $contextBuilder,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        private readonly IriConverterInterface $iriConverter,
+        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        array $defaultContext = [],
+    ) {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 

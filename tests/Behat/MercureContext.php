@@ -24,9 +24,9 @@ use Psr\Container\ContainerInterface;
  */
 final class MercureContext implements Context
 {
-    public function __construct(private readonly ContainerInterface $driverContainer)
-    {
-    }
+    public function __construct(
+        private readonly ContainerInterface $driverContainer,
+    ) {}
 
     /**
      * @Then the following Mercure update with topics :topics should have been sent:

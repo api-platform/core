@@ -35,8 +35,10 @@ final class RespondListener
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private readonly ?IriConverterInterface $iriConverter = null)
-    {
+    public function __construct(
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
+        private readonly ?IriConverterInterface $iriConverter = null,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
 

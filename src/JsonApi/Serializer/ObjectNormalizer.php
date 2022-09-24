@@ -30,9 +30,12 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     public const FORMAT = 'jsonapi';
 
-    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
-    {
-    }
+    public function __construct(
+        private readonly NormalizerInterface $decorated,
+        private readonly IriConverterInterface $iriConverter,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+    ) {}
 
     /**
      * {@inheritdoc}

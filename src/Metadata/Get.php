@@ -91,7 +91,7 @@ final class Get extends HttpOperation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
     ) {
         parent::__construct(self::METHOD_GET, ...\func_get_args());
     }

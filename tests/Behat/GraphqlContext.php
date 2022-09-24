@@ -36,9 +36,9 @@ final class GraphqlContext implements Context
 
     private ?int $graphqlLine = null; // @phpstan-ignore-line
 
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(
+        private readonly Request $request,
+    ) {}
 
     /**
      * Gives access to the Behatch context.

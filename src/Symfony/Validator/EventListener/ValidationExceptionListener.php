@@ -27,9 +27,11 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class ValidationExceptionListener
 {
-    public function __construct(private readonly SerializerInterface $serializer, private readonly array $errorFormats, private readonly array $exceptionToStatus = [])
-    {
-    }
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+        private readonly array $errorFormats,
+        private readonly array $exceptionToStatus = [],
+    ) {}
 
     /**
      * Returns a list of violations normalized in the Hydra format.

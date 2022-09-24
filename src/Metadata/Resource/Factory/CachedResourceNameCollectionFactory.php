@@ -28,8 +28,10 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
 
     public const CACHE_KEY = 'resource_name_collection';
 
-    public function __construct(CacheItemPoolInterface $cacheItemPool, private readonly ResourceNameCollectionFactoryInterface $decorated)
-    {
+    public function __construct(
+        CacheItemPoolInterface $cacheItemPool,
+        private readonly ResourceNameCollectionFactoryInterface $decorated,
+    ) {
         $this->cacheItemPool = $cacheItemPool;
     }
 

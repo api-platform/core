@@ -22,9 +22,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 final class HttpCacheContext implements Context
 {
-    public function __construct(private readonly KernelInterface $kernel)
-    {
-    }
+    public function __construct(
+        private readonly KernelInterface $kernel,
+    ) {}
 
     /**
      * @Then :iris IRIs should be purged

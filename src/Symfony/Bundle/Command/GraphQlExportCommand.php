@@ -28,8 +28,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class GraphQlExportCommand extends Command
 {
-    public function __construct(private readonly SchemaBuilderInterface $schemaBuilder)
-    {
+    public function __construct(
+        private readonly SchemaBuilderInterface $schemaBuilder,
+    ) {
         parent::__construct();
     }
 

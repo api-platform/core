@@ -30,8 +30,13 @@ class VoDummyCar extends VoDummyVehicle
     #[Groups(['car_read', 'car_write'])]
     private Collection|iterable $inspections;
 
-    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, #[ORM\Column(type: 'integer')] #[Groups(['car_read', 'car_write'])] private int $mileage, #[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $bodyType = 'coupe')
-    {
+    public function __construct(
+        string $make,
+        VoDummyInsuranceCompany $insuranceCompany,
+        array $drivers,
+        #[ORM\Column(type: 'integer')] #[Groups(['car_read', 'car_write'])] private int $mileage,
+        #[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $bodyType = 'coupe',
+    ) {
         parent::__construct($make, $insuranceCompany, $drivers);
         $this->inspections = new ArrayCollection();
     }

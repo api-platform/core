@@ -21,9 +21,9 @@ final class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
     use ClassInfoTrait;
 
-    public function __construct(private readonly ClassMetadataFactoryInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly ClassMetadataFactoryInterface $decorated,
+    ) {}
 
     /**
      * {@inheritdoc}

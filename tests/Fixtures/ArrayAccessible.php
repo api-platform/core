@@ -15,9 +15,9 @@ namespace ApiPlatform\Tests\Fixtures;
 
 class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
 {
-    public function __construct(private array $array = [])
-    {
-    }
+    public function __construct(
+        private array $array = [],
+    ) {}
 
     public function offsetExists($offset): bool
     {

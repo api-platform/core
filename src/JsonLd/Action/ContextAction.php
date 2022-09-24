@@ -31,9 +31,11 @@ final class ContextAction
         'Error' => true,
     ];
 
-    public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
-    {
-    }
+    public function __construct(
+        private readonly ContextBuilderInterface $contextBuilder,
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+    ) {}
 
     /**
      * Generates a context according to the type requested.

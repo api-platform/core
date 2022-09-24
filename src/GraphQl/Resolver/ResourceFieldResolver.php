@@ -28,9 +28,9 @@ final class ResourceFieldResolver
 {
     use ClassInfoTrait;
 
-    public function __construct(private readonly IriConverterInterface $iriConverter)
-    {
-    }
+    public function __construct(
+        private readonly IriConverterInterface $iriConverter,
+    ) {}
 
     public function __invoke(?array $source, array $args, $context, ResolveInfo $info): mixed
     {

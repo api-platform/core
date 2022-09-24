@@ -25,9 +25,9 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final class DummyDtoInputOutputProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly ManagerRegistry $registry)
-    {
-    }
+    public function __construct(
+        private readonly ManagerRegistry $registry,
+    ) {}
 
     /**
      * {@inheritDoc}

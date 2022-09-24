@@ -22,9 +22,10 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class ProductProvider implements ProviderInterface
 {
-    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly bool $orm = true)
-    {
-    }
+    public function __construct(
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly bool $orm = true,
+    ) {}
 
     /**
      * {@inheritDoc}

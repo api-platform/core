@@ -40,8 +40,14 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
 {
     use OrderFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null, private readonly ?string $orderNullsComparison = null)
-    {
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        string $orderParameterName = 'order',
+        LoggerInterface $logger = null,
+        array $properties = null,
+        NameConverterInterface $nameConverter = null,
+        private readonly ?string $orderNullsComparison = null,
+    ) {
         if (null !== $properties) {
             $properties = array_map(static function ($propertyOptions) {
                 // shorthand for default direction

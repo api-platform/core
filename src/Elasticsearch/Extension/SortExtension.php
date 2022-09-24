@@ -33,8 +33,12 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
 {
     use FieldDatatypeTrait;
 
-    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, private readonly ?NameConverterInterface $nameConverter = null, private readonly ?string $defaultDirection = null)
-    {
+    public function __construct(
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        ResourceClassResolverInterface $resourceClassResolver,
+        private readonly ?NameConverterInterface $nameConverter = null,
+        private readonly ?string $defaultDirection = null,
+    ) {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
     }

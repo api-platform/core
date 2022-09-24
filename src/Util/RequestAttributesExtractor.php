@@ -22,9 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class RequestAttributesExtractor
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Extracts resource class, operation name and format request attributes. Returns an empty array if the request does

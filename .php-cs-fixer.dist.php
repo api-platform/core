@@ -29,12 +29,13 @@ $finder = PhpCsFixer\Finder::create()
     ]);
 
 return (new PhpCsFixer\Config())
+    ->registerCustomFixers(new PhpCsFixerCustomFixers\Fixers())
     ->setRiskyAllowed(true)
     ->setRules([
         '@DoctrineAnnotation' => true,
-        '@PHP71Migration' => true,
-        '@PHP71Migration:risky' => true,
-        '@PHPUnit60Migration:risky' => true,
+        '@PHP80Migration' => true,
+        '@PHP80Migration:risky' => true,
+        '@PHPUnit84Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'align_multiline_comment' => [
@@ -113,5 +114,9 @@ return (new PhpCsFixer\Config())
                 'property',
             ],
         ],
+        'trailing_comma_in_multiline' => ['elements' => ['arrays', 'parameters']],
+
+        PhpCsFixerCustomFixers\Fixer\MultilinePromotedPropertiesFixer::name() => true,
+        PhpCsFixerCustomFixers\Fixer\ConstructorEmptyBracesFixer::name() => true,
     ])
     ->setFinder($finder);

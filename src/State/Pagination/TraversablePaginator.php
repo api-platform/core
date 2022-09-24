@@ -15,9 +15,12 @@ namespace ApiPlatform\State\Pagination;
 
 final class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
 {
-    public function __construct(private readonly \Traversable $traversable, private readonly float $currentPage, private readonly float $itemsPerPage, private readonly float $totalItems)
-    {
-    }
+    public function __construct(
+        private readonly \Traversable $traversable,
+        private readonly float $currentPage,
+        private readonly float $itemsPerPage,
+        private readonly float $totalItems,
+    ) {}
 
     /**
      * {@inheritdoc}

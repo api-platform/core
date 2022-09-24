@@ -22,9 +22,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
 
 final class DummyDtoInputOutputProvider implements ProviderInterface
 {
-    public function __construct(private readonly ProviderInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly ProviderInterface $decorated,
+    ) {}
 
     /**
      * {@inheritDoc}

@@ -28,9 +28,10 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly ResourceMetadataCollectionFactoryInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly ResourceMetadataCollectionFactoryInterface $decorated,
+    ) {}
 
     /**
      * {@inheritDoc}

@@ -24,9 +24,7 @@ class DummyTableInheritanceNotApiResourceChild extends DummyTableInheritance
     #[ODM\Field(type: 'bool')]
     private bool $swaggerThanParent = true;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function isSwaggerThanParent(): bool
     {

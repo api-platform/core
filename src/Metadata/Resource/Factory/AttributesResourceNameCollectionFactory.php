@@ -29,9 +29,10 @@ final class AttributesResourceNameCollectionFactory implements ResourceNameColle
     /**
      * @param string[] $paths
      */
-    public function __construct(private readonly array $paths, private readonly ?ResourceNameCollectionFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly array $paths,
+        private readonly ?ResourceNameCollectionFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}

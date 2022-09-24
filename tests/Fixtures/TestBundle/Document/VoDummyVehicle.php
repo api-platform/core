@@ -32,7 +32,7 @@ abstract class VoDummyVehicle
     public function __construct(
         #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $make,
         #[Groups(['car_read', 'car_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyInsuranceCompany::class, cascade: ['persist'])] private VoDummyInsuranceCompany $insuranceCompany,
-        array $drivers
+        array $drivers,
     ) {
         $this->drivers = new ArrayCollection($drivers);
     }

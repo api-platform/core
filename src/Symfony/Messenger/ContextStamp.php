@@ -22,9 +22,9 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  */
 final class ContextStamp implements StampInterface
 {
-    public function __construct(private readonly array $context = [])
-    {
-    }
+    public function __construct(
+        private readonly array $context = [],
+    ) {}
 
     /**
      * Get the context related to a message.

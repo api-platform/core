@@ -43,8 +43,19 @@ final class ItemNormalizer extends BaseItemNormalizer
     public const ITEM_RESOURCE_CLASS_KEY = '#itemResourceClass';
     public const ITEM_IDENTIFIERS_KEY = '#itemIdentifiers';
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, LoggerInterface $logger = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
-    {
+    public function __construct(
+        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        IriConverterInterface $iriConverter,
+        private readonly IdentifiersExtractorInterface $identifiersExtractor,
+        ResourceClassResolverInterface $resourceClassResolver,
+        PropertyAccessorInterface $propertyAccessor = null,
+        NameConverterInterface $nameConverter = null,
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        LoggerInterface $logger = null,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ResourceAccessCheckerInterface $resourceAccessChecker = null,
+    ) {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $logger ?: new NullLogger(), $resourceMetadataCollectionFactory, $resourceAccessChecker);
     }
 

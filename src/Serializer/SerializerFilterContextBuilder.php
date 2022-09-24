@@ -27,9 +27,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class SerializerFilterContextBuilder implements SerializerContextBuilderInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ContainerInterface $filterLocator, private readonly SerializerContextBuilderInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ContainerInterface $filterLocator,
+        private readonly SerializerContextBuilderInterface $decorated,
+    ) {}
 
     /**
      * {@inheritdoc}

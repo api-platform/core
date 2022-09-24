@@ -28,9 +28,10 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 final class RequestDataCollector extends DataCollector
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $metadataFactory, private readonly ContainerInterface $filterLocator)
-    {
-    }
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $metadataFactory,
+        private readonly ContainerInterface $filterLocator,
+    ) {}
 
     /**
      * {@inheritdoc}

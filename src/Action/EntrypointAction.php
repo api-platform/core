@@ -23,9 +23,9 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
  */
 final class EntrypointAction
 {
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
-    {
-    }
+    public function __construct(
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+    ) {}
 
     public function __invoke(): Entrypoint
     {

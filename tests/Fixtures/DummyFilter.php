@@ -20,9 +20,9 @@ use ApiPlatform\Api\FilterInterface;
  */
 class DummyFilter implements FilterInterface
 {
-    public function __construct(private readonly array $description)
-    {
-    }
+    public function __construct(
+        private readonly array $description,
+    ) {}
 
     /**
      * Gets the description of this filter for the given resource.

@@ -17,9 +17,11 @@ final class RequestBody
 {
     use ExtensionTrait;
 
-    public function __construct(private string $description = '', private ?\ArrayObject $content = null, private bool $required = false)
-    {
-    }
+    public function __construct(
+        private string $description = '',
+        private ?\ArrayObject $content = null,
+        private bool $required = false,
+    ) {}
 
     public function getDescription(): string
     {

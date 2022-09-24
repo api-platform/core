@@ -35,9 +35,14 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 {
     use CloneTrait;
 
-    public function __construct(private readonly ReadStageInterface $readStage, private readonly SecurityStageInterface $securityStage, private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, private readonly SerializeStageInterface $serializeStage, private readonly ContainerInterface $queryResolverLocator, private readonly ?RequestStack $requestStack = null)
-    {
-    }
+    public function __construct(
+        private readonly ReadStageInterface $readStage,
+        private readonly SecurityStageInterface $securityStage,
+        private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage,
+        private readonly SerializeStageInterface $serializeStage,
+        private readonly ContainerInterface $queryResolverLocator,
+        private readonly ?RequestStack $requestStack = null,
+    ) {}
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {

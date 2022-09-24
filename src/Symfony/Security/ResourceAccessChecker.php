@@ -28,9 +28,13 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 final class ResourceAccessChecker implements ResourceAccessCheckerInterface
 {
-    public function __construct(private readonly ?ExpressionLanguage $expressionLanguage = null, private readonly ?AuthenticationTrustResolverInterface $authenticationTrustResolver = null, private readonly ?RoleHierarchyInterface $roleHierarchy = null, private readonly ?TokenStorageInterface $tokenStorage = null, private readonly ?AuthorizationCheckerInterface $authorizationChecker = null)
-    {
-    }
+    public function __construct(
+        private readonly ?ExpressionLanguage $expressionLanguage = null,
+        private readonly ?AuthenticationTrustResolverInterface $authenticationTrustResolver = null,
+        private readonly ?RoleHierarchyInterface $roleHierarchy = null,
+        private readonly ?TokenStorageInterface $tokenStorage = null,
+        private readonly ?AuthorizationCheckerInterface $authorizationChecker = null,
+    ) {}
 
     public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool
     {

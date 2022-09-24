@@ -40,8 +40,12 @@ final class ReadListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'read';
 
-    public function __construct(private readonly ProviderInterface $provider, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null, UriVariablesConverterInterface $uriVariablesConverter = null)
-    {
+    public function __construct(
+        private readonly ProviderInterface $provider,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
+        UriVariablesConverterInterface $uriVariablesConverter = null,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
     }

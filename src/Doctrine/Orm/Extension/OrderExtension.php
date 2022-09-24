@@ -28,9 +28,9 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class OrderExtension implements QueryCollectionExtensionInterface
 {
-    public function __construct(private readonly ?string $order = null)
-    {
-    }
+    public function __construct(
+        private readonly ?string $order = null,
+    ) {}
 
     /**
      * {@inheritdoc}

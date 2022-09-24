@@ -32,9 +32,13 @@ use GraphQL\Type\Schema;
  */
 final class SchemaBuilder implements SchemaBuilderInterface
 {
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly TypesFactoryInterface $typesFactory, private readonly TypesContainerInterface $typesContainer, private readonly FieldsBuilderInterface $fieldsBuilder)
-    {
-    }
+    public function __construct(
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly TypesFactoryInterface $typesFactory,
+        private readonly TypesContainerInterface $typesContainer,
+        private readonly FieldsBuilderInterface $fieldsBuilder,
+    ) {}
 
     public function getSchema(): Schema
     {

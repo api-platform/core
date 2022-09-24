@@ -36,9 +36,15 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
 
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null)
-    {
-    }
+    public function __construct(
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly ?IriConverterInterface $iriConverter = null,
+        private readonly ?NameConverterInterface $nameConverter = null,
+    ) {}
 
     /**
      * {@inheritdoc}

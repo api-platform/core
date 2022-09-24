@@ -25,9 +25,9 @@ use Psr\Container\ContainerInterface;
  */
 abstract class AbstractFilterExtension implements RequestBodySearchCollectionExtensionInterface
 {
-    public function __construct(private readonly ContainerInterface $filterLocator)
-    {
-    }
+    public function __construct(
+        private readonly ContainerInterface $filterLocator,
+    ) {}
 
     /**
      * {@inheritdoc}

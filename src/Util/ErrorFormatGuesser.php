@@ -22,9 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class ErrorFormatGuesser
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Get the error format and its associated MIME type.

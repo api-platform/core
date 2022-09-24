@@ -17,9 +17,10 @@ final class ExternalDocumentation
 {
     use ExtensionTrait;
 
-    public function __construct(private string $description = '', private string $url = '')
-    {
-    }
+    public function __construct(
+        private string $description = '',
+        private string $url = '',
+    ) {}
 
     public function getDescription(): string
     {

@@ -25,9 +25,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ConfigCustom
 {
-    public function __construct(private readonly ProviderInterface $provider)
-    {
-    }
+    public function __construct(
+        private readonly ProviderInterface $provider,
+    ) {}
 
     public function __invoke(Request $request, $id)
     {

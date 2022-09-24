@@ -31,9 +31,11 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
  */
 final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    public function __construct(private readonly Client $client, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ?DocumentMetadataFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly Client $client,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly ?DocumentMetadataFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}

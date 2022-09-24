@@ -29,8 +29,10 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
     private readonly DocBlockFactoryInterface $docBlockFactory;
     private readonly ContextFactory $contextFactory;
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated, DocBlockFactoryInterface $docBlockFactory = null)
-    {
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $decorated,
+        DocBlockFactoryInterface $docBlockFactory = null,
+    ) {
         $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
         $this->contextFactory = new ContextFactory();
     }

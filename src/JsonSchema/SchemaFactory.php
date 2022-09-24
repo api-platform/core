@@ -37,8 +37,14 @@ final class SchemaFactory implements SchemaFactoryInterface
     use ResourceClassInfoTrait;
     private array $distinctFormats = [];
 
-    public function __construct(private readonly TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
-    {
+    public function __construct(
+        private readonly TypeFactoryInterface $typeFactory,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ?NameConverterInterface $nameConverter = null,
+        ResourceClassResolverInterface $resourceClassResolver = null,
+    ) {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
     }

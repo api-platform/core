@@ -41,9 +41,14 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly int $maxJoins = 30, private readonly bool $forceEager = true, private readonly bool $fetchPartial = false, private readonly ?ClassMetadataFactoryInterface $classMetadataFactory = null)
-    {
-    }
+    public function __construct(
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly int $maxJoins = 30,
+        private readonly bool $forceEager = true,
+        private readonly bool $fetchPartial = false,
+        private readonly ?ClassMetadataFactoryInterface $classMetadataFactory = null,
+    ) {}
 
     /**
      * {@inheritdoc}

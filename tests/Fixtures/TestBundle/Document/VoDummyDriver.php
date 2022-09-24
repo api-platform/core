@@ -25,9 +25,8 @@ class VoDummyDriver
 
     public function __construct(
         #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $firstName,
-        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $lastName
-    ) {
-    }
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $lastName,
+    ) {}
 
     public function getFirstName(): string
     {

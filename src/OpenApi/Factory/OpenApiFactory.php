@@ -65,8 +65,19 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private readonly PaginationOptions $paginationOptions;
     private ?RouteCollection $routeCollection = null;
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, private readonly TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, private readonly array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
-    {
+    public function __construct(
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly SchemaFactoryInterface $jsonSchemaFactory,
+        private readonly TypeFactoryInterface $jsonSchemaTypeFactory,
+        ContainerInterface $filterLocator,
+        private readonly array $formats = [],
+        Options $openApiOptions = null,
+        PaginationOptions $paginationOptions = null,
+        private readonly ?RouterInterface $router = null,
+    ) {
         $this->setFilterLocator($filterLocator, true);
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();

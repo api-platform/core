@@ -19,9 +19,10 @@ use ApiPlatform\Metadata\ApiResource;
 #[ApiResource(paginationItemsPerPage: 10, graphQlOperations: [], cacheHeaders: ['shared_max_age' => 60])]
 final class AttributeDefaultOperations
 {
-    public function __construct(#[ApiProperty(identifier: true)] private int $identifier, private string $name)
-    {
-    }
+    public function __construct(
+        #[ApiProperty(identifier: true)] private int $identifier,
+        private string $name,
+    ) {}
 
     public function getIdentifier(): int
     {

@@ -26,9 +26,10 @@ final class TypesFactory implements TypesFactoryInterface
     /**
      * @param string[] $typeIds
      */
-    public function __construct(private readonly ContainerInterface $typeLocator, private readonly array $typeIds)
-    {
-    }
+    public function __construct(
+        private readonly ContainerInterface $typeLocator,
+        private readonly array $typeIds,
+    ) {}
 
     public function getTypes(): array
     {

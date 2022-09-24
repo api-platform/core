@@ -26,9 +26,13 @@ use Twig\Environment as TwigEnvironment;
  */
 final class GraphiQlAction
 {
-    public function __construct(private readonly TwigEnvironment $twig, private readonly RouterInterface $router, private readonly bool $graphiqlEnabled = false, private readonly string $title = '', private $assetPackage = null)
-    {
-    }
+    public function __construct(
+        private readonly TwigEnvironment $twig,
+        private readonly RouterInterface $router,
+        private readonly bool $graphiqlEnabled = false,
+        private readonly string $title = '',
+        private $assetPackage = null,
+    ) {}
 
     public function __invoke(Request $request): Response
     {

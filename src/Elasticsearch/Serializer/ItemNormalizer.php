@@ -30,9 +30,9 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     public const FORMAT = 'elasticsearch';
 
-    public function __construct(private readonly NormalizerInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly NormalizerInterface $decorated,
+    ) {}
 
     /**
      * @throws LogicException

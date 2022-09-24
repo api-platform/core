@@ -34,8 +34,10 @@ final class JsonSchemaGenerateCommand extends Command
     // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private array $formats;
 
-    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, array $formats)
-    {
+    public function __construct(
+        private readonly SchemaFactoryInterface $schemaFactory,
+        array $formats,
+    ) {
         $this->formats = array_keys($formats);
 
         parent::__construct();

@@ -17,9 +17,11 @@ final class Server
 {
     use ExtensionTrait;
 
-    public function __construct(private string $url, private string $description = '', private ?\ArrayObject $variables = null)
-    {
-    }
+    public function __construct(
+        private string $url,
+        private string $description = '',
+        private ?\ArrayObject $variables = null,
+    ) {}
 
     public function getUrl(): string
     {

@@ -22,9 +22,12 @@ use ApiPlatform\Metadata\Resource\ResourceNameCollection;
  */
 final class Documentation implements DocumentationInterface
 {
-    public function __construct(private readonly ResourceNameCollection $resourceNameCollection, private readonly string $title = '', private readonly string $description = '', private readonly string $version = '')
-    {
-    }
+    public function __construct(
+        private readonly ResourceNameCollection $resourceNameCollection,
+        private readonly string $title = '',
+        private readonly string $description = '',
+        private readonly string $version = '',
+    ) {}
 
     public function getVersion(): string
     {

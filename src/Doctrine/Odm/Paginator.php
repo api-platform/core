@@ -37,8 +37,12 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
 
     private readonly int $totalItems;
 
-    public function __construct(private readonly Iterator $mongoDbOdmIterator, private readonly UnitOfWork $unitOfWork, private readonly string $resourceClass, private readonly array $pipeline)
-    {
+    public function __construct(
+        private readonly Iterator $mongoDbOdmIterator,
+        private readonly UnitOfWork $unitOfWork,
+        private readonly string $resourceClass,
+        private readonly array $pipeline,
+    ) {
         $resultsFacetInfo = $this->getFacetInfo('results');
         $this->getFacetInfo('count');
 

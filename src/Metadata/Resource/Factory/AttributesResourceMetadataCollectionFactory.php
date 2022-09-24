@@ -48,8 +48,12 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     private readonly LoggerInterface $logger;
     private readonly CamelCaseToSnakeCaseNameConverter $camelCaseToSnakeCaseNameConverter;
 
-    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, LoggerInterface $logger = null, private readonly array $defaults = [], private readonly bool $graphQlEnabled = false)
-    {
+    public function __construct(
+        private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
+        LoggerInterface $logger = null,
+        private readonly array $defaults = [],
+        private readonly bool $graphQlEnabled = false,
+    ) {
         $this->logger = $logger ?? new NullLogger();
         $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }

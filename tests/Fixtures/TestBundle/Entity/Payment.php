@@ -31,9 +31,9 @@ class Payment
     #[ORM\OneToOne(targetEntity: VoidPayment::class, mappedBy: 'payment')]
     private ?VoidPayment $voidPayment = null;
 
-    public function __construct(#[ORM\Column(type: 'decimal', precision: 6, scale: 2)] private string $amount)
-    {
-    }
+    public function __construct(
+        #[ORM\Column(type: 'decimal', precision: 6, scale: 2)] private string $amount,
+    ) {}
 
     public function getId(): ?int
     {

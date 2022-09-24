@@ -25,9 +25,9 @@ final class HydraContext implements Context
 {
     private ?RestContext $restContext = null;
 
-    public function __construct(private readonly PropertyAccessorInterface $propertyAccessor)
-    {
-    }
+    public function __construct(
+        private readonly PropertyAccessorInterface $propertyAccessor,
+    ) {}
 
     /**
      * Gives access to the Behatch context.

@@ -19,9 +19,21 @@ final class PathItem
 
     public static array $methods = ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH', 'TRACE'];
 
-    public function __construct(private ?string $ref = null, private ?string $summary = null, private ?string $description = null, private ?Operation $get = null, private ?Operation $put = null, private ?Operation $post = null, private ?Operation $delete = null, private ?Operation $options = null, private ?Operation $head = null, private ?Operation $patch = null, private ?Operation $trace = null, private ?array $servers = null, private array $parameters = [])
-    {
-    }
+    public function __construct(
+        private ?string $ref = null,
+        private ?string $summary = null,
+        private ?string $description = null,
+        private ?Operation $get = null,
+        private ?Operation $put = null,
+        private ?Operation $post = null,
+        private ?Operation $delete = null,
+        private ?Operation $options = null,
+        private ?Operation $head = null,
+        private ?Operation $patch = null,
+        private ?Operation $trace = null,
+        private ?array $servers = null,
+        private array $parameters = [],
+    ) {}
 
     public function getRef(): ?string
     {

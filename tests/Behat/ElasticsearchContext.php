@@ -25,9 +25,11 @@ use Symfony\Component\Finder\Finder;
  */
 final class ElasticsearchContext implements Context
 {
-    public function __construct(private readonly Client $client, private readonly string $elasticsearchMappingsPath, private readonly string $elasticsearchFixturesPath)
-    {
-    }
+    public function __construct(
+        private readonly Client $client,
+        private readonly string $elasticsearchMappingsPath,
+        private readonly string $elasticsearchFixturesPath,
+    ) {}
 
     /**
      * @BeforeScenario

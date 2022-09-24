@@ -19,9 +19,9 @@ use Psr\Container\ContainerInterface;
 
 final class CallableProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly ContainerInterface $locator)
-    {
-    }
+    public function __construct(
+        private readonly ContainerInterface $locator,
+    ) {}
 
     /**
      * {@inheritDoc}

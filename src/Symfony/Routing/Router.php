@@ -35,9 +35,10 @@ final class Router implements RouterInterface, UrlGeneratorInterface
         UrlGeneratorInterface::NET_PATH => RouterInterface::NETWORK_PATH,
     ];
 
-    public function __construct(private readonly RouterInterface $router, private readonly int $urlGenerationStrategy = self::ABS_PATH)
-    {
-    }
+    public function __construct(
+        private readonly RouterInterface $router,
+        private readonly int $urlGenerationStrategy = self::ABS_PATH,
+    ) {}
 
     /**
      * {@inheritdoc}

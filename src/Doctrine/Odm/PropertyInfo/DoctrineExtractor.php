@@ -32,9 +32,9 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
-    public function __construct(private readonly ObjectManager $objectManager)
-    {
-    }
+    public function __construct(
+        private readonly ObjectManager $objectManager,
+    ) {}
 
     /**
      * {@inheritdoc}

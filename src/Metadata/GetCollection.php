@@ -94,7 +94,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         $provider = null,
         $processor = null,
         array $extraProperties = [],
-        ?string $itemUriTemplate = null
+        ?string $itemUriTemplate = null,
     ) {
         parent::__construct(self::METHOD_GET, ...\func_get_args());
         $this->itemUriTemplate = $itemUriTemplate;

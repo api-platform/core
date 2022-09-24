@@ -24,9 +24,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class QueryBuilderHelper
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Adds a join to the QueryBuilder if none exists.

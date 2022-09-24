@@ -21,9 +21,10 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class TaxonItemProvider implements ProviderInterface
 {
-    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly bool $orm = true)
-    {
-    }
+    public function __construct(
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly bool $orm = true,
+    ) {}
 
     /**
      * {@inheritDoc}

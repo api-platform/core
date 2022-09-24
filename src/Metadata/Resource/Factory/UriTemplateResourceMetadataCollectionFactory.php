@@ -27,9 +27,11 @@ use Symfony\Component\Routing\Route;
  */
 final class UriTemplateResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly LinkFactoryInterface $linkFactory, private readonly PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly LinkFactoryInterface $linkFactory,
+        private readonly PathSegmentNameGeneratorInterface $pathSegmentNameGenerator,
+        private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -99,7 +101,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         if ($parameters = array_keys($uriVariables)) {
             foreach ($parameters as $parameterName) {
                 $part = sprintf('/{%s}', $parameterName);
-                if (false === strpos($uriTemplate, $part)) {
+                if (!str_contains($uriTemplate, $part)) {
                     $uriTemplate .= sprintf('/{%s}', $parameterName);
                 }
             }

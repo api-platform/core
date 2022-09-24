@@ -30,9 +30,8 @@ class CompositePrimitiveItem
 
     public function __construct(
         #[ODM\Field(type: 'string')] private string $name,
-        #[ODM\Field(type: 'int')] private int $year
-    ) {
-    }
+        #[ODM\Field(type: 'int')] private int $year,
+    ) {}
 
     /**
      * Gets id.

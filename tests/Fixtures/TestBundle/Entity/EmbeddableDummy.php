@@ -60,9 +60,7 @@ class EmbeddableDummy
     {
     }
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function getDummyName(): ?string
     {

@@ -28,8 +28,10 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
     public const CACHE_KEY_PREFIX = 'property_metadata_';
 
-    public function __construct(CacheItemPoolInterface $cacheItemPool, private readonly PropertyMetadataFactoryInterface $decorated)
-    {
+    public function __construct(
+        CacheItemPoolInterface $cacheItemPool,
+        private readonly PropertyMetadataFactoryInterface $decorated,
+    ) {
         $this->cacheItemPool = $cacheItemPool;
     }
 

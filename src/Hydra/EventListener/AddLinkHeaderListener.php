@@ -29,9 +29,9 @@ final class AddLinkHeaderListener
 {
     use CorsTrait;
 
-    public function __construct(private readonly UrlGeneratorInterface $urlGenerator)
-    {
-    }
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+    ) {}
 
     /**
      * Sends the Hydra header on each response.

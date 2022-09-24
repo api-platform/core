@@ -28,8 +28,10 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
 
     public const CACHE_KEY_PREFIX = 'property_name_collection_';
 
-    public function __construct(CacheItemPoolInterface $cacheItemPool, private readonly PropertyNameCollectionFactoryInterface $decorated)
-    {
+    public function __construct(
+        CacheItemPoolInterface $cacheItemPool,
+        private readonly PropertyNameCollectionFactoryInterface $decorated,
+    ) {
         $this->cacheItemPool = $cacheItemPool;
     }
 

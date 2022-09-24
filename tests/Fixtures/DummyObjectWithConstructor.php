@@ -18,9 +18,10 @@ namespace ApiPlatform\Tests\Fixtures;
  */
 class DummyObjectWithConstructor
 {
-    public function __construct(private readonly string $foo, private \stdClass $bar)
-    {
-    }
+    public function __construct(
+        private readonly string $foo,
+        private \stdClass $bar,
+    ) {}
 
     public function getFoo(): string
     {

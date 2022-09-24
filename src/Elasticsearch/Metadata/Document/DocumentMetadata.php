@@ -26,9 +26,10 @@ final class DocumentMetadata
 {
     public const DEFAULT_TYPE = '_doc';
 
-    public function __construct(private ?string $index = null, private string $type = self::DEFAULT_TYPE)
-    {
-    }
+    public function __construct(
+        private ?string $index = null,
+        private string $type = self::DEFAULT_TYPE,
+    ) {}
 
     /**
      * Gets a new instance with the given index.

@@ -33,8 +33,19 @@ final class SwaggerUiAction
 {
     use NormalizeOperationNameTrait;
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ?TwigEnvironment $twig, private readonly UrlGeneratorInterface $urlGenerator, private readonly NormalizerInterface $normalizer, private readonly OpenApiFactoryInterface $openApiFactory, private readonly Options $openApiOptions, private readonly SwaggerUiContext $swaggerUiContext, private readonly array $formats = [], private readonly ?string $oauthClientId = null, private readonly ?string $oauthClientSecret = null, private readonly bool $oauthPkce = false)
-    {
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly ?TwigEnvironment $twig,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly NormalizerInterface $normalizer,
+        private readonly OpenApiFactoryInterface $openApiFactory,
+        private readonly Options $openApiOptions,
+        private readonly SwaggerUiContext $swaggerUiContext,
+        private readonly array $formats = [],
+        private readonly ?string $oauthClientId = null,
+        private readonly ?string $oauthClientSecret = null,
+        private readonly bool $oauthPkce = false,
+    ) {
         if (null === $this->twig) {
             throw new \RuntimeException('The documentation cannot be displayed since the Twig bundle is not installed. Try running "composer require symfony/twig-bundle".');
         }

@@ -15,7 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
 
 class CustomObject
 {
-    public function __construct(public $id, public $text)
-    {
-    }
+    public function __construct(
+        public $id,
+        public $text,
+    ) {}
 }

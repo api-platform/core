@@ -29,9 +29,10 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
 {
     public const FORMAT = 'jsonapi';
 
-    public function __construct(private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null)
-    {
-    }
+    public function __construct(
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ?NameConverterInterface $nameConverter = null,
+    ) {}
 
     /**
      * {@inheritdoc}

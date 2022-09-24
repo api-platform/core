@@ -25,9 +25,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
  */
 final class IriHelper
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Parses and standardizes the request IRI.

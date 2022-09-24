@@ -32,8 +32,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 final class CreateProvider implements ProviderInterface
 {
-    public function __construct(private ProviderInterface $decorated, private ?PropertyAccessorInterface $propertyAccessor = null)
-    {
+    public function __construct(
+        private ProviderInterface $decorated,
+        private ?PropertyAccessorInterface $propertyAccessor = null,
+    ) {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 

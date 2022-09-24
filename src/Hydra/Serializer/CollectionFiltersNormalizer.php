@@ -35,8 +35,12 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * @param ContainerInterface $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
-    {
+    public function __construct(
+        private readonly NormalizerInterface $collectionNormalizer,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        ContainerInterface $filterLocator,
+    ) {
         $this->setFilterLocator($filterLocator);
     }
 

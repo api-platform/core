@@ -29,9 +29,14 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
 {
     private array $cachedDenormalizedDocuments = [];
 
-    public function __construct(private readonly DenormalizerInterface $denormalizer, private readonly array $documents, private readonly string $resourceClass, private readonly int $limit, private readonly int $offset, private readonly array $denormalizationContext = [])
-    {
-    }
+    public function __construct(
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly array $documents,
+        private readonly string $resourceClass,
+        private readonly int $limit,
+        private readonly int $offset,
+        private readonly array $denormalizationContext = [],
+    ) {}
 
     /**
      * {@inheritdoc}

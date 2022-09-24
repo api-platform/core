@@ -22,9 +22,7 @@ final class CompositeIdentifierParser
 {
     public const COMPOSITE_IDENTIFIER_REGEXP = '/(\w+)=(?<=\w=)(.*?)(?=;\w+=)|(\w+)=([^;]*);?$/';
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /*
      * Normalize takes a string and gives back an array of identifiers.

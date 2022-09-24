@@ -55,8 +55,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected PropertyAccessorInterface $propertyAccessor;
     protected array $localCache = [];
 
-    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
-    {
+    public function __construct(
+        protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        protected PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        protected IriConverterInterface $iriConverter,
+        protected ResourceClassResolverInterface $resourceClassResolver,
+        PropertyAccessorInterface $propertyAccessor = null,
+        NameConverterInterface $nameConverter = null,
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        array $defaultContext = [],
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null,
+    ) {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = fn ($object): ?string => $this->iriConverter->getIriFromResource($object);
         }

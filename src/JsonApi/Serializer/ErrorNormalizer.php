@@ -33,8 +33,10 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         self::TITLE => 'An error occurred',
     ];
 
-    public function __construct(private readonly bool $debug = false, array $defaultContext = [])
-    {
+    public function __construct(
+        private readonly bool $debug = false,
+        array $defaultContext = [],
+    ) {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 

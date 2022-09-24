@@ -30,8 +30,11 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 {
     use ResourceClassInfoTrait;
 
-    public function __construct(private readonly SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null)
-    {
+    public function __construct(
+        private readonly SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory,
+        private readonly PropertyMetadataFactoryInterface $decorated,
+        ResourceClassResolverInterface $resourceClassResolver = null,
+    ) {
         $this->resourceClassResolver = $resourceClassResolver;
     }
 

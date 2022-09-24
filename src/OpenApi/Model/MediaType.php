@@ -17,9 +17,12 @@ final class MediaType
 {
     use ExtensionTrait;
 
-    public function __construct(private ?\ArrayObject $schema = null, private $example = null, private ?\ArrayObject $examples = null, private ?Encoding $encoding = null)
-    {
-    }
+    public function __construct(
+        private ?\ArrayObject $schema = null,
+        private $example = null,
+        private ?\ArrayObject $examples = null,
+        private ?Encoding $encoding = null,
+    ) {}
 
     public function getSchema(): ?\ArrayObject
     {

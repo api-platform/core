@@ -21,9 +21,9 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class RelatedQuestionsProvider implements ProviderInterface
 {
-    public function __construct(private readonly ManagerRegistry $registry)
-    {
-    }
+    public function __construct(
+        private readonly ManagerRegistry $registry,
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
     {

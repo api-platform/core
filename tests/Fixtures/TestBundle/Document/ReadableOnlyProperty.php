@@ -28,9 +28,7 @@ class ReadableOnlyProperty
     #[ODM\Field]
     private string $name = 'Read only';
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function getId(): ?int
     {

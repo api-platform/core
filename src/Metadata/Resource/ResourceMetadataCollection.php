@@ -26,8 +26,10 @@ final class ResourceMetadataCollection extends \ArrayObject
 {
     private array $operationCache = [];
 
-    public function __construct(private readonly string $resourceClass, array $input = [])
-    {
+    public function __construct(
+        private readonly string $resourceClass,
+        array $input = [],
+    ) {
         parent::__construct($input);
     }
 

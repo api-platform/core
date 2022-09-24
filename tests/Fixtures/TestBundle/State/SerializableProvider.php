@@ -31,12 +31,12 @@ class SerializableProvider implements ProviderInterface, SerializerAwareProvider
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object
     {
         return $this->getSerializer()->deserialize(<<<'JSON'
-{
-    "id": 1,
-    "foo": "Lorem",
-    "bar": "Ipsum"
-}
-JSON
+            {
+                "id": 1,
+                "foo": "Lorem",
+                "bar": "Ipsum"
+            }
+            JSON
             , $operation->getClass(), 'json');
     }
 }

@@ -25,9 +25,10 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  */
 final class CachePoolClearerCacheWarmer implements CacheWarmerInterface
 {
-    public function __construct(private readonly Psr6CacheClearer $poolClearer, private readonly array $pools = [])
-    {
-    }
+    public function __construct(
+        private readonly Psr6CacheClearer $poolClearer,
+        private readonly array $pools = [],
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -23,9 +23,9 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
     /**
      * @param string[] $properties
      */
-    public function __construct(private readonly array $properties = [])
-    {
-    }
+    public function __construct(
+        private readonly array $properties = [],
+    ) {}
 
     /**
      * {@inheritdoc}

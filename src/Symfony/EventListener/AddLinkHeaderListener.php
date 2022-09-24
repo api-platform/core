@@ -30,8 +30,10 @@ final class AddLinkHeaderListener
     use CorsTrait;
     use OperationRequestInitiatorTrait;
 
-    public function __construct(private readonly Discovery $discovery, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
-    {
+    public function __construct(
+        private readonly Discovery $discovery,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 

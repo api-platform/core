@@ -39,9 +39,12 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeConverter implements TypeConverterInterface
 {
-    public function __construct(private readonly TypeBuilderInterface $typeBuilder, private readonly TypesContainerInterface $typesContainer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory)
-    {
-    }
+    public function __construct(
+        private readonly TypeBuilderInterface $typeBuilder,
+        private readonly TypesContainerInterface $typesContainer,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+    ) {}
 
     /**
      * {@inheritdoc}

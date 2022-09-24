@@ -47,9 +47,11 @@ class DummyEntityWithConstructor
     /**
      * @param DummyObjectWithoutConstructor[] $items
      */
-    public function __construct(#[ORM\Column] private string $foo, #[ORM\Column] private string $bar, private array $items)
-    {
-    }
+    public function __construct(
+        #[ORM\Column] private string $foo,
+        #[ORM\Column] private string $bar,
+        private array $items,
+    ) {}
 
     public function getId(): ?int
     {

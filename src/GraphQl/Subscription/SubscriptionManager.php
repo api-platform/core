@@ -36,9 +36,13 @@ final class SubscriptionManager implements SubscriptionManagerInterface
     use ResourceClassInfoTrait;
     use SortTrait;
 
-    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly SerializeStageInterface $serializeStage, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
-    {
-    }
+    public function __construct(
+        private readonly CacheItemPoolInterface $subscriptionsCache,
+        private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator,
+        private readonly SerializeStageInterface $serializeStage,
+        private readonly IriConverterInterface $iriConverter,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+    ) {}
 
     public function retrieveSubscriptionId(array $context, ?array $result): ?string
     {

@@ -17,9 +17,13 @@ final class Link
 {
     use ExtensionTrait;
 
-    public function __construct(private string $operationId, private ?\ArrayObject $parameters = null, private $requestBody = null, private string $description = '', private ?Server $server = null)
-    {
-    }
+    public function __construct(
+        private string $operationId,
+        private ?\ArrayObject $parameters = null,
+        private $requestBody = null,
+        private string $description = '',
+        private ?Server $server = null,
+    ) {}
 
     public function getOperationId(): string
     {

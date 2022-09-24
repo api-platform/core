@@ -30,9 +30,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider;
 
 class ProviderResourceMetadatatCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $decorated,
+    ) {}
 
     /**
      * {@inheritDoc}

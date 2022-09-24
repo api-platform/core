@@ -30,7 +30,7 @@ final class ComplexSubQueryFilter extends AbstractFilter
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
-        array $context = []
+        array $context = [],
     ): void {
         if ('complex_sub_query_filter' !== $property) {
             return;

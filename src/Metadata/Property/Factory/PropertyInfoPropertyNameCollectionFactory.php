@@ -25,9 +25,9 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
  */
 final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
-    public function __construct(private readonly PropertyInfoExtractorInterface $propertyInfo)
-    {
-    }
+    public function __construct(
+        private readonly PropertyInfoExtractorInterface $propertyInfo,
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -15,9 +15,19 @@ namespace ApiPlatform\State\Pagination;
 
 final class PaginationOptions
 {
-    public function __construct(private readonly bool $paginationEnabled = true, private readonly string $paginationPageParameterName = 'page', private readonly bool $clientItemsPerPage = false, private readonly string $itemsPerPageParameterName = 'itemsPerPage', private readonly bool $paginationClientEnabled = false, private readonly string $paginationClientEnabledParameterName = 'pagination', private readonly int $itemsPerPage = 30, private readonly ?int $maximumItemsPerPage = null, private readonly bool $partialPaginationEnabled = false, private readonly bool $clientPartialPaginationEnabled = false, private readonly string $partialPaginationParameterName = 'partial')
-    {
-    }
+    public function __construct(
+        private readonly bool $paginationEnabled = true,
+        private readonly string $paginationPageParameterName = 'page',
+        private readonly bool $clientItemsPerPage = false,
+        private readonly string $itemsPerPageParameterName = 'itemsPerPage',
+        private readonly bool $paginationClientEnabled = false,
+        private readonly string $paginationClientEnabledParameterName = 'pagination',
+        private readonly int $itemsPerPage = 30,
+        private readonly ?int $maximumItemsPerPage = null,
+        private readonly bool $partialPaginationEnabled = false,
+        private readonly bool $clientPartialPaginationEnabled = false,
+        private readonly string $partialPaginationParameterName = 'partial',
+    ) {}
 
     public function isPaginationEnabled(): bool
     {

@@ -27,9 +27,10 @@ final class CachedResourceMetadataCollectionFactory implements ResourceMetadataC
     public const CACHE_KEY_PREFIX = 'resource_metadata_collection_';
     private array $localCache = [];
 
-    public function __construct(private readonly CacheItemPoolInterface $cacheItemPool, private readonly ResourceMetadataCollectionFactoryInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly CacheItemPoolInterface $cacheItemPool,
+        private readonly ResourceMetadataCollectionFactoryInterface $decorated,
+    ) {}
 
     /**
      * {@inheritdoc}

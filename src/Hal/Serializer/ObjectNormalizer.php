@@ -27,9 +27,10 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
 {
     public const FORMAT = 'jsonhal';
 
-    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter)
-    {
-    }
+    public function __construct(
+        private readonly NormalizerInterface $decorated,
+        private readonly IriConverterInterface $iriConverter,
+    ) {}
 
     /**
      * {@inheritdoc}

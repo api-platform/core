@@ -25,9 +25,9 @@ class VoidPayment
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    public function __construct(#[ORM\OneToOne(targetEntity: Payment::class, inversedBy: 'voidPayment')] #[ORM\JoinColumn(nullable: false)] private Payment $payment)
-    {
-    }
+    public function __construct(
+        #[ORM\OneToOne(targetEntity: Payment::class, inversedBy: 'voidPayment')] #[ORM\JoinColumn(nullable: false)] private Payment $payment,
+    ) {}
 
     public function getId(): ?int
     {

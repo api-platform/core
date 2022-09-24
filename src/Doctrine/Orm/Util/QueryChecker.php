@@ -28,9 +28,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class QueryChecker
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Determines whether the QueryBuilder uses a HAVING clause.

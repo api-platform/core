@@ -28,9 +28,9 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     public const FORMAT = 'json';
     private const EXTENSION_PROPERTIES_KEY = 'extensionProperties';
 
-    public function __construct(private readonly NormalizerInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly NormalizerInterface $decorated,
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -33,8 +33,13 @@ abstract class AbstractFilter implements FilterInterface
 {
     use FieldDatatypeTrait { getNestedFieldPath as protected; }
 
-    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected ?NameConverterInterface $nameConverter = null, protected ?array $properties = null)
-    {
+    public function __construct(
+        protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        ResourceClassResolverInterface $resourceClassResolver,
+        protected ?NameConverterInterface $nameConverter = null,
+        protected ?array $properties = null,
+    ) {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
     }

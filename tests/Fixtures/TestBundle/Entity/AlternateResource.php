@@ -20,9 +20,9 @@ use ApiPlatform\Metadata\Get;
 #[Get('/alternate/{id}', uriVariables: ['id' => ['from_class' => AlternateResource::class, 'identifiers' => ['id']]])]
 final class AlternateResource
 {
-    public function __construct(#[ApiProperty(identifier: true)] public string $id)
-    {
-    }
+    public function __construct(
+        #[ApiProperty(identifier: true)] public string $id,
+    ) {}
 
     public function getId(): string
     {

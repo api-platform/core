@@ -34,9 +34,9 @@ class RelatedDummyPlainIdentifierDenormalizer implements DenormalizerAwareInterf
 {
     use DenormalizerAwareTrait;
 
-    public function __construct(private readonly IriConverterInterface $iriConverter)
-    {
-    }
+    public function __construct(
+        private readonly IriConverterInterface $iriConverter,
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -38,8 +38,11 @@ final class Response implements ResponseInterface
     private readonly string $content;
     private ?array $jsonData = null;
 
-    public function __construct(private readonly HttpFoundationResponse $httpFoundationResponse, private readonly BrowserKitResponse $browserKitResponse, array $info)
-    {
+    public function __construct(
+        private readonly HttpFoundationResponse $httpFoundationResponse,
+        private readonly BrowserKitResponse $browserKitResponse,
+        array $info,
+    ) {
         $this->headers = $httpFoundationResponse->headers->all();
 
         // Compute raw headers

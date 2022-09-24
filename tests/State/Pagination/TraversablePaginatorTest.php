@@ -28,7 +28,7 @@ class TraversablePaginatorTest extends TestCase
         float $perPage,
         float $totalItems,
         float $lastPage,
-        int $currentItems
+        int $currentItems,
     ): void {
         $traversable = new ArrayIterator($results);
 

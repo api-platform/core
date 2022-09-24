@@ -26,9 +26,10 @@ class CompositePrimitiveItem
     #[ORM\Column(type: 'text')]
     private string $description;
 
-    public function __construct(#[ORM\Id] #[ORM\Column(type: 'string')] private string $name, #[ORM\Id] #[ORM\Column(type: 'integer')] private int $year)
-    {
-    }
+    public function __construct(
+        #[ORM\Id] #[ORM\Column(type: 'string')] private string $name,
+        #[ORM\Id] #[ORM\Column(type: 'integer')] private int $year,
+    ) {}
 
     /**
      * Gets name.

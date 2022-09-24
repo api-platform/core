@@ -24,9 +24,8 @@ class VoidPayment
     private ?int $id = null;
 
     public function __construct(
-        #[ODM\ReferenceOne(targetDocument: Payment::class, inversedBy: 'voidPayment')] private Payment $payment
-    ) {
-    }
+        #[ODM\ReferenceOne(targetDocument: Payment::class, inversedBy: 'voidPayment')] private Payment $payment,
+    ) {}
 
     public function getId(): ?int
     {

@@ -22,10 +22,10 @@ class MatchesJsonSchemaTest extends TestCase
     public function testAdditionalFailureDescription(): void
     {
         $jsonSchema = <<<JSON
-{
-  "required": ["notexist"]
-}
-JSON;
+            {
+              "required": ["notexist"]
+            }
+            JSON;
 
         $constraint = new MatchesJsonSchema($jsonSchema);
 

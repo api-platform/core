@@ -33,9 +33,11 @@ final class CollectionProvider implements ProviderInterface
     /**
      * @param AggregationCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $collectionExtensions = [])
-    {
-    }
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly iterable $collectionExtensions = [],
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
     {

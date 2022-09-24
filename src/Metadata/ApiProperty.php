@@ -68,9 +68,8 @@ final class ApiProperty
         private ?array $schema = null,
         private ?bool $initializable = null,
         private $iris = null,
-        private array $extraProperties = []
-    ) {
-    }
+        private array $extraProperties = [],
+    ) {}
 
     public function getDescription(): ?string
     {

@@ -25,9 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class RequestParser
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Parses request parameters from the specified source.

@@ -40,9 +40,17 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     use ClassInfoTrait;
     use CloneTrait;
 
-    public function __construct(private readonly ReadStageInterface $readStage, private readonly SecurityStageInterface $securityStage, private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, private readonly SerializeStageInterface $serializeStage, private readonly DeserializeStageInterface $deserializeStage, private readonly WriteStageInterface $writeStage, private readonly ValidateStageInterface $validateStage, private readonly ContainerInterface $mutationResolverLocator, private readonly SecurityPostValidationStageInterface $securityPostValidationStage)
-    {
-    }
+    public function __construct(
+        private readonly ReadStageInterface $readStage,
+        private readonly SecurityStageInterface $securityStage,
+        private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage,
+        private readonly SerializeStageInterface $serializeStage,
+        private readonly DeserializeStageInterface $deserializeStage,
+        private readonly WriteStageInterface $writeStage,
+        private readonly ValidateStageInterface $validateStage,
+        private readonly ContainerInterface $mutationResolverLocator,
+        private readonly SecurityPostValidationStageInterface $securityPostValidationStage,
+    ) {}
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {

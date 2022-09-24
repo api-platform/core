@@ -24,8 +24,10 @@ final class EntityManager extends EntityManagerDecorator
 {
     public static $dql;
 
-    public function __construct(EntityManagerInterface $wrapped, private readonly RepositoryFactory $repositoryFactory)
-    {
+    public function __construct(
+        EntityManagerInterface $wrapped,
+        private readonly RepositoryFactory $repositoryFactory,
+    ) {
         parent::__construct($wrapped);
     }
 

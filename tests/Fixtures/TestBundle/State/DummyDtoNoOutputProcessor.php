@@ -23,9 +23,9 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class DummyDtoNoOutputProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly ManagerRegistry $registry)
-    {
-    }
+    public function __construct(
+        private readonly ManagerRegistry $registry,
+    ) {}
 
     /**
      * {@inheritDoc}

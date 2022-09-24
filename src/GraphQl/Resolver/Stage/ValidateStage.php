@@ -23,9 +23,9 @@ use ApiPlatform\Validator\ValidatorInterface;
  */
 final class ValidateStage implements ValidateStageInterface
 {
-    public function __construct(private readonly ValidatorInterface $validator)
-    {
-    }
+    public function __construct(
+        private readonly ValidatorInterface $validator,
+    ) {}
 
     /**
      * {@inheritdoc}

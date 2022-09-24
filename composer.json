@@ -51,6 +51,7 @@
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "jangregor/phpstan-prophecy": "^1.0",
         "justinrainbow/json-schema": "^5.2.1",
+        "kubawerlos/php-cs-fixer-custom-fixers": "^3.11",
         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0 || ^5.1",
         "phpdocumentor/type-resolver": "^0.3 || ^0.4 || ^1.4",
         "phpspec/prophecy-phpunit": "^2.0",

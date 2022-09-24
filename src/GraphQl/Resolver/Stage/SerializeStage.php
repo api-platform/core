@@ -34,9 +34,11 @@ final class SerializeStage implements SerializeStageInterface
 {
     use IdentifierTrait;
 
-    public function __construct(private readonly NormalizerInterface $normalizer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private readonly Pagination $pagination)
-    {
-    }
+    public function __construct(
+        private readonly NormalizerInterface $normalizer,
+        private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+        private readonly Pagination $pagination,
+    ) {}
 
     public function __invoke(iterable|object|null $itemOrCollection, string $resourceClass, Operation $operation, array $context): ?array
     {

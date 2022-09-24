@@ -17,9 +17,16 @@ final class SecurityScheme
 {
     use ExtensionTrait;
 
-    public function __construct(private ?string $type = null, private string $description = '', private ?string $name = null, private ?string $in = null, private ?string $scheme = null, private ?string $bearerFormat = null, private ?OAuthFlows $flows = null, private ?string $openIdConnectUrl = null)
-    {
-    }
+    public function __construct(
+        private ?string $type = null,
+        private string $description = '',
+        private ?string $name = null,
+        private ?string $in = null,
+        private ?string $scheme = null,
+        private ?string $bearerFormat = null,
+        private ?OAuthFlows $flows = null,
+        private ?string $openIdConnectUrl = null,
+    ) {}
 
     public function getType(): string
     {

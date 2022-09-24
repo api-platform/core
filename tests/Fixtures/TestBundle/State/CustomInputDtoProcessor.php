@@ -21,9 +21,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 
 final class CustomInputDtoProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly ProcessorInterface $decorated)
-    {
-    }
+    public function __construct(
+        private readonly ProcessorInterface $decorated,
+    ) {}
 
     /**
      * {@inheritDoc}

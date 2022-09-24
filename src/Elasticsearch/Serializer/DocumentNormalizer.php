@@ -34,8 +34,16 @@ final class DocumentNormalizer extends ObjectNormalizer
 {
     public const FORMAT = 'elasticsearch';
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
-    {
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        NameConverterInterface $nameConverter = null,
+        PropertyAccessorInterface $propertyAccessor = null,
+        PropertyTypeExtractorInterface $propertyTypeExtractor = null,
+        ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
+        callable $objectClassResolver = null,
+        array $defaultContext = [],
+    ) {
         parent::__construct($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
     }
 

@@ -27,9 +27,9 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeConverter implements TypeConverterInterface
 {
-    public function __construct(private readonly TypeConverterInterface $defaultTypeConverter)
-    {
-    }
+    public function __construct(
+        private readonly TypeConverterInterface $defaultTypeConverter,
+    ) {}
 
     /**
      * {@inheritdoc}

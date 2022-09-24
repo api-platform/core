@@ -41,8 +41,13 @@ final class WriteListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'write';
 
-    public function __construct(private readonly ProcessorInterface $processor, private readonly IriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?UriVariablesConverterInterface $uriVariablesConverter = null)
-    {
+    public function __construct(
+        private readonly ProcessorInterface $processor,
+        private readonly IriConverterInterface $iriConverter,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?UriVariablesConverterInterface $uriVariablesConverter = null,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
     }

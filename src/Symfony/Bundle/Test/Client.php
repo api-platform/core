@@ -59,8 +59,10 @@ final class Client implements HttpClientInterface
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(private readonly KernelBrowser $kernelBrowser, array $defaultOptions = [])
-    {
+    public function __construct(
+        private readonly KernelBrowser $kernelBrowser,
+        array $defaultOptions = [],
+    ) {
         $kernelBrowser->followRedirects(false);
         if ($defaultOptions) {
             $this->setDefaultOptions($defaultOptions);

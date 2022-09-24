@@ -25,8 +25,10 @@ final class MatchesJsonSchema extends Constraint
 {
     private object|array $schema;
 
-    public function __construct(object|array|string $schema, private readonly ?int $checkMode = null)
-    {
+    public function __construct(
+        object|array|string $schema,
+        private readonly ?int $checkMode = null,
+    ) {
         $this->schema = \is_string($schema) ? json_decode($schema, null, 512, \JSON_THROW_ON_ERROR) : $schema;
     }
 

@@ -36,9 +36,13 @@ final class CollectionProvider implements ProviderInterface
     /**
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(private readonly Client $client, private readonly DocumentMetadataFactoryInterface $documentMetadataFactory, private readonly DenormalizerInterface $denormalizer, private readonly Pagination $pagination, private readonly iterable $collectionExtensions = [])
-    {
-    }
+    public function __construct(
+        private readonly Client $client,
+        private readonly DocumentMetadataFactoryInterface $documentMetadataFactory,
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly Pagination $pagination,
+        private readonly iterable $collectionExtensions = [],
+    ) {}
 
     /**
      * {@inheritdoc}

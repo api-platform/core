@@ -29,9 +29,9 @@ class Payment
     #[ODM\ReferenceOne(targetDocument: VoidPayment::class, mappedBy: 'payment')]
     private ?VoidPayment $voidPayment = null;
 
-    public function __construct(private ?string $amount)
-    {
-    }
+    public function __construct(
+        private ?string $amount,
+    ) {}
 
     public function getId(): ?int
     {

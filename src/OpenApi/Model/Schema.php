@@ -20,8 +20,15 @@ final class Schema extends \ArrayObject
     use ExtensionTrait;
     private readonly JsonSchema $schema;
 
-    public function __construct(private $discriminator = null, private bool $readOnly = false, private bool $writeOnly = false, private ?string $xml = null, private $externalDocs = null, private $example = null, private bool $deprecated = false)
-    {
+    public function __construct(
+        private $discriminator = null,
+        private bool $readOnly = false,
+        private bool $writeOnly = false,
+        private ?string $xml = null,
+        private $externalDocs = null,
+        private $example = null,
+        private bool $deprecated = false,
+    ) {
         $this->schema = new JsonSchema();
 
         parent::__construct([]);

@@ -17,9 +17,15 @@ final class Info
 {
     use ExtensionTrait;
 
-    public function __construct(private string $title, private string $version, private string $description = '', private ?string $termsOfService = null, private ?Contact $contact = null, private ?License $license = null, private ?string $summary = null)
-    {
-    }
+    public function __construct(
+        private string $title,
+        private string $version,
+        private string $description = '',
+        private ?string $termsOfService = null,
+        private ?Contact $contact = null,
+        private ?License $license = null,
+        private ?string $summary = null,
+    ) {}
 
     public function getTitle(): string
     {

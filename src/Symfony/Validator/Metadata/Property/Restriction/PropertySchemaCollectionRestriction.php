@@ -27,9 +27,9 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
     /**
      * @param iterable<PropertySchemaRestrictionMetadataInterface> $restrictionsMetadata
      */
-    public function __construct(private readonly iterable $restrictionsMetadata = [])
-    {
-    }
+    public function __construct(
+        private readonly iterable $restrictionsMetadata = [],
+    ) {}
 
     /**
      * {@inheritdoc}

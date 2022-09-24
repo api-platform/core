@@ -29,9 +29,9 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
     private array $localIsResourceClassCache = [];
     private array $localMostSpecificResourceClassCache = [];
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
-    {
-    }
+    public function __construct(
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+    ) {}
 
     /**
      * {@inheritdoc}

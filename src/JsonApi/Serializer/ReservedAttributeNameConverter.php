@@ -31,9 +31,9 @@ final class ReservedAttributeNameConverter implements AdvancedNameConverterInter
         'included' => '_included',
     ];
 
-    public function __construct(private readonly ?NameConverterInterface $nameConverter = null)
-    {
-    }
+    public function __construct(
+        private readonly ?NameConverterInterface $nameConverter = null,
+    ) {}
 
     /**
      * {@inheritdoc}

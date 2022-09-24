@@ -22,9 +22,7 @@ namespace ApiPlatform\Util;
  */
 final class AttributesExtractor
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Extracts resource class, operation name and format request attributes. Returns an empty array if the request does

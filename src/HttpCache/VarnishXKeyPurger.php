@@ -27,9 +27,11 @@ final class VarnishXKeyPurger implements PurgerInterface
     /**
      * @param HttpClientInterface[] $clients
      */
-    public function __construct(private readonly array $clients, private readonly int $maxHeaderLength = self::VARNISH_MAX_HEADER_LENGTH, private readonly string $xkeyGlue = ' ')
-    {
-    }
+    public function __construct(
+        private readonly array $clients,
+        private readonly int $maxHeaderLength = self::VARNISH_MAX_HEADER_LENGTH,
+        private readonly string $xkeyGlue = ' ',
+    ) {}
 
     /**
      * {@inheritdoc}

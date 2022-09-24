@@ -29,9 +29,11 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
     /**
      * @param iterable<UriVariableTransformerInterface> $uriVariableTransformers
      */
-    public function __construct(private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly iterable $uriVariableTransformers)
-    {
-    }
+    public function __construct(
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly iterable $uriVariableTransformers,
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -27,9 +27,11 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInterface
 {
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface $resourceClassResolver)
-    {
-    }
+    public function __construct(
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+    ) {}
 
     /**
      * {@inheritdoc}

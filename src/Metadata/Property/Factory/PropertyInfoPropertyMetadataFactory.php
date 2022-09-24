@@ -24,9 +24,10 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
  */
 final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    public function __construct(private readonly PropertyInfoExtractorInterface $propertyInfo, private readonly ?PropertyMetadataFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly PropertyInfoExtractorInterface $propertyInfo,
+        private readonly ?PropertyMetadataFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}

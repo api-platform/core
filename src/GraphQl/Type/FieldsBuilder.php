@@ -47,9 +47,23 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class FieldsBuilder implements FieldsBuilderInterface
 {
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, private readonly TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ResolverFactoryInterface $collectionResolverFactory, private readonly ResolverFactoryInterface $itemMutationResolverFactory, private readonly ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator)
-    {
-    }
+    public function __construct(
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        private readonly TypesContainerInterface $typesContainer,
+        private readonly TypeBuilderInterface $typeBuilder,
+        private readonly TypeConverterInterface $typeConverter,
+        private readonly ResolverFactoryInterface $itemResolverFactory,
+        private readonly ResolverFactoryInterface $collectionResolverFactory,
+        private readonly ResolverFactoryInterface $itemMutationResolverFactory,
+        private readonly ResolverFactoryInterface $itemSubscriptionResolverFactory,
+        private readonly ContainerInterface $filterLocator,
+        private readonly Pagination $pagination,
+        private readonly ?NameConverterInterface $nameConverter,
+        private readonly string $nestingSeparator,
+    ) {}
 
     /**
      * {@inheritdoc}

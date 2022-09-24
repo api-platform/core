@@ -29,9 +29,17 @@ final class OpenApi implements DocumentationInterface
 
     private string $openapi = self::VERSION;
 
-    public function __construct(private Info $info, private array $servers, private Paths $paths, private ?Components $components = null, private array $security = [], private array $tags = [], private $externalDocs = null, private ?string $jsonSchemaDialect = null, private readonly ?\ArrayObject $webhooks = null)
-    {
-    }
+    public function __construct(
+        private Info $info,
+        private array $servers,
+        private Paths $paths,
+        private ?Components $components = null,
+        private array $security = [],
+        private array $tags = [],
+        private $externalDocs = null,
+        private ?string $jsonSchemaDialect = null,
+        private readonly ?\ArrayObject $webhooks = null,
+    ) {}
 
     public function getOpenapi(): string
     {

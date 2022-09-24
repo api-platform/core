@@ -26,9 +26,9 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
 {
     use AttributeFilterExtractorTrait;
 
-    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}

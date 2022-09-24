@@ -71,9 +71,11 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * @param PropertySchemaRestrictionMetadataInterface[] $restrictionsMetadata
      */
-    public function __construct(private readonly ValidatorMetadataFactoryInterface $validatorMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, private readonly iterable $restrictionsMetadata = [])
-    {
-    }
+    public function __construct(
+        private readonly ValidatorMetadataFactoryInterface $validatorMetadataFactory,
+        private readonly PropertyMetadataFactoryInterface $decorated,
+        private readonly iterable $restrictionsMetadata = [],
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -159,7 +161,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
      */
     private function getPropertyConstraints(
         ValidatorPropertyMetadataInterface $validatorPropertyMetadata,
-        array $groups
+        array $groups,
     ): array {
         $constraints = [];
 

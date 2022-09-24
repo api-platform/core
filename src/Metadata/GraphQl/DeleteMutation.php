@@ -70,7 +70,7 @@ class DeleteMutation extends Mutation implements DeleteOperationInterface
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
     ) {
         parent::__construct(...\func_get_args());
     }

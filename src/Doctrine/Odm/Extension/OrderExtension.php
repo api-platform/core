@@ -34,9 +34,10 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     use MongoDbOdmPropertyHelperTrait;
     use PropertyHelperTrait;
 
-    public function __construct(private readonly ?string $order = null, private readonly ?ManagerRegistry $managerRegistry = null)
-    {
-    }
+    public function __construct(
+        private readonly ?string $order = null,
+        private readonly ?ManagerRegistry $managerRegistry = null,
+    ) {}
 
     /**
      * {@inheritdoc}

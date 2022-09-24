@@ -91,14 +91,11 @@ class HttpOperation extends Operation
         protected ?string $condition = null,
         protected ?string $controller = null,
         protected ?array $cacheHeaders = null,
-
         protected ?array $hydraContext = null,
         protected ?array $openapiContext = null,
         protected ?bool $openapi = null,
         protected ?array $exceptionToStatus = null,
-
         protected ?bool $queryParameterValidationEnabled = null,
-
         // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
@@ -143,7 +140,7 @@ class HttpOperation extends Operation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
     ) {
         $this->shortName = $shortName;
         $this->description = $description;

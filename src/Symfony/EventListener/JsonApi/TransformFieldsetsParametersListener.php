@@ -24,9 +24,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 final class TransformFieldsetsParametersListener
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
-    {
-    }
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+    ) {}
 
     public function onKernelRequest(RequestEvent $event): void
     {

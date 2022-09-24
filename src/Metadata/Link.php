@@ -16,8 +16,16 @@ namespace ApiPlatform\Metadata;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
 final class Link
 {
-    public function __construct(private ?string $parameterName = null, private ?string $fromProperty = null, private ?string $toProperty = null, private ?string $fromClass = null, private ?string $toClass = null, private ?array $identifiers = null, private ?bool $compositeIdentifier = null, private ?string $expandedValue = null)
-    {
+    public function __construct(
+        private ?string $parameterName = null,
+        private ?string $fromProperty = null,
+        private ?string $toProperty = null,
+        private ?string $fromClass = null,
+        private ?string $toClass = null,
+        private ?array $identifiers = null,
+        private ?bool $compositeIdentifier = null,
+        private ?string $expandedValue = null,
+    ) {
         // For the inverse property shortcut
         if ($this->parameterName && class_exists($this->parameterName)) {
             $this->fromClass = $this->parameterName;

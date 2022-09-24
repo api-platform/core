@@ -27,8 +27,12 @@ class VoDummyInspection
     #[ODM\Field(type: 'date')]
     private \DateTime $performed;
 
-    public function __construct(#[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] #[ODM\Field(type: 'bool')] private bool $accepted, #[Groups(['inspection_read', 'inspection_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyCar::class, inversedBy: 'inspections')] private VoDummyCar $car, DateTime $performed = null, private string $attributeWithoutConstructorEquivalent = '')
-    {
+    public function __construct(
+        #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] #[ODM\Field(type: 'bool')] private bool $accepted,
+        #[Groups(['inspection_read', 'inspection_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyCar::class, inversedBy: 'inspections')] private VoDummyCar $car,
+        DateTime $performed = null,
+        private string $attributeWithoutConstructorEquivalent = '',
+    ) {
         $this->performed = $performed ?: new DateTime();
     }
 

@@ -32,8 +32,10 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
 
     private readonly ?array $serializePayloadFields;
 
-    public function __construct(array $serializePayloadFields = null, private readonly ?NameConverterInterface $nameConverter = null)
-    {
+    public function __construct(
+        array $serializePayloadFields = null,
+        private readonly ?NameConverterInterface $nameConverter = null,
+    ) {
         $this->serializePayloadFields = null === $serializePayloadFields ? null : array_flip($serializePayloadFields);
     }
 

@@ -35,8 +35,13 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     use ResourceClassInfoTrait;
     private readonly PropertyAccessorInterface $propertyAccessor;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null)
-    {
+    public function __construct(
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        ResourceClassResolverInterface $resourceClassResolver,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        PropertyAccessorInterface $propertyAccessor = null,
+    ) {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();

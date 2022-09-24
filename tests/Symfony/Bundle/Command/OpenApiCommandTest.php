@@ -54,37 +54,37 @@ class OpenApiCommandTest extends KernelTestCase
         $operationId = 'api_dummy_cars_get_collection';
 
         $expected = <<<YAML
-  /dummy_cars:
-    get:
-      operationId: $operationId
-      tags:
-        - DummyCar
-YAML;
+              /dummy_cars:
+                get:
+                  operationId: $operationId
+                  tags:
+                    - DummyCar
+            YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
 
         $operationId = 'api_dummy_cars_id_get';
         $expected = <<<YAML
-  '/dummy_cars/{id}':
-    get:
-      operationId: $operationId
-      tags: []
-YAML;
+              '/dummy_cars/{id}':
+                get:
+                  operationId: $operationId
+                  tags: []
+            YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');
         $this->assertStringContainsString('openapi: '.OpenApi::VERSION, $result);
 
         $expected = <<<YAML
-info:
-  title: 'My Dummy API'
-YAML;
+            info:
+              title: 'My Dummy API'
+            YAML;
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
 
         $expected = <<<YAML
-    This is a test API.
-    Made with love
-  version: 0.0.0
-YAML;
+                This is a test API.
+                Made with love
+              version: 0.0.0
+            YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
     }

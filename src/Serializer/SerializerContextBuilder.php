@@ -26,9 +26,9 @@ use Symfony\Component\Serializer\Encoder\CsvEncoder;
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
-    {
-    }
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+    ) {}
 
     /**
      * {@inheritdoc}

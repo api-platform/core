@@ -43,8 +43,9 @@ final class SchemaFactory implements SchemaFactoryInterface
         ],
     ];
 
-    public function __construct(private readonly SchemaFactoryInterface $schemaFactory)
-    {
+    public function __construct(
+        private readonly SchemaFactoryInterface $schemaFactory,
+    ) {
         $this->addDistinctFormat('jsonhal');
     }
 

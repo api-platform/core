@@ -26,9 +26,10 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
  */
 final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ?DocumentMetadataFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly ?DocumentMetadataFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}

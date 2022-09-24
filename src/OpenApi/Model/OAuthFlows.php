@@ -17,9 +17,12 @@ final class OAuthFlows
 {
     use ExtensionTrait;
 
-    public function __construct(private ?OAuthFlow $implicit = null, private ?OAuthFlow $password = null, private ?OAuthFlow $clientCredentials = null, private ?OAuthFlow $authorizationCode = null)
-    {
-    }
+    public function __construct(
+        private ?OAuthFlow $implicit = null,
+        private ?OAuthFlow $password = null,
+        private ?OAuthFlow $clientCredentials = null,
+        private ?OAuthFlow $authorizationCode = null,
+    ) {}
 
     public function getImplicit(): ?OAuthFlow
     {

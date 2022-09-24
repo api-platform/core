@@ -25,9 +25,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 final class SecurityPostValidationStage implements SecurityPostValidationStageInterface
 {
-    public function __construct(private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker)
-    {
-    }
+    public function __construct(
+        private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker,
+    ) {}
 
     /**
      * {@inheritdoc}

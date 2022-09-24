@@ -29,8 +29,10 @@ final class VarnishPurger implements PurgerInterface
     /**
      * @param HttpClientInterface[] $clients
      */
-    public function __construct(private readonly array $clients, int $maxHeaderLength = self::DEFAULT_VARNISH_MAX_HEADER_LENGTH)
-    {
+    public function __construct(
+        private readonly array $clients,
+        int $maxHeaderLength = self::DEFAULT_VARNISH_MAX_HEADER_LENGTH,
+    ) {
         $this->maxHeaderLength = $maxHeaderLength - mb_strlen(self::REGEXP_PATTERN) + 2; // 2 for %s
     }
 

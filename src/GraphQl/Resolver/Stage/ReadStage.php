@@ -36,9 +36,12 @@ final class ReadStage implements ReadStageInterface
     use ClassInfoTrait;
     use IdentifierTrait;
 
-    public function __construct(private readonly IriConverterInterface $iriConverter, private readonly ProviderInterface $provider, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private readonly string $nestingSeparator)
-    {
-    }
+    public function __construct(
+        private readonly IriConverterInterface $iriConverter,
+        private readonly ProviderInterface $provider,
+        private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+        private readonly string $nestingSeparator,
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -41,9 +41,14 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 {
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?NameConverterInterface $nameConverter = null)
-    {
-    }
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly ?NameConverterInterface $nameConverter = null,
+    ) {}
 
     /**
      * {@inheritdoc}

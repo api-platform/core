@@ -35,10 +35,10 @@ class ApiTestCaseTest extends ApiTestCase
     {
         self::createClient()->request('GET', '/');
         $this->assertJsonContains(<<<JSON
-{
-    "@context": "/contexts/Entrypoint"
-}
-JSON
+            {
+                "@context": "/contexts/Entrypoint"
+            }
+            JSON
         );
     }
 
@@ -49,8 +49,8 @@ JSON
 
         self::createClient()->request('GET', '/');
         $this->assertJsonContains(<<<JSON
-"/contexts/Entrypoint"
-JSON
+            "/contexts/Entrypoint"
+            JSON
         );
     }
 
@@ -70,14 +70,14 @@ JSON
     {
         self::createClient()->request('GET', '/contexts/Address');
         $this->assertJsonEquals(<<<JSON
-{
-    "@context": {
-        "@vocab": "http://localhost/docs.jsonld#",
-        "hydra": "http://www.w3.org/ns/hydra/core#",
-        "name": "Address/name"
-    }
-}
-JSON
+            {
+                "@context": {
+                    "@vocab": "http://localhost/docs.jsonld#",
+                    "hydra": "http://www.w3.org/ns/hydra/core#",
+                    "name": "Address/name"
+                }
+            }
+            JSON
         );
     }
 
@@ -88,26 +88,26 @@ JSON
 
         self::createClient()->request('GET', '/contexts/Address');
         $this->assertJsonEquals(<<<JSON
-"Address/name"
-JSON
+            "Address/name"
+            JSON
         );
     }
 
     public function testAssertMatchesJsonSchema(): void
     {
         $jsonSchema = <<<JSON
-{
-  "type": "object",
-  "properties": {
-    "@context": {"pattern": "^/contexts/Entrypoint"},
-    "@id": {"pattern": "^/$"},
-    "@type": {"pattern": "^Entrypoint$"},
-    "dummy": {}
-  },
-  "additionalProperties": true,
-  "required": ["@context", "@id", "@type", "dummy"]
-}
-JSON;
+            {
+              "type": "object",
+              "properties": {
+                "@context": {"pattern": "^/contexts/Entrypoint"},
+                "@id": {"pattern": "^/$"},
+                "@type": {"pattern": "^Entrypoint$"},
+                "dummy": {}
+              },
+              "additionalProperties": true,
+              "required": ["@context", "@id", "@type", "dummy"]
+            }
+            JSON;
 
         self::createClient()->request('GET', '/');
         $this->assertMatchesJsonSchema($jsonSchema);

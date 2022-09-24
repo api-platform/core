@@ -24,9 +24,9 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class OperationNameResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}

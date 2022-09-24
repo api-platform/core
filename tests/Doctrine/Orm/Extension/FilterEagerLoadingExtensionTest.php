@@ -156,17 +156,17 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
         $expected = <<<'SQL'
-SELECT o
-FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
-LEFT JOIN o.colors colors
-INNER JOIN ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel t_a3 WITH o.id = t_a3.car AND t_a3.passenger = :user
-WHERE o IN(
-  SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
-  LEFT JOIN o_2.colors colors_2
-  INNER JOIN ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel t_a3_a20 WITH o_2.id = t_a3_a20.car AND t_a3_a20.passenger = :user
-  WHERE o_2.colors = :foo AND t_a3_a20.confirmed = :confirmation
-)
-SQL;
+            SELECT o
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
+            LEFT JOIN o.colors colors
+            INNER JOIN ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel t_a3 WITH o.id = t_a3.car AND t_a3.passenger = :user
+            WHERE o IN(
+              SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
+              LEFT JOIN o_2.colors colors_2
+              INNER JOIN ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel t_a3_a20 WITH o_2.id = t_a3_a20.car AND t_a3_a20.passenger = :user
+              WHERE o_2.colors = :foo AND t_a3_a20.confirmed = :confirmation
+            )
+            SQL;
 
         $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
@@ -198,15 +198,15 @@ SQL;
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
         $expected = <<<'SQL'
-SELECT o
-FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
-LEFT JOIN o.colors colors ON o.id = colors.car AND colors.id IN (1,2,3)
-WHERE o IN(
-  SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
-  LEFT JOIN o_2.colors colors_2 ON o_2.id = colors_2.car AND colors_2.id IN (1,2,3)
-  WHERE o_2.colors = :foo AND o_2.info.name = :bar
-)
-SQL;
+            SELECT o
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
+            LEFT JOIN o.colors colors ON o.id = colors.car AND colors.id IN (1,2,3)
+            WHERE o IN(
+              SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
+              LEFT JOIN o_2.colors colors_2 ON o_2.id = colors_2.car AND colors_2.id IN (1,2,3)
+              WHERE o_2.colors = :foo AND o_2.info.name = :bar
+            )
+            SQL;
 
         $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
@@ -236,15 +236,15 @@ SQL;
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
         $expected = <<<SQL
-SELECT o, CASE WHEN o.dateCreated IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dateCreated_null_rank
-FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
-LEFT JOIN o.colors colors
-WHERE o IN(
-  SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
-  LEFT JOIN o_2.colors colors_2
-  WHERE o_2.colors = :foo
-) ORDER BY _o_dateCreated_null_rank DESC ASC
-SQL;
+            SELECT o, CASE WHEN o.dateCreated IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dateCreated_null_rank
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
+            LEFT JOIN o.colors colors
+            WHERE o IN(
+              SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
+              LEFT JOIN o_2.colors colors_2
+              WHERE o_2.colors = :foo
+            ) ORDER BY _o_dateCreated_null_rank DESC ASC
+            SQL;
 
         $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
@@ -273,17 +273,17 @@ SQL;
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
         $expected = <<<SQL
-SELECT o, count(o.id) as counter
-FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
-LEFT JOIN o.colors colors WHERE o
-IN(
-  SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
-  LEFT JOIN o_2.colors colors_2
-  WHERE o_2.colors = :foo
-)
-GROUP BY o.colors HAVING counter > 3
-ORDER BY o.colors ASC
-SQL;
+            SELECT o, count(o.id) as counter
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
+            LEFT JOIN o.colors colors WHERE o
+            IN(
+              SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
+              LEFT JOIN o_2.colors colors_2
+              WHERE o_2.colors = :foo
+            )
+            GROUP BY o.colors HAVING counter > 3
+            ORDER BY o.colors ASC
+            SQL;
 
         $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
@@ -321,22 +321,22 @@ SQL;
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
 
         $expected = <<<SQL
-SELECT o
-FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
-INNER JOIN o.compositeItem item
-INNER JOIN o.compositeLabel label
-WHERE o.item IN(
-    SELECT IDENTITY(o_2.item) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
-    INNER JOIN o_2.compositeItem item_2
-    INNER JOIN o_2.compositeLabel label_2
-    WHERE item_2.field1 = :foo
-) AND o.label IN(
-    SELECT IDENTITY(o_2.label) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
-    INNER JOIN o_2.compositeItem item_2
-    INNER JOIN o_2.compositeLabel label_2
-    WHERE item_2.field1 = :foo
-)
-SQL;
+            SELECT o
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
+            INNER JOIN o.compositeItem item
+            INNER JOIN o.compositeLabel label
+            WHERE o.item IN(
+                SELECT IDENTITY(o_2.item) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
+                INNER JOIN o_2.compositeItem item_2
+                INNER JOIN o_2.compositeLabel label_2
+                WHERE item_2.field1 = :foo
+            ) AND o.label IN(
+                SELECT IDENTITY(o_2.label) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
+                INNER JOIN o_2.compositeItem item_2
+                INNER JOIN o_2.compositeLabel label_2
+                WHERE item_2.field1 = :foo
+            )
+            SQL;
 
         $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
@@ -388,26 +388,26 @@ SQL;
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
 
         $expected = <<<DQL
-SELECT o
-FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
-INNER JOIN o.compositeItem item
-INNER JOIN o.compositeLabel label
-LEFT JOIN o.foo foo WITH o.bar = item.foo
-LEFT JOIN ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar car WITH car.id = o.car
-WHERE o.item IN(
-    SELECT IDENTITY(o_2.item) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
-    INNER JOIN o_2.compositeItem item_2
-    INNER JOIN o_2.compositeLabel label_2
-    LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
-    WHERE item_2.field1 = :foo
-) AND o.label IN(
-    SELECT IDENTITY(o_2.label) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
-    INNER JOIN o_2.compositeItem item_2
-    INNER JOIN o_2.compositeLabel label_2
-    LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
-    WHERE item_2.field1 = :foo
-)
-DQL;
+            SELECT o
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
+            INNER JOIN o.compositeItem item
+            INNER JOIN o.compositeLabel label
+            LEFT JOIN o.foo foo WITH o.bar = item.foo
+            LEFT JOIN ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar car WITH car.id = o.car
+            WHERE o.item IN(
+                SELECT IDENTITY(o_2.item) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
+                INNER JOIN o_2.compositeItem item_2
+                INNER JOIN o_2.compositeLabel label_2
+                LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
+                WHERE item_2.field1 = :foo
+            ) AND o.label IN(
+                SELECT IDENTITY(o_2.label) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
+                INNER JOIN o_2.compositeItem item_2
+                INNER JOIN o_2.compositeLabel label_2
+                LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
+                WHERE item_2.field1 = :foo
+            )
+            DQL;
 
         $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
@@ -447,22 +447,22 @@ DQL;
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
 
         $expected = <<<SQL
-SELECT o
-FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
-INNER JOIN o.compositeItem item
-INNER JOIN o.compositeLabel label
-WHERE (o.item IN(
-    SELECT IDENTITY(o_2.item) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
-    INNER JOIN o_2.compositeItem item_2
-    INNER JOIN o_2.compositeLabel label_2
-    WHERE item_2.field1 = :foo AND o_2.bar = :bar
-)) AND (o.label IN(
-    SELECT IDENTITY(o_2.label) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
-    INNER JOIN o_2.compositeItem item_2
-    INNER JOIN o_2.compositeLabel label_2
-    WHERE item_2.field1 = :foo AND o_2.bar = :bar
-))
-SQL;
+            SELECT o
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
+            INNER JOIN o.compositeItem item
+            INNER JOIN o.compositeLabel label
+            WHERE (o.item IN(
+                SELECT IDENTITY(o_2.item) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
+                INNER JOIN o_2.compositeItem item_2
+                INNER JOIN o_2.compositeLabel label_2
+                WHERE item_2.field1 = :foo AND o_2.bar = :bar
+            )) AND (o.label IN(
+                SELECT IDENTITY(o_2.label) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
+                INNER JOIN o_2.compositeItem item_2
+                INNER JOIN o_2.compositeLabel label_2
+                WHERE item_2.field1 = :foo AND o_2.bar = :bar
+            ))
+            SQL;
 
         $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
@@ -496,12 +496,12 @@ SQL;
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
 
         $expected = <<<SQL
-SELECT o
-FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
-INNER JOIN o.compositeItem item
-INNER JOIN o.compositeLabel label
-WHERE item.field1 = :foo AND o.bar = :bar
-SQL;
+            SELECT o
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
+            INNER JOIN o.compositeItem item
+            INNER JOIN o.compositeLabel label
+            WHERE item.field1 = :foo AND o.bar = :bar
+            SQL;
 
         $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }
@@ -532,15 +532,15 @@ SQL;
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
         $expected = <<<SQL
-SELECT o
-FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
-LEFT JOIN o.colors colors
-WHERE o.id IN(
-  SELECT IDENTITY(o_2.id) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
-  LEFT JOIN o_2.colors colors_2
-  WHERE o_2.colors = :foo
-)
-SQL;
+            SELECT o
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
+            LEFT JOIN o.colors colors
+            WHERE o.id IN(
+              SELECT IDENTITY(o_2.id) FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
+              LEFT JOIN o_2.colors colors_2
+              WHERE o_2.colors = :foo
+            )
+            SQL;
 
         $this->assertSame($this->toDQLString($expected), $qb->getDQL());
     }

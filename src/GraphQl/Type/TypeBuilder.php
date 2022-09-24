@@ -40,8 +40,12 @@ final class TypeBuilder implements TypeBuilderInterface
 {
     private $defaultFieldResolver;
 
-    public function __construct(private readonly TypesContainerInterface $typesContainer, callable $defaultFieldResolver, private readonly ContainerInterface $fieldsBuilderLocator, private readonly Pagination $pagination)
-    {
+    public function __construct(
+        private readonly TypesContainerInterface $typesContainer,
+        callable $defaultFieldResolver,
+        private readonly ContainerInterface $fieldsBuilderLocator,
+        private readonly Pagination $pagination,
+    ) {
         $this->defaultFieldResolver = $defaultFieldResolver;
     }
 

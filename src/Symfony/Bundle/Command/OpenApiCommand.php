@@ -28,8 +28,10 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class OpenApiCommand extends Command
 {
-    public function __construct(private readonly OpenApiFactoryInterface $openApiFactory, private readonly NormalizerInterface $normalizer)
-    {
+    public function __construct(
+        private readonly OpenApiFactoryInterface $openApiFactory,
+        private readonly NormalizerInterface $normalizer,
+    ) {
         parent::__construct();
     }
 

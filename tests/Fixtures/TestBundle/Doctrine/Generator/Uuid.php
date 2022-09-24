@@ -17,9 +17,7 @@ class Uuid implements \JsonSerializable, \Stringable
 {
     private string $id = 'foo';
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function __toString(): string
     {

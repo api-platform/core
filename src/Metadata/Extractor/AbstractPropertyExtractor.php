@@ -29,9 +29,10 @@ abstract class AbstractPropertyExtractor implements PropertyExtractorInterface
     /**
      * @param string[] $paths
      */
-    public function __construct(protected array $paths, private readonly ?ContainerInterface $container = null)
-    {
-    }
+    public function __construct(
+        protected array $paths,
+        private readonly ?ContainerInterface $container = null,
+    ) {}
 
     /**
      * {@inheritdoc}

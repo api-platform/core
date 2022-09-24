@@ -27,9 +27,10 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
  */
 final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
-    public function __construct(private readonly PropertyExtractorInterface $extractor, private readonly ?PropertyNameCollectionFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly PropertyExtractorInterface $extractor,
+        private readonly ?PropertyNameCollectionFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}

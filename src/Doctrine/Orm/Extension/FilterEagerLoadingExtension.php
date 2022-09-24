@@ -29,9 +29,10 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class FilterEagerLoadingExtension implements QueryCollectionExtensionInterface
 {
-    public function __construct(private readonly bool $forceEager = true, private readonly ?ResourceClassResolverInterface $resourceClassResolver = null)
-    {
-    }
+    public function __construct(
+        private readonly bool $forceEager = true,
+        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
+    ) {}
 
     /**
      * {@inheritdoc}

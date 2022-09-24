@@ -29,9 +29,9 @@ use Psr\Container\ContainerInterface;
  */
 final class FilterExtension implements QueryCollectionExtensionInterface
 {
-    public function __construct(private readonly ContainerInterface $filterLocator)
-    {
-    }
+    public function __construct(
+        private readonly ContainerInterface $filterLocator,
+    ) {}
 
     /**
      * {@inheritdoc}

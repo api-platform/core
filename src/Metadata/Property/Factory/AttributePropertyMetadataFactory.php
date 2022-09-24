@@ -24,9 +24,9 @@ use ApiPlatform\Util\Reflection;
  */
 final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    public function __construct(private readonly ?PropertyMetadataFactoryInterface $decorated = null)
-    {
-    }
+    public function __construct(
+        private readonly ?PropertyMetadataFactoryInterface $decorated = null,
+    ) {}
 
     /**
      * {@inheritdoc}

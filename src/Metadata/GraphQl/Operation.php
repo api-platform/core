@@ -30,7 +30,6 @@ class Operation extends AbstractOperation
         protected ?string $resolver = null,
         protected ?array $args = null,
         protected ?array $links = null,
-
         // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
@@ -75,7 +74,7 @@ class Operation extends AbstractOperation
         ?string $name = null,
         ?string $provider = null,
         ?string $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
     ) {
         // Abstract operation properties
         $this->shortName = $shortName;

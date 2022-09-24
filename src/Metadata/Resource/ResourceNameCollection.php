@@ -23,9 +23,9 @@ final class ResourceNameCollection implements \IteratorAggregate, \Countable
     /**
      * @param string[] $classes
      */
-    public function __construct(private readonly array $classes = [])
-    {
-    }
+    public function __construct(
+        private readonly array $classes = [],
+    ) {}
 
     /**
      * {@inheritdoc}

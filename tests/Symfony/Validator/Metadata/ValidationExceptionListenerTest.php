@@ -77,8 +77,12 @@ class ValidationExceptionListenerTest extends TestCase
         $serializedConstraintViolationList = '{"foo": "bar"}';
         $constraintViolationList = new ConstraintViolationList([]);
         $exception = new class($constraintViolationList) extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface {
-            public function __construct(private readonly ConstraintViolationListInterface $constraintViolationList, $message = '', $code = 0, \Throwable $previous = null)
-            {
+            public function __construct(
+                private readonly ConstraintViolationListInterface $constraintViolationList,
+                $message = '',
+                $code = 0,
+                \Throwable $previous = null,
+            ) {
                 parent::__construct($message, $code, $previous);
             }
 
