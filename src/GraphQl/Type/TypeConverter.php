@@ -68,6 +68,9 @@ final class TypeConverter implements TypeConverterInterface
                 if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                     return GraphQLType::string();
                 }
+                if (is_a($type->getClassName(), \BackedEnum::class, true)) {
+                    return GraphQLType::string();
+                }
 
                 return $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth);
             default:
