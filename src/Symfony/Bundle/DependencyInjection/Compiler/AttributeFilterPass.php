@@ -83,7 +83,7 @@ final class AttributeFilterPass implements CompilerPassInterface
                     throw new InvalidArgumentException(sprintf('Class "%s" does not have argument "$%s".', $filterClass, $key));
                 }
 
-                $definition->setArgument("${$key}", $value);
+                $definition->setArgument("$$key", $value);
             }
 
             $container->setDefinition($id, $definition);
