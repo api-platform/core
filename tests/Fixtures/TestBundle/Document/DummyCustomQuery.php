@@ -39,13 +39,16 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
             'customArgumentFloat' => ['type' => 'Float!'],
             'customArgumentIntArray' => ['type' => '[Int!]!'],
             'customArgumentCustomType' => ['type' => 'DateTime!'],
-        ], name: 'testItemCustomArguments'),
+        ],
+        name: 'testItemCustomArguments'
+    ),
     new QueryCollection(resolver: 'app.graphql.query_resolver.dummy_custom_collection', name: 'testCollection'),
     new QueryCollection(resolver: 'app.graphql.query_resolver.dummy_custom_collection_no_read_and_serialize', read: false, serialize: false, name: 'testCollectionNoReadAndSerialize'),
     new QueryCollection(
         name: 'testCollectionCustomArguments',
         resolver: 'app.graphql.query_resolver.dummy_custom_collection',
-        args: ['customArgumentString' => ['type' => 'String!']]),
+        args: ['customArgumentString' => ['type' => 'String!']]
+    ),
 ])]
 class DummyCustomQuery
 {

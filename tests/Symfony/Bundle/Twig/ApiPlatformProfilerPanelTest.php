@@ -66,7 +66,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         /** @var string $token */
         $token = $client->getResponse()->headers->get('X-Debug-Token');
-        $crawler = $client->request('GET', "/_wdt/$token");
+        $crawler = $client->request('GET', "/_wdt/{$token}");
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $block = $crawler->filter('div[class*=sf-toolbar-block-api_platform]');
@@ -85,7 +85,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         /** @var string $token */
         $token = $client->getResponse()->headers->get('X-Debug-Token');
 
-        $crawler = $client->request('GET', "/_wdt/$token");
+        $crawler = $client->request('GET', "/_wdt/{$token}");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $block = $crawler->filter('div[class*=sf-toolbar-block-api_platform]');
 

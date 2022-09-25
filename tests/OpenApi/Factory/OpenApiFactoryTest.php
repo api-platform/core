@@ -77,76 +77,78 @@ class OpenApiFactoryTest extends TestCase
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withClass(Dummy::class)->withOutput([
             'class' => OutputDto::class,
         ])->withPaginationClientItemsPerPage(true)->withShortName('Dummy')->withDescription('This is a dummy');
-        $dummyResource = (new ApiResource())->withOperations(new Operations([
-            'ignored' => new NotExposed(),
-            'ignoredWithUriTemplate' => (new NotExposed())->withUriTemplate('/dummies/{id}'),
-            'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
-            'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
-            'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
-            'customDummyItem' => (new HttpOperation())->withMethod(HttpOperation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapiContext([
-                'x-visibility' => 'hide',
-                'description' => 'Custom description',
-                'parameters' => [
-                    ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'required' => true],
-                    ['description' => 'Replace parameter', 'name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string', 'format' => 'uuid']],
-                ],
-                'tags' => ['Dummy', 'Profile'],
-                'responses' => [
-                    '202' => [
-                        'description' => 'Success',
-                        'content' => [
-                            'application/json' => [
-                                'schema' => ['$ref' => '#/components/schemas/Dummy'],
+        $dummyResource = (new ApiResource())->withOperations(
+            new Operations([
+                'ignored' => new NotExposed(),
+                'ignoredWithUriTemplate' => (new NotExposed())->withUriTemplate('/dummies/{id}'),
+                'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+                'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+                'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+                'customDummyItem' => (new HttpOperation())->withMethod(HttpOperation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapiContext(
+                    [
+                        'x-visibility' => 'hide',
+                        'description' => 'Custom description',
+                        'parameters' => [
+                            ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'required' => true],
+                            ['description' => 'Replace parameter', 'name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string', 'format' => 'uuid']],
+                        ],
+                        'tags' => ['Dummy', 'Profile'],
+                        'responses' => [
+                            '202' => [
+                                'description' => 'Success',
+                                'content' => [
+                                    'application/json' => [
+                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                                    ],
+                                ],
+                                'headers' => [
+                                    'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
+                                ],
+                                'links' => [
+                                    'Foo' => ['$ref' => '#/components/schemas/Dummy'],
+                                ],
                             ],
+                            '205' => [],
                         ],
-                        'headers' => [
-                            'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
-                        ],
-                        'links' => [
-                            'Foo' => ['$ref' => '#/components/schemas/Dummy'],
-                        ],
-                    ],
-                    '205' => [],
-                ],
-                'requestBody' => [
-                    'required' => true,
-                    'description' => 'Custom request body',
-                    'content' => [
-                        'multipart/form-data' => [
-                            'schema' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'file' => [
-                                        'type' => 'string',
-                                        'format' => 'binary',
+                        'requestBody' => [
+                            'required' => true,
+                            'description' => 'Custom request body',
+                            'content' => [
+                                'multipart/form-data' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'file' => [
+                                                'type' => 'string',
+                                                'format' => 'binary',
+                                            ],
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
+                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy', 'description' => 'See also'],
+                    ]
+                ),
+                'custom-http-verb' => (new HttpOperation())->withMethod('TEST')->withOperation($baseOperation),
+                'withRoutePrefix' => (new GetCollection())->withUriTemplate('/dummies')->withRoutePrefix('/prefix')->withOperation($baseOperation),
+                'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
+                'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenApiContext([
+                    'parameters' => [
+                        ['description' => 'Test modified collection page number', 'name' => 'page', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'integer', 'default' => 1], 'allowEmptyValue' => true],
                     ],
-                ],
-                'externalDocs' => ['url' => 'http://schema.example.com/Dummy', 'description' => 'See also'],
-            ]
-            ),
-            'custom-http-verb' => (new HttpOperation())->withMethod('TEST')->withOperation($baseOperation),
-            'withRoutePrefix' => (new GetCollection())->withUriTemplate('/dummies')->withRoutePrefix('/prefix')->withOperation($baseOperation),
-            'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
-            'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenApiContext([
-                'parameters' => [
-                    ['description' => 'Test modified collection page number', 'name' => 'page', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'integer', 'default' => 1], 'allowEmptyValue' => true],
-                ],
-            ])->withOperation($baseOperation),
-            'postDummyCollection' => (new Post())->withUriTemplate('/dummies')->withOperation($baseOperation),
-            // Filtered
-            'filteredDummyCollection' => (new GetCollection())->withUriTemplate('/filtered')->withFilters(['f1', 'f2', 'f3', 'f4', 'f5'])->withOperation($baseOperation),
-            // Paginated
-            'paginatedDummyCollection' => (new GetCollection())->withUriTemplate('/paginated')
-                                           ->withPaginationClientEnabled(true)
-                                           ->withPaginationClientItemsPerPage(true)
-                                           ->withPaginationItemsPerPage(20)
-                                       ->withPaginationMaximumItemsPerPage(80)
-                                               ->withOperation($baseOperation),
-        ])
+                ])->withOperation($baseOperation),
+                'postDummyCollection' => (new Post())->withUriTemplate('/dummies')->withOperation($baseOperation),
+                // Filtered
+                'filteredDummyCollection' => (new GetCollection())->withUriTemplate('/filtered')->withFilters(['f1', 'f2', 'f3', 'f4', 'f5'])->withOperation($baseOperation),
+                // Paginated
+                'paginatedDummyCollection' => (new GetCollection())->withUriTemplate('/paginated')
+                    ->withPaginationClientEnabled(true)
+                    ->withPaginationClientItemsPerPage(true)
+                    ->withPaginationItemsPerPage(20)
+                    ->withPaginationMaximumItemsPerPage(80)
+                    ->withOperation($baseOperation),
+            ])
         );
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);

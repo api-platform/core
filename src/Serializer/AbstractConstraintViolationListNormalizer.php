@@ -66,11 +66,11 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
 
             $constraint = $violation instanceof ConstraintViolation ? $violation->getConstraint() : null;
             if (
-                [] !== $this->serializePayloadFields &&
-                $constraint &&
-                $constraint->payload &&
+                [] !== $this->serializePayloadFields
+                && $constraint
+                && $constraint->payload
                 // If some fields are whitelisted, only them are added
-                $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, $this->serializePayloadFields)
+                && $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, $this->serializePayloadFields)
             ) {
                 $violationData['payload'] = $payloadFields;
             }

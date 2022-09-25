@@ -48,14 +48,11 @@ final class NotExposed extends HttpOperation
         ?string $condition = null,
         ?string $controller = 'api_platform.action.not_exposed',
         ?array $cacheHeaders = null,
-
         ?array $hydraContext = null,
         ?array $openapiContext = null,
         ?bool $openapi = false,
         ?array $exceptionToStatus = null,
-
         ?bool $queryParameterValidationEnabled = null,
-
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,

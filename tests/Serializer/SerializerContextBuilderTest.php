@@ -67,22 +67,22 @@ class SerializerContextBuilderTest extends TestCase
     {
         $request = Request::create('/foos/1');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['foo' => 'bar', 'operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation];
+        $expected = ['foo' => 'bar', 'operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
 
         $request = Request::create('/foos');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get_collection', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['foo' => 'bar', 'operation_name' => 'get_collection',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation->withName('get_collection')];
+        $expected = ['foo' => 'bar', 'operation_name' => 'get_collection', 'resource_class' => 'Foo', 'request_uri' => '/foos', 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation->withName('get_collection')];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
 
         $request = Request::create('/foos/1');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation];
+        $expected = ['bar' => 'baz', 'operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foos', 'POST');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'post', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => false, 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation->withName('post')];
+        $expected = ['bar' => 'baz', 'operation_name' => 'post', 'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => false, 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation->withName('post')];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foos', 'PUT');

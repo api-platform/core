@@ -42,14 +42,11 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?string $condition = null,
         ?string $controller = null,
         ?array $cacheHeaders = null,
-
         ?array $hydraContext = null,
         ?array $openapiContext = null,
         ?bool $openapi = null,
         ?array $exceptionToStatus = null,
-
         ?bool $queryParameterValidationEnabled = null,
-
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,

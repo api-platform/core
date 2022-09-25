@@ -37,13 +37,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
         normalizationContext: ['groups' => ['result']],
         denormalizationContext: ['groups' => ['sum']]
     ),
-    new Mutation(name: 'sumNoWriteCustomResult',
+    new Mutation(
+        name: 'sumNoWriteCustomResult',
         resolver: 'app.graphql.mutation_resolver.dummy_custom_no_write_custom_result',
         normalizationContext: ['groups' => ['result']],
         denormalizationContext: ['groups' => ['sum']],
         write: false
     ),
-    new Mutation(name: 'sumOnlyPersist',
+    new Mutation(
+        name: 'sumOnlyPersist',
         resolver: 'app.graphql.mutation_resolver.dummy_custom_only_persist_document',
         normalizationContext: ['groups' => ['result']],
         denormalizationContext: ['groups' => ['sum']],
@@ -52,7 +54,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
         validate: false,
         serialize: false
     ),
-    new Mutation(name: 'testCustomArguments',
+    new Mutation(
+        name: 'testCustomArguments',
         resolver: 'app.graphql.mutation_resolver.dummy_custom',
         args: ['operandC' => ['type' => 'Int!']]
     ),

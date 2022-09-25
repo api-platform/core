@@ -38,7 +38,7 @@ class ContainNonResourceProvider implements ProviderInterface
         $cnr->id = $id;
         $cnr->notAResource = new NotAResource('f1', 'b1');
         $cnr->nested = new $resourceClass();
-        $cnr->nested->id = "$id-nested";
+        $cnr->nested->id = "{$id}-nested";
         $cnr->nested->notAResource = new NotAResource('f2', 'b2');
 
         return $cnr;

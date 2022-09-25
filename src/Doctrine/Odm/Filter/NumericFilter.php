@@ -49,9 +49,9 @@ final class NumericFilter extends AbstractFilter
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isNumericField($property, $resourceClass)
+            !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
+            || !$this->isNumericField($property, $resourceClass)
         ) {
             return;
         }

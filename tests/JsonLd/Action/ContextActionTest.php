@@ -70,17 +70,17 @@ class ContextActionTest extends TestCase
         $resourceMetadataCollectionFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(
             new ResourceMetadataCollection('dummy', [
                 (new ApiResource())
-                ->withShortName('dummy')
-                ->withDescription('dummy')
-                ->withTypes(['#dummy'])
-                ->withOperations(new Operations([
-                    'get' => (new Get())->withShortName('dummy'),
-                    'put' => (new Put())->withShortName('dummy'),
-                    'get_collection' => (new GetCollection())->withShortName('dummy'),
-                    'post' => (new Post())->withShortName('dummy'),
-                    'custom' => (new Get())->withUriTemplate('/foo')->withShortName('dummy'),
-                    'custom2' => (new Post())->withUriTemplate('/foo')->withShortName('dummy'),
-                ])),
+                    ->withShortName('dummy')
+                    ->withDescription('dummy')
+                    ->withTypes(['#dummy'])
+                    ->withOperations(new Operations([
+                        'get' => (new Get())->withShortName('dummy'),
+                        'put' => (new Put())->withShortName('dummy'),
+                        'get_collection' => (new GetCollection())->withShortName('dummy'),
+                        'post' => (new Post())->withShortName('dummy'),
+                        'custom' => (new Get())->withUriTemplate('/foo')->withShortName('dummy'),
+                        'custom2' => (new Post())->withUriTemplate('/foo')->withShortName('dummy'),
+                    ])),
             ])
         );
         $this->assertEquals(['@context' => ['/dummies']], $contextAction('dummy'));

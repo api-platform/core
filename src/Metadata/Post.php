@@ -42,12 +42,10 @@ final class Post extends HttpOperation
         ?string $condition = null,
         ?string $controller = null,
         ?array $cacheHeaders = null,
-
         ?array $hydraContext = null,
         ?array $openapiContext = null,
         ?bool $openapi = null,
         ?array $exceptionToStatus = null,
-
         ?bool $queryParameterValidationEnabled = null,
 
         // abstract operation arguments

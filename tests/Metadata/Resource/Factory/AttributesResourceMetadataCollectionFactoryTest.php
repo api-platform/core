@@ -48,9 +48,9 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         return [
             'collection_query' => new QueryCollection(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider),
             'item_query' => new Query(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider),
-            'update' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'update', description: "Updates a $shortName.", provider: $provider),
-            'delete' => new DeleteMutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'delete', description: "Deletes a $shortName.", provider: $provider),
-            'create' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'create', description: "Creates a $shortName.", provider: $provider),
+            'update' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'update', description: "Updates a {$shortName}.", provider: $provider),
+            'delete' => new DeleteMutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'delete', description: "Deletes a {$shortName}.", provider: $provider),
+            'create' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'create', description: "Creates a {$shortName}.", provider: $provider),
         ];
     }
 
@@ -67,13 +67,25 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     provider: AttributeResourceProvider::class,
                     operations: [
                         '_api_AttributeResource_get' => new Get(
-                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 1, provider: AttributeResourceProvider::class,
+                            shortName: 'AttributeResource',
+                            class: AttributeResource::class,
+                            normalizationContext: ['skip_null_values' => true],
+                            priority: 1,
+                            provider: AttributeResourceProvider::class,
                         ),
                         '_api_AttributeResource_put' => new Put(
-                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 2, provider: AttributeResourceProvider::class,
+                            shortName: 'AttributeResource',
+                            class: AttributeResource::class,
+                            normalizationContext: ['skip_null_values' => true],
+                            priority: 2,
+                            provider: AttributeResourceProvider::class,
                         ),
                         '_api_AttributeResource_delete' => new Delete(
-                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 3, provider: AttributeResourceProvider::class,
+                            shortName: 'AttributeResource',
+                            class: AttributeResource::class,
+                            normalizationContext: ['skip_null_values' => true],
+                            priority: 3,
+                            provider: AttributeResourceProvider::class,
                         ),
                     ],
                     graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResource', AttributeResource::class, AttributeResourceProvider::class)
@@ -126,10 +138,20 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     provider: AttributeResourceProvider::class,
                     operations: [
                         '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(
-                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 1, provider: AttributeResourceProvider::class,
+                            shortName: 'AttributeResources',
+                            class: AttributeResources::class,
+                            uriTemplate: '/attribute_resources.{_format}',
+                            normalizationContext: ['skip_null_values' => true],
+                            priority: 1,
+                            provider: AttributeResourceProvider::class,
                         ),
                         '_api_/attribute_resources.{_format}_post' => new Post(
-                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 2, provider: AttributeResourceProvider::class,
+                            shortName: 'AttributeResources',
+                            class: AttributeResources::class,
+                            uriTemplate: '/attribute_resources.{_format}',
+                            normalizationContext: ['skip_null_values' => true],
+                            priority: 2,
+                            provider: AttributeResourceProvider::class,
                         ),
                     ],
                     graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResources', AttributeResources::class, AttributeResourceProvider::class)
@@ -176,7 +198,9 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     public function testCreateShouldNotOverrideWithDefault(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(
-            null, null, [
+            null,
+            null,
+            [
                 'pagination_items_per_page' => 3,
             ]
         );

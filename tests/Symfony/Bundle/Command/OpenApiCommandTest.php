@@ -56,7 +56,7 @@ class OpenApiCommandTest extends KernelTestCase
         $expected = <<<YAML
               /dummy_cars:
                 get:
-                  operationId: $operationId
+                  operationId: {$operationId}
                   tags:
                     - DummyCar
             YAML;
@@ -67,20 +67,20 @@ class OpenApiCommandTest extends KernelTestCase
         $expected = <<<YAML
               '/dummy_cars/{id}':
                 get:
-                  operationId: $operationId
+                  operationId: {$operationId}
                   tags: []
             YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');
         $this->assertStringContainsString('openapi: '.OpenApi::VERSION, $result);
 
-        $expected = <<<YAML
+        $expected = <<<'YAML'
             info:
               title: 'My Dummy API'
             YAML;
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
 
-        $expected = <<<YAML
+        $expected = <<<'YAML'
                 This is a test API.
                 Made with love
               version: 0.0.0

@@ -38,7 +38,7 @@ final class QueryBuilderHelper
         }
 
         $associationAlias = $newAlias ?? $queryNameGenerator->generateJoinAlias($association);
-        $query = "$alias.$association";
+        $query = "{$alias}.{$association}";
 
         if (Join::LEFT_JOIN === $joinType || QueryChecker::hasLeftJoin($queryBuilder)) {
             $queryBuilder->leftJoin($query, $associationAlias, $conditionType, $condition); // @phpstan-ignore-line

@@ -119,7 +119,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         foreach ($this->pipeline as $indexStage => $infoStage) {
             if (\array_key_exists('$facet', $infoStage)) {
                 if (!isset($this->pipeline[$indexStage]['$facet'][$field])) {
-                    throw new InvalidArgumentException("\"$field\" facet was not applied to the aggregation pipeline.");
+                    throw new InvalidArgumentException("\"{$field}\" facet was not applied to the aggregation pipeline.");
                 }
 
                 return $this->pipeline[$indexStage]['$facet'][$field];
@@ -140,7 +140,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
             }
         }
 
-        throw new InvalidArgumentException("$stage stage was not applied to the facet stage of the aggregation pipeline.");
+        throw new InvalidArgumentException("{$stage} stage was not applied to the facet stage of the aggregation pipeline.");
     }
 
     private function hasLimitZeroStage(array $resultsFacetInfo): bool

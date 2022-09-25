@@ -87,8 +87,8 @@ class SchemaTest extends TestCase
 
     public function definitionsDataProvider(): iterable
     {
-        yield [Schema::VERSION_OPENAPI,  ['foo' => []]];
-        yield [Schema::VERSION_JSON_SCHEMA,  ['foo' => []]];
+        yield [Schema::VERSION_OPENAPI, ['foo' => []]];
+        yield [Schema::VERSION_JSON_SCHEMA, ['foo' => []]];
     }
 
     public function testIsDefined(): void

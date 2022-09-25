@@ -392,10 +392,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $parameters = [];
                 $method = $operation instanceof HttpOperation ? $operation->getMethod() : HttpOperation::METHOD_GET;
                 if (
-                    $operationName === $operation->getName() ||
-                    isset($links[$operationName]) ||
-                    $operation instanceof CollectionOperationInterface ||
-                    HttpOperation::METHOD_GET !== ($method ?? null)
+                    $operationName === $operation->getName()
+                    || isset($links[$operationName])
+                    || $operation instanceof CollectionOperationInterface
+                    || HttpOperation::METHOD_GET !== ($method ?? null)
                 ) {
                     continue;
                 }

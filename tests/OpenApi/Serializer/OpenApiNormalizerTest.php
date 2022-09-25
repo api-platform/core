@@ -101,10 +101,10 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create('Zorro', Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
 
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])
-                                              ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
-                                              ->withClass(Dummy::class)
-                                              ->withShortName('Dummy')
-                                              ->withDescription('This is a dummy.');
+            ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
+            ->withClass(Dummy::class)
+            ->withShortName('Dummy')
+            ->withDescription('This is a dummy.');
 
         $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withOperations(new Operations(

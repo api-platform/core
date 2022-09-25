@@ -58,7 +58,7 @@ trait LinksHandlerTrait
 
                 foreach ($identifierProperties as $identifierProperty) {
                     $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
-                    $queryBuilder->andWhere("$currentAlias.$identifierProperty = :$placeholder");
+                    $queryBuilder->andWhere("{$currentAlias}.{$identifierProperty} = :{$placeholder}");
                     $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
                 }
 
@@ -80,32 +80,32 @@ trait LinksHandlerTrait
                     $whereClause = [];
                     foreach ($identifierProperties as $identifierProperty) {
                         $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
-                        $whereClause[] = "$nextAlias.{$identifierProperty} = :$placeholder";
+                        $whereClause[] = "{$nextAlias}.{$identifierProperty} = :{$placeholder}";
                         $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
                     }
 
                     $property = $associationMapping['mappedBy'] ?? $joinProperties[0];
-                    $select = isset($associationMapping['mappedBy']) ? "IDENTITY($joinAlias.$property)" : "$joinAlias.$property";
-                    $expressions["$previousAlias.{$property}"] = "SELECT $select FROM {$link->getFromClass()} $nextAlias INNER JOIN $nextAlias.{$associationMapping['fieldName']} $joinAlias WHERE ".implode(' AND ', $whereClause);
+                    $select = isset($associationMapping['mappedBy']) ? "IDENTITY({$joinAlias}.{$property})" : "{$joinAlias}.{$property}";
+                    $expressions["{$previousAlias}.{$property}"] = "SELECT {$select} FROM {$link->getFromClass()} {$nextAlias} INNER JOIN {$nextAlias}.{$associationMapping['fieldName']} {$joinAlias} WHERE ".implode(' AND ', $whereClause);
                     $previousAlias = $nextAlias;
                     continue;
                 }
 
                 // A single-valued association path expression to an inverse side is not supported in DQL queries.
                 if ($relationType & ClassMetadataInfo::TO_ONE && !($associationMapping['isOwningSide'] ?? true)) {
-                    $queryBuilder->innerJoin("$previousAlias.".$associationMapping['mappedBy'], $joinAlias);
+                    $queryBuilder->innerJoin("{$previousAlias}.".$associationMapping['mappedBy'], $joinAlias);
                 } else {
                     $queryBuilder->join(
                         $link->getFromClass(),
                         $joinAlias,
                         'WITH',
-                        "$previousAlias.{$previousJoinProperties[0]} = $joinAlias.{$associationMapping['fieldName']}"
+                        "{$previousAlias}.{$previousJoinProperties[0]} = {$joinAlias}.{$associationMapping['fieldName']}"
                     );
                 }
 
                 foreach ($identifierProperties as $identifierProperty) {
                     $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
-                    $queryBuilder->andWhere("$joinAlias.$identifierProperty = :$placeholder");
+                    $queryBuilder->andWhere("{$joinAlias}.{$identifierProperty} = :{$placeholder}");
                     $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
                 }
 
@@ -119,7 +119,7 @@ trait LinksHandlerTrait
 
             foreach ($identifierProperties as $identifierProperty) {
                 $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
-                $queryBuilder->andWhere("$joinAlias.$identifierProperty = :$placeholder");
+                $queryBuilder->andWhere("{$joinAlias}.{$identifierProperty} = :{$placeholder}");
                 $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
             }
 
@@ -132,12 +132,12 @@ trait LinksHandlerTrait
             $clause = '';
             foreach ($expressions as $alias => $expression) {
                 if (0 === $i) {
-                    $clause .= "$alias IN (".$expression;
+                    $clause .= "{$alias} IN (".$expression;
                     ++$i;
                     continue;
                 }
 
-                $clause .= " AND $alias IN (".$expression;
+                $clause .= " AND {$alias} IN (".$expression;
                 ++$i;
             }
 

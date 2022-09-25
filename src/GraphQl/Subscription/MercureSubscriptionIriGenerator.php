@@ -37,7 +37,7 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
             $host = 'api-platform.com';
         }
 
-        return "$scheme://$host/subscriptions/$subscriptionId";
+        return "{$scheme}://{$host}/subscriptions/{$subscriptionId}";
     }
 
     public function generateMercureUrl(string $subscriptionId, ?string $hub = null): string

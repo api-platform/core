@@ -69,9 +69,9 @@ class ItemProviderTest extends TestCase
         /** @var HttpOperation */
         $operation = (new Get())->withUriVariables([
             'identifier' => (new Link())->withFromClass(OperationResource::class)
-            ->withIdentifiers([
-                0 => 'identifier',
-            ]),
+                ->withIdentifiers([
+                    0 => 'identifier',
+                ]),
         ])->withClass(OperationResource::class)->withName('get');
 
         $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);

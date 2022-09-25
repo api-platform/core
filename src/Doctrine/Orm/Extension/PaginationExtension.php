@@ -130,11 +130,11 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     {
         $fetchJoinCollection = $operation?->getPaginationFetchJoinCollection();
 
-        if (isset($context['operation_name']) && isset($fetchJoinCollection)) {
+        if (isset($context['operation_name'], $fetchJoinCollection)) {
             return $fetchJoinCollection;
         }
 
-        if (isset($context['graphql_operation_name']) && isset($fetchJoinCollection)) {
+        if (isset($context['graphql_operation_name'], $fetchJoinCollection)) {
             return $fetchJoinCollection;
         }
 
@@ -163,11 +163,11 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     {
         $useOutputWalkers = $operation?->getPaginationUseOutputWalkers();
 
-        if (isset($context['operation_name']) && isset($useOutputWalkers)) {
+        if (isset($context['operation_name'], $useOutputWalkers)) {
             return $useOutputWalkers;
         }
 
-        if (isset($context['graphql_operation_name']) && isset($useOutputWalkers)) {
+        if (isset($context['graphql_operation_name'], $useOutputWalkers)) {
             return $useOutputWalkers;
         }
 

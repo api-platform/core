@@ -19,12 +19,13 @@ use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(operations: [
-    new GetCollection(),
-    new Post(uriTemplate: 'dummy_validation.{_format}'),
-    new Post(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]),
-    new Post(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator']),
-]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Post(uriTemplate: 'dummy_validation.{_format}'),
+        new Post(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]),
+        new Post(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator']),
+    ]
 )]
 #[ODM\Document]
 class DummyValidation

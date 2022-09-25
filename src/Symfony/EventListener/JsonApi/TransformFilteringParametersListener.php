@@ -30,9 +30,9 @@ final class TransformFilteringParametersListener
         $filterParameter = $request->query->all()['filter'] ?? null;
 
         if (
-            !$filterParameter ||
-            !\is_array($filterParameter) ||
-            'jsonapi' !== $request->getRequestFormat()
+            !$filterParameter
+            || !\is_array($filterParameter)
+            || 'jsonapi' !== $request->getRequestFormat()
         ) {
             return;
         }

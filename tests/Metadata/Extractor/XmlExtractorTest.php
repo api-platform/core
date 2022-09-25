@@ -387,7 +387,7 @@ class XmlExtractorTest extends TestCase
     public function getInvalidPaths(): array
     {
         return [
-            [__DIR__.'/xml/invalid/required_class.xml', "/^\[ERROR 1868\] Element '\{https:\/\/api-platform\.com\/schema\/metadata\/resources-3\.0\}resource': The attribute 'class' is required but missing\./"],
+            [__DIR__.'/xml/invalid/required_class.xml', "/^\\[ERROR 1868\\] Element '\\{https:\\/\\/api-platform\\.com\\/schema\\/metadata\\/resources-3\\.0\\}resource': The attribute 'class' is required but missing\\./"],
         ];
     }
 }

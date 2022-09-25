@@ -42,7 +42,7 @@ final class MercureContext implements Context
             $toMatchTopics = \count($topics);
             foreach ($sentUpdate->getTopics() as $sentTopic) {
                 foreach ($topics as $topic) {
-                    if (preg_match("@$topic@", (string) $sentTopic)) {
+                    if (preg_match("@{$topic}@", (string) $sentTopic)) {
                         --$toMatchTopics;
                     }
                 }

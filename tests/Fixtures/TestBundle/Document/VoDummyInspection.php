@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
-use DateTime;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -30,10 +29,10 @@ class VoDummyInspection
     public function __construct(
         #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] #[ODM\Field(type: 'bool')] private bool $accepted,
         #[Groups(['inspection_read', 'inspection_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyCar::class, inversedBy: 'inspections')] private VoDummyCar $car,
-        DateTime $performed = null,
+        \DateTime $performed = null,
         private string $attributeWithoutConstructorEquivalent = '',
     ) {
-        $this->performed = $performed ?: new DateTime();
+        $this->performed = $performed ?: new \DateTime();
     }
 
     public function isAccepted(): bool
@@ -46,12 +45,12 @@ class VoDummyInspection
         return $this->car;
     }
 
-    public function getPerformed(): DateTime
+    public function getPerformed(): \DateTime
     {
         return $this->performed;
     }
 
-    public function setPerformed(DateTime $performed)
+    public function setPerformed(\DateTime $performed)
     {
         $this->performed = $performed;
 

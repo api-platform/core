@@ -230,7 +230,7 @@ final class TypeBuilder implements TypeBuilderInterface
 
         $configuration = [
             'name' => $connectionTypeKey,
-            'description' => sprintf("%s connection for $shortName.", ucfirst($paginationType)),
+            'description' => sprintf("%s connection for {$shortName}.", ucfirst($paginationType)),
             'fields' => $fields,
         ];
 
@@ -254,7 +254,7 @@ final class TypeBuilder implements TypeBuilderInterface
 
         $edgeObjectTypeConfiguration = [
             'name' => "{$shortName}Edge",
-            'description' => "Edge of $shortName.",
+            'description' => "Edge of {$shortName}.",
             'fields' => [
                 'node' => $resourceType,
                 'cursor' => GraphQLType::nonNull(GraphQLType::string()),

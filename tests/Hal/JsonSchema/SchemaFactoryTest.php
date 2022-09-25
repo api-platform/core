@@ -46,7 +46,8 @@ class SchemaFactoryTest extends TestCase
                 (new ApiResource())->withOperations(new Operations([
                     'get' => (new Get())->withName('get'),
                 ])),
-            ]));
+            ])
+        );
         $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);

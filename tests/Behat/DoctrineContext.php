@@ -244,7 +244,7 @@ final class DoctrineContext implements Context
         $expectedDql = preg_replace('/\R */', ' ', $expectedDql);
 
         if ($expectedDql !== $actualDql) {
-            throw new \RuntimeException("The DQL:\n'$actualDql' is not equal to:\n'$expectedDql'");
+            throw new \RuntimeException("The DQL:\n'{$actualDql}' is not equal to:\n'{$expectedDql}'");
         }
     }
 
@@ -379,7 +379,7 @@ final class DoctrineContext implements Context
             foreach (['foo', 'bar', 'baz'] as $property) {
                 $dummyProperty->{$property} = $dummyGroup->{$property} = ucfirst($property).' #'.$i;
             }
-            $dummyProperty->nameConverted = "NameConverted #$i";
+            $dummyProperty->nameConverted = "NameConverted #{$i}";
 
             $dummyProperty->group = $dummyGroup;
 
@@ -506,7 +506,7 @@ final class DoctrineContext implements Context
             $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
-            $dummy->nameConverted = "Converted $i";
+            $dummy->nameConverted = "Converted {$i}";
             $dummy->setRelatedDummy($relatedDummy);
 
             $this->manager->persist($relatedDummy);
@@ -894,7 +894,7 @@ final class DoctrineContext implements Context
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $convertedString = $this->buildConvertedString();
-            $convertedString->nameConverted = ($i % 2) ? "name#$i" : null;
+            $convertedString->nameConverted = ($i % 2) ? "name#{$i}" : null;
 
             $this->manager->persist($convertedString);
         }
@@ -1049,8 +1049,8 @@ final class DoctrineContext implements Context
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $securedDummy = $this->buildSecuredDummy();
-            $securedDummy->setTitle("#$i");
-            $securedDummy->setDescription("Hello #$i");
+            $securedDummy->setTitle("#{$i}");
+            $securedDummy->setDescription("Hello #{$i}");
             $securedDummy->setOwner('notexist');
 
             $this->manager->persist($securedDummy);
@@ -1066,8 +1066,8 @@ final class DoctrineContext implements Context
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $securedDummy = $this->buildSecuredDummy();
-            $securedDummy->setTitle("#$i");
-            $securedDummy->setDescription("Hello #$i");
+            $securedDummy->setTitle("#{$i}");
+            $securedDummy->setDescription("Hello #{$i}");
             $securedDummy->setOwner($ownedby);
 
             $relatedDummy = $this->buildRelatedDummy();
@@ -1337,7 +1337,7 @@ final class DoctrineContext implements Context
 
         for ($i = $count + 1; $i <= $nb; ++$i) {
             $program = $this->isOrm() ? new Program() : new ProgramDocument();
-            $program->name = "Lorem ipsum $i";
+            $program->name = "Lorem ipsum {$i}";
             $program->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));
             $program->author = $author;
 
@@ -1377,7 +1377,7 @@ final class DoctrineContext implements Context
         } else {
             /** @var Builder $qb */
             $qb = $this->doctrine->getRepository(CommentDocument::class)
-                                 ->createQueryBuilder('f');
+                ->createQueryBuilder('f');
 
             $count = $qb->field('author')->equals($author)
                 ->count()->getQuery()->execute();
@@ -1385,7 +1385,7 @@ final class DoctrineContext implements Context
 
         for ($i = $count + 1; $i <= $nb; ++$i) {
             $comment = $this->isOrm() ? new Comment() : new CommentDocument();
-            $comment->comment = "Lorem ipsum dolor sit amet $i";
+            $comment->comment = "Lorem ipsum dolor sit amet {$i}";
             $comment->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));
             $comment->author = $author;
 
@@ -1681,7 +1681,7 @@ final class DoctrineContext implements Context
     public function thereIsAMaxDepthDummyWithLevelOfDescendants(int $level): void
     {
         $maxDepthDummy = $this->buildMaxDepthDummy();
-        $maxDepthDummy->name = "level $level";
+        $maxDepthDummy->name = "level {$level}";
         $this->manager->persist($maxDepthDummy);
 
         for ($i = 1; $i <= $level; ++$i) {
@@ -1850,7 +1850,7 @@ final class DoctrineContext implements Context
             $relatedDummy->setName('RelatedDummy #'.$i);
 
             $dummyMercure = $this->buildDummyMercure();
-            $dummyMercure->name = "Dummy Mercure #$i";
+            $dummyMercure->name = "Dummy Mercure #{$i}";
             $dummyMercure->description = 'Description';
             $dummyMercure->relatedDummy = $relatedDummy;
 

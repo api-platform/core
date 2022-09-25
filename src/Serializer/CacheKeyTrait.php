@@ -20,8 +20,8 @@ trait CacheKeyTrait
         foreach ($context[self::EXCLUDE_FROM_CACHE_KEY] ?? $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] as $key) {
             unset($context[$key]);
         }
-        unset($context[self::EXCLUDE_FROM_CACHE_KEY]);
-        unset($context['cache_key']); // avoid artificially different keys
+        unset($context[self::EXCLUDE_FROM_CACHE_KEY], $context['cache_key']);
+        // avoid artificially different keys
 
         try {
             return md5($format.serialize($context));

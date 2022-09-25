@@ -21,7 +21,7 @@ class MatchesJsonSchemaTest extends TestCase
 {
     public function testAdditionalFailureDescription(): void
     {
-        $jsonSchema = <<<JSON
+        $jsonSchema = <<<'JSON'
             {
               "required": ["notexist"]
             }

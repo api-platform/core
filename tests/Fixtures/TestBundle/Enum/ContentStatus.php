@@ -23,7 +23,7 @@ final class ContentStatus implements \JsonSerializable
     public function __construct(string $value)
     {
         if (!self::isValid($value)) {
-            throw new \UnexpectedValueException("Value '$value' is not part of the enum ".self::class);
+            throw new \UnexpectedValueException("Value '{$value}' is not part of the enum ".self::class);
         }
 
         $this->value = $value;

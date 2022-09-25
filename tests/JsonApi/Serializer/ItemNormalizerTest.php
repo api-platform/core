@@ -285,13 +285,17 @@ class ItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(NormalizerInterface::class);
 
         $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource())->withOperations(new Operations([new Get(name: 'get')])),
-        ]
+        $resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(
+            Dummy::class,
+            [
+                (new ApiResource())->withOperations(new Operations([new Get(name: 'get')])),
+            ]
         ));
-        $resourceMetadataCollectionFactory->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
-            (new ApiResource())->withOperations(new Operations([new Get(name: 'get')])),
-        ]
+        $resourceMetadataCollectionFactory->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection(
+            RelatedDummy::class,
+            [
+                (new ApiResource())->withOperations(new Operations([new Get(name: 'get')])),
+            ]
         ));
 
         $normalizer = new ItemNormalizer(
@@ -359,7 +363,8 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(
+            (new ApiProperty())
                 ->withBuiltinTypes([$type])
                 ->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)
         );

@@ -39,7 +39,9 @@ use Doctrine\ORM\Mapping as ORM;
             'customArgumentFloat' => ['type' => 'Float!'],
             'customArgumentIntArray' => ['type' => '[Int!]!'],
             'customArgumentCustomType' => ['type' => 'DateTime!'],
-        ], name: 'testItemCustomArguments'),
+        ],
+        name: 'testItemCustomArguments'
+    ),
     new QueryCollection(resolver: 'app.graphql.query_resolver.dummy_custom_collection', name: 'testCollection'),
     new QueryCollection(resolver: 'app.graphql.query_resolver.dummy_custom_collection_no_read_and_serialize', read: false, serialize: false, name: 'testCollectionNoReadAndSerialize'),
     new QueryCollection(

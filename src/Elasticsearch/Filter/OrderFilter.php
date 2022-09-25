@@ -102,7 +102,7 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
                 continue;
             }
 
-            $description["$this->orderParameterName[$property]"] = [
+            $description["{$this->orderParameterName}[{$property}]"] = [
                 'property' => $property,
                 'type' => 'string',
                 'required' => false,

@@ -156,7 +156,7 @@ class AddHeadersListenerTest extends TestCase
             $response
         );
 
-        $operation = new Get(name: 'get', cacheHeaders: ['max_age' => 123, 'shared_max_age' => 456, 'stale_while_revalidate' => 928, 'stale_if_error' => 70,  'vary' => ['Vary-1', 'Vary-2']]);
+        $operation = new Get(name: 'get', cacheHeaders: ['max_age' => 123, 'shared_max_age' => 456, 'stale_while_revalidate' => 928, 'stale_if_error' => 70, 'vary' => ['Vary-1', 'Vary-2']]);
         $factory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [new ApiResource(operations: ['get' => $operation])]))->shouldBeCalled();
 

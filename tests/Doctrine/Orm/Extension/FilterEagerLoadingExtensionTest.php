@@ -235,7 +235,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
-        $expected = <<<SQL
+        $expected = <<<'SQL'
             SELECT o, CASE WHEN o.dateCreated IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dateCreated_null_rank
             FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
             LEFT JOIN o.colors colors
@@ -272,7 +272,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
-        $expected = <<<SQL
+        $expected = <<<'SQL'
             SELECT o, count(o.id) as counter
             FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
             LEFT JOIN o.colors colors WHERE o
@@ -320,7 +320,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
 
-        $expected = <<<SQL
+        $expected = <<<'SQL'
             SELECT o
             FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
             INNER JOIN o.compositeItem item
@@ -387,7 +387,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(false);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
 
-        $expected = <<<DQL
+        $expected = <<<'DQL'
             SELECT o
             FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
             INNER JOIN o.compositeItem item
@@ -446,7 +446,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
 
-        $expected = <<<SQL
+        $expected = <<<'SQL'
             SELECT o
             FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
             INNER JOIN o.compositeItem item
@@ -495,7 +495,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
 
-        $expected = <<<SQL
+        $expected = <<<'SQL'
             SELECT o
             FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
             INNER JOIN o.compositeItem item
@@ -531,7 +531,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
 
-        $expected = <<<SQL
+        $expected = <<<'SQL'
             SELECT o
             FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o
             LEFT JOIN o.colors colors

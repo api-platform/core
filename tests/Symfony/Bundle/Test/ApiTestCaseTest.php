@@ -34,11 +34,12 @@ class ApiTestCaseTest extends ApiTestCase
     public function testAssertJsonContainsWithJsonObjectString(): void
     {
         self::createClient()->request('GET', '/');
-        $this->assertJsonContains(<<<JSON
-            {
-                "@context": "/contexts/Entrypoint"
-            }
-            JSON
+        $this->assertJsonContains(
+            <<<'JSON'
+                {
+                    "@context": "/contexts/Entrypoint"
+                }
+                JSON
         );
     }
 
@@ -48,9 +49,10 @@ class ApiTestCaseTest extends ApiTestCase
         $this->expectExceptionMessage('$subset must be array or string (JSON array or JSON object)');
 
         self::createClient()->request('GET', '/');
-        $this->assertJsonContains(<<<JSON
-            "/contexts/Entrypoint"
-            JSON
+        $this->assertJsonContains(
+            <<<'JSON'
+                "/contexts/Entrypoint"
+                JSON
         );
     }
 
@@ -69,15 +71,16 @@ class ApiTestCaseTest extends ApiTestCase
     public function testAssertJsonEqualsWithJsonObjectString(): void
     {
         self::createClient()->request('GET', '/contexts/Address');
-        $this->assertJsonEquals(<<<JSON
-            {
-                "@context": {
-                    "@vocab": "http://localhost/docs.jsonld#",
-                    "hydra": "http://www.w3.org/ns/hydra/core#",
-                    "name": "Address/name"
+        $this->assertJsonEquals(
+            <<<'JSON'
+                {
+                    "@context": {
+                        "@vocab": "http://localhost/docs.jsonld#",
+                        "hydra": "http://www.w3.org/ns/hydra/core#",
+                        "name": "Address/name"
+                    }
                 }
-            }
-            JSON
+                JSON
         );
     }
 
@@ -87,15 +90,16 @@ class ApiTestCaseTest extends ApiTestCase
         $this->expectExceptionMessage('$json must be array or string (JSON array or JSON object)');
 
         self::createClient()->request('GET', '/contexts/Address');
-        $this->assertJsonEquals(<<<JSON
-            "Address/name"
-            JSON
+        $this->assertJsonEquals(
+            <<<'JSON'
+                "Address/name"
+                JSON
         );
     }
 
     public function testAssertMatchesJsonSchema(): void
     {
-        $jsonSchema = <<<JSON
+        $jsonSchema = <<<'JSON'
             {
               "type": "object",
               "properties": {

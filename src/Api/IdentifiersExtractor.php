@@ -119,7 +119,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 }
 
                 if ($type->getClassName() === $class) {
-                    return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
+                    return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "{$propertyName}.{$property}"), $parameterName);
                 }
             } catch (NoSuchPropertyException $e) {
                 throw new RuntimeException('Not able to retrieve identifiers.', $e->getCode(), $e);

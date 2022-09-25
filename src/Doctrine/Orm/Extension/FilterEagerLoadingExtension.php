@@ -76,8 +76,8 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 
             if ($classMetadata->containsForeignIdentifier) {
                 $identifier = current($classMetadata->getIdentifier());
-                $in->select("IDENTITY($replacementAlias.$identifier)");
-                $queryBuilderClone->andWhere($queryBuilderClone->expr()->in("$originAlias.$identifier", $in->getDQL()));
+                $in->select("IDENTITY({$replacementAlias}.{$identifier})");
+                $queryBuilderClone->andWhere($queryBuilderClone->expr()->in("{$originAlias}.{$identifier}", $in->getDQL()));
             } else {
                 $in->select($replacementAlias);
                 $queryBuilderClone->andWhere($queryBuilderClone->expr()->in($originAlias, $in->getDQL()));
@@ -93,8 +93,8 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 
                 $replacementAlias = $queryNameGenerator->generateJoinAlias($originAlias);
                 $in = $this->getQueryBuilderWithNewAliases($queryBuilder, $queryNameGenerator, $originAlias, $replacementAlias);
-                $in->select("IDENTITY($replacementAlias.$identifier)");
-                $queryBuilderClone->andWhere($queryBuilderClone->expr()->in("$originAlias.$identifier", $in->getDQL()));
+                $in->select("IDENTITY({$replacementAlias}.{$identifier})");
+                $queryBuilderClone->andWhere($queryBuilderClone->expr()->in("{$originAlias}.{$identifier}", $in->getDQL()));
                 $changedWhereClause = true;
             }
         }
@@ -160,8 +160,8 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         $queryBuilderClone->resetDQLPart('from');
         $queryBuilderClone->from($from->getFrom(), $replacement);
 
-        $aliases = ["$originAlias."];
-        $replacements = ["$replacement."];
+        $aliases = ["{$originAlias}."];
+        $replacements = ["{$replacement}."];
 
         // Change join aliases
         foreach ($joinParts[$originAlias] as $joinPart) {
@@ -172,7 +172,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
                 if (null !== $joinPart->getCondition() && null !== $this->resourceClassResolver && $this->resourceClassResolver->isResourceClass($joinString)) {
                     $newAlias = $queryNameGenerator->generateJoinAlias($joinPart->getAlias());
                     $aliases[] = "{$joinPart->getAlias()}.";
-                    $replacements[] = "$newAlias.";
+                    $replacements[] = "{$newAlias}.";
                     $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getCondition());
                     $join = new Join($joinPart->getJoinType(), $joinPart->getJoin(), $newAlias, $joinPart->getConditionType(), $condition);
                     $queryBuilderClone->add('join', [$replacement => $join], true); // @phpstan-ignore-line
@@ -184,7 +184,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
             $association = substr($joinString, $pos + 1);
             $newAlias = $queryNameGenerator->generateJoinAlias($association);
             $aliases[] = "{$joinPart->getAlias()}.";
-            $replacements[] = "$newAlias.";
+            $replacements[] = "{$newAlias}.";
             $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getCondition() ?? '');
             QueryBuilderHelper::addJoinOnce($queryBuilderClone, $queryNameGenerator, $alias, $association, $joinPart->getJoinType(), $joinPart->getConditionType(), $condition, $originAlias, $newAlias);
         }

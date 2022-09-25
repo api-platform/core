@@ -49,14 +49,15 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
      */
     public function __invoke(string $resourceClass, string $propertyName, array $parameters, array $fixtures): array
     {
-        $xml = new \SimpleXMLElement(<<<XML_WRAP
-            <?xml version="1.0" encoding="UTF-8" ?>
-            <properties xmlns="https://api-platform.com/schema/metadata/properties-3.0"
-                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                       xsi:schemaLocation="https://api-platform.com/schema/metadata/properties-3.0
-                       https://api-platform.com/schema/metadata/properties-3.0.xsd">
-            </properties>
-            XML_WRAP
+        $xml = new \SimpleXMLElement(
+            <<<'XML_WRAP'
+                <?xml version="1.0" encoding="UTF-8" ?>
+                <properties xmlns="https://api-platform.com/schema/metadata/properties-3.0"
+                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                           xsi:schemaLocation="https://api-platform.com/schema/metadata/properties-3.0
+                           https://api-platform.com/schema/metadata/properties-3.0.xsd">
+                </properties>
+                XML_WRAP
         );
 
         $property = $xml->addChild('property');

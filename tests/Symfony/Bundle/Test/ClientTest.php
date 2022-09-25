@@ -131,19 +131,20 @@ class ClientTest extends ApiTestCase
             ]
         );
 
-        $this->assertMatchesJsonSchema(<<<JSON
-            {
-              "type": "object",
-              "properties": {
-                "@context": {"pattern": "^/contexts/SecuredDummy$"},
-                "@id": {"pattern": "^/secured_dummies$"},
-                "@type": {"pattern": "^hydra:Collection"},
-                "hydra:member": {}
-              },
-              "additionalProperties": true,
-              "required": ["@context", "@id", "@type", "hydra:member"]
-            }
-            JSON
+        $this->assertMatchesJsonSchema(
+            <<<'JSON'
+                {
+                  "type": "object",
+                  "properties": {
+                    "@context": {"pattern": "^/contexts/SecuredDummy$"},
+                    "@id": {"pattern": "^/secured_dummies$"},
+                    "@type": {"pattern": "^hydra:Collection"},
+                    "hydra:member": {}
+                  },
+                  "additionalProperties": true,
+                  "required": ["@context", "@id", "@type", "hydra:member"]
+                }
+                JSON
         );
     }
 

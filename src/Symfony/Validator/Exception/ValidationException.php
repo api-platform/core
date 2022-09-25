@@ -45,7 +45,7 @@ final class ValidationException extends BaseValidationException implements Const
                 $message .= "\n";
             }
             if ($propertyPath = $violation->getPropertyPath()) {
-                $message .= "$propertyPath: ";
+                $message .= "{$propertyPath}: ";
             }
 
             $message .= $violation->getMessage();

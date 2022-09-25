@@ -67,9 +67,9 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
+            null === $value
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
@@ -173,11 +173,11 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $quotedValue = preg_quote($value);
 
         return match ($strategy) {
-            self::STRATEGY_EXACT => $caseSensitive ? $value : new Regex("^$quotedValue$", 'i'),
+            self::STRATEGY_EXACT => $caseSensitive ? $value : new Regex("^{$quotedValue}$", 'i'),
             self::STRATEGY_PARTIAL => new Regex($quotedValue, $caseSensitive ? '' : 'i'),
-            self::STRATEGY_START => new Regex("^$quotedValue", $caseSensitive ? '' : 'i'),
-            self::STRATEGY_END => new Regex("$quotedValue$", $caseSensitive ? '' : 'i'),
-            self::STRATEGY_WORD_START => new Regex("(^$quotedValue.*|.*\s$quotedValue.*)", $caseSensitive ? '' : 'i'),
+            self::STRATEGY_START => new Regex("^{$quotedValue}", $caseSensitive ? '' : 'i'),
+            self::STRATEGY_END => new Regex("{$quotedValue}$", $caseSensitive ? '' : 'i'),
+            self::STRATEGY_WORD_START => new Regex("(^{$quotedValue}.*|.*\\s{$quotedValue}.*)", $caseSensitive ? '' : 'i'),
             default => throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy)),
         };
     }

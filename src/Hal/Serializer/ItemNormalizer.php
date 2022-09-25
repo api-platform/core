@@ -245,9 +245,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
     {
         if (
-            !($context[self::ENABLE_MAX_DEPTH] ?? false) ||
-            !isset($attributesMetadata[$attribute]) ||
-            null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
+            !($context[self::ENABLE_MAX_DEPTH] ?? false)
+            || !isset($attributesMetadata[$attribute])
+            || null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
         ) {
             return false;
         }

@@ -90,9 +90,9 @@ final class QueryChecker
     public static function hasOrderByOnFetchJoinedToManyAssociation(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         if (
-            0 === (is_countable($selectParts = $queryBuilder->getDQLPart('select')) ? \count($selectParts = $queryBuilder->getDQLPart('select')) : 0) ||
-            0 === (is_countable($queryBuilder->getDQLPart('join')) ? \count($queryBuilder->getDQLPart('join')) : 0) ||
-            0 === (is_countable($orderByParts = $queryBuilder->getDQLPart('orderBy')) ? \count($orderByParts = $queryBuilder->getDQLPart('orderBy')) : 0)
+            0 === (is_countable($selectParts = $queryBuilder->getDQLPart('select')) ? \count($selectParts = $queryBuilder->getDQLPart('select')) : 0)
+            || 0 === (is_countable($queryBuilder->getDQLPart('join')) ? \count($queryBuilder->getDQLPart('join')) : 0)
+            || 0 === (is_countable($orderByParts = $queryBuilder->getDQLPart('orderBy')) ? \count($orderByParts = $queryBuilder->getDQLPart('orderBy')) : 0)
         ) {
             return false;
         }

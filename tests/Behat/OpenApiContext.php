@@ -102,7 +102,7 @@ final class OpenApiContext implements Context
     {
         $json = $this->getLastJsonResponse();
 
-        Assert::assertTrue(isset($json->paths) && isset($json->paths->{$path}));
+        Assert::assertTrue(isset($json->paths, $json->paths->{$path}));
     }
 
     /**

@@ -51,7 +51,7 @@ final class DateTimeType extends ScalarType implements TypeInterface
             return (new \DateTime($value))->format('Y-m-d');
         }
 
-        if (!($value instanceof \DateTime)) {
+        if (!$value instanceof \DateTime) {
             throw new Error(sprintf('Value must be an instance of DateTime to be represented by DateTime: %s', Utils::printSafe($value)));
         }
 

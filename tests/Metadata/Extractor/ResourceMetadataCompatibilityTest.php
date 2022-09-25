@@ -34,7 +34,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\ResourceAdapterInterface;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlResourceAdapter;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\YamlResourceAdapter;
-use Exception;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
@@ -420,7 +419,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             $extractor = new $extractorClass($adapter(self::RESOURCE_CLASS, $parameters, self::FIXTURES));
             $factory = new ExtractorResourceMetadataCollectionFactory($extractor);
             $collection = $factory->create(self::RESOURCE_CLASS);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
         }
 

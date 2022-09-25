@@ -69,14 +69,15 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
      */
     public function __invoke(string $resourceClass, array $parameters, array $fixtures): array
     {
-        $xml = new \SimpleXMLElement(<<<XML_WRAP
-            <?xml version="1.0" encoding="UTF-8" ?>
-            <resources xmlns="https://api-platform.com/schema/metadata/resources-3.0"
-                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                       xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
-                       https://api-platform.com/schema/metadata/resources-3.0.xsd">
-            </resources>
-            XML_WRAP
+        $xml = new \SimpleXMLElement(
+            <<<'XML_WRAP'
+                <?xml version="1.0" encoding="UTF-8" ?>
+                <resources xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                           xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+                           https://api-platform.com/schema/metadata/resources-3.0.xsd">
+                </resources>
+                XML_WRAP
         );
 
         foreach ($fixtures as $fixture) {

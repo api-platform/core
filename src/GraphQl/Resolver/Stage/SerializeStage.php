@@ -115,7 +115,7 @@ final class SerializeStage implements SerializeStageInterface
     {
         $args = $context['args'];
 
-        if (!($collection instanceof PartialPaginatorInterface)) {
+        if (!$collection instanceof PartialPaginatorInterface) {
             throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s or %s.', PaginatorInterface::class, PartialPaginatorInterface::class));
         }
 
@@ -177,7 +177,7 @@ final class SerializeStage implements SerializeStageInterface
      */
     private function serializePageBasedPaginatedCollection(iterable $collection, array $normalizationContext): array
     {
-        if (!($collection instanceof PaginatorInterface)) {
+        if (!$collection instanceof PaginatorInterface) {
             throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s.', PaginatorInterface::class));
         }
 

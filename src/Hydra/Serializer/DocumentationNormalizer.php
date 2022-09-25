@@ -63,7 +63,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
             $resourceMetadata = $resourceMetadataCollection[0];
             $shortName = $resourceMetadata->getShortName();
-            $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
+            $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#{$shortName}";
             $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $resourceMetadataCollection);
             $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $resourceMetadataCollection);
         }
@@ -87,7 +87,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 '@id' => sprintf('#Entrypoint/%s', lcfirst($shortName)),
                 '@type' => 'hydra:Link',
                 'domain' => '#Entrypoint',
-                'rdfs:label' => "The collection of $shortName resources",
+                'rdfs:label' => "The collection of {$shortName} resources",
                 'rdfs:range' => [
                     ['@id' => 'hydra:Collection'],
                     [
@@ -99,7 +99,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 ],
                 'hydra:supportedOperation' => $hydraCollectionOperations,
             ],
-            'hydra:title' => "The collection of $shortName resources",
+            'hydra:title' => "The collection of {$shortName} resources",
             'hydra:readable' => true,
             'hydra:writeable' => false,
         ];
@@ -263,40 +263,40 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if ('GET' === $method && $operation instanceof CollectionOperationInterface) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
-                'hydra:title' => "Retrieves the collection of $shortName resources.",
+                'hydra:title' => "Retrieves the collection of {$shortName} resources.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : 'hydra:Collection',
             ];
         } elseif ('GET' === $method) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
-                'hydra:title' => "Retrieves a $shortName resource.",
+                'hydra:title' => "Retrieves a {$shortName} resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PATCH' === $method) {
             $hydraOperation += [
                 '@type' => 'hydra:Operation',
-                'hydra:title' => "Updates the $shortName resource.",
+                'hydra:title' => "Updates the {$shortName} resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
                 'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('POST' === $method) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:CreateAction'],
-                'hydra:title' => "Creates a $shortName resource.",
+                'hydra:title' => "Creates a {$shortName} resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
                 'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PUT' === $method) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
-                'hydra:title' => "Replaces the $shortName resource.",
+                'hydra:title' => "Replaces the {$shortName} resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
                 'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('DELETE' === $method) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:DeleteAction'],
-                'hydra:title' => "Deletes the $shortName resource.",
+                'hydra:title' => "Deletes the {$shortName} resource.",
                 'returns' => 'owl:Nothing',
             ];
         }
@@ -458,7 +458,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if (!isset($iri)) {
-            $iri = "#$shortName/$propertyName";
+            $iri = "#{$shortName}/{$propertyName}";
         }
 
         $propertyData = [
