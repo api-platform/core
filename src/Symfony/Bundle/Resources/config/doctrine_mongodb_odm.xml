@@ -25,23 +25,19 @@
             <factory service="doctrine_mongodb.odm.default_document_manager" method="getMetadataFactory"/>
         </service>
 
-        <service id="api_platform.doctrine_mongodb.odm.state.processor" class="ApiPlatform\Doctrine\Common\State\Processor">
+        <service id="api_platform.doctrine_mongodb.odm.state.remove_processor" class="ApiPlatform\Doctrine\Common\State\RemoveProcessor">
             <argument type="service" id="doctrine_mongodb" />
 
-            <tag name="api_platform.state_processor" priority="-100" />
+            <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\RemoveProcessor" />
         </service>
+        <service id="ApiPlatform\Doctrine\Common\State\RemoveProcessor" alias="api_platform.doctrine_mongodb.odm.state.remove_processor" />
 
-        <service id="ApiPlatform\Doctrine\Common\State\RemoveProcessor" class="ApiPlatform\Doctrine\Common\State\RemoveProcessor">
+        <service id="api_platform.doctrine_mongodb.odm.state.persist_processor" class="ApiPlatform\Doctrine\Common\State\PersistProcessor">
             <argument type="service" id="doctrine_mongodb" />
 
-            <tag name="api_platform.state_processor" priority="-100" />
+            <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\PersistProcessor" />
         </service>
-
-        <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" class="ApiPlatform\Doctrine\Common\State\PersistProcessor">
-            <argument type="service" id="doctrine_mongodb" />
-
-            <tag name="api_platform.state_processor" priority="-100" />
-        </service>
+        <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" alias="api_platform.doctrine_mongodb.odm.state.persist_processor" />
 
         <service id="api_platform.doctrine_mongodb.odm.data_persister" class="ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister" public="false">
             <argument type="service" id="doctrine_mongodb" />

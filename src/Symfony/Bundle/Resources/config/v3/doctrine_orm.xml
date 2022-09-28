@@ -13,21 +13,23 @@
             <argument type="service" id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory.inner" />
         </service>
 
-        <service id="ApiPlatform\Doctrine\Orm\State\CollectionProvider" class="ApiPlatform\Doctrine\Orm\State\CollectionProvider" public="false">
+        <service id="api_platform.doctrine.orm.state.collection_provider" class="ApiPlatform\Doctrine\Orm\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
 
-            <tag name="api_platform.state_provider" priority="-100" />
+            <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\CollectionProvider" />
         </service>
+        <service id="ApiPlatform\Doctrine\Orm\State\CollectionProvider" alias="api_platform.doctrine.orm.state.collection_provider" />
 
-        <service id="ApiPlatform\Doctrine\Orm\State\ItemProvider" class="ApiPlatform\Doctrine\Orm\State\ItemProvider" public="false">
+        <service id="api_platform.doctrine.orm.state.item_provider" class="ApiPlatform\Doctrine\Orm\State\ItemProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
 
-            <tag name="api_platform.state_provider" priority="-100" />
+            <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\ItemProvider" />
         </service>
+        <service id="ApiPlatform\Doctrine\Orm\State\ItemProvider" alias="api_platform.doctrine.orm.state.item_provider" />
 
         <service id="api_platform.doctrine.orm.search_filter" class="ApiPlatform\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />

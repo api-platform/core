@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.1
+
+* Replace FQCN service names by snake ones (#5019)
+
 ## 2.7.0
 
 * chore: remove @experimental phpdoc (#4933)
