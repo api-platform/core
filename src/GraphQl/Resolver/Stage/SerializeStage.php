@@ -38,7 +38,7 @@ final class SerializeStage implements SerializeStageInterface
     {
     }
 
-    public function __invoke(iterable|object|null $itemOrCollection, string $resourceClass, Operation $operation, array $context): ?array
+    public function __invoke(object|array|null $itemOrCollection, string $resourceClass, Operation $operation, array $context): ?array
     {
         $isCollection = $operation instanceof CollectionOperationInterface;
         $isMutation = $operation instanceof Mutation;

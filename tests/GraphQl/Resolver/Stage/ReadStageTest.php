@@ -62,7 +62,7 @@ class ReadStageTest extends TestCase
     /**
      * @dataProvider contextProvider
      */
-    public function testApplyDisabled(array $context, iterable|object|null $expectedResult): void
+    public function testApplyDisabled(array $context, object|array|null $expectedResult): void
     {
         $resourceClass = 'myResource';
         /** @var Operation $operation */

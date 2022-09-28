@@ -23,7 +23,7 @@ final class FakeProvider implements ProviderInterface
      *
      * @return array|object|null
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable|object|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $className = $operation->getClass();
         $data = [
