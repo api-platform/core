@@ -42,7 +42,7 @@
         <service id="ApiPlatform\State\Pagination\PaginationOptions" alias="api_platform.pagination_options" />
 
         <service id="ApiPlatform\State\CreateProvider" class="ApiPlatform\State\CreateProvider">
-            <argument type="service" id="api_platform.state.item_provider" on-invalid="ignore" />
+            <argument type="service" id="api_platform.state.item_provider" />
 
             <tag name="api_platform.state_provider" />
         </service>
