@@ -20,6 +20,7 @@
             <argument type="service" id="doctrine_mongodb" />
 
             <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\RemoveProcessor" />
+            <tag name="api_platform.state_processor" priority="-100" key="api_platform.doctrine_mongodb.odm.state.remove_processor" />
         </service>
         <service id="ApiPlatform\Doctrine\Common\State\RemoveProcessor" alias="api_platform.doctrine_mongodb.odm.state.remove_processor" />
 
@@ -27,6 +28,7 @@
             <argument type="service" id="doctrine_mongodb" />
 
             <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\PersistProcessor" />
+            <tag name="api_platform.state_processor" priority="-100" key="api_platform.doctrine_mongodb.odm.state.persist_processor" />
         </service>
         <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" alias="api_platform.doctrine_mongodb.odm.state.persist_processor" />
 
@@ -127,6 +129,7 @@
             <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Odm\State\CollectionProvider" />
+            <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine_mongodb.odm.state.collection_provider" />
         </service>
         <service id="ApiPlatform\Doctrine\Odm\State\CollectionProvider" alias="api_platform.doctrine_mongodb.odm.state.collection_provider" />
 
@@ -136,6 +139,7 @@
             <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Odm\State\ItemProvider" />
+            <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine_mongodb.odm.state.item_provider" />
         </service>
         <service id="ApiPlatform\Doctrine\Odm\State\ItemProvider" alias="api_platform.doctrine_mongodb.odm.state.item_provider" />
         <service id="api_platform.state.item_provider" alias="ApiPlatform\Doctrine\Odm\State\ItemProvider" />

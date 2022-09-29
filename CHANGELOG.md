@@ -67,6 +67,7 @@ Breaking changes:
 * Symfony: missing Elasticsearch DocumentMetadataFactoryInterface alias definition (#4962)
 * Chore: drop dependency on fig/link-util (#4945)
 * Metadata: resource name collection missing deprecation (#4953)
+* Doctrine: ability to use ORM and ODM (#5032)
 
 ## 2.7.0
 

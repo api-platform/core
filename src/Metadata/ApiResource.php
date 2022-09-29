@@ -18,6 +18,8 @@ use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 /**
  * Resource metadata attribute.
  *
+ * @Annotation
+ *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
