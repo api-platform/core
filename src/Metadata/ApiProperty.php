@@ -60,7 +60,7 @@ final class ApiProperty
         private ?bool $push = null,
         private ?string $security = null,
         private ?string $securityPostDenormalize = null,
-        private $types = null,
+        private array|string|null $types = null,
         /**
          * The related php types.
          */
@@ -70,6 +70,9 @@ final class ApiProperty
         private $iris = null,
         private array $extraProperties = []
     ) {
+        if (\is_string($types)) {
+            $this->types = (array) $types;
+        }
     }
 
     public function getDescription(): ?string

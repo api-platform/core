@@ -36,7 +36,7 @@ class ApiResource
     protected $processor;
 
     /**
-     * @param array|null                                                      $types                          The RDF types of this resource
+     * @param array|string|null                                               $types                          The RDF types of this resource
      * @param mixed|null                                                      $operations
      * @param array|string|null                                               $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
      * @param array|string|null                                               $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
@@ -83,7 +83,7 @@ class ApiResource
         protected ?string $uriTemplate = null,
         protected ?string $shortName = null,
         protected ?string $description = null,
-        protected $types = null,
+        protected string|array|null $types = null,
         $operations = null,
         protected $formats = null,
         protected $inputFormats = null,
@@ -147,6 +147,9 @@ class ApiResource
         $this->operations = null === $operations ? null : new Operations($operations);
         $this->provider = $provider;
         $this->processor = $processor;
+        if (\is_string($types)) {
+            $this->types = (array) $types;
+        }
     }
 
     public function getOperations(): ?Operations
