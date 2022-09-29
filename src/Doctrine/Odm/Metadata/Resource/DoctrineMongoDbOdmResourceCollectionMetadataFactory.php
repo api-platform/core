@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Metadata\Resource;
 
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
-use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider;
 use ApiPlatform\Metadata\CollectionOperationInterface;
@@ -110,9 +108,9 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
     private function getProcessor(Operation $operation): string
     {
         if ($operation instanceof DeleteOperationInterface) {
-            return RemoveProcessor::class;
+            return 'api_platform.doctrine_mongodb.odm.state.remove_processor';
         }
 
-        return PersistProcessor::class;
+        return 'api_platform.doctrine_mongodb.odm.state.persist_processor';
     }
 }
