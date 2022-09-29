@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.0.1
+
+* Symfony: don't use ArrayAdapter cache in production #5027
+* Symfony: remove `_api_exception_to_status` leftovers (#4992)
+* Serializer: support empty array as object (#4999)
+* Chore: compatibility with PHP 8.2 (#5024)
+* Symfony: resource class directories bc break (#4982)
+* Symfony: exception_status bad merge (#4981)
+* Graphql: remove unused service for ItemResolverFactory (#4976)
+* Chore: document missing breaking changes on the 3.0.0-beta.1
+
 ## 3.0.0
 
 * Metadata: CRUD on subresource with experimental write support (#4932)
@@ -35,6 +46,9 @@ Breaking changes:
 * Doctrine: `ContextAware` interfaces were merged with their child interfaces you can safely remove them (#4779)
 * Metadata: the `Core` namespace got removed (#4805)
 * Mercure: deprecation removed (#4805)
+* Identifiers: using an object as identifier is supported only when this object is `Stringable`
+* Serializer: `skip_null_values` now defaults to `true`
+* Metadata: `Patch` is added to the automatic CRUD
 
 ## 2.7.1
 
