@@ -1,5 +1,15 @@
 # Changelog
-=======
+
+## 3.0.1
+
+* Symfony: don't use ArrayAdapter cache in production #5027
+* Symfony: remove `_api_exception_to_status` leftovers (#4992)
+* Serializer: support empty array as object (#4999)
+* Chore: compatibility with PHP 8.2 (#5024)
+* Symfony: resource class directories bc break (#4982)
+* Symfony: exception_status bad merge (#4981)
+* Graphql: remove unused service for ItemResolverFactory (#4976)
+* Chore: document missing breaking changes on the 3.0.0-beta.1
 
 ## 3.0.0
 
@@ -12,19 +22,6 @@
 * Cache: remove guzzle from the Varnish purger (#4872)
 
 Various cleanup in services and removal of backward compatibility layer.
-
-## 2.7.0
-
-* chore: remove @experimental phpdoc (#4933)
-* Metadata: do not set id when identifier is `false` (#4880)
-* Metadata: automatic GET operation when none is declared (#4881)
-* Metadata: exception to status on operations (#4861)
-* Serializer: adds the JSON_INVALID_UTF8_IGNORE flag to JsonEncode (#4741)
-* Symfony: autoconfigure legacy Doctrine extensions (#4909)
-* Elasticsearch: skip metadata without ES nodes (#4913)
-* Symfony: deprecated the `$exceptionOnNoToken` parameter in `ResourceAccessChecker::__construct()` (#4900)
-
-Various cs fixes and PHPDoc to help upgrading to 3.0.
 
 ## 3.0.0-rc.2 
 
@@ -49,6 +46,41 @@ Breaking changes:
 * Doctrine: `ContextAware` interfaces were merged with their child interfaces you can safely remove them (#4779)
 * Metadata: the `Core` namespace got removed (#4805)
 * Mercure: deprecation removed (#4805)
+* Identifiers: using an object as identifier is supported only when this object is `Stringable`
+* Serializer: `skip_null_values` now defaults to `true`
+* Metadata: `Patch` is added to the automatic CRUD
+
+## 2.7.1
+
+* Chore: update swagger ui and javascript libraries (#5028)
+* Symfony: don't use ArrayAdapter cache in production #4975 (#5025)
+* Doctrine: check fetch joined queries based on all aliases (#4974)
+* Metadata: fix missing `array` cast for RDF types in `ApiResource` & `ApiProperty` constructors (#5000)
+* Symfony: replace FQCN service names by snake ones (#5019)
+* Symfony: add missing dependency on symfony/deprecation-contracts (#5015)
+* Chore: add conflict on elasticsearch >= 8.0 (#5018)
+* Symfony: bc layer broken for symfony/console lower than 5.3 (#4990)
+* Symfony: missing deprecations related to Ulid and Uuid normalize… (#4963)
+* Metadata: do not auto-generate NotExposed operation when using custom operation classes
+* Symfony: upgrade command requires phpunit (#4968)
+* Symfony: upgrade command removes filters (#4970)
+* Symfony: missing Elasticsearch DocumentMetadataFactoryInterface alias definition (#4962)
+* Chore: drop dependency on fig/link-util (#4945)
+* Metadata: resource name collection missing deprecation (#4953)
+* Doctrine: ability to use ORM and ODM (#5032)
+
+## 2.7.0
+
+* chore: remove @experimental phpdoc (#4933)
+* Metadata: do not set id when identifier is `false` (#4880)
+* Metadata: automatic GET operation when none is declared (#4881)
+* Metadata: exception to status on operations (#4861)
+* Serializer: adds the JSON_INVALID_UTF8_IGNORE flag to JsonEncode (#4741)
+* Symfony: autoconfigure legacy Doctrine extensions (#4909)
+* Elasticsearch: skip metadata without ES nodes (#4913)
+* Symfony: deprecated the `$exceptionOnNoToken` parameter in `ResourceAccessChecker::__construct()` (#4900)
+
+Various cs fixes and PHPDoc to help upgrading to 3.0.
 
 ## 2.7.0-rc.2 
 
@@ -141,7 +173,7 @@ Doctrine: new interfaces for Filters and Extensions ready, switch to the `ApiPla
 
 * Swagger UI: Add `usePkceWithAuthorizationCodeGrant` to Swagger UI initOAuth (#4649)
 * **BC**: `mapping.paths` in configuration should override bundles configuration (#4465)
-* GraphQL: Add ability to use different pagination types for the queries of a resource (#4453)
+* GraphQL: Add the ability to use different pagination types for the queries of a resource (#4453)
 * Security: **BC** Fix `ApiProperty` `security` attribute expression being passed a class string for the `object` variable on updates/creates - null is now passed instead if the object is not available (#4184)
 * Security: `ApiProperty` now supports a `security_post_denormalize` attribute, which provides access to the `object` variable for the object being updated/created and `previous_object` for the object before it was updated (#4184)
 * Maker: Add `make:data-provider` and `make :data-persister` commands to generate a data provider / persister (#3850)
@@ -175,7 +207,7 @@ Doctrine: new interfaces for Filters and Extensions ready, switch to the `ApiPla
 * Metadata: deprecation of `ApiPlatform\Core\Annotation` (#4351)
 * Metadata: `ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface` is deprecated in favor of `ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface` (#4351)
 * Metadata: item and collection prefixes for operations are deprecated, as well as the `ApiPlatform\Core\Api\OperationType` class (#4351)
-* Graphql: `ApiPlatform\Metadata\GraphQl` follow the same metadata conventions (a Subscription operation is available and isn't hidden behind an update Mutation anymore), interfaces got simplified (beeing @experimental) (#4351)
+* Graphql: `ApiPlatform\Metadata\GraphQl` follow the same metadata conventions (a Subscription operation is available and isn't hidden behind an update Mutation anymore), interfaces got simplified (being @experimental) (#4351)
 * IriConverter: new interface for `ApiPlatform\Bridge\Symfony\Routing\IriConverter` that adds an operationName, same for `ApiPlatform\Api\IdentifiersExtractor` (#4351)
 * DataProvider: new `ApiPlatform\State\ProviderInterface` that replaces DataProviders (#4351)
 * DataPersister: new `ApiPlatform\State\ProcessorInterface` that replaces DataPersisters (#4351)

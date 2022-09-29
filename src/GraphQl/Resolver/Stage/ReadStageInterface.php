@@ -22,5 +22,5 @@ use ApiPlatform\Metadata\GraphQl\Operation;
  */
 interface ReadStageInterface
 {
-    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context): iterable|object|null;
+    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context): object|array|null;
 }

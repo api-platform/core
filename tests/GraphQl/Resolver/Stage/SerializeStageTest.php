@@ -80,7 +80,7 @@ class SerializeStageTest extends TestCase
     /**
      * @dataProvider applyProvider
      */
-    public function testApply(iterable|object $itemOrCollection, string $operationName, array $context, bool $paginationEnabled, ?array $expectedResult): void
+    public function testApply(object|array $itemOrCollection, string $operationName, array $context, bool $paginationEnabled, ?array $expectedResult): void
     {
         $resourceClass = 'myResource';
         $operation = $context['is_mutation'] ? new Mutation() : new Query();

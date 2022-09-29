@@ -34,6 +34,7 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -305,13 +306,20 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $paths = array_unique(array_merge($this->getBundlesResourcesPaths($container, $config), $config['mapping']['paths']));
 
-        // Default paths
-        if (!$paths) {
+        if (!$config['mapping']['paths']) {
             $projectDir = $container->getParameter('kernel.project_dir');
-            foreach (["$projectDir/config/api_platform", "$projectDir/src/ApiResource", "$projectDir/src/Document", "$projectDir/src/Entity"] as $dir) {
+            foreach (["$projectDir/config/api_platform", "$projectDir/src/ApiResource"] as $dir) {
                 if (is_dir($dir)) {
                     $paths[] = $dir;
                 }
+            }
+
+            if ($this->isConfigEnabled($container, $config['doctrine']) && is_dir($doctrinePath = "$projectDir/src/Entity")) {
+                $paths[] = $doctrinePath;
+            }
+
+            if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm']) && is_dir($documentPath = "$projectDir/src/Document")) {
+                $paths[] = $documentPath;
             }
         }
 
@@ -478,22 +486,27 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerCacheConfiguration(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter('kernel.debug') || !$container->getParameter('kernel.debug')) {
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $container->register('api_platform.cache.metadata.property', ArrayAdapter::class)->addTag('cache.pool');
+            $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class)->addTag('cache.pool');
+            $container->register('api_platform.cache.metadata.resource_collection', ArrayAdapter::class)->addTag('cache.pool');
+            $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class)->addTag('cache.pool');
+            $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
+            $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
+        } else {
             $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
         }
-
-        $container->register('api_platform.cache.metadata.property', ArrayAdapter::class)->addTag('cache.pool');
-        $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class)->addTag('cache.pool');
-        $container->register('api_platform.cache.metadata.resource_collection', ArrayAdapter::class)->addTag('cache.pool');
-        $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class)->addTag('cache.pool');
-        $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
-        $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
     }
 
     private function registerDoctrineOrmConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         if (!$this->isConfigEnabled($container, $config['doctrine'])) {
             return;
+        }
+
+        // For older versions of doctrine bridge this allows autoconfiguration for filters
+        if (!$container->has(ManagerRegistry::class)) {
+            $container->setAlias(ManagerRegistry::class, 'doctrine');
         }
 
         $container->registerForAutoconfiguration(QueryItemExtensionInterface::class)

@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\Metadata\Resource;
 
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
-use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Metadata\Resource\DoctrineMongoDbOdmResourceCollectionMetadataFactory;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider;
@@ -97,8 +95,8 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         $default = (new Get())->withName('get')->withClass(Dummy::class);
 
         yield [(new Get())->withProvider('has a provider')->withProcessor('and a processor')->withOperation($default), 'has a provider', 'and a processor'];
-        yield [(new Get())->withOperation($default), ItemProvider::class, PersistProcessor::class];
-        yield [(new GetCollection())->withOperation($default), CollectionProvider::class, PersistProcessor::class];
-        yield [(new Delete())->withOperation($default), ItemProvider::class, RemoveProcessor::class];
+        yield [(new Get())->withOperation($default), ItemProvider::class, 'api_platform.doctrine_mongodb.odm.state.persist_processor'];
+        yield [(new GetCollection())->withOperation($default), CollectionProvider::class, 'api_platform.doctrine_mongodb.odm.state.persist_processor'];
+        yield [(new Delete())->withOperation($default), ItemProvider::class, 'api_platform.doctrine_mongodb.odm.state.remove_processor'];
     }
 }

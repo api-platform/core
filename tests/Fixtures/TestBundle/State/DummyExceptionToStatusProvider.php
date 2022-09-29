@@ -15,21 +15,12 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Exception\NotFoundException;
 
-final class FakeProvider implements ProviderInterface
+class DummyExceptionToStatusProvider implements ProviderInterface
 {
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $className = $operation->getClass();
-        $data = [
-            '12345' => new $className('12345', 'Vincent'),
-            '67890' => new $className('67890', 'Grégoire'),
-        ];
-
-        if (isset($uriVariables['id'])) {
-            return $data[$uriVariables['id']] ?? null;
-        }
-
-        return array_values($data);
+        throw new NotFoundException();
     }
 }

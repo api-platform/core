@@ -154,7 +154,6 @@
             <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.graphql.query_resolver_locator" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
         </service>
 
         <service id="api_platform.graphql.resolver.factory.collection" class="ApiPlatform\GraphQl\Resolver\Factory\CollectionResolverFactory" public="false">

@@ -9,19 +9,21 @@
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
-        <service id="ApiPlatform\Doctrine\Common\State\RemoveProcessor" class="ApiPlatform\Doctrine\Common\State\RemoveProcessor">
+        <service id="api_platform.doctrine.orm.state.remove_processor" class="ApiPlatform\Doctrine\Common\State\RemoveProcessor">
             <argument type="service" id="doctrine" />
 
-            <tag name="api_platform.state_processor" priority="-100" />
+            <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\RemoveProcessor" />
+            <tag name="api_platform.state_processor" priority="-100" key="api_platform.doctrine.orm.state.remove_processor" />
         </service>
-        <service id="api_platform.doctrine.orm.state.remove_processor" alias="ApiPlatform\Doctrine\Common\State\RemoveProcessor" />
+        <service id="ApiPlatform\Doctrine\Common\State\RemoveProcessor" alias="api_platform.doctrine.orm.state.remove_processor" />
 
-        <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" class="ApiPlatform\Doctrine\Common\State\PersistProcessor">
+        <service id="api_platform.doctrine.orm.state.persist_processor" class="ApiPlatform\Doctrine\Common\State\PersistProcessor">
             <argument type="service" id="doctrine" />
 
-            <tag name="api_platform.state_processor" priority="-100" />
+            <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\PersistProcessor" />
+            <tag name="api_platform.state_processor" priority="-100" key="api_platform.doctrine.orm.state.persist_processor" />
         </service>
-        <service id="api_platform.doctrine.orm.state.persist_processor" alias="ApiPlatform\Doctrine\Common\State\PersistProcessor" />
+        <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" alias="api_platform.doctrine.orm.state.persist_processor" />
 
         <!-- Filter -->
 
@@ -129,23 +131,25 @@
             <argument type="service" id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory.inner" />
         </service>
 
-        <service id="ApiPlatform\Doctrine\Orm\State\CollectionProvider" class="ApiPlatform\Doctrine\Orm\State\CollectionProvider" public="false">
+        <service id="api_platform.doctrine.orm.state.collection_provider" class="ApiPlatform\Doctrine\Orm\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
 
-            <tag name="api_platform.state_provider" priority="-100" />
+            <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\CollectionProvider" />
+            <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine.orm.state.collection_provider" />
         </service>
-        <service id="api_platform.doctrine.orm.state.collection_provider" alias="ApiPlatform\Doctrine\Orm\State\CollectionProvider" />
+        <service id="ApiPlatform\Doctrine\Orm\State\CollectionProvider" alias="api_platform.doctrine.orm.state.collection_provider" />
 
-        <service id="ApiPlatform\Doctrine\Orm\State\ItemProvider" class="ApiPlatform\Doctrine\Orm\State\ItemProvider" public="false">
+        <service id="api_platform.doctrine.orm.state.item_provider" class="ApiPlatform\Doctrine\Orm\State\ItemProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
 
-            <tag name="api_platform.state_provider" priority="-100" />
+            <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\ItemProvider" />
+            <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine.orm.state.item_provider" />
         </service>
-        <service id="api_platform.doctrine.orm.state.item_provider" alias="ApiPlatform\Doctrine\Orm\State\ItemProvider" />
+        <service id="ApiPlatform\Doctrine\Orm\State\ItemProvider" alias="api_platform.doctrine.orm.state.item_provider" />
         <service id="api_platform.state.item_provider" alias="ApiPlatform\Doctrine\Orm\State\ItemProvider" />
 
         <service id="api_platform.doctrine.orm.search_filter" class="ApiPlatform\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">
