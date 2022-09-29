@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Metadata\Resource;
 
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
-use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Metadata\CollectionOperationInterface;
@@ -110,9 +108,9 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
     private function getProcessor(Operation $operation): string
     {
         if ($operation instanceof DeleteOperationInterface) {
-            return RemoveProcessor::class;
+            return 'api_platform.doctrine.orm.state.remove_processor';
         }
 
-        return PersistProcessor::class;
+        return 'api_platform.doctrine.orm.state.persist_processor';
     }
 }

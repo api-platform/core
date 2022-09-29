@@ -29,6 +29,7 @@
             <argument type="service" id="doctrine_mongodb" />
 
             <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\RemoveProcessor" />
+            <tag name="api_platform.state_processor" priority="-100" key="api_platform.doctrine_mongodb.odm.state.remove_processor" />
         </service>
         <service id="ApiPlatform\Doctrine\Common\State\RemoveProcessor" alias="api_platform.doctrine_mongodb.odm.state.remove_processor" />
 
@@ -36,6 +37,7 @@
             <argument type="service" id="doctrine_mongodb" />
 
             <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\PersistProcessor" />
+            <tag name="api_platform.state_processor" priority="-100" key="api_platform.doctrine_mongodb.odm.state.persist_processor" />
         </service>
         <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" alias="api_platform.doctrine_mongodb.odm.state.persist_processor" />
 

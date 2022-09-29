@@ -19,6 +19,7 @@
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\CollectionProvider" />
+            <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine.orm.state.collection_provider" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\State\CollectionProvider" alias="api_platform.doctrine.orm.state.collection_provider" />
 
@@ -28,6 +29,7 @@
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\ItemProvider" />
+            <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine.orm.state.item_provider" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\State\ItemProvider" alias="api_platform.doctrine.orm.state.item_provider" />
 
