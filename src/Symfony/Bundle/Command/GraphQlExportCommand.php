@@ -75,7 +75,7 @@ class GraphQlExportCommand extends Command
             $output->writeln($schemaExport);
         }
 
-        return 0;
+        return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
     }
 
     public static function getDefaultName(): string
