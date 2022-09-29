@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\NotExposed;
@@ -58,7 +59,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
 
             foreach ($operations as $operation) {
                 // An item operation has been found, nothing to do anymore in this factory
-                if ($operation instanceof Get) {
+                if ((HttpOperation::METHOD_GET === $operation->getMethod() && !$operation instanceof CollectionOperationInterface) || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false)) {
                     return $resourceMetadataCollection;
                 }
             }

@@ -23,22 +23,10 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
-use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider as MongoDbCollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider as MongoDbItemProvider;
-use ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension;
-use ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
-use ApiPlatform\Doctrine\Orm\Extension\FilterExtension;
-use ApiPlatform\Doctrine\Orm\Extension\OrderExtension;
-use ApiPlatform\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
-use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
@@ -714,10 +702,10 @@ class ApiPlatformExtensionTest extends TestCase
         $services = [
             // doctrine_orm.xml
             'api_platform.doctrine.metadata_factory',
-            RemoveProcessor::class,
-            PersistProcessor::class,
-            CollectionProvider::class,
-            ItemProvider::class,
+            'api_platform.doctrine.orm.state.remove_processor',
+            'api_platform.doctrine.orm.state.persist_processor',
+            'api_platform.doctrine.orm.state.collection_provider',
+            'api_platform.doctrine.orm.state.item_provider',
             'api_platform.doctrine.orm.search_filter',
             'api_platform.doctrine.orm.order_filter',
             'api_platform.doctrine.orm.range_filter',
@@ -730,30 +718,30 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // doctrine_orm.xml
-            'api_platform.doctrine.orm.state.remove_processor',
-            'api_platform.doctrine.orm.state.persist_processor',
-            'api_platform.doctrine.orm.state.collection_provider',
-            'api_platform.doctrine.orm.state.item_provider',
-            OrderFilter::class,
-            RangeFilter::class,
-            DateFilter::class,
-            BooleanFilter::class,
-            NumericFilter::class,
-            ExistsFilter::class,
-            EagerLoadingExtension::class,
-            FilterExtension::class,
-            FilterEagerLoadingExtension::class,
-            PaginationExtension::class,
-            OrderExtension::class,
+            RemoveProcessor::class,
+            PersistProcessor::class,
+            CollectionProvider::class,
+            ItemProvider::class,
+            'ApiPlatform\Doctrine\Orm\Filter\OrderFilter',
+            'ApiPlatform\Doctrine\Orm\Filter\RangeFilter',
+            'ApiPlatform\Doctrine\Orm\Filter\DateFilter',
+            'ApiPlatform\Doctrine\Orm\Filter\BooleanFilter',
+            'ApiPlatform\Doctrine\Orm\Filter\NumericFilter',
+            'ApiPlatform\Doctrine\Orm\Filter\ExistsFilter',
+            'ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension',
+            'ApiPlatform\Doctrine\Orm\Extension\FilterExtension',
+            'ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension',
+            'ApiPlatform\Doctrine\Orm\Extension\PaginationExtension',
+            'ApiPlatform\Doctrine\Orm\Extension\OrderExtension',
         ];
 
         $this->assertContainerHas($services, $aliases);
 
         // doctrine_orm.xml
-        $this->assertServiceHasTags(RemoveProcessor::class, ['api_platform.state_processor']);
-        $this->assertServiceHasTags(PersistProcessor::class, ['api_platform.state_processor']);
-        $this->assertServiceHasTags(CollectionProvider::class, ['api_platform.state_provider']);
-        $this->assertServiceHasTags(ItemProvider::class, ['api_platform.state_provider']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.state.remove_processor', ['api_platform.state_processor']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.state.persist_processor', ['api_platform.state_processor']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.state.collection_provider', ['api_platform.state_provider']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.state.item_provider', ['api_platform.state_provider']);
         $this->assertServiceHasTags('api_platform.doctrine.orm.query_extension.eager_loading', ['api_platform.doctrine.orm.query_extension.item', 'api_platform.doctrine.orm.query_extension.collection']);
         $this->assertServiceHasTags('api_platform.doctrine.orm.query_extension.filter', ['api_platform.doctrine.orm.query_extension.collection']);
         $this->assertServiceHasTags('api_platform.doctrine.orm.query_extension.filter_eager_loading', ['api_platform.doctrine.orm.query_extension.collection']);
@@ -771,10 +759,10 @@ class ApiPlatformExtensionTest extends TestCase
             // doctrine_mongodb_odm.xml
             'api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor',
             'api_platform.doctrine.metadata_factory',
-            RemoveProcessor::class,
-            PersistProcessor::class,
-            MongoDbCollectionProvider::class,
-            MongoDbItemProvider::class,
+            'api_platform.doctrine_mongodb.odm.state.remove_processor',
+            'api_platform.doctrine_mongodb.odm.state.persist_processor',
+            'api_platform.doctrine_mongodb.odm.state.collection_provider',
+            'api_platform.doctrine_mongodb.odm.state.item_provider',
             'api_platform.doctrine_mongodb.odm.search_filter',
             'api_platform.doctrine_mongodb.odm.boolean_filter',
             'api_platform.doctrine_mongodb.odm.date_filter',
@@ -791,28 +779,28 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // doctrine_mongodb_odm.xml
-            'api_platform.doctrine_mongodb.odm.state.remove_processor',
-            'api_platform.doctrine_mongodb.odm.state.persist_processor',
-            'api_platform.doctrine_mongodb.odm.state.collection_provider',
-            'api_platform.doctrine_mongodb.odm.state.item_provider',
-            SearchFilter::class,
-            \ApiPlatform\Doctrine\Odm\Filter\BooleanFilter::class,
-            \ApiPlatform\Doctrine\Odm\Filter\DateFilter::class,
-            \ApiPlatform\Doctrine\Odm\Filter\ExistsFilter::class,
-            \ApiPlatform\Doctrine\Odm\Filter\NumericFilter::class,
-            \ApiPlatform\Doctrine\Odm\Filter\OrderFilter::class,
-            \ApiPlatform\Doctrine\Odm\Filter\RangeFilter::class,
-            \ApiPlatform\Doctrine\Odm\Extension\FilterExtension::class,
-            \ApiPlatform\Doctrine\Odm\Extension\PaginationExtension::class,
-            \ApiPlatform\Doctrine\Odm\Extension\OrderExtension::class,
+            RemoveProcessor::class,
+            PersistProcessor::class,
+            MongoDbCollectionProvider::class,
+            MongoDbItemProvider::class,
+            'ApiPlatform\Doctrine\Odm\Filter\SearchFilter',
+            'ApiPlatform\Doctrine\Odm\Filter\BooleanFilter',
+            'ApiPlatform\Doctrine\Odm\Filter\DateFilter',
+            'ApiPlatform\Doctrine\Odm\Filter\ExistsFilter',
+            'ApiPlatform\Doctrine\Odm\Filter\NumericFilter',
+            'ApiPlatform\Doctrine\Odm\Filter\OrderFilter',
+            'ApiPlatform\Doctrine\Odm\Filter\RangeFilter',
+            'ApiPlatform\Doctrine\Odm\Extension\FilterExtension',
+            'ApiPlatform\Doctrine\Odm\Extension\PaginationExtension',
+            'ApiPlatform\Doctrine\Odm\Extension\OrderExtension',
         ];
 
         $this->assertContainerHas($services, $aliases);
 
-        $this->assertServiceHasTags(RemoveProcessor::class, ['api_platform.state_processor']);
-        $this->assertServiceHasTags(PersistProcessor::class, ['api_platform.state_processor']);
-        $this->assertServiceHasTags(MongoDbCollectionProvider::class, ['api_platform.state_provider']);
-        $this->assertServiceHasTags(MongoDbItemProvider::class, ['api_platform.state_provider']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.state.remove_processor', ['api_platform.state_processor']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.state.persist_processor', ['api_platform.state_processor']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.state.collection_provider', ['api_platform.state_provider']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.state.item_provider', ['api_platform.state_provider']);
         $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor', ['property_info.list_extractor', 'property_info.type_extractor']);
         $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.aggregation_extension.filter', ['api_platform.doctrine_mongodb.odm.aggregation_extension.collection']);
         $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.aggregation_extension.pagination', ['api_platform.doctrine_mongodb.odm.aggregation_extension.collection']);
@@ -1159,5 +1147,24 @@ class ApiPlatformExtensionTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $this->assertEquals($this->container->getParameter('api_platform.defaults'), ['extra_properties' => ['else' => 'foo', 'something' => 'test']]);
+    }
+
+    public function testConfigurationDirectories(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults'] = [
+            'something' => 'test',
+            'extra_properties' => ['else' => 'foo'],
+        ];
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $kernelProjectDir = realpath(__DIR__.'/../../../Fixtures/TestBundle');
+        $resourceClassDirectories = $this->container->getParameter('api_platform.resource_class_directories');
+
+        $this->assertContains($kernelProjectDir.'/Resources/config/api_resources', $resourceClassDirectories);
+        $this->assertContains($kernelProjectDir.'/Entity', $resourceClassDirectories);
+        $this->assertContains($kernelProjectDir.'/Document', $resourceClassDirectories);
+        $this->assertContains(realpath(__DIR__.'/../../../Symfony/Bundle/DependencyInjection').'/../../../Fixtures/app/config/api_platform', $resourceClassDirectories);
     }
 }

@@ -43,7 +43,7 @@ final class ReadStage implements ReadStageInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context): iterable|object|null
+    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context): object|array|null
     {
         if (!($operation->canRead() ?? true)) {
             return $context['is_collection'] ? [] : null;

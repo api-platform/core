@@ -137,6 +137,11 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\EmptyArrayAsObjectProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\EmptyArrayAsObjectProvider'
+        tags:
+            - { name: 'api_platform.state_provider' }
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor'
         tags:
@@ -409,3 +414,4 @@ services:
         arguments: [ '@doctrine' ]
         tags:
             - { name: 'api_platform.state_processor' }
+

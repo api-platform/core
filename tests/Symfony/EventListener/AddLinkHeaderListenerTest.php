@@ -19,8 +19,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +29,9 @@ use Symfony\Component\Mercure\Discovery;
 use Symfony\Component\Mercure\Hub;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Jwt\StaticTokenProvider;
+use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\WebLink\Link;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

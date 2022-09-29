@@ -26,7 +26,7 @@ final class CallableProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|iterable|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if (\is_callable($provider = $operation->getProvider())) {
             return $provider($operation, $uriVariables, $context);

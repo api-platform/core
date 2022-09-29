@@ -50,12 +50,12 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return static::FORMAT === $format && is_iterable($data);
+        return static::FORMAT === $format && is_iterable($data) && isset($context['resource_class']) && !isset($context['api_sub_level']);
     }
 
     public function hasCacheableSupportsMethod(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -65,10 +65,6 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
-            return $this->normalizeRawCollection($object, $format, $context);
-        }
-
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $context = $this->initContext($resourceClass, $context);
         $data = [];
@@ -84,19 +80,6 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         $itemsData = $this->getItemsData($object, $format, $context);
 
         return array_merge_recursive($data, $paginationData, $itemsData);
-    }
-
-    /**
-     * Normalizes a raw collection (not API resources).
-     */
-    protected function normalizeRawCollection(iterable $object, string $format = null, array $context = []): array
-    {
-        $data = [];
-        foreach ($object as $index => $obj) {
-            $data[$index] = $this->normalizer->normalize($obj, $format, $context);
-        }
-
-        return $data;
     }
 
     /**
