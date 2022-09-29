@@ -56,7 +56,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && is_iterable($data);
+        return self::FORMAT === $format && is_iterable($data) && isset($context['resource_class']) && !isset($context['api_sub_level']);
     }
 
     /**
@@ -66,10 +66,6 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
-        if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
-            return $this->normalizeRawCollection($object, $format, $context);
-        }
-
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $context = $this->initContext($resourceClass, $context);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
@@ -106,19 +102,6 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
     public function hasCacheableSupportsMethod(): bool
     {
-        return true;
-    }
-
-    /**
-     * Normalizes a raw collection (not API resources).
-     */
-    private function normalizeRawCollection(iterable $object, ?string $format, array $context): array
-    {
-        $data = [];
-        foreach ($object as $index => $obj) {
-            $data[$index] = $this->normalizer->normalize($obj, $format, $context);
-        }
-
-        return $data;
+        return false;
     }
 }

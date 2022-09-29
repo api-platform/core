@@ -16,14 +16,12 @@ namespace ApiPlatform\Tests\Hydra\Serializer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\Tests\Fixtures\Foo;
-use ApiPlatform\Tests\Fixtures\NotAResource;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -48,11 +46,13 @@ class CollectionNormalizerTest extends TestCase
 
         $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $iriConvert->reveal());
 
-        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT));
-        $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
-        $this->assertFalse($normalizer->supportsNormalization([], 'xml'));
-        $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml'));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo', 'api_sub_level' => true]));
+        $this->assertFalse($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, []));
+        $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization([], 'xml', ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml', ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalizeResourceCollection(): void
@@ -115,141 +115,6 @@ class CollectionNormalizerTest extends TestCase
                 $normalizedFooThree,
             ],
             'hydra:totalItems' => 2,
-        ], $actual);
-    }
-
-    public function testNormalizeNonResourceCollection(): void
-    {
-        $notAResourceA = new NotAResource('A', 'buzz');
-        $notAResourceB = new NotAResource('B', 'bzzt');
-
-        $data = [$notAResourceA, $notAResourceB];
-
-        $normalizedNotAResourceA = [
-            'foo' => 'A',
-            'bar' => 'buzz',
-        ];
-
-        $normalizedNotAResourceB = [
-            'foo' => 'B',
-            'bar' => 'bzzt',
-        ];
-
-        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($data, null)->willThrow(InvalidArgumentException::class);
-
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-
-        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $delegateNormalizerProphecy->normalize($notAResourceA, CollectionNormalizer::FORMAT, Argument::any())->willReturn($normalizedNotAResourceA);
-        $delegateNormalizerProphecy->normalize($notAResourceB, CollectionNormalizer::FORMAT, Argument::any())->willReturn($normalizedNotAResourceB);
-
-        $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
-        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
-
-        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-        ]);
-
-        $this->assertEquals([
-            $normalizedNotAResourceA,
-            $normalizedNotAResourceB,
-        ], $actual);
-    }
-
-    public function testNormalizeSubLevelResourceCollection(): void
-    {
-        $fooOne = new Foo();
-        $fooOne->id = 1;
-        $fooOne->bar = 'baz';
-
-        $fooThree = new Foo();
-        $fooThree->id = 3;
-        $fooThree->bar = 'bzz';
-
-        $data = [$fooOne, $fooThree];
-
-        $normalizedFooOne = [
-            '@id' => '/foos/1',
-            '@type' => 'Foo',
-            'bar' => 'baz',
-        ];
-
-        $normalizedFooThree = [
-            '@id' => '/foos/3',
-            '@type' => 'Foo',
-            'bar' => 'bzz',
-        ];
-
-        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-
-        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
-            Argument::withEntry('resource_class', Foo::class),
-            Argument::withEntry('api_sub_level', true)
-        ))->willReturn($normalizedFooOne);
-        $delegateNormalizerProphecy->normalize($fooThree, CollectionNormalizer::FORMAT, Argument::allOf(
-            Argument::withEntry('resource_class', Foo::class),
-            Argument::withEntry('api_sub_level', true)
-        ))->willReturn($normalizedFooThree);
-
-        $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
-        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
-
-        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'operation_name' => 'get',
-            'resource_class' => Foo::class,
-            'api_sub_level' => true,
-        ]);
-
-        $this->assertEquals([
-            $normalizedFooOne,
-            $normalizedFooThree,
-        ], $actual);
-    }
-
-    public function testNormalizeSubLevelNonResourceCollection(): void
-    {
-        $notAResourceA = new NotAResource('A', 'buzz');
-        $notAResourceB = new NotAResource('B', 'bzzt');
-
-        $data = [$notAResourceA, $notAResourceB];
-
-        $normalizedNotAResourceA = [
-            'foo' => 'A',
-            'bar' => 'buzz',
-        ];
-
-        $normalizedNotAResourceB = [
-            'foo' => 'B',
-            'bar' => 'bzzt',
-        ];
-
-        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-
-        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $delegateNormalizerProphecy->normalize($notAResourceA, CollectionNormalizer::FORMAT, Argument::any())->willReturn($normalizedNotAResourceA);
-        $delegateNormalizerProphecy->normalize($notAResourceB, CollectionNormalizer::FORMAT, Argument::any())->willReturn($normalizedNotAResourceB);
-
-        $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
-        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
-
-        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'api_sub_level' => true,
-        ]);
-
-        $this->assertEquals([
-            $normalizedNotAResourceA,
-            $normalizedNotAResourceB,
         ], $actual);
     }
 

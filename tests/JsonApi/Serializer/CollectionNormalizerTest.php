@@ -41,11 +41,13 @@ class CollectionNormalizerTest extends TestCase
 
         $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
 
-        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT));
-        $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
-        $this->assertFalse($normalizer->supportsNormalization([], 'xml'));
-        $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml'));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo', 'api_sub_level' => true]));
+        $this->assertFalse($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, []));
+        $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization([], 'xml', ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml', ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalizePaginator(): void

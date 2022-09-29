@@ -39,26 +39,13 @@ class CollectionNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
 
-        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT));
-        $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
-        $this->assertFalse($normalizer->supportsNormalization([], 'xml'));
-        $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml'));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-    }
-
-    public function testNormalizeApiSubLevel(): void
-    {
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass()->shouldNotBeCalled();
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $itemNormalizer = $this->prophesize(NormalizerInterface::class);
-        $itemNormalizer->normalize('bar', null, ['api_sub_level' => true])->willReturn(22);
-
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
-        $normalizer->setNormalizer($itemNormalizer->reveal());
-
-        $this->assertEquals(['foo' => 22], $normalizer->normalize(['foo' => 'bar'], null, ['api_sub_level' => true]));
+        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo', 'api_sub_level' => true]));
+        $this->assertFalse($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, []));
+        $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization([], 'xml', ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml', ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalizePaginator(): void
