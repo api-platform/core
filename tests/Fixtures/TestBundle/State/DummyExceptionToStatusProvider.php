@@ -19,7 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Exception\NotFoundException;
 
 class DummyExceptionToStatusProvider implements ProviderInterface
 {
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable|object|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         throw new NotFoundException();
     }

@@ -18,12 +18,7 @@ use ApiPlatform\State\ProviderInterface;
 
 final class FakeProvider implements ProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     *
-     * @return array|object|null
-     */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable|object|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $className = $operation->getClass();
         $data = [
