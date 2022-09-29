@@ -2,7 +2,21 @@
 
 ## 2.7.1
 
-* Replace FQCN service names by snake ones (#5019)
+* Chore: update swagger ui and javascript libraries (#5028)
+* Symfony: don't use ArrayAdapter cache in production #4975 (#5025)
+* Doctrine: check fetch joined queries based on all aliases (#4974)
+* Metadata: fix missing `array` cast for RDF types in `ApiResource` & `ApiProperty` constructors (#5000)
+* Symfony: replace FQCN service names by snake ones (#5019)
+* Symfony: add missing dependency on symfony/deprecation-contracts (#5015)
+* Chore: add conflict on elasticsearch >= 8.0 (#5018)
+* Symfony: bc layer broken for symfony/console lower than 5.3 (#4990)
+* Symfony: missing deprecations related to Ulid and Uuid normalize… (#4963)
+* Metadata: do not auto-generate NotExposed operation when using custom operation classes
+* Symfony: upgrade command requires phpunit (#4968)
+* Symfony: upgrade command removes filters (#4970)
+* Symfony: missing Elasticsearch DocumentMetadataFactoryInterface alias definition (#4962)
+* Chore: drop dependency on fig/link-util (#4945)
+* Metadata: resource name collection missing deprecation (#4953)
 
 ## 2.7.0
 
