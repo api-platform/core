@@ -649,7 +649,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         @trigger_error('The "api_platform.metadata_cache" parameter is deprecated since version 2.4 and will have no effect in 3.0.', \E_USER_DEPRECATED);
 
         // BC
-        if (!$container->getParameter('api_platform.metadata_cache')) {
+        if (!$container->getParameter('api_platform.metadata_cache') && $container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
 
             $container->register('api_platform.cache.metadata.property', ArrayAdapter::class);
