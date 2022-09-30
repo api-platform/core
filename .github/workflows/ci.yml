@@ -22,9 +22,9 @@ jobs:
       - name: Run commitlint
         run: | 
             commit=$(gh api \
-              -H "Accept: application/vnd.github+json" \
               /repos/${{ github.repository }}/pulls/${{github.event.number}}/commits \
-              | jq -r '.[0].commit.message')
+              | jq -r '.[0].commit.message' \
+              | head -n 1)
             # we can't use npx see https://github.com/conventional-changelog/commitlint/issues/613
             echo '{}' > package.json
             npm install --no-fund --no-audit @commitlint/config-conventional @commitlint/cli
