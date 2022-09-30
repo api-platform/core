@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaContextDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -139,6 +140,20 @@ JSON;
     {
         self::createClient()->request('GET', '/resource_interfaces/some-id');
         $this->assertMatchesResourceItemJsonSchema(ResourceInterface::class);
+    }
+
+    public function testAssertMatchesResourceItemJsonSchemaWithCustomJson(): void
+    {
+        $this->recreateSchema();
+
+        /** @var EntityManagerInterface $manager */
+        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager();
+        $jsonSchemaContextDummy = new JsonSchemaContextDummy();
+        $manager->persist($jsonSchemaContextDummy);
+        $manager->flush();
+
+        self::createClient()->request('GET', '/json_schema_context_dummies/1');
+        $this->assertMatchesResourceItemJsonSchema(JsonSchemaContextDummy::class);
     }
 
     public function testAssertMatchesResourceItemJsonSchemaOutput(): void
