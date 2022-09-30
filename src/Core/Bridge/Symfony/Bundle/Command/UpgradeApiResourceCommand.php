@@ -86,13 +86,13 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
         if (!$input->getOption('force') && \PHP_VERSION_ID < 80100) {
             $output->write('<error>The new metadata system only works with PHP 8.1 and above.');
 
-            return Command::INVALID;
+            return \defined(Command::class.'::INVALID') ? Command::INVALID : 2;
         }
 
         if (!class_exists(NodeTraverser::class)) {
             $output->writeln('Run `composer require --dev `nikic/php-parser` or install phpunit to use this command.');
 
-            return Command::FAILURE;
+            return \defined(Command::class.'::FAILURE') ? Command::FAILURE : 1;
         }
 
         $subresources = $this->getSubresources();
@@ -151,7 +151,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
                 if (!class_exists(Differ::class)) {
                     $output->writeln('Run `composer require --dev sebastian/diff` or install phpunit to print a diff.');
 
-                    return Command::FAILURE;
+                    return \defined(Command::class.'::FAILURE') ? Command::FAILURE : 1;
                 }
 
                 $this->printDiff($oldCode, $newCode, $output);
@@ -161,7 +161,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
             file_put_contents($fileName, $newCode);
         }
 
-        return Command::SUCCESS;
+        return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
     }
 
     /**

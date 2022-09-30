@@ -86,12 +86,12 @@ final class OpenApiCommand extends Command
             $filesystem->dumpFile($filename, $content);
             $io->success(sprintf('Data written to %s.', $filename));
 
-            return 0;
+            return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
         }
 
         $output->writeln($content);
 
-        return 0;
+        return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
     }
 
     public static function getDefaultName(): string
