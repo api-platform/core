@@ -150,6 +150,7 @@ class ApiResource
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
         protected array $extraProperties = [],
+        protected ?bool $collectDenormalizationErrors = null,
     ) {
         $this->operations = null === $operations ? null : new Operations($operations);
         $this->provider = $provider;
@@ -1048,6 +1049,17 @@ class ApiResource
     {
         $self = clone $this;
         $self->stateOptions = $stateOptions;
+    }
+
+    public function getCollectDenormalizationErrors(): ?bool
+    {
+        return $this->collectDenormalizationErrors;
+    }
+
+    public function withCollectDenormalizationErrors(bool $collectDenormalizationErrors = null): self
+    {
+        $self = clone $this;
+        $self->collectDenormalizationErrors = $collectDenormalizationErrors;
 
         return $self;
     }

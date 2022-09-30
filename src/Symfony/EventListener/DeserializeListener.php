@@ -16,13 +16,18 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\FormatMatcher;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * Updates the entity retrieved by the data provider with data contained in the request body.
@@ -72,11 +77,28 @@ final class DeserializeListener
         if (null !== $data) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
-
-        $request->attributes->set(
-            'data',
-            $this->serializer->deserialize($request->getContent(), $context['resource_class'], $format, $context)
-        );
+        try {
+            $request->attributes->set(
+                'data',
+                $this->serializer->deserialize($request->getContent(), $context['resource_class'], $format, $context)
+            );
+        } catch (PartialDenormalizationException $e) {
+            $violations = new ConstraintViolationList();
+            foreach ($e->getErrors() as $exception) {
+                if (!$exception instanceof NotNormalizableValueException) {
+                    continue;
+                }
+                $message = sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $exception->getPath(), implode(', ', $exception->getExpectedTypes() ?? []), $exception->getCurrentType());
+                $parameters = [];
+                if ($exception->canUseMessageForUser()) {
+                    $parameters['hint'] = $exception->getMessage();
+                }
+                $violations->add(new ConstraintViolation($message, '', $parameters, null, $exception->getPath(), null, null, (string) $exception->getCode()));
+            }
+            if (0 !== \count($violations)) {
+                throw new ValidationException($violations);
+            }
+        }
     }
 
     /**

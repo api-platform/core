@@ -422,7 +422,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @throws InvalidArgumentException
      */
-    protected function validateType(string $attribute, Type $type, mixed $value, string $format = null): void
+    protected function validateType(string $attribute, Type $type, mixed $value, string $format = null, array &$context): void
     {
         $builtinType = $type->getBuiltinType();
         if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && str_contains($format, 'json')) {
@@ -432,7 +432,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!$isValid) {
-            throw new UnexpectedValueException(sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, \gettype($value)));
+            $exception = NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute  must be "%s", "%s" given.', $attribute, $builtinType, \gettype($value)), $value, [$builtinType], $context['deserialization_path'] ?? null);
+            if (!isset($context['not_normalizable_value_exceptions'])) {
+                throw $exception;
+            }
+            $context['not_normalizable_value_exceptions'][] = $exception;
         }
     }
 
@@ -791,7 +795,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $value;
         }
 
-        $this->validateType($attribute, $type, $value, $format);
+        $this->validateType($attribute, $type, $value, $format, $context);
 
         return $value;
     }

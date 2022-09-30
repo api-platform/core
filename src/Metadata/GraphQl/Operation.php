@@ -77,6 +77,7 @@ class Operation extends AbstractOperation
         ?string $processor = null,
         protected ?OptionsInterface $stateOptions = null,
         array $extraProperties = [],
+        ?bool $collectDenormalizationErrors = null,
     ) {
         // Abstract operation properties
         $this->shortName = $shortName;
@@ -123,6 +124,7 @@ class Operation extends AbstractOperation
         $this->provider = $provider;
         $this->processor = $processor;
         $this->extraProperties = $extraProperties;
+        $this->collectDenormalizationErrors = $collectDenormalizationErrors;
     }
 
     public function getResolver(): ?string

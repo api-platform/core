@@ -72,3 +72,38 @@ Feature: Using validations groups
     }
     """
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @createSchema
+  Scenario: Create a resource with collectDenormalizationErrors
+    When I add "Content-type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummy_collect_denormalization" with body:
+    """
+      {
+        "foo": 3,
+        "bar": "baz"
+      }
+    """
+    Then the response status code should be 422
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/ConstraintViolationList",
+      "@type": "ConstraintViolationList",
+      "hydra:title": "An error occurred",
+      "hydra:description": "foo: The type of the \"foo\" attribute must be \"bool\", \"int\" given.\nbar: The type of the \"bar\" attribute must be \"int\", \"string\" given.",
+      "violations": [
+        {
+          "propertyPath": "foo",
+          "message": "The type of the \"foo\" attribute must be \"bool\", \"int\" given.",
+          "code": "0"
+        },
+        {
+          "propertyPath": "bar",
+          "message": "The type of the \"bar\" attribute must be \"int\", \"string\" given.",
+          "code": "0"
+        }
+      ]
+    }
+    """
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

@@ -149,6 +149,7 @@ class HttpOperation extends Operation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array $extraProperties = [],
+        ?bool $collectDenormalizationErrors = null,
     ) {
         $this->shortName = $shortName;
         $this->description = $description;
@@ -195,6 +196,7 @@ class HttpOperation extends Operation
         $this->processor = $processor;
         $this->extraProperties = $extraProperties;
         $this->stateOptions = $stateOptions;
+        $this->collectDenormalizationErrors = $collectDenormalizationErrors;
     }
 
     public function getMethod(): ?string
@@ -562,6 +564,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
+
+        return $self;
+    }
+
+    public function getCollectDenormalizationErrors(): ?bool
+    {
+        return $this->collectDenormalizationErrors;
+    }
+
+    public function withCollectDenormalizationErrors(bool $collectDenormalizationErrors = null): self
+    {
+        $self = clone $this;
+        $self->collectDenormalizationErrors = $collectDenormalizationErrors;
 
         return $self;
     }

@@ -27,6 +27,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -314,5 +315,53 @@ class DeserializeListenerTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal()
         );
         $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
+    public function testTurnPartialDenormalizationExceptionIntoValidationException(): void
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
+            new ApiResource(operations: [
+                'put' => new Put(inputFormats: self::FORMATS),
+                'post' => new Post(inputFormats: self::FORMATS),
+            ]),
+        ]));
+        $notNormalizableValueException = \Symfony\Component\Serializer\Exception\NotNormalizableValueException::createForUnexpectedDataType('', [], ['bool'], 'foo', false, 0);
+        $partialDenormalizationException = new PartialDenormalizationException('', [$notNormalizableValueException]);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->deserialize(Argument::cetera())->shouldBeCalled()->willThrow($partialDenormalizationException);
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn(['input' => ['class' => 'Foo'], 'output' => ['class' => 'Foo'], 'resource_class' => 'Foo']);
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'post'], [], [], [], '{}');
+        $request->setMethod('POST');
+        $request->headers->set('Content-Type', 'application/json');
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $listener = new DeserializeListener(
+            $serializerProphecy->reveal(),
+            $serializerContextBuilderProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal()
+        );
+
+        try {
+            $listener->onKernelRequest($eventProphecy->reveal());
+            $this->fail('Test failed, a ValidationException should have been thrown');
+        } catch (\ApiPlatform\Symfony\Validator\Exception\ValidationException $e) {
+            $this->assertCount(1, $e->getConstraintViolationList());
+            $list = $e->getConstraintViolationList();
+            $violation = $list->get(0);
+            $this->assertSame($violation->getMessage(), 'The type of the "foo" attribute must be "bool", "array" given.');
+            $this->assertEmpty($violation->getMessageTemplate());
+            $this->assertIsArray($violation->getParameters());
+            $this->assertNull($violation->getRoot());
+            $this->assertSame($violation->getPropertyPath(), 'foo');
+            $this->assertNull($violation->getInvalidValue());
+            $this->assertNull($violation->getPlural());
+            $this->assertSame($violation->getCode(), '0');
+        }
     }
 }
