@@ -58,7 +58,8 @@ final class CreateProvider implements ProviderInterface
         }
 
         $relation = $this->decorated->provide(new Get(uriVariables: $relationUriVariables, class: $relationClass), $uriVariables);
-        $resource = new ($operation->getClass());
+        $refl = new \ReflectionClass($operation->getClass());
+        $resource = $refl->newInstanceWithoutConstructor();
         $this->propertyAccessor->setValue($resource, $key, $relation);
 
         return $resource;
