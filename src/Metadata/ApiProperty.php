@@ -92,6 +92,7 @@ final class ApiProperty
 
     private $schema;
     private $initializable;
+    private $skolemIri;
 
     /**
      * @var string[]
@@ -146,6 +147,7 @@ final class ApiProperty
         ?array $builtinTypes = null,
         ?array $schema = null,
         ?bool $initializable = null,
+        ?bool $skolemIri = null,
 
         $iris = null,
 
@@ -175,6 +177,7 @@ final class ApiProperty
         $this->builtinTypes = $builtinTypes;
         $this->schema = $schema;
         $this->initializable = $initializable;
+        $this->skolemIri = $skolemIri;
         $this->iris = $iris;
         $this->extraProperties = $extraProperties;
     }
@@ -504,6 +507,22 @@ final class ApiProperty
     {
         $metadata = clone $this;
         $metadata->iris = (array) $iris;
+
+        return $metadata;
+    }
+
+    /**
+     * Whether to generate a skolem iri on anonymous resources.
+     */
+    public function getSkolemIri()
+    {
+        return $this->skolemIri;
+    }
+
+    public function withSkolemIri($skolemIri): self
+    {
+        $metadata = clone $this;
+        $metadata->skolemIri = $skolemIri;
 
         return $metadata;
     }

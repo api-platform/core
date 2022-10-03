@@ -831,10 +831,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             unset($childContext['iri'], $childContext['uri_variables']);
 
             if ($propertyMetadata instanceof PropertyMetadata) {
-                $childContext['output']['iri'] = $propertyMetadata->getIri();
+                $childContext['output']['iri'] = $propertyMetadata->getIri() ?? false;
             } else {
                 if (null !== ($propertyIris = $propertyMetadata->getIris())) {
-                    $childContext['output']['iri'] = 1 === \count($propertyIris) ? $propertyIris[0] : $propertyIris;
+                    $childContext['output']['iri'] = 1 === \count($propertyIris) ? ($propertyIris[0] ?? false) : $propertyIris;
                 }
             }
 
