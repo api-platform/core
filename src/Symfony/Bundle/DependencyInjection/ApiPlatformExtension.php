@@ -128,6 +128,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.state_provider');
         $container->registerForAutoconfiguration(ProcessorInterface::class)
             ->addTag('api_platform.state_processor');
+
+        if (!$container->has('api_platform.state.item_provider')) {
+            $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
+        }
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
