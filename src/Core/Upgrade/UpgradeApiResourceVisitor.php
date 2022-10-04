@@ -361,6 +361,16 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
                 }
             }
         }
+        foreach ($node->stmts as $k => $stmts) {
+            foreach ($stmts->attrGroups as $i => $attrGroups) {
+                foreach ($attrGroups->attrs as $j => $attrs) {
+                    if (str_ends_with(implode('\\', $attrs->name->parts), 'ApiSubresource')) {
+                        unset($node->stmts[$k]->attrGroups[$i]);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private function removeAnnotation(Node\Stmt\Class_|Node\Stmt\Interface_ $node)
