@@ -58,10 +58,6 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.filters.inner" />
         </service>
 
-        <service id="api_platform.metadata.resource.metadata_collection_factory.alternate_uri" class="ApiPlatform\Metadata\Resource\Factory\AlternateUriResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="200" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.alternate_uri.inner" />
-        </service>
-
         <service id="api_platform.metadata.resource.metadata_collection_factory.cached" class="ApiPlatform\Metadata\Resource\Factory\CachedResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.resource_collection" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.cached.inner" />
