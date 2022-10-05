@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 
 /**
- * An ItemProvider that just create a new object.
+ * An ItemProvider that just creates a new object.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
@@ -26,8 +27,10 @@ final class ObjectProvider implements ProviderInterface
 {
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        $refl = new \ReflectionClass($operation->getClass());
-
-        return $refl->newInstanceWithoutConstructor();
+        try {
+            return new ($operation->getClass());
+        } catch (\Throwable $e) {
+            throw new RuntimeException(sprintf('An error occurred while trying to create an instance of the "%s" resource. Consider writing your own "%s" implementation and setting it as `provider` on your operation instead.', $operation->getClass(), ProviderInterface::class), 0, $e);
+        }
     }
 }
