@@ -18,7 +18,8 @@
         "openapi",
         "serializer",
         "jsonschema",
-        "validation"
+        "validation",
+        "state"
       ]
     ],
     "scope-empty": [
