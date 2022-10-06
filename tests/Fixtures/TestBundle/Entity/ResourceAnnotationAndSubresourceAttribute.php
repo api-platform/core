@@ -29,6 +29,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiFilter(filterClass: SearchFilter::class, properties: ['id'])]
 class ResourceAnnotationAndSubresourceAttribute
 {
+    /**
+     * @var int
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -37,6 +40,9 @@ class ResourceAnnotationAndSubresourceAttribute
     #[ApiFilter(DateFilter::class)]
     private $id;
 
+    /**
+     * @var RelatedDummy
+     */
     #[ORM\Column(type: 'string')]
     #[Groups(['barcelona', 'chicago', 'friends'])]
     #[ApiSubresource]
@@ -44,4 +50,24 @@ class ResourceAnnotationAndSubresourceAttribute
     #[ApiFilter(SearchFilter::class)]
     #[ApiFilter(ExistsFilter::class)]
     private $name;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getName(): RelatedDummy
+    {
+        return $this->name;
+    }
+
+    public function setName(RelatedDummy $name): void
+    {
+        $this->name = $name;
+    }
 }

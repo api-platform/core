@@ -118,7 +118,7 @@ class UpgradeApiResourceCommandTest extends TestCase
                     '-     * @ApiProperty(iri="RelatedDummy.name")',
                     "+    #[ApiProperty(iris: ['RelatedDummy.name'])]",
                     '-     * @ApiFilter(SearchFilter::class)',
-                    '-     * @ApiFilter(ExistsFilter::class)',
+                    '-     * @ApiFilter(ExistsFilter::class)'
                 );
             }
             if (OnlyAttribute::class === $entityClass) {
@@ -130,7 +130,7 @@ class UpgradeApiResourceCommandTest extends TestCase
                     "-    #[ApiProperty(iri: 'RelatedDummy.name')]",
                     "+    #[ApiProperty(iris: ['RelatedDummy.name'])]",
                     '-    #[ApiFilter(SearchFilter::class)]',
-                    '-    #[ApiFilter(ExistsFilter::class)]',
+                    '-    #[ApiFilter(ExistsFilter::class)]'
                 );
             }
             if (ResourceAnnotationAndSubresourceAttribute::class === $entityClass) {
@@ -142,7 +142,7 @@ class UpgradeApiResourceCommandTest extends TestCase
                     "-    #[ApiProperty(iri: 'RelatedDummy.name')]",
                     "+    #[ApiProperty(iris: ['RelatedDummy.name'])]",
                     '-    #[ApiFilter(SearchFilter::class)]',
-                    '-    #[ApiFilter(ExistsFilter::class)]',
+                    '-    #[ApiFilter(ExistsFilter::class)]'
                 );
             }
             if (ResourceAttributeAndSubresourceAnnotation::class === $entityClass) {
@@ -157,7 +157,7 @@ class UpgradeApiResourceCommandTest extends TestCase
                     "+    #[ApiProperty(iris: ['RelatedDummy.name'])]",
                     '-     * @ApiProperty(iri="RelatedDummy.name")',
                     '-     * @ApiFilter(SearchFilter::class)',
-                    '-     * @ApiFilter(ExistsFilter::class)',
+                    '-     * @ApiFilter(ExistsFilter::class)'
                 );
             }
 

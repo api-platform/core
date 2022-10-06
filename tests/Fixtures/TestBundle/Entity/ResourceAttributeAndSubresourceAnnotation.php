@@ -30,6 +30,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ResourceAttributeAndSubresourceAnnotation
 {
     /**
+     * @var int
+     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -40,6 +42,8 @@ class ResourceAttributeAndSubresourceAnnotation
     private $id;
 
     /**
+     * @var RelatedDummy
+     *
      * @ORM\Column(type="string")
      * @Groups({"barcelona", "chicago", "friends"})
      *
@@ -50,4 +54,24 @@ class ResourceAttributeAndSubresourceAnnotation
      * @ApiFilter(ExistsFilter::class)
      */
     private $name;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getName(): RelatedDummy
+    {
+        return $this->name;
+    }
+
+    public function setName(RelatedDummy $name): void
+    {
+        $this->name = $name;
+    }
 }
