@@ -92,6 +92,7 @@ final class ApiProperty
 
     private $schema;
     private $initializable;
+    private $genId;
 
     /**
      * @var string[]
@@ -146,6 +147,7 @@ final class ApiProperty
         ?array $builtinTypes = null,
         ?array $schema = null,
         ?bool $initializable = null,
+        ?bool $genId = null,
 
         $iris = null,
 
@@ -175,6 +177,7 @@ final class ApiProperty
         $this->builtinTypes = $builtinTypes;
         $this->schema = $schema;
         $this->initializable = $initializable;
+        $this->genId = $genId;
         $this->iris = $iris;
         $this->extraProperties = $extraProperties;
     }
@@ -504,6 +507,22 @@ final class ApiProperty
     {
         $metadata = clone $this;
         $metadata->iris = (array) $iris;
+
+        return $metadata;
+    }
+
+    /**
+     * Whether to generate a skolem iri on anonymous resources.
+     */
+    public function getGenId()
+    {
+        return $this->genId;
+    }
+
+    public function withGenId(bool $genId): self
+    {
+        $metadata = clone $this;
+        $metadata->genId = $genId;
 
         return $metadata;
     }

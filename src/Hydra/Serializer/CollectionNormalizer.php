@@ -87,6 +87,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $context = $this->initContext($resourceClass, $context);
+        $context['api_collection_sub_level'] = true;
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
         if ($this->iriConverter instanceof LegacyIriConverterInterface) {

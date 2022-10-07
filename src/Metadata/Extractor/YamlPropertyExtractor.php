@@ -92,6 +92,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
                     'example' => $propertyValues['example'] ?? null,
                     'builtinTypes' => $this->buildAttribute($propertyValues, 'builtinTypes'),
                     'schema' => $this->buildAttribute($propertyValues, 'schema'),
+                    'genId' => $this->phpize($propertyValues, 'genId', 'bool'),
                 ];
             }
         }
