@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\Operation;
 #[Get('/genids/{id}', provider: [GenId::class, 'getData'])]
 class GenId
 {
-    #[ApiProperty(genId: true)]
+    #[ApiProperty(genId: false)]
     public MonetaryAmount $totalPrice;
 
     public function __construct(public int $id)

@@ -13,43 +13,37 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * JSON Schema Context Dummy.
- *
- * @ApiResource
- *
- * @ORM\Entity
  */
+#[ORM\Entity]
+#[ApiResource]
 class JsonSchemaContextDummy
 {
     /**
      * @var int The id
-     *
-     * @ApiProperty(identifier=true)
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ApiProperty(identifier: true)]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    public $id;
 
     /**
      * @var array
-     *
-     * @ApiProperty(
-     *     attributes={
-     *         "json_schema_context"={
-     *             "type"="array",
-     *             "items"={"type"="string"},
-     *             "minItems"=2,
-     *             "maxItems"=2
-     *         }
-     *     },
-     * )
      */
+    #[ApiProperty(
+        jsonSchemaContext: [
+            'type' => 'array',
+            'items' => ['type' => 'string'],
+            'minItems' => 2,
+            'maxItems' => 2,
+        ]
+    )]
     private $things = ['pool', 'bag'];
 
     public function getId()

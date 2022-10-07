@@ -592,7 +592,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if ($type && $type->getClassName()) {
             $childContext = $this->createChildContext($context, $attribute, $format);
             unset($childContext['iri'], $childContext['uri_variables']);
-            $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? false;
+            $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
 
             return $this->serializer->normalize($attributeValue, $format, $childContext);
         }
