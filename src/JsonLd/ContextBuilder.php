@@ -200,8 +200,12 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             }
         }
 
+        if ($this->iriConverter && isset($context['gen_id']) && true === $context['gen_id']) {
+            $jsonLdContext['@id'] = $this->iriConverter->getIriFromResource($object);
+        }
+
         if (false === ($context['iri'] ?? null)) {
-            trigger_deprecation('api-platform/core', '2.7', 'An anonymous resource will use a Skolem IRI in API Platform 3.0. Use #[ApiProperty(skolemIri: false)] to keep this behavior in 3.0.');
+            trigger_deprecation('api-platform/core', '2.7', 'An anonymous resource will use a Skolem IRI in API Platform 3.0. Use #[ApiProperty(genId: false)] to keep this behavior in 3.0.');
         }
 
         if ($context['has_context'] ?? false) {

@@ -75,7 +75,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
             'custom_property' => 'Lorem ipsum dolor sit amet',
         ],
         'iris' => ['https://schema.org/totalPrice'],
-        'skolemIri' => true
+        'genId' => true,
     ];
 
     /**

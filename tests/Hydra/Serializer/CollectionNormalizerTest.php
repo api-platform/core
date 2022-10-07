@@ -327,6 +327,7 @@ class CollectionNormalizerTest extends TestCase
             'jsonld_has_context' => true,
             'api_sub_level' => true,
             'resource_class' => 'Foo',
+            'api_collection_sub_level' => true,
         ])->willReturn(['name' => 'Kévin', 'friend' => 'Smail']);
 
         $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $iriConvert->reveal());

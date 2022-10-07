@@ -833,9 +833,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if ($propertyMetadata instanceof PropertyMetadata) {
                 $childContext['output']['iri'] = $propertyMetadata->getIri() ?? false;
             } else {
-                if (null !== ($propertyIris = $propertyMetadata->getIris())) {
-                    $childContext['output']['iri'] = 1 === \count($propertyIris) ? ($propertyIris[0] ?? false) : $propertyIris;
-                }
+                $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? false;
             }
 
             return $this->serializer->normalize($attributeValue, $format, $childContext);
