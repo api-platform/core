@@ -79,6 +79,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context = $this->initContext($resourceClass, $context);
             $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         } elseif ($this->contextBuilder instanceof AnonymousContextBuilderInterface) {
+            if ($context['api_collection_sub_level'] ?? false) {
+                unset($context['api_collection_sub_level']);
+                $context['output']['genid'] = true;
+                $context['output']['iri'] = null;
+            }
+
             // We should improve what's behind the context creation, its probably more complicated then it should
             $metadata = $this->createJsonLdContext($this->contextBuilder, $object, $context);
         }

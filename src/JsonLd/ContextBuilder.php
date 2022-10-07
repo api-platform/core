@@ -15,7 +15,6 @@ namespace ApiPlatform\JsonLd;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -123,12 +122,10 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             '@type' => $shortName,
         ];
 
-        if (!isset($context['iri']) || false !== $context['iri']) {
-            if (!isset($context['iri']) && !$this->iriConverter) {
-                throw new RuntimeException('Can not guess an anonymous resource IRI without IRI Converter.');
-            }
-
-            $jsonLdContext['@id'] = $context['iri'] ?? $this->iriConverter->getIriFromResource($object);
+        if (isset($context['iri'])) {
+            $jsonLdContext['@id'] = $context['iri'];
+        } elseif (true === ($context['gen_id'] ?? true) && $this->iriConverter) {
+            $jsonLdContext['@id'] = $this->iriConverter->getIriFromResource($object);
         }
 
         if ($context['has_context'] ?? false) {

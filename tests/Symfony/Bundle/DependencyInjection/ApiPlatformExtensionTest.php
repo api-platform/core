@@ -369,6 +369,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_collection_factory.input_output',
             'api_platform.metadata.resource.metadata_collection_factory.formats',
             'api_platform.metadata.resource.metadata_collection_factory.filters',
+            'api_platform.metadata.resource.metadata_collection_factory.alternate_uri',
             'api_platform.metadata.resource.metadata_collection_factory.cached',
             'api_platform.cache.metadata.resource_collection',
 

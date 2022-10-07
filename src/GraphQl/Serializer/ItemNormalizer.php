@@ -59,6 +59,8 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      *
+     * @param array<string, mixed> $context
+     *
      * @throws UnexpectedValueException
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
