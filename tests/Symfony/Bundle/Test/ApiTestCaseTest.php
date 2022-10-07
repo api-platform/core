@@ -132,7 +132,7 @@ JSON;
         $this->recreateSchema();
 
         /** @var EntityManagerInterface $manager */
-        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager();
+        $manager = static::getContainer()->get('doctrine')->getManager();
         $jsonSchemaContextDummy = new JsonSchemaContextDummy();
         $manager->persist($jsonSchemaContextDummy);
         $manager->flush();
