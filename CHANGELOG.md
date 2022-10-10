@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.2
+
+* Metadata: generate skolem IRI by default, use `genId: false` to disable **BC**
+
 ## 3.0.1
 
 * Symfony: don't use ArrayAdapter cache in production #5027
