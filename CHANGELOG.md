@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.2
+
+* Metadata: no skolem IRI by default
+* Symfony: use service id as tag for lower symfony versions (processor/provider service locator)
+* Symfony: fix command constants not available on lower symfony versions
+
 ## 2.7.1
 
 * Chore: update swagger ui and javascript libraries (#5028)
