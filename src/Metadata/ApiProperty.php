@@ -68,6 +68,7 @@ final class ApiProperty
         private ?array $schema = null,
         private ?bool $initializable = null,
         private $iris = null,
+        private ?bool $genId = null,
         private array $extraProperties = []
     ) {
         if (\is_string($types)) {
@@ -400,6 +401,22 @@ final class ApiProperty
     {
         $metadata = clone $this;
         $metadata->iris = (array) $iris;
+
+        return $metadata;
+    }
+
+    /**
+     * Whether to generate a skolem iri on anonymous resources.
+     */
+    public function getGenId()
+    {
+        return $this->genId;
+    }
+
+    public function withGenId(bool $genId): self
+    {
+        $metadata = clone $this;
+        $metadata->genId = $genId;
 
         return $metadata;
     }

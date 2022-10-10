@@ -592,10 +592,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if ($type && $type->getClassName()) {
             $childContext = $this->createChildContext($context, $attribute, $format);
             unset($childContext['iri'], $childContext['uri_variables']);
-
-            if (null !== ($propertyIris = $propertyMetadata->getIris())) {
-                $childContext['output']['iri'] = 1 === (is_countable($propertyIris) ? \count($propertyIris) : 0) ? $propertyIris[0] : $propertyIris;
-            }
+            $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
 
             return $this->serializer->normalize($attributeValue, $format, $childContext);
         }

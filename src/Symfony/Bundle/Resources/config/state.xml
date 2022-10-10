@@ -41,12 +41,18 @@
         </service>
         <service id="ApiPlatform\State\Pagination\PaginationOptions" alias="api_platform.pagination_options" />
 
-        <service id="ApiPlatform\State\CreateProvider" class="ApiPlatform\State\CreateProvider">
-            <argument type="service" id="api_platform.state.item_provider" on-invalid="ignore" />
+        <service id="api_platform.state_provider.create" class="ApiPlatform\State\CreateProvider">
+            <argument type="service" id="api_platform.state.item_provider" />
 
-            <tag name="api_platform.state_provider" />
+            <tag name="api_platform.state_provider" key="ApiPlatform\State\CreateProvider" />
+            <tag name="api_platform.state_provider" key="api_platform.state_provider.create" />
         </service>
-        <service id="api_platform.state_provider.create" alias="ApiPlatform\State\CreateProvider" />
+        <service id="ApiPlatform\State\CreateProvider" alias="api_platform.state_provider.create" />
 
+        <service id="api_platform.state_provider.object" class="ApiPlatform\State\ObjectProvider">
+            <tag name="api_platform.state_provider" key="ApiPlatform\State\ObjectProvider" />
+            <tag name="api_platform.state_provider" key="api_platform.state_provider.object" />
+        </service>
+        <service id="ApiPlatform\State\ObjectProvider" alias="api_platform.state_provider.object" />
     </services>
 </container>

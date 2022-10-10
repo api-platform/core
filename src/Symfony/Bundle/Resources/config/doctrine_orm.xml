@@ -12,16 +12,16 @@
         <service id="api_platform.doctrine.orm.state.remove_processor" class="ApiPlatform\Doctrine\Common\State\RemoveProcessor">
             <argument type="service" id="doctrine" />
 
-            <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\RemoveProcessor" />
             <tag name="api_platform.state_processor" priority="-100" key="api_platform.doctrine.orm.state.remove_processor" />
+            <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\RemoveProcessor" />
         </service>
         <service id="ApiPlatform\Doctrine\Common\State\RemoveProcessor" alias="api_platform.doctrine.orm.state.remove_processor" />
 
         <service id="api_platform.doctrine.orm.state.persist_processor" class="ApiPlatform\Doctrine\Common\State\PersistProcessor">
             <argument type="service" id="doctrine" />
 
-            <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\PersistProcessor" />
             <tag name="api_platform.state_processor" priority="-100" key="api_platform.doctrine.orm.state.persist_processor" />
+            <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\PersistProcessor" />
         </service>
         <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" alias="api_platform.doctrine.orm.state.persist_processor" />
 

@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\State;
 
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\CreateProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyResourceWithComplexConstructor;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -36,6 +38,23 @@ class CreateProviderTest extends TestCase
             ['company' => 1]
         )->shouldBeCalled()->willReturn(new Company());
         $operation = new Post(class: Employee::class, uriTemplate: '/company/{company}/employees', uriVariables: ['company' => $link]);
+
+        $createProvider = new CreateProvider($decorated->reveal());
+        $createProvider->provide($operation, ['company' => 1]);
+    }
+
+    public function testProvideFailsProperlyOnComplexConstructor(): void
+    {
+        $link = new Link(identifiers: ['id'], fromClass: Company::class, parameterName: 'company');
+        $decorated = $this->prophesize(ProviderInterface::class);
+        $decorated->provide(
+            new Get(uriVariables: ['id' => $link], class: Company::class),
+            ['company' => 1]
+        )->shouldBeCalled()->willReturn(new Company());
+        $operation = new Post(class: DummyResourceWithComplexConstructor::class, uriTemplate: '/company/{company}/employees', uriVariables: ['company' => $link]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('An error occurred while trying to create an instance of the "ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyResourceWithComplexConstructor" resource. Consider writing your own "ApiPlatform\State\ProviderInterface" implementation and setting it as `provider` on your operation instead.');
 
         $createProvider = new CreateProvider($decorated->reveal());
         $createProvider->provide($operation, ['company' => 1]);

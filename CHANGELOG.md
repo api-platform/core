@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.2
+
+* Metadata: generate skolem IRI by default, use `genId: false` to disable **BC**
+
 ## 3.0.1
 
 * Symfony: don't use ArrayAdapter cache in production #5027
@@ -49,6 +53,12 @@ Breaking changes:
 * Identifiers: using an object as identifier is supported only when this object is `Stringable`
 * Serializer: `skip_null_values` now defaults to `true`
 * Metadata: `Patch` is added to the automatic CRUD
+
+## 2.7.2
+
+* Metadata: no skolem IRI by default
+* Symfony: use service id as tag for lower symfony versions (processor/provider service locator)
+* Symfony: fix command constants not available on lower symfony versions
 
 ## 2.7.1
 

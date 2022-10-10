@@ -42,6 +42,7 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
         'securityPostDenormalize',
         'initializable',
         'iris',
+        'genId',
     ];
 
     /**

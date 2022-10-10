@@ -17,8 +17,6 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @deprecated BC layer, is removed in 3.0
  */
 final class AlternateUriResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
