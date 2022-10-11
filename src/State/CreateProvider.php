@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
@@ -58,7 +59,11 @@ final class CreateProvider implements ProviderInterface
         }
 
         $relation = $this->decorated->provide(new Get(uriVariables: $relationUriVariables, class: $relationClass), $uriVariables);
-        $resource = new ($operation->getClass());
+        try {
+            $resource = new ($operation->getClass());
+        } catch (\Throwable $e) {
+            throw new RuntimeException(sprintf('An error occurred while trying to create an instance of the "%s" resource. Consider writing your own "%s" implementation and setting it as `provider` on your operation instead.', $operation->getClass(), ProviderInterface::class), 0, $e);
+        }
         $this->propertyAccessor->setValue($resource, $key, $relation);
 
         return $resource;

@@ -38,6 +38,7 @@ Feature: JSON-LD non-resource handling
       }
     }
     """
+    And the JSON node "notAResource.@id" should exist
 
   Scenario: Get a resource containing a raw object with selected properties
     Given there are 1 dummy objects with relatedDummy and its thirdLevel
@@ -123,3 +124,11 @@ Feature: JSON-LD non-resource handling
       "id": 1
     }
     """
+
+  @php8
+  Scenario: Get a generated id
+    When I send a "GET" request to "/genids/1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "totalPrice.@id" should not exist

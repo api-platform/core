@@ -51,11 +51,11 @@ trait JsonLdContextTrait
     {
         // We're in a collection, don't add the @context part
         if (isset($context['jsonld_has_context'])) {
-            return $contextBuilder->getAnonymousResourceContext($object, ['api_resource' => $context['api_resource'] ?? null, 'has_context' => true]);
+            return $contextBuilder->getAnonymousResourceContext($object, ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null, 'has_context' => true]);
         }
 
         $context['jsonld_has_context'] = true;
 
-        return $contextBuilder->getAnonymousResourceContext($object, ['api_resource' => $context['api_resource'] ?? null]);
+        return $contextBuilder->getAnonymousResourceContext($object, ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null]);
     }
 }

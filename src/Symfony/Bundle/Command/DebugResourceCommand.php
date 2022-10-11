@@ -51,7 +51,7 @@ final class DebugResourceCommand extends Command
         if (0 === \count($resourceCollection)) {
             $output->writeln(sprintf('<error>No resources found for class %s</error>', $resourceClass));
 
-            return Command::INVALID;
+            return \defined(Command::class.'::INVALID') ? Command::INVALID : 2;
         }
 
         $shortName = (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
@@ -103,13 +103,13 @@ final class DebugResourceCommand extends Command
             $this->dumper->dump($this->cloner->cloneVar($selectedResource));
             $output->writeln('Successfully dumped the selected resource');
 
-            return Command::SUCCESS;
+            return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
         }
 
         $this->dumper->dump($this->cloner->cloneVar($resourceCollection->getOperation($answerOperation)));
         $output->writeln('Successfully dumped the selected operation');
 
-        return Command::SUCCESS;
+        return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
     }
 
     public static function getDefaultName(): string

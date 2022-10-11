@@ -68,6 +68,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     {
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $context = $this->initContext($resourceClass, $context);
+        $context['api_collection_sub_level'] = true;
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         $data['@id'] = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         $data['@type'] = 'hydra:Collection';
