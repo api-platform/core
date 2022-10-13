@@ -24,6 +24,18 @@ trait SearchFilterTestTrait
         $filter = $this->buildSearchFilter($this->managerRegistry, [
             'id' => null,
             'name' => null,
+            'name_exact' => [
+                'name' => 'exact',
+            ],
+            'name_partial' => [
+                'name' => 'partial',
+            ],
+            'name[istart]' => [
+                'name' => 'istart',
+            ],
+            'name[exact]' => [
+                'name' => 'exact',
+            ],
             'alias' => null,
             'dummy' => null,
             'dummyDate' => null,
@@ -32,6 +44,9 @@ trait SearchFilterTestTrait
             'nameConverted' => null,
             'foo' => null,
             'relatedDummies.dummyDate' => null,
+            'relatedDummies.name[start]' => [
+                'relatedDummies.name' => 'start'
+            ],
             'relatedDummy' => null,
         ]);
 
@@ -58,6 +73,48 @@ trait SearchFilterTestTrait
                 'is_collection' => false,
             ],
             'name[]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => true,
+            ],
+            'name_exact' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => false,
+            ],
+            'name_exact[]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => true,
+            ],
+            'name_partial' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'partial',
+                'is_collection' => false,
+            ],
+            'name[istart]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'istart',
+                'is_collection' => false,
+            ],
+            'name[exact]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => false,
+            ],
+            'name[exact][]' => [
                 'property' => 'name',
                 'type' => 'string',
                 'required' => false,
@@ -162,6 +219,13 @@ trait SearchFilterTestTrait
                 'strategy' => 'exact',
                 'is_collection' => true,
             ],
+            'relatedDummies.name[start]' => [
+                'property' => 'relatedDummies.name',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'start',
+                'is_collection' => false,
+            ],
             'relatedDummy' => [
                 'property' => 'relatedDummy',
                 'type' => 'string',
@@ -191,6 +255,30 @@ trait SearchFilterTestTrait
                     'name' => 'exact',
                 ],
             ],
+            'multiple strategies (one strategy)' => [
+                [
+                    'id' => null,
+                    'name[exact]' => [
+                        'name' => 'exact'
+                    ],
+                ],
+                ['name[exact]' => 'exact'],
+            ],
+            'multiple strategies (two strategy)' => [
+                [
+                    'id' => null,
+                    'name[start]' => [
+                        'name' => 'start'
+                    ],
+                    'name[end]' => [
+                        'name' => 'end'
+                    ],
+                ],
+                [
+                    'name[start]' => 'start with',
+                    'name[end]' => 'end with',
+                ],
+            ],
             'exact (case insensitive)' => [
                 [
                     'id' => null,
@@ -218,6 +306,22 @@ trait SearchFilterTestTrait
                     'name' => [
                         'CaSE',
                         'SENSitive',
+                    ],
+                ],
+            ],
+            'multiple strategies (one strategy; multiple values)' => [
+                [
+                    'id' => null,
+                    'name[exact]' => [
+                        'name' => 'exact'
+                    ],
+                ],
+                [
+                    'name' => [
+                        'exact' => [
+                            'CaSE',
+                            'SENSitive',
+                        ]
                     ],
                 ],
             ],

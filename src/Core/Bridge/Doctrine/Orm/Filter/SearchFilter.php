@@ -68,9 +68,29 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
      */
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
+        $filterParameter = $property;
+        if (isset($this->properties[$filterParameter]) && \is_array($this->properties[$filterParameter])) {
+            $property = (string) array_keys($this->properties[$filterParameter])[0];
+            $strategy = array_values($this->properties[$filterParameter])[0];
+        }
+
+        if (\is_array($value) && \count($value) > 0) {
+            $valueKey = array_keys($value)[0];
+            $possibleFilterParameter = $filterParameter.'['.$valueKey.']';
+
+            if (isset($this->properties[$possibleFilterParameter]) && \is_array($this->properties[$possibleFilterParameter])) {
+                $filterParameter = $possibleFilterParameter;
+
+                $property = (string) array_keys($this->properties[$filterParameter])[0];
+                $strategy = array_values($this->properties[$filterParameter])[0];
+
+                $value = $value[$valueKey];
+            }
+        }
+
         if (
             null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyEnabled($filterParameter, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
@@ -90,7 +110,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         }
 
         $caseSensitive = true;
-        $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
+        $strategy = $strategy ?? ($this->properties[$filterParameter] ?? self::STRATEGY_EXACT);
 
         // prefixing the strategy with i makes it case insensitive
         if (0 === strpos($strategy, 'i')) {

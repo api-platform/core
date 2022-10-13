@@ -46,6 +46,13 @@ trait SearchFilterTrait
         }
 
         foreach ($properties as $property => $strategy) {
+            $filterParameter = $property;
+
+            if (\is_array($strategy)) {
+                $property = array_keys($strategy)[0];
+                $strategy = $strategy[$property];
+            }
+
             if (!$this->isPropertyMapped($property, $resourceClass, true)) {
                 continue;
             }
@@ -60,13 +67,14 @@ trait SearchFilterTrait
             }
 
             $propertyName = $this->normalizePropertyName($property);
+            $filterParameterName = $this->normalizePropertyName($filterParameter);
             if ($metadata->hasField($field)) {
                 $typeOfField = $this->getType($metadata->getTypeOfField($field));
-                $strategy = $this->getProperties()[$property] ?? self::STRATEGY_EXACT;
-                $filterParameterNames = [$propertyName];
+                $strategy = $strategy ?? self::STRATEGY_EXACT;
+                $filterParameterNames = [$filterParameterName];
 
                 if (self::STRATEGY_EXACT === $strategy) {
-                    $filterParameterNames[] = $propertyName.'[]';
+                    $filterParameterNames[] = $filterParameterName.'[]';
                 }
 
                 foreach ($filterParameterNames as $filterParameterName) {
@@ -80,8 +88,8 @@ trait SearchFilterTrait
                 }
             } elseif ($metadata->hasAssociation($field)) {
                 $filterParameterNames = [
-                    $propertyName,
-                    $propertyName.'[]',
+                    $filterParameterName,
+                    $filterParameterName.'[]',
                 ];
 
                 foreach ($filterParameterNames as $filterParameterName) {

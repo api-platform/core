@@ -286,6 +286,19 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     ['name_p1' => 'exact'],
                     $filterFactory,
                 ],
+                'multiple strategies (one strategy)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', $this->alias, Dummy::class),
+                    ['name_p1' => 'exact'],
+                    $filterFactory,
+                ],
+                'multiple strategies (two strategy)' => [
+                    sprintf("SELECT %s FROM %s %1\$s WHERE %1\$s.name LIKE CONCAT(:name_p1_0, '%%') AND %1\$s.name LIKE CONCAT('%%', :name_p2_0)", $this->alias, Dummy::class),
+                    [
+                        'name_p1_0' => 'start with',
+                        'name_p2_0' => 'end with',
+                    ],
+                    $filterFactory,
+                ],
                 'exact (case insensitive)' => [
                     sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) = LOWER(:name_p1)', $this->alias, Dummy::class),
                     ['name_p1' => 'exact'],
@@ -297,6 +310,16 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'exact (multiple values)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN(:name_p1)', $this->alias, Dummy::class),
+                    [
+                        'name_p1' => [
+                            'CaSE',
+                            'SENSitive',
+                        ],
+                    ],
+                    $filterFactory,
+                ],
+                'multiple strategies (one strategy; multiple values)' => [
                     sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN(:name_p1)', $this->alias, Dummy::class),
                     [
                         'name_p1' => [

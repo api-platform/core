@@ -292,6 +292,43 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     ],
                     $filterFactory,
                 ],
+                'multiple strategies (one strategy)' => [
+                    [
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        'exact',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                ],
+                'multiple strategies (two strategy)' => [
+                    [
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^start with'),
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('end with$'),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                ],
                 'exact (case insensitive)' => [
                     [
                         [
@@ -321,6 +358,21 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     $filterFactory,
                 ],
                 'exact (multiple values)' => [
+                    [
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        'CaSE',
+                                        'SENSitive',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                ],
+                'multiple strategies (one strategy; multiple values)' => [
                     [
                         [
                             '$match' => [
