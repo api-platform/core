@@ -45,7 +45,7 @@ trait SearchFilterTestTrait
             'foo' => null,
             'relatedDummies.dummyDate' => null,
             'relatedDummies.name[start]' => [
-                'relatedDummies.name' => 'start'
+                'relatedDummies.name' => 'start',
             ],
             'relatedDummy' => null,
         ]);
@@ -259,7 +259,7 @@ trait SearchFilterTestTrait
                 [
                     'id' => null,
                     'name[exact]' => [
-                        'name' => 'exact'
+                        'name' => 'exact',
                     ],
                 ],
                 ['name[exact]' => 'exact'],
@@ -268,10 +268,10 @@ trait SearchFilterTestTrait
                 [
                     'id' => null,
                     'name[start]' => [
-                        'name' => 'start'
+                        'name' => 'start',
                     ],
                     'name[end]' => [
-                        'name' => 'end'
+                        'name' => 'end',
                     ],
                 ],
                 [
@@ -313,7 +313,7 @@ trait SearchFilterTestTrait
                 [
                     'id' => null,
                     'name[exact]' => [
-                        'name' => 'exact'
+                        'name' => 'exact',
                     ],
                 ],
                 [
@@ -321,7 +321,7 @@ trait SearchFilterTestTrait
                         'exact' => [
                             'CaSE',
                             'SENSitive',
-                        ]
+                        ],
                     ],
                 ],
             ],
