@@ -42,9 +42,9 @@
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
     </listeners>
 
-<!--    <groups>-->
-<!--        <exclude>-->
-<!--            <group>mongodb</group>-->
-<!--        </exclude>-->
-<!--    </groups>-->
+    <groups>
+        <exclude>
+            <group>mongodb</group>
+        </exclude>
+    </groups>
 </phpunit>
