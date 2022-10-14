@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.3
+
+* Filters: Allow to configure multiple strategies for SearchFilter
+
 ## 2.7.2
 
 * Metadata: no skolem IRI by default
