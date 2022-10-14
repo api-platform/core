@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.7.3
+* Filters: Allow filter by IRI for guid fields in SearchFilter
+
 ## 2.7.2
 
 * Metadata: no skolem IRI by default
