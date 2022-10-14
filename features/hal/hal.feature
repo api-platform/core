@@ -80,7 +80,8 @@ Feature: HAL support
       "id": 1,
       "name": "Dummy with relations",
       "alias": null,
-      "foo": null
+      "foo": null,
+      "uuid": null
     }
     """
 
@@ -123,7 +124,8 @@ Feature: HAL support
       "id": 1,
       "name": "A nice dummy",
       "alias": null,
-      "foo": null
+      "foo": null,
+      "uuid": null
     }
     """
 

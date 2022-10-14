@@ -180,6 +180,18 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
                     ],
                 ],
             ],
+            'order[uuid]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+                'schema' => [
+                    'type' => 'string',
+                    'enum' => [
+                        'asc',
+                        'desc',
+                    ],
+                ],
+            ],
         ], $filter->getDescription($this->resourceClass));
 
         $this->assertEquals([

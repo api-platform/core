@@ -347,7 +347,8 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 1,
                     "name": "Dummy #1",
                     "alias": "Alias #0",
-                    "foo": null
+                    "foo": null,
+                    "uuid": null
                 },
                 "relationships": {
                     "relatedDummy": {
@@ -417,7 +418,8 @@ Feature: JSON API Inclusion of Related Resources
                 "dummyPrice": null,
                 "jsonData": [],
                 "arrayData": [],
-                "name_converted": null
+                "name_converted": null,
+                "uuid": null
             },
             "relationships": {
                 "relatedDummy": {
@@ -524,7 +526,8 @@ Feature: JSON API Inclusion of Related Resources
                 "dummyPrice": null,
                 "jsonData": [],
                 "arrayData": [],
-                "name_converted": null
+                "name_converted": null,
+                "uuid": null
             },
             "relationships": {
                 "relatedDummies": {
@@ -687,7 +690,8 @@ Feature: JSON API Inclusion of Related Resources
                 "_id": 1,
                 "name": "plop",
                 "alias": null,
-                "foo": null
+                "foo": null,
+                "uuid": null
             },
             "relationships": {
                 "relatedOwningDummy": {
@@ -745,7 +749,8 @@ Feature: JSON API Inclusion of Related Resources
                 "dummyPrice": null,
                 "jsonData": [],
                 "arrayData": [],
-                "name_converted": null
+                "name_converted": null,
+                "uuid": null
             },
             "relationships": {
                 "relatedDummies": {
@@ -1184,7 +1189,8 @@ Feature: JSON API Inclusion of Related Resources
                     "dummyPrice": null,
                     "jsonData": [],
                     "arrayData": [],
-                    "name_converted": null
+                    "name_converted": null,
+                    "uuid": null
                 },
                 "relationships": {
                     "relatedDummy": {
@@ -1211,7 +1217,8 @@ Feature: JSON API Inclusion of Related Resources
                     "dummyPrice": null,
                     "jsonData": [],
                     "arrayData": [],
-                    "name_converted": null
+                    "name_converted": null,
+                    "uuid": null
                 },
                 "relationships": {
                     "relatedDummy": {
@@ -1238,7 +1245,8 @@ Feature: JSON API Inclusion of Related Resources
                     "dummyPrice": null,
                     "jsonData": [],
                     "arrayData": [],
-                    "name_converted": null
+                    "name_converted": null,
+                    "uuid": null
                 },
                 "relationships": {
                     "relatedDummy": {

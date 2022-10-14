@@ -22,6 +22,7 @@ use ApiPlatform\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\Persistence\ManagerRegistry;
@@ -212,6 +213,20 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                 'strategy' => 'exact',
                 'is_collection' => true,
             ],
+            'uuid' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => false,
+            ],
+            'uuid[]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => true,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 
@@ -278,7 +293,32 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
     {
         $filterFactory = [$this, 'buildSearchFilter'];
 
-        return array_merge_recursive(
+        $doctrineCases = [
+            'IRI value for uuid field' => [
+                [
+                    'uuid' => null,
+                ],
+                [
+                    'uuid' => '/uuid_identifier_dummies/3ac6566e-6f7f-49e6-8a47-168e22f80e6c',
+                ],
+                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.uuid = :uuid_p1', $this->alias, Dummy::class),
+                ['uuid_p1' => '3ac6566e-6f7f-49e6-8a47-168e22f80e6c'],
+                $filterFactory,
+            ],
+            'uuid value for uuid field' => [
+                [
+                    'uuid' => null,
+                ],
+                [
+                    'uuid' => '3ac6566e-6f7f-49e6-8a47-168e22f80e6c',
+                ],
+                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.uuid = :uuid_p1', $this->alias, Dummy::class),
+                ['uuid_p1' => '3ac6566e-6f7f-49e6-8a47-168e22f80e6c'],
+                $filterFactory,
+            ],
+        ];
+
+        return array_merge($doctrineCases, array_merge_recursive(
             $this->provideApplyTestArguments(),
             [
                 'exact' => [
@@ -493,19 +533,26 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     Dummy::class,
                 ],
             ]
-        );
+        ));
     }
 
     protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)
     {
-        $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
+        $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) {
             if (false !== strpos($args[0], '/related_dummies')) {
-                $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
+                $relatedDummy = new RelatedDummy();
+                $relatedDummy->setId(1);
 
-                return $relatedDummyProphecy->reveal();
+                return $relatedDummy;
+            }
+
+            if (false !== strpos($args[0], '/uuid_identifier_dummies')) {
+                $uuidIdentifierDummy = new UuidIdentifierDummy();
+                $uuidIdentifierDummy->setUuid('3ac6566e-6f7f-49e6-8a47-168e22f80e6c');
+
+                return $uuidIdentifierDummy;
             }
 
             throw new InvalidArgumentException();

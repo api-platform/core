@@ -40,6 +40,8 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
     public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
 
+    public const DOCTRINE_GUID_TYPE = Types::GUID;
+
     public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null, NameConverterInterface $nameConverter = null)
     {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
@@ -101,7 +103,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
         if ($metadata->hasField($field)) {
-            if ('id' === $field) {
+            if ($metadata->isIdentifier($field) || $metadata->getTypeOfField($field) === self::DOCTRINE_GUID_TYPE) {
                 $values = array_map([$this, 'getIdFromValue'], $values);
             }
 

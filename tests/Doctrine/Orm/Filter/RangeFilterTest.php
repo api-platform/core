@@ -332,6 +332,31 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'uuid[between]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'uuid[gt]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'uuid[gte]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'uuid[lt]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'uuid[lte]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 

@@ -525,7 +525,8 @@ Feature: Subresource support
       "id": 1,
       "name": "plop",
       "alias": null,
-      "foo": null
+      "foo": null,
+      "uuid": null
     }
     """
 
@@ -558,6 +559,7 @@ Feature: Subresource support
       "id": 1,
       "name": "plop",
       "alias": null,
-      "foo": null
+      "foo": null,
+      "uuid": null
     }
     """

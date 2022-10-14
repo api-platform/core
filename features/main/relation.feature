@@ -170,7 +170,8 @@ Feature: Relations support
       "id": 1,
       "name": "Dummy with relations",
       "alias": null,
-      "foo": null
+      "foo": null,
+      "uuid": null
     }
     """
 

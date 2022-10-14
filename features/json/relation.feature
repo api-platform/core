@@ -225,6 +225,7 @@ Feature: JSON relations support
       "id": 1,
       "name": "Dummy with plain relations",
       "alias": null,
-      "foo": null
+      "foo": null,
+      "uuid": null
     }
     """

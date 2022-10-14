@@ -121,8 +121,9 @@ trait SearchFilterTrait
         try {
             $iriConverter = $this->getIriConverter();
             $item = $iriConverter->getResourceFromIri($value, ['fetch_data' => false]);
+            $metadata = $this->getClassMetadata(get_class($item));
 
-            return $this->getPropertyAccessor()->getValue($item, 'id');
+            return $this->getPropertyAccessor()->getValue($item, $metadata->getIdentifier()[0]);
         } catch (InvalidArgumentException $e) {
             // Do nothing, return the raw value
         }

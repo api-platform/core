@@ -89,6 +89,11 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'bool',
                 'required' => false,
             ],
+            'exists[uuid]' => [
+                'property' => 'uuid',
+                'type' => 'bool',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 

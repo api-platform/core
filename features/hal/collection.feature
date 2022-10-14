@@ -82,7 +82,8 @@ Feature: HAL Collections support
             "id": 1,
             "name": "Dummy #1",
             "alias": "Alias #9",
-            "foo": null
+            "foo": null,
+            "uuid": null
           },
           {
             "_links": {
@@ -102,7 +103,8 @@ Feature: HAL Collections support
             "id": 2,
             "name": "Dummy #2",
             "alias": "Alias #8",
-            "foo": null
+            "foo": null,
+            "uuid": null
           },
           {
             "_links": {
@@ -122,7 +124,8 @@ Feature: HAL Collections support
             "id": 3,
             "name": "Dummy #3",
             "alias": "Alias #7",
-            "foo": null
+            "foo": null,
+            "uuid": null
           }
         ]
       }
@@ -189,7 +192,8 @@ Feature: HAL Collections support
             "id": 7,
             "name": "Dummy #7",
             "alias": "Alias #3",
-            "foo": null
+            "foo": null,
+            "uuid": null
           },
           {
             "_links": {
@@ -209,7 +213,8 @@ Feature: HAL Collections support
             "id": 8,
             "name": "Dummy #8",
             "alias": "Alias #2",
-            "foo": null
+            "foo": null,
+            "uuid": null
           },
           {
             "_links": {
@@ -229,7 +234,8 @@ Feature: HAL Collections support
             "id": 9,
             "name": "Dummy #9",
             "alias": "Alias #1",
-            "foo": null
+            "foo": null,
+            "uuid": null
           }
         ]
       }
@@ -287,7 +293,8 @@ Feature: HAL Collections support
             "id": 10,
             "name": "Dummy #10",
             "alias": "Alias #0",
-            "foo": null
+            "foo": null,
+            "uuid": null
           }
         ]
       }
@@ -348,7 +355,8 @@ Feature: HAL Collections support
             "id": 4,
             "name": "Dummy #4",
             "alias": "Alias #6",
-            "foo": null
+            "foo": null,
+            "uuid": null
           },
           {
             "_links": {
@@ -368,7 +376,8 @@ Feature: HAL Collections support
             "id": 5,
             "name": "Dummy #5",
             "alias": "Alias #5",
-            "foo": null
+            "foo": null,
+            "uuid": null
           },
           {
             "_links": {
@@ -388,7 +397,8 @@ Feature: HAL Collections support
             "id": 6,
             "name": "Dummy #6",
             "alias": "Alias #4",
-            "foo": null
+            "foo": null,
+            "uuid": null
           }
         ]
       }
@@ -510,7 +520,8 @@ Feature: HAL Collections support
             "id": 2,
             "name": "Dummy #2",
             "alias": "Alias #8",
-            "foo": null
+            "foo": null,
+            "uuid": null
           }
         ]
       }
@@ -559,7 +570,8 @@ Feature: HAL Collections support
             "id": 8,
             "name": "Dummy #8",
             "alias": "Alias #2",
-            "foo": null
+            "foo": null,
+            "uuid": null
           }
         ]
       }
@@ -608,7 +620,8 @@ Feature: HAL Collections support
             "id": 8,
             "name": "Dummy #8",
             "alias": "Alias #2",
-            "foo": null
+            "foo": null,
+            "uuid": null
           }
         ]
       }

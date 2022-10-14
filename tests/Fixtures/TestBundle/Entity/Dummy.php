@@ -155,6 +155,13 @@ class Dummy
      */
     public $nameConverted;
 
+/**
+     * @var string|null
+     *
+     * @ORM\Column(type="guid", nullable=true)
+     */
+    public $uuid;
+
     /**
      * @var RelatedOwnedDummy|null
      *

@@ -38,7 +38,8 @@ Feature: Handle properly invalid data submitted to the API
       "id": 1,
       "name": "Not existing",
       "alias": null,
-      "foo": null
+      "foo": null,
+      "uuid": null
     }
     """
 

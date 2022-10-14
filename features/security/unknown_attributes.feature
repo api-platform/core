@@ -38,6 +38,7 @@ Feature: Ignore unknown attributes
       "id": 1,
       "name": "Not existing",
       "alias": null,
-      "foo": null
+      "foo": null,
+      "uuid": null
     }
     """
