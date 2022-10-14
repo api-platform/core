@@ -159,6 +159,13 @@ class Dummy
     public $nameConverted;
 
     /**
+     * @var string|null
+     *
+     * @ODM\Field(nullable=true)
+     */
+    public $uuid;
+
+    /**
      * @var RelatedOwnedDummy|null
      *
      * @ODM\ReferenceOne(targetDocument=RelatedOwnedDummy::class, cascade={"persist"}, mappedBy="owningDummy", nullable=true)

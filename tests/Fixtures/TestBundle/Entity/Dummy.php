@@ -155,7 +155,7 @@ class Dummy
      */
     public $nameConverted;
 
-/**
+    /**
      * @var string|null
      *
      * @ORM\Column(type="guid", nullable=true)

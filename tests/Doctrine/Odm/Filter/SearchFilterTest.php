@@ -198,6 +198,20 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'strategy' => 'exact',
                 'is_collection' => true,
             ],
+            'uuid' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => false,
+            ],
+            'uuid[]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => true,
+            ],
             'dummyBoolean' => [
                 'property' => 'dummyBoolean',
                 'type' => 'bool',
@@ -740,14 +754,14 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null): SearchFilter
     {
-        $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
+        $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) {
             if (false !== strpos($args[0], '/related_dummies')) {
-                $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
+                $relatedDummy = new RelatedDummy();
+                $relatedDummy->setId(1);
 
-                return $relatedDummyProphecy->reveal();
+                return $relatedDummy;
             }
 
             throw new InvalidArgumentException();

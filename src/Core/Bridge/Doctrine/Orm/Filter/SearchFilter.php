@@ -103,7 +103,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
         if ($metadata->hasField($field)) {
-            if ($metadata->isIdentifier($field) || $metadata->getTypeOfField($field) === self::DOCTRINE_GUID_TYPE) {
+            if ($metadata->isIdentifier($field) || self::DOCTRINE_GUID_TYPE === $metadata->getTypeOfField($field)) {
                 $values = array_map([$this, 'getIdFromValue'], $values);
             }
 

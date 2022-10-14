@@ -310,6 +310,31 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'uuid[between]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'uuid[gt]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'uuid[gte]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'uuid[lt]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'uuid[lte]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+            ],
             'dummyBoolean[between]' => [
                 'property' => 'dummyBoolean',
                 'type' => 'string',

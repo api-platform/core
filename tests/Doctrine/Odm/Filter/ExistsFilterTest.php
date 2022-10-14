@@ -86,6 +86,11 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'bool',
                 'required' => false,
             ],
+            'exists[uuid]' => [
+                'property' => 'uuid',
+                'type' => 'bool',
+                'required' => false,
+            ],
             'exists[dummyBoolean]' => [
                 'property' => 'dummyBoolean',
                 'type' => 'bool',

@@ -170,6 +170,18 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     ],
                 ],
             ],
+            'order[uuid]' => [
+                'property' => 'uuid',
+                'type' => 'string',
+                'required' => false,
+                'schema' => [
+                    'type' => 'string',
+                    'enum' => [
+                        'asc',
+                        'desc',
+                    ],
+                ],
+            ],
             'order[dummyBoolean]' => [
                 'property' => 'dummyBoolean',
                 'type' => 'string',
