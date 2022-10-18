@@ -471,7 +471,7 @@ class YamlExtractorTest extends TestCase
     public function getInvalidPaths(): array
     {
         return [
-            [__DIR__.'/yaml/invalid/invalid_resources.yaml', '"resources" setting is expected to be null or an array, string given in "'.__DIR__.'/yaml/invalid/invalid_resources.yaml'.'".'],
+            [__DIR__.'/yaml/invalid/invalid_resources.yaml', '"resources" setting is expected to be null or an array, string given in "'.__DIR__.'/yaml/invalid/invalid_resources.yaml".'],
         ];
     }
 }
