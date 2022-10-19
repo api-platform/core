@@ -22,10 +22,8 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Core\Upgrade\SubresourceTransformer;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OnlyAnnotation;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OnlyAttribute;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceAnnotationAndSubresourceAttribute;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceAttributeAndSubresourceAnnotation;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyToUpgradeWithOnlyAnnotation;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyToUpgradeWithOnlyAttribute;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -64,22 +62,6 @@ class UpgradeApiResourceCommandTest extends TestCase
         $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
         $subresourceOperationFactoryProphecy->create($entityClass)->willReturn($subresourceOperationFactoryReturn);
 
-        $expectedStrings = array_merge($expectedStrings, [
-            '-use ApiPlatform\\Core\\Annotation\\ApiSubresource',
-            '-use ApiPlatform\\Core\\Annotation\\ApiProperty',
-            '-use ApiPlatform\\Core\\Annotation\\ApiResource',
-            '-use ApiPlatform\\Core\\Annotation\\ApiFilter',
-            '-use ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\SearchFilter;',
-            '-use ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\ExistsFilter;',
-            '-use ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\DateFilter;',
-            '+use ApiPlatform\\Metadata\\ApiProperty',
-            '+use ApiPlatform\\Metadata\\ApiResource',
-            '+use ApiPlatform\\Metadata\\ApiFilter',
-            '+use ApiPlatform\\Doctrine\\Orm\\Filter\\SearchFilter',
-            '+use ApiPlatform\\Doctrine\\Orm\\Filter\\ExistsFilter',
-            '+use ApiPlatform\\Doctrine\\Orm\\Filter\\DateFilter',
-            '+use ApiPlatform\\Metadata\\Get', ]
-        );
         $commandTester = $this->getCommandTester($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $subresourceOperationFactoryProphecy->reveal());
         $commandTester->execute([]);
 
@@ -92,22 +74,32 @@ class UpgradeApiResourceCommandTest extends TestCase
     public function debugResourceProvider(): array
     {
         $entityClasses = [
-            'only_annotation' => OnlyAnnotation::class,
-            'only_attribute' => OnlyAttribute::class,
-            'resource_attribute_and_subresource_annotation' => ResourceAttributeAndSubresourceAnnotation::class,
-            'resource_annotation_and_subresource_attribute' => ResourceAnnotationAndSubresourceAttribute::class,
+            'only_annotation' => DummyToUpgradeWithOnlyAnnotation::class,
+            'only_attribute' => DummyToUpgradeWithOnlyAttribute::class,
         ];
 
         return array_map(function ($key, $entityClass) {
             $expectedStrings = [
                 '+#[ApiResource]',
+                '-use ApiPlatform\\Core\\Annotation\\ApiSubresource',
+                '-use ApiPlatform\\Core\\Annotation\\ApiProperty',
+                '-use ApiPlatform\\Core\\Annotation\\ApiResource',
+                '+use ApiPlatform\\Metadata\\ApiProperty',
+                '+use ApiPlatform\\Metadata\\ApiResource',
+                '+use ApiPlatform\\Metadata\\ApiFilter',
+                '+use ApiPlatform\\Metadata\\Get',
                 sprintf("#[ApiResource(uriTemplate: '/%s/{id}/name.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]", $key),
-                '+    #[ApiFilter(filterClass: SearchFilter::class)]',
-                '+    #[ApiFilter(filterClass: ExistsFilter::class)]',
-                '+    #[ApiFilter(filterClass: DateFilter::class)]',
             ];
-            if (OnlyAnnotation::class === $entityClass) {
+
+            if (DummyToUpgradeWithOnlyAnnotation::class === $entityClass) {
                 array_push($expectedStrings,
+                    '+use ApiPlatform\\Doctrine\\Orm\\Filter\\SearchFilter',
+                    '+use ApiPlatform\\Doctrine\\Orm\\Filter\\ExistsFilter',
+                    '+use ApiPlatform\\Doctrine\\Orm\\Filter\\DateFilter',
+                    '-use ApiPlatform\\Core\\Annotation\\ApiFilter',
+                    '-use ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\SearchFilter;',
+                    '-use ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\ExistsFilter;',
+                    '-use ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\DateFilter;',
                     '- * @ApiResource',
                     '- * @ApiFilter(SearchFilter::class, properties={"id"})',
                     "+#[ApiFilter(filterClass: SearchFilter::class, properties: ['id'])]",
@@ -115,49 +107,23 @@ class UpgradeApiResourceCommandTest extends TestCase
                     '+    #[ApiProperty(writable: false)]',
                     '-     * @ApiSubresource',
                     '-     * @ApiFilter(DateFilter::class)',
-                    '-     * @ApiProperty(iri="RelatedDummy.name")',
-                    "+    #[ApiProperty(iris: ['RelatedDummy.name'])]",
+                    '-     * @ApiProperty(iri="DummyToUpgradeWithOnlyAnnotation.dummyToUpgradeProduct")',
+                    "+    #[ApiProperty(iris: ['DummyToUpgradeWithOnlyAnnotation.dummyToUpgradeProduct'])]",
                     '-     * @ApiFilter(SearchFilter::class)',
-                    '-     * @ApiFilter(ExistsFilter::class)'
+                    '-     * @ApiFilter(ExistsFilter::class)',
+                    '+    #[ApiFilter(filterClass: SearchFilter::class)]',
+                    '+    #[ApiFilter(filterClass: ExistsFilter::class)]',
+                    '+    #[ApiFilter(filterClass: DateFilter::class)]'
                 );
             }
-            if (OnlyAttribute::class === $entityClass) {
+
+            if (DummyToUpgradeWithOnlyAttribute::class === $entityClass) {
                 array_push($expectedStrings,
                     '-#[ApiResource()]',
                     "+#[ApiResource(uriTemplate: '/only_attribute/{id}/name.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]",
-                    '-    #[ApiFilter(DateFilter::class)]',
                     '-    #[ApiSubresource]',
-                    "-    #[ApiProperty(iri: 'RelatedDummy.name')]",
-                    "+    #[ApiProperty(iris: ['RelatedDummy.name'])]",
-                    '-    #[ApiFilter(SearchFilter::class)]',
-                    '-    #[ApiFilter(ExistsFilter::class)]'
-                );
-            }
-            if (ResourceAnnotationAndSubresourceAttribute::class === $entityClass) {
-                array_push($expectedStrings,
-                    '- * @ApiResource',
-                    "+#[ApiResource(uriTemplate: '/resource_annotation_and_subresource_attribute/{id}/name.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]",
-                    '-    #[ApiFilter(DateFilter::class)]',
-                    '-    #[ApiSubresource]',
-                    "-    #[ApiProperty(iri: 'RelatedDummy.name')]",
-                    "+    #[ApiProperty(iris: ['RelatedDummy.name'])]",
-                    '-    #[ApiFilter(SearchFilter::class)]',
-                    '-    #[ApiFilter(ExistsFilter::class)]'
-                );
-            }
-            if (ResourceAttributeAndSubresourceAnnotation::class === $entityClass) {
-                array_push($expectedStrings,
-                    '-#[ApiResource()]',
-                    '- * @ApiFilter(SearchFilter::class, properties={"id"})',
-                    "+#[ApiFilter(filterClass: SearchFilter::class, properties: ['id'])]",
-                    '-     * @ApiProperty(writable=false)',
-                    '+    #[ApiProperty(writable: false)]',
-                    '-     * @ApiFilter(DateFilter::class)',
-                    '-     * @ApiSubresource',
-                    "+    #[ApiProperty(iris: ['RelatedDummy.name'])]",
-                    '-     * @ApiProperty(iri="RelatedDummy.name")',
-                    '-     * @ApiFilter(SearchFilter::class)',
-                    '-     * @ApiFilter(ExistsFilter::class)'
+                    "-    #[ApiProperty(iri: 'DummyToUpgradeWithOnlyAttribute.dummyToUpgradeProduct')]",
+                    "+    #[ApiProperty(iris: ['DummyToUpgradeWithOnlyAttribute.dummyToUpgradeProduct'])]"
                 );
             }
 

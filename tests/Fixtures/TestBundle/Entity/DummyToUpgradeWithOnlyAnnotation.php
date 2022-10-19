@@ -24,10 +24,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
+ * @ORM\Entity
+ * @ApiResource
  * @ApiFilter(SearchFilter::class, properties={"id"})
  */
-#[ApiResource()]
-class ResourceAttributeAndSubresourceAnnotation
+class DummyToUpgradeWithOnlyAnnotation
 {
     /**
      * @var int
@@ -42,36 +43,14 @@ class ResourceAttributeAndSubresourceAnnotation
     private $id;
 
     /**
-     * @var RelatedDummy
-     *
-     * @ORM\Column(type="string")
+     * @var DummyToUpgradeProduct
+     * @ORM\ManyToOne(targetEntity="DummyToUpgradeProduct", cascade={"persist"}, inversedBy="dummysToUpgradeWithOnlyAnnotation")
+     * @ORM\JoinColumn(nullable=false)
      * @Groups({"barcelona", "chicago", "friends"})
-     *
      * @ApiSubresource
-     *
-     * @ApiProperty(iri="RelatedDummy.name")
+     * @ApiProperty(iri="DummyToUpgradeWithOnlyAnnotation.dummyToUpgradeProduct")
      * @ApiFilter(SearchFilter::class)
      * @ApiFilter(ExistsFilter::class)
      */
-    private $name;
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function getName(): RelatedDummy
-    {
-        return $this->name;
-    }
-
-    public function setName(RelatedDummy $name): void
-    {
-        $this->name = $name;
-    }
+    private $dummyToUpgradeProduct;
 }
