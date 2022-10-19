@@ -27,6 +27,7 @@ class DummyToUpgradeWithOnlyAttribute
 {
     /**
      * @var int
+     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -37,6 +38,7 @@ class DummyToUpgradeWithOnlyAttribute
 
     /**
      * @var DummyToUpgradeProduct
+     *
      * @ORM\ManyToOne(targetEntity="DummyToUpgradeProduct", inversedBy="dummysToUpgradeWithOnlyAttribute")
      * @ORM\JoinColumn(nullable=false)
      */

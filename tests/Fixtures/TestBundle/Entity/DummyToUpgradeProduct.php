@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ApiResource
  */
 class DummyToUpgradeProduct
@@ -34,12 +35,14 @@ class DummyToUpgradeProduct
 
     /**
      * @var Collection<int,DummyToUpgradeWithOnlyAnnotation>
+     *
      * @ORM\OneToMany(mappedBy="dummyToUpgradeProduct", targetEntity=DummyToUpgradeWithOnlyAnnotation::class)
      */
     private $dummysToUpgradeWithOnlyAnnotation;
 
     /**
      * @var Collection<int,DummyToUpgradeWithOnlyAttribute>
+     *
      * @ORM\OneToMany(mappedBy="dummyToUpgradeProduct", targetEntity=DummyToUpgradeWithOnlyAttribute::class)
      */
     private $dummysToUpgradeWithOnlyAttribute;

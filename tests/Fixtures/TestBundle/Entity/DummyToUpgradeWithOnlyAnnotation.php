@@ -25,7 +25,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
+ *
  * @ApiResource
+ *
  * @ApiFilter(SearchFilter::class, properties={"id"})
  */
 class DummyToUpgradeWithOnlyAnnotation
@@ -44,10 +46,13 @@ class DummyToUpgradeWithOnlyAnnotation
 
     /**
      * @var DummyToUpgradeProduct
+     *
      * @ORM\ManyToOne(targetEntity="DummyToUpgradeProduct", cascade={"persist"}, inversedBy="dummysToUpgradeWithOnlyAnnotation")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"barcelona", "chicago", "friends"})
+     *
      * @ApiSubresource
+     *
      * @ApiProperty(iri="DummyToUpgradeWithOnlyAnnotation.dummyToUpgradeProduct")
      * @ApiFilter(SearchFilter::class)
      * @ApiFilter(ExistsFilter::class)
