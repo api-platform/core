@@ -105,7 +105,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             }
         }
 
-        return sprintf('%s.{_format}', $uriTemplate);
+        return sprintf('%s{._format}', $uriTemplate);
     }
 
     private function configureUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation
@@ -144,8 +144,12 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         }
         $operation = $operation->withUriVariables($uriVariables);
 
+        if (str_ends_with($uriTemplate, '{._format}')) {
+            $uriTemplate = substr($uriTemplate, 0, -10);
+        }
+
         $route = (new Route($uriTemplate))->compile();
-        $variables = array_filter($route->getPathVariables(), fn ($v): bool => '_format' !== $v);
+        $variables = $route->getPathVariables();
 
         if (\count($variables) !== \count($uriVariables)) {
             $newUriVariables = [];

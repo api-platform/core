@@ -22,7 +22,7 @@ use IteratorAggregate;
 use Traversable;
 
 #[ApiResource(
-    '/attribute_resources.{_format}',
+    '/attribute_resources{._format}',
     normalizationContext: ['skip_null_values' => true],
     provider: AttributeResourceProvider::class
 )]

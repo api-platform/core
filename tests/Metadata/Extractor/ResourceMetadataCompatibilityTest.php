@@ -224,7 +224,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 [
                     'name' => 'custom_operation_name',
                     'method' => 'GET',
-                    'uriTemplate' => '/users/{userId}/comments.{_format}',
+                    'uriTemplate' => '/users/{userId}/comments{._format}',
                     'shortName' => self::SHORT_NAME,
                     'description' => 'A list of Comments',
                     'types' => ['Comment'],
@@ -330,7 +330,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     ],
                 ],
                 [
-                    'uriTemplate' => '/users/{userId}/comments/{commentId}.{_format}',
+                    'uriTemplate' => '/users/{userId}/comments/{commentId}{._format}',
                     'class' => Get::class,
                     'uriVariables' => [
                         'userId' => [
