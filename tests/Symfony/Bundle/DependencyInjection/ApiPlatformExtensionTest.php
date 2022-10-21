@@ -70,7 +70,9 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\AbstractUid;
@@ -163,6 +165,7 @@ class ApiPlatformExtensionTest extends TestCase
             'kernel.bundles' => [
                 'DoctrineBundle' => DoctrineBundle::class,
                 'SecurityBundle' => SecurityBundle::class,
+                'TwigBundle' => TwigBundle::class,
             ],
             'kernel.bundles_metadata' => [
                 'TestBundle' => [
@@ -173,6 +176,7 @@ class ApiPlatformExtensionTest extends TestCase
             ],
             'kernel.project_dir' => __DIR__.'/../../../Fixtures/app',
             'kernel.debug' => false,
+            'kernel.environment' => 'test',
         ]);
 
         $this->container = new ContainerBuilder($containerParameterBag);
@@ -691,6 +695,37 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.graphql.normalizer.validation_exception', ['serializer.normalizer']);
         $this->assertServiceHasTags('api_platform.graphql.normalizer.http_exception', ['serializer.normalizer']);
         $this->assertServiceHasTags('api_platform.graphql.normalizer.runtime_exception', ['serializer.normalizer']);
+    }
+
+    public function testRuntimeExceptionIsThrownIfTwigIsNotEnabledButGraphqlClientsAre(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['graphql']['enabled'] = true;
+        $this->container->getParameterBag()->set('kernel.bundles', [
+            'DoctrineBundle' => DoctrineBundle::class,
+            'SecurityBundle' => SecurityBundle::class,
+        ]);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('GraphiQL and GraphQL Playground interfaces depend on Twig. Please activate TwigBundle for the test environnement or disable GraphiQL and GraphQL Playground.');
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+    }
+
+    public function testGraphqlClientsDefinitionsAreRemovedIfDisabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['graphql']['enabled'] = true;
+        $config['api_platform']['graphql']['graphiql']['enabled'] = false;
+        $config['api_platform']['graphql']['graphql_playground']['enabled'] = false;
+        $this->container->getParameterBag()->set('kernel.bundles', [
+            'DoctrineBundle' => DoctrineBundle::class,
+            'SecurityBundle' => SecurityBundle::class,
+        ]);
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertNotContainerHasService('api_platform.graphql.action.graphiql');
+        $this->assertNotContainerHasService('api_platform.graphql.action.graphql_playground');
     }
 
     public function testDoctrineOrmConfiguration(): void

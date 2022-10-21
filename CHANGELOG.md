@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.3
+
+* Graphql: add a clearer error message when TwigBundle is disabled but graphQL clients are enabled (#5064)
+
 ## 3.0.2
 
 * Metadata: generate skolem IRI by default, use `genId: false` to disable **BC**
