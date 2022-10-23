@@ -24,6 +24,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -162,6 +164,46 @@ class ItemNormalizerTest extends TestCase
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['name' => 'hello'], Dummy::class, null, $context));
+    }
+
+    public function testDenormalizeConcreteClass()
+    {
+        $context = ['resource_class' => ConcreteDummy::class, 'api_allow_update' => true];
+
+        $propertyNameCollection = new PropertyNameCollection(['instance']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(ConcreteDummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
+
+        $propertyMetadata = (new ApiProperty())->withReadable(true)->withWritable(true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(ConcreteDummy::class, 'instance', [])->willReturn($propertyMetadata)->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, ConcreteDummy::class)->willReturn(AbstractDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(ConcreteDummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+            null,
+            [],
+            null
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertInstanceOf(ConcreteDummy::class, $normalizer->denormalize(['instance' => 'hello'], ConcreteDummy::class, null, $context));
     }
 
     public function testDenormalizeWithIri()

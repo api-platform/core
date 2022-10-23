@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.3
+
+* Serializer: don't use abstract class as resource_class on denormalization
+
 ## 2.7.2
 
 * Metadata: no skolem IRI by default

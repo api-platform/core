@@ -322,8 +322,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['api_denormalize'] = true;
 
         if ($this->resourceClassResolver->isResourceClass($class)) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $class);
-            $context['resource_class'] = $resourceClass;
+            $context['resource_class'] = $resourceClass = $this->getResourceClass($objectToPopulate, $class);
         }
 
         $supportsPlainIdentifiers = $this->supportsPlainIdentifiers();
@@ -490,7 +489,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
+        $context['resource_class'] = $resourceClass = $this->getResourceClass(null, $context['resource_class']);
+
         $options = $this->getFactoryOptions($context);
         $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
 
@@ -1086,6 +1086,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     private function supportsPlainIdentifiers(): bool
     {
         return $this->allowPlainIdentifiers && null !== $this->itemDataProvider;
+    }
+
+    private function getResourceClass($objectToPopulate, $class): string
+    {
+        $newResourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $class);
+        if (!(new \ReflectionClass($newResourceClass))->isAbstract()) {
+            return $newResourceClass;
+        }
+        return $class;
     }
 }
 
