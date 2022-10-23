@@ -70,5 +70,10 @@
         <service id="api_platform.cache.metadata.resource_collection" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
+
+        <!-- GraphQl specific metadata factory used in the FieldsBuilder and decorated by doctrine metadata factories -->
+        <service id="api_platform.graphql_metadata.resource.metadata_collection_factory" class="ApiPlatform\GraphQl\Metadata\Factory\GraphQlNestedOperationResourceMetadataFactory">
+            <argument>%api_platform.defaults%</argument>
+        </service>
     </services>
 </container>
