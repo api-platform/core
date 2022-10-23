@@ -42,6 +42,10 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
+        if ($resourceMetadataCollection->isDynamic()) {
+            return $resourceMetadataCollection;
+        }
+
         foreach ($resourceMetadataCollection as $key => $resourceMetadata) {
             if (null !== $resourceMetadata->getDescription()) {
                 continue;
