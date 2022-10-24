@@ -15,9 +15,6 @@ namespace ApiPlatform\Metadata;
 
 use RuntimeException;
 
-/**
- * @internal
- */
 final class Operations implements \IteratorAggregate, \Countable
 {
     private $operations;
