@@ -40,6 +40,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Base item normalizer.
@@ -514,7 +515,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         // This is a hot spot
         if (isset($context['resource_class'])) {
-            $operationCacheKey = $context['resource_class'] . ($context['operation_name'] ?? '');
+            $operationCacheKey = $context['resource_class'].($context['operation_name'] ?? '');
             $operation = $context['operation'] ?? $this->localOperationCache[$operationCacheKey] ?? null;
 
             if (!isset($this->localOperationCache[$operationCacheKey]) && !$operation && $this->resourceClassResolver->isResourceClass($context['resource_class']) && $this->resourceMetadataCollectionFactory) {
@@ -522,10 +523,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
                 $this->localOperationCache[$operationCacheKey] = $operation;
             }
-            
-            $options['normalization_groups'] = $operation->getNormalizationContext()['groups'] ?? null;
-            $options['denormalization_groups'] = $operation->getDenormalizationContext()['groups'] ?? null;
-            $options['operation_name'] = $operation->getName();
+
+            if ($operation) {
+                $options['normalization_groups'] = $operation->getNormalizationContext()['groups'] ?? null;
+                $options['denormalization_groups'] = $operation->getDenormalizationContext()['groups'] ?? null;
+                $options['operation_name'] = $operation->getName();
+            }
         }
 
         return $options;
