@@ -31,7 +31,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
 #[Put]
 #[Delete]
 #[ApiResource(
-    '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
+    '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
     inputFormats: ['json' => ['application/merge-patch+json']],
     status: 301,
     provider: AttributeResourceProvider::class,

@@ -205,7 +205,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         yield 'simple' => [
             $this->createRequest('PUT', [
                 '_api_resource_class' => ResourceImplementation::class,
-                '_api_operation_name' => '_api_/resource_implementations.{_format}_put',
+                '_api_operation_name' => '_api_/resource_implementations{._format}_put',
                 'data' => $resource,
             ]),
             static function (ResourceImplementation $payload): void {},
@@ -215,7 +215,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         yield 'with another argument named $data' => [
             $this->createRequest('PUT', [
                 '_api_resource_class' => ResourceImplementation::class,
-                '_api_operation_name' => '_api_/resource_implementations.{_format}_put',
+                '_api_operation_name' => '_api_/resource_implementations{._format}_put',
                 'data' => $resource,
             ]),
             static function (ResourceImplementation $payload, $data): void {},

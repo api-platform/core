@@ -166,7 +166,7 @@ class YamlExtractorTest extends TestCase
                     'write' => null,
                 ],
                 [
-                    'uriTemplate' => '/users/{author}/programs.{_format}',
+                    'uriTemplate' => '/users/{author}/programs{._format}',
                     'shortName' => null,
                     'description' => 'User programs',
                     'routePrefix' => null,
@@ -230,7 +230,7 @@ class YamlExtractorTest extends TestCase
                         [
                             'name' => null,
                             'class' => GetCollection::class,
-                            'uriTemplate' => '/users/{author}/programs.{_format}',
+                            'uriTemplate' => '/users/{author}/programs{._format}',
                             'shortName' => null,
                             'description' => 'User programs',
                             'routePrefix' => null,
@@ -305,7 +305,7 @@ class YamlExtractorTest extends TestCase
                         [
                             'name' => null,
                             'class' => Get::class,
-                            'uriTemplate' => '/users/{userId}/programs/{id}.{_format}',
+                            'uriTemplate' => '/users/{userId}/programs/{id}{._format}',
                             'shortName' => null,
                             'description' => 'User programs',
                             'routePrefix' => null,
@@ -471,7 +471,7 @@ class YamlExtractorTest extends TestCase
     public function getInvalidPaths(): array
     {
         return [
-            [__DIR__.'/yaml/invalid/invalid_resources.yaml', '"resources" setting is expected to be null or an array, string given in "'.__DIR__.'/yaml/invalid/invalid_resources.yaml'.'".'],
+            [__DIR__.'/yaml/invalid/invalid_resources.yaml', '"resources" setting is expected to be null or an array, string given in "'.__DIR__.'/yaml/invalid/invalid_resources.yaml".'],
         ];
     }
 }

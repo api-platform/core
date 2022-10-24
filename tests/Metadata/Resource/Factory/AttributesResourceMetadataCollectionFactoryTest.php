@@ -81,11 +81,11 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 new ApiResource(
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
-                    uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
+                    uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
                     operations: [
-                        '_api_/dummy/{dummyId}/attribute_resources/{identifier}.{_format}_get' => new Get(
+                        '_api_/dummy/{dummyId}/attribute_resources/{identifier}{._format}_get' => new Get(
                             class: AttributeResource::class,
-                            uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
+                            uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
                             shortName: 'AttributeResource',
                             inputFormats: ['json' => ['application/merge-patch+json']],
                             priority: 4,
@@ -94,9 +94,9 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                             // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
                             processor: [AttributeResourceProcessor::class, 'process']
                         ),
-                        '_api_/dummy/{dummyId}/attribute_resources/{identifier}.{_format}_patch' => new Patch(
+                        '_api_/dummy/{dummyId}/attribute_resources/{identifier}{._format}_patch' => new Patch(
                             class: AttributeResource::class,
-                            uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
+                            uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
                             shortName: 'AttributeResource',
                             inputFormats: ['json' => ['application/merge-patch+json']],
                             priority: 5,
@@ -119,17 +119,17 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertEquals(
             new ResourceMetadataCollection(AttributeResources::class, [
                 new ApiResource(
-                    uriTemplate: '/attribute_resources.{_format}',
+                    uriTemplate: '/attribute_resources{._format}',
                     shortName: 'AttributeResources',
                     normalizationContext: ['skip_null_values' => true],
                     class: AttributeResources::class,
                     provider: AttributeResourceProvider::class,
                     operations: [
-                        '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(
-                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 1, provider: AttributeResourceProvider::class,
+                        '_api_/attribute_resources{._format}_get_collection' => new GetCollection(
+                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources{._format}', normalizationContext: ['skip_null_values' => true], priority: 1, provider: AttributeResourceProvider::class,
                         ),
-                        '_api_/attribute_resources.{_format}_post' => new Post(
-                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 2, provider: AttributeResourceProvider::class,
+                        '_api_/attribute_resources{._format}_post' => new Post(
+                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources{._format}', normalizationContext: ['skip_null_values' => true], priority: 2, provider: AttributeResourceProvider::class,
                         ),
                     ],
                     graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResources', AttributeResources::class, AttributeResourceProvider::class)
