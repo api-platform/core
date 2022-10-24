@@ -125,11 +125,8 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Stmt\Class_ || $node instanceof Node\Stmt\Interface_) {
-            if ($this->isAnnotation) {
-                $this->removeAnnotation($node);
-            } else {
-                $this->removeAttribute($node);
-            }
+            $this->removeAnnotation($node);
+            $this->removeAttribute($node);
 
             $arguments = [];
             $operations = null === $this->resourceAnnotation->itemOperations && null === $this->resourceAnnotation->collectionOperations ? null : array_merge(
@@ -361,13 +358,23 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
                 }
             }
         }
+        foreach ($node->stmts as $k => $stmts) {
+            foreach ($stmts->attrGroups as $i => $attrGroups) {
+                foreach ($attrGroups->attrs as $j => $attrs) {
+                    if (str_ends_with(implode('\\', $attrs->name->parts), 'ApiSubresource')) {
+                        unset($node->stmts[$k]->attrGroups[$i]);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private function removeAnnotation(Node\Stmt\Class_|Node\Stmt\Interface_ $node)
     {
         $comment = $node->getDocComment();
 
-        if (preg_match('/@ApiResource/', $comment->getText())) {
+        if ($comment && preg_match('/@ApiResource/', $comment->getText())) {
             $node->setDocComment($this->removeAnnotationByTag($comment, 'ApiResource'));
         }
     }
