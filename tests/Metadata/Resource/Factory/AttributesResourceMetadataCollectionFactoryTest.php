@@ -29,6 +29,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeDefaultOperations;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeOnlyOperation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResources;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExtraPropertiesResource;
@@ -205,5 +206,21 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 
         $this->assertEquals($extraPropertiesResource[0]->getExtraProperties(), ['foo' => 'bar']);
         $this->assertEquals($extraPropertiesResource->getOperation('_api_ExtraPropertiesResource_get')->getExtraProperties(), ['foo' => 'bar']);
+    }
+
+    public function testOverrideNameWithoutOperations(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+
+        $operation = new HttpOperation(shortName: 'AttributeOnlyOperation', class: AttributeOnlyOperation::class);
+        $this->assertEquals(new ResourceMetadataCollection(AttributeOnlyOperation::class, [
+            new ApiResource(
+                shortName: 'AttributeOnlyOperation',
+                class: AttributeOnlyOperation::class,
+                operations: [
+                    'my own name' => (new Get(name: 'my own name', priority: 1))->withOperation($operation),
+                ]
+            ),
+        ]), $attributeResourceMetadataCollectionFactory->create(AttributeOnlyOperation::class));
     }
 }
