@@ -18,6 +18,7 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\ItemNotFoundException;
@@ -51,8 +52,9 @@ final class IriConverter implements IriConverterInterface
     private $identifiersExtractor;
     private $resourceMetadataCollectionFactory;
     private $decorated;
+    private $dataProvider;
 
-    public function __construct(ProviderInterface $provider, RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null, IriConverterInterface $decorated = null)
+    public function __construct(ProviderInterface $provider, RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ItemDataProviderInterface $dataProvider, UriVariablesConverterInterface $uriVariablesConverter = null, IriConverterInterface $decorated = null)
     {
         $this->provider = $provider;
         $this->router = $router;
@@ -63,6 +65,7 @@ final class IriConverter implements IriConverterInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->resourceMetadataFactory = $resourceMetadataCollectionFactory;
         $this->decorated = $decorated;
+        $this->dataProvider = $dataProvider;
     }
 
     /**
@@ -102,11 +105,17 @@ final class IriConverter implements IriConverterInterface
             }
         }
 
-        if ($item = $this->provider->provide($operation, $uriVariables, $context)) {
-            return $item;
+        if (($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && !($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
+            $item = $this->dataProvider->getItem($operation->getClass(), $uriVariables, $operation->getName(), $context);
+        } else {
+            $item = $this->provider->provide($operation, $uriVariables, $context);
         }
 
-        throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
+        if (!$item) {
+            throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
+        }
+
+        return $item;
     }
 
     /**

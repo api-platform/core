@@ -141,6 +141,7 @@
             <argument type="service" id="api_platform.api.identifiers_extractor" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.item_data_provider" />
             <argument type="service" id="api_platform.uri_variables.converter" />
             <argument type="service" id="api_platform.symfony.iri_converter.skolem" on-invalid="null" />
         </service>
