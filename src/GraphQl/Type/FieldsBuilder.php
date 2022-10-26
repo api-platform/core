@@ -195,7 +195,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
             return $fields;
         }
 
-        if (!$input || 'create' !== $operation->getName()) {
+        if (!$input || ('create' !== $operation->getName() && !$operation->getInput())) {
             $fields['id'] = $idField;
         }
         if ($input && $depth >= 1) {
