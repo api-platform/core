@@ -56,7 +56,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     public function hasCacheableSupportsMethod(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -90,9 +90,9 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     /**
      * Normalizes a raw collection (not API resources).
      */
-    protected function normalizeRawCollection(iterable $object, string $format = null, array $context = []): array
+    protected function normalizeRawCollection(iterable $object, string $format = null, array $context = []): array|\ArrayObject
     {
-        if (\is_array($object) && !$object && ($context[Serializer::EMPTY_ARRAY_AS_OBJECT] ?? false)) {
+        if (!$object && ($context[Serializer::EMPTY_ARRAY_AS_OBJECT] ?? false) && \is_array($object)) {
             return new \ArrayObject();
         }
 

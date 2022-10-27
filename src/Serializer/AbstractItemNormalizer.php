@@ -55,7 +55,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     protected PropertyAccessorInterface $propertyAccessor;
     protected array $localCache = [];
-    protected array $localOperationCache = [];
+    protected array $localFactoryOptionsCache = [];
 
     public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
@@ -506,6 +506,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function getFactoryOptions(array $context): array
     {
+        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? '').($context['api_normalize'] ?? '');
+        if ($operationCacheKey && isset($this->localFactoryOptionsCache[$operationCacheKey])) {
+            return $this->localFactoryOptionsCache[$operationCacheKey];
+        }
+
         $options = [];
 
         if (isset($context[self::GROUPS])) {
@@ -515,13 +520,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         // This is a hot spot
         if (isset($context['resource_class'])) {
-            $operationCacheKey = $context['resource_class'].($context['operation_name'] ?? '');
-            $operation = $context['operation'] ?? $this->localOperationCache[$operationCacheKey] ?? null;
+            $operation = $context['operation'] ?? null;
 
-            if (!isset($this->localOperationCache[$operationCacheKey]) && !$operation && $this->resourceClassResolver->isResourceClass($context['resource_class']) && $this->resourceMetadataCollectionFactory) {
+            if (!$operation && $this->resourceMetadataCollectionFactory && $this->resourceClassResolver->isResourceClass($context['resource_class'])) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
                 $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
-                $this->localOperationCache[$operationCacheKey] = $operation;
             }
 
             if ($operation) {
@@ -531,7 +534,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        return $options;
+        return $this->localFactoryOptionsCache[$operationCacheKey] = $options;
     }
 
     /**
@@ -603,7 +606,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if ($type && $type->getClassName()) {
             $childContext = $this->createChildContext($context, $attribute, $format);
             unset($childContext['iri'], $childContext['uri_variables']);
-			$childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
+            $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
 
             return $this->serializer->normalize($attributeValue, $format, $childContext);
         }

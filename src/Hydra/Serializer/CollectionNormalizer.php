@@ -65,7 +65,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      *
      * @param iterable $object
      */
-    public function normalize(mixed $object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $this->normalizeRawCollection($object, $format, $context);
@@ -114,7 +114,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     /**
      * Normalizes a raw collection (not API resources).
      */
-    protected function normalizeRawCollection(iterable $object, string $format = null, array $context = [])
+    protected function normalizeRawCollection(iterable $object, string $format = null, array $context = []): array|\ArrayObject
     {
         if (\is_array($object) && !$object && ($context[Serializer::EMPTY_ARRAY_AS_OBJECT] ?? false)) {
             return new \ArrayObject();

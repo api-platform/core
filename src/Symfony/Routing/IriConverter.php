@@ -48,6 +48,8 @@ final class IriConverter implements IriConverterInterface
     use ResourceClassInfoTrait;
     use UriVariablesResolverTrait;
 
+    private $localOperationCache = [];
+
     public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
@@ -102,6 +104,11 @@ final class IriConverter implements IriConverterInterface
     {
         $resourceClass = \is_string($resource) ? $resource : $this->getObjectClass($resource);
 
+        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_c' : '_i');
+        if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
+            return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context);
+        }
+
         if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
             return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }
@@ -140,24 +147,9 @@ final class IriConverter implements IriConverterInterface
             return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }
 
-        $identifiers = $context['uri_variables'] ?? [];
+        $this->localOperationCache[$localOperationCacheKey] = $operation;
 
-        if (\is_object($resource)) {
-            try {
-                $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, $operation);
-            } catch (InvalidArgumentException|RuntimeException $e) {
-                // We can try using context uri variables if any
-                if (!$identifiers) {
-                    throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
-                }
-            }
-        }
-
-        try {
-            return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
-        } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
-        }
+        return $this->generateSymfonyRoute($resource, $referenceType, $operation, $context);
     }
 
     private function generateSkolemIri(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = [], string $resourceClass = null): string
@@ -168,5 +160,27 @@ final class IriConverter implements IriConverterInterface
 
         // Use a skolem iri, the route is defined in genid.xml
         return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
+    }
+
+    private function generateSymfonyRoute(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): string
+    {
+        $identifiers = $context['uri_variables'] ?? [];
+
+        if (\is_object($resource)) {
+            try {
+                $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, $operation);
+            } catch (InvalidArgumentException|RuntimeException $e) {
+                // We can try using context uri variables if any
+                if (!$identifiers) {
+                    throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+                }
+            }
+        }
+
+        try {
+            return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
+        } catch (RoutingExceptionInterface $e) {
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+        }
     }
 }

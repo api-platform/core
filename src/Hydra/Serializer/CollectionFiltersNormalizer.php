@@ -23,7 +23,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Enhances the result of collection by adding the filters applied on collection.
@@ -60,8 +59,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $preserveEmpty = ($context[Serializer::EMPTY_ARRAY_AS_OBJECT] ?? false) || ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false);
-        if ($preserveEmpty && $object instanceof \ArrayObject && !\count($object)) {
+        if (($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && $object instanceof \ArrayObject && !\count($object)) {
             return $object;
         }
 
