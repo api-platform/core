@@ -967,6 +967,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         ) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $context['resource_class'] = $resourceClass;
+            unset($context[self::OBJECT_TO_POPULATE]);
 
             return $this->denormalizeCollection($attribute, $propertyMetadata, $type, $resourceClass, $value, $format, $context);
         }
