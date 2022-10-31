@@ -130,8 +130,8 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
 
             $arguments = [];
             $operations = null === $this->resourceAnnotation->itemOperations && null === $this->resourceAnnotation->collectionOperations ? null : array_merge(
-                $this->legacyOperationsToOperations($this->getLegacyOperations()),
-                $this->legacyOperationsToOperations($this->getLegacyOperations(true), true)
+                $this->legacyOperationsToOperations($this->getLegacyOperations(true), true),
+                $this->legacyOperationsToOperations($this->getLegacyOperations())
             );
 
             if (null !== $operations) {
@@ -443,6 +443,9 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
 
             $method = $operation['method'] ?? strtoupper($operationName);
             unset($operation['method']);
+            if(!in_array($operationName, ['get', 'post', 'put', 'patch', 'delete'])) {
+                $operation['name']= $operationName;
+            }
             $operations[] = $this->createOperation($this->getOperationNamespace($method, $isCollection), $operation);
         }
 
