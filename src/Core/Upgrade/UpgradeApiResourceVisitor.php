@@ -359,8 +359,8 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
             }
         }
         foreach ($node->stmts as $k => $stmts) {
-            foreach ($stmts->attrGroups as $i => $attrGroups) {
-                foreach ($attrGroups->attrs as $j => $attrs) {
+            foreach ($stmts->attrGroups ?? [] as $i => $attrGroups) {
+                foreach ($attrGroups->attrs ?? [] as $j => $attrs) {
                     if (str_ends_with(implode('\\', $attrs->name->parts), 'ApiSubresource')) {
                         unset($node->stmts[$k]->attrGroups[$i]);
                         break;
@@ -443,6 +443,9 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
 
             $method = $operation['method'] ?? strtoupper($operationName);
             unset($operation['method']);
+            if (!isset($operation['path']) && !\in_array($operationName, ['get', 'post', 'put', 'patch', 'delete'], true)) {
+                $operation['name'] = $operationName;
+            }
             $operations[] = $this->createOperation($this->getOperationNamespace($method, $isCollection), $operation);
         }
 
