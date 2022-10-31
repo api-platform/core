@@ -443,6 +443,9 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
 
             $method = $operation['method'] ?? strtoupper($operationName);
             unset($operation['method']);
+            if (!\in_array($operationName, ['get', 'post', 'put', 'patch', 'delete'], true)) {
+                $operation['name'] = $operationName;
+            }
             $operations[] = $this->createOperation($this->getOperationNamespace($method, $isCollection), $operation);
         }
 
