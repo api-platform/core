@@ -367,6 +367,8 @@ class ApiPlatformExtensionTest extends TestCase
             // metadata/resource.xml
             'api_platform.metadata.resource.metadata_collection_factory.attributes',
             'api_platform.metadata.resource.metadata_collection_factory.xml',
+            'api_platform.metadata.resource_extractor.dynamic',
+            'api_platform.metadata.resource.metadata_collection_factory.dynamic',
             'api_platform.metadata.resource.metadata_collection_factory.uri_template',
             'api_platform.metadata.resource.metadata_collection_factory.link',
             'api_platform.metadata.resource.metadata_collection_factory.operation_name',

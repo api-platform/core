@@ -23,6 +23,14 @@
             <argument>%api_platform.defaults%</argument>
         </service>
 
+        <service id="api_platform.metadata.resource_extractor.dynamic" class="ApiPlatform\Metadata\Extractor\DynamicResourceExtractor" public="false" />
+
+        <service id="api_platform.metadata.resource.metadata_collection_factory.dynamic" class="ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="800" public="false">
+            <argument type="service" id="api_platform.metadata.resource_extractor.dynamic" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.dynamic.inner" />
+            <argument>%api_platform.defaults%</argument>
+        </service>
+
         <service id="api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation" class="ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="700" public="false">
             <argument type="service" id="api_platform.metadata.resource.link_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation.inner" />

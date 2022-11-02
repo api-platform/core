@@ -43,7 +43,7 @@ interface TypeBuilderInterface
     /**
      * Gets the type of a paginated collection of the given resource type.
      */
-    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, Operation $operation): GraphQLType;
+    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, Operation $operation): GraphQLType;
 
     /**
      * Returns true if a type is a collection.

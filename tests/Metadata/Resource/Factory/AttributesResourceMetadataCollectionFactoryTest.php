@@ -209,4 +209,14 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertEquals($extraPropertiesResource[0]->getExtraProperties(), ['foo' => 'bar']);
         $this->assertEquals($extraPropertiesResource->getOperation('_api_ExtraPropertiesResource_get')->getExtraProperties(), ['foo' => 'bar']);
     }
+
+    public function testDynamic(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+
+        self::assertEquals(
+            new ResourceMetadataCollection(ResourceMetadataCollection::DYNAMIC_RESOURCE_CLASS_PREFIX.AttributeResource::class),
+            $attributeResourceMetadataCollectionFactory->create(ResourceMetadataCollection::DYNAMIC_RESOURCE_CLASS_PREFIX.AttributeResource::class)
+        );
+    }
 }
