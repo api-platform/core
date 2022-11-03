@@ -15,6 +15,8 @@ namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
 final class ArrayItems implements ValidatorInterface
 {
+    use CheckFilterDeprecationsTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -24,9 +26,11 @@ final class ArrayItems implements ValidatorInterface
             return [];
         }
 
-        $maxItems = $filterDescription['swagger']['maxItems'] ?? null;
-        $minItems = $filterDescription['swagger']['minItems'] ?? null;
-        $uniqueItems = $filterDescription['swagger']['uniqueItems'] ?? false;
+        $this->checkFilterDeprecations($filterDescription);
+
+        $maxItems = $filterDescription['openapi']['maxItems'] ?? $filterDescription['swagger']['maxItems'] ?? null;
+        $minItems = $filterDescription['openapi']['minItems'] ?? $filterDescription['swagger']['minItems'] ?? null;
+        $uniqueItems = $filterDescription['openapi']['uniqueItems'] ?? $filterDescription['swagger']['uniqueItems'] ?? false;
 
         $errorList = [];
 
@@ -60,7 +64,7 @@ final class ArrayItems implements ValidatorInterface
             return $value;
         }
 
-        $collectionFormat = $filterDescription['swagger']['collectionFormat'] ?? 'csv';
+        $collectionFormat = $filterDescription['openapi']['collectionFormat'] ?? $filterDescription['swagger']['collectionFormat'] ?? 'csv';
 
         return explode(self::getSeparator($collectionFormat), (string) $value) ?: []; // @phpstan-ignore-line
     }

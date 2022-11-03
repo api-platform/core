@@ -15,6 +15,8 @@ namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
 final class MultipleOf implements ValidatorInterface
 {
+    use CheckFilterDeprecationsTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -25,7 +27,9 @@ final class MultipleOf implements ValidatorInterface
             return [];
         }
 
-        $multipleOf = $filterDescription['swagger']['multipleOf'] ?? null;
+        $this->checkFilterDeprecations($filterDescription);
+
+        $multipleOf = $filterDescription['openapi']['multipleOf'] ?? $filterDescription['swagger']['multipleOf'] ?? null;
 
         if (null !== $multipleOf && 0 !== ($value % $multipleOf)) {
             return [

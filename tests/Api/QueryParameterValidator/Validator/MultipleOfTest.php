@@ -18,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
+ *
+ * @group legacy
  */
 class MultipleOfTest extends TestCase
 {

@@ -20,6 +20,8 @@ use PHPUnit\Framework\TestCase;
  * Class RequiredTest.
  *
  * @author Julien Deniau <julien.deniau@mapado.com>
+ *
+ * @group legacy
  */
 class RequiredTest extends TestCase
 {
