@@ -286,10 +286,10 @@ final class DoctrineContext implements Context
     public function thereAreOfTheseSoManyObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $soMany = $this->buildSoMany();
-            $soMany->content = 'Many #'.$i;
+            $dummy = $this->isOrm() ? new SoMany() : new SoManyDocument();
+            $dummy->content = 'Many #'.$i;
 
-            $this->manager->persist($soMany);
+            $this->manager->persist($dummy);
         }
 
         $this->manager->flush();
@@ -340,12 +340,6 @@ final class DoctrineContext implements Context
             $foo = $this->buildFooDummy();
             $foo->setName($names[$i]);
             $foo->setDummy($dummy);
-            for ($j = 0; $j < 3; ++$j) {
-                $soMany = $this->buildSoMany();
-                $soMany->content = "So many $j";
-                $soMany->fooDummy = $foo;
-                $foo->soManies->add($soMany);
-            }
 
             $this->manager->persist($foo);
         }
@@ -2204,11 +2198,6 @@ final class DoctrineContext implements Context
     private function buildRelatedSecureDummy(): RelatedSecuredDummy|RelatedSecuredDummyDocument
     {
         return $this->isOrm() ? new RelatedSecuredDummy() : new RelatedSecuredDummyDocument();
-    }
-
-    private function buildSoMany(): SoMany|SoManyDocument
-    {
-        return $this->isOrm() ? new SoMany() : new SoManyDocument();
     }
 
     private function buildThirdLevel(): ThirdLevel|ThirdLevelDocument

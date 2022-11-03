@@ -31,7 +31,4 @@ class SoMany
     public $id;
     #[ORM\Column(nullable: true)]
     public $content;
-
-    #[ORM\ManyToOne]
-    public ?FooDummy $fooDummy;
 }
