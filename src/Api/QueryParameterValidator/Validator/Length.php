@@ -25,8 +25,8 @@ final class Length implements ValidatorInterface
             return [];
         }
 
-        $maxLength = $filterDescription['swagger']['maxLength'] ?? null;
-        $minLength = $filterDescription['swagger']['minLength'] ?? null;
+        $maxLength = $filterDescription['openapi']['maxLength'] ?? $filterDescription['swagger']['maxLength'] ?? null;
+        $minLength = $filterDescription['openapi']['minLength'] ?? $filterDescription['swagger']['minLength'] ?? null;
 
         $errorList = [];
 

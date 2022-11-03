@@ -25,7 +25,7 @@ final class Enum implements ValidatorInterface
             return [];
         }
 
-        $enum = $filterDescription['swagger']['enum'] ?? null;
+        $enum = $filterDescription['openapi']['enum'] ?? $filterDescription['swagger']['enum'] ?? null;
 
         if (null !== $enum && !\in_array($value, $enum, true)) {
             return [

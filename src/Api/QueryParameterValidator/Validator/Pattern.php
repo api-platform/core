@@ -25,7 +25,7 @@ final class Pattern implements ValidatorInterface
             return [];
         }
 
-        $pattern = $filterDescription['swagger']['pattern'] ?? null;
+        $pattern = $filterDescription['openapi']['pattern'] ?? $filterDescription['swagger']['pattern'] ?? null;
 
         if (null !== $pattern && !preg_match($pattern, $value)) {
             return [

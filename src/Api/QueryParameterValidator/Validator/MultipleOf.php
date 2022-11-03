@@ -25,7 +25,7 @@ final class MultipleOf implements ValidatorInterface
             return [];
         }
 
-        $multipleOf = $filterDescription['swagger']['multipleOf'] ?? null;
+        $multipleOf = $filterDescription['openapi']['multipleOf'] ?? $filterDescription['swagger']['multipleOf'] ?? null;
 
         if (null !== $multipleOf && 0 !== ($value % $multipleOf)) {
             return [
