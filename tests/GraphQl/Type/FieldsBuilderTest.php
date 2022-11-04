@@ -58,7 +58,7 @@ class FieldsBuilderTest extends TestCase
     private ObjectProphecy $propertyNameCollectionFactoryProphecy;
     private ObjectProphecy $propertyMetadataFactoryProphecy;
     private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
-    private ObjectProphecy $dynamicResourceExtractorProphecy;
+    private ObjectProphecy $graphQlNestedOperationResourceMetadataFactoryProphecy;
     private ObjectProphecy $typesContainerProphecy;
     private ObjectProphecy $typeBuilderProphecy;
     private ObjectProphecy $typeConverterProphecy;

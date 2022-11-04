@@ -133,7 +133,7 @@
             <argument type="service" id="api_platform.pagination" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument>%api_platform.graphql.nesting_separator%</argument>
-            <argument type="service" id="api_platform.graphql_metadata.resource.metadata_collection_factory" on-invalid="ignore" />
+            <argument type="service" id="api_platform.graphql_metadata.resource.metadata_collection_factory" />
         </service>
 
         <service id="api_platform.graphql.schema_builder" class="ApiPlatform\GraphQl\Type\SchemaBuilder" public="false">
@@ -273,6 +273,15 @@
 
         <service id="api_platform.graphql.normalizer.runtime_exception" class="ApiPlatform\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer">
             <tag name="serializer.normalizer" priority="-780" />
+        </service>
+
+        <!-- GraphQl specific metadata factory used in the FieldsBuilder and decorated by doctrine metadata factories -->
+        <service id="api_platform.graphql_metadata.resource.metadata_collection_factory" class="ApiPlatform\GraphQl\Metadata\Factory\GraphQlNestedOperationResourceMetadataFactory">
+            <argument>%api_platform.defaults%</argument>
+        </service>
+
+        <service id="api_platform.graphql_metadata.resource.metadata_collection_factory.filters" class="ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory" decorates="api_platform.graphql_metadata.resource.metadata_collection_factory" decoration-priority="200" public="false">
+            <argument type="service" id="api_platform.graphql_metadata.resource.metadata_collection_factory.filters.inner" />
         </service>
     </services>
 

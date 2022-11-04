@@ -40,10 +40,27 @@ final class GraphQlNestedOperationResourceMetadataFactory implements ResourceMet
             $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
 
-        if (0 === \count($resourceMetadataCollection)) {
-            $shortName = (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
-            $resourceMetadataCollection[0] = $this->addDefaultGraphQlOperations(new ApiResource(class: $resourceClass, shortName: $shortName));
+        if (0 < \count($resourceMetadataCollection)) {
+            return $resourceMetadataCollection;
         }
+
+        $shortName = (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
+
+        $apiResource = new ApiResource(
+            class: $resourceClass,
+            shortName: $shortName
+        );
+
+        if (class_exists($resourceClass)) {
+            $refl = new \ReflectionClass($resourceClass);
+            $attribute = $refl->getAttributes(ApiResource::class)[0] ?? null;
+            $attributeInstance = $attribute?->newInstance();
+            if ($filters = $attributeInstance?->getFilters()) {
+                $apiResource = $apiResource->withFilters($filters);
+            }
+        }
+
+        $resourceMetadataCollection[0] = $this->addDefaultGraphQlOperations($apiResource);
 
         return $resourceMetadataCollection;
     }

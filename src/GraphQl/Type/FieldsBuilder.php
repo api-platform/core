@@ -19,6 +19,7 @@ use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -260,9 +261,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
                     $resourceOperation = $resourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
                 } catch (OperationNotFoundException) {
                     // If there is no query operation for a nested resource we force one to exist
-                    $resourceMetadataCollection = $this->graphQlNestedOperationResourceMetadataFactory->create($resourceClass);
-                    $resourceOperation = $resourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
-                    dump($resourceOperation);
+                    $nestedResourceMetadataCollection = $this->graphQlNestedOperationResourceMetadataFactory->create($resourceClass);
+                    $resourceOperation = $nestedResourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
                 }
             }
 
