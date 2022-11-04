@@ -179,7 +179,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $parameters = [];
         foreach ($values as $key => $value) {
             $keyValueParameter = sprintf('%s_%s', $valueParameter, $key);
-            $parameters[$caseSensitive ? $value : strtolower($value)] = $keyValueParameter;
+            $parameters[] = [$caseSensitive ? $value : strtolower($value), $keyValueParameter];
 
             $ors[] = match ($strategy) {
                 self::STRATEGY_PARTIAL => $queryBuilder->expr()->like(
@@ -209,7 +209,9 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         }
 
         $queryBuilder->andWhere($queryBuilder->expr()->orX(...$ors));
-        array_walk($parameters, $queryBuilder->setParameter(...));
+        foreach ($parameters as $parameter) {
+            $queryBuilder->setParameter($parameter[1], $parameter[0]);
+        }
     }
 
     /**

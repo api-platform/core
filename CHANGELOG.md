@@ -1,5 +1,24 @@
 # Changelog
 
+## v3.0.3
+
+### Bug fixes
+
+* [176fff2cb](https://github.com/api-platform/core/commit/176fff2cb15efa01b6c898d0442a4f540d4ddeaa) fix(metadata): upgrade script keep operation name (#5109)
+* [1b64ebf6a](https://github.com/api-platform/core/commit/1b64ebf6a438222ae091ec3690063d0fb1b61977) fix: upgrade command remove ApiSubresource attribute  (#5049)
+* [27fcdc6b2](https://github.com/api-platform/core/commit/27fcdc6b270d1699e76c37ccda690b8a5ed8b4c9) fix(metadata): deprecate when user decorates in legacy mode (#5091)
+* [310363d56](https://github.com/api-platform/core/commit/310363d56129c94cf4d51977f85486729e582fbc) fix: remove @internal annotation for Operations (#5089)
+* [41bbad94e](https://github.com/api-platform/core/commit/41bbad94e93df49eb4ade0fe1307b20d9cd07102) fix: update yaml extractor test file coding standard (#5068)
+* [44337ddb3](https://github.com/api-platform/core/commit/44337ddb3908d7b05ed75b75325b7941581f575b) fix(graphql): use right nested operation (#5102)
+* [541b738e9](https://github.com/api-platform/core/commit/541b738e942156b711665952b50fbd4f060fcdea) fix(graphql): add clearer error message when TwigBundle is disabled but graphQL clients are enabled (#5064)
+* [59826bbe9](https://github.com/api-platform/core/commit/59826bbe9e246cf839bdc0c4d0d470f54e27b453) fix: only alias if exists for opcache preload
+* [7044c5a1b](https://github.com/api-platform/core/commit/7044c5a1b2895e72f0579d1e788740606f94dece) fix(doctrine): use abitrary index instead of value (#5079)
+* [8250d41a3](https://github.com/api-platform/core/commit/8250d41a38913a17364d617875bb5a90f434ec48) fix(metadata): define a name on a single operation (#5090)
+* [9c19fa171](https://github.com/api-platform/core/commit/9c19fa17110aac7dd39bff827091c00b42a80d4f) fix(metadata): add class key in payload argument resolver (#5067)
+* [a4cd12b2a](https://github.com/api-platform/core/commit/a4cd12b2a73bc0f726c5724de790f885884e6113) fix: uri template should respect rfc 6570 (#5080)
+* [bbeaf7082](https://github.com/api-platform/core/commit/bbeaf7082bba4a019206c3862425cf849d55addd) fix(graphql): always allow to query nested resources (#5112)
+* [c1cb3cd2f](https://github.com/api-platform/core/commit/c1cb3cd2ff32c8b1ee694b0989efeb133fbd8438) Revert "fix(graphql): use right nested operation (#5102)" (#5111)
+
 ## 3.0.2
 
 * Metadata: generate skolem IRI by default, use `genId: false` to disable **BC**
@@ -53,6 +72,19 @@ Breaking changes:
 * Identifiers: using an object as identifier is supported only when this object is `Stringable`
 * Serializer: `skip_null_values` now defaults to `true`
 * Metadata: `Patch` is added to the automatic CRUD
+
+## v2.7.3
+
+### Bug fixes
+
+* [176fff2cb](https://github.com/api-platform/core/commit/176fff2cb15efa01b6c898d0442a4f540d4ddeaa) fix(metadata): upgrade script keep operation name (#5109)
+* [1b64ebf6a](https://github.com/api-platform/core/commit/1b64ebf6a438222ae091ec3690063d0fb1b61977) fix: upgrade command remove ApiSubresource attribute  (#5049)
+* [27fcdc6b2](https://github.com/api-platform/core/commit/27fcdc6b270d1699e76c37ccda690b8a5ed8b4c9) fix(metadata): deprecate when user decorates in legacy mode (#5091)
+* [310363d56](https://github.com/api-platform/core/commit/310363d56129c94cf4d51977f85486729e582fbc) fix: remove @internal annotation for Operations (#5089)
+* [41bbad94e](https://github.com/api-platform/core/commit/41bbad94e93df49eb4ade0fe1307b20d9cd07102) fix: update yaml extractor test file coding standard (#5068)
+* [59826bbe9](https://github.com/api-platform/core/commit/59826bbe9e246cf839bdc0c4d0d470f54e27b453) fix: only alias if exists for opcache preload
+* [8250d41a3](https://github.com/api-platform/core/commit/8250d41a38913a17364d617875bb5a90f434ec48) fix(metadata): define a name on a single operation (#5090)
+* [9c19fa171](https://github.com/api-platform/core/commit/9c19fa17110aac7dd39bff827091c00b42a80d4f) fix(metadata): add class key in payload argument resolver (#5067)
 
 ## 2.7.2
 
