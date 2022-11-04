@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -28,9 +27,9 @@ class VoDummyInspection
     #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
     private \DateTime $performed;
 
-    public function __construct(#[ORM\Column(type: 'boolean')] #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private bool $accepted, #[ORM\ManyToOne(targetEntity: VoDummyCar::class, inversedBy: 'inspections')] #[Groups(['inspection_read', 'inspection_write'])] private ?VoDummyCar $car, DateTime $performed = null, private string $attributeWithoutConstructorEquivalent = '')
+    public function __construct(#[ORM\Column(type: 'boolean')] #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private bool $accepted, #[ORM\ManyToOne(targetEntity: VoDummyCar::class, inversedBy: 'inspections')] #[Groups(['inspection_read', 'inspection_write'])] private ?VoDummyCar $car, \DateTime $performed = null, private string $attributeWithoutConstructorEquivalent = '')
     {
-        $this->performed = $performed ?: new DateTime();
+        $this->performed = $performed ?: new \DateTime();
     }
 
     public function isAccepted(): bool
@@ -43,12 +42,12 @@ class VoDummyInspection
         return $this->car;
     }
 
-    public function getPerformed(): DateTime
+    public function getPerformed(): \DateTime
     {
         return $this->performed;
     }
 
-    public function setPerformed(DateTime $performed)
+    public function setPerformed(\DateTime $performed)
     {
         $this->performed = $performed;
 

@@ -672,7 +672,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.normalizer.http_exception',
             'api_platform.graphql.normalizer.runtime_exception',
             'api_platform.graphql_metadata.resource.metadata_collection_factory',
-            'api_platform.graphql_metadata.resource.metadata_collection_factory.filters'
+            'api_platform.graphql_metadata.resource.metadata_collection_factory.filters',
         ];
 
         $aliases = [
