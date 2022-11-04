@@ -21,7 +21,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use ReflectionClass;
 
 final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
 {
@@ -175,7 +174,7 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
             ];
 
             if (null !== $this->referenceType) {
-                $urlGeneratorInterface = new ReflectionClass(UrlGeneratorInterface::class);
+                $urlGeneratorInterface = new \ReflectionClass(UrlGeneratorInterface::class);
                 $urlGeneratorConstants = array_flip($urlGeneratorInterface->getConstants());
                 $currentUrlGeneratorConstant = $urlGeneratorConstants[$this->referenceType];
 

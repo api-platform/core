@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use DateTime;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -49,7 +48,7 @@ class VoDummyInspection
     private $car;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ODM\Field(type="date")
      * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
@@ -58,11 +57,11 @@ class VoDummyInspection
 
     private $attributeWithoutConstructorEquivalent;
 
-    public function __construct(bool $accepted, VoDummyCar $car, DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
+    public function __construct(bool $accepted, VoDummyCar $car, \DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
     {
         $this->accepted = $accepted;
         $this->car = $car;
-        $this->performed = $performed ?: new DateTime();
+        $this->performed = $performed ?: new \DateTime();
         $this->attributeWithoutConstructorEquivalent = $parameterWhichIsNotClassAttribute;
     }
 
@@ -81,7 +80,7 @@ class VoDummyInspection
         return $this->performed;
     }
 
-    public function setPerformed(DateTime $performed)
+    public function setPerformed(\DateTime $performed)
     {
         $this->performed = $performed;
 

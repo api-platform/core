@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
-use SimpleXMLElement;
 use Symfony\Component\Config\Util\XmlUtils;
 
 /**
@@ -25,14 +24,14 @@ use Symfony\Component\Config\Util\XmlUtils;
 trait ResourceExtractorTrait
 {
     /**
-     * @param array|SimpleXMLElement|null $resource
-     * @param mixed|null                  $default
+     * @param array|\SimpleXMLElement|null $resource
+     * @param mixed|null                   $default
      *
      * @return array|null
      */
     private function buildArrayValue($resource, string $key, $default = null)
     {
-        if (\is_object($resource) && $resource instanceof SimpleXMLElement) {
+        if (\is_object($resource) && $resource instanceof \SimpleXMLElement) {
             if (!isset($resource->{$key.'s'}->{$key})) {
                 return $default;
             }
@@ -54,8 +53,8 @@ trait ResourceExtractorTrait
     /**
      * Transforms an attribute's value in a PHP value.
      *
-     * @param array|SimpleXMLElement|null $resource
-     * @param mixed|null                  $default
+     * @param array|\SimpleXMLElement|null $resource
+     * @param mixed|null                   $default
      *
      * @return string|int|bool|array|null
      */
@@ -73,7 +72,7 @@ trait ResourceExtractorTrait
             case 'integer':
                 return (int) $resource[$key];
             case 'bool':
-                if (\is_object($resource) && $resource instanceof SimpleXMLElement) {
+                if (\is_object($resource) && $resource instanceof \SimpleXMLElement) {
                     return (bool) XmlUtils::phpize($resource[$key]);
                 }
 
@@ -83,7 +82,7 @@ trait ResourceExtractorTrait
         throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key])));
     }
 
-    private function buildArgs(SimpleXMLElement $resource): ?array
+    private function buildArgs(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->args->arg)) {
             return null;
@@ -97,7 +96,7 @@ trait ResourceExtractorTrait
         return $data;
     }
 
-    private function buildValues(SimpleXMLElement $resource): array
+    private function buildValues(\SimpleXMLElement $resource): array
     {
         $data = [];
         foreach ($resource->value as $value) {
