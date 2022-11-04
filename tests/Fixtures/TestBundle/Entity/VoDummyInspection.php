@@ -49,7 +49,7 @@ class VoDummyInspection
     private $car;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(type="datetime")
      * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
@@ -58,11 +58,11 @@ class VoDummyInspection
 
     private $attributeWithoutConstructorEquivalent;
 
-    public function __construct(bool $accepted, VoDummyCar $car, DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
+    public function __construct(bool $accepted, VoDummyCar $car, \DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
     {
         $this->accepted = $accepted;
         $this->car = $car;
-        $this->performed = $performed ?: new DateTime();
+        $this->performed = $performed ?: new \DateTime();
         $this->attributeWithoutConstructorEquivalent = $parameterWhichIsNotClassAttribute;
     }
 
@@ -81,7 +81,7 @@ class VoDummyInspection
         return $this->performed;
     }
 
-    public function setPerformed(DateTime $performed)
+    public function setPerformed(\DateTime $performed)
     {
         $this->performed = $performed;
 

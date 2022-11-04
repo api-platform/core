@@ -21,8 +21,6 @@ use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
-use function sys_get_temp_dir;
-
 /**
  * Source: https://github.com/doctrine/DoctrineMongoDBBundle/blob/0174003844bc566bb4cb3b7d10c5528d1924d719/Tests/TestCase.php
  * Test got excluded from vendor in 4.x.
@@ -38,8 +36,8 @@ class DoctrineMongoDbOdmTestCase extends TestCase
     {
         $config = new Configuration();
         $config->setAutoGenerateProxyClasses(Configuration::AUTOGENERATE_FILE_NOT_EXISTS);
-        $config->setProxyDir(sys_get_temp_dir());
-        $config->setHydratorDir(sys_get_temp_dir());
+        $config->setProxyDir(\sys_get_temp_dir());
+        $config->setHydratorDir(\sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setHydratorNamespace('SymfonyTests\Doctrine');
         $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), $paths)); // @phpstan-ignore-line

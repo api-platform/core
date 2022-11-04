@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Metadata\Extractor;
 
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
 use ApiPlatform\Exception\InvalidArgumentException;
-use Generator;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -56,7 +55,7 @@ class YamlExtractorTest extends ExtractorTestCase
         }
     }
 
-    public function provideInvalidResources(): Generator
+    public function provideInvalidResources(): \Generator
     {
         yield [
             __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.yml',
