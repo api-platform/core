@@ -50,17 +50,21 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
         $filters = array_keys($this->readFilterAttributes($reflectionClass));
 
         foreach ($resourceMetadataCollection as $i => $resource) {
-            foreach ($operations = $resource->getOperations() as $operationName => $operation) {
+            foreach ($operations = $resource->getOperations() ?? [] as $operationName => $operation) {
                 $operations->add($operationName, $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [], $filters))));
             }
 
-            $resourceMetadataCollection[$i] = $resource->withOperations($operations);
+            if ($operations) {
+                $resourceMetadataCollection[$i] = $resource->withOperations($operations);
+            }
 
             foreach ($graphQlOperations = $resource->getGraphQlOperations() ?? [] as $operationName => $operation) {
                 $graphQlOperations[$operationName] = $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [], $filters)));
             }
 
-            $resourceMetadataCollection[$i] = $resource->withGraphQlOperations($graphQlOperations);
+            if ($graphQlOperations) {
+                $resourceMetadataCollection[$i] = $resource->withGraphQlOperations($graphQlOperations);
+            }
         }
 
         return $resourceMetadataCollection;

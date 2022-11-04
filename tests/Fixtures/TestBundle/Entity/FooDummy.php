@@ -15,6 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -43,6 +45,17 @@ class FooDummy
      */
     #[ORM\ManyToOne(targetEntity: Dummy::class, cascade: ['persist'])]
     private ?Dummy $dummy = null;
+
+    /**
+     * @var Collection<SoMany>
+     */
+    #[ORM\OneToMany(targetEntity: SoMany::class, mappedBy: 'fooDummy', cascade: ['persist'])]
+    public Collection $soManies;
+
+    public function __construct()
+    {
+        $this->soManies = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
