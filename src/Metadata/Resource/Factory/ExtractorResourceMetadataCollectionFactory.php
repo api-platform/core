@@ -19,7 +19,12 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -88,9 +93,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 }
             }
 
-            if (isset($node['graphQlOperations'])) {
-                $resource = $resource->withGraphQlOperations($this->buildGraphQlOperations($node['graphQlOperations'], $resource));
-            }
+            $resource = $resource->withGraphQlOperations($this->buildGraphQlOperations($node['graphQlOperations'] ?? null, $resource));
 
             $resources[] = $resource->withOperations(new Operations($this->buildOperations($node['operations'] ?? null, $resource)));
         }
@@ -148,6 +151,20 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
     {
         $operations = [];
 
+        if (null === $data) {
+            foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $operation) {
+                $operation = $this->getOperationWithDefaults($resource, $operation);
+
+                if ($operation instanceof Mutation) {
+                    $operation = $operation->withDescription(ucfirst("{$operation->getName()}s a {$resource->getShortName()}."));
+                }
+
+                $operations[$operation->getName()] = $operation;
+            }
+
+            return $operations;
+        }
+
         foreach ($data as $attributes) {
             /** @var HttpOperation $operation */
             $operation = (new $attributes['graphql_operation_class']())->withShortName($resource->getShortName());
@@ -175,7 +192,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         return $operations;
     }
 
-    private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
+    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
     {
         foreach (($this->defaults['attributes'] ?? []) as $key => $value) {
             $key = $this->camelCaseToSnakeCaseNameConverter->denormalize($key);

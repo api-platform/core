@@ -333,7 +333,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     private function getPath(string $path): string
     {
-        if (str_ends_with($path, '.{_format}')) {
+        // Handle either API Platform's URI Template (rfc6570) or Symfony's route
+        if (str_ends_with($path, '{._format}') || str_ends_with($path, '.{_format}')) {
             $path = substr($path, 0, -10);
         }
 

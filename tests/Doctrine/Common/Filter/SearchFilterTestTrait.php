@@ -297,6 +297,18 @@ trait SearchFilterTestTrait
                     ],
                 ],
             ],
+            'partial (multiple almost same values; case insensitive)' => [
+                [
+                    'id' => null,
+                    'name' => 'ipartial',
+                ],
+                [
+                    'name' => [
+                        'blue car',
+                        'Blue Car',
+                    ],
+                ],
+            ],
             'start' => [
                 [
                     'id' => null,

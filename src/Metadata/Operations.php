@@ -13,11 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use RuntimeException;
-
-/**
- * @internal
- */
 final class Operations implements \IteratorAggregate, \Countable
 {
     private array $operations = [];
@@ -73,7 +68,7 @@ final class Operations implements \IteratorAggregate, \Countable
             }
         }
 
-        throw new RuntimeException(sprintf('Could not remove operation "%s".', $key));
+        throw new \RuntimeException(sprintf('Could not remove operation "%s".', $key));
     }
 
     public function has(string $key): bool

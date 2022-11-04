@@ -22,7 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-#[ApiResource(operations: [new Get(), new Get(uriTemplate: '/books/by_isbn/{isbn}.{_format}', requirements: ['isbn' => '.+'], uriVariables: 'isbn')])]
+#[ApiResource(operations: [new Get(), new Get(uriTemplate: '/books/by_isbn/{isbn}{._format}', requirements: ['isbn' => '.+'], uriVariables: 'isbn')])]
 #[ORM\Entity]
 class Book
 {

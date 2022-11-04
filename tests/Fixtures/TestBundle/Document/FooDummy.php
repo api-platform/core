@@ -15,6 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -41,6 +43,17 @@ class FooDummy
      */
     #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], storeAs: 'id')]
     private ?Dummy $dummy = null;
+
+    /**
+     * @var Collection<SoMany>
+     */
+    #[ODM\ReferenceMany(targetDocument: SoMany::class, cascade: ['persist'], storeAs: 'id')]
+    public Collection $soManies;
+
+    public function __construct()
+    {
+        $this->soManies = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {

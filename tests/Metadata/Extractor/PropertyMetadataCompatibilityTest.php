@@ -21,7 +21,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\PropertyAdapterInterface;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlPropertyAdapter;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\YamlPropertyAdapter;
-use Exception;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
@@ -87,7 +86,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
             $extractor = new $extractorClass($adapter(self::RESOURCE_CLASS, self::PROPERTY, $parameters, self::FIXTURES));
             $factory = new ExtractorPropertyMetadataFactory($extractor);
             $property = $factory->create(self::RESOURCE_CLASS, self::PROPERTY);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiProperty::class, 0, $exception);
         }
 
