@@ -53,7 +53,6 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
-use Twig\Environment;
 
 /**
  * The extension of this bundle.
@@ -463,12 +462,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $enabled = $this->isConfigEnabled($container, $config['graphql']);
 
-        $graphiqlEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']);
-        $graphqlPlayGroundEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphql_playground']);
-
         $container->setParameter('api_platform.graphql.enabled', $enabled);
-        $container->setParameter('api_platform.graphql.graphiql.enabled', $graphiqlEnabled);
-        $container->setParameter('api_platform.graphql.graphql_playground.enabled', $graphqlPlayGroundEnabled);
+        $container->setParameter('api_platform.graphql.graphiql.enabled', $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']));
+        $container->setParameter('api_platform.graphql.graphql_playground.enabled', $enabled && $this->isConfigEnabled($container, $config['graphql']['graphql_playground']));
         $container->setParameter('api_platform.graphql.collection.pagination', $config['graphql']['collection']['pagination']);
 
         if (!$enabled) {
@@ -479,15 +475,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.graphql.nesting_separator', $config['graphql']['nesting_separator']);
 
         $loader->load('graphql.xml');
-
-        // @phpstan-ignore-next-line because PHPStan uses the container of the test env cache and in test the parameter kernel.bundles always contains the key TwigBundle
-        if (!class_exists(Environment::class) || !isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
-            if ($graphiqlEnabled || $graphqlPlayGroundEnabled) {
-                throw new RuntimeException(sprintf('GraphiQL and GraphQL Playground interfaces depend on Twig. Please activate TwigBundle for the %s environnement or disable GraphiQL and GraphQL Playground.', $container->getParameter('kernel.environment')));
-            }
-            $container->removeDefinition('api_platform.graphql.action.graphiql');
-            $container->removeDefinition('api_platform.graphql.action.graphql_playground');
-        }
 
         $container->registerForAutoconfiguration(QueryItemResolverInterface::class)
             ->addTag('api_platform.graphql.query_resolver');

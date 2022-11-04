@@ -156,11 +156,6 @@
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory.inner"/>
         </service>
-
-        <service id="api_platform.doctrine_mongodb.odm.graphql_metadata.resource.metadata_collection_factory" class="ApiPlatform\Doctrine\Odm\Metadata\Resource\DoctrineMongoDbOdmResourceCollectionMetadataFactory" decorates="api_platform.graphql_metadata.resource.metadata_collection_factory" decoration-priority="40" decoration-on-invalid="ignore">
-            <argument type="service" id="doctrine_mongodb" />
-            <argument type="service" id="api_platform.doctrine_mongodb.odm.graphql_metadata.resource.metadata_collection_factory.inner" />
-        </service>
     </services>
 
 </container>

@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::NET_PATH)]
-#[ApiResource(uriTemplate: '/network_path_relation_dummies/{id}/network_path_dummies{._format}', uriVariables: ['id' => new Link(fromClass: NetworkPathRelationDummy::class, identifiers: ['id'], toProperty: 'networkPathRelationDummy')], status: 200, urlGenerationStrategy: UrlGeneratorInterface::NET_PATH, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/network_path_relation_dummies/{id}/network_path_dummies.{_format}', uriVariables: ['id' => new Link(fromClass: NetworkPathRelationDummy::class, identifiers: ['id'], toProperty: 'networkPathRelationDummy')], status: 200, urlGenerationStrategy: UrlGeneratorInterface::NET_PATH, operations: [new GetCollection()])]
 #[ORM\Entity]
 class NetworkPathDummy
 {

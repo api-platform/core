@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\State\Pagination;
 
 use ApiPlatform\State\Pagination\TraversablePaginator;
+use ArrayIterator;
 use PHPUnit\Framework\TestCase;
 
 class TraversablePaginatorTest extends TestCase
@@ -29,7 +30,7 @@ class TraversablePaginatorTest extends TestCase
         float $lastPage,
         int $currentItems
     ): void {
-        $traversable = new \ArrayIterator($results);
+        $traversable = new ArrayIterator($results);
 
         $paginator = new TraversablePaginator($traversable, $currentPage, $perPage, $totalItems);
 

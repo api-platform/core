@@ -17,6 +17,7 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Operation;
+use SplObjectStorage;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -35,7 +36,7 @@ final class SkolemIriConverter implements IriConverterInterface
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
-        $this->objectHashMap = new \SplObjectStorage();
+        $this->objectHashMap = new SplObjectStorage();
     }
 
     /**

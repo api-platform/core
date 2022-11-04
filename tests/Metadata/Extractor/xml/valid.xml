@@ -7,7 +7,7 @@
     <resource class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment"/>
 
     <resource
-        uriTemplate="/users/{author}/comments{._format}"
+        uriTemplate="/users/{author}/comments.{_format}"
         description="User comments"
         messenger="input"
         class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment">
@@ -96,7 +96,7 @@
 
         <operations>
             <operation class="ApiPlatform\Metadata\GetCollection" name="custom_operation_name"/>
-            <operation class="ApiPlatform\Metadata\Get" uriTemplate="/users/{userId}/comments/{id}{._format}">
+            <operation class="ApiPlatform\Metadata\Get" uriTemplate="/users/{userId}/comments/{id}.{_format}">
                 <uriVariables>
                     <uriVariable parameterName="userId" fromClass="ApiPlatform\Tests\Fixtures\TestBundle\Entity\User" fromProperty="author"/>
                     <uriVariable parameterName="id"/>

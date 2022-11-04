@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Sort;
 use Doctrine\Persistence\ManagerRegistry;
+use OutOfRangeException;
 
 /**
  * Applies selected ordering while querying resource collection.
@@ -99,7 +100,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
                     // If at least one stage is sort, then it has sorting
                     return true;
                 }
-            } catch (\OutOfRangeException $outOfRangeException) {
+            } catch (OutOfRangeException) {
                 // There is no more stages on the aggregation builder
                 $shouldStop = true;
             }

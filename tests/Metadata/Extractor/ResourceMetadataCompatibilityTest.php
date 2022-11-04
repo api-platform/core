@@ -20,13 +20,10 @@ use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Extractor\YamlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -37,6 +34,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\ResourceAdapterInterface;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlResourceAdapter;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\YamlResourceAdapter;
+use Exception;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
@@ -226,7 +224,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 [
                     'name' => 'custom_operation_name',
                     'method' => 'GET',
-                    'uriTemplate' => '/users/{userId}/comments{._format}',
+                    'uriTemplate' => '/users/{userId}/comments.{_format}',
                     'shortName' => self::SHORT_NAME,
                     'description' => 'A list of Comments',
                     'types' => ['Comment'],
@@ -332,7 +330,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     ],
                 ],
                 [
-                    'uriTemplate' => '/users/{userId}/comments/{commentId}{._format}',
+                    'uriTemplate' => '/users/{userId}/comments/{commentId}.{_format}',
                     'class' => Get::class,
                     'uriVariables' => [
                         'userId' => [
@@ -422,7 +420,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             $extractor = new $extractorClass($adapter(self::RESOURCE_CLASS, $parameters, self::FIXTURES));
             $factory = new ExtractorResourceMetadataCollectionFactory($extractor);
             $collection = $factory->create(self::RESOURCE_CLASS);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
         }
 
@@ -455,16 +453,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation)->withName($operationName);
                 }
 
-                $resource = $resource->withOperations(new Operations($operations));
-
-                // Build default GraphQL operations
-                $graphQlOperations = [];
-                foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $graphQlOperation) {
-                    $description = $graphQlOperation instanceof Mutation ? ucfirst("{$graphQlOperation->getName()}s a {$resource->getShortName()}.") : null;
-                    $graphQlOperations[$graphQlOperation->getName()] = $this->getOperationWithDefaults($resource, $graphQlOperation)->withName($graphQlOperation->getName())->withDescription($description);
-                }
-
-                $resources[] = $resource->withGraphQlOperations($graphQlOperations);
+                $resources[] = $resource->withOperations(new Operations($operations));
 
                 continue;
             }
@@ -602,7 +591,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         return $operations;
     }
 
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
+    private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
     {
         foreach (get_class_methods($resource) as $methodName) {
             if (!str_starts_with($methodName, 'get')) {

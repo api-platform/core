@@ -483,7 +483,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->set('StringPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'test', $operation);
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', $operation);
         $this->assertSame('StringCursorConnection', $resourcePaginatedCollectionType->name);
         $this->assertSame('Cursor connection for String.', $resourcePaginatedCollectionType->description);
 
@@ -538,7 +538,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->set('StringPaginationInfo', Argument::type(ObjectType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'test', $operation);
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', $operation);
         $this->assertSame('StringPageConnection', $resourcePaginatedCollectionType->name);
         $this->assertSame('Page connection for String.', $resourcePaginatedCollectionType->description);
 

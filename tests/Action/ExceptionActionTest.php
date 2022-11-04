@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use DomainException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
@@ -73,7 +74,7 @@ class ExceptionActionTest extends TestCase
         ?array $operationExceptionToStatus,
         int $expectedStatusCode
     ): void {
-        $exception = new \DomainException();
+        $exception = new DomainException();
         $flattenException = FlattenException::create($exception);
 
         $serializer = $this->prophesize(SerializerInterface::class);
@@ -134,86 +135,86 @@ class ExceptionActionTest extends TestCase
         ];
 
         yield 'on global attributes' => [
-            [\DomainException::class => 100],
+            [DomainException::class => 100],
             null,
             null,
             100,
         ];
 
         yield 'on global attributes with empty resource and operation attributes' => [
-            [\DomainException::class => 100],
+            [DomainException::class => 100],
             [],
             [],
             100,
         ];
 
         yield 'on global attributes and resource attributes' => [
-            [\DomainException::class => 100],
-            [\DomainException::class => 200],
+            [DomainException::class => 100],
+            [DomainException::class => 200],
             null,
             200,
         ];
 
         yield 'on global attributes and resource attributes with empty operation attributes' => [
-            [\DomainException::class => 100],
-            [\DomainException::class => 200],
+            [DomainException::class => 100],
+            [DomainException::class => 200],
             [],
             200,
         ];
 
         yield 'on global attributes and operation attributes' => [
-            [\DomainException::class => 100],
+            [DomainException::class => 100],
             null,
-            [\DomainException::class => 300],
+            [DomainException::class => 300],
             300,
         ];
 
         yield 'on global attributes and operation attributes with empty resource attributes' => [
-            [\DomainException::class => 100],
+            [DomainException::class => 100],
             [],
-            [\DomainException::class => 300],
+            [DomainException::class => 300],
             300,
         ];
 
         yield 'on global, resource and operation attributes' => [
-            [\DomainException::class => 100],
-            [\DomainException::class => 200],
-            [\DomainException::class => 300],
+            [DomainException::class => 100],
+            [DomainException::class => 200],
+            [DomainException::class => 300],
             300,
         ];
 
         yield 'on resource attributes' => [
             [],
-            [\DomainException::class => 200],
+            [DomainException::class => 200],
             null,
             200,
         ];
 
         yield 'on resource attributes with empty operation attributes' => [
             [],
-            [\DomainException::class => 200],
+            [DomainException::class => 200],
             [],
             200,
         ];
 
         yield 'on resource and operation attributes' => [
             [],
-            [\DomainException::class => 200],
-            [\DomainException::class => 300],
+            [DomainException::class => 200],
+            [DomainException::class => 300],
             300,
         ];
 
         yield 'on operation attributes' => [
             [],
             null,
-            [\DomainException::class => 300],
+            [DomainException::class => 300],
             300,
         ];
 
         yield 'on operation attributes with empty resource attributes' => [
             [],
             [],
-            [\DomainException::class => 300],
+            [DomainException::class => 300],
             300,
         ];
     }

@@ -28,7 +28,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 #[ApiResource]
-#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products{._format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, operations: [new GetCollection()])]
 #[ORM\Entity]
 class DummyProduct
 {

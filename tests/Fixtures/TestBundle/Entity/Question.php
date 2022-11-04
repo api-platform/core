@@ -19,8 +19,8 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource]
-#[ApiResource(uriTemplate: '/answers/{id}/related_questions{._format}', uriVariables: ['id' => new Link(fromClass: Answer::class, identifiers: ['id'], toProperty: 'answer')], status: 200, operations: [new GetCollection()])]
-#[ApiResource(uriTemplate: '/questions/{id}/answer/related_questions{._format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'], fromProperty: 'answer'), 'answer' => new Link(fromClass: Answer::class, identifiers: [], expandedValue: 'answer', toProperty: 'answer')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/answers/{id}/related_questions.{_format}', uriVariables: ['id' => new Link(fromClass: Answer::class, identifiers: ['id'], toProperty: 'answer')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/questions/{id}/answer/related_questions.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'], fromProperty: 'answer'), 'answer' => new Link(fromClass: Answer::class, identifiers: [], expandedValue: 'answer', toProperty: 'answer')], status: 200, operations: [new GetCollection()])]
 #[ORM\Entity]
 class Question
 {

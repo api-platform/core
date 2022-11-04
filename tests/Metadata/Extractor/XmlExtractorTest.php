@@ -99,7 +99,7 @@ class XmlExtractorTest extends TestCase
                     'write' => null,
                 ],
                 [
-                    'uriTemplate' => '/users/{author}/comments{._format}',
+                    'uriTemplate' => '/users/{author}/comments.{_format}',
                     'shortName' => null,
                     'description' => 'User comments',
                     'routePrefix' => null,
@@ -177,7 +177,7 @@ class XmlExtractorTest extends TestCase
                         [
                             'name' => 'custom_operation_name',
                             'class' => GetCollection::class,
-                            'uriTemplate' => '/users/{author}/comments{._format}',
+                            'uriTemplate' => '/users/{author}/comments.{_format}',
                             'shortName' => null,
                             'description' => 'User comments',
                             'routePrefix' => null,
@@ -268,7 +268,7 @@ class XmlExtractorTest extends TestCase
                         [
                             'name' => null,
                             'class' => Get::class,
-                            'uriTemplate' => '/users/{userId}/comments/{id}{._format}',
+                            'uriTemplate' => '/users/{userId}/comments/{id}.{_format}',
                             'shortName' => null,
                             'description' => 'User comments',
                             'routePrefix' => null,

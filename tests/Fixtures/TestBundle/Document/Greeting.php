@@ -19,7 +19,7 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ApiResource]
-#[ApiResource(uriTemplate: '/people/{id}/sent_greetings{._format}', uriVariables: ['id' => new Link(fromClass: Person::class, identifiers: ['id'], toProperty: 'sender')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/people/{id}/sent_greetings.{_format}', uriVariables: ['id' => new Link(fromClass: Person::class, identifiers: ['id'], toProperty: 'sender')], status: 200, operations: [new GetCollection()])]
 #[ODM\Document]
 class Greeting
 {

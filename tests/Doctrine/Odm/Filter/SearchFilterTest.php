@@ -426,21 +426,6 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     ],
                     $filterFactory,
                 ],
-                'partial (multiple almost same values; case insensitive)' => [
-                    [
-                        [
-                            '$match' => [
-                                'name' => [
-                                    '$in' => [
-                                        new Regex('blue car', 'i'),
-                                        new Regex('Blue Car', 'i'),
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    $filterFactory,
-                ],
                 'start' => [
                     [
                         [

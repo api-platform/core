@@ -28,8 +28,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 #[ApiResource]
-#[ApiResource(uriTemplate: '/dummy_products/{id}/offers{._format}', uriVariables: ['id' => new Link(fromClass: DummyProduct::class, identifiers: ['id'], toProperty: 'product')], status: 200, operations: [new GetCollection()])]
-#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products/{relatedProducts}/offers{._format}', uriVariables: ['id' => new Link(fromClass: DummyProduct::class, identifiers: ['id']), 'relatedProducts' => new Link(fromClass: DummyProduct::class, identifiers: ['id'], toProperty: 'product')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/dummy_products/{id}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: DummyProduct::class, identifiers: ['id'], toProperty: 'product')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products/{relatedProducts}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: DummyProduct::class, identifiers: ['id']), 'relatedProducts' => new Link(fromClass: DummyProduct::class, identifiers: ['id'], toProperty: 'product')], status: 200, operations: [new GetCollection()])]
 #[ODM\Document]
 class DummyAggregateOffer
 {

@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::ABS_URL)]
-#[ApiResource(uriTemplate: '/absolute_url_relation_dummies/{id}/absolute_url_dummies{._format}', uriVariables: ['id' => new Link(fromClass: AbsoluteUrlRelationDummy::class, identifiers: ['id'], toProperty: 'absoluteUrlRelationDummy')], status: 200, urlGenerationStrategy: UrlGeneratorInterface::ABS_URL, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/absolute_url_relation_dummies/{id}/absolute_url_dummies.{_format}', uriVariables: ['id' => new Link(fromClass: AbsoluteUrlRelationDummy::class, identifiers: ['id'], toProperty: 'absoluteUrlRelationDummy')], status: 200, urlGenerationStrategy: UrlGeneratorInterface::ABS_URL, operations: [new GetCollection()])]
 #[ORM\Entity]
 class AbsoluteUrlDummy
 {

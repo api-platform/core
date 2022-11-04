@@ -205,7 +205,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         yield 'simple' => [
             $this->createRequest('PUT', [
                 '_api_resource_class' => ResourceImplementation::class,
-                '_api_operation_name' => '_api_/resource_implementations{._format}_put',
+                '_api_operation_name' => '_api_/resource_implementations.{_format}_put',
                 'data' => $resource,
             ]),
             static function (ResourceImplementation $payload): void {},
@@ -215,7 +215,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         yield 'with another argument named $data' => [
             $this->createRequest('PUT', [
                 '_api_resource_class' => ResourceImplementation::class,
-                '_api_operation_name' => '_api_/resource_implementations{._format}_put',
+                '_api_operation_name' => '_api_/resource_implementations.{_format}_put',
                 'data' => $resource,
             ]),
             static function (ResourceImplementation $payload, $data): void {},
@@ -230,7 +230,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
             (new ApiResource())->withShortName('ResourceImplementation')->withOperations(new Operations([
                 'update' => new Put(),
                 'update_no_deserialize' => (new Put())->withDeserialize(false),
-                'update_with_dto' => (new Put())->withInput(['class' => NotResource::class, 'name' => 'NotResource']),
+                'update_with_dto' => (new Put())->withInput(['class' => NotResource::class]),
                 'create' => new Post(),
             ])),
         ]));
@@ -251,7 +251,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
                 ];
 
                 if ('update_with_dto' === $request->attributes->get('_api_operation_name')) {
-                    $context['input'] = ['class' => NotResource::class, 'name' => 'NotResource'];
+                    $context['input'] = NotResource::class;
                 } else {
                     $context['input'] = null;
                 }

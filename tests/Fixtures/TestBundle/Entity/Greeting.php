@@ -19,7 +19,7 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource]
-#[ApiResource(uriTemplate: '/people/{id}/sent_greetings{._format}', uriVariables: ['id' => new Link(fromClass: Person::class, identifiers: ['id'], toProperty: 'sender')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/people/{id}/sent_greetings.{_format}', uriVariables: ['id' => new Link(fromClass: Person::class, identifiers: ['id'], toProperty: 'sender')], status: 200, operations: [new GetCollection()])]
 #[ORM\Entity]
 class Greeting
 {

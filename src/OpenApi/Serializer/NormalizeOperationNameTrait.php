@@ -22,6 +22,7 @@ trait NormalizeOperationNameTrait
 {
     private function normalizeOperationName(string $operationName): string
     {
-        return preg_replace('/^_/', '', str_replace(['/', '{._format}', '{', '}'], ['', '', '_', ''], $operationName));
+        // .{_format} is related to the symfony router
+        return preg_replace('/^_/', '', str_replace(['/', '.{_format}', '{', '}'], ['', '', '_', ''], $operationName));
     }
 }

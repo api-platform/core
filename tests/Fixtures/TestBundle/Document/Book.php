@@ -22,7 +22,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-#[ApiResource(operations: [new Get(), new Get(uriTemplate: '/books/by_isbn/{isbn}{._format}', requirements: ['isbn' => '.+'], uriVariables: 'isbn')])]
+#[ApiResource(operations: [new Get(), new Get(uriTemplate: '/books/by_isbn/{isbn}.{_format}', requirements: ['isbn' => '.+'], uriVariables: 'isbn')])]
 #[ODM\Document]
 class Book
 {

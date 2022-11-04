@@ -3,7 +3,7 @@ resources:
 
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program:
         -   ~
-        -   uriTemplate: /users/{author}/programs{._format}
+        -   uriTemplate: /users/{author}/programs.{_format}
             uriVariables: ['author']
             types: ['someirischema']
             description: User programs
@@ -13,7 +13,7 @@ resources:
             operations:
                 ApiPlatform\Metadata\GetCollection: ~
                 ApiPlatform\Metadata\Get:
-                    uriTemplate: /users/{userId}/programs/{id}{._format}
+                    uriTemplate: /users/{userId}/programs/{id}.{_format}
                     types: ['anotheririschema']
                     uriVariables:
                         userId: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\User, 'author']

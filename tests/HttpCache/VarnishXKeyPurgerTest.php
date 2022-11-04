@@ -17,6 +17,7 @@ use ApiPlatform\HttpCache\VarnishXKeyPurger;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Http\Message\RequestInterface;
@@ -108,12 +109,12 @@ class VarnishXKeyPurgerTest extends TestCase
 
             public function send(RequestInterface $request, array $options = []): ResponseInterface
             {
-                throw new \LogicException('Not implemented');
+                throw new LogicException('Not implemented');
             }
 
             public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface
             {
-                throw new \LogicException('Not implemented');
+                throw new LogicException('Not implemented');
             }
 
             public function request($method, $uri, array $options = []): ResponseInterface
@@ -125,12 +126,12 @@ class VarnishXKeyPurgerTest extends TestCase
 
             public function requestAsync($method, $uri, array $options = []): PromiseInterface
             {
-                throw new \LogicException('Not implemented');
+                throw new LogicException('Not implemented');
             }
 
             public function getConfig($option = null): void
             {
-                throw new \LogicException('Not implemented');
+                throw new LogicException('Not implemented');
             }
         };
 
