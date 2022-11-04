@@ -24,8 +24,6 @@ use ApiPlatform\Metadata\Operation;
  */
 final class ResourceMetadataCollection extends \ArrayObject
 {
-    public const DYNAMIC_RESOURCE_CLASS_PREFIX = 'Dynamic#';
-
     private array $operationCache = [];
 
     public function __construct(private readonly string $resourceClass, array $input = [])
@@ -86,11 +84,6 @@ final class ResourceMetadataCollection extends \ArrayObject
         // }
 
         $this->handleNotFound($operationName, $metadata);
-    }
-
-    public function isDynamic(): bool
-    {
-        return str_starts_with($this->resourceClass, self::DYNAMIC_RESOURCE_CLASS_PREFIX);
     }
 
     /**

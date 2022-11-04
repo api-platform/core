@@ -64,10 +64,6 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
 
-        if ($resourceMetadataCollection->isDynamic()) {
-            return $resourceMetadataCollection;
-        }
-
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException) {

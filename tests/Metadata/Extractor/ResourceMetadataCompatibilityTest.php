@@ -20,13 +20,10 @@ use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Extractor\YamlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -456,16 +453,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation)->withName($operationName);
                 }
 
-                $resource = $resource->withOperations(new Operations($operations));
-
-                // Build default GraphQL operations
-                $graphQlOperations = [];
-                foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $graphQlOperation) {
-                    $description = $graphQlOperation instanceof Mutation ? ucfirst("{$graphQlOperation->getName()}s a {$resource->getShortName()}.") : null;
-                    $graphQlOperations[$graphQlOperation->getName()] = $this->getOperationWithDefaults($resource, $graphQlOperation)->withName($graphQlOperation->getName())->withDescription($description);
-                }
-
-                $resources[] = $resource->withGraphQlOperations($graphQlOperations);
+                $resources[] = $resource->withOperations(new Operations($operations));
 
                 continue;
             }
@@ -603,7 +591,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         return $operations;
     }
 
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
+    private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
     {
         foreach (get_class_methods($resource) as $methodName) {
             if (!str_starts_with($methodName, 'get')) {

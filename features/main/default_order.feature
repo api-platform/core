@@ -79,61 +79,35 @@ Feature: Default order
           "@type": "FooDummy",
           "id": 5,
           "name": "Balbo",
-          "dummy": "/dummies/5",
-          "soManies": [
-            "/so_manies/13",
-            "/so_manies/14",
-            "/so_manies/15"
-          ]
-
+          "dummy": "/dummies/5"
         },
         {
           "@id": "/foo_dummies/3",
           "@type": "FooDummy",
           "id": 3,
           "name": "Sthenelus",
-          "dummy": "/dummies/3",
-          "soManies": [
-            "/so_manies/7",
-            "/so_manies/8",
-            "/so_manies/9"
-          ]
+          "dummy": "/dummies/3"
         },
         {
           "@id": "/foo_dummies/2",
           "@type": "FooDummy",
           "id": 2,
           "name": "Ephesian",
-          "dummy": "/dummies/2",
-          "soManies": [
-            "/so_manies/4",
-            "/so_manies/5",
-            "/so_manies/6"
-          ]
+          "dummy": "/dummies/2"
         },
         {
           "@id": "/foo_dummies/1",
           "@type": "FooDummy",
           "id": 1,
           "name": "Hawsepipe",
-          "dummy": "/dummies/1",
-          "soManies": [
-            "/so_manies/1",
-            "/so_manies/2",
-            "/so_manies/3"
-          ]
+          "dummy": "/dummies/1"
         },
         {
           "@id": "/foo_dummies/4",
           "@type": "FooDummy",
           "id": 4,
           "name": "Separativeness",
-          "dummy": "/dummies/4",
-          "soManies": [
-            "/so_manies/10",
-            "/so_manies/11",
-            "/so_manies/12"
-          ]
+          "dummy": "/dummies/4"
         }
       ],
       "hydra:totalItems": 5,

@@ -210,7 +210,7 @@ final class TypeBuilder implements TypeBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, Operation $operation): GraphQLType
+    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, Operation $operation): GraphQLType
     {
         $shortName = $resourceType->name;
         $paginationType = $this->pagination->getGraphQlPaginationType($operation);

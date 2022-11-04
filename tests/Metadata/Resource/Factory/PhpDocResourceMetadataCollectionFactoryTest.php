@@ -58,19 +58,4 @@ class PhpDocResourceMetadataCollectionFactoryTest extends TestCase
         $factory = new PhpDocResourceMetadataCollectionFactory($decorated);
         $this->assertSame('My dummy entity.', $factory->create(DummyEntity::class)[0]->getDescription());
     }
-
-    public function testDynamic(): void
-    {
-        $resourceCollection = new ResourceMetadataCollection(ResourceMetadataCollection::DYNAMIC_RESOURCE_CLASS_PREFIX.DummyEntity::class, [new ApiResource()]);
-        $decoratedProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $decoratedProphecy->create(ResourceMetadataCollection::DYNAMIC_RESOURCE_CLASS_PREFIX.DummyEntity::class)->willReturn($resourceCollection)->shouldBeCalled();
-        $decorated = $decoratedProphecy->reveal();
-
-        $factory = new PhpDocResourceMetadataCollectionFactory($decorated);
-
-        self::assertSame(
-            $resourceCollection,
-            $factory->create(ResourceMetadataCollection::DYNAMIC_RESOURCE_CLASS_PREFIX.DummyEntity::class)
-        );
-    }
 }
