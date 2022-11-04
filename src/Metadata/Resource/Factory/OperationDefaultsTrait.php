@@ -137,8 +137,8 @@ trait OperationDefaultsTrait
         }
 
         // Check for name conflict
-        if ($operation->getName()) {
-            if (null !== $resource->getOperations() && !$resource->getOperations()->has($operation->getName())) {
+        if ($operation->getName() && null !== ($operations = $resource->getOperations())) {
+            if (!$operations->has($operation->getName())) {
                 return [$operation->getName(), $operation];
             }
 

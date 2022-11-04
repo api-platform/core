@@ -230,7 +230,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
             (new ApiResource())->withShortName('ResourceImplementation')->withOperations(new Operations([
                 'update' => new Put(),
                 'update_no_deserialize' => (new Put())->withDeserialize(false),
-                'update_with_dto' => (new Put())->withInput(['class' => NotResource::class]),
+                'update_with_dto' => (new Put())->withInput(['class' => NotResource::class, 'name' => 'NotResource']),
                 'create' => new Post(),
             ])),
         ]));
@@ -251,7 +251,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
                 ];
 
                 if ('update_with_dto' === $request->attributes->get('_api_operation_name')) {
-                    $context['input'] = NotResource::class;
+                    $context['input'] = ['class' => NotResource::class, 'name' => 'NotResource'];
                 } else {
                     $context['input'] = null;
                 }
