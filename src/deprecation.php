@@ -12,8 +12,12 @@
 declare(strict_types=1);
 
 // Must be declared first!
-class_alias(ApiPlatform\Api\FilterInterface::class, ApiPlatform\Core\Api\FilterInterface::class);
-class_alias(ApiPlatform\Api\ResourceClassResolverInterface::class, ApiPlatform\Core\Api\ResourceClassResolverInterface::class);
+if (!interface_exists(ApiPlatform\Core\Api\FilterInterface::class)) {
+    class_alias(ApiPlatform\Api\FilterInterface::class, ApiPlatform\Core\Api\FilterInterface::class);
+}
+if (!interface_exists(ApiPlatform\Core\Api\ResourceClassResolverInterface::class)) {
+    class_alias(ApiPlatform\Api\ResourceClassResolverInterface::class, ApiPlatform\Core\Api\ResourceClassResolverInterface::class);
+}
 
 $deprecatedInterfaces = include 'deprecated_interfaces.php';
 foreach ($deprecatedInterfaces as $oldInterfaceName => $interfaceName) {
