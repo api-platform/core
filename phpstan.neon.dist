@@ -83,3 +83,5 @@ parameters:
 		-
 			message: '#^Property .+ is unused.$#'
 			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php
+		# Waiting for https://github.com/laminas/laminas-code/pull/150
+		- '#Call to an undefined method ReflectionEnum::.+#'

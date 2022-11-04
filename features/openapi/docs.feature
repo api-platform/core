@@ -36,6 +36,7 @@ Feature: Documentation support
     And the OpenAPI class "OverriddenOperationDummy-overridden_operation_dummy_put" exists
     And the OpenAPI class "OverriddenOperationDummy-overridden_operation_dummy_read" exists
     And the OpenAPI class "OverriddenOperationDummy-overridden_operation_dummy_write" exists
+    And the OpenAPI class "Person" exists
     And the OpenAPI class "RelatedDummy" exists
     And the OpenAPI class "NoCollectionDummy" exists
     And the OpenAPI class "RelatedToDummyFriend" exists
@@ -57,6 +58,21 @@ Feature: Documentation support
     # Properties
     And the "id" property exists for the OpenAPI class "Dummy"
     And the "name" property is required for the OpenAPI class "Dummy"
+    And the "genderType" property exists for the OpenAPI class "Person"
+    And the "genderType" property for the OpenAPI class "Person" should be equal to:
+    """
+    {
+      "default": "male",
+      "example": "male",
+      "type": "string",
+      "enum": [
+          "male",
+          "female",
+          null
+      ],
+      "nullable": true
+    }
+    """
     # Enable these tests when SF 4.4 / PHP 7.1 support is dropped
     #And the "isDummyBoolean" property exists for the OpenAPI class "DummyBoolean"
     #And the "isDummyBoolean" property is not read only for the OpenAPI class "DummyBoolean"

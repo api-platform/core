@@ -16,7 +16,9 @@ namespace ApiPlatform\Tests\Behat;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Context\RestContext;
+use Behatch\Json\Json;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -43,41 +45,15 @@ final class OpenApiContext implements Context
     }
 
     /**
-     * @Then the Swagger class :class exists
-     */
-    public function assertTheSwaggerClassExist(string $className): void
-    {
-        try {
-            $this->getClassInfo($className);
-        } catch (\InvalidArgumentException $e) {
-            throw new ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
-        }
-    }
-
-    /**
      * @Then the OpenAPI class :class exists
      */
     public function assertTheOpenApiClassExist(string $className): void
     {
         try {
-            $this->getClassInfo($className, 3);
+            $this->getClassInfo($className);
         } catch (\InvalidArgumentException $e) {
             throw new ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
         }
-    }
-
-    /**
-     * @Then the Swagger class :class doesn't exist
-     */
-    public function assertTheSwaggerClassNotExist(string $className): void
-    {
-        try {
-            $this->getClassInfo($className);
-        } catch (\InvalidArgumentException) {
-            return;
-        }
-
-        throw new ExpectationFailedException(sprintf('The class "%s" exists.', $className));
     }
 
     /**
@@ -86,7 +62,7 @@ final class OpenApiContext implements Context
     public function assertTheOpenAPIClassNotExist(string $className): void
     {
         try {
-            $this->getClassInfo($className, 3);
+            $this->getClassInfo($className);
         } catch (\InvalidArgumentException) {
             return;
         }
@@ -95,7 +71,6 @@ final class OpenApiContext implements Context
     }
 
     /**
-     * @Then the Swagger path :arg1 exists
      * @Then the OpenAPI path :arg1 exists
      */
     public function assertThePathExist(string $path): void
@@ -106,9 +81,9 @@ final class OpenApiContext implements Context
     }
 
     /**
-     * @Then the :prop property exists for the Swagger class :class
+     * @Then the :prop property exists for the OpenAPI class :class
      */
-    public function assertThePropertyExistForTheSwaggerClass(string $propertyName, string $className): void
+    public function assertThePropertyExistForTheOpenApiClass(string $propertyName, string $className): void
     {
         try {
             $this->getPropertyInfo($propertyName, $className);
@@ -118,45 +93,12 @@ final class OpenApiContext implements Context
     }
 
     /**
-     * @Then the :prop property exists for the OpenAPI class :class
-     */
-    public function assertThePropertyExistForTheOpenApiClass(string $propertyName, string $className): void
-    {
-        try {
-            $this->getPropertyInfo($propertyName, $className, 3);
-        } catch (\InvalidArgumentException $e) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" doesn\'t exist.', $propertyName, $className), null, $e);
-        }
-    }
-
-    /**
-     * @Then the :prop property is required for the Swagger class :class
-     */
-    public function assertThePropertyIsRequiredForTheSwaggerClass(string $propertyName, string $className): void
-    {
-        if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
-        }
-    }
-
-    /**
      * @Then the :prop property is required for the OpenAPI class :class
      */
     public function assertThePropertyIsRequiredForTheOpenAPIClass(string $propertyName, string $className): void
     {
-        if (!\in_array($propertyName, $this->getClassInfo($className, 3)->required, true)) {
+        if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
-        }
-    }
-
-    /**
-     * @Then the :prop property is not read only for the Swagger class :class
-     */
-    public function assertThePropertyIsNotReadOnlyForTheSwaggerClass(string $propertyName, string $className): void
-    {
-        $propertyInfo = $this->getPropertyInfo($propertyName, $className);
-        if (property_exists($propertyInfo, 'readOnly') && $propertyInfo->readOnly) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should not be read only', $propertyName, $className));
         }
     }
 
@@ -165,9 +107,22 @@ final class OpenApiContext implements Context
      */
     public function assertThePropertyIsNotReadOnlyForTheOpenAPIClass(string $propertyName, string $className): void
     {
-        $propertyInfo = $this->getPropertyInfo($propertyName, $className, 3);
+        $propertyInfo = $this->getPropertyInfo($propertyName, $className);
         if (property_exists($propertyInfo, 'readOnly') && $propertyInfo->readOnly) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should not be read only', $propertyName, $className));
+        }
+    }
+
+    /**
+     * @Then the :prop property for the OpenAPI class :class should be equal to:
+     */
+    public function assertThePropertyForTheOpenAPIClassShouldBeEqualTo(string $propertyName, string $className, PyStringNode $propertyContent): void
+    {
+        $propertyInfo = $this->getPropertyInfo($propertyName, $className);
+        $propertyInfoJson = new Json(json_encode($propertyInfo));
+
+        if (new Json($propertyContent) != $propertyInfoJson) {
+            throw new ExpectationFailedException(sprintf("Property \"%s\" of class \"%s\" is '%s'", $propertyName, $className, $propertyInfoJson));
         }
     }
 
@@ -176,12 +131,10 @@ final class OpenApiContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getPropertyInfo(string $propertyName, string $className, int $specVersion = 2): \stdClass
+    private function getPropertyInfo(string $propertyName, string $className): \stdClass
     {
-        /**
-         * @var iterable $properties
-         */
-        $properties = $this->getProperties($className, $specVersion);
+        /** @var iterable $properties */
+        $properties = $this->getProperties($className);
         foreach ($properties as $classPropertyName => $property) {
             if ($classPropertyName === $propertyName) {
                 return $property;
@@ -194,9 +147,9 @@ final class OpenApiContext implements Context
     /**
      * Gets all operations of a given class.
      */
-    private function getProperties(string $className, int $specVersion = 2): \stdClass
+    private function getProperties(string $className): \stdClass
     {
-        return $this->getClassInfo($className, $specVersion)->{'properties'} ?? new \stdClass();
+        return $this->getClassInfo($className)->{'properties'} ?? new \stdClass();
     }
 
     /**
@@ -204,9 +157,9 @@ final class OpenApiContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getClassInfo(string $className, int $specVersion = 2): \stdClass
+    private function getClassInfo(string $className): \stdClass
     {
-        $nodes = 2 === $specVersion ? $this->getLastJsonResponse()->{'definitions'} : $this->getLastJsonResponse()->{'components'}->{'schemas'};
+        $nodes = $this->getLastJsonResponse()->{'components'}->{'schemas'};
         foreach ($nodes as $classTitle => $classData) {
             if ($classTitle === $className) {
                 return $classData;

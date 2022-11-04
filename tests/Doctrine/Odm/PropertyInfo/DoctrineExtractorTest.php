@@ -17,10 +17,13 @@ use ApiPlatform\Doctrine\Odm\PropertyInfo\DoctrineExtractor;
 use ApiPlatform\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineDummy;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineEmbeddable;
+use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineEnum;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineFooType;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineRelation;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineWithEmbedded;
+use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\EnumInt;
+use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\EnumString;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -126,6 +129,13 @@ class DoctrineExtractorTest extends TestCase
         );
 
         $this->assertEquals($expectedTypes, $actualTypes);
+    }
+
+    public function testExtractEnum(): void
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt'));
+        $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom'));
     }
 
     public function typesProvider(): array

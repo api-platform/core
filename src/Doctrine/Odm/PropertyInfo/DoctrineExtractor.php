@@ -92,6 +92,10 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         if ($metadata->hasField($property)) {
             $typeOfField = $metadata->getTypeOfField($property);
             $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+            $enumType = null;
+            if (null !== $enumClass = $metadata instanceof MongoDbClassMetadata ? $metadata->getFieldMapping($property)['enumType'] ?? null : null) {
+                $enumType = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
+            }
 
             switch ($typeOfField) {
                 case MongoDbType::DATE:
@@ -102,11 +106,16 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
                 case MongoDbType::COLLECTION:
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT))];
-                default:
-                    $builtinType = $this->getPhpType($typeOfField);
-
-                    return $builtinType ? [new Type($builtinType, $nullable)] : null;
+                case MongoDbType::INT:
+                case MongoDbType::STRING:
+                    if ($enumType) {
+                        return [$enumType];
+                    }
             }
+
+            $builtinType = $this->getPhpType($typeOfField);
+
+            return $builtinType ? [new Type($builtinType, $nullable)] : null;
         }
 
         return null;

@@ -17,6 +17,7 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -53,6 +54,8 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
         yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
         yield [['nullable' => true, 'type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
+        yield [['type' => 'string', 'enum' => ['male', 'female', null], 'nullable' => true], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable' => [
             ['nullable' => true, 'type' => 'array', 'items' => ['type' => 'string']],
@@ -174,6 +177,8 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
         yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
         yield [['type' => ['string', 'null'], 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
+        yield [['type' => ['string', 'null'], 'enum' => ['male', 'female', null]], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable' => [
             ['type' => ['array', 'null'], 'items' => ['type' => 'string']],
@@ -288,6 +293,8 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
         yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
         yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
+        yield [['type' => 'string', 'enum' => ['male', 'female', null]], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable, but ignored in OpenAPI V2' => [
             ['type' => 'array', 'items' => ['type' => 'string']],
