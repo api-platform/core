@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -31,13 +32,19 @@ class Person
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private ?int $id = null;
+
+    #[ORM\Column(type: 'string', enumType: GenderTypeEnum::class, nullable: true)]
+    public ?GenderTypeEnum $genderType = GenderTypeEnum::MALE;
+
     #[ORM\Column(type: 'string')]
     #[Groups(['people.pets'])]
-    public $name;
+    public string $name;
+
     #[ORM\OneToMany(targetEntity: PersonToPet::class, mappedBy: 'person')]
     #[Groups(['people.pets'])]
     public Collection|iterable $pets;
+
     #[ORM\OneToMany(targetEntity: Greeting::class, mappedBy: 'sender')]
     public Collection|iterable|null $sentGreetings = null;
 
@@ -46,7 +53,7 @@ class Person
         $this->pets = new ArrayCollection();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

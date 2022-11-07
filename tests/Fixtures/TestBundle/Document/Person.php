@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -29,13 +30,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Person
 {
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
-    private $id;
+    private ?int $id = null;
+
     #[Groups(['people.pets'])]
     #[ODM\Field(type: 'string')]
-    public $name;
+    public string $name;
+
+    #[ODM\Field(type: 'string', enumType: GenderTypeEnum::class, nullable: true)]
+    public ?GenderTypeEnum $genderType = GenderTypeEnum::MALE;
+
     #[Groups(['people.pets'])]
     #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'person')]
     public Collection|iterable $pets;
+
     #[ODM\ReferenceMany(targetDocument: Greeting::class, mappedBy: 'sender')]
     public Collection|iterable|null $sentGreetings = null;
 
@@ -44,7 +51,7 @@ class Person
         $this->pets = new ArrayCollection();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

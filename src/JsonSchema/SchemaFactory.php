@@ -175,6 +175,9 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         if (!isset($propertySchema['default']) && !empty($default = $propertyMetadata->getDefault())) {
+            if ($default instanceof \BackedEnum) {
+                $default = $default->value;
+            }
             $propertySchema['default'] = $default;
         }
 

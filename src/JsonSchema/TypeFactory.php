@@ -72,7 +72,7 @@ final class TypeFactory implements TypeFactoryInterface
             Type::BUILTIN_TYPE_INT => ['type' => 'integer'],
             Type::BUILTIN_TYPE_FLOAT => ['type' => 'number'],
             Type::BUILTIN_TYPE_BOOL => ['type' => 'boolean'],
-            Type::BUILTIN_TYPE_OBJECT => $this->getClassType($type->getClassName(), $format, $readableLink, $serializerContext, $schema),
+            Type::BUILTIN_TYPE_OBJECT => $this->getClassType($type->getClassName(), $type->isNullable(), $format, $readableLink, $serializerContext, $schema),
             default => ['type' => 'string'],
         };
     }
@@ -80,7 +80,7 @@ final class TypeFactory implements TypeFactoryInterface
     /**
      * Gets the JSON Schema document which specifies the data type corresponding to the given PHP class, and recursively adds needed new schema to the current schema if provided.
      */
-    private function getClassType(?string $className, string $format, ?bool $readableLink, ?array $serializerContext, ?Schema $schema): array
+    private function getClassType(?string $className, bool $nullable, string $format, ?bool $readableLink, ?array $serializerContext, ?Schema $schema): array
     {
         if (null === $className) {
             return ['type' => 'string'];
@@ -114,6 +114,18 @@ final class TypeFactory implements TypeFactoryInterface
             return [
                 'type' => 'string',
                 'format' => 'binary',
+            ];
+        }
+        if (is_a($className, \BackedEnum::class, true)) {
+            $rEnum = new \ReflectionEnum($className);
+            $enumCases = array_map(static fn (\ReflectionEnumBackedCase $rCase) => $rCase->getBackingValue(), $rEnum->getCases());
+            if ($nullable) {
+                $enumCases[] = null;
+            }
+
+            return [
+                'type' => (string) $rEnum->getBackingType(),
+                'enum' => $enumCases,
             ];
         }
 
