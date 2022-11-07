@@ -508,10 +508,10 @@ class FieldsBuilderTest extends TestCase
             }
             if ('propertyNestedResourceNoQuery' === $propertyName) {
                 $nestedResourceQueryOperation = new Query();
-                $this->resourceMetadataCollectionFactoryProphecy->create('nestedResourceNoQueryClass')->willReturn(new ResourceMetadataCollection('nestedResourceNoQueryClass', [(new ApiResource())->withDescription('A description.')->withGraphQlOperations([])]));
+                $this->resourceMetadataCollectionFactoryProphecy->create('nestedResourceNoQueryClass')->willReturn(new ResourceMetadataCollection('nestedResourceNoQueryClass', [(new ApiResource())->withDescription('A description.')->withFilters(['search_filter'])->withGraphQlOperations([])]));
                 $this->graphQlNestedOperationResourceMetadataFactoryProphecy->create('nestedResourceNoQueryClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('nestedResourceNoQueryClass', [(new ApiResource())->withGraphQlOperations(['item_query' => $nestedResourceQueryOperation])]));
                 $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'nestedResourceNoQueryClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType']));
-                $this->itemResolverFactoryProphecy->__invoke('nestedResourceNoQueryClass', $resourceClass, $nestedResourceQueryOperation)->willReturn(static function (): void {
+                $this->itemResolverFactoryProphecy->__invoke('nestedResourceNoQueryClass', $resourceClass, $nestedResourceQueryOperation->withFilters(['search_filter']))->willReturn(static function (): void {
                 });
             }
         }
