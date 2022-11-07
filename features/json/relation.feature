@@ -215,6 +215,7 @@ Feature: JSON relations support
       "relatedDummies": [
         "/related_dummies/1"
       ],
+      "otherRelatedDummies": [],
       "jsonData": [],
       "arrayData": [],
       "name_converted": null,

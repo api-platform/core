@@ -30,6 +30,7 @@ Feature: Handle properly invalid data submitted to the API
       "dummyPrice": null,
       "relatedDummy": null,
       "relatedDummies": [],
+      "otherRelatedDummies": [],
       "jsonData": [],
       "arrayData": [],
       "name_converted": null,

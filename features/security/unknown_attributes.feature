@@ -30,6 +30,7 @@ Feature: Ignore unknown attributes
       "dummyPrice": null,
       "relatedDummy": null,
       "relatedDummies": [],
+      "otherRelatedDummies": [],
       "jsonData": [],
       "arrayData": [],
       "name_converted": null,

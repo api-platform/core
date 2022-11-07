@@ -760,6 +760,46 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there are :nb dummy objects having each :nbrelated relatedDummies with relatedDummy having each :nbotherrelated otherRelatedDummies
+     */
+    public function thereAreDummyObjectsWithRelatedDummiesWithRelatedDummy(int $nb, int $nbrelated, int $nbotherrelated): void
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $relatedDummy = $this->buildRelatedDummy();
+            $relatedDummy->setName('RelatedDummy #'.$i);
+
+            $dummy = $this->buildDummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setRelatedDummy($relatedDummy);
+
+            for ($j = 1; $j <= $nbrelated; ++$j) {
+                $relatedCollectionDummy = $this->buildRelatedDummy();
+                $relatedCollectionDummy->setName('RelatedDummy'.$j.$i);
+                $relatedCollectionDummy->setAge((int) ($j.$i));
+                $this->manager->persist($relatedCollectionDummy);
+
+                $dummy->addRelatedDummy($relatedCollectionDummy);
+            }
+
+            for ($j = 1; $j <= $nbotherrelated; ++$j) {
+                $relatedCollectionDummy = $this->buildRelatedDummy();
+                $relatedCollectionDummy->setName('OtherRelatedDummy'.$j.$i);
+                $relatedCollectionDummy->setAge((int) ($j.$i));
+                $relatedCollectionDummy->setOtherRelatedDummy($dummy);
+                $this->manager->persist($relatedCollectionDummy);
+
+                $dummy->addOtherRelatedDummy($relatedCollectionDummy);
+            }
+
+            $this->manager->persist($relatedDummy);
+            $this->manager->persist($dummy);
+
+        }
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb dummy objects with dummyDate
      * @Given there is :nb dummy object with dummyDate
      */
