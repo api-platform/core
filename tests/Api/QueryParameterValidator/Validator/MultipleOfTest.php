@@ -18,8 +18,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
- *
- * @group legacy
  */
 class MultipleOfTest extends TestCase
 {
@@ -42,6 +40,9 @@ class MultipleOfTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testNonMatchingParameter(): void
     {
         $request = ['some_filter' => '8'];
@@ -59,6 +60,26 @@ class MultipleOfTest extends TestCase
         );
     }
 
+    public function testNonMatchingParameterOpenApi(): void
+    {
+        $request = ['some_filter' => '8'];
+        $filter = new MultipleOf();
+
+        $filterDefinition = [
+            'openapi' => [
+                'multipleOf' => 3,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must multiple of 3'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+    }
+
+    /**
+     * @group legacy
+     */
     public function testMatchingParameter(): void
     {
         $request = ['some_filter' => '8'];
@@ -66,6 +87,22 @@ class MultipleOfTest extends TestCase
 
         $filterDefinition = [
             'swagger' => [
+                'multipleOf' => 4,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+    }
+
+    public function testMatchingParameterOpenApi(): void
+    {
+        $request = ['some_filter' => '8'];
+        $filter = new MultipleOf();
+
+        $filterDefinition = [
+            'openapi' => [
                 'multipleOf' => 4,
             ],
         ];

@@ -18,8 +18,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
- *
- * @group legacy
  */
 class EnumTest extends TestCase
 {
@@ -41,6 +39,9 @@ class EnumTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testNonMatchingParameter(): void
     {
         $filter = new Enum();
@@ -57,12 +58,46 @@ class EnumTest extends TestCase
         );
     }
 
+    public function testNonMatchingParameterOpenApi(): void
+    {
+        $filter = new Enum();
+
+        $filterDefinition = [
+            'openapi' => [
+                'enum' => ['foo', 'bar'],
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be one of "foo, bar"'],
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foobar'])
+        );
+    }
+
+    /**
+     * @group legacy
+     */
     public function testMatchingParameter(): void
     {
         $filter = new Enum();
 
         $filterDefinition = [
             'swagger' => [
+                'enum' => ['foo', 'bar'],
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foo'])
+        );
+    }
+
+    public function testMatchingParameterOpenApi(): void
+    {
+        $filter = new Enum();
+
+        $filterDefinition = [
+            'openapi' => [
                 'enum' => ['foo', 'bar'],
             ],
         ];
