@@ -106,6 +106,9 @@ class Dummy
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
     public Collection|iterable $relatedDummies;
 
+    #[ORM\OneToMany(targetEntity: RelatedDummy::class, mappedBy: 'otherRelatedDummy')]
+    public Collection|iterable $otherRelatedDummies;
+
     /**
      * @var array|null serialize data
      */
@@ -143,6 +146,7 @@ class Dummy
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
+        $this->otherRelatedDummies = new ArrayCollection();
     }
 
     public function getId()
@@ -256,6 +260,11 @@ class Dummy
         $this->relatedDummies->add($relatedDummy);
     }
 
+    public function addOtherRelatedDummy(RelatedDummy $relatedDummy): void
+    {
+        $this->otherRelatedDummies->add($relatedDummy);
+    }
+
     public function getRelatedOwnedDummy()
     {
         return $this->relatedOwnedDummy;
@@ -305,5 +314,10 @@ class Dummy
     public function getRelatedDummies(): Collection|iterable
     {
         return $this->relatedDummies;
+    }
+
+    public function getOtherRelatedDummies(): Collection|iterable
+    {
+        return $this->otherRelatedDummies;
     }
 }
