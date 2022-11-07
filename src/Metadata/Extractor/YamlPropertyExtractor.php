@@ -63,8 +63,8 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
                     continue;
                 }
 
-                if (!\is_array($propertyValues)) {
-                    throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given.', $propertyName, \gettype($propertyValues)));
+                if (!\is_array($propertyValues) && !\is_string($propertyValues)) {
+                    throw new InvalidArgumentException(sprintf('"%s" setting is expected to be a string, null or an array, %s given.', $propertyName, \gettype($propertyValues)));
                 }
 
                 $this->properties[$resourceName][$propertyName] = [
@@ -98,14 +98,14 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
         }
     }
 
-    private function buildAttribute(array $resource, string $key, mixed $default = null)
+    private function buildAttribute(array|string|null $resource, string $key, mixed $default = null)
     {
         if (empty($resource[$key])) {
             return $default;
         }
 
-        if (!\is_array($resource[$key])) {
-            throw new InvalidArgumentException(sprintf('"%s" setting is expected to be an array, %s given', $key, \gettype($resource[$key])));
+        if (!\is_array($resource[$key]) && !\is_string($resource[$key])) {
+            throw new InvalidArgumentException(sprintf('"%s" setting is expected to be a string or an array, %s given', $key, \gettype($resource[$key])));
         }
 
         return $resource[$key];
@@ -114,7 +114,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
     /**
      * Transforms an XML attribute's value in a PHP value.
      */
-    private function phpize(?array $resource, string $key, string $type, mixed $default = null): array|bool|int|string|null
+    private function phpize(array|string|null $resource, string $key, string $type, mixed $default = null): array|bool|int|string|null
     {
         if (!isset($resource[$key])) {
             return $default;
