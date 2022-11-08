@@ -80,9 +80,6 @@ final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCol
             $classLinks[$link->getToClass()][$link->getFromProperty()] = $link;
         }
 
-        // return array_values(array_merge(...array_values($classLinks)));   (branch 3.0)
-        return array_reduce($classLinks, static function (array $carry, array $item) {
-            return array_merge($carry, array_values($item));
-        }, []);
+        return array_values(array_merge(...array_values($classLinks)));
     }
 }
