@@ -78,8 +78,10 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyD
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy as RelatedOwnedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy as RelatedOwningDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedSecuredDummy as RelatedSecuredDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedMultiUsedDummy as RelatedMultiUsedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\SameRelationMultiUseDummy as SameRelationMultiUseDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
@@ -152,11 +154,13 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedMultiUsedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedSecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SameRelationMultiUseDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoMany;
@@ -760,36 +764,33 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @Given there are :nb dummy objects having each :nbrelated relatedDummies with relatedDummy having each :nbotherrelated otherRelatedDummies
+     * @Given there are :nb sameRelationMultiUseDummy objects having a manyToOneRelation and each :nbmtmr manyToManyRelations and having each :nbotmr oneToManyRelations
      */
-    public function thereAreDummyObjectsWithRelatedDummiesWithRelatedDummy(int $nb, int $nbrelated, int $nbotherrelated): void
+    public function thereAreSameRelationMultiUseDummyObjectsHavingAManyToOneRelationAndEachManyToManyRelationsAndHavingEachOneToManyRelations(int $nb, int $nbmtmr, int $nbotmr): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $relatedDummy = $this->buildRelatedDummy();
-            $relatedDummy->setName('RelatedDummy #'.$i);
+            $relatedDummy = $this->buildRelatedMultiUsedDummy();
+            $relatedDummy->setName('RelatedMultiUsedDummy #'.$i);
 
-            $dummy = $this->buildDummy();
+            $dummy = $this->buildSameRelationMultiUseDummy();
             $dummy->setName('Dummy #'.$i);
-            $dummy->setAlias('Alias #'.($nb - $i));
-            $dummy->setRelatedDummy($relatedDummy);
+            $dummy->setManyToOneRelation($relatedDummy);
 
-            for ($j = 1; $j <= $nbrelated; ++$j) {
-                $relatedCollectionDummy = $this->buildRelatedDummy();
-                $relatedCollectionDummy->setName('RelatedDummy'.$j.$i);
-                $relatedCollectionDummy->setAge((int) ($j.$i));
-                $this->manager->persist($relatedCollectionDummy);
+            for ($j = 1; $j <= $nbmtmr; ++$j) {
+                $manyToManyItem = $this->buildRelatedMultiUsedDummy();
+                $manyToManyItem->setName('RelatedManyToManyDummy'.$j.$i);
+                $this->manager->persist($manyToManyItem);
 
-                $dummy->addRelatedDummy($relatedCollectionDummy);
+                $dummy->addManyToManyRelation($manyToManyItem);
             }
 
-            for ($j = 1; $j <= $nbotherrelated; ++$j) {
-                $relatedCollectionDummy = $this->buildRelatedDummy();
-                $relatedCollectionDummy->setName('OtherRelatedDummy'.$j.$i);
-                $relatedCollectionDummy->setAge((int) ($j.$i));
-                $relatedCollectionDummy->setOtherRelatedDummy($dummy);
-                $this->manager->persist($relatedCollectionDummy);
+            for ($j = 1; $j <= $nbotmr; ++$j) {
+                $oneToManyItem = $this->buildRelatedMultiUsedDummy();
+                $oneToManyItem->setName('RelatedOneToManyDummy'.$j.$i);
+                $oneToManyItem->setOneToManyRelation($dummy);
+                $this->manager->persist($oneToManyItem);
 
-                $dummy->addOtherRelatedDummy($relatedCollectionDummy);
+                $dummy->addOneToManyRelation($oneToManyItem);
             }
 
             $this->manager->persist($relatedDummy);
@@ -2339,5 +2340,15 @@ final class DoctrineContext implements Context
     private function buildPayment(string $amount): Payment|PaymentDocument
     {
         return $this->isOrm() ? new Payment($amount) : new PaymentDocument($amount);
+    }
+
+    private function buildSameRelationMultiUseDummy(): SameRelationMultiUseDummy|SameRelationMultiUseDummyDocument
+    {
+        return $this->isOrm() ? new SameRelationMultiUseDummy() : new SameRelationMultiUseDummyDocument();
+    }
+
+    private function buildRelatedMultiUsedDummy(): RelatedMultiUsedDummy|RelatedMultiUsedDummyDocument
+    {
+        return $this->isOrm() ? new RelatedMultiUsedDummy() : new RelatedMultiUsedDummyDocument();
     }
 }

@@ -451,27 +451,27 @@ Feature: GraphQL query support
     And the JSON node "data.dummyDifferentGraphQlSerializationGroup.title" should be equal to "Title #1"
 
   @createSchema
-  Scenario: Execute a GraphQL query that includes a nested collection
-    Given there are 1 dummy objects having each 2 relatedDummies with relatedDummy having each 3 otherRelatedDummies
+  Scenario: Execute a GraphQL query that includes a nested collection with different relations to same entity
+    Given there are 3 sameRelationMultiUseDummy objects having a manyToOneRelation and each 2 manyToManyRelations and having each 3 oneToManyRelations
     When I send the following GraphQL request:
     """
     {
-      dummy(id: "/dummies/1") {
+      sameRelationMultiUseDummy(id: "/same_relation_multi_use_dummies/2") {
         id
         name
-        relatedDummy {
+        manyToOneRelation {
           id
           name
         }
-        relatedDummies {
+        manyToManyRelations {
           edges{
             node {
-              id
+             id
               name
             }
           }
         }
-        otherRelatedDummies {
+        oneToManyRelations {
           edges{
             node {
               id
@@ -485,16 +485,15 @@ Feature: GraphQL query support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.dummy.id" should be equal to "/dummies/1"
-    And the JSON node "data.dummy.name" should be equal to "Dummy #1"
-    And the JSON node "data.dummy.relatedDummy.id" should not be null
-    And the JSON node "data.dummy.relatedDummy.name" should be equal to "RelatedDummy #1"
-    And the JSON node "data.dummy.relatedDummies.edges" should have 2 element
-    And the JSON node "data.dummy.relatedDummies.edges[1].node.id" should not be null
-    And the JSON node "data.dummy.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy11"
-    And the JSON node "data.dummy.relatedDummies.edges[1].node.name" should be equal to "RelatedDummy21"
-    And the JSON node "data.dummy.otherRelatedDummies.edges" should have 3 element
-    And the JSON node "data.dummy.otherRelatedDummies.edges[1].node.id" should not be null
-    And the JSON node "data.dummy.otherRelatedDummies.edges[0].node.name" should be equal to "OtherRelatedDummy11"
-    And the JSON node "data.dummy.otherRelatedDummies.edges[2].node.name" should be equal to "OtherRelatedDummy31"
-
+    And the JSON node "data.sameRelationMultiUseDummy.id" should be equal to "/same_relation_multi_use_dummies/2"
+    And the JSON node "data.sameRelationMultiUseDummy.name" should be equal to "Dummy #2"
+    And the JSON node "data.sameRelationMultiUseDummy.manyToOneRelation.id" should not be null
+    And the JSON node "data.sameRelationMultiUseDummy.manyToOneRelation.name" should be equal to "RelatedMultiUsedDummy #2"
+    And the JSON node "data.sameRelationMultiUseDummy.manyToManyRelations.edges" should have 2 element
+    And the JSON node "data.sameRelationMultiUseDummy.manyToManyRelations.edges[1].node.id" should not be null
+    And the JSON node "data.sameRelationMultiUseDummy.manyToManyRelations.edges[0].node.name" should be equal to "RelatedManyToManyDummy12"
+    And the JSON node "data.sameRelationMultiUseDummy.manyToManyRelations.edges[1].node.name" should be equal to "RelatedManyToManyDummy22"
+    And the JSON node "data.sameRelationMultiUseDummy.oneToManyRelations.edges" should have 3 element
+    And the JSON node "data.sameRelationMultiUseDummy.oneToManyRelations.edges[1].node.id" should not be null
+    And the JSON node "data.sameRelationMultiUseDummy.oneToManyRelations.edges[0].node.name" should be equal to "RelatedOneToManyDummy12"
+    And the JSON node "data.sameRelationMultiUseDummy.oneToManyRelations.edges[2].node.name" should be equal to "RelatedOneToManyDummy32"
