@@ -38,7 +38,6 @@ final class GraphQlNestedOperationResourceMetadataFactoryTest extends TestCase
     {
         $metadataFactory = new GraphQlNestedOperationResourceMetadataFactory(['status' => 500]);
         $apiResource = $metadataFactory->create(RelatedDummy::class)[0];
-        $this->assertNotEmpty($apiResource->getFilters());
         $this->assertEquals('RelatedDummy', $apiResource->getShortName());
     }
 }

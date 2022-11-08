@@ -263,6 +263,10 @@ final class FieldsBuilder implements FieldsBuilderInterface
                     // If there is no query operation for a nested resource we force one to exist
                     $nestedResourceMetadataCollection = $this->graphQlNestedOperationResourceMetadataFactory->create($resourceClass);
                     $resourceOperation = $nestedResourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
+                    // Add filters from the metadata defined on the resource itself.
+                    if ($filters = $resourceMetadataCollection[0]?->getFilters()) {
+                        $resourceOperation = $resourceOperation->withFilters($filters);
+                    }
                 }
             }
 

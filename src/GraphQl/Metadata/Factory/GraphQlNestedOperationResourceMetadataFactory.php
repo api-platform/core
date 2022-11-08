@@ -51,15 +51,6 @@ final class GraphQlNestedOperationResourceMetadataFactory implements ResourceMet
             shortName: $shortName
         );
 
-        if (class_exists($resourceClass)) {
-            $refl = new \ReflectionClass($resourceClass);
-            $attribute = $refl->getAttributes(ApiResource::class)[0] ?? null;
-            $attributeInstance = $attribute?->newInstance();
-            if ($filters = $attributeInstance?->getFilters()) {
-                $apiResource = $apiResource->withFilters($filters);
-            }
-        }
-
         $resourceMetadataCollection[0] = $this->addDefaultGraphQlOperations($apiResource);
 
         return $resourceMetadataCollection;
