@@ -38,7 +38,6 @@ Feature: Create-Retrieve-Update-Delete
       "dummyPrice": null,
       "relatedDummy": null,
       "relatedDummies": [],
-      "otherRelatedDummies": [],
       "jsonData": {
         "key": [
           "value1",
@@ -75,7 +74,6 @@ Feature: Create-Retrieve-Update-Delete
       "dummyPrice": null,
       "relatedDummy": null,
       "relatedDummies": [],
-      "otherRelatedDummies": [],
       "jsonData": {
         "key": [
           "value1",
@@ -126,7 +124,6 @@ Feature: Create-Retrieve-Update-Delete
           "dummyPrice": null,
           "relatedDummy": null,
           "relatedDummies": [],
-          "otherRelatedDummies": [],
           "jsonData": {
             "key": [
               "value1",
@@ -531,7 +528,6 @@ Feature: Create-Retrieve-Update-Delete
       "dummyPrice": null,
       "relatedDummy": null,
       "relatedDummies": [],
-      "otherRelatedDummies": [],
       "jsonData": [
         {
           "key": "value1"

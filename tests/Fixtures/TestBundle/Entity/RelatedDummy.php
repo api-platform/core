@@ -104,8 +104,6 @@ class RelatedDummy extends ParentDummy implements \Stringable
     #[ORM\Embedded(class: 'EmbeddableDummy')]
     #[Groups(['friends'])]
     public ?EmbeddableDummy $embeddedDummy = null;
-    #[ORM\ManyToOne(targetEntity: Dummy::class, inversedBy: 'otherRelatedDummies')]
-    protected ?Dummy $otherRelatedDummy = null;
 
     public function __construct()
     {
@@ -203,17 +201,6 @@ class RelatedDummy extends ParentDummy implements \Stringable
     {
         $this->embeddedDummy = $embeddedDummy;
     }
-
-    public function getOtherRelatedDummy(): ?Dummy
-    {
-        return $this->otherRelatedDummy;
-    }
-
-    public function setOtherRelatedDummy(Dummy $otherRelatedDummy): void
-    {
-        $this->otherRelatedDummy = $otherRelatedDummy;
-    }
-
 
     public function __toString(): string
     {
