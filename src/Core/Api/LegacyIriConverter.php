@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Operation;
  * This IRI converter calls the legacy IriConverter on legacy resources.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
  * @internal
  */
 final class LegacyIriConverter implements IriConverterInterface
@@ -44,7 +45,7 @@ final class LegacyIriConverter implements IriConverterInterface
             return $this->iriConverter->getResourceFromIri($iri, $context);
         }
 
-        if ($operation && !($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && !($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
+        if (!($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && !($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
             return $this->iriConverter->getResourceFromIri($iri, $context, $operation);
         }
 
@@ -59,12 +60,18 @@ final class LegacyIriConverter implements IriConverterInterface
         if (!$operation) {
             return $this->iriConverter->getIriFromResource($item, $referenceType, $operation, $context);
         }
+        
+        $isSubresource = $operation->getExtraProperties()['is_legacy_subresource'] ?? false;
+        $isResource = $operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false;
 
-        if ($operation && !($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && !($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
+        if (!$isSubresource && !$isResource) {
             return $this->iriConverter->getIriFromResource($item, $referenceType, $operation, $context);
+        }
+
+        if (\is_string($item)) {
+            return $isSubresource ? $this->iriConverter->getIriFromResource($item, $referenceType, $operation, $context) : $this->legacyIriConverter->getIriFromResourceClass($item, $referenceType);
         }
 
         return $this->legacyIriConverter->getIriFromItem($item, $referenceType);
     }
 }
-

@@ -146,6 +146,20 @@
         </service>
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
+        <service id="api_platform.iri_converter.legacy" class="ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.legacy" />
+            <argument type="service" id="api_platform.item_data_provider" />
+            <argument type="service" id="api_platform.route_name_resolver" />
+            <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
+            <argument type="service" id="api_platform.identifier.converter" on-invalid="ignore" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+        </service>
+
         <service id="api_platform.symfony.iri_converter.skolem" class="ApiPlatform\Symfony\Routing\SkolemIriConverter" public="false">
             <argument type="service" id="api_platform.router" />
         </service>

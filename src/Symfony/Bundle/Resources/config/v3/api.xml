@@ -24,7 +24,7 @@
             <tag name="routing.loader" />
         </service>
 
-        <service id="api_platform.iri_converter">
+        <service id="api_platform.iri_converter" class="ApiPlatform\Core\Api\LegacyIriConverter">
             <argument type="service" id="api_platform.iri_converter.legacy" />
             <argument type="service" id="api_platform.symfony.iri_converter" />
         </service>
