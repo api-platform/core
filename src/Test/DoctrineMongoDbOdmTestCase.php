@@ -30,8 +30,8 @@ class DoctrineMongoDbOdmTestCase extends TestCase
     {
         $config = new Configuration();
         $config->setAutoGenerateProxyClasses(Configuration::AUTOGENERATE_FILE_NOT_EXISTS);
-        $config->setProxyDir(\sys_get_temp_dir());
-        $config->setHydratorDir(\sys_get_temp_dir());
+        $config->setProxyDir(sys_get_temp_dir());
+        $config->setHydratorDir(sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setHydratorNamespace('SymfonyTests\Doctrine');
         $config->setMetadataDriverImpl(new AttributeDriver($paths, new AttributeReader())); // @phpstan-ignore-line
