@@ -91,7 +91,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         $operationPriority = 0;
 
         foreach ($attributes as $attribute) {
-            if (ApiResource::class === $attribute->getName()) {
+            if (is_a($attribute->getName(), ApiResource::class, true)) {
                 $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, $attribute->newInstance());
                 continue;
             }
@@ -159,7 +159,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     private function hasResourceAttributes(\ReflectionClass $reflectionClass): bool
     {
         foreach ($reflectionClass->getAttributes() as $attribute) {
-            if (ApiResource::class === $attribute->getName() || is_subclass_of($attribute->getName(), HttpOperation::class) || is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
+            if (is_a($attribute->getName(), ApiResource::class, true) || is_subclass_of($attribute->getName(), HttpOperation::class) || is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
                 return true;
             }
         }
