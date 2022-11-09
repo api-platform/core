@@ -259,6 +259,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/links.xml');
         $loader->load('metadata/property.xml');
         $loader->load('metadata/resource.xml');
+        $loader->load('metadata/operation.xml');
 
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);

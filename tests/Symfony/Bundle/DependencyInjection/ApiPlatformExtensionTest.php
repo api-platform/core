@@ -390,6 +390,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_collection_factory.yaml',
             'api_platform.metadata.property.metadata_factory.yaml',
             'api_platform.metadata.property.name_collection_factory.yaml',
+
+            // metadata/operation.xml
+            'api_platform.metadata.operation.metadata_factory',
         ];
 
         $aliases = [
@@ -403,7 +406,6 @@ class ApiPlatformExtensionTest extends TestCase
 
             // metadata/resource.xml
             'api_platform.metadata.resource.metadata_collection_factory',
-            'api_platform.metadata.resource.metadata_collection_factory.retro_compatible',
             ResourceMetadataCollectionFactoryInterface::class,
 
             // metadata/resource_name.xml

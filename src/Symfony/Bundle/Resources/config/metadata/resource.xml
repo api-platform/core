@@ -6,7 +6,6 @@
     <services>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory" alias="api_platform.metadata.resource.metadata_collection_factory.attributes" />
-        <service id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" alias="api_platform.metadata.resource.metadata_collection_factory" />
 
         <service id="ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface" alias="api_platform.metadata.resource.metadata_collection_factory" />
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Serializer\AbstractCollectionNormalizer;
@@ -31,9 +32,9 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
     public const FORMAT = 'jsonapi';
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ?OperationMetadataFactory $operationMetadataFactory = null)
     {
-        parent::__construct($resourceClassResolver, $pageParameterName, $resourceMetadataFactory);
+        parent::__construct($resourceClassResolver, $pageParameterName, $resourceMetadataFactory, $operationMetadataFactory);
     }
 
     /**

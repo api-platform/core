@@ -19,6 +19,7 @@ use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\State\Pagination\PaginatorInterface;
@@ -47,7 +48,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         self::IRI_ONLY => false,
     ];
 
-    public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $defaultContext = [])
+    public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $defaultContext = [], private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -80,8 +81,8 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data['hydra:member'] = [];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
 
-        if ($this->resourceMetadataCollectionFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
-            $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operation->getItemUriTemplate());
+        if ($this->operationMetadataFactory && $this->resourceMetadataCollectionFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
+            $context['operation'] = $this->operationMetadataFactory->create($itemUriTemplate);
         } else {
             unset($context['operation']);
         }
