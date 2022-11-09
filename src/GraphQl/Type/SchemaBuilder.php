@@ -50,7 +50,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
             foreach ($resourceMetadataCollection as $resourceMetadata) {
-                foreach ($resourceMetadata->getGraphQlOperations() ?? [] as $operationName => $operation) {
+                foreach ($resourceMetadata->getGraphQlOperations() ?? [] as $operation) {
                     $configuration = null !== $operation->getArgs() ? ['args' => $operation->getArgs()] : [];
 
                     if ($operation instanceof Query && $operation instanceof CollectionOperationInterface) {

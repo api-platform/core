@@ -167,11 +167,6 @@
             <argument type="service" id="api_platform.doctrine.orm.metadata.resource.metadata_collection_factory.inner" />
         </service>
 
-        <service id="api_platform.doctrine.orm.graphql_metadata.resource.metadata_collection_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmResourceCollectionMetadataFactory" decorates="api_platform.graphql_metadata.resource.metadata_collection_factory" decoration-priority="40" decoration-on-invalid="ignore">
-            <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.orm.graphql_metadata.resource.metadata_collection_factory.inner" />
-        </service>
-
     </services>
 
 </container>

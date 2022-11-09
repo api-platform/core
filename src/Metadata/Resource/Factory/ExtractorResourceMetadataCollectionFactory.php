@@ -14,22 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\GraphQl\DeleteMutation;
-use ApiPlatform\Metadata\GraphQl\Mutation;
-use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
@@ -39,10 +29,12 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  */
 final class ExtractorResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private readonly CamelCaseToSnakeCaseNameConverter $camelCaseToSnakeCaseNameConverter;
+    use OperationDefaultsTrait;
 
-    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, private readonly array $defaults = [])
+    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [], LoggerInterface $logger = null)
     {
+        $this->logger = $logger ?? new NullLogger();
+        $this->defaults = $defaults;
         $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
@@ -93,25 +85,25 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 }
             }
 
-            $resource = $resource->withGraphQlOperations($this->buildGraphQlOperations($node['graphQlOperations'] ?? null, $resource));
+            $resource = $this->addGraphQlOperations($node['graphQlOperations'] ?? null, $resource);
 
-            $resources[] = $resource->withOperations(new Operations($this->buildOperations($node['operations'] ?? null, $resource)));
+            $resources[] = $this->addOperations($node['operations'] ?? null, $resource);
         }
 
         return $resources;
     }
 
-    private function buildOperations(?array $data, ApiResource $resource): array
+    private function addOperations(?array $data, ApiResource $resource): ApiResource
     {
         $operations = [];
 
         if (null === $data) {
-            foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
-                $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
-                $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation)->withName($operationName);
+            foreach ($this->getDefaultHttpOperations($resource) as $operation) {
+                [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
+                $operations[$key] = $operation;
             }
 
-            return $operations;
+            return $resource->withOperations(new Operations($operations));
         }
 
         foreach ($data as $attributes) {
@@ -138,31 +130,19 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 $operation = $operation->withExtraProperties(array_merge($operation->getExtraProperties(), [$key => $value]));
             }
 
-            if (empty($attributes['name'])) {
-                $attributes['name'] = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
-            }
-            $operations[$attributes['name']] = $this->getOperationWithDefaults($resource, $operation)->withName($attributes['name']);
+            [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
+            $operations[$key] = $operation;
         }
 
-        return $operations;
+        return $resource->withOperations(new Operations($operations));
     }
 
-    private function buildGraphQlOperations(?array $data, ApiResource $resource): array
+    private function addGraphQlOperations(?array $data, ApiResource $resource): ApiResource
     {
         $operations = [];
 
         if (null === $data) {
-            foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $operation) {
-                $operation = $this->getOperationWithDefaults($resource, $operation);
-
-                if ($operation instanceof Mutation) {
-                    $operation = $operation->withDescription(ucfirst("{$operation->getName()}s a {$resource->getShortName()}."));
-                }
-
-                $operations[$operation->getName()] = $operation;
-            }
-
-            return $operations;
+            return $this->addDefaultGraphQlOperations($resource);
         }
 
         foreach ($data as $attributes) {
@@ -189,34 +169,8 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
             $operations[] = $operation;
         }
 
-        return $operations;
-    }
+        $resource = $resource->withGraphQlOperations($operations);
 
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
-    {
-        foreach (($this->defaults['attributes'] ?? []) as $key => $value) {
-            $key = $this->camelCaseToSnakeCaseNameConverter->denormalize($key);
-            if (null === $operation->{'get'.ucfirst($key)}()) {
-                $operation = $operation->{'with'.ucfirst($key)}($value);
-            }
-        }
-
-        foreach (get_class_methods($resource) as $methodName) {
-            if (!str_starts_with($methodName, 'get')) {
-                continue;
-            }
-
-            if (!method_exists($operation, $methodName) || null !== $operation->{$methodName}()) {
-                continue;
-            }
-
-            if (null === ($value = $resource->{$methodName}())) {
-                continue;
-            }
-
-            $operation = $operation->{'with'.substr($methodName, 3)}($value);
-        }
-
-        return $operation;
+        return $this->completeGraphQlOperations($resource);
     }
 }
