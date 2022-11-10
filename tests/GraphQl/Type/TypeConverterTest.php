@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -170,13 +171,14 @@ class TypeConverterTest extends TestCase
      */
     public function testConvertTypeCollectionResource(Type $type, ObjectType $expectedGraphqlType): void
     {
-        /** @var Operation $operation */
-        $operation = (new Query())->withName('test');
-        $graphqlResourceMetadata = new ResourceMetadataCollection('dummyValue', [(new ApiResource())->withShortName('DummyValue')->withGraphQlOperations(['test' => $operation])]);
+        $collectionOperation = new QueryCollection();
+        $graphqlResourceMetadata = new ResourceMetadataCollection('dummyValue', [
+            (new ApiResource())->withShortName('DummyValue')->withGraphQlOperations(['collection_query' => $collectionOperation]),
+        ]);
 
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(true);
         $this->resourceMetadataCollectionFactoryProphecy->create('dummyValue')->shouldBeCalled()->willReturn($graphqlResourceMetadata);
-        $this->typeBuilderProphecy->getResourceObjectType('dummyValue', $graphqlResourceMetadata, $operation, false, false, 0)->shouldBeCalled()->willReturn($expectedGraphqlType);
+        $this->typeBuilderProphecy->getResourceObjectType('dummyValue', $graphqlResourceMetadata, $collectionOperation, false, false, 0)->shouldBeCalled()->willReturn($expectedGraphqlType);
 
         /** @var Operation $rootOperation */
         $rootOperation = (new Query())->withName('test');

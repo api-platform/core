@@ -15,8 +15,10 @@ namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Post;
 use Symfony\Component\Config\Util\XmlUtils;
@@ -332,9 +334,18 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                     }
                 }
 
+                $collection = $this->phpize($operation, 'collection', 'bool', false);
+                if (Query::class === $class && $collection) {
+                    $class = QueryCollection::class;
+                }
+
+                $delete = $this->phpize($operation, 'delete', 'bool', false);
+                if (Mutation::class === $class && $delete) {
+                    $class = DeleteMutation::class;
+                }
+
                 $data[] = array_merge($datum, [
                     'graphql_operation_class' => $class,
-                    'collection' => $this->phpize($operation, 'collection', 'bool'),
                     'resolver' => $this->phpize($operation, 'resolver', 'string'),
                     'args' => $this->buildArgs($operation),
                     'class' => $this->phpize($operation, 'class', 'string'),

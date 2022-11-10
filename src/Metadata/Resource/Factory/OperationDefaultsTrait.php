@@ -16,6 +16,9 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
@@ -24,6 +27,10 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\State\CreateProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -71,10 +78,20 @@ trait OperationDefaultsTrait
         return $this->addGlobalDefaults($resource);
     }
 
+    private function getDefaultHttpOperations($resource): iterable
+    {
+        $post = new Post();
+        if ($resource->getUriTemplate() && !$resource->getProvider()) {
+            $post = $post->withProvider(CreateProvider::class);
+        }
+
+        return [new Get(), new GetCollection(), $post, new Put(), new Patch(), new Delete()];
+    }
+
     private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource
     {
         $graphQlOperations = [];
-        foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $i => $operation) {
+        foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $operation) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
             $graphQlOperations[$key] = $operation;
         }
@@ -82,6 +99,38 @@ trait OperationDefaultsTrait
         if ($resource->getMercure()) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, (new Subscription())->withDescription("Subscribes to the update event of a {$operation->getShortName()}."));
             $graphQlOperations[$key] = $operation;
+        }
+
+        return $resource->withGraphQlOperations($graphQlOperations);
+    }
+
+    /**
+     * Adds nested query operations if there are no existing query ones on the resource.
+     * They are needed when the resource is queried inside a root query, using a relation.
+     * Since the nested argument is used, root queries will not be generated for these operations.
+     */
+    private function completeGraphQlOperations(ApiResource $resource): ApiResource
+    {
+        $graphQlOperations = $resource->getGraphQlOperations();
+
+        $hasQueryOperation = false;
+        $hasQueryCollectionOperation = false;
+        foreach ($graphQlOperations as $operation) {
+            if ($operation instanceof Query && !$operation instanceof QueryCollection) {
+                $hasQueryOperation = true;
+            }
+            if ($operation instanceof QueryCollection) {
+                $hasQueryCollectionOperation = true;
+            }
+        }
+
+        if (!$hasQueryOperation) {
+            $queryOperation = (new Query())->withNested(true);
+            $graphQlOperations[$queryOperation->getName()] = $queryOperation;
+        }
+        if (!$hasQueryCollectionOperation) {
+            $queryCollectionOperation = (new QueryCollection())->withNested(true);
+            $graphQlOperations[$queryCollectionOperation->getName()] = $queryCollectionOperation;
         }
 
         return $resource->withGraphQlOperations($graphQlOperations);
@@ -147,13 +196,15 @@ trait OperationDefaultsTrait
             $operation = $operation->withName('');
         }
 
+        $operationName = $operation->getName() ?? sprintf(
+            '_api_%s_%s%s',
+            $operation->getUriTemplate() ?: $operation->getShortName(),
+            strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET),
+            $operation instanceof CollectionOperationInterface ? '_collection' : '',
+        );
+
         return [
-            sprintf(
-                '_api_%s_%s%s',
-                $operation->getUriTemplate() ?: $operation->getShortName(),
-                strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET),
-                $operation instanceof CollectionOperationInterface ? '_collection' : '',
-            ),
+            $operationName,
             $operation,
         ];
     }

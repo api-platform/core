@@ -21,6 +21,7 @@
             <argument type="service" id="api_platform.metadata.resource_extractor.xml" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.xml.inner" />
             <argument>%api_platform.defaults%</argument>
+            <argument type="service" id="logger" on-invalid="null" />
         </service>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation" class="ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="700" public="false">
