@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
@@ -74,12 +73,9 @@ final class TypeBuilder implements TypeBuilderInterface
         }
 
         if ('item_query' === $operationName || 'collection_query' === $operationName) {
-            // Test if the collection/item operation exists and it has different groups
-            try {
-                if ($resourceMetadataCollection->getOperation($operation instanceof CollectionOperationInterface ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
-                    $shortName .= $operation instanceof CollectionOperationInterface ? 'Collection' : 'Item';
-                }
-            } catch (OperationNotFoundException) {
+            // Test if the collection/item has different groups
+            if ($resourceMetadataCollection->getOperation($operation instanceof CollectionOperationInterface ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
+                $shortName .= $operation instanceof CollectionOperationInterface ? 'Collection' : 'Item';
             }
         }
 
@@ -126,13 +122,7 @@ final class TypeBuilder implements TypeBuilderInterface
                         $wrappedOperationName = $operation instanceof Query ? $operationName : 'item_query';
                     }
 
-                    try {
-                        $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
-                    } catch (OperationNotFoundException) {
-                        $wrappedOperation = ('collection_query' === $wrappedOperationName ? new QueryCollection() : new Query())
-                            ->withResource($resourceMetadataCollection[0])
-                            ->withName($wrappedOperationName);
-                    }
+                    $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
 
                     $fields = [
                         lcfirst($wrappedOperation->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadataCollection, $wrappedOperation instanceof Operation ? $wrappedOperation : null, $input, true, $depth),

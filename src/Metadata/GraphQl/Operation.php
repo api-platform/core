@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Operation as AbstractOperation;
 class Operation extends AbstractOperation
 {
     /**
-     * @param string      $resolver
      * @param mixed|null  $input
      * @param mixed|null  $output
      * @param mixed|null  $mercure

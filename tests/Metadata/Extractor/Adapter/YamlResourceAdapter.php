@@ -38,7 +38,7 @@ final class YamlResourceAdapter implements ResourceAdapterInterface
             $resource = [];
             foreach ($parameters as $parameter) {
                 $parameterName = $parameter->getName();
-                $resource[$parameterName] = \array_key_exists($parameterName, $fixture) ? $fixture[$parameterName] : null;
+                $resource[$parameterName] = $fixture[$parameterName] ?? null;
             }
             $yaml['resources'][$resourceClass][] = $resource;
         }

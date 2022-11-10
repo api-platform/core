@@ -70,9 +70,24 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+
+        protected ?bool $nested = null,
     ) {
         parent::__construct(...\func_get_args());
         $this->name = $name ?: 'collection_query';
+    }
+
+    public function getNested(): ?bool
+    {
+        return $this->nested;
+    }
+
+    public function withNested(?bool $nested = null): self
+    {
+        $self = clone $this;
+        $self->nested = $nested;
+
+        return $self;
     }
 }

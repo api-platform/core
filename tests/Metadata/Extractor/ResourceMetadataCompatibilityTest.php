@@ -163,7 +163,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         ],
                         'shortName' => self::SHORT_NAME,
                         'description' => 'A list of Comments',
-                        'class' => GetCollection::class,
+                        'class' => Mutation::class,
                         'urlGenerationStrategy' => 0,
                         'deprecationReason' => 'I don\'t know',
                         'normalizationContext' => [
@@ -207,18 +207,26 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'serialize' => true,
                         'priority' => 200,
                         'extraProperties' => [
+                            'custom_property' => 'Lorem ipsum dolor sit amet',
+                            'another_custom_property' => [
+                                'Lorem ipsum' => 'Dolor sit amet',
+                            ],
                             'foo' => 'bar',
                         ],
                     ],
                 ],
                 'queries' => [
                     [
-                        'class' => Get::class,
+                        'class' => Query::class,
+                    ],
+                    [
+                        'class' => QueryCollection::class,
+                        'collection' => true,
                     ],
                 ],
                 'subscriptions' => [
                     [
-                        'class' => Post::class,
+                        'class' => Subscription::class,
                     ],
                 ],
             ],
@@ -328,6 +336,10 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'serialize' => true,
                     'priority' => 200,
                     'extraProperties' => [
+                        'custom_property' => 'Lorem ipsum dolor sit amet',
+                        'another_custom_property' => [
+                            'Lorem ipsum' => 'Dolor sit amet',
+                        ],
                         'foo' => 'bar',
                     ],
                 ],
@@ -452,7 +464,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 $operations = [];
                 foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
                     $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
-                    $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation)->withName($operationName);
+                    $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation);
                 }
 
                 $resource = $resource->withOperations(new Operations($operations));
@@ -461,7 +473,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 $graphQlOperations = [];
                 foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $graphQlOperation) {
                     $description = $graphQlOperation instanceof Mutation ? ucfirst("{$graphQlOperation->getName()}s a {$resource->getShortName()}.") : null;
-                    $graphQlOperations[$graphQlOperation->getName()] = $this->getOperationWithDefaults($resource, $graphQlOperation)->withName($graphQlOperation->getName())->withDescription($description);
+                    $graphQlOperations[$graphQlOperation->getName()] = $this->getOperationWithDefaults($resource, $graphQlOperation)->withDescription($description);
                 }
 
                 $resources[] = $resource->withGraphQlOperations($graphQlOperations);
@@ -547,10 +559,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 throw new \RuntimeException(sprintf('Unknown Operation parameter "%s".', $parameter));
             }
 
-            if (null === $operation->getName()) {
-                $operation = $operation->withName(sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : ''));
-            }
-            $operations[$operation->getName()] = $operation;
+            $operationName = $operation->getName() ?? sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
+            $operations[$operationName] = $operation;
         }
 
         return new Operations($operations);
@@ -559,22 +569,11 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     private function withGraphQlOperations(array $values, ?array $fixtures): array
     {
         $operations = [];
-        foreach ($values as $type => $graphQlOperations) {
-            switch ($type) {
-                case 'queries':
-                    $class = Query::class;
-                    break;
-                case 'mutations':
-                    $class = Mutation::class;
-                    break;
-                case 'subscriptions':
-                    $class = Subscription::class;
-                    break;
-                default:
-            }
-
+        foreach ($values as $graphQlOperations) {
             foreach ($graphQlOperations as $value) {
-                $operation = new $class(); // @phpstan-ignore-line
+                $class = $value['class'];
+                $operation = new $class();
+                unset($value['collection']);
 
                 foreach (self::BASE as $parameter) {
                     if ((!\array_key_exists($parameter, $value) || null === $value[$parameter]) && isset($fixtures[$parameter])) {
