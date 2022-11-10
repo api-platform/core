@@ -16,6 +16,7 @@ namespace ApiPlatform\Elasticsearch\Metadata\Resource\Factory;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Util\Inflector;
@@ -41,7 +42,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
             if ($operations) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if ($this->hasIndices($operation->getShortName())) {
+                    if ($this->hasIndices($operation)) {
                         $operation = $operation->withElasticsearch(true);
                     }
 
@@ -59,7 +60,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
             if ($graphQlOperations) {
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
-                    if ($this->hasIndices($graphQlOperation->getShortName())) {
+                    if ($this->hasIndices($graphQlOperation)) {
                         $graphQlOperation = $graphQlOperation->withElasticsearch(true);
                     }
 
@@ -79,8 +80,13 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
         return $resourceMetadataCollection;
     }
 
-    private function hasIndices(string $shortName): bool
+    private function hasIndices(Operation $operation): bool
     {
+        if (false === $operation->getElasticsearch()) {
+            return false;
+        }
+
+        $shortName = $operation->getShortName();
         $index = Inflector::tableize($shortName);
 
         try {
