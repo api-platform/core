@@ -57,7 +57,7 @@ final class AttributesResourceNameCollectionFactory implements ResourceNameColle
 
     private function isResource(\ReflectionClass $reflectionClass): bool
     {
-        if ($reflectionClass->getAttributes(ApiResource::class)) {
+        if ($reflectionClass->getAttributes(ApiResource::class, \ReflectionAttribute::IS_INSTANCEOF)) {
             return true;
         }
 
