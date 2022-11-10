@@ -22,7 +22,6 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Creates a function retrieving a collection to resolve a GraphQL query or a field returned by a mutation.
@@ -35,7 +34,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 {
     use CloneTrait;
 
-    public function __construct(private readonly ReadStageInterface $readStage, private readonly SecurityStageInterface $securityStage, private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, private readonly SerializeStageInterface $serializeStage, private readonly ContainerInterface $queryResolverLocator, private readonly ?RequestStack $requestStack = null)
+    public function __construct(private readonly ReadStageInterface $readStage, private readonly SecurityStageInterface $securityStage, private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, private readonly SerializeStageInterface $serializeStage, private readonly ContainerInterface $queryResolverLocator)
     {
     }
 
@@ -45,13 +44,6 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             // If authorization has failed for a relation field (e.g. via ApiProperty security), the field is not present in the source: null can be returned directly to ensure the collection isn't in the response.
             if (null === $resourceClass || null === $rootClass || (null !== $source && !\array_key_exists($info->fieldName, $source))) {
                 return null;
-            }
-
-            if ($this->requestStack && null !== $request = $this->requestStack->getCurrentRequest()) {
-                $request->attributes->set(
-                    '_graphql_collections_args',
-                    [$resourceClass => $args] + $request->attributes->get('_graphql_collections_args', [])
-                );
             }
 
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];

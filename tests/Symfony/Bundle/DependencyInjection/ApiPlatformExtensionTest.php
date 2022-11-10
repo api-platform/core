@@ -626,6 +626,7 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['graphql']['enabled'] = true;
+        $this->container->setParameter('kernel.debug', true);
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $services = [
@@ -673,6 +674,10 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.normalizer.runtime_exception',
             'api_platform.graphql_metadata.resource.metadata_collection_factory',
             'api_platform.graphql_metadata.resource.metadata_collection_factory.filters',
+            'api_platform.graphql.data_collector.resolver.factory.collection',
+            'api_platform.graphql.data_collector.resolver.factory.item',
+            'api_platform.graphql.data_collector.resolver.factory.item_mutation',
+            'api_platform.graphql.data_collector.resolver.factory.item_subscription',
         ];
 
         $aliases = [

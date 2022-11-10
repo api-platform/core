@@ -163,7 +163,6 @@
             <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.graphql.query_resolver_locator" />
-            <argument type="service" id="request_stack" />
         </service>
 
         <service id="api_platform.graphql.resolver.factory.item_mutation" class="ApiPlatform\GraphQl\Resolver\Factory\ItemMutationResolverFactory" public="false">
