@@ -51,6 +51,10 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $defaultContext = [], private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
+
+        if ($resourceMetadataCollectionFactory) {
+            trigger_deprecation('api-platform/core', '3.0', 'The ResourceMetadataCollectionFactoryInterface argument is not used anymore and will be removed in 4.0.');
+        }
     }
 
     /**
@@ -81,7 +85,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data['hydra:member'] = [];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
 
-        if ($this->operationMetadataFactory && $this->resourceMetadataCollectionFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
+        if ($this->operationMetadataFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
             $context['operation'] = $this->operationMetadataFactory->create($itemUriTemplate);
         } else {
             unset($context['operation']);

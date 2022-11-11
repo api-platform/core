@@ -30,7 +30,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
     public const FORMAT = 'jsonhal';
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
         parent::__construct($resourceClassResolver, $pageParameterName, $resourceMetadataFactory, $operationMetadataFactory);
     }

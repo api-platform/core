@@ -28,7 +28,7 @@
         <service id="api_platform.hal.normalizer.collection" class="ApiPlatform\Hal\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument>null</argument>
             <argument type="service" id="api_platform.metadata.operation.metadata_factory" on-invalid="null" />
 
             <!-- Run after api_platform.hal.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->
