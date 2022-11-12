@@ -207,13 +207,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw new UnexpectedValueException(sprintf('Expected IRI or document for resource "%s", "%s" given.', $resourceClass, \gettype($data)));
         }
 
+        $previousObject = isset($objectToPopulate) ? clone $objectToPopulate : null;
+
         $object = parent::denormalize($data, $class, $format, $context);
 
         if (!$this->resourceClassResolver->isResourceClass($class)) {
             return $object;
         }
 
-        $previousObject = isset($objectToPopulate) ? clone $objectToPopulate : null;
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
         foreach (array_keys($data) as $attribute) {
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
