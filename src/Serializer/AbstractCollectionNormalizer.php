@@ -45,9 +45,6 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     public function __construct(protected ResourceClassResolverInterface $resourceClassResolver, protected string $pageParameterName, protected ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, protected ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
-        if ($resourceMetadataFactory) {
-            trigger_deprecation('api-platform/core', '3.0', 'The ResourceMetadataCollectionFactoryInterface argument is not used anymore and will be removed in 4.0.');
-        }
     }
 
     /**

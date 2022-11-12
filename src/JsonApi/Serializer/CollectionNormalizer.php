@@ -32,7 +32,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
     public const FORMAT = 'jsonapi';
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ?OperationMetadataFactory $operationMetadataFactory = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ?OperationMetadataFactory $operationMetadataFactory = null)
     {
         parent::__construct($resourceClassResolver, $pageParameterName, $resourceMetadataFactory, $operationMetadataFactory);
     }
