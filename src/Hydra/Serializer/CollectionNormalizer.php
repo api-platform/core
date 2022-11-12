@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * This normalizer handles collections.
@@ -56,7 +57,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && is_iterable($data) && isset($context['resource_class']) && !isset($context['api_sub_level']);
+        return self::FORMAT === $format && is_iterable($data);
     }
 
     /**
@@ -64,8 +65,12 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      *
      * @param iterable $object
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
+        if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
+            return $this->normalizeRawCollection($object, $format, $context);
+        }
+
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $context = $this->initContext($resourceClass, $context);
         $context['api_collection_sub_level'] = true;
@@ -103,6 +108,23 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
     public function hasCacheableSupportsMethod(): bool
     {
-        return false;
+        return true;
+    }
+
+    /**
+     * Normalizes a raw collection (not API resources).
+     */
+    protected function normalizeRawCollection(iterable $object, string $format = null, array $context = []): array|\ArrayObject
+    {
+        if (\is_array($object) && !$object && ($context[Serializer::EMPTY_ARRAY_AS_OBJECT] ?? false)) {
+            return new \ArrayObject();
+        }
+
+        $data = [];
+        foreach ($object as $index => $obj) {
+            $data[$index] = $this->normalizer->normalize($obj, $format, $context);
+        }
+
+        return $data;
     }
 }

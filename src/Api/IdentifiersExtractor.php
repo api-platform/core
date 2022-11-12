@@ -49,26 +49,34 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
      */
     public function getIdentifiersFromItem(object $item, Operation $operation = null, array $context = []): array
     {
-        $identifiers = [];
-
         if (!$this->isResourceClass($this->getObjectClass($item))) {
             return ['id' => $this->propertyAccessor->getValue($item, 'id')];
+        }
+
+        if ($operation && $operation->getClass()) {
+            return $this->getIdentifiersFromOperation($item, $operation, $context);
         }
 
         $resourceClass = $this->getResourceClass($item, true);
         $operation ??= $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
 
+        return $this->getIdentifiersFromOperation($item, $operation, $context);
+    }
+
+    private function getIdentifiersFromOperation(object $item, Operation $operation, array $context = []): array
+    {
         if ($operation instanceof HttpOperation) {
             $links = $operation->getUriVariables();
         } elseif ($operation instanceof GraphQlOperation) {
             $links = $operation->getLinks();
         }
 
+        $identifiers = [];
         foreach ($links ?? [] as $link) {
             if (1 < (is_countable($link->getIdentifiers()) ? \count($link->getIdentifiers()) : 0)) {
                 $compositeIdentifiers = [];
                 foreach ($link->getIdentifiers() as $identifier) {
-                    $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $link->getFromClass() ?? $resourceClass, $identifier, $link->getParameterName());
+                    $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $identifier, $link->getParameterName());
                 }
 
                 $identifiers[$link->getParameterName()] = CompositeIdentifierParser::stringify($compositeIdentifiers);
