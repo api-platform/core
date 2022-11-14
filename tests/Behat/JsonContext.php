@@ -107,6 +107,6 @@ final class JsonContext extends BaseJsonContext
         $array = json_decode($this->httpCallResultPool->getResult()->getValue(), true, 512, \JSON_THROW_ON_ERROR);
         $subset = json_decode($content->getRaw(), true, 512, \JSON_THROW_ON_ERROR);
 
-        method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array); // @phpstan-ignore-line Compatibility with PHPUnit 7
+        method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array);
     }
 }
