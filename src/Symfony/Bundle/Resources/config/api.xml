@@ -164,6 +164,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.uri_variables.converter" />
             <argument type="service" id="api_platform.symfony.iri_converter.skolem" />
+            <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
         </service>
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 

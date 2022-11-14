@@ -84,7 +84,6 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
 
             $parameterName = $link->getParameterName();
-
             $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass(), $link->getIdentifiers()[0], $parameterName);
         }
 
@@ -96,7 +95,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
      */
     private function getIdentifierValue(object $item, string $class, string $property, string $parameterName): float|bool|int|string
     {
-        if ($item instanceof $class || $this->propertyAccessor->isReadable($item, $property)) {
+        if ($item instanceof $class) {
             try {
                 return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, $property), $parameterName);
             } catch (NoSuchPropertyException $e) {

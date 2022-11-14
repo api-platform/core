@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
@@ -49,8 +50,9 @@ final class IriConverter implements IriConverterInterface
     use UriVariablesResolverTrait;
 
     private $localOperationCache = [];
+    private $localIdentifiersExtractorOperationCache = [];
 
-    public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null)
+    public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->uriVariablesConverter = $uriVariablesConverter;
@@ -106,7 +108,7 @@ final class IriConverter implements IriConverterInterface
 
         $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_c' : '_i');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
-            return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context);
+            return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
         }
 
         if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
@@ -127,8 +129,10 @@ final class IriConverter implements IriConverterInterface
             unset($context['uri_variables']);
         }
 
-        if ($operation instanceof HttpOperation && HttpOperation::METHOD_POST === $operation->getMethod() && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
-            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($itemUriTemplate);
+        $identifiersExtractorOperation = $operation;
+        if ($this->operationMetadataFactory && isset($context['item_uri_template'])) {
+            $identifiersExtractorOperation = null;
+            $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
         }
 
         // In symfony the operation name is the route name, try to find one if none provided
@@ -139,6 +143,7 @@ final class IriConverter implements IriConverterInterface
             $forceCollection = $operation instanceof CollectionOperationInterface;
             try {
                 $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
+                $identifiersExtractorOperation = $operation;
             } catch (OperationNotFoundException) {
             }
         }
@@ -148,8 +153,9 @@ final class IriConverter implements IriConverterInterface
         }
 
         $this->localOperationCache[$localOperationCacheKey] = $operation;
+        $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] = $identifiersExtractorOperation;
 
-        return $this->generateSymfonyRoute($resource, $referenceType, $operation, $context);
+        return $this->generateSymfonyRoute($resource, $referenceType, $operation, $context, $identifiersExtractorOperation);
     }
 
     private function generateSkolemIri(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = [], string $resourceClass = null): string
@@ -162,13 +168,13 @@ final class IriConverter implements IriConverterInterface
         return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
     }
 
-    private function generateSymfonyRoute(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): string
+    private function generateSymfonyRoute(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = [], ?Operation $identifiersExtractorOperation = null): string
     {
         $identifiers = $context['uri_variables'] ?? [];
 
         if (\is_object($resource)) {
             try {
-                $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, $operation);
+                $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, $identifiersExtractorOperation, $context);
             } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers) {

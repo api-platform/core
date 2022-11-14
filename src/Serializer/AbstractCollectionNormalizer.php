@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -43,7 +41,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     // @noRector \Rector\Php81\Rector\ClassConst\FinalizePublicClassConstantRector
     public const FORMAT = 'to-override';
 
-    public function __construct(protected ResourceClassResolverInterface $resourceClassResolver, protected string $pageParameterName, protected ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, protected ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
+    public function __construct(protected ResourceClassResolverInterface $resourceClassResolver, protected string $pageParameterName, protected ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
     {
     }
 
@@ -76,11 +74,10 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         $data = [];
         $paginationData = $this->getPaginationData($object, $context);
 
-        if ($this->operationMetadataFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
-            $context['operation'] = $this->operationMetadataFactory->create($itemUriTemplate);
-        } else {
-            unset($context['operation']);
+        if (($operation = $context['operation'] ?? null) && method_exists($operation, 'getItemUriTemplate')) {
+            $context['item_uri_template'] = $operation->getItemUriTemplate();
         }
+        unset($context['operation']);
         unset($context['operation_type'], $context['operation_name']);
         $itemsData = $this->getItemsData($object, $format, $context);
 
