@@ -57,21 +57,6 @@ final class LegacyIriConverter implements IriConverterInterface
      */
     public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
-        if (!$operation) {
-            return $this->iriConverter->getIriFromResource($item, $referenceType, $operation, $context);
-        }
-        
-        $isSubresource = $operation->getExtraProperties()['is_legacy_subresource'] ?? false;
-        $isResource = $operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false;
-
-        if (!$isSubresource && !$isResource) {
-            return $this->iriConverter->getIriFromResource($item, $referenceType, $operation, $context);
-        }
-
-        if (\is_string($item)) {
-            return $isSubresource ? $this->iriConverter->getIriFromResource($item, $referenceType, $operation, $context) : $this->legacyIriConverter->getIriFromResourceClass($item, $referenceType);
-        }
-
-        return $this->legacyIriConverter->getIriFromItem($item, $referenceType);
+        return $this->iriConverter->getIriFromResource($item, $referenceType, $operation, $context);
     }
 }
