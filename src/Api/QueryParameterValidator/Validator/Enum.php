@@ -15,6 +15,8 @@ namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
 final class Enum implements ValidatorInterface
 {
+    use CheckFilterDeprecationsTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -25,7 +27,9 @@ final class Enum implements ValidatorInterface
             return [];
         }
 
-        $enum = $filterDescription['swagger']['enum'] ?? null;
+        $this->checkFilterDeprecations($filterDescription);
+
+        $enum = $filterDescription['openapi']['enum'] ?? $filterDescription['swagger']['enum'] ?? null;
 
         if (null !== $enum && !\in_array($value, $enum, true)) {
             return [
