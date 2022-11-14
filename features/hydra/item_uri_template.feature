@@ -130,7 +130,7 @@ Feature: Exposing a collection of objects should use the specified operation to 
     }
     """
 
-  Scenario: Get a collection referencing another resource for it's IRI
+  Scenario: Get a collection referencing another resource for its IRI
     When I add "Content-Type" header equal to "application/json"
     And I send a "GET" request to "/item_referenced_in_collection"
     Then the response status code should be 200

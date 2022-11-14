@@ -85,7 +85,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         if (($operation = $context['operation'] ?? null) && method_exists($operation, 'getItemUriTemplate')) {
             $context['item_uri_template'] = $operation->getItemUriTemplate();
-            unset($context['operation']);
         }
 
         $context = $this->initContext($resourceClass, $context);
