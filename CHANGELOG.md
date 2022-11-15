@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.0.4
+
+### Bug fixes
+
+* [148442c49](https://github.com/api-platform/core/commit/148442c49b1312b3665be353def371faedb9750c) fix(metadata): item uri template with another resource (#5176)
+* [2a582764a](https://github.com/api-platform/core/commit/2a582764af9a7bd2dd1d87c49c74974ef8d3a68b) fix(graphql): add filters from the nested resource metadata (#5171)
+* [45b552673](https://github.com/api-platform/core/commit/45b55267371b73a98ef5282b2e08f7ad224ca666) fix(metadata): _format broken bc promise on #5080  (#5187)
+* [5bc84ce36](https://github.com/api-platform/core/commit/5bc84ce36a0dafa8c63209978471a48bf1a5d0f5) fix(graphql): use default nested query operations (#5174)
+* [6e2f920ec](https://github.com/api-platform/core/commit/6e2f920ecacd0460efeef11381947800c86d4d7c) fix(serializer): empty object as array with supports cache  (#5100)
+* [706f66f6b](https://github.com/api-platform/core/commit/706f66f6b39d60f031dd610a8586c6e576827ce9) fix(metadata): allow input/output configuration values to be bool in yaml config (#5186)
+* [b3bc4d6ac](https://github.com/api-platform/core/commit/b3bc4d6ac33f1a9756cc91c86d8cc30049ed044f) fix: use legacy iri converter for legacy resources (#5172)
+* [d18813597](https://github.com/api-platform/core/commit/d18813597bae255318aafb43a5bd65bbabab14ca) fix: securityPostDenormalize not working because clone is made after denormalization (#5182)
+* [dbf44470a](https://github.com/api-platform/core/commit/dbf44470aed45f8ccea0cc2cb261a28394b7685d) fix(metadata): check if elasticsearch is set to false by user through ApiResource (#5115) (#5177)
+* [a52750496](https://github.com/api-platform/core/commit/a5275049663c336cd7fb4e83b62ea1d93c2cf06a) fix(metadata): allow custom Attribute to extend ApiResource (#5076) (#5175)
+* [62af87485](https://github.com/api-platform/core/commit/62af8748561feb340353b581b681b82b5fdadc5f) fix(openapi): use "openapi" key to validate filter parameters (#5114)
+
 ## v3.0.3
 
 ### Bug fixes
