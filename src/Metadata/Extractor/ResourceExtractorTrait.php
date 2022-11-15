@@ -55,7 +55,7 @@ trait ResourceExtractorTrait
 
         switch ($type) {
             case 'bool|string':
-                return \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string');
+                return \is_bool($resource[$key]) || \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string');
             case 'string':
                 return (string) $resource[$key];
             case 'integer':

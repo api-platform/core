@@ -1,0 +1,8 @@
+resources:
+    ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program:
+        -   uriTemplate: /users/{author}/programs.{_format}
+            uriVariables: ['author']
+            operations:
+                ApiPlatform\Metadata\Post:
+                    input: ApiPlatform\Tests\Fixtures\TestBundle\Entity\ProgramInput
+                    output: ApiPlatform\Tests\Fixtures\TestBundle\Entity\ProgramOutput

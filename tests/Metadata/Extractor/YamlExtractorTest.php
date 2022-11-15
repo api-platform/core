@@ -457,6 +457,40 @@ class YamlExtractorTest extends TestCase
         ], $extractor->getResources());
     }
 
+    public function testInputAndOutputAreBooleans(): void
+    {
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/input-and-output-are-booleans.yaml']);
+        $resources = $extractor->getResources();
+
+        $this->assertArrayHasKey(Program::class, $resources);
+        $this->assertArrayHasKey(0, $resources[Program::class]);
+        $this->assertArrayHasKey('operations', $resources[Program::class][0]);
+        $this->assertArrayHasKey('0', $resources[Program::class][0]['operations']);
+
+        $this->assertArrayHasKey('input', $resources[Program::class][0]['operations'][0]);
+        $this->assertFalse($resources[Program::class][0]['operations'][0]['input']);
+
+        $this->assertArrayHasKey('output', $resources[Program::class][0]['operations'][0]);
+        $this->assertFalse($resources[Program::class][0]['operations'][0]['output']);
+    }
+
+    public function testInputAndOutputAreStrings(): void
+    {
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/input-and-output-are-strings.yaml']);
+        $resources = $extractor->getResources();
+
+        $this->assertArrayHasKey(Program::class, $resources);
+        $this->assertArrayHasKey(0, $resources[Program::class]);
+        $this->assertArrayHasKey('operations', $resources[Program::class][0]);
+        $this->assertArrayHasKey('0', $resources[Program::class][0]['operations']);
+
+        $this->assertArrayHasKey('input', $resources[Program::class][0]['operations'][0]);
+        $this->assertSame(Program::class.'Input', $resources[Program::class][0]['operations'][0]['input']);
+
+        $this->assertArrayHasKey('output', $resources[Program::class][0]['operations'][0]);
+        $this->assertSame(Program::class.'Output', $resources[Program::class][0]['operations'][0]['output']);
+    }
+
     /**
      * @dataProvider getInvalidPaths
      */
