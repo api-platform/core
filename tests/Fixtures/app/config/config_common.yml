@@ -165,6 +165,12 @@ services:
         tags:
             - { name: 'api_platform.item_data_provider' }
 
+    issue5094_relation.item_data_provider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\Issue5094RelationDataProvider'
+        public: false
+        tags:
+            - { name: 'api_platform.item_data_provider' }
+
     serializable.item_data_provider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\SerializableItemDataProvider'
         public: false

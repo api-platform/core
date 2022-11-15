@@ -650,6 +650,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             try {
                 return $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
+                throw $e;
                 if (!$supportsPlainIdentifiers) {
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
                 }

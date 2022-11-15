@@ -41,7 +41,7 @@ final class LegacyIriConverter implements IriConverterInterface
      */
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null)
     {
-        if (!$operation) {
+        if (!$operation && !($operation = $context['operation'] ?? null)) {
             return $this->iriConverter->getResourceFromIri($iri, $context);
         }
 
