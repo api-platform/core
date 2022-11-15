@@ -27,6 +27,8 @@ use Symfony\Component\Routing\Route;
  */
 final class UriTemplateResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    private $triggerLegacyFormatOnce = [];
+
     public function __construct(private readonly LinkFactoryInterface $linkFactory, private readonly PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
     }
@@ -96,6 +98,15 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         $uriTemplate = $operation->getUriTemplate() ?? sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
         $uriVariables = $operation->getUriVariables() ?? [];
 
+        if (str_ends_with($uriTemplate, '{._format}') || ($legacyFormat = str_ends_with($uriTemplate, '.{_format}'))) {
+            $uriTemplate = substr($uriTemplate, 0, -10);
+        }
+
+        if ($legacyFormat && ($this->triggerLegacyFormatOnce[$operation->getClass()] ?? true)) {
+            $this->triggerLegacyFormatOnce[$operation->getClass()] = false;
+            trigger_deprecation('api-platform/core', '3.0', sprintf('The special Symfony parameter ".{_format}" in your URI Template is deprecated, use an RFC6570 variable "{._format}" on the class "%s" instead. We will only use the RFC6570 compatible variable in 4.0.', $operation->getClass()));
+        }
+
         if ($parameters = array_keys($uriVariables)) {
             foreach ($parameters as $parameterName) {
                 $part = sprintf('/{%s}', $parameterName);
@@ -105,7 +116,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             }
         }
 
-        return sprintf('%s{._format}', $uriTemplate);
+        return sprintf('%s%s', $uriTemplate, $legacyFormat ? '.{_format}' : '{._format}');
     }
 
     private function configureUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation
@@ -144,7 +155,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         }
         $operation = $operation->withUriVariables($uriVariables);
 
-        if (str_ends_with($uriTemplate, '{._format}')) {
+        if (str_ends_with($uriTemplate, '{._format}') || str_ends_with($uriTemplate, '.{_format}')) {
             $uriTemplate = substr($uriTemplate, 0, -10);
         }
 
