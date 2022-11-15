@@ -83,6 +83,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         }
 
+        if (($operation = $context['operation'] ?? null) && method_exists($operation, 'getItemUriTemplate')) {
+            $context['item_uri_template'] = $operation->getItemUriTemplate();
+        }
+
         $context = $this->initContext($resourceClass, $context);
         $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         $context['iri'] = $iri;

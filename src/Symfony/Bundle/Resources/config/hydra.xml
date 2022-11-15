@@ -9,7 +9,7 @@
             <argument type="service" id="api_platform.hydra.json_schema.schema_factory.inner" />
         </service>
         <service id="api_platform.hydra.normalizer.documentation" class="ApiPlatform\Hydra\Serializer\DocumentationNormalizer" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
@@ -39,7 +39,7 @@
         </service>
 
         <service id="api_platform.hydra.normalizer.entrypoint" class="ApiPlatform\Hydra\Serializer\EntrypointNormalizer" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.router" />
 
@@ -57,7 +57,9 @@
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="null" />
+            <argument>null</argument>
+            <argument type="collection"/> <!-- default context -->
+
 
             <!-- Run after api_platform.jsonld.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->
             <tag name="serializer.normalizer" priority="-985" />
@@ -67,13 +69,13 @@
             <argument type="service" id="api_platform.hydra.normalizer.partial_collection_view.inner" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.property_accessor" />
         </service>
 
         <service id="api_platform.hydra.normalizer.collection_filters" class="ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
             <argument type="service" id="api_platform.hydra.normalizer.collection_filters.inner" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.filter_locator" />
         </service>
