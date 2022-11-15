@@ -87,6 +87,7 @@ Feature: Authorization checking
     And the JSON node "ownerOnlyProperty" should exist
     And the JSON node "ownerOnlyProperty" should not be null
 
+  @!mongodb
   Scenario: An admin can create a secured resource with properties depending on themselves
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
@@ -100,6 +101,7 @@ Feature: Authorization checking
     """
     Then the response status code should be 201
 
+  @!mongodb
   Scenario: A user cannot patch a secured property if not granted
     When I add "Content-Type" header equal to "application/merge-patch+json"
     And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
