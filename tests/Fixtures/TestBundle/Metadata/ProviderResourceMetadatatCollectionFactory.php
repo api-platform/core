@@ -18,12 +18,14 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ContainNonResource as ContainNonResourceDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5094Relation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface as ResourceInterfaceDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\SerializableResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\TaxonInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5094RelationProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider;
@@ -61,6 +63,10 @@ class ProviderResourceMetadatatCollectionFactory implements ResourceMetadataColl
 
         if (Taxon::class === $resourceClass || TaxonDocument::class === $resourceClass || TaxonInterface::class === $resourceClass) {
             return $this->setProvider($resourceMetadataCollection, TaxonItemProvider::class);
+        }
+
+        if (Issue5094Relation::class === $resourceClass) {
+            return $this->setProvider($resourceMetadataCollection, Issue5094RelationProvider::class);
         }
 
         return $resourceMetadataCollection;

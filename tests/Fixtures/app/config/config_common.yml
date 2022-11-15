@@ -107,6 +107,12 @@ services:
         tags:
             - { name: 'api_platform.state_provider' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5094RelationProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5094RelationProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider'
         public: false
