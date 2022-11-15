@@ -97,6 +97,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     {
         $uriTemplate = $operation->getUriTemplate() ?? sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
         $uriVariables = $operation->getUriVariables() ?? [];
+        $legacyFormat = null;
 
         if (str_ends_with($uriTemplate, '{._format}') || ($legacyFormat = str_ends_with($uriTemplate, '.{_format}'))) {
             $uriTemplate = substr($uriTemplate, 0, -10);
