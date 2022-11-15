@@ -45,12 +45,13 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (!\is_array($data)) {
-            throw new UnexpectedValueException('Expected data to be an array');
-        }
 
         if (isset($context['api_sub_level'])) {
             return $data;
+        }
+
+        if (!\is_array($data)) {
+            throw new UnexpectedValueException('Expected data to be an array');
         }
 
         $currentPage = $lastPage = $itemsPerPage = $pageTotalItems = null;

@@ -19,6 +19,7 @@ use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -58,12 +59,17 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (!\is_array($data)) {
-            throw new UnexpectedValueException('Expected data to be an array');
+        if (($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && $object instanceof \ArrayObject && !\count($object)) {
+            return $object;
         }
+
+        $data = $this->collectionNormalizer->normalize($object, $format, $context);
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $data;
+        }
+
+        if (!\is_array($data)) {
+            throw new UnexpectedValueException('Expected data to be an array');
         }
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);

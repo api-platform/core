@@ -52,10 +52,39 @@ class IdentifiersExtractorTest extends TestCase
         $operation = $this->prophesize(HttpOperation::class);
         $item = new Dummy();
         $resourceClass = Dummy::class;
+        $operation->getClass()->willReturn(null);
 
         $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
         $operation->getUriVariables()->willReturn([]);
+
+        $this->assertEquals([], $identifiersExtractor->getIdentifiersFromItem($item, $operation->reveal()));
+    }
+
+    public function testGetIdentifiersFromItemWithOperation(): void
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $resourceClassResolver = $resourceClassResolverProphecy->reveal();
+
+        $identifiersExtractor = new IdentifiersExtractor(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolver,
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal()
+        );
+
+        $operation = $this->prophesize(HttpOperation::class);
+        $item = new Dummy();
+        $resourceClass = Dummy::class;
+        $operation->getClass()->willReturn($resourceClass);
+        $operation->getUriVariables()->willReturn([]);
+
+        $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass($item)->shouldNotBeCalled();
 
         $this->assertEquals([], $identifiersExtractor->getIdentifiersFromItem($item, $operation->reveal()));
     }

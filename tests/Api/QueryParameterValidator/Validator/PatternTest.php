@@ -30,6 +30,9 @@ class PatternTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testFilterWithEmptyValue(): void
     {
         $filter = new Pattern();
@@ -51,6 +54,30 @@ class PatternTest extends TestCase
         );
     }
 
+    public function testFilterWithEmptyValueOpenApi(): void
+    {
+        $filter = new Pattern();
+
+        $explicitFilterDefinition = [
+            'openapi' => [
+                'pattern' => '/foo/',
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => ''])
+        );
+
+        $weirdParameter = new \stdClass();
+        $weirdParameter->foo = 'non string value should not exists';
+        $this->assertEmpty(
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => $weirdParameter])
+        );
+    }
+
+    /**
+     * @group legacy
+     */
     public function testFilterWithZeroAsParameter(): void
     {
         $filter = new Pattern();
@@ -67,6 +94,25 @@ class PatternTest extends TestCase
         );
     }
 
+    public function testFilterWithZeroAsParameterOpenApi(): void
+    {
+        $filter = new Pattern();
+
+        $explicitFilterDefinition = [
+            'openapi' => [
+                'pattern' => '/foo/',
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must match pattern /foo/'],
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => '0'])
+        );
+    }
+
+    /**
+     * @group legacy
+     */
     public function testFilterWithNonMatchingValue(): void
     {
         $filter = new Pattern();
@@ -83,12 +129,46 @@ class PatternTest extends TestCase
         );
     }
 
+    public function testFilterWithNonMatchingValueOpenApi(): void
+    {
+        $filter = new Pattern();
+
+        $explicitFilterDefinition = [
+            'openapi' => [
+                'pattern' => '/foo/',
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must match pattern /foo/'],
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => 'bar'])
+        );
+    }
+
+    /**
+     * @group legacy
+     */
     public function testFilterWithNonchingValue(): void
     {
         $filter = new Pattern();
 
         $explicitFilterDefinition = [
             'swagger' => [
+                'pattern' => '/foo \d+/',
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => 'this is a foo '.random_int(0, 10).' and it should match'])
+        );
+    }
+
+    public function testFilterWithNonchingValueOpenApi(): void
+    {
+        $filter = new Pattern();
+
+        $explicitFilterDefinition = [
+            'openapi' => [
                 'pattern' => '/foo \d+/',
             ],
         ];

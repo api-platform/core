@@ -16,10 +16,8 @@ namespace ApiPlatform\GraphQl\Type;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Error\SyntaxError;
@@ -144,25 +142,20 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         $operationName = $rootOperation->getName();
-        $isCollection = $rootOperation instanceof CollectionOperationInterface || 'collection_query' === $operationName;
+        $isCollection = $this->typeBuilder->isCollection($type);
 
-        // We're retrieving the type of a property which is a relation to the rootResource
-        if ($resourceClass !== $rootResource && $property && $rootOperation instanceof Query) {
-            $isCollection = $this->typeBuilder->isCollection($type);
+        // We're retrieving the type of a property which is a relation to the root resource.
+        if ($resourceClass !== $rootResource && $rootOperation instanceof Query) {
             $operationName = $isCollection ? 'collection_query' : 'item_query';
         }
 
         try {
             $operation = $resourceMetadataCollection->getOperation($operationName);
-
-            if (!$operation instanceof Operation) {
-                throw new OperationNotFoundException();
-            }
         } catch (OperationNotFoundException) {
-            /** @var Operation $operation */
-            $operation = ($isCollection ? new QueryCollection() : new Query())
-                ->withResource($resourceMetadataCollection[0])
-                ->withName($operationName);
+            $operation = $resourceMetadataCollection->getOperation($isCollection ? 'collection_query' : 'item_query');
+        }
+        if (!$operation instanceof Operation) {
+            throw new OperationNotFoundException();
         }
 
         return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadataCollection, $operation, $input, false, $depth);

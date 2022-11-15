@@ -547,4 +547,3 @@ Feature: Relations support
       "hydra:totalItems": 1
     }
     """
-

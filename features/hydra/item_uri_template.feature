@@ -129,3 +129,33 @@ Feature: Exposing a collection of objects should use the specified operation to 
       }
     }
     """
+
+  Scenario: Get a collection referencing another resource for its IRI
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "GET" request to "/item_referenced_in_collection"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context":"/contexts/CollectionReferencingItem",
+      "@id":"/item_referenced_in_collection",
+      "@type":"hydra:Collection",
+      "hydra:member":[
+        {
+          "@id":"/item_referenced_in_collection/a",
+          "@type":"CollectionReferencingItem",
+          "id":"a",
+          "name":"hello"
+        },
+        {
+          "@id":"/item_referenced_in_collection/b",
+          "@type":"CollectionReferencingItem",
+          "id":"b",
+          "name":"you"
+        }
+      ],
+      "hydra:totalItems":2
+    }
+    """

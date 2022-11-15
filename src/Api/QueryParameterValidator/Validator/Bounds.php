@@ -15,6 +15,8 @@ namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
 final class Bounds implements ValidatorInterface
 {
+    use CheckFilterDeprecationsTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -25,13 +27,15 @@ final class Bounds implements ValidatorInterface
             return [];
         }
 
-        $maximum = $filterDescription['swagger']['maximum'] ?? null;
-        $minimum = $filterDescription['swagger']['minimum'] ?? null;
+        $this->checkFilterDeprecations($filterDescription);
+
+        $maximum = $filterDescription['openapi']['maximum'] ?? $filterDescription['swagger']['maximum'] ?? null;
+        $minimum = $filterDescription['openapi']['minimum'] ?? $filterDescription['swagger']['minimum'] ?? null;
 
         $errorList = [];
 
         if (null !== $maximum) {
-            if (($filterDescription['swagger']['exclusiveMaximum'] ?? false) && $value >= $maximum) {
+            if (($filterDescription['openapi']['exclusiveMaximum'] ?? $filterDescription['swagger']['exclusiveMaximum'] ?? false) && $value >= $maximum) {
                 $errorList[] = sprintf('Query parameter "%s" must be less than %s', $name, $maximum);
             } elseif ($value > $maximum) {
                 $errorList[] = sprintf('Query parameter "%s" must be less than or equal to %s', $name, $maximum);
@@ -39,7 +43,7 @@ final class Bounds implements ValidatorInterface
         }
 
         if (null !== $minimum) {
-            if (($filterDescription['swagger']['exclusiveMinimum'] ?? false) && $value <= $minimum) {
+            if (($filterDescription['openapi']['exclusiveMinimum'] ?? $filterDescription['swagger']['exclusiveMinimum'] ?? false) && $value <= $minimum) {
                 $errorList[] = sprintf('Query parameter "%s" must be greater than %s', $name, $minimum);
             } elseif ($value < $minimum) {
                 $errorList[] = sprintf('Query parameter "%s" must be greater than or equal to %s', $name, $minimum);

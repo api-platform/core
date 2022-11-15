@@ -24,6 +24,8 @@ use ApiPlatform\Metadata\Operation;
  */
 final class ResourceMetadataCollection extends \ArrayObject
 {
+    private const GRAPHQL_PREFIX = 'g_';
+    private const HTTP_PREFIX = 'h_';
     private array $operationCache = [];
 
     public function __construct(private readonly string $resourceClass, array $input = [])
@@ -34,12 +36,12 @@ final class ResourceMetadataCollection extends \ArrayObject
     public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
     {
         $operationName ??= '';
-        if (isset($this->operationCache[$operationName])) {
-            return $this->operationCache[$operationName];
+        if (isset($this->operationCache[self::HTTP_PREFIX.$operationName])) {
+            return $this->operationCache[self::HTTP_PREFIX.$operationName];
         }
 
-        if (isset($this->operationCache['graphql_'.$operationName])) {
-            return $this->operationCache['graphql_'.$operationName];
+        if (isset($this->operationCache[self::GRAPHQL_PREFIX.$operationName])) {
+            return $this->operationCache[self::GRAPHQL_PREFIX.$operationName];
         }
 
         $it = $this->getIterator();
@@ -51,27 +53,29 @@ final class ResourceMetadataCollection extends \ArrayObject
 
             foreach ($metadata->getOperations() ?? [] as $name => $operation) {
                 $isCollection = $operation instanceof CollectionOperationInterface;
-                if ('' === $operationName && \in_array($operation->getMethod() ?? HttpOperation::METHOD_GET, [HttpOperation::METHOD_GET, HttpOperation::METHOD_OPTIONS, HttpOperation::METHOD_HEAD], true) && ($forceCollection ? $isCollection : !$isCollection)) {
-                    return $this->operationCache[$operationName] = $operation;
+                $method = $operation->getMethod() ?? HttpOperation::METHOD_GET;
+                $isGetOperation = HttpOperation::METHOD_GET === $method || HttpOperation::METHOD_OPTIONS === $method || HttpOperation::METHOD_HEAD === $method;
+                if ('' === $operationName && $isGetOperation && ($forceCollection ? $isCollection : !$isCollection)) {
+                    return $this->operationCache[self::HTTP_PREFIX.$operationName] = $operation;
                 }
 
                 if ($name === $operationName) {
-                    return $this->operationCache[$operationName] = $operation;
+                    return $this->operationCache[self::HTTP_PREFIX.$operationName] = $operation;
                 }
 
                 if ($operation->getUriTemplate() === $operationName) {
-                    return $this->operationCache[$operationName] = $operation;
+                    return $this->operationCache[self::HTTP_PREFIX.$operationName] = $operation;
                 }
             }
 
             foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
                 $isCollection = $operation instanceof CollectionOperationInterface;
                 if ('' === $operationName && ($forceCollection ? $isCollection : !$isCollection) && false === $httpOperation) {
-                    return $this->operationCache['graphql_'.$operationName] = $operation;
+                    return $this->operationCache[self::GRAPHQL_PREFIX.$operationName] = $operation;
                 }
 
                 if ($name === $operationName) {
-                    return $this->operationCache['graphql_'.$operationName] = $operation;
+                    return $this->operationCache[self::GRAPHQL_PREFIX.$operationName] = $operation;
                 }
             }
 

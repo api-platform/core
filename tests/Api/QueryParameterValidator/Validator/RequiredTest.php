@@ -58,6 +58,9 @@ class RequiredTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testEmptyValueNotAllowed(): void
     {
         $request = ['some_filter' => ''];
@@ -85,6 +88,36 @@ class RequiredTest extends TestCase
         );
     }
 
+    public function testEmptyValueNotAllowedOpenApi(): void
+    {
+        $request = ['some_filter' => ''];
+        $filter = new Required();
+
+        $explicitFilterDefinition = [
+            'required' => true,
+            'openapi' => [
+                'allowEmptyValue' => false,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" does not allow empty value'],
+            $filter->validate('some_filter', $explicitFilterDefinition, $request)
+        );
+
+        $implicitFilterDefinition = [
+            'required' => true,
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" does not allow empty value'],
+            $filter->validate('some_filter', $implicitFilterDefinition, $request)
+        );
+    }
+
+    /**
+     * @group legacy
+     */
     public function testEmptyValueAllowed(): void
     {
         $request = ['some_filter' => ''];
@@ -93,6 +126,23 @@ class RequiredTest extends TestCase
         $explicitFilterDefinition = [
             'required' => true,
             'swagger' => [
+                'allowEmptyValue' => true,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $explicitFilterDefinition, $request)
+        );
+    }
+
+    public function testEmptyValueAllowedOpenApi(): void
+    {
+        $request = ['some_filter' => ''];
+        $filter = new Required();
+
+        $explicitFilterDefinition = [
+            'required' => true,
+            'openapi' => [
                 'allowEmptyValue' => true,
             ],
         ];

@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\NotExposed;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -53,7 +54,7 @@ class IriConverterTest extends TestCase
         $routerProphecy->generate($operationName, ['id' => 1], UrlGeneratorInterface::ABS_PATH)->shouldBeCalled()->willReturn('/dummies/1');
 
         $identifiersExtractyorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractyorProphecy->getIdentifiersFromItem($item, $operation)->shouldBeCalled()->willReturn(['id' => 1]);
+        $identifiersExtractyorProphecy->getIdentifiersFromItem($item, $operation, Argument::any())->shouldBeCalled()->willReturn(['id' => 1]);
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldNotBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
@@ -76,7 +77,7 @@ class IriConverterTest extends TestCase
         $routerProphecy->generate($operationName, ['id' => 1], UrlGeneratorInterface::ABS_PATH)->shouldBeCalled()->willReturn('/dummies/1');
 
         $identifiersExtractyorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractyorProphecy->getIdentifiersFromItem($item, $operation)->shouldBeCalled()->willReturn(['id' => 1]);
+        $identifiersExtractyorProphecy->getIdentifiersFromItem($item, $operation, Argument::any())->shouldBeCalled()->willReturn(['id' => 1]);
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
@@ -99,7 +100,7 @@ class IriConverterTest extends TestCase
         $routerProphecy->generate($operationName, ['id' => 1], UrlGeneratorInterface::ABS_URL)->shouldBeCalled()->willReturn('/dummies/1');
 
         $identifiersExtractyorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractyorProphecy->getIdentifiersFromItem($item, $operation)->shouldBeCalled()->willReturn(['id' => 1]);
+        $identifiersExtractyorProphecy->getIdentifiersFromItem($item, $operation, Argument::any())->shouldBeCalled()->willReturn(['id' => 1]);
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldNotBeCalled();
@@ -121,7 +122,7 @@ class IriConverterTest extends TestCase
         ]));
 
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractorProphecy->getIdentifiersFromItem($item, Argument::type(HttpOperation::class))->willThrow(RuntimeException::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($item, Argument::type(HttpOperation::class), Argument::any())->willThrow(RuntimeException::class);
 
         $iriConverter = $this->getIriConverter(null, null, $identifiersExtractorProphecy, $resourceMetadataCollectionFactoryProphecy);
         $iriConverter->getIriFromResource($item);
@@ -140,7 +141,7 @@ class IriConverterTest extends TestCase
         ]));
 
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractorProphecy->getIdentifiersFromItem($item, Argument::type(HttpOperation::class))->willThrow(InvalidArgumentException::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($item, Argument::type(HttpOperation::class), Argument::any())->willThrow(InvalidArgumentException::class);
 
         $iriConverter = $this->getIriConverter(null, null, $identifiersExtractorProphecy, $resourceMetadataCollectionFactoryProphecy);
         $iriConverter->getIriFromResource($item);
@@ -205,6 +206,22 @@ class IriConverterTest extends TestCase
 
         $iriConverter = $this->getIriConverter(null, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy);
         $this->assertSame('/dummies/1/foo', $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_URL, $operation, ['uri_variables' => ['id' => 1]]));
+    }
+
+    public function testGetIriFromResourceClassWithItemUriTemplate(): void
+    {
+        $operation = new GetCollection(name: 'operation_name', class: Dummy::class, itemUriTemplate: '/dummies/another/{id}{._format}');
+        $anotherOperation = new Get(name: 'another_name', uriTemplate: '/dummies/another/{id}{._format}');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('another_name', ['id' => 1], UrlGeneratorInterface::ABS_URL)->shouldBeCalled()->willReturn('/dummies/another/1');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+
+        $operationMetadataFactoryProphecy = $this->prophesize(OperationMetadataFactoryInterface::class);
+        $operationMetadataFactoryProphecy->create('/dummies/another/{id}{._format}')->willReturn($anotherOperation);
+        $iriConverter = $this->getIriConverter(null, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy, null, null, $operationMetadataFactoryProphecy);
+        $this->assertSame('/dummies/another/1', $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_URL, $operation, ['uri_variables' => ['id' => 1], 'item_uri_template' => '/dummies/another/{id}{._format}']));
     }
 
     public function testGetItemFromCollectionIri(): void
@@ -280,7 +297,7 @@ class IriConverterTest extends TestCase
         return $resourceClassResolver->reveal();
     }
 
-    private function getIriConverter(?ObjectProphecy $stateProviderProphecy = null, ?ObjectProphecy $routerProphecy = null, ?ObjectProphecy $identifiersExtractorProphecy = null, $resourceMetadataCollectionFactoryProphecy = null, $uriVariablesConverter = null, $decorated = null): IriConverter
+    private function getIriConverter(?ObjectProphecy $stateProviderProphecy = null, ?ObjectProphecy $routerProphecy = null, ?ObjectProphecy $identifiersExtractorProphecy = null, $resourceMetadataCollectionFactoryProphecy = null, $uriVariablesConverter = null, $decorated = null, ?ObjectProphecy $operationMetadataFactory = null): IriConverter
     {
         if (!$stateProviderProphecy) {
             $stateProviderProphecy = $this->prophesize(ProviderInterface::class);
@@ -298,6 +315,6 @@ class IriConverterTest extends TestCase
             $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         }
 
-        return new IriConverter($stateProviderProphecy->reveal(), $routerProphecy->reveal(), $identifiersExtractorProphecy->reveal(), $this->getResourceClassResolver(), $resourceMetadataCollectionFactoryProphecy->reveal(), $uriVariablesConverter, $decorated);
+        return new IriConverter($stateProviderProphecy->reveal(), $routerProphecy->reveal(), $identifiersExtractorProphecy->reveal(), $this->getResourceClassResolver(), $resourceMetadataCollectionFactoryProphecy->reveal(), $uriVariablesConverter, $decorated, $operationMetadataFactory?->reveal());
     }
 }

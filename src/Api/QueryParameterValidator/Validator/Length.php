@@ -15,6 +15,8 @@ namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
 final class Length implements ValidatorInterface
 {
+    use CheckFilterDeprecationsTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -25,8 +27,10 @@ final class Length implements ValidatorInterface
             return [];
         }
 
-        $maxLength = $filterDescription['swagger']['maxLength'] ?? null;
-        $minLength = $filterDescription['swagger']['minLength'] ?? null;
+        $this->checkFilterDeprecations($filterDescription);
+
+        $maxLength = $filterDescription['openapi']['maxLength'] ?? $filterDescription['swagger']['maxLength'] ?? null;
+        $minLength = $filterDescription['openapi']['minLength'] ?? $filterDescription['swagger']['minLength'] ?? null;
 
         $errorList = [];
 

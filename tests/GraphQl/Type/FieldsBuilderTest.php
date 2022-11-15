@@ -58,7 +58,6 @@ class FieldsBuilderTest extends TestCase
     private ObjectProphecy $propertyNameCollectionFactoryProphecy;
     private ObjectProphecy $propertyMetadataFactoryProphecy;
     private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
-    private ObjectProphecy $graphQlNestedOperationResourceMetadataFactoryProphecy;
     private ObjectProphecy $typesContainerProphecy;
     private ObjectProphecy $typeBuilderProphecy;
     private ObjectProphecy $typeConverterProphecy;
@@ -87,13 +86,12 @@ class FieldsBuilderTest extends TestCase
         $this->itemSubscriptionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $this->filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $this->resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $this->graphQlNestedOperationResourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->fieldsBuilder = $this->buildFieldsBuilder();
     }
 
     private function buildFieldsBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): FieldsBuilder
     {
-        return new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->resourceClassResolverProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->collectionResolverFactoryProphecy->reveal(), $this->itemMutationResolverFactoryProphecy->reveal(), $this->itemSubscriptionResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination(), $advancedNameConverter ?? new CustomConverter(), '__', $this->graphQlNestedOperationResourceMetadataFactoryProphecy->reveal());
+        return new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->resourceClassResolverProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->collectionResolverFactoryProphecy->reveal(), $this->itemMutationResolverFactoryProphecy->reveal(), $this->itemSubscriptionResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination(), $advancedNameConverter ?? new CustomConverter(), '__');
     }
 
     public function testGetNodeQueryFields(): void
@@ -140,6 +138,7 @@ class FieldsBuilderTest extends TestCase
     {
         return [
             'no resource field configuration' => ['resourceClass', (new Query())->withClass('resourceClass')->withName('action'), [], null, null, []],
+            'nested item query' => ['resourceClass', (new Query())->withNested(true)->withClass('resourceClass')->withName('action')->withShortName('ShortName'), [], new ObjectType(['name' => 'item']), function (): void {}, []],
             'nominal standard type case with deprecation reason and description' => ['resourceClass', (new Query())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withDeprecationReason('not useful')->withDescription('Custom description.'), [], GraphQLType::string(), null,
                 [
                     'actionShortName' => [
@@ -233,6 +232,7 @@ class FieldsBuilderTest extends TestCase
     {
         return [
             'no resource field configuration' => ['resourceClass', (new QueryCollection())->withClass('resourceClass')->withName('action'), [], null, null, []],
+            'nested collection query' => ['resourceClass', (new QueryCollection())->withNested(true)->withClass('resourceClass')->withName('action')->withShortName('ShortName'), [], GraphQLType::listOf(new ObjectType(['name' => 'collection'])), function (): void {}, []],
             'nominal collection case with deprecation reason and description' => ['resourceClass', (new QueryCollection())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withDeprecationReason('not useful')->withDescription('Custom description.'), [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function (): void {
             },
                 [
@@ -506,14 +506,6 @@ class FieldsBuilderTest extends TestCase
                 $this->itemResolverFactoryProphecy->__invoke('nestedResourceClass', $resourceClass, $nestedResourceQueryOperation)->willReturn(static function (): void {
                 });
             }
-            if ('propertyNestedResourceNoQuery' === $propertyName) {
-                $nestedResourceQueryOperation = new Query();
-                $this->resourceMetadataCollectionFactoryProphecy->create('nestedResourceNoQueryClass')->willReturn(new ResourceMetadataCollection('nestedResourceNoQueryClass', [(new ApiResource())->withDescription('A description.')->withGraphQlOperations([])]));
-                $this->graphQlNestedOperationResourceMetadataFactoryProphecy->create('nestedResourceNoQueryClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('nestedResourceNoQueryClass', [(new ApiResource())->withGraphQlOperations(['item_query' => $nestedResourceQueryOperation])]));
-                $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'nestedResourceNoQueryClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType']));
-                $this->itemResolverFactoryProphecy->__invoke('nestedResourceNoQueryClass', $resourceClass, $nestedResourceQueryOperation)->willReturn(static function (): void {
-                });
-            }
         }
         $this->typesContainerProphecy->has('NotRegisteredType')->willReturn(false);
         $this->typesContainerProphecy->all()->willReturn([]);
@@ -623,7 +615,6 @@ class FieldsBuilderTest extends TestCase
             'query with nested resources' => ['resourceClass', (new Query())->withClass('resourceClass'),
                 [
                     'propertyNestedResource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'nestedResourceClass')])->withReadable(true)->withWritable(true),
-                    'propertyNestedResourceNoQuery' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'nestedResourceNoQueryClass')])->withReadable(true)->withWritable(true),
                 ],
                 false, 0, null,
                 [
@@ -631,14 +622,6 @@ class FieldsBuilderTest extends TestCase
                         'type' => GraphQLType::nonNull(GraphQLType::id()),
                     ],
                     'propertyNestedResource' => [
-                        'type' => GraphQLType::nonNull(new ObjectType(['name' => 'objectType'])),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => static function (): void {
-                        },
-                        'deprecationReason' => null,
-                    ],
-                    'propertyNestedResourceNoQuery' => [
                         'type' => GraphQLType::nonNull(new ObjectType(['name' => 'objectType'])),
                         'description' => null,
                         'args' => [],

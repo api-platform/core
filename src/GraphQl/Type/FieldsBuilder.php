@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
@@ -45,7 +44,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class FieldsBuilder implements FieldsBuilderInterface
 {
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, private readonly TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ResolverFactoryInterface $collectionResolverFactory, private readonly ResolverFactoryInterface $itemMutationResolverFactory, private readonly ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator, private readonly ?ResourceMetadataCollectionFactoryInterface $graphQlNestedOperationResourceMetadataFactory = null)
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, private readonly TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ResolverFactoryInterface $collectionResolverFactory, private readonly ResolverFactoryInterface $itemMutationResolverFactory, private readonly ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator)
     {
     }
 
@@ -68,6 +67,10 @@ final class FieldsBuilder implements FieldsBuilderInterface
      */
     public function getItemQueryFields(string $resourceClass, Operation $operation, array $configuration): array
     {
+        if ($operation instanceof Query && $operation->getNested()) {
+            return [];
+        }
+
         $fieldName = lcfirst('item_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $operation)) {
@@ -85,6 +88,10 @@ final class FieldsBuilder implements FieldsBuilderInterface
      */
     public function getCollectionQueryFields(string $resourceClass, Operation $operation, array $configuration): array
     {
+        if ($operation instanceof Query && $operation->getNested()) {
+            return [];
+        }
+
         $fieldName = lcfirst('collection_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $operation)) {
@@ -257,13 +264,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             $resourceOperation = $rootOperation;
             if ($resourceClass && $rootOperation->getClass() && $this->resourceClassResolver->isResourceClass($resourceClass) && $rootOperation->getClass() !== $resourceClass) {
                 $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-                try {
-                    $resourceOperation = $resourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
-                } catch (OperationNotFoundException) {
-                    // If there is no query operation for a nested resource we force one to exist
-                    $nestedResourceMetadataCollection = $this->graphQlNestedOperationResourceMetadataFactory->create($resourceClass);
-                    $resourceOperation = $nestedResourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
-                }
+                $resourceOperation = $resourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
             }
 
             if (!$resourceOperation instanceof Operation) {

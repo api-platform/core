@@ -40,6 +40,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Base item normalizer.
@@ -54,6 +55,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     protected PropertyAccessorInterface $propertyAccessor;
     protected array $localCache = [];
+    protected array $localFactoryOptionsCache = [];
 
     public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
@@ -205,13 +207,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw new UnexpectedValueException(sprintf('Expected IRI or document for resource "%s", "%s" given.', $resourceClass, \gettype($data)));
         }
 
+        $previousObject = isset($objectToPopulate) ? clone $objectToPopulate : null;
+
         $object = parent::denormalize($data, $class, $format, $context);
 
         if (!$this->resourceClassResolver->isResourceClass($class)) {
             return $object;
         }
 
-        $previousObject = isset($objectToPopulate) ? clone $objectToPopulate : null;
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
         foreach (array_keys($data) as $attribute) {
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
@@ -504,6 +507,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function getFactoryOptions(array $context): array
     {
+        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? '').($context['api_normalize'] ?? '');
+        if ($operationCacheKey && isset($this->localFactoryOptionsCache[$operationCacheKey])) {
+            return $this->localFactoryOptionsCache[$operationCacheKey];
+        }
+
         $options = [];
 
         if (isset($context[self::GROUPS])) {
@@ -511,16 +519,23 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $options['serializer_groups'] = (array) $context[self::GROUPS];
         }
 
-        if (isset($context['resource_class']) && $this->resourceClassResolver->isResourceClass($context['resource_class']) && $this->resourceMetadataCollectionFactory) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
-            // This is a hot spot, we should avoid calling this here but in many cases we can't
-            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
-            $options['normalization_groups'] = $operation->getNormalizationContext()['groups'] ?? null;
-            $options['denormalization_groups'] = $operation->getDenormalizationContext()['groups'] ?? null;
-            $options['operation_name'] = $operation->getName();
+        // This is a hot spot
+        if (isset($context['resource_class'])) {
+            $operation = $context['operation'] ?? null;
+
+            if (!$operation && $this->resourceMetadataCollectionFactory && $this->resourceClassResolver->isResourceClass($context['resource_class'])) {
+                $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
+                $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
+            }
+
+            if ($operation) {
+                $options['normalization_groups'] = $operation->getNormalizationContext()['groups'] ?? null;
+                $options['denormalization_groups'] = $operation->getDenormalizationContext()['groups'] ?? null;
+                $options['operation_name'] = $operation->getName();
+            }
         }
 
-        return $options;
+        return $this->localFactoryOptionsCache[$operationCacheKey] = $options;
     }
 
     /**

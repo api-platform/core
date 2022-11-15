@@ -18,7 +18,6 @@ use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\JsonLdContextTrait;
-use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\State\Pagination\PaginatorInterface;
@@ -27,6 +26,7 @@ use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * This normalizer handles collections.
@@ -49,6 +49,10 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
+
+        if ($this->resourceMetadataCollectionFactory) {
+            trigger_deprecation('api-platform/core', '3.0', sprintf('Injecting "%s" within "%s" is not needed anymore and this dependency will be removed in 4.0.', ResourceMetadataCollectionFactoryInterface::class, self::class));
+        }
     }
 
     /**
@@ -56,7 +60,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && is_iterable($data) && isset($context['resource_class']) && !isset($context['api_sub_level']);
+        return self::FORMAT === $format && is_iterable($data);
     }
 
     /**
@@ -64,8 +68,12 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      *
      * @param iterable $object
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
+        if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
+            return $this->normalizeRawCollection($object, $format, $context);
+        }
+
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $context = $this->initContext($resourceClass, $context);
         $context['api_collection_sub_level'] = true;
@@ -75,11 +83,11 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data['hydra:member'] = [];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
 
-        if ($this->resourceMetadataCollectionFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
-            $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operation->getItemUriTemplate());
-        } else {
-            unset($context['operation']);
+        if (($operation = $context['operation'] ?? null) && method_exists($operation, 'getItemUriTemplate')) {
+            $context['item_uri_template'] = $operation->getItemUriTemplate();
         }
+
+        unset($context['operation']);
         unset($context['operation_name'], $context['uri_variables']);
 
         foreach ($object as $obj) {
@@ -103,6 +111,23 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
     public function hasCacheableSupportsMethod(): bool
     {
-        return false;
+        return true;
+    }
+
+    /**
+     * Normalizes a raw collection (not API resources).
+     */
+    protected function normalizeRawCollection(iterable $object, string $format = null, array $context = []): array|\ArrayObject
+    {
+        if (\is_array($object) && !$object && ($context[Serializer::EMPTY_ARRAY_AS_OBJECT] ?? false)) {
+            return new \ArrayObject();
+        }
+
+        $data = [];
+        foreach ($object as $index => $obj) {
+            $data[$index] = $this->normalizer->normalize($obj, $format, $context);
+        }
+
+        return $data;
     }
 }

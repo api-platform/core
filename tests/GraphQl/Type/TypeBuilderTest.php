@@ -75,7 +75,9 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectType(): void
     {
-        $resourceMetadataCollection = new ResourceMetadataCollection('resourceClass', []);
+        $resourceMetadataCollection = new ResourceMetadataCollection('resourceClass', [
+            (new ApiResource())->withGraphQlOperations(['collection_query' => new QueryCollection()]),
+        ]);
         $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -99,7 +101,9 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeOutputClass(): void
     {
-        $resourceMetadata = new ResourceMetadataCollection('resourceClass', []);
+        $resourceMetadataCollection = new ResourceMetadataCollection('resourceClass', [
+            (new ApiResource())->withGraphQlOperations(['collection_query' => new QueryCollection()]),
+        ]);
         $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -108,7 +112,7 @@ class TypeBuilderTest extends TestCase
         /** @var Operation $operation */
         $operation = (new Query())->withShortName('shortName')->withDescription('description')->withOutput(['class' => 'outputClass']);
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadataCollection, $operation, false);
         $this->assertSame('shortName', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -249,8 +253,8 @@ class TypeBuilderTest extends TestCase
         $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
             'create' => (new Mutation())->withName('create')->withShortName('shortName')->withDescription('description'),
             'item_query' => (new Query())->withShortName('shortName')->withDescription('description'),
-        ]),
-        ]);
+            'collection_query' => new QueryCollection(),
+        ])]);
         $this->typesContainerProphecy->has('createShortNamePayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('createShortNamePayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -351,8 +355,8 @@ class TypeBuilderTest extends TestCase
         $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
             'update' => (new Subscription())->withName('update')->withShortName('shortName')->withDescription('description')->withMercure(true),
             'item_query' => (new Query())->withShortName('shortName')->withDescription('description'),
-        ]),
-        ]);
+            'collection_query' => new QueryCollection(),
+        ])]);
         $this->typesContainerProphecy->has('updateShortNameSubscriptionPayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('updateShortNameSubscriptionPayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
