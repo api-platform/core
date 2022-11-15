@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 
-#[GetCollection('/item_referenced_in_collection{._format}', itemUriTemplate: '/item_referenced_in_collection/{id}{._format}', provider: [CollectionReferencingItem::class, 'getData'], shortName: 'MyResourceWithoutGroups')]
+#[GetCollection('/item_referenced_in_collection{._format}', itemUriTemplate: '/item_referenced_in_collection/{id}{._format}', provider: [CollectionReferencingItem::class, 'getData'])]
 class CollectionReferencingItem
 {
     public function __construct(public string $id, public string $name)

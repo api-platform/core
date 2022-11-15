@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\Get;
 
-#[Get('/item_referenced_in_collection/{id}{._format}', shortName: 'MyResourceWithoutGroups')]
+#[Get('/item_referenced_in_collection/{id}{._format}')]
 class ItemReferencedInCollection
 {
     public $id;

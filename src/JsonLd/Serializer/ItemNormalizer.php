@@ -94,10 +94,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
             unset($context['operation'], $context['operation_name']);
         }
 
-        if (($operation = $context['operation'] ?? null) && method_exists($operation, 'getItemUriTemplate')) {
-            $context['item_uri_template'] = $operation->getItemUriTemplate();
-        }
-
         if ($iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
             $context['iri'] = $iri;
             $metadata['@id'] = $iri;
@@ -112,6 +108,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         if (!isset($metadata['@type']) && $isResourceClass) {
             $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+
             $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
             if (null === $types) {
                 $types = [$operation->getShortName()];
