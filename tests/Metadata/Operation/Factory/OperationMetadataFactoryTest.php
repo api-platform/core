@@ -32,16 +32,17 @@ class OperationMetadataFactoryTest extends TestCase
 
     public function testCreate(): void
     {
+        $operation = new Get('/one', name: 'one');
         $resourceNameCollectionFactory = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceNameCollectionFactory->create()->willReturn(new ResourceNameCollection(['one']));
         $resourceMetadataCollectionFactory->create('one')->willReturn(new ResourceMetadataCollection('one', [
-            new ApiResource(operations: [new Get('/one', name: 'one')]),
+            new ApiResource(operations: [$operation]),
         ]));
 
         $operationMetadata = new OperationMetadataFactory($resourceNameCollectionFactory->reveal(), $resourceMetadataCollectionFactory->reveal());
-        $this->assertEquals(new Get('/one', name: 'one'), $operationMetadata->create('one'));
-        $this->assertEquals(new Get('/one', name: 'one'), $operationMetadata->create('/one'));
+        $this->assertEquals($operation, $operationMetadata->create('one'));
+        $this->assertEquals($operation, $operationMetadata->create('/one'));
         $this->assertNull($operationMetadata->create('none'));
     }
 }
