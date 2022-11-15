@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.7.4
+
+### Bug fixes
+
+* [706f66f6b](https://github.com/api-platform/core/commit/706f66f6b39d60f031dd610a8586c6e576827ce9) fix(metadata): allow input/output configuration values to be bool in yaml config (#5186)
+* [b3bc4d6ac](https://github.com/api-platform/core/commit/b3bc4d6ac33f1a9756cc91c86d8cc30049ed044f) fix: use legacy iri converter for legacy resources (#5172)
+
 ## v2.7.3
 
 ### Bug fixes
