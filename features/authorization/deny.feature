@@ -87,6 +87,33 @@ Feature: Authorization checking
     And the JSON node "ownerOnlyProperty" should exist
     And the JSON node "ownerOnlyProperty" should not be null
 
+  Scenario: An admin can create a secured resource with properties depending on themselves
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send a "POST" request to "/secured_dummy_with_properties_depending_on_themselves" with body:
+    """
+    {
+        "canUpdateProperty": false,
+        "property": false
+    }
+    """
+    Then the response status code should be 201
+
+  Scenario: A user cannot patch a secured property if not granted
+    When I add "Content-Type" header equal to "application/merge-patch+json"
+    And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send a "PATCH" request to "/secured_dummy_with_properties_depending_on_themselves/1" with body:
+    """
+    {
+        "canUpdateProperty": true,
+        "property": true
+    }
+    """
+    Then the response status code should be 200
+    And the JSON node "canUpdateProperty" should be true
+    And the JSON node "property" should be false
+
   Scenario: An admin can't see a secured owner-only property on objects they don't own
     When I add "Accept" header equal to "application/ld+json"
     And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
