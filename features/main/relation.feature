@@ -548,3 +548,12 @@ Feature: Relations support
     }
     """
 
+  @createSchema
+  @!mongodb
+  Scenario: Issue #5094
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/issue5094_resources" with body:
+    """
+    {"relation": "/issue5094_relations/1"}
+    """
+    Then the response status code should be 201

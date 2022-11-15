@@ -436,11 +436,11 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_collection_factory.legacy_subresource_metadata',
             'api_platform.listener.view.write.legacy',
             'api_platform.listener.request.read.legacy',
+            'api_platform.iri_converter',
         ];
 
         $aliases = [
             // v3/api.xml
-            'api_platform.iri_converter',
             'ApiPlatform\Api\IriConverterInterface',
             'api_platform.identifiers_extractor',
             'ApiPlatform\Api\IdentifiersExtractorInterface',
