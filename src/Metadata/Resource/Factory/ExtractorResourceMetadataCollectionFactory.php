@@ -26,6 +26,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * Creates a resource metadata from {@see Resource} extractors (XML, YAML).
@@ -38,12 +41,14 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
     private $extractor;
     private $decorated;
     private $defaults;
+    private $logger;
 
-    public function __construct(ResourceExtractorInterface $extractor, ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [])
+    public function __construct(ResourceExtractorInterface $extractor, ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [], LoggerInterface $logger = null)
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;
         $this->defaults = $defaults;
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
@@ -182,13 +187,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 
     private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
     {
-        foreach (($this->defaults['attributes'] ?? []) as $key => $value) {
-            [$key, $value] = $this->getKeyValue($key, $value);
-            if (null === $operation->{'get'.ucfirst($key)}()) {
-                $operation = $operation->{'with'.ucfirst($key)}($value);
-            }
-        }
-
+        // Inherit from resource defaults
         foreach (get_class_methods($resource) as $methodName) {
             if (0 !== strpos($methodName, 'get')) {
                 continue;
@@ -205,6 +204,65 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
             $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
 
+        $operation = $operation->withExtraProperties(array_merge(
+            $resource->getExtraProperties(),
+            $operation->getExtraProperties()
+        ));
+
+        // Add global defaults attributes to the operation
+        $operation = $this->addGlobalDefaults($operation);
+
+        if ($operation->getRouteName()) {
+            /** @var HttpOperation $operation */
+            $operation = $operation->withName($operation->getRouteName());
+        }
+
+        // Check for name conflict
+        if ($operation->getName() && null !== ($operations = $resource->getOperations())) {
+            if (!$operations->has($operation->getName())) {
+                return $operation;
+            }
+
+            $this->logger->warning(sprintf('The operation "%s" already exists on the resource "%s", pick a different name or leave it empty. In the meantime we will generate a unique name.', $operation->getName(), $resource->getClass()));
+            /** @var HttpOperation $operation */
+            $operation = $operation->withName('');
+        }
+
         return $operation;
+    }
+
+    private function addGlobalDefaults(HttpOperation $operation): HttpOperation
+    {
+        if (!$this->camelCaseToSnakeCaseNameConverter) {
+            $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
+        }
+
+        $extraProperties = [];
+        foreach ($this->defaults as $key => $value) {
+            $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
+            $getter = 'get'.$upperKey;
+
+            if (!method_exists($operation, $getter)) {
+                if (!isset($extraProperties[$key])) {
+                    $extraProperties[$key] = $value;
+                }
+
+                continue;
+            }
+
+            $currentValue = $operation->{$getter}();
+
+            if (\is_array($currentValue) && $currentValue) {
+                $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
+            }
+
+            if (null !== $currentValue) {
+                continue;
+            }
+
+            $operation = $operation->{'with'.$upperKey}($value);
+        }
+
+        return $operation->withExtraProperties(array_merge($extraProperties, $operation->getExtraProperties()));
     }
 }
