@@ -101,12 +101,6 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data['hydra:member'] = [];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
 
-        if ($this->resourceMetadataCollectionFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && ($itemUriTemplate = $operation->getItemUriTemplate())) {
-            $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operation->getItemUriTemplate());
-        } else {
-            unset($context['operation']);
-        }
-
         // We need to keep this operation for serialization groups for later
         if (isset($context['operation'])) {
             $context['root_operation'] = $context['operation'];
@@ -116,8 +110,12 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $context['root_operation_name'] = $context['operation_name'];
         }
 
-        // We need to unset the operation to ensure a proper IRI generation inside items
-        unset($context['operation']);
+        if ($this->resourceMetadataCollectionFactory && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && ($itemUriTemplate = $operation->getItemUriTemplate())) {
+            $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operation->getItemUriTemplate());
+        } else {
+            unset($context['operation']);
+        }
+
         unset($context['operation_name'], $context['uri_variables']);
 
         foreach ($object as $obj) {
