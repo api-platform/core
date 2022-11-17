@@ -712,7 +712,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (isset($context['resource_class']) && $this->resourceClassResolver->isResourceClass($context['resource_class']) && $this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
             // This is a hot spot, we should avoid calling this here but in many cases we can't
-            $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
+            $operation = $context['root_operation'] ?? $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($context['root_operation_name'] ?? $context['operation_name'] ?? null);
             $options['normalization_groups'] = $operation->getNormalizationContext()['groups'] ?? null;
             $options['denormalization_groups'] = $operation->getDenormalizationContext()['groups'] ?? null;
         }

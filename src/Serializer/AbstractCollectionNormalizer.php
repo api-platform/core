@@ -99,6 +99,17 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         } else {
             unset($context['operation']);
         }
+
+        // We need to keep this operation for serialization groups for later
+        if (isset($context['operation'])) {
+            $context['root_operation'] = $context['operation'];
+        }
+
+        if (isset($context['operation_name'])) {
+            $context['root_operation_name'] = $context['operation_name'];
+        }
+
+        unset($context['operation']);
         unset($context['operation_type'], $context['operation_name']);
         $itemsData = $this->getItemsData($object, $format, $context);
 
