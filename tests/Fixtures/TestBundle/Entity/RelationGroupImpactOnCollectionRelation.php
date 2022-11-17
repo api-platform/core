@@ -19,10 +19,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource]
 class RelationGroupImpactOnCollectionRelation
 {
-    public function __construct(
-        public ?int $id = null,
-        #[Groups('related')]
-        public ?string $title = null
-    ) {
+    public ?int $id;
+
+    #[Groups('related')]
+    public ?string $title;
+
+    public function __construct($id, $title)
+    {
+        $this->id = $id;
+        $this->title = $title;
     }
 }

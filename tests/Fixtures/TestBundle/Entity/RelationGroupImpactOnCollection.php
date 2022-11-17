@@ -21,19 +21,20 @@ use ApiPlatform\Metadata\Operation;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    provider: [RelationGroupImpactOnCollection::class, 'getData'],
-    operations: [
-        new GetCollection(),
-        new Get(normalizationContext: ['groups' => 'related']),
-    ]
+    provider: [RelationGroupImpactOnCollection::class, 'getData']
 )]
+#[GetCollection]
+#[Get(normalizationContext: ['groups' => 'related'])]
 class RelationGroupImpactOnCollection
 {
-    public function __construct(
-        public ?int $id = null,
-        #[Groups('related')]
-        public ?RelationGroupImpactOnCollectionRelation $related = null)
+    public ?int $id;
+    #[Groups('related')]
+    public ?RelationGroupImpactOnCollectionRelation $related;
+
+    public function __construct($id = null, $related = null)
     {
+        $this->id = $id;
+        $this->related = $related;
     }
 
     public static function getData(Operation $operation, array $uriVariables = [], array $context = []): self|array
