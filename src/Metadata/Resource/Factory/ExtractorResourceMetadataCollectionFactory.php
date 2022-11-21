@@ -173,4 +173,39 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 
         return $this->completeGraphQlOperations($resource);
     }
+
+    private function addGlobalDefaults(HttpOperation $operation): HttpOperation
+    {
+        if (!$this->camelCaseToSnakeCaseNameConverter) {
+            $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
+        }
+
+        $extraProperties = [];
+        foreach ($this->defaults as $key => $value) {
+            $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
+            $getter = 'get'.$upperKey;
+
+            if (!method_exists($operation, $getter)) {
+                if (!isset($extraProperties[$key])) {
+                    $extraProperties[$key] = $value;
+                }
+
+                continue;
+            }
+
+            $currentValue = $operation->{$getter}();
+
+            if (\is_array($currentValue) && $currentValue) {
+                $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
+            }
+
+            if (null !== $currentValue) {
+                continue;
+            }
+
+            $operation = $operation->{'with'.$upperKey}($value);
+        }
+
+        return $operation->withExtraProperties(array_merge($extraProperties, $operation->getExtraProperties()));
+    }
 }

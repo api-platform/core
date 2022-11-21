@@ -39,6 +39,7 @@ use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlResourceAdapter;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\YamlResourceAdapter;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * Ensures XML and YAML mappings are fully compatible with ApiResource.
@@ -49,6 +50,9 @@ final class ResourceMetadataCompatibilityTest extends TestCase
 {
     private const RESOURCE_CLASS = Comment::class;
     private const SHORT_NAME = 'Comment';
+    private const DEFAULTS = [
+        'route_prefix' => '/v1',
+    ];
     private const FIXTURES = [
         null,
         [
@@ -212,6 +216,10 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                                 'Lorem ipsum' => 'Dolor sit amet',
                             ],
                             'foo' => 'bar',
+                            'custom_property' => 'Lorem ipsum dolor sit amet',
+                            'another_custom_property' => [
+                                'Lorem ipsum' => 'Dolor sit amet',
+                            ],
                         ],
                     ],
                 ],
@@ -341,6 +349,10 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                             'Lorem ipsum' => 'Dolor sit amet',
                         ],
                         'foo' => 'bar',
+                        'custom_property' => 'Lorem ipsum dolor sit amet',
+                        'another_custom_property' => [
+                            'Lorem ipsum' => 'Dolor sit amet',
+                        ],
                     ],
                 ],
                 [
@@ -432,7 +444,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
 
         try {
             $extractor = new $extractorClass($adapter(self::RESOURCE_CLASS, $parameters, self::FIXTURES));
-            $factory = new ExtractorResourceMetadataCollectionFactory($extractor);
+            $factory = new ExtractorResourceMetadataCollectionFactory($extractor, null, self::DEFAULTS);
             $collection = $factory->create(self::RESOURCE_CLASS);
         } catch (\Exception $exception) {
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
@@ -603,6 +615,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
 
     private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
     {
+        // Inherit from resource defaults
         foreach (get_class_methods($resource) as $methodName) {
             if (!str_starts_with($methodName, 'get')) {
                 continue;
@@ -619,6 +632,65 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
 
+        $operation = $operation->withExtraProperties(array_merge(
+            $resource->getExtraProperties(),
+            $operation->getExtraProperties()
+        ));
+
+        // Add global defaults attributes to the operation
+        $operation = $this->addGlobalDefaults($operation);
+
+        if ($operation->getRouteName()) {
+            /** @var HttpOperation $operation */
+            $operation = $operation->withName($operation->getRouteName());
+        }
+
+        // Check for name conflict
+        if ($operation->getName() && null !== ($operations = $resource->getOperations())) {
+            if (!$operations->has($operation->getName())) {
+                return $operation;
+            }
+
+            /** @var HttpOperation $operation */
+            $operation = $operation->withName('');
+        }
+
         return $operation;
+    }
+
+    private function addGlobalDefaults(HttpOperation $operation): HttpOperation
+    {
+        if (!$this->camelCaseToSnakeCaseNameConverter) {
+            $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
+        }
+
+        $extraProperties = [];
+        foreach (self::DEFAULTS as $key => $value) {
+            $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
+            $getter = 'get'.$upperKey;
+
+            if (!method_exists($operation, $getter)) {
+                if (!isset($extraProperties[$key])) {
+                    $extraProperties[$key] = $value;
+                }
+
+                continue;
+            }
+
+            $currentValue = $operation->{$getter}();
+
+            /* @phpstan-ignore-next-line */
+            if (\is_array($currentValue) && $currentValue && \is_array($value) && $value) {
+                $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
+            }
+
+            if (null !== $currentValue) {
+                continue;
+            }
+
+            $operation = $operation->{'with'.$upperKey}($value);
+        }
+
+        return $operation->withExtraProperties(array_merge($extraProperties, $operation->getExtraProperties()));
     }
 }
