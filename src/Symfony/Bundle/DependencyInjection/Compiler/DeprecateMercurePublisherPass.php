@@ -27,9 +27,11 @@ final class DeprecateMercurePublisherPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $container
-            ->setAlias('api_platform.doctrine.listener.mercure.publish', 'api_platform.doctrine.orm.listener.mercure.publish')
-            ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'Using "%alias_id%" service is deprecated since API Platform 2.6. Use "api_platform.doctrine.orm.listener.mercure.publish" instead.'));
+        if ($container->hasDefinition('api_platform.doctrine.listener.mercure.publish')) {
+            $container
+                ->setAlias('api_platform.doctrine.listener.mercure.publish', 'api_platform.doctrine.orm.listener.mercure.publish')
+                ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'Using "%alias_id%" service is deprecated since API Platform 2.6. Use "api_platform.doctrine.orm.listener.mercure.publish" instead.'));
+        }
     }
 
     private function buildDeprecationArgs(string $version, string $message): array
