@@ -1,3 +1,4 @@
+@!mongodb
 Feature: Groups to embed relations
   In order to show embed relations on a Resource
   As a client software developer
