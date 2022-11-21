@@ -80,6 +80,7 @@ class CollectionNormalizerTest extends TestCase
             'uri' => 'http://example.com/foos?page=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
+            'root_operation_name' => 'get',
         ])->willReturn([
             'data' => [
                 'type' => 'Foo',
@@ -156,6 +157,7 @@ class CollectionNormalizerTest extends TestCase
             'uri' => 'http://example.com/foos?page=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
+            'root_operation_name' => 'get',
         ])->willReturn([
             'data' => [
                 'type' => 'Foo',
@@ -218,6 +220,7 @@ class CollectionNormalizerTest extends TestCase
             'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
+            'root_operation_name' => 'get',
         ])->willReturn([
             'data' => [
                 'type' => 'Foo',
@@ -275,6 +278,7 @@ class CollectionNormalizerTest extends TestCase
             'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
+            'root_operation_name' => 'get',
         ])->willReturn([
             'data' => [
                 'type' => 'Foo',
@@ -355,6 +359,7 @@ class CollectionNormalizerTest extends TestCase
             'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
+            'root_operation_name' => 'get',
         ])->willReturn([]);
 
         $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());

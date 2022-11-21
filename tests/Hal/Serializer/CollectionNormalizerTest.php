@@ -142,6 +142,7 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'resource_class' => 'Foo',
             'api_sub_level' => true,
+            'root_operation_name' => 'bar',
         ])->willReturn(['_links' => ['self' => '/me'], 'name' => 'Kévin']);
 
         $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());

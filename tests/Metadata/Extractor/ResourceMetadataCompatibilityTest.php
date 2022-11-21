@@ -26,12 +26,12 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\OperationDefaultsTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\ResourceAdapterInterface;
@@ -39,6 +39,7 @@ use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlResourceAdapter;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\YamlResourceAdapter;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * Ensures XML and YAML mappings are fully compatible with ApiResource.
@@ -47,8 +48,12 @@ use PHPUnit\Framework\TestCase;
  */
 final class ResourceMetadataCompatibilityTest extends TestCase
 {
+    use OperationDefaultsTrait;
     private const RESOURCE_CLASS = Comment::class;
     private const SHORT_NAME = 'Comment';
+    private const DEFAULTS = [
+        'route_prefix' => '/v1',
+    ];
     private const FIXTURES = [
         null,
         [
@@ -212,21 +217,29 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                                 'Lorem ipsum' => 'Dolor sit amet',
                             ],
                             'foo' => 'bar',
+                            'custom_property' => 'Lorem ipsum dolor sit amet',
+                            'another_custom_property' => [
+                                'Lorem ipsum' => 'Dolor sit amet',
+                            ],
+                            'route_prefix' => '/v1', // from defaults
                         ],
                     ],
                 ],
                 'queries' => [
                     [
                         'class' => Query::class,
+                        'extraProperties' => ['route_prefix' => '/v1'],
                     ],
                     [
                         'class' => QueryCollection::class,
                         'collection' => true,
+                        'extraProperties' => ['route_prefix' => '/v1'],
                     ],
                 ],
                 'subscriptions' => [
                     [
                         'class' => Subscription::class,
+                        'extraProperties' => ['route_prefix' => '/v1'],
                     ],
                 ],
             ],
@@ -341,6 +354,10 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                             'Lorem ipsum' => 'Dolor sit amet',
                         ],
                         'foo' => 'bar',
+                        'custom_property' => 'Lorem ipsum dolor sit amet',
+                        'another_custom_property' => [
+                            'Lorem ipsum' => 'Dolor sit amet',
+                        ],
                     ],
                 ],
                 [
@@ -429,10 +446,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     {
         $reflClass = new \ReflectionClass(ApiResource::class);
         $parameters = $reflClass->getConstructor()->getParameters();
+        $this->defaults = self::DEFAULTS;
+        $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
 
         try {
             $extractor = new $extractorClass($adapter(self::RESOURCE_CLASS, $parameters, self::FIXTURES));
-            $factory = new ExtractorResourceMetadataCollectionFactory($extractor);
+            $factory = new ExtractorResourceMetadataCollectionFactory($extractor, null, self::DEFAULTS);
             $collection = $factory->create(self::RESOURCE_CLASS);
         } catch (\Exception $exception) {
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
@@ -464,7 +483,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 $operations = [];
                 foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
                     $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
-                    $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation);
+                    [$name, $operation] = $this->getOperationWithDefaults($resource, $operation);
+                    $operations[$name] = $operation;
                 }
 
                 $resource = $resource->withOperations(new Operations($operations));
@@ -473,7 +493,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 $graphQlOperations = [];
                 foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $graphQlOperation) {
                     $description = $graphQlOperation instanceof Mutation ? ucfirst("{$graphQlOperation->getName()}s a {$resource->getShortName()}.") : null;
-                    $graphQlOperations[$graphQlOperation->getName()] = $this->getOperationWithDefaults($resource, $graphQlOperation)->withDescription($description);
+                    [$name, $operation] = $this->getOperationWithDefaults($resource, $graphQlOperation);
+                    $graphQlOperations[$name] = $operation->withDescription($description);
                 }
 
                 $resources[] = $resource->withGraphQlOperations($graphQlOperations);
@@ -599,26 +620,5 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         }
 
         return $operations;
-    }
-
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
-    {
-        foreach (get_class_methods($resource) as $methodName) {
-            if (!str_starts_with($methodName, 'get')) {
-                continue;
-            }
-
-            if (!method_exists($operation, $methodName) || null !== $operation->{$methodName}()) {
-                continue;
-            }
-
-            if (null === ($value = $resource->{$methodName}())) {
-                continue;
-            }
-
-            $operation = $operation->{'with'.substr($methodName, 3)}($value);
-        }
-
-        return $operation;
     }
 }
