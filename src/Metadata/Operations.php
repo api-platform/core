@@ -26,6 +26,11 @@ final class Operations implements \IteratorAggregate, \Countable
             // When we use an int-indexed array in the constructor, compute priorities
             if (\is_int($operationName)) {
                 $operation = $operation->withPriority($operationName);
+                $operationName = (string) $operationName;
+            }
+
+            if ($operation->getName()) {
+                $operationName = $operation->getName();
             }
 
             $this->operations[] = [$operationName, $operation];

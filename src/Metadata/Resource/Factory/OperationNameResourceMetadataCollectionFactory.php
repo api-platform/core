@@ -52,7 +52,8 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
                     continue;
                 }
 
-                $newOperationName = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : '');
+                $path = ($operation->getRoutePrefix() ?? '').($operation->getUriTemplate() ?? '');
+                $newOperationName = sprintf('_api_%s_%s%s', $path ?: ($operation->getShortName() ?? $this->getDefaultShortname($resourceClass)), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : '');
                 $operations->remove($operationName)->add($newOperationName, $operation->withName($newOperationName));
             }
 
@@ -60,5 +61,10 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
         }
 
         return $resourceMetadataCollection;
+    }
+
+    private function getDefaultShortname(string $resourceClass): string
+    {
+        return (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
     }
 }
