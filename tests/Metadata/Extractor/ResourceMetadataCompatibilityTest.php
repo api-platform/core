@@ -26,12 +26,12 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\OperationDefaultsTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\ResourceAdapterInterface;
@@ -48,6 +48,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  */
 final class ResourceMetadataCompatibilityTest extends TestCase
 {
+    use OperationDefaultsTrait;
     private const RESOURCE_CLASS = Comment::class;
     private const SHORT_NAME = 'Comment';
     private const DEFAULTS = [
@@ -220,21 +221,25 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                             'another_custom_property' => [
                                 'Lorem ipsum' => 'Dolor sit amet',
                             ],
+                            'route_prefix' => '/v1', // from defaults
                         ],
                     ],
                 ],
                 'queries' => [
                     [
                         'class' => Query::class,
+                        'extraProperties' => ['route_prefix' => '/v1'],
                     ],
                     [
                         'class' => QueryCollection::class,
                         'collection' => true,
+                        'extraProperties' => ['route_prefix' => '/v1'],
                     ],
                 ],
                 'subscriptions' => [
                     [
                         'class' => Subscription::class,
+                        'extraProperties' => ['route_prefix' => '/v1'],
                     ],
                 ],
             ],
@@ -441,6 +446,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     {
         $reflClass = new \ReflectionClass(ApiResource::class);
         $parameters = $reflClass->getConstructor()->getParameters();
+        $this->defaults = self::DEFAULTS;
+        $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
 
         try {
             $extractor = new $extractorClass($adapter(self::RESOURCE_CLASS, $parameters, self::FIXTURES));
@@ -476,7 +483,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 $operations = [];
                 foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
                     $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
-                    $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation);
+                    [$name, $operation] = $this->getOperationWithDefaults($resource, $operation);
+                    $operations[$name] = $operation;
                 }
 
                 $resource = $resource->withOperations(new Operations($operations));
@@ -485,7 +493,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 $graphQlOperations = [];
                 foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $graphQlOperation) {
                     $description = $graphQlOperation instanceof Mutation ? ucfirst("{$graphQlOperation->getName()}s a {$resource->getShortName()}.") : null;
-                    $graphQlOperations[$graphQlOperation->getName()] = $this->getOperationWithDefaults($resource, $graphQlOperation)->withDescription($description);
+                    [$name, $operation] = $this->getOperationWithDefaults($resource, $graphQlOperation);
+                    $graphQlOperations[$name] = $operation->withDescription($description);
                 }
 
                 $resources[] = $resource->withGraphQlOperations($graphQlOperations);
@@ -611,86 +620,5 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         }
 
         return $operations;
-    }
-
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
-    {
-        // Inherit from resource defaults
-        foreach (get_class_methods($resource) as $methodName) {
-            if (!str_starts_with($methodName, 'get')) {
-                continue;
-            }
-
-            if (!method_exists($operation, $methodName) || null !== $operation->{$methodName}()) {
-                continue;
-            }
-
-            if (null === ($value = $resource->{$methodName}())) {
-                continue;
-            }
-
-            $operation = $operation->{'with'.substr($methodName, 3)}($value);
-        }
-
-        $operation = $operation->withExtraProperties(array_merge(
-            $resource->getExtraProperties(),
-            $operation->getExtraProperties()
-        ));
-
-        // Add global defaults attributes to the operation
-        $operation = $this->addGlobalDefaults($operation);
-
-        if ($operation->getRouteName()) {
-            /** @var HttpOperation $operation */
-            $operation = $operation->withName($operation->getRouteName());
-        }
-
-        // Check for name conflict
-        if ($operation->getName() && null !== ($operations = $resource->getOperations())) {
-            if (!$operations->has($operation->getName())) {
-                return $operation;
-            }
-
-            /** @var HttpOperation $operation */
-            $operation = $operation->withName('');
-        }
-
-        return $operation;
-    }
-
-    private function addGlobalDefaults(HttpOperation $operation): HttpOperation
-    {
-        if (!$this->camelCaseToSnakeCaseNameConverter) {
-            $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
-        }
-
-        $extraProperties = [];
-        foreach (self::DEFAULTS as $key => $value) {
-            $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
-            $getter = 'get'.$upperKey;
-
-            if (!method_exists($operation, $getter)) {
-                if (!isset($extraProperties[$key])) {
-                    $extraProperties[$key] = $value;
-                }
-
-                continue;
-            }
-
-            $currentValue = $operation->{$getter}();
-
-            /* @phpstan-ignore-next-line */
-            if (\is_array($currentValue) && $currentValue && \is_array($value) && $value) {
-                $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
-            }
-
-            if (null !== $currentValue) {
-                continue;
-            }
-
-            $operation = $operation->{'with'.$upperKey}($value);
-        }
-
-        return $operation->withExtraProperties(array_merge($extraProperties, $operation->getExtraProperties()));
     }
 }
