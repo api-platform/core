@@ -25,6 +25,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new GetCollection(),
         new Get(normalizationContext: ['groups' => 'related']),
+        // This adds a "related" group in the "AddGroupNormalizer"
+        new Get(uriTemplate: '/custom_normalizer_relation_group_impact_on_collection'),
     ]
 )]
 class RelationGroupImpactOnCollection

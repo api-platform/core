@@ -507,16 +507,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function getFactoryOptions(array $context): array
     {
-        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? '').($context['api_normalize'] ?? '');
-        if ($operationCacheKey && isset($this->localFactoryOptionsCache[$operationCacheKey])) {
-            return $this->localFactoryOptionsCache[$operationCacheKey];
-        }
-
         $options = [];
-
         if (isset($context[self::GROUPS])) {
             /* @see https://github.com/symfony/symfony/blob/v4.2.6/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php */
             $options['serializer_groups'] = (array) $context[self::GROUPS];
+        }
+
+        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? '').($context['api_normalize'] ?? '');
+        if ($operationCacheKey && isset($this->localFactoryOptionsCache[$operationCacheKey])) {
+            return $options + $this->localFactoryOptionsCache[$operationCacheKey];
         }
 
         // This is a hot spot
@@ -536,7 +535,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        return $this->localFactoryOptionsCache[$operationCacheKey] = $options;
+        return $options + $this->localFactoryOptionsCache[$operationCacheKey] = $options;
     }
 
     /**
