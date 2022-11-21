@@ -242,6 +242,53 @@ class ItemNormalizerTest extends TestCase
         $normalizer->denormalize(['id' => '12', 'name' => 'hello'], Dummy::class, null, $context);
     }
 
+    public function testDenormalizeWithDefinedIri()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('hello');
+
+        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $propertyMetadata = (new ApiProperty())->withReadable(true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+            null,
+            [],
+            null
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertEquals(['name' => 'hello'], $normalizer->normalize($dummy, null, ['resources' => [], 'iri' => '/custom']));
+    }
+
     public function testDenormalizeWithIdAndNoResourceClass()
     {
         $context = [];
