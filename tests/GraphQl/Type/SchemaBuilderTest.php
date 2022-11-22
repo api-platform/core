@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Type;
 
-use ApiPlatform\GraphQl\Type\FieldsBuilderInterface;
+use ApiPlatform\GraphQl\Type\FieldsBuilderEnumInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilder;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\GraphQl\Type\TypesFactoryInterface;
@@ -42,15 +42,10 @@ class SchemaBuilderTest extends TestCase
     use ProphecyTrait;
 
     private ObjectProphecy $resourceNameCollectionFactoryProphecy;
-
     private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
-
     private ObjectProphecy $typesFactoryProphecy;
-
     private ObjectProphecy $typesContainerProphecy;
-
     private ObjectProphecy $fieldsBuilderProphecy;
-
     private SchemaBuilder $schemaBuilder;
 
     /**
@@ -62,7 +57,7 @@ class SchemaBuilderTest extends TestCase
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->typesFactoryProphecy = $this->prophesize(TypesFactoryInterface::class);
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
-        $this->fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $this->fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $this->schemaBuilder = new SchemaBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->typesFactoryProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->fieldsBuilderProphecy->reveal());
     }
 

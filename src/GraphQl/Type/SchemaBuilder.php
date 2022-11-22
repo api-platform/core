@@ -32,8 +32,11 @@ use GraphQL\Type\Schema;
  */
 final class SchemaBuilder implements SchemaBuilderInterface
 {
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly TypesFactoryInterface $typesFactory, private readonly TypesContainerInterface $typesContainer, private readonly FieldsBuilderInterface $fieldsBuilder)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly TypesFactoryInterface $typesFactory, private readonly TypesContainerInterface $typesContainer, private readonly FieldsBuilderEnumInterface|FieldsBuilderInterface $fieldsBuilder)
     {
+        if ($this->fieldsBuilder instanceof FieldsBuilderInterface) {
+            @trigger_error(sprintf('$fieldsBuilder argument of SchemaBuilder implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', FieldsBuilderInterface::class, FieldsBuilderEnumInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     public function getSchema(): Schema

@@ -42,10 +42,16 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class FieldsBuilder implements FieldsBuilderInterface
+final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumInterface
 {
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, private readonly TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ResolverFactoryInterface $collectionResolverFactory, private readonly ResolverFactoryInterface $itemMutationResolverFactory, private readonly ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator)
+    private readonly TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder;
+
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ResolverFactoryInterface $collectionResolverFactory, private readonly ResolverFactoryInterface $itemMutationResolverFactory, private readonly ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator)
     {
+        if ($typeBuilder instanceof TypeBuilderInterface) {
+            @trigger_error(sprintf('$typeBuilder argument of FieldsBuilder implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', TypeBuilderInterface::class, TypeBuilderEnumInterface::class), \E_USER_DEPRECATED);
+        }
+        $this->typeBuilder = $typeBuilder;
     }
 
     /**
@@ -224,6 +230,26 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         return $fields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEnumFields(string $enumClass): array
+    {
+        $rEnum = new \ReflectionEnum($enumClass);
+
+        $enumCases = [];
+        foreach ($rEnum->getCases() as $rCase) {
+            $enumCase = ['value' => $rCase->getBackingValue()];
+            $propertyMetadata = $this->propertyMetadataFactory->create($enumClass, $rCase->getName());
+            if ($enumCaseDescription = $propertyMetadata->getDescription()) {
+                $enumCase['description'] = $enumCaseDescription;
+            }
+            $enumCases[$rCase->getName()] = $enumCase;
+        }
+
+        return $enumCases;
     }
 
     /**
@@ -481,7 +507,16 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         if ($this->typeBuilder->isCollection($type)) {
-            return $this->pagination->isGraphQlEnabled($resourceOperation) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $resourceOperation) : GraphQLType::listOf($graphqlType);
+            if (!$input && $this->pagination->isGraphQlEnabled($resourceOperation)) {
+                // Deprecated path, to remove in API Platform 4.
+                if ($this->typeBuilder instanceof TypeBuilderInterface) {
+                    return $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $resourceOperation);
+                }
+
+                return $this->typeBuilder->getPaginatedCollectionType($graphqlType, $resourceOperation);
+            }
+
+            return GraphQLType::listOf($graphqlType);
         }
 
         return $forceNullable || !$graphqlType instanceof NullableType || $type->isNullable() || ($rootOperation instanceof Mutation && 'update' === $rootOperation->getName())

@@ -485,6 +485,69 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummy.dummy.arrayData[1]" should be equal to baz
     And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
 
+  Scenario: Create an item with an enum
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createPerson(input: {name: "Mob", genderType: FEMALE}) {
+        person {
+          id
+          name
+          genderType
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.createPerson.person.id" should be equal to "/people/1"
+    And the JSON node "data.createPerson.person.name" should be equal to "Mob"
+    And the JSON node "data.createPerson.person.genderType" should be equal to "FEMALE"
+
+  Scenario: Create an item with an enum as a resource
+    When I send the following GraphQL request:
+    """
+    {
+      gamePlayModes {
+        id
+        name
+      }
+      gamePlayMode(id: "/game_play_modes/SINGLE_PLAYER") {
+        name
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.gamePlayModes" should have 3 elements
+    And the JSON node "data.gamePlayModes[2].id" should be equal to "/game_play_modes/SINGLE_PLAYER"
+    And the JSON node "data.gamePlayModes[2].name" should be equal to "SINGLE_PLAYER"
+    And the JSON node "data.gamePlayMode.name" should be equal to "SINGLE_PLAYER"
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createVideoGame(input: {name: "Baten Kaitos", playMode: "/game_play_modes/SINGLE_PLAYER"}) {
+        videoGame {
+          id
+          name
+          playMode {
+            id
+            name
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.createVideoGame.videoGame.id" should be equal to "/video_games/1"
+    And the JSON node "data.createVideoGame.videoGame.name" should be equal to "Baten Kaitos"
+    And the JSON node "data.createVideoGame.videoGame.playMode.id" should be equal to "/game_play_modes/SINGLE_PLAYER"
+    And the JSON node "data.createVideoGame.videoGame.playMode.name" should be equal to "SINGLE_PLAYER"
+
   Scenario: Delete an item through a mutation
     When I send the following GraphQL request:
     """

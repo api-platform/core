@@ -17,7 +17,7 @@ use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\FieldsBuilder;
-use ApiPlatform\GraphQl\Type\TypeBuilderInterface;
+use ApiPlatform\GraphQl\Type\TypeBuilderEnumInterface;
 use ApiPlatform\GraphQl\Type\TypeConverterInterface;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\Metadata\ApiProperty;
@@ -33,6 +33,7 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -78,7 +79,7 @@ class FieldsBuilderTest extends TestCase
         $this->propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
-        $this->typeBuilderProphecy = $this->prophesize(TypeBuilderInterface::class);
+        $this->typeBuilderProphecy = $this->prophesize(TypeBuilderEnumInterface::class);
         $this->typeConverterProphecy = $this->prophesize(TypeConverterInterface::class);
         $this->itemResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $this->collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
@@ -207,7 +208,7 @@ class FieldsBuilderTest extends TestCase
         $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(true);
-        $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $operation)->willReturn($graphqlType);
+        $this->typeBuilderProphecy->getPaginatedCollectionType($graphqlType, $operation)->willReturn($graphqlType);
         $this->collectionResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation)->willReturn($resolver);
         $this->filterLocatorProphecy->has('my_filter')->willReturn(true);
         $filterProphecy = $this->prophesize(FilterInterface::class);
@@ -825,6 +826,25 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    public function testGetEnumFields(): void
+    {
+        $enumClass = GenderTypeEnum::class;
+
+        $this->propertyMetadataFactoryProphecy->create($enumClass, GenderTypeEnum::MALE->name)->willReturn(new ApiProperty(
+            description: 'Description of MALE case',
+        ));
+        $this->propertyMetadataFactoryProphecy->create($enumClass, GenderTypeEnum::FEMALE->name)->willReturn(new ApiProperty(
+            description: 'Description of FEMALE case',
+        ));
+
+        $enumFields = $this->fieldsBuilder->getEnumFields($enumClass);
+
+        $this->assertSame([
+            GenderTypeEnum::MALE->name => ['value' => GenderTypeEnum::MALE->value, 'description' => 'Description of MALE case'],
+            GenderTypeEnum::FEMALE->name => ['value' => GenderTypeEnum::FEMALE->value, 'description' => 'Description of FEMALE case'],
+        ], $enumFields);
     }
 
     /**
