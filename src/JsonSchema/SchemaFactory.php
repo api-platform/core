@@ -174,7 +174,10 @@ final class SchemaFactory implements SchemaFactoryInterface
             $propertySchema['externalDocs'] = ['url' => $iri];
         }
 
-        if (!isset($propertySchema['default']) && !empty($default = $propertyMetadata->getDefault())) {
+        // TODO: 3.0 support multiple types
+        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+
+        if (!isset($propertySchema['default']) && !empty($default = $propertyMetadata->getDefault()) && (null === $type?->getClassName() || !$this->isResourceClass($type->getClassName()))) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }
@@ -190,8 +193,6 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         $valueSchema = [];
-        // TODO: 3.0 support multiple types
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
         if (null !== $type) {
             if ($isCollection = $type->isCollection()) {
                 $keyType = $type->getCollectionKeyTypes()[0] ?? null;

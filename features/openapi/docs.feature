@@ -73,6 +73,14 @@ Feature: Documentation support
       "nullable": true
     }
     """
+    And the "playMode" property exists for the OpenAPI class "VideoGame"
+    And the "playMode" property for the OpenAPI class "VideoGame" should be equal to:
+    """
+    {
+      "type": "string",
+      "format": "iri-reference"
+    }
+    """
     # Enable these tests when SF 4.4 / PHP 7.1 support is dropped
     #And the "isDummyBoolean" property exists for the OpenAPI class "DummyBoolean"
     #And the "isDummyBoolean" property is not read only for the OpenAPI class "DummyBoolean"

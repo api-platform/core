@@ -24,6 +24,7 @@ $finder = PhpCsFixer\Finder::create()
     ->notPath('src/Annotation/ApiResource.php') // temporary
     ->notPath('src/Annotation/ApiSubresource.php') // temporary
     ->notPath('tests/Fixtures/TestBundle/Entity/DummyPhp8.php') // temporary
+    ->notPath('tests/Fixtures/TestBundle/Enum/GamePlayMode.php') // PHPDoc on enum cases
     ->append([
         'tests/Fixtures/app/console',
     ]);

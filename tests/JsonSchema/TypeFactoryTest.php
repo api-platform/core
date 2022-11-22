@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonSchema;
 
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GamePlayMode;
 use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -32,7 +34,10 @@ class TypeFactoryTest extends TestCase
      */
     public function testGetType(array $schema, Type $type): void
     {
-        $typeFactory = new TypeFactory();
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(GenderTypeEnum::class)->willReturn(false);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
+        $typeFactory = new TypeFactory($resourceClassResolver->reveal());
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_OPENAPI)));
     }
 
@@ -54,8 +59,10 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
         yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
         yield [['nullable' => true, 'type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
-        yield [['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
-        yield [['type' => 'string', 'enum' => ['male', 'female', null], 'nullable' => true], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
+        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
+        yield ['nullable enum' => ['type' => 'string', 'enum' => ['male', 'female', null], 'nullable' => true], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference', 'nullable' => true], new Type(Type::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable' => [
             ['nullable' => true, 'type' => 'array', 'items' => ['type' => 'string']],
@@ -155,7 +162,10 @@ class TypeFactoryTest extends TestCase
      */
     public function testGetTypeWithJsonSchemaSyntax(array $schema, Type $type): void
     {
-        $typeFactory = new TypeFactory();
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(GenderTypeEnum::class)->willReturn(false);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
+        $typeFactory = new TypeFactory($resourceClassResolver->reveal());
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_JSON_SCHEMA)));
     }
 
@@ -177,8 +187,10 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
         yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
         yield [['type' => ['string', 'null'], 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
-        yield [['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
-        yield [['type' => ['string', 'null'], 'enum' => ['male', 'female', null]], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
+        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
+        yield ['nullable enum' => ['type' => ['string', 'null'], 'enum' => ['male', 'female', null]], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => ['string', 'null'], 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable' => [
             ['type' => ['array', 'null'], 'items' => ['type' => 'string']],
@@ -271,7 +283,10 @@ class TypeFactoryTest extends TestCase
     /** @dataProvider openAPIV2TypeProvider */
     public function testGetTypeWithOpenAPIV2Syntax(array $schema, Type $type): void
     {
-        $typeFactory = new TypeFactory();
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(GenderTypeEnum::class)->willReturn(false);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
+        $typeFactory = new TypeFactory($resourceClassResolver->reveal());
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_SWAGGER)));
     }
 
@@ -293,8 +308,10 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
         yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
         yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
-        yield [['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
-        yield [['type' => 'string', 'enum' => ['male', 'female', null]], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
+        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
+        yield ['nullable enum' => ['type' => 'string', 'enum' => ['male', 'female', null]], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable, but ignored in OpenAPI V2' => [
             ['type' => 'array', 'items' => ['type' => 'string']],

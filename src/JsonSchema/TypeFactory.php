@@ -116,7 +116,7 @@ final class TypeFactory implements TypeFactoryInterface
                 'format' => 'binary',
             ];
         }
-        if (is_a($className, \BackedEnum::class, true)) {
+        if (!$this->isResourceClass($className) && is_a($className, \BackedEnum::class, true)) {
             $rEnum = new \ReflectionEnum($className);
             $enumCases = array_map(static fn (\ReflectionEnumBackedCase $rCase) => $rCase->getBackingValue(), $rEnum->getCases());
             if ($nullable) {
