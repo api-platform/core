@@ -42,9 +42,30 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
+        $reflectionClass = null;
+        $reflectionEnum = null;
+
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException) {
+        }
+        try {
+            $reflectionEnum = new \ReflectionEnum($resourceClass);
+        } catch (\ReflectionException) {
+        }
+
+        if (!$reflectionClass && !$reflectionEnum) {
+            return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
+        }
+
+        if ($reflectionEnum) {
+            if ($reflectionEnum->hasCase($property)) {
+                $reflectionCase = $reflectionEnum->getCase($property);
+                if ($attributes = $reflectionCase->getAttributes(ApiProperty::class)) {
+                    return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
+                }
+            }
+
             return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
         }
 
