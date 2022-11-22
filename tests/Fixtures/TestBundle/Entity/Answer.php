@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 /**
  * Answer.
  */
-#[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(normalizationContext: ['groups' => ['foobar']])])]
+#[ApiResource(operations: [new Put(), new Patch(), new Delete(), new GetCollection(normalizationContext: ['groups' => ['foobar']])])]
 #[ApiResource(uriTemplate: '/answers/{id}/related_questions/{relatedQuestions}/answer{._format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'], toProperty: 'answer'), 'relatedQuestions' => new Link(fromClass: Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
 #[ApiResource(uriTemplate: '/questions/{id}/answer{._format}', uriVariables: ['id' => new Link(fromClass: Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
 #[ORM\Entity]
