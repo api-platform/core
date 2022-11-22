@@ -11,14 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Elasticsearch\Metadata\Resource\Factory;
+namespace ApiPlatform\Elasticsearch\Metadata;
 
-use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
-
-class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCase
+class Get extends Operation
 {
-    use ProphecyTrait;
-
-    // TODO: add test
 }

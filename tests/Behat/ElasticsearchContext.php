@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Behat;
 
-use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use Behat\Behat\Context\Context;
 use Elasticsearch\Client;
 use Symfony\Component\Finder\Finder;
@@ -114,9 +113,9 @@ final class ElasticsearchContext implements Context
 
             foreach (json_decode($file->getContents(), true, 512, \JSON_THROW_ON_ERROR) as $document) {
                 if (null === ($document['id'] ?? null)) {
-                    $bulk[] = ['index' => ['_index' => $index, '_type' => DocumentMetadata::DEFAULT_TYPE]];
+                    $bulk[] = ['index' => ['_index' => $index, '_type' => '_doc']];
                 } else {
-                    $bulk[] = ['create' => ['_index' => $index, '_type' => DocumentMetadata::DEFAULT_TYPE, '_id' => (string) $document['id']]];
+                    $bulk[] = ['create' => ['_index' => $index, '_type' => '_doc', '_id' => (string) $document['id']]];
                 }
 
                 $bulk[] = $document;

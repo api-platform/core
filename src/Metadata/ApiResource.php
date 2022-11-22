@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Elasticsearch\Metadata\Get;
+use ApiPlatform\Elasticsearch\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 
@@ -149,6 +151,12 @@ class ApiResource
         $processor = null,
         protected array $extraProperties = []
     ) {
+        if (null !== $this->elasticsearch) {
+            $solution = $this->elasticsearch
+                ? sprintf('Configure %s or %s instead', Get::class, GetCollection::class)
+                : 'You will have to remove it when upgrading to v4';
+            trigger_deprecation('api-platform/core', '3.1', sprintf('Setting "elasticsearch" is deprecated. %s', $solution));
+        }
         $this->operations = null === $operations ? null : new Operations($operations);
         $this->provider = $provider;
         $this->processor = $processor;
@@ -616,11 +624,17 @@ class ApiResource
         return $self;
     }
 
+    /**
+     * @deprecated this will be removed in v4
+     */
     public function getElasticsearch(): ?bool
     {
         return $this->elasticsearch;
     }
 
+    /**
+     * @deprecated this will be removed in v4
+     */
     public function withElasticsearch(bool $elasticsearch): self
     {
         $self = clone $this;

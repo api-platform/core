@@ -14,11 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
-use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
-use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
+use ApiPlatform\Elasticsearch\Metadata\GetCollection;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
@@ -43,7 +41,6 @@ final class CollectionProviderTest extends TestCase
             CollectionProvider::class,
             new CollectionProvider(
                 $this->prophesize(Client::class)->reveal(),
-                $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(DenormalizerInterface::class)->reveal(),
                 new Pagination()
             )
@@ -55,9 +52,6 @@ final class CollectionProviderTest extends TestCase
         $context = [
             'groups' => ['custom'],
         ];
-
-        $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
-        $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadataCollection(Foo::class));
@@ -121,14 +115,13 @@ final class CollectionProviderTest extends TestCase
             ->willReturn($documents)
             ->shouldBeCalled();
 
-        $operation = (new Get())->withName('get')->withClass(Foo::class);
+        $operation = (new GetCollection('foo'))->withName('get')->withClass(Foo::class);
 
         $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
         $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, $operation, $context)->willReturn([])->shouldBeCalled();
 
         $provider = new CollectionProvider(
             $clientProphecy->reveal(),
-            $documentMetadataFactoryProphecy->reveal(),
             $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(),
             new Pagination(['items_per_page' => 2]),
             [$requestBodySearchCollectionExtensionProphecy->reveal()]

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\State;
 
-use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
+use ApiPlatform\Elasticsearch\Metadata\Operation as ElasticsearchOperation;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Metadata\Operation;
@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class ItemProvider implements ProviderInterface
 {
-    public function __construct(private readonly Client $client, private readonly DocumentMetadataFactoryInterface $documentMetadataFactory, private readonly DenormalizerInterface $denormalizer)
+    public function __construct(private readonly Client $client, private readonly DenormalizerInterface $denormalizer)
     {
     }
 
@@ -42,17 +42,17 @@ final class ItemProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        $resourceClass = $operation->getClass();
-        $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
+        if (!$operation instanceof ElasticsearchOperation) {
+            throw new \InvalidArgumentException(sprintf('$operation must be instance of %s, but %s given', ElasticsearchOperation::class, $operation::class));
+        }
 
         try {
             $params = [
-                'index' => $documentMetadata->getIndex(),
+                'index' => $operation->getIndex(),
                 'id' => (string) reset($uriVariables),
             ];
-
             if (ElasticsearchVersion::supportsMappingType()) {
-                $params['type'] = $documentMetadata->getType();
+                $params['type'] = $operation->getType();
             }
 
             $document = $this->client->get($params);
@@ -60,7 +60,7 @@ final class ItemProvider implements ProviderInterface
             return null;
         }
 
-        $item = $this->denormalizer->denormalize($document, $resourceClass, DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true]);
+        $item = $this->denormalizer->denormalize($document, $operation->getClass(), DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true]);
         if (!\is_object($item) && null !== $item) {
             throw new \UnexpectedValueException('Expected item to be an object or null.');
         }

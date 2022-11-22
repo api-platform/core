@@ -670,7 +670,7 @@ abstract class Operation
         return $this->provider;
     }
 
-    public function withProvider(callable|string|null $provider): self
+    public function withProvider(callable|string|null $provider): static
     {
         $self = clone $this;
         $self->provider = $provider;

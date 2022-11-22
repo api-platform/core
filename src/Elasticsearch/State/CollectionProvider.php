@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
-use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
+use ApiPlatform\Elasticsearch\Metadata\Operation as ElasticsearchOperation;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Metadata\Operation;
@@ -36,7 +36,7 @@ final class CollectionProvider implements ProviderInterface
     /**
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(private readonly Client $client, private readonly DocumentMetadataFactoryInterface $documentMetadataFactory, private readonly DenormalizerInterface $denormalizer, private readonly Pagination $pagination, private readonly iterable $collectionExtensions = [])
+    public function __construct(private readonly Client $client, private readonly DenormalizerInterface $denormalizer, private readonly Pagination $pagination, private readonly iterable $collectionExtensions = [])
     {
     }
 
@@ -45,8 +45,10 @@ final class CollectionProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): Paginator
     {
+        if (!$operation instanceof ElasticsearchOperation) {
+            throw new \InvalidArgumentException(sprintf('$operation must be instance of %s, but %s given', ElasticsearchOperation::class, $operation::class));
+        }
         $resourceClass = $operation->getClass();
-        $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {
@@ -61,12 +63,12 @@ final class CollectionProvider implements ProviderInterface
         $offset = $body['from'] ??= $this->pagination->getOffset($operation, $context);
 
         $params = [
-            'index' => $documentMetadata->getIndex(),
+            'index' => $operation->getIndex(),
             'body' => $body,
         ];
 
         if (ElasticsearchVersion::supportsMappingType()) {
-            $params['type'] = $documentMetadata->getType();
+            $params['type'] = $operation->getType();
         }
 
         $documents = $this->client->search($params);

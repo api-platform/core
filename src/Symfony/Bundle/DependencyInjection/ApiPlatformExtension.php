@@ -715,11 +715,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('elasticsearch.xml');
 
+        $container->getDefinition('api_platform.elasticsearch.metadata.resource.metadata_collection_factory')
+            ->setArgument('$mapping', $config['elasticsearch']['mapping']);
+
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
 
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
-        $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
     }
 
     private function registerSecurityConfiguration(ContainerBuilder $container, XmlFileLoader $loader): void
