@@ -415,3 +415,7 @@ services:
         tags:
             - { name: 'api_platform.state_processor' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer\AddGroupNormalizer:
+        tags:
+            -  { name: 'serializer.normalizer' }
+
