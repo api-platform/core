@@ -43,6 +43,30 @@ class IriHelperTest extends TestCase
         $this->assertSame('/hello.json?foo=bar&bar=3&page=2', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2.));
     }
 
+    public function testHelpersWithMultiDimensionalArrayParameters(): void
+    {
+        $parsed = [
+            'parts' => [
+                'path' => '/hello.json',
+                'query' => 'f[0][a]=foo&f[0][b]=bar&f[1][x]=y',
+            ],
+            'parameters' => [
+                'f' => [
+                    [
+                        'a' => 'foo',
+                        'b' => 'bar',
+                    ],
+                    [
+                        'x' => 'y',
+                    ]
+                ]
+            ],
+        ];
+
+        $this->assertSame($parsed, IriHelper::parseIri('/hello.json?f[0][a]=foo&f[0][b]=bar&f[1][x]=y', 'page'));
+        $this->assertSame('/hello.json?f%5B0%5D%5Ba%5D=foo&f%5B0%5D%5Bb%5D=bar&f%5B1%5D%5Bx%5D=y', IriHelper::createIri($parsed['parts'], $parsed['parameters']));
+    }
+
     public function testHelpersWithNetworkPath(): void
     {
         $parsed = [

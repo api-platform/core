@@ -61,8 +61,7 @@ final class IriHelper
             $parameters[$pageParameterName] = $page;
         }
 
-        $query = http_build_query($parameters, '', '&', \PHP_QUERY_RFC3986);
-        $parts['query'] = preg_replace('/%5B\d+%5D/', '%5B%5D', $query);
+        $parts['query'] = http_build_query($parameters, '', '&', \PHP_QUERY_RFC3986);
 
         $url = '';
         if ((UrlGeneratorInterface::ABS_URL === $urlGenerationStrategy || UrlGeneratorInterface::NET_PATH === $urlGenerationStrategy) && isset($parts['host'])) {
