@@ -217,10 +217,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                                 'Lorem ipsum' => 'Dolor sit amet',
                             ],
                             'foo' => 'bar',
-                            'custom_property' => 'Lorem ipsum dolor sit amet',
-                            'another_custom_property' => [
-                                'Lorem ipsum' => 'Dolor sit amet',
-                            ],
                             'route_prefix' => '/v1', // from defaults
                         ],
                     ],
@@ -354,10 +350,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                             'Lorem ipsum' => 'Dolor sit amet',
                         ],
                         'foo' => 'bar',
-                        'custom_property' => 'Lorem ipsum dolor sit amet',
-                        'another_custom_property' => [
-                            'Lorem ipsum' => 'Dolor sit amet',
-                        ],
                     ],
                 ],
                 [
