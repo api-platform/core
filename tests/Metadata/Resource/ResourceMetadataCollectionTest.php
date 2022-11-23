@@ -16,7 +16,9 @@ namespace ApiPlatform\Tests\Metadata\Resource;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use PHPUnit\Framework\TestCase;
@@ -45,5 +47,47 @@ final class ResourceMetadataCollectionTest extends TestCase
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
         $this->assertSame($operation, $resourceMetadataCollection->getOperation('noname'));
+    }
+
+    public function testCache(): void
+    {
+        $defaultOperation = new Get(name: 'get');
+        $defaultGqlOperation = new Query();
+        $defaultCollectionOperation = new GetCollection(name: 'get_collection');
+        $defaultGqlCollectionOperation = new QueryCollection();
+        $resource = new ApiResource(
+            operations: [
+                'get' => $defaultOperation,
+                'get_collection' => $defaultCollectionOperation,
+            ],
+            graphQlOperations: [
+                'query' => $defaultGqlOperation,
+                'query_collection' => $defaultGqlCollectionOperation,
+            ]
+        );
+
+        $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
+
+        $this->assertEquals($resourceMetadataCollection->getOperation(), $defaultOperation);
+        $this->assertEquals($resourceMetadataCollection->getOperation(null, true), $defaultCollectionOperation);
+        $this->assertEquals($resourceMetadataCollection->getOperation(null, false, true), $defaultOperation);
+
+        $resource = new ApiResource(
+            graphQlOperations: [
+                'query' => $defaultGqlOperation,
+                'query_collection' => $defaultGqlCollectionOperation,
+            ]
+        );
+
+        $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
+
+        $this->assertEquals($resourceMetadataCollection->getOperation(), $defaultGqlOperation);
+        $this->assertEquals($resourceMetadataCollection->getOperation(null, true), $defaultGqlCollectionOperation);
+
+        try {
+            $resourceMetadataCollection->getOperation(null, false, true);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(OperationNotFoundException::class, $e);
+        }
     }
 }
