@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Behat;
 use ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\AbsoluteUrlDummy as AbsoluteUrlDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as AbsoluteUrlRelationDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Account as AccountDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Book as BookDocument;
@@ -81,6 +82,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedSecuredDummy as Relate
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Settings as SettingsDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
@@ -89,6 +91,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\WithJsonDummy as WithJsonDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Account;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Book;
@@ -158,6 +161,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedSecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Settings;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoMany;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDummy;
@@ -1976,6 +1980,15 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there is an account with settings
+     */
+    public function thereIsAnAccountWithSettings(): void
+    {
+        $this->manager->persist($this->buildAccount());
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -2299,5 +2312,14 @@ final class DoctrineContext implements Context
     private function buildPayment(string $amount): Payment|PaymentDocument
     {
         return $this->isOrm() ? new Payment($amount) : new PaymentDocument($amount);
+    }
+
+    private function buildAccount(): Account|AccountDocument
+    {
+        $account = $this->isOrm() ? new Account() : new AccountDocument();
+        $settings = $this->isOrm() ? new Settings() : new SettingsDocument();
+        $account->setSettings($settings);
+
+        return $account;
     }
 }

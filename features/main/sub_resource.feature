@@ -593,3 +593,20 @@ Feature: Sub-resource support
     }
     """
     Then the response status code should be 200
+
+    @createSchema
+    Scenario: Access settings through accounts only and show the correct Settings URI on an account (issue #5108)
+    Given there is an account with settings
+    And I send a "GET" request to "/accounts/1/settings"
+    Then the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Settings",
+      "@id": "/accounts/1/settings",
+      "@type": "Settings",
+      "id": 1
+    }
+    """
+    Then I send a "GET" request to "/accounts"
+
+
