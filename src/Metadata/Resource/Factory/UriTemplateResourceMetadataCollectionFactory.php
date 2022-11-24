@@ -132,7 +132,9 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             return $this->normalizeUriVariables($operation);
         }
 
+        $hasUserConfiguredUriVariables = !($operation->getExtraProperties['is_legacy_resource_metadata'] ?? false);
         if (!$operation->getUriVariables()) {
+            $hasUserConfiguredUriVariables = false;
             $operation = $operation->withUriVariables($this->transformLinksToUriVariables($this->linkFactory->createLinksFromIdentifiers($operation)));
         }
 
@@ -157,6 +159,10 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         });
 
         if (\count($variables) !== \count($uriVariables)) {
+            if ($hasUserConfiguredUriVariables) {
+                return $operation;
+            }
+
             $newUriVariables = [];
             foreach ($variables as $variable) {
                 if (isset($uriVariables[$variable])) {

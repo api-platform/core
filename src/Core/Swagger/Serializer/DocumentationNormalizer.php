@@ -274,6 +274,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         foreach ($operations as $operationName => $operation) {
+            if (false === ($operation['openapi'] ?? null)) {
+                continue;
+            }
+
             // Skolem IRI
             if ('api_genid' === ($operation['route_name'] ?? null)) {
                 continue;
