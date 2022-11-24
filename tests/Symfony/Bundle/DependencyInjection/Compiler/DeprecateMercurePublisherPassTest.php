@@ -25,7 +25,7 @@ final class DeprecateMercurePublisherPassTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $deprecateMercurePublisherPass = new DeprecateMercurePublisherPass();
 
@@ -33,6 +33,10 @@ final class DeprecateMercurePublisherPassTest extends TestCase
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $aliasProphecy = $this->prophesize(Alias::class);
+
+        $containerBuilderProphecy
+            ->hasDefinition('api_platform.doctrine.listener.mercure.publish')
+            ->willReturn(true);
 
         $containerBuilderProphecy
             ->setAlias('api_platform.doctrine.listener.mercure.publish', 'api_platform.doctrine.orm.listener.mercure.publish')
@@ -47,6 +51,22 @@ final class DeprecateMercurePublisherPassTest extends TestCase
             ->setDeprecated(...$setDeprecatedArgs)
             ->willReturn($aliasProphecy->reveal())
             ->shouldBeCalled();
+
+        $deprecateMercurePublisherPass->process($containerBuilderProphecy->reveal());
+    }
+
+    public function testProcessWithoutDefinition(): void
+    {
+        $deprecateMercurePublisherPass = new DeprecateMercurePublisherPass();
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+
+        $containerBuilderProphecy
+            ->hasDefinition('api_platform.doctrine.listener.mercure.publish')
+            ->willReturn(false);
+
+        $containerBuilderProphecy
+            ->setAlias('api_platform.doctrine.listener.mercure.publish', 'api_platform.doctrine.orm.listener.mercure.publish')
+            ->shouldNotBeCalled();
 
         $deprecateMercurePublisherPass->process($containerBuilderProphecy->reveal());
     }
