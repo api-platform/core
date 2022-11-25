@@ -218,7 +218,7 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->shouldNotBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
@@ -233,15 +233,7 @@ class ItemNormalizerTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            null,
-            null,
-            null,
-            null,
-            false,
-            null,
-            [],
-            null
+            $resourceClassResolverProphecy->reveal()
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
