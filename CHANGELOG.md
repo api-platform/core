@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.0.5
+
+### Bug fixes
+
+* [0f891616f](https://github.com/api-platform/core/commit/0f891616f65ad7a27338dbb91ab7c773f4e7d36e) fix(metadata): route prefix in the operation name (#5208)
+* [84a7e564d](https://github.com/api-platform/core/commit/84a7e564d0c3baded424ae754be00144e8179091) fix(metadata): getOperation cache matches arguments (#5215)
+* [bd0b05abc](https://github.com/api-platform/core/commit/bd0b05abc0f7e563290369eb7f45d6689d9ff10b) fix(serializer): dynamic groups should not be cached (#5207)
+* [ebaad51b2](https://github.com/api-platform/core/commit/ebaad51b2ce173b6c59582dcc6fb311f1f4b7fa9) fix(serializer): read groups off the root operation (#5196)
+
 ## v3.0.4
 
 ### Bug fixes
