@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.7.5
+
+### Bug fixes
+
+* [096ac119a](https://github.com/api-platform/core/commit/096ac119a5126bdc5e7877172a033d7cdaa28983) fix(metadata): keep configured uri variables (#5217)
+* [2b2d468f0](https://github.com/api-platform/core/commit/2b2d468f06a63ecfa4928d5d631953acb624c181) fix(metadata): operations must inherit from resource and defaults
+* [2cb3b4272](https://github.com/api-platform/core/commit/2cb3b42725105aaf34dc9d71d2c03e156acd5833) fix(serializer): use iri from $context if defined (#5201)
+* [39398579e](https://github.com/api-platform/core/commit/39398579e32976b5b4b0219da98fdb35629a35ad) fix(symfony): definition when mercure is not installed (#5206)
+* [e9c7e4abb](https://github.com/api-platform/core/commit/e9c7e4abb683bb830a61712a8b63b8063e015b13) fix(serializer): avoid call to legacy iri converter with non-resource class (#5219)
+* [ebaad51b2](https://github.com/api-platform/core/commit/ebaad51b2ce173b6c59582dcc6fb311f1f4b7fa9) fix(serializer): read groups off the root operation (#5196)
+
 ## v2.7.4
 
 ### Bug fixes
