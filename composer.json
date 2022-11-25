@@ -12,12 +12,6 @@
             "homepage": "https://dunglas.fr"
         }
     ],
-    "repositories": [
-        {
-            "type": "git",
-            "url": "git@github.com:cdaguerre/contexts.git"
-        }
-    ],
     "require": {
         "php": ">=8.1",
         "doctrine/inflector": "^1.0 || ^2.0",
@@ -35,7 +29,7 @@
     "require-dev": {
         "behat/behat": "^3.1",
         "behat/mink": "^1.9@dev",
-        "behatch/contexts": "dev-patch-1",
+        "soyuka/contexts": "dev-main",
         "doctrine/cache": "^1.11 || ^2.1",
         "doctrine/common": "^2.11 || ^3.0",
         "doctrine/data-fixtures": "^1.2.2",

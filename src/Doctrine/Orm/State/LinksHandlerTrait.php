@@ -45,7 +45,7 @@ trait LinksHandlerTrait
         $identifiers = array_reverse($identifiers);
 
         foreach (array_reverse($links) as $link) {
-            if ($link->getExpandedValue() || !$link->getFromClass()) {
+            if (null !== $link->getExpandedValue() || !$link->getFromClass()) {
                 continue;
             }
 

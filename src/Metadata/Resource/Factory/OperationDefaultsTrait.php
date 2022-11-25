@@ -51,19 +51,21 @@ trait OperationDefaultsTrait
                 if (!isset($extraProperties[$key])) {
                     $extraProperties[$key] = $value;
                 }
-            } else {
-                $currentValue = $operation->{$getter}();
 
-                if (\is_array($currentValue) && $currentValue) {
-                    $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
-                }
-
-                if (null !== $currentValue) {
-                    continue;
-                }
-
-                $operation = $operation->{'with'.$upperKey}($value);
+                continue;
             }
+
+            $currentValue = $operation->{$getter}();
+
+            if (\is_array($currentValue) && $currentValue) {
+                $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
+            }
+
+            if (null !== $currentValue) {
+                continue;
+            }
+
+            $operation = $operation->{'with'.$upperKey}($value);
         }
 
         return $operation->withExtraProperties(array_merge($extraProperties, $operation->getExtraProperties()));
