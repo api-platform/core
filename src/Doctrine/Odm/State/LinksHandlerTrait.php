@@ -37,6 +37,12 @@ trait LinksHandlerTrait
             return;
         }
 
+        foreach ($links as $i => $link) {
+            if (null !== $link->getExpandedValue()) {
+                unset($links[$i]);
+            }
+        }
+
         $executeOptions = $operation->getExtraProperties()['doctrine_mongodb']['execute_options'] ?? [];
 
         $this->buildAggregation($resourceClass, array_reverse($links), array_reverse($identifiers), $context, $executeOptions, $resourceClass, $aggregationBuilder);
