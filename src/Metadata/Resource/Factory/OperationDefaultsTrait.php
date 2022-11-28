@@ -187,17 +187,6 @@ trait OperationDefaultsTrait
             $operation = $operation->withName($operation->getRouteName());
         }
 
-        // Check for name conflict
-        if ($operation->getName() && null !== ($operations = $resource->getOperations())) {
-            if (!$operations->has($operation->getName())) {
-                return [$operation->getName(), $operation];
-            }
-
-            $this->logger->warning(sprintf('The operation "%s" already exists on the resource "%s", pick a different name or leave it empty. In the meantime we will generate a unique name.', $operation->getName(), $resource->getClass()));
-            /** @var HttpOperation $operation */
-            $operation = $operation->withName('');
-        }
-
         $operationName = $operation->getName() ?? sprintf(
             '_api_%s_%s%s',
             $operation->getUriTemplate() ?: $operation->getShortName(),

@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PasswordResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeDefaultOperations;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeOnlyOperation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
@@ -225,5 +226,19 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 ]
             ),
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeOnlyOperation::class));
+    }
+
+    /**
+     * Tests issue #5235.
+     */
+    public function testNameDeclarationShouldNotBeRemoved(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+
+        $metadataCollection = $attributeResourceMetadataCollectionFactory->create(PasswordResource::class);
+        $operations = $metadataCollection[0]->getOperations();
+        $this->assertTrue($operations->has('password_set'));
+        $this->assertTrue($operations->has('password_reset_token'));
+        $this->assertTrue($operations->has('password_reset'));
     }
 }
