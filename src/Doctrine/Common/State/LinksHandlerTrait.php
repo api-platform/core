@@ -20,9 +20,12 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 trait LinksHandlerTrait
 {
+    private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+
     /**
      * @return Link[]
      */
@@ -45,6 +48,10 @@ trait LinksHandlerTrait
         }
 
         if ($newLink) {
+            return [$newLink];
+        }
+
+        if (!$this->resourceMetadataCollectionFactory) {
             return [$newLink];
         }
 
