@@ -66,6 +66,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
@@ -427,8 +428,8 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testMetadataConfigurationDocBlockFactoryInterface(): void
     {
-        if (!interface_exists(DocBlockFactoryInterface::class)) {
-            $this->markTestSkipped('class phpDocumentor\Reflection\DocBlockFactoryInterface does not exist');
+        if (!class_exists(PhpDocParser::class) || !interface_exists(DocBlockFactoryInterface::class)) {
+            $this->markTestSkipped('class PHPStan\PhpDocParser\Parser\PhpDocParser or phpDocumentor\Reflection\DocBlockFactoryInterface does not exist');
         }
 
         $config = self::DEFAULT_CONFIG;
