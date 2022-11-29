@@ -13,16 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Enum;
 
-use ApiPlatform\Metadata\ApiProperty;
-
-/**
- * An enumeration of genders.
- */
-enum GenderTypeEnum: string
+enum EnumWithDescriptions
 {
-    /** The male gender. */
-    case MALE = 'male';
+    /**
+     * A short description for case one.
+     */
+    case ONE;
 
-    #[ApiProperty(description: 'The female gender.')]
-    case FEMALE = 'female';
+    /**
+     * A short description for case two.
+     *
+     * A long description for case two.
+     */
+    case TWO;
 }

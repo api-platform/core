@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\GraphQl\Type;
 
 use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\GraphQl\Type\TypeBuilderInterface;
+use ApiPlatform\GraphQl\Type\TypeBuilderEnumInterface;
 use ApiPlatform\GraphQl\Type\TypeConverter;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\Metadata\ApiProperty;
@@ -25,7 +25,9 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
 use ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
@@ -42,13 +44,9 @@ class TypeConverterTest extends TestCase
     use ProphecyTrait;
 
     private ObjectProphecy $typeBuilderProphecy;
-
     private ObjectProphecy $typesContainerProphecy;
-
     private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
-
     private ObjectProphecy $propertyMetadataFactoryProphecy;
-
     private TypeConverter $typeConverter;
 
     /**
@@ -56,7 +54,7 @@ class TypeConverterTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->typeBuilderProphecy = $this->prophesize(TypeBuilderInterface::class);
+        $this->typeBuilderProphecy = $this->prophesize(TypeBuilderEnumInterface::class);
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -69,6 +67,8 @@ class TypeConverterTest extends TestCase
     public function testConvertType(Type $type, bool $input, int $depth, GraphQLType|string|null $expectedGraphqlType): void
     {
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
+        $this->resourceMetadataCollectionFactoryProphecy->create(Argument::type('string'))->willThrow(new ResourceClassNotFoundException());
+        $this->typeBuilderProphecy->getEnumType(Argument::type(Operation::class))->willReturn($expectedGraphqlType);
 
         /** @var Operation $operation */
         $operation = (new Query())->withName('test');
@@ -86,6 +86,7 @@ class TypeConverterTest extends TestCase
             [new Type(Type::BUILTIN_TYPE_ARRAY), false, 0, 'Iterable'],
             [new Type(Type::BUILTIN_TYPE_ITERABLE), false, 0, 'Iterable'],
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class), false, 0, GraphQLType::string()],
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class), false, 0, new EnumType(['name' => 'GenderTypeEnum'])],
             [new Type(Type::BUILTIN_TYPE_OBJECT), false, 0, null],
             [new Type(Type::BUILTIN_TYPE_CALLABLE), false, 0, null],
             [new Type(Type::BUILTIN_TYPE_NULL), false, 0, null],

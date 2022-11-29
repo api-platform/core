@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\GraphQl\Type;
 
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\GraphQl\Type\FieldsBuilderInterface;
+use ApiPlatform\GraphQl\Type\FieldsBuilderEnumInterface;
 use ApiPlatform\GraphQl\Type\TypeBuilder;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\Metadata\ApiResource;
@@ -26,6 +26,8 @@ use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GamePlayMode;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;
@@ -48,12 +50,9 @@ class TypeBuilderTest extends TestCase
     use ProphecyTrait;
 
     private ObjectProphecy $typesContainerProphecy;
-
     /** @var callable */
     private $defaultFieldResolver;
-
     private ObjectProphecy $fieldsBuilderLocatorProphecy;
-
     private TypeBuilder $typeBuilder;
 
     /**
@@ -93,7 +92,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $operation, false, 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
@@ -119,7 +118,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $fieldsBuilderProphecy->getResourceObjectTypeFields('outputClass', $operation, false, 0, ['class' => 'outputClass'])->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
@@ -188,7 +187,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $operation, true, 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $wrappedType->config['fields']();
@@ -214,7 +213,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $operation, true, 1, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $wrappedType->config['fields']();
@@ -240,7 +239,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $operation, true, 0, null)
             ->shouldBeCalled()->willReturn(['clientMutationId' => GraphQLType::string()]);
         $fieldsBuilderProphecy->resolveResourceArgs([], $operation)->shouldBeCalled();
@@ -320,7 +319,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $operation, false, 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $wrappedType->config['fields']();
@@ -344,7 +343,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $operation, false, 1, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
@@ -425,7 +424,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $operation, false, 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $wrappedType->config['fields']();
@@ -449,7 +448,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $operation, false, 1, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
@@ -477,7 +476,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame(GraphQLType::string(), $resolvedType);
     }
 
-    public function testCursorBasedGetResourcePaginatedCollectionType(): void
+    public function testCursorBasedGetPaginatedCollectionType(): void
     {
         /** @var Operation $operation */
         $operation = (new Query())->withPaginationType('cursor');
@@ -487,7 +486,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->set('StringPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'test', $operation);
+        $resourcePaginatedCollectionType = $this->typeBuilder->getPaginatedCollectionType(GraphQLType::string(), $operation);
         $this->assertSame('StringCursorConnection', $resourcePaginatedCollectionType->name);
         $this->assertSame('Cursor connection for String.', $resourcePaginatedCollectionType->description);
 
@@ -533,7 +532,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame(GraphQLType::int(), $totalCountType->getWrappedType());
     }
 
-    public function testPageBasedGetResourcePaginatedCollectionType(): void
+    public function testPageBasedGetPaginatedCollectionType(): void
     {
         /** @var Operation $operation */
         $operation = (new Query())->withPaginationType('page');
@@ -542,7 +541,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->set('StringPaginationInfo', Argument::type(ObjectType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'test', $operation);
+        $resourcePaginatedCollectionType = $this->typeBuilder->getPaginatedCollectionType(GraphQLType::string(), $operation);
         $this->assertSame('StringPageConnection', $resourcePaginatedCollectionType->name);
         $this->assertSame('Page connection for String.', $resourcePaginatedCollectionType->description);
 
@@ -566,6 +565,35 @@ class TypeBuilderTest extends TestCase
         $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['lastPage']->getType()->getWrappedType());
         $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['totalCount']->getType());
         $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['totalCount']->getType()->getWrappedType());
+    }
+
+    public function testGetEnumType(): void
+    {
+        $enumClass = GamePlayMode::class;
+        $enumName = 'GamePlayMode';
+        $enumDescription = 'GamePlayModeEnum description';
+        /** @var Operation $operation */
+        $operation = (new Operation())
+            ->withClass($enumClass)
+            ->withShortName($enumName)
+            ->withDescription('GamePlayModeEnum description');
+
+        $this->typesContainerProphecy->has('GamePlayModeEnum')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('GamePlayModeEnum', Argument::type(EnumType::class))->shouldBeCalled();
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
+        $enumValues = [
+            GamePlayMode::CO_OP->name => ['value' => GamePlayMode::CO_OP->value],
+            GamePlayMode::MULTI_PLAYER->name => ['value' => GamePlayMode::MULTI_PLAYER->value],
+            GamePlayMode::SINGLE_PLAYER->name => ['value' => GamePlayMode::SINGLE_PLAYER->value, 'description' => 'Which is played by a lone player.'],
+        ];
+        $fieldsBuilderProphecy->getEnumFields($enumClass)->willReturn($enumValues);
+        $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->willReturn($fieldsBuilderProphecy->reveal());
+
+        self::assertEquals(new EnumType([
+            'name' => $enumName,
+            'description' => $enumDescription,
+            'values' => $enumValues,
+        ]), $this->typeBuilder->getEnumType($operation));
     }
 
     /**

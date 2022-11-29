@@ -32,12 +32,13 @@ class Person
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
+    #[ODM\Field(type: 'string', enumType: GenderTypeEnum::class, nullable: true)]
+    #[Groups(['people.pets'])]
+    public ?GenderTypeEnum $genderType = GenderTypeEnum::MALE;
+
     #[Groups(['people.pets'])]
     #[ODM\Field(type: 'string')]
     public string $name;
-
-    #[ODM\Field(type: 'string', enumType: GenderTypeEnum::class, nullable: true)]
-    public ?GenderTypeEnum $genderType = GenderTypeEnum::MALE;
 
     #[Groups(['people.pets'])]
     #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'person')]

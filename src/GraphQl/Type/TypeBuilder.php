@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\NonNull;
@@ -35,7 +36,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class TypeBuilder implements TypeBuilderInterface
+final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterface
 {
     private $defaultFieldResolver;
 
@@ -202,6 +203,16 @@ final class TypeBuilder implements TypeBuilderInterface
      */
     public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, Operation $operation): GraphQLType
     {
+        @trigger_error('Using getResourcePaginatedCollectionType method of TypeBuilder is deprecated since API Platform 3.1. Use getPaginatedCollectionType method instead.', \E_USER_DEPRECATED);
+
+        return $this->getPaginatedCollectionType($resourceType, $operation);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaginatedCollectionType(GraphQLType $resourceType, Operation $operation): GraphQLType
+    {
         $shortName = $resourceType->name;
         $paginationType = $this->pagination->getGraphQlPaginationType($operation);
 
@@ -224,6 +235,42 @@ final class TypeBuilder implements TypeBuilderInterface
         $this->typesContainer->set($connectionTypeKey, $resourcePaginatedCollectionType);
 
         return $resourcePaginatedCollectionType;
+    }
+
+    public function getEnumType(Operation $operation): GraphQLType
+    {
+        $enumName = $operation->getShortName();
+        $enumKey = $enumName;
+        if (!str_ends_with($enumName, 'Enum')) {
+            $enumKey = sprintf('%sEnum', $enumName);
+        }
+
+        if ($this->typesContainer->has($enumKey)) {
+            return $this->typesContainer->get($enumKey);
+        }
+
+        /** @var FieldsBuilderEnumInterface|FieldsBuilderInterface $fieldsBuilder */
+        $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
+        $enumCases = [];
+        // Remove the condition in API Platform 4.
+        if ($fieldsBuilder instanceof FieldsBuilderEnumInterface) {
+            $enumCases = $fieldsBuilder->getEnumFields($operation->getClass());
+        } else {
+            @trigger_error(sprintf('api_platform.graphql.fields_builder service implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', FieldsBuilderInterface::class, FieldsBuilderEnumInterface::class), \E_USER_DEPRECATED);
+        }
+
+        $enumConfig = [
+            'name' => $enumName,
+            'values' => $enumCases,
+        ];
+        if ($enumDescription = $operation->getDescription()) {
+            $enumConfig['description'] = $enumDescription;
+        }
+
+        $enumType = new EnumType($enumConfig);
+        $this->typesContainer->set($enumKey, $enumType);
+
+        return $enumType;
     }
 
     /**

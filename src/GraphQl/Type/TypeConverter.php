@@ -37,8 +37,11 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeConverter implements TypeConverterInterface
 {
-    public function __construct(private readonly TypeBuilderInterface $typeBuilder, private readonly TypesContainerInterface $typesContainer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory)
+    public function __construct(private readonly TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder, private readonly TypesContainerInterface $typesContainer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
+        if ($typeBuilder instanceof TypeBuilderInterface) {
+            @trigger_error(sprintf('$typeBuilder argument of TypeConverter implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', TypeBuilderInterface::class, TypeBuilderEnumInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -67,7 +70,28 @@ final class TypeConverter implements TypeConverterInterface
                     return GraphQLType::string();
                 }
 
-                return $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth);
+                $resourceType = $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth);
+
+                if (!$resourceType && is_a($type->getClassName(), \BackedEnum::class, true)) {
+                    // Remove the condition in API Platform 4.
+                    if ($this->typeBuilder instanceof TypeBuilderEnumInterface) {
+                        $operation = null;
+                        try {
+                            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($type->getClassName());
+                            $operation = $resourceMetadataCollection->getOperation();
+                        } catch (ResourceClassNotFoundException|OperationNotFoundException) {
+                        }
+                        /** @var Query $enumOperation */
+                        $enumOperation = (new Query())
+                            ->withClass($type->getClassName())
+                            ->withShortName($operation?->getShortName() ?? (new \ReflectionClass($type->getClassName()))->getShortName())
+                            ->withDescription($operation?->getDescription());
+
+                        return $this->typeBuilder->getEnumType($enumOperation);
+                    }
+                }
+
+                return $resourceType;
             default:
                 return null;
         }

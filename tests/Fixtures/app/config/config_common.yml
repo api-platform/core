@@ -78,6 +78,7 @@ api_platform:
     doctrine_mongodb_odm: false
     mapping:
         paths:
+            - '%kernel.project_dir%/../TestBundle/Enum'
             - '%kernel.project_dir%/../TestBundle/Model'
 
 parameters:

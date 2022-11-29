@@ -35,6 +35,7 @@ class Person
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', enumType: GenderTypeEnum::class, nullable: true)]
+    #[Groups(['people.pets'])]
     public ?GenderTypeEnum $genderType = GenderTypeEnum::MALE;
 
     #[ORM\Column(type: 'string')]
