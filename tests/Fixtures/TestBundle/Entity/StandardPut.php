@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -21,10 +23,12 @@ use Doctrine\ORM\Mapping\Id;
 /**
  * @author Kévin Dunglas <kevin@dunglas.fr>
  */
-#[ApiResource(extraProperties: [
-    'standard_put' => true,
-    'allow_create' => true,
-])]
+#[ApiResource(
+    operations: [new Get(), new Put(allowCreate: true)],
+    extraProperties: [
+        'standard_put' => true,
+    ]
+)]
 #[Entity]
 class StandardPut
 {

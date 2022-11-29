@@ -97,7 +97,7 @@ final class ReadListener
             null === $data &&
             (
                 HttpOperation::METHOD_PUT !== $operation->getMethod() ||
-                !($operation->getExtraProperties()['allow_create'] ?? false)
+                !($operation->getAllowCreate() ?? false)
             )
         ) {
             throw new NotFoundHttpException('Not Found');
