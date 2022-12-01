@@ -43,6 +43,11 @@ interface FilterInterface
      *          'type' => 'integer',
      *       ]
      *     ]
+     *   - schema (optional): schema definition,
+     *     e.g. 'schema' => [
+     *       'type' => 'string',
+     *       'enum' => ['value_1', 'value_2'],
+     *     ]
      * The description can contain additional data specific to a filter.
      *
      * @see \ApiPlatform\OpenApi\Factory\OpenApiFactory::getFiltersParameters
