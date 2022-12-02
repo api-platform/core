@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * Symfony router decorator.
  *
- * Kévin Dunglas <dunglas@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Router implements RouterInterface, UrlGeneratorInterface
 {
