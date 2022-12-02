@@ -56,10 +56,14 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
         if (class_exists(DocBlockFactory::class) && !class_exists(PhpDocParser::class)) {
             trigger_deprecation('api-platform/core', '3.1', 'Using phpdocumentor/reflection-docblock is deprecated. Require phpstan/phpdoc-parser instead.');
         }
+        $phpDocParser = null;
+        $lexer = null;
         if (class_exists(PhpDocParser::class)) {
-            $this->phpDocParser = new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser());
-            $this->lexer = new Lexer();
+            $phpDocParser = new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser());
+            $lexer = new Lexer();
         }
+        $this->phpDocParser = $phpDocParser;
+        $this->lexer = $lexer;
     }
 
     /**
