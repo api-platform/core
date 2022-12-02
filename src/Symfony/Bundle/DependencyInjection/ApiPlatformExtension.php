@@ -39,7 +39,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -535,14 +534,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerCacheConfiguration(ContainerBuilder $container): void
     {
-        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
-            $container->register('api_platform.cache.metadata.property', ArrayAdapter::class)->addTag('cache.pool');
-            $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class)->addTag('cache.pool');
-            $container->register('api_platform.cache.metadata.resource_collection', ArrayAdapter::class)->addTag('cache.pool');
-            $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class)->addTag('cache.pool');
-            $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
-            $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
-        } else {
+        if (!$container->hasParameter('kernel.debug') || !$container->getParameter('kernel.debug')) {
             $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
         }
     }

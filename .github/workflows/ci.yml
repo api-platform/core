@@ -397,9 +397,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Check
+      - name: Setup MongoDB
         run: |
-          sudo systemctl start mongod.service
+          sudo apt update
+          sudo apt install -y wget gnupg
+          wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          sudo apt update
+          sudo apt install -y mongodb-org
+          sudo systemctl start mongod
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
