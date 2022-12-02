@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.6
+
+### Bug fixes
+
+* [d4173e7db](https://github.com/api-platform/core/commit/d4173e7dbca8e72af484c38fa0dc46a81b238fc6) fix(metadata): do not override name fixes #5235 (#5237)
+
 ## v3.0.5
 
 ### Bug fixes
@@ -97,6 +103,7 @@ Breaking changes:
 * Identifiers: using an object as identifier is supported only when this object is `Stringable`
 * Serializer: `skip_null_values` now defaults to `true`
 * Metadata: `Patch` is added to the automatic CRUD
+* Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
 
 ## v2.7.5
 
