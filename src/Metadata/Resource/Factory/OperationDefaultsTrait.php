@@ -187,16 +187,28 @@ trait OperationDefaultsTrait
             $operation = $operation->withName($operation->getRouteName());
         }
 
-        $operationName = $operation->getName() ?? sprintf(
-            '_api_%s_%s%s',
-            $operation->getUriTemplate() ?: $operation->getShortName(),
-            strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET),
-            $operation instanceof CollectionOperationInterface ? '_collection' : '',
-        );
+        $path = ($operation->getRoutePrefix() ?? '').($operation->getUriTemplate() ?? '');
+        $operationName = $operation->getName() ?? $this->getDefaultOperationName($operation, $resource->getClass());
 
         return [
             $operationName,
             $operation,
         ];
+    }
+
+    private function getDefaultShortname(string $resourceClass): string
+    {
+        return (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
+    }
+
+    private function getDefaultOperationName(HttpOperation $operation, string $resourceClass): string
+    {
+        $path = ($operation->getRoutePrefix() ?? '').($operation->getUriTemplate() ?? '');
+
+        return sprintf(
+            '_api_%s_%s%s',
+            $path ?: ($operation->getShortName() ?? $this->getDefaultShortname($resourceClass)),
+            strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET),
+            $operation instanceof CollectionOperationInterface ? '_collection' : '');
     }
 }

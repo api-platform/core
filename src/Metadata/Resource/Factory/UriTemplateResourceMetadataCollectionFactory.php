@@ -27,6 +27,8 @@ use Symfony\Component\Routing\Route;
  */
 final class UriTemplateResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use OperationDefaultsTrait;
+
     private $triggerLegacyFormatOnce = [];
 
     public function __construct(private readonly LinkFactoryInterface $linkFactory, private readonly PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
@@ -78,12 +80,12 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 }
 
                 $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
-                $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : '');
+
                 if (!$operation->getName()) {
-                    $operation = $operation->withName($operationName);
+                    $operation = $operation->withName($this->getDefaultOperationName($operation, $resourceClass));
                 }
 
-                $operations->add($operationName, $operation);
+                $operations->add($operation->getName(), $operation);
             }
 
             $resource = $resource->withOperations($operations->sort());
