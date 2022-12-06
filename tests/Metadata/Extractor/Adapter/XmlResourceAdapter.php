@@ -218,9 +218,141 @@ XML_WRAP
         $this->buildValues($resource->addChild('hydraContext'), $values);
     }
 
+    /**
+     * TODO Remove in 4.0.
+     *
+     * @deprecated
+     */
     private function buildOpenapiContext(\SimpleXMLElement $resource, array $values): void
     {
         $this->buildValues($resource->addChild('openapiContext'), $values);
+    }
+
+    private function buildOpenapi(\SimpleXMLElement $resource, array $values): void
+    {
+        $node = $resource->openapi ?? $resource->addChild('openapi');
+
+        if (isset($values['tags'])) {
+            $tagsNode = $node->tags ?? $node->addChild('tags');
+            foreach ($values['tags'] as $tag) {
+                $tagsNode->addChild('tag', $tag);
+            }
+        }
+
+        if (isset($values['responses'])) {
+            $responsesNode = $node->responses ?? $node->addChild('responses');
+            foreach ($values['responses'] as $status => $response) {
+                $responseNode = $responsesNode->addChild('response');
+                $responseNode->addAttribute('status', $status);
+                if (isset($response['description'])) {
+                    $responseNode->addAttribute('description', $response['description']);
+                }
+                if (isset($response['content'])) {
+                    $this->buildValues($responseNode->addChild('content'), $response['content']);
+                }
+                if (isset($response['headers'])) {
+                    $this->buildValues($responseNode->addChild('headers'), $response['headers']);
+                }
+                if (isset($response['links'])) {
+                    $this->buildValues($responseNode->addChild('links'), $response['links']);
+                }
+            }
+        }
+
+        if (isset($values['externalDocs'])) {
+            $externalDocsNode = $node->externalDocs ?? $node->addChild('externalDocs');
+            if (isset($values['externalDocs']['description'])) {
+                $externalDocsNode->addAttribute('description', $values['externalDocs']['description']);
+            }
+            if (isset($values['url']['description'])) {
+                $externalDocsNode->addAttribute('url', $values['externalDocs']['url']);
+            }
+        }
+
+        if (isset($values['parameters'])) {
+            $parametersNode = $node->parameters ?? $node->addChild('parameters');
+            foreach ($values['parameters'] as $name => $parameter) {
+                $parameterNode = $parametersNode->addChild('parameter');
+                $parameterNode->addAttribute('name', $name);
+                if (isset($parameter['in'])) {
+                    $parameterNode->addAttribute('in', $parameter['in']);
+                }
+                if (isset($parameter['description'])) {
+                    $parameterNode->addAttribute('description', $parameter['description']);
+                }
+                if (isset($parameter['required'])) {
+                    $parameterNode->addAttribute('required', $parameter['required']);
+                }
+                if (isset($parameter['deprecated'])) {
+                    $parameterNode->addAttribute('deprecated', $parameter['deprecated']);
+                }
+                if (isset($parameter['allowEmptyValue'])) {
+                    $parameterNode->addAttribute('allowEmptyValue', $parameter['allowEmptyValue']);
+                }
+                if (isset($parameter['style'])) {
+                    $parameterNode->addAttribute('style', $parameter['style']);
+                }
+                if (isset($parameter['explode'])) {
+                    $parameterNode->addAttribute('explode', $parameter['explode']);
+                }
+                if (isset($parameter['allowReserved'])) {
+                    $parameterNode->addAttribute('allowReserved', $parameter['allowReserved']);
+                }
+                if (isset($parameter['example'])) {
+                    $parameterNode->addAttribute('example', $parameter['example']);
+                }
+                if (isset($parameter['schema'])) {
+                    $this->buildValues($parameterNode->addChild('schema'), $parameter['schema']);
+                }
+                if (isset($parameter['examples'])) {
+                    $this->buildValues($parameterNode->addChild('examples'), $parameter['examples']);
+                }
+                if (isset($parameter['content'])) {
+                    $this->buildValues($parameterNode->addChild('content'), $parameter['content']);
+                }
+            }
+        }
+
+        if (isset($values['requestBody'])) {
+            $requestBodyNode = $node->requestBody ?? $node->addChild('requestBody');
+            if (isset($values['requestBody']['content'])) {
+                $this->buildValues($requestBodyNode->addChild('content'), $values['requestBody']['content']);
+            }
+            if (isset($values['requestBody']['description'])) {
+                $requestBodyNode->addAttribute('description', $values['requestBody']['description']);
+            }
+            if (isset($values['requestBody']['required'])) {
+                $requestBodyNode->addAttribute('required', $values['requestBody']['required']);
+            }
+        }
+
+        if (isset($values['callbacks'])) {
+            $this->buildValues($node->callbacks ?? $node->addChild('callbacks'), $values['callbacks']);
+        }
+
+        if (isset($values['security'])) {
+            $this->buildValues($node->security ?? $node->addChild('security'), $values['security']);
+        }
+
+        if (isset($values['servers'])) {
+            $serversNode = $node->servers ?? $node->addChild('servers');
+            foreach ($values['servers'] as $server) {
+                $serverNode = $serversNode->addChild('serverNode');
+                if (isset($server['url'])) {
+                    $serverNode->addAttribute('url', $server['url']);
+                }
+                if (isset($server['description'])) {
+                    $serverNode->addAttribute('description', $server['description']);
+                }
+                if (isset($server['variables'])) {
+                    $this->buildValues($serverNode->addChild('variables'), $server['variables']);
+                }
+            }
+        }
+
+        if (isset($values['extensionProperties'])) {
+            $this->buildValues($node->extensionProperties ?? $node->addChild('extensionProperties'), $values['extensionProperties']);
+        }
     }
 
     private function buildValidationContext(\SimpleXMLElement $resource, array $values): void

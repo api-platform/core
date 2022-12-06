@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+
 class HttpOperation extends Operation
 {
     public const METHOD_GET = 'GET';
@@ -38,6 +40,7 @@ class HttpOperation extends Operation
      * @param array|null                                                      $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
      * @param string[]                                                        $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
      * @param array|null                                                      $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param bool|OpenApiOperation|null                                      $openapi                        https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param string[]|null                                                   $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
      * @param bool|null                                                       $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
      * @param mixed|null                                                      $mercure                        https://api-platform.com/docs/core/mercure
@@ -93,8 +96,8 @@ class HttpOperation extends Operation
         protected ?array $cacheHeaders = null,
 
         protected ?array $hydraContext = null,
-        protected ?array $openapiContext = null,
-        protected ?bool $openapi = null,
+        protected ?array $openapiContext = null, // TODO Remove in 4.0
+        protected bool|OpenApiOperation|null $openapi = null,
         protected ?array $exceptionToStatus = null,
 
         protected ?bool $queryParameterValidationEnabled = null,
@@ -498,11 +501,21 @@ class HttpOperation extends Operation
         return $self;
     }
 
+    /**
+     * TODO Remove in 4.0.
+     *
+     * @deprecated
+     */
     public function getOpenapiContext(): ?array
     {
         return $this->openapiContext;
     }
 
+    /**
+     * TODO Remove in 4.0.
+     *
+     * @deprecated
+     */
     public function withOpenapiContext(array $openapiContext): self
     {
         $self = clone $this;
@@ -511,12 +524,12 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    public function getOpenapi(): ?bool
+    public function getOpenapi(): bool|OpenApiOperation|null
     {
         return $this->openapi;
     }
 
-    public function withOpenapi(bool $openapi): self
+    public function withOpenapi(bool|OpenApiOperation $openapi): self
     {
         $self = clone $this;
         $self->openapi = $openapi;

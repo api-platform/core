@@ -68,7 +68,8 @@ YAML;
   '/dummy_cars/{id}':
     get:
       operationId: $operationId
-      tags: []
+      tags:
+        - Dummy
 YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');

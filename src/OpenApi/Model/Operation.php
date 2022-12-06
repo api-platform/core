@@ -29,7 +29,7 @@ final class Operation
         return $this;
     }
 
-    public function getOperationId(): string
+    public function getOperationId(): ?string
     {
         return $this->operationId;
     }

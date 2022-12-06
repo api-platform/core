@@ -34,6 +34,7 @@ use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\Info;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\Paths;
 use ApiPlatform\OpenApi\Model\Server;
@@ -113,7 +114,10 @@ class OpenApiNormalizerTest extends TestCase
                     'put' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
                     'delete' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
                     'get_collection' => (new GetCollection())->withUriTemplate('/dummies')->withOperation($baseOperation),
-                    'post' => (new Post())->withUriTemplate('/dummies')->withOpenapiContext(['security' => [], 'servers' => ['url' => '/test']])->withOperation($baseOperation),
+                    'post' => (new Post())->withUriTemplate('/dummies')->withOpenapi(new OpenApiOperation(
+                        security: [],
+                        servers: ['url' => '/test'],
+                    ))->withOperation($baseOperation),
                 ]
             )),
         ]);

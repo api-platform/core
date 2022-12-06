@@ -21,6 +21,9 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model\ExternalDocumentation;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\RequestBody;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -106,7 +109,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'types' => $this->buildArrayValue($resource, 'types'),
             'cacheHeaders' => $this->buildArrayValue($resource, 'cacheHeaders'),
             'hydraContext' => $this->buildArrayValue($resource, 'hydraContext'),
-            'openapiContext' => $this->buildArrayValue($resource, 'openapiContext'),
+            'openapiContext' => $this->buildArrayValue($resource, 'openapiContext'), // TODO Remove in 4.0
+            'openapi' => $this->buildOpenapi($resource),
             'paginationViaCursor' => $this->buildArrayValue($resource, 'paginationViaCursor'),
             'exceptionToStatus' => $this->buildArrayValue($resource, 'exceptionToStatus'),
             'defaults' => $this->buildArrayValue($resource, 'defaults'),
@@ -205,6 +209,36 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         return $uriVariables;
     }
 
+    private function buildOpenapi(array $resource): bool|OpenApiOperation|null
+    {
+        if (!\array_key_exists('openapi', $resource)) {
+            return null;
+        }
+
+        if (!\is_array($resource['openapi'])) {
+            return $this->phpize($resource, 'openapi', 'bool');
+        }
+
+        $allowedProperties = array_map(fn (\ReflectionProperty $reflProperty): string => $reflProperty->getName(), (new \ReflectionClass(OpenApiOperation::class))->getProperties());
+        foreach ($resource['openapi'] as $key => $value) {
+            $resource['openapi'][$key] = match ($key) {
+                'externalDocs' => new ExternalDocumentation(description: $value['description'] ?? '', url: $value['url'] ?? ''),
+                'requestBody' => new RequestBody(description: $value['description'] ?? '', content: isset($value['content']) ? new \ArrayObject($value['content'] ?? []) : null, required: $value['required'] ?? false),
+                'callbacks' => new \ArrayObject($value ?? []),
+                default => $value,
+            };
+
+            if (\in_array($key, $allowedProperties, true)) {
+                continue;
+            }
+
+            $resource['openapi']['extensionProperties'][$key] = $value;
+            unset($resource['openapi'][$key]);
+        }
+
+        return new OpenApiOperation(...$resource['openapi']);
+    }
+
     /**
      * @return bool|string|string[]|null
      */
@@ -271,7 +305,6 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             $data[] = array_merge($datum, [
                 'read' => $this->phpize($operation, 'read', 'bool'),
                 'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
-                'openapi' => $this->phpize($operation, 'openapi', 'bool'),
                 'validate' => $this->phpize($operation, 'validate', 'bool'),
                 'write' => $this->phpize($operation, 'write', 'bool'),
                 'serialize' => $this->phpize($operation, 'serialize', 'bool'),
