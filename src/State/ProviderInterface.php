@@ -26,6 +26,8 @@ interface ProviderInterface
 {
     /**
      * Provides data.
+     *
+     * @return T|Pagination\PartialPaginatorInterface<T>|iterable<T>|null
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null;
 }
