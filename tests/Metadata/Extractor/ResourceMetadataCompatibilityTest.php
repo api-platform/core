@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Metadata\Extractor;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Extractor\YamlResourceExtractor;
@@ -474,7 +473,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 // Build default operations
                 $operations = [];
                 foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
-                    $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
+                    $operationName = $this->getDefaultOperationName($operation, self::RESOURCE_CLASS);
                     [$name, $operation] = $this->getOperationWithDefaults($resource, $operation);
                     $operations[$name] = $operation;
                 }
@@ -572,7 +571,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 throw new \RuntimeException(sprintf('Unknown Operation parameter "%s".', $parameter));
             }
 
-            $operationName = $operation->getName() ?? sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
+            $operationName = $operation->getName() ?? $this->getDefaultOperationName($operation, self::RESOURCE_CLASS);
             $operations[$operationName] = $operation;
         }
 
