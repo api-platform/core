@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\HttpCache\TagsInvalidatorInterface;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
@@ -305,45 +306,185 @@ final class Configuration implements ConfigurationInterface
 
     private function addHttpCacheSection(ArrayNodeDefinition $rootNode): void
     {
-        $rootNode
-            ->children()
-                ->arrayNode('http_cache')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->booleanNode('public')->defaultNull()->info('To make all responses public by default.')->end()
-                        ->arrayNode('invalidation')
-                            ->info('Enable the tags-based cache invalidation system.')
-                            ->canBeEnabled()
-                            ->children()
-                                ->arrayNode('varnish_urls')
-                                    ->defaultValue([])
-                                    ->prototype('scalar')->end()
-                                    ->info('URLs of the Varnish servers to purge using cache tags when a resource is updated.')
-                                ->end()
-                                ->integerNode('max_header_length')
-                                    ->defaultValue(7500)
-                                    ->info('Max header length supported by the server')
-                                ->end()
-                                ->variableNode('request_options')
-                                    ->defaultValue([])
-                                    ->validate()
-                                        ->ifTrue(static fn($v): bool => false === \is_array($v))
-                                        ->thenInvalid('The request_options parameter must be an array.')
-                                    ->end()
-                                    ->info('To pass options to the client charged with the request.')
-                                ->end()
-                                ->scalarNode('purger')
-                                    ->defaultValue('api_platform.http_cache.purger.varnish')
-                                    ->info('Specify a varnish purger to use (available values: "api_platform.http_cache.purger.varnish.ban" or "api_platform.http_cache.purger.varnish.xkey").')
-                                ->end()
-                                ->arrayNode('xkey')
-                                    ->addDefaultsIfNotSet()
-                                    ->children()
-                                        ->scalarNode('glue')
-                                        ->defaultValue(' ')
-                                        ->info('xkey glue between keys')
+        $httpCacheNode = $rootNode->children()->arrayNode('http_cache')->addDefaultsIfNotSet();
+
+        $this->addLegacyHttpCacheNodes($httpCacheNode);
+
+        $httpCacheNode->children()
+            ->booleanNode('public')->defaultNull()->info('To make all responses public by default.')->end()
+            ->arrayNode('tags')
+                ->info('Configure tags ("surrogate keys") support. This can be disabled if you don’t use a caching proxy.')
+                ->canBeDisabled()
+                ->children()
+                    ->arrayNode('header')
+                        ->info('Configure a response header tags will be set into.')
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->scalarNode('name')
+                                ->defaultValue('Cache-Tags')
+                            ->end()
+                            ->scalarNode('separator')
+                                ->info('If null, multiple headers with one tag each will be set.')
+                                ->defaultValue(',')
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->arrayNode('invalidator')
+                        ->canBeEnabled()
+                        ->validate()
+                            ->ifTrue(static function (array $config): bool {
+                                if (!$config['enabled']) {
+                                    return false;
+                                }
+
+                                return 1 !== isset($config['id']) + isset($config['purger']) + isset($config['banner']);
+                            })
+                            ->thenInvalid('You have to configure one of "id", "purger" or "banner" if you want to invalidate tags.')
+                        ->end()
+                        ->children()
+                            ->scalarNode('id')
+                                ->info('ID of a custom service implementing '.TagsInvalidatorInterface::class.'.')
+                            ->end()
+                            ->arrayNode('purger')
+                                ->info('Configure a service invalidating tags by sending PURGE requests.')
+                                ->children()
+                                    ->arrayNode('header')
+                                        ->addDefaultsIfNotSet()
+                                        ->children()
+                                            ->scalarNode('name')->defaultValue('xkey')->end()
+                                            ->integerNode('max_size')->defaultValue(7500)->end()
+                                            ->scalarNode('separator')->defaultValue(' ')->end()
                                         ->end()
                                     ->end()
+                                    ->arrayNode('urls')
+                                        ->info('URLs to send requests to.')
+                                        ->cannotBeEmpty()
+                                        ->prototype('scalar')->end()
+                                    ->end()
+                                    ->arrayNode('client_options')
+                                        ->info('Options to pass to the HTTP clients sending the requests.')
+                                        ->prototype('variable')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                            ->arrayNode('banner')
+                                ->info('Configure a service invalidating tags by sending BAN requests.')
+                                ->children()
+                                    ->arrayNode('header')
+                                        ->addDefaultsIfNotSet()
+                                        ->children()
+                                            ->scalarNode('name')->defaultValue('ApiPlatform-Ban-Regex')->end()
+                                            ->integerNode('max_size')->defaultValue(7500)->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('urls')
+                                        ->info('URLs to send requests to.')
+                                        ->cannotBeEmpty()
+                                        ->prototype('scalar')->end()
+                                    ->end()
+                                    ->arrayNode('client_options')
+                                        ->info('Options to pass to the HTTP clients sending the requests.')
+                                        ->prototype('variable')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ->end();
+
+
+    }
+
+    private function addLegacyHttpCacheNodes(ArrayNodeDefinition $httpCacheNode): void
+    {
+        $httpCacheNode
+            ->beforeNormalization()
+                ->always(static function (array $config): array {
+                    switch ($config['invalidation']['purger'] ?? null) {
+                        case 'api_platform.http_cache.purger.varnish.xkey':
+                            $config['tags']['header'] = [
+                                'name' => 'xkey',
+                                'separator' => $config['invalidation']['xkey']['glue'] ?? ' ',
+                            ];
+
+                            if (empty($config['invalidation']['varnish_urls'])) {
+                                break;
+                            }
+
+                            $config['tags']['invalidator']['purger'] = [
+                                'urls' => $config['invalidation']['varnish_urls'],
+                                'header' => [
+                                    'name' => 'xkey',
+                                    'max_size' => $config['invalidation']['max_header_length'] ?? 7500,
+                                    'separator' => $config['invalidation']['xkey']['glue'] ?? ' ',
+                                ],
+                                'client_options' => $config['invalidation']['request_options'] ?? [],
+                            ];
+
+                            break;
+                        case null:
+                            if (isset($config['tags'])) {
+                                break;
+                            }
+                        case 'api_platform.http_cache.purger.varnish':
+                        case 'api_platform.http_cache.purger.varnish.ban':
+                            if (empty($config['invalidation']['varnish_urls'])) {
+                                break;
+                            }
+
+                            $config['tags']['invalidator']['banner'] = [
+                                'urls' => $config['invalidation']['varnish_urls'],
+                                'header' => [
+                                    'max_size' => $config['invalidation']['max_header_length'] ?? 7500,
+                                ],
+                                'client_options' => $config['invalidation']['request_options'] ?? [],
+                            ];
+
+                            break;
+                        default:
+                            $config['tags']['invalidator']['id'] = $config['invalidation']['purger'];
+                    }
+
+                    unset($config['invalidation']);
+
+                    return $config;
+                })
+            ->end()
+            ->children()
+                ->arrayNode('invalidation')
+                    ->setDeprecated('api-platform/core', '3.1', 'The child node "%node%" at path "%path%" is deprecated, use "tags" instead.')
+                    ->info('Enable the tags-based cache invalidation system.')
+                    ->canBeEnabled()
+                    ->children()
+                        ->arrayNode('varnish_urls')
+                            ->defaultValue([])
+                            ->prototype('scalar')->end()
+                            ->info('URLs of the Varnish servers to purge using cache tags when a resource is updated.')
+                        ->end()
+                        ->integerNode('max_header_length')
+                            ->defaultValue(7500)
+                            ->info('Max header length supported by the server')
+                        ->end()
+                        ->variableNode('request_options')
+                            ->defaultValue([])
+                            ->validate()
+                                ->ifTrue(static fn($v): bool => false === \is_array($v))
+                                ->thenInvalid('The request_options parameter must be an array.')
+                            ->end()
+                            ->info('To pass options to the client charged with the request.')
+                        ->end()
+                        ->scalarNode('purger')
+                            ->defaultValue('api_platform.http_cache.purger.varnish')
+                            ->info('Specify a varnish purger to use (available values: "api_platform.http_cache.purger.varnish.ban" or "api_platform.http_cache.purger.varnish.xkey").')
+                        ->end()
+                        ->arrayNode('xkey')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('glue')
+                                ->defaultValue(' ')
+                                ->info('xkey glue between keys')
                                 ->end()
                             ->end()
                         ->end()

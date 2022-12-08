@@ -59,10 +59,9 @@ api_platform:
         ApiPlatform\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
         ApiPlatform\Exception\FilterValidationException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
     http_cache:
-        invalidation:
-            enabled: true
-            xkey: 
-                glue: ' '
+        tags:
+            invalidator:
+                id: api_platform.http_cache.invalidator_spy
     defaults:
         normalization_context: 
             skip_null_values: false
@@ -244,11 +243,8 @@ services:
     logger:
         class: Psr\Log\NullLogger
 
-    api_platform.http_cache.purger:
-        class: ApiPlatform\Tests\Fixtures\NullPurger
-        
-    test.api_platform.http_cache.purger:
-        alias: api_platform.http_cache.purger
+    api_platform.http_cache.invalidator_spy:
+        class: ApiPlatform\Tests\Fixtures\InvalidatorSpy
         public: true
         
     test.property_accessor:

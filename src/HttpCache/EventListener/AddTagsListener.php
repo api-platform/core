@@ -16,6 +16,8 @@ namespace ApiPlatform\HttpCache\EventListener;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\HttpCache\TagsHeadersProvider;
+use ApiPlatform\HttpCache\TagsHeadersProviderInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
@@ -24,14 +26,7 @@ use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
- * Sets the list of resources' IRIs included in this response in the "Cache-Tags" and/or "xkey" HTTP headers.
- *
- * The "Cache-Tags" is used because it is supported by CloudFlare.
- *
- * @see https://support.cloudflare.com/hc/en-us/articles/206596608-How-to-Purge-Cache-Using-Cache-Tags-Enterprise-only-
- *
- * The "xkey" is used because it is supported by Varnish.
- * @see https://docs.varnish-software.com/varnish-cache-plus/vmods/ykey/
+ * Adds the IRI list of the request’s resources in the response’s headers.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -40,13 +35,23 @@ final class AddTagsListener
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
-    public function __construct(private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?PurgerInterface $purger = null)
+    public function __construct(private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private PurgerInterface|TagsHeadersProviderInterface|null $headersProvider = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+
+        if ($this->headersProvider instanceof TagsHeadersProvider) {
+            return;
+        }
+
+        trigger_deprecation('api-platform/core', '3.1', 'Not passing $headersProvider a %s is deprecated.', TagsHeadersProvider::class);
+
+        if (!$this->headersProvider) {
+            $this->headersProvider = new TagsHeadersProvider('Cache-Tags', ',');
+        }
     }
 
     /**
-     * Adds the "Cache-Tags" and "xkey" headers.
+     * Adds tags to the response.
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
@@ -75,13 +80,9 @@ final class AddTagsListener
             return;
         }
 
-        if (!$this->purger) {
-            $response->headers->set('Cache-Tags', implode(',', $resources));
-
-            return;
-        }
-
-        $headers = $this->purger->getResponseHeaders($resources);
+        $headers = $this->headersProvider instanceof PurgerInterface
+            ? $this->headersProvider->getResponseHeaders($resources)
+            : $this->headersProvider->provideHeaders($resources);
 
         foreach ($headers as $key => $value) {
             $response->headers->set($key, $value);

@@ -19,7 +19,7 @@ use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
-use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\HttpCache\TagsInvalidatorInterface;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Tests\Fixtures\NotAResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
@@ -61,8 +61,9 @@ class PurgeHttpCacheListenerTest extends TestCase
         $toDeleteNoPurge = new DummyNoGetOperation();
         $toDeleteNoPurge->setId(5);
 
-        $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->purge(['/dummies', '/dummies/1', '/dummies/2', '/dummies/3', '/dummies/4'])->shouldBeCalled();
+        $invalidatorProphecy = $this->prophesize(TagsInvalidatorInterface::class);
+        $expectedTags = ['/dummies', '/dummies/1', '/dummies/2', '/dummies/3', '/dummies/4'];
+        $invalidatorProphecy->invalidate(array_combine($expectedTags, $expectedTags))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/dummies')->shouldBeCalled();
@@ -102,7 +103,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedDummy')->shouldBeCalled();
         $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedOwningDummy')->shouldNotBeCalled();
 
-        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
+        $listener = new PurgeHttpCacheListener($invalidatorProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
         $listener->onFlush($eventArgs);
         $listener->postFlush();
     }
@@ -118,8 +119,9 @@ class PurgeHttpCacheListenerTest extends TestCase
         $dummy = new Dummy();
         $dummy->setId(1);
 
-        $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->purge(['/dummies', '/dummies/1', '/related_dummies/old', '/related_dummies/new'])->shouldBeCalled();
+        $invalidatorProphecy = $this->prophesize(TagsInvalidatorInterface::class);
+        $expectedTags = ['/dummies', '/dummies/1', '/related_dummies/old', '/related_dummies/new'];
+        $invalidatorProphecy->invalidate(array_combine($expectedTags, $expectedTags))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/dummies')->shouldBeCalled();
@@ -140,7 +142,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $changeSet = ['relatedDummy' => [$oldRelatedDummy, $newRelatedDummy]];
         $eventArgs = new PreUpdateEventArgs($dummy, $emProphecy->reveal(), $changeSet);
 
-        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+        $listener = new PurgeHttpCacheListener($invalidatorProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal());
         $listener->preUpdate($eventArgs);
         $listener->postFlush();
     }
@@ -150,8 +152,8 @@ class PurgeHttpCacheListenerTest extends TestCase
         $dummyNoGetOperation = new DummyNoGetOperation();
         $dummyNoGetOperation->setId(1);
 
-        $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->purge([])->shouldNotBeCalled();
+        $invalidatorProphecy = $this->prophesize(TagsInvalidatorInterface::class);
+        $invalidatorProphecy->invalidate()->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(DummyNoGetOperation::class, UrlGeneratorInterface::ABS_PATH, new GetCollection())->willThrow(new InvalidArgumentException())->shouldBeCalled();
@@ -168,7 +170,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $changeSet = ['lorem' => 'ipsum'];
         $eventArgs = new PreUpdateEventArgs($dummyNoGetOperation, $emProphecy->reveal(), $changeSet);
 
-        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+        $listener = new PurgeHttpCacheListener($invalidatorProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal());
         $listener->preUpdate($eventArgs);
         $listener->postFlush();
     }
@@ -178,8 +180,8 @@ class PurgeHttpCacheListenerTest extends TestCase
         $containNonResource = new ContainNonResource();
         $nonResource = new NotAResource('foo', 'bar');
 
-        $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->purge([])->shouldNotBeCalled();
+        $invalidatorProphecy = $this->prophesize(TagsInvalidatorInterface::class);
+        $invalidatorProphecy->invalidate()->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(ContainNonResource::class, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/dummies/1');
@@ -209,7 +211,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $propertyAccessorProphecy->isReadable(Argument::type(ContainNonResource::class), 'notAResource')->willReturn(true);
         $propertyAccessorProphecy->getValue(Argument::type(ContainNonResource::class), 'notAResource')->shouldBeCalled()->willReturn($nonResource);
 
-        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
+        $listener = new PurgeHttpCacheListener($invalidatorProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
         $listener->onFlush($eventArgs);
     }
 }

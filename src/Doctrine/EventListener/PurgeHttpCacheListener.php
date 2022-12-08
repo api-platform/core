@@ -20,6 +20,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\HttpCache\TagsInvalidatorInterface;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\Common\Util\ClassUtils;
@@ -41,8 +42,12 @@ final class PurgeHttpCacheListener
     private readonly PropertyAccessorInterface $propertyAccessor;
     private array $tags = [];
 
-    public function __construct(private readonly PurgerInterface $purger, private readonly IriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(private readonly PurgerInterface|TagsInvalidatorInterface $invalidator, private readonly IriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
     {
+        if ($this->invalidator instanceof PurgerInterface) {
+            trigger_deprecation('api-platform/core', '3.1', 'Passing $invalidator a %s is deprecated, pass a %s instead.', PurgerInterface::class, TagsInvalidatorInterface::class);
+        }
+
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
@@ -100,7 +105,11 @@ final class PurgeHttpCacheListener
             return;
         }
 
-        $this->purger->purge(array_values($this->tags));
+        if ($this->invalidator instanceof PurgerInterface) {
+            $this->invalidator->purge(array_values($this->tags));
+        } elseif ($this->invalidator instanceof TagsInvalidatorInterface) {
+            $this->invalidator->invalidate($this->tags);
+        }
 
         $this->tags = [];
     }

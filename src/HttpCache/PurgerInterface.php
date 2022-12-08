@@ -17,6 +17,8 @@ namespace ApiPlatform\HttpCache;
  * Purges resources from the cache.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated use {@see TagsHeadersProviderInterface} and {@see TagsInvalidatorInterface} instead
  */
 interface PurgerInterface
 {

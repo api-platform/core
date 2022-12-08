@@ -48,6 +48,105 @@ class ConfigurationTest extends TestCase
     }
 
     /**
+     * @dataProvider provideHttpCacheInvalidationConfigMapping
+     */
+    public function testLegacyHttpCacheInvalidationConfigMapping(array $invalidationConfig, array $expectedTagsConfig): void
+    {
+        $processedTagsConfig = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'http_cache' => ['invalidation' => $invalidationConfig],
+            ],
+        ])['http_cache']['tags'];
+
+        $this->assertEquals($expectedTagsConfig, $processedTagsConfig);
+    }
+
+    public function provideHttpCacheInvalidationConfigMapping(): \Iterator
+    {
+        yield 'default varnish.xkey purger' => [
+            ['purger' => 'api_platform.http_cache.purger.varnish.xkey'],
+            [
+                'enabled' => true,
+                'header' => [
+                    'name' => 'xkey',
+                    'separator' => ' ',
+                ],
+                'invalidator' => ['enabled' => false],
+            ],
+        ];
+
+        yield 'custom varnish.xkey purger' => [
+            [
+                'purger' => 'api_platform.http_cache.purger.varnish.xkey',
+                'varnish_urls' => ['/url'],
+                'max_header_length' => 10,
+                'request_options' => ['key' => 'value'],
+                'xkey' => ['glue' => ','],
+            ],
+            [
+                'enabled' => true,
+                'header' => [
+                    'name' => 'xkey',
+                    'separator' => ',',
+                ],
+                'invalidator' => [
+                    'enabled' => true,
+                    'purger' => [
+                        'urls' => ['/url'],
+                        'header' => [
+                            'name' => 'xkey',
+                            'max_size' => 10,
+                            'separator' => ',',
+                        ],
+                        'client_options' => ['key' => 'value'],
+                    ],
+                ],
+            ],
+        ];
+
+        foreach (['varnish', 'varnish.ban'] as $purger) {
+            yield "default {$purger} purger" => [
+                ['purger' => "api_platform.http_cache.purger.{$purger}"],
+                [
+                    'enabled' => true,
+                    'header' => [
+                        'name' => 'Cache-Tags',
+                        'separator' => ',',
+                    ],
+                    'invalidator' => ['enabled' => false],
+                ],
+            ];
+
+            yield "custom {$purger} purger" => [
+                [
+                    'purger' => "api_platform.http_cache.purger.{$purger}",
+                    'varnish_urls' => ['/url'],
+                    'max_header_length' => 10,
+                    'request_options' => ['key' => 'value'],
+                ],
+                [
+                    'enabled' => true,
+                    'header' => [
+                        'name' => 'Cache-Tags',
+                        'separator' => ',',
+                    ],
+                    'invalidator' => [
+                        'enabled' => true,
+                        'banner' => [
+                            'urls' => ['/url'],
+                            'header' => [
+                                'name' => 'ApiPlatform-Ban-Regex',
+                                'max_size' => 10,
+                            ],
+                            'client_options' => ['key' => 'value'],
+                        ],
+                    ],
+                ],
+            ];
+        }
+    }
+
+    /**
      * @group mongodb
      */
     public function testDefaultConfigWithMongoDbOdm(): void
@@ -179,6 +278,14 @@ class ConfigurationTest extends TestCase
                     'xkey' => ['glue' => ' '],
                 ],
                 'public' => null,
+                'tags' => [
+                    'enabled' => true,
+                    'header' => [
+                        'name' => 'Cache-Tags',
+                        'separator' => ',',
+                    ],
+                    'invalidator' => ['enabled' => false],
+                ],
             ],
             'doctrine' => [
                 'enabled' => \in_array('orm', $doctrineIntegrationsToLoad, true),

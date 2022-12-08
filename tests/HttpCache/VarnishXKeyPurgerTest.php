@@ -75,7 +75,7 @@ class VarnishXKeyPurgerTest extends TestCase
 
     public function testHeaderTooLong(): void
     {
-        $this->expectExceptionMessage('IRI "/foobar-long-foobar-toolong-foofoo-barbar" is too long to fit current max header length (currently set to "20"). You can increase it using the "api_platform.http_cache.invalidation.max_header_length" parameter.');
+        self::expectExceptionMessage('IRI "/foobar-long-foobar-toolong-foofoo-barbar" is too long to fit the max header size (currently set to "20").');
 
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foobar-long-foobar-toolong-foofoo-barbar']])->willReturn(new Response())->shouldNotBeCalled();

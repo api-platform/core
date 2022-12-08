@@ -860,12 +860,10 @@ class ApiPlatformExtensionTest extends TestCase
             // http_cache.xml
             'api_platform.http_cache.listener.response.configure',
 
-            // doctrine_orm_http_cache_purger.xml
+            // doctrine_orm_http_cache_invalidator.xml
             'api_platform.doctrine.listener.http_cache.purge',
 
             // http_cache_tags.xml
-            'api_platform.http_cache.purger.varnish.xkey',
-            'api_platform.http_cache.purger.varnish.ban',
             'api_platform.http_cache.listener.response.add_tags',
         ];
 
@@ -874,13 +872,11 @@ class ApiPlatformExtensionTest extends TestCase
         // http_cache.xml
         $this->assertServiceHasTags('api_platform.http_cache.listener.response.configure', ['kernel.event_listener']);
 
-        // doctrine_orm_http_cache_purger.xml
+        // doctrine_orm_http_cache_invalidator.xml
         $this->assertServiceHasTags('api_platform.doctrine.listener.http_cache.purge', ['doctrine.event_listener']);
 
         // http_cache_tags.xml
         $this->assertServiceHasTags('api_platform.http_cache.listener.response.add_tags', ['kernel.event_listener']);
-
-        $this->assertContainerHasAlias('api_platform.http_cache.purger.varnish');
 
         $this->assertEquals([
             ['event' => 'preUpdate'],

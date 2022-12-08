@@ -29,6 +29,9 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\HttpCache\TagsHeadersProvider;
+use ApiPlatform\HttpCache\TagsInvalidator\Banner;
+use ApiPlatform\HttpCache\TagsInvalidator\Purger;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -188,8 +191,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.shared_max_age', $config['defaults']['cache_headers']['shared_max_age'] ?? null);
         $container->setParameter('api_platform.http_cache.vary', $config['defaults']['cache_headers']['vary'] ?? ['Accept']);
         $container->setParameter('api_platform.http_cache.public', $config['defaults']['cache_headers']['public'] ?? $config['http_cache']['public']);
-        $container->setParameter('api_platform.http_cache.invalidation.max_header_length', $config['defaults']['cache_headers']['invalidation']['max_header_length'] ?? $config['http_cache']['invalidation']['max_header_length']);
-        $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? $config['http_cache']['invalidation']['xkey']['glue']);
 
         $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
 
@@ -588,33 +589,69 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $loader->load('http_cache.xml');
 
-        if (!$this->isConfigEnabled($container, $config['http_cache']['invalidation'])) {
+        if (!$this->isConfigEnabled($container, $config['http_cache']['tags'])) {
+            return;
+        }
+
+        $loader->load('http_cache_tags.xml');
+
+        $tagsConfig = $config['http_cache']['tags'];
+
+        $addTagListener = $container->findDefinition('api_platform.http_cache.listener.response.add_tags');
+        $addTagListener->setArgument('$headersProvider', new Definition(TagsHeadersProvider::class, [
+            $tagsConfig['header']['name'],
+            $tagsConfig['header']['separator'],
+        ]));
+
+        if (!$this->isConfigEnabled($container, $tagsConfig['invalidator'])) {
             return;
         }
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
-            $loader->load('doctrine_orm_http_cache_purger.xml');
+            $loader->load('doctrine_orm_http_cache_invalidator.xml');
+        } else {
+            return;
         }
 
-        $loader->load('http_cache_purger.xml');
+        if ($purgerConfig = $tagsConfig['invalidator']['purger'] ?? null) {
+            $clients = array_map(static function (string $url) use ($purgerConfig): Definition {
+                $client = new Definition(
+                    ScopingHttpClient::class,
+                    [new Reference('http_client'), $url, $purgerConfig['client_options']]
+                );
+                $client->setFactory([ScopingHttpClient::class, 'forBaseUri']);
 
-        $definitions = [];
-        foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
-            $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);
-            $definition->setFactory([ScopingHttpClient::class, 'forBaseUri']);
+                return $client;
+            }, $purgerConfig['urls']);
 
-            $definitions[] = $definition;
-        }
-
-        foreach (['api_platform.http_cache.purger.varnish.ban', 'api_platform.http_cache.purger.varnish.xkey'] as $serviceName) {
-            $container->findDefinition($serviceName)->setArguments([
-                $definitions,
-                $config['http_cache']['invalidation']['max_header_length'],
+            $invalidator = new Definition(Purger::class, [
+                $clients,
+                $purgerConfig['header']['name'],
+                $purgerConfig['header']['max_size'],
+                $purgerConfig['header']['separator'],
             ]);
+        } elseif ($bannerConfig = $tagsConfig['invalidator']['banner'] ?? null) {
+            $clients = array_map(static function (string $url) use ($bannerConfig): Definition {
+                $client = new Definition(
+                    ScopingHttpClient::class,
+                    [new Reference('http_client'), $url, $bannerConfig['client_options']]
+                );
+                $client->setFactory([ScopingHttpClient::class, 'forBaseUri']);
+
+                return $client;
+            }, $bannerConfig['urls']);
+
+            $invalidator = new Definition(Banner::class, [
+                $clients,
+                $bannerConfig['header']['name'],
+                $bannerConfig['header']['max_size'],
+            ]);
+        } else {
+            $invalidator = new Reference($tagsConfig['invalidator']['id']);
         }
 
-        $serviceName = $config['http_cache']['invalidation']['purger'];
-        $container->setAlias('api_platform.http_cache.purger', $serviceName);
+        $container->findDefinition('api_platform.doctrine.listener.http_cache.purge')
+            ->setArgument('$invalidator', $invalidator);
     }
 
     /**

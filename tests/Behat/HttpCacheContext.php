@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Behat;
 
+use ApiPlatform\Tests\Fixtures\InvalidatorSpy;
 use Behat\Behat\Context\Context;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -31,13 +32,14 @@ final class HttpCacheContext implements Context
      */
     public function irisShouldBePurged(string $iris): void
     {
-        $purger = $this->kernel->getContainer()->get('behat.driver.service_container')->get('test.api_platform.http_cache.purger');
+        /** @var InvalidatorSpy $invalidator */
+        $invalidator = $this->kernel->getContainer()->get('behat.driver.service_container')->get('api_platform.http_cache.invalidator_spy');
 
-        $purgedIris = implode(',', $purger->getIris());
-        $purger->clear();
+        $invalidatedTags = implode(',', $invalidator->getInvalidatedTags());
+        $invalidator->clear();
 
-        if ($iris !== $purgedIris) {
-            throw new ExpectationFailedException(sprintf('IRIs "%s" does not match expected "%s".', $purgedIris, $iris));
+        if ($iris !== $invalidatedTags) {
+            throw new ExpectationFailedException(sprintf('IRIs "%s" does not match expected "%s".', $invalidatedTags, $iris));
         }
     }
 }

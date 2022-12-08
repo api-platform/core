@@ -13,32 +13,27 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures;
 
-use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\HttpCache\TagsInvalidatorInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class NullPurger implements PurgerInterface
+final class InvalidatorSpy implements TagsInvalidatorInterface
 {
-    private array $iris = [];
+    private array $tags = [];
 
-    public function purge(array $iris): void
+    public function invalidate(array $tags): void
     {
-        $this->iris = $iris;
+        $this->tags = $tags;
     }
 
-    public function getIris(): array
+    public function getInvalidatedTags(): array
     {
-        return $this->iris;
+        return $this->tags;
     }
 
     public function clear(): void
     {
-        $this->iris = [];
-    }
-
-    public function getResponseHeaders(array $iris): array
-    {
-        return ['Cache-Tags' => implode(',', $iris)];
+        $this->tags = [];
     }
 }
