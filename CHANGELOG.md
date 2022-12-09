@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.0.7
+
+### Bug fixes
+
+* [27af3216f](https://github.com/api-platform/core/commit/27af3216f2beac654acb7881b52b3e2e29bf9078) fix(symfony): wire Symfony JsonEncoder if it exists (#5240)
+* [31215c623](https://github.com/api-platform/core/commit/31215c62365c6b9095486c307d29837e53c0357a) ci: fix mongod startup (#5248)
+* [55be4ca41](https://github.com/api-platform/core/commit/55be4ca41b6a97004d4be623d55bd5e7a3004b16) fix: get back return phpdoc on ProviderInterface
+* [6d38cd941](https://github.com/api-platform/core/commit/6d38cd94140edd573ef9b09997204ef345360880) fix(metadata): include routePrefix in default operation name (#5203) (#5252)
+* [b52161f](https://github.com/api-platform/core/commit/b52161f75cbfb8fd42b79db8b62e38747c84f089) perf(symfony): use default cache pool config in development environment (#5242)
+
 ## v3.0.6
 
 ### Bug fixes
