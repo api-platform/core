@@ -42,6 +42,10 @@ header #logo img {
   background-color: rgba(40, 134, 144, .4)
 }
 
+.svg-icons {
+    position:absolute;width:0;height:0
+}
+
 /** WEBBY AND WEB **/
 
 .web, .webby {
