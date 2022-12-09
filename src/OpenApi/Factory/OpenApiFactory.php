@@ -189,7 +189,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             // Set up parameters
             foreach ($uriVariables ?? [] as $parameterName => $uriVariable) {
-                $parameter = new Parameter($parameterName, 'path', (new \ReflectionClass($uriVariable->getFromClass()))->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                $parameter = new Model\Parameter($parameterName, 'path', (new \ReflectionClass($uriVariable->getFromClass()))->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                if ($uriVariable->getExpandedValue() ?? false) {
+                    continue;
+                }
+
                 if ($this->hasParameter($parameter, $parameters)) {
                     continue;
                 }
