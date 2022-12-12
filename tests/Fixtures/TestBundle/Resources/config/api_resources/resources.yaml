@@ -11,9 +11,9 @@ resources:
     ApiPlatform\Tests\Fixtures\TestBundle\Model\DummyAddress:
         operations:
             ApiPlatform\Metadata\GetCollection:
-                openapi:
-                    extensionProperties:
-                        x-visibility: hide
+                # TODO Remove in 4.0
+                openapiContext:
+                    x-visibility: hide
 
     ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface:
         operations:

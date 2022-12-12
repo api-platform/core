@@ -130,8 +130,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
+            $openapiOperation = $operation->getOpenapi();
+            $hasOpenapi = null !== $openapiOperation && !\is_bool($openapiOperation);
+
             // Operation ignored from OpenApi
-            if ($operation instanceof HttpOperation && false === $operation->getOpenapi()) {
+            if ($operation instanceof HttpOperation && false === $openapiOperation) {
                 continue;
             }
 
@@ -158,9 +161,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);
 
-            $operationId = $operation->getOpenapi()?->getOperationId() ?: $this->normalizeOperationName($operationName);
+            $operationId = $hasOpenapi && $openapiOperation->getOperationId() ? $openapiOperation->getOperationId() : $this->normalizeOperationName($operationName);
             // TODO Remove in 4.0
             if ($operation->getOpenapiContext()['operationId'] ?? false) {
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
                 $operationId = $operation->getOpenapiContext()['operationId'];
             }
 
@@ -182,11 +190,16 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
             }
 
-            $parameters = $operation->getOpenapi()?->getParameters() ?: [];
+            $parameters = $hasOpenapi ? $openapiOperation->getParameters() : [];
             $responses = [];
 
             // TODO Remove in 4.0
             if ($operation->getOpenapiContext()['parameters'] ?? false) {
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
                 $parameters = [];
                 foreach ($operation->getOpenapiContext()['parameters'] as $parameter) {
                     $parameters[] = new Parameter($parameter['name'], $parameter['in'], $parameter['description'] ?? '', $parameter['required'] ?? false, $parameter['deprecated'] ?? false, $parameter['allowEmptyValue'] ?? false, $parameter['schema'] ?? [], $parameter['style'] ?? null, $parameter['explode'] ?? false, $parameter['allowReserved '] ?? false, $parameter['example'] ?? null, isset($parameter['examples']) ? new \ArrayObject($parameter['examples']) : null, isset($parameter['content']) ? new \ArrayObject($parameter['content']) : null);
@@ -255,22 +268,32 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $responses['default'] = new Response('Unexpected error');
             }
 
-            if ($contextResponses = $operation->getOpenapi()?->getResponses() ?: false) {
+            if ($hasOpenapi && ($contextResponses = $openapiOperation->getResponses() ?: false)) {
                 foreach ($contextResponses as $statusCode => $contextResponse) {
                     $responses[$statusCode] = $contextResponse;
                 }
             } elseif ($contextResponses = $operation->getOpenapiContext()['responses'] ?? false) {
                 // TODO Remove this "elseif" in 4.0
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
                 foreach ($contextResponses as $statusCode => $contextResponse) {
                     $responses[$statusCode] = new Response($contextResponse['description'] ?? '', isset($contextResponse['content']) ? new \ArrayObject($contextResponse['content']) : null, isset($contextResponse['headers']) ? new \ArrayObject($contextResponse['headers']) : null, isset($contextResponse['links']) ? new \ArrayObject($contextResponse['links']) : null);
                 }
             }
 
             $requestBody = null;
-            if ($contextRequestBody = $operation->getOpenapi()?->getRequestBody() ?: false) {
+            if ($hasOpenapi && ($contextRequestBody = $openapiOperation->getRequestBody() ?: false)) {
                 $requestBody = $contextRequestBody;
             } elseif ($contextRequestBody = $operation->getOpenapiContext()['requestBody'] ?? false) {
                 // TODO Remove this "elseif" in 4.0
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
                 $requestBody = new RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false);
             } elseif (\in_array($method, [HttpOperation::METHOD_PATCH, HttpOperation::METHOD_PUT, HttpOperation::METHOD_POST], true)) {
                 $operationInputSchemas = [];
@@ -283,15 +306,20 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $requestBody = new RequestBody(sprintf('The %s %s resource', HttpOperation::METHOD_POST === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true);
             }
 
-            $openapiOperation = ($operation->getOpenapi() ?: new Model\Operation())
+            $openapiOperation = ($hasOpenapi ? $openapiOperation : new Model\Operation())
                 // Defaults
-                ->withTags($operation->getOpenapi()?->getTags() ?: [$operation->getShortName() ?: $resourceShortName])
-                ->withSummary($operation->getOpenapi()?->getSummary() ?: $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface))
-                ->withDescription($operation->getOpenapi()?->getDescription() ?: $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface))
-                ->withDeprecated($operation->getOpenapi()?->getDeprecated() ?: (bool) $operation->getDeprecationReason());
+                ->withTags($hasOpenapi && $openapiOperation->getTags() ? $openapiOperation->getTags() : [$operation->getShortName() ?: $resourceShortName])
+                ->withSummary($hasOpenapi && $openapiOperation->getSummary() ? $openapiOperation->getSummary() : $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface))
+                ->withDescription($hasOpenapi && $openapiOperation->getDescription() ? $openapiOperation->getDescription() : $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface))
+                ->withDeprecated($hasOpenapi && $openapiOperation->getDeprecated() ? $openapiOperation->getDeprecated() : (bool) $operation->getDeprecationReason());
 
             // TODO Remove in 4.0
-            if (null !== $operation->getOpenapiContext()) {
+            if (null !== $operation->getOpenapiContext() && \count($operation->getOpenapiContext())) {
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
                 $allowedProperties = array_map(fn (\ReflectionProperty $reflProperty): string => $reflProperty->getName(), (new \ReflectionClass(Model\Operation::class))->getProperties());
                 foreach ($operation->getOpenapiContext() as $key => $value) {
                     $value = match ($key) {

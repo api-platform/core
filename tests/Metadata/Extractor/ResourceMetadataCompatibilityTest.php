@@ -138,8 +138,9 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'hydraContext' => [
                 'foo' => ['bar' => 'baz'],
             ],
+            // TODO Remove in 4.0
             'openapiContext' => [
-                'foo' => 'bar',
+                'bar' => 'baz',
             ],
             'openapi' => [
                 'extensionProperties' => [
@@ -307,8 +308,9 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'hydraContext' => [
                         'foo' => ['bar' => 'baz'],
                     ],
+                    // TODO Remove in 4.0
                     'openapiContext' => [
-                        'foo' => 'bar',
+                        'bar' => 'baz',
                     ],
                     'openapi' => [
                         'extensionProperties' => [
@@ -439,6 +441,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'schemes',
         'cacheHeaders',
         'hydraContext',
+        // TODO Remove in 4.0
         'openapiContext',
         'openapi',
         'paginationViaCursor',
