@@ -36,6 +36,8 @@ class OpenApiCommandTest extends KernelTestCase
         $application->setAutoExit(false);
 
         $this->tester = new ApplicationTester($application);
+
+        $this->handleDeprecations();
     }
 
     public function testExecute(): void
@@ -109,5 +111,13 @@ YAML;
             $this->fail('Is not valid YAML: '.$exception->getMessage());
         }
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * TODO Remove in 4.0
+     */
+    private function handleDeprecations(): void
+    {
+        $this->expectDeprecationMessage('The "openapiContext" option is deprecated, use "openapi" instead.');
     }
 }
