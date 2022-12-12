@@ -82,7 +82,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
     private function hasIndices(Operation $operation): bool
     {
-        if (false === $operation->getElasticsearch()) {
+        if (false === $operation->getElasticsearch() || null === $operation->getElasticsearch()) {
             return false;
         }
 
