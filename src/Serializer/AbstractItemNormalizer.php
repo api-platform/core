@@ -628,6 +628,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new UnexpectedValueException('Unexpected non-object element in to-many relation.');
             }
 
+            // update context, if concrete object class deviates from general relation class (e.g. in case of polymorphic resources)
+            $objResourceClass = $this->resourceClassResolver->getResourceClass($obj, $resourceClass);
+            if ($objResourceClass !== $resourceClass) {
+                $context['resource_class'] = $objResourceClass;
+                if ($this->resourceMetadataCollectionFactory) {
+                    $context['operation'] = $this->resourceMetadataCollectionFactory->create($objResourceClass)->getOperation();
+                }
+            }
+
             $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $resourceClass, $format, $context);
         }
 

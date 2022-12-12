@@ -51,6 +51,9 @@ abstract class AbstractDummy
     #[Assert\NotBlank]
     private $name;
 
+    #[ORM\ManyToOne(targetEntity: Dummy::class, inversedBy: 'abstractDummies')]
+    public ?Dummy $dummy = null;
+
     public function getId(): ?int
     {
         return $this->id;
