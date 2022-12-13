@@ -22,9 +22,10 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -580,41 +581,41 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testNormalizePolymorphicRelations(): void
     {
-        $concreteDummy = new ConcreteDummy();
+        $concreteDummy = new DummyTableInheritanceChild();
 
-        $dummy = new Dummy();
-        $dummy->addAbstractDummy($concreteDummy);
+        $dummy = new DummyTableInheritanceRelated();
+        $dummy->addChild($concreteDummy);
 
         $abstractDummies = new ArrayCollection([$concreteDummy]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['abstractDummies']));
+        $propertyNameCollectionFactoryProphecy->create(DummyTableInheritanceRelated::class, [])->willReturn(new PropertyNameCollection(['children']));
 
-        $abstractDummyType = new Type(Type::BUILTIN_TYPE_OBJECT, false, AbstractDummy::class);
+        $abstractDummyType = new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyTableInheritance::class);
         $abstractDummiesType = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_INT), $abstractDummyType);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'abstractDummies', [])->willReturn((new ApiProperty())->withBuiltinTypes([$abstractDummiesType])->withReadable(true)->withWritable(false)->withReadableLink(true));
+        $propertyMetadataFactoryProphecy->create(DummyTableInheritanceRelated::class, 'children', [])->willReturn((new ApiProperty())->withBuiltinTypes([$abstractDummiesType])->withReadable(true)->withWritable(false)->withReadableLink(true));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
-        $propertyAccessorProphecy->getValue($dummy, 'abstractDummies')->willReturn($abstractDummies);
+        $propertyAccessorProphecy->getValue($dummy, 'children')->willReturn($abstractDummies);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($concreteDummy, AbstractDummy::class)->willReturn(ConcreteDummy::class);
-        $resourceClassResolverProphecy->getResourceClass($abstractDummies, AbstractDummy::class)->willReturn(AbstractDummy::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-        $resourceClassResolverProphecy->isResourceClass(AbstractDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(DummyTableInheritanceRelated::class);
+        $resourceClassResolverProphecy->getResourceClass(null, DummyTableInheritanceRelated::class)->willReturn(DummyTableInheritanceRelated::class);
+        $resourceClassResolverProphecy->getResourceClass($concreteDummy, DummyTableInheritance::class)->willReturn(DummyTableInheritanceChild::class);
+        $resourceClassResolverProphecy->getResourceClass($abstractDummies, DummyTableInheritance::class)->willReturn(DummyTableInheritance::class);
+        $resourceClassResolverProphecy->isResourceClass(DummyTableInheritanceRelated::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(DummyTableInheritance::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $concreteDummyChildContext = Argument::allOf(
             Argument::type('array'),
-            Argument::withEntry('resource_class', ConcreteDummy::class),
+            Argument::withEntry('resource_class', DummyTableInheritanceChild::class),
             Argument::not(Argument::withKey('iri'))
         );
         $serializerProphecy->normalize($concreteDummy, null, $concreteDummyChildContext)->willReturn(['foo' => 'concrete']);
@@ -635,7 +636,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $expected = [
-            'abstractDummies' => [['foo' => 'concrete']],
+            'children' => [['foo' => 'concrete']],
         ];
         $this->assertSame($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
