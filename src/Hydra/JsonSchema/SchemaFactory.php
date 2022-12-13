@@ -71,7 +71,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         if ('jsonld' !== $format) {
             return $schema;
         }
-        
+
         if ('input' === $type) {
             return $schema;
         }
