@@ -442,7 +442,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
 
         try {
             $extractor = new $extractorClass($adapter(self::RESOURCE_CLASS, $parameters, self::FIXTURES));
-            $factory = new ExtractorResourceMetadataCollectionFactory($extractor, null, self::DEFAULTS);
+            $factory = new ExtractorResourceMetadataCollectionFactory($extractor, null, self::DEFAULTS, null, true);
             $collection = $factory->create(self::RESOURCE_CLASS);
         } catch (\Exception $exception) {
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
