@@ -63,7 +63,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     public function testExecuteWithJsonldFormatOption(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies{._format}_post', '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies/{id}{._format}_get', '--format' => 'jsonld', '--type' => 'output']);
         $result = $this->tester->getDisplay();
 
         $this->assertStringContainsString('@id', $result);
