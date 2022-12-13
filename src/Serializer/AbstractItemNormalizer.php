@@ -569,11 +569,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
-            $childContext['resource_class'] = $resourceClass;
-            if ($this->resourceMetadataCollectionFactory) {
-                $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
-            }
-            unset($childContext['iri'], $childContext['uri_variables']);
+            unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation']);
 
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -589,7 +585,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
-            unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation']);
+            $childContext['resource_class'] = $resourceClass;
+            if ($this->resourceMetadataCollectionFactory) {
+                $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+            }
+            unset($childContext['iri'], $childContext['uri_variables']);
 
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
