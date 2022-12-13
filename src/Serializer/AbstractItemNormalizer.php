@@ -589,11 +589,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
-            $childContext['resource_class'] = $resourceClass;
-            if ($this->resourceMetadataCollectionFactory) {
-                $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
-            }
-            unset($childContext['iri'], $childContext['uri_variables']);
+            unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation']);
 
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -630,11 +626,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             // update context, if concrete object class deviates from general relation class (e.g. in case of polymorphic resources)
             $objResourceClass = $this->resourceClassResolver->getResourceClass($obj, $resourceClass);
-            if ($objResourceClass !== $resourceClass) {
-                $context['resource_class'] = $objResourceClass;
-                if ($this->resourceMetadataCollectionFactory) {
-                    $context['operation'] = $this->resourceMetadataCollectionFactory->create($objResourceClass)->getOperation();
-                }
+            $context['resource_class'] = $objResourceClass;
+            if ($this->resourceMetadataCollectionFactory) {
+                $context['operation'] = $this->resourceMetadataCollectionFactory->create($objResourceClass)->getOperation();
             }
 
             $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $resourceClass, $format, $context);
