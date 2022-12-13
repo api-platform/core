@@ -63,6 +63,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\IriOnlyDummy as IriOnlyDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsDummy as MultiRelationsDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsRelatedDummy as MultiRelationsRelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
@@ -78,10 +80,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyD
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy as RelatedOwnedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy as RelatedOwningDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedSecuredDummy as RelatedSecuredDummyDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedMultiUsedDummy as RelatedMultiUsedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\SameRelationMultiUseDummy as SameRelationMultiUseDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
@@ -140,6 +140,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Order;
@@ -154,13 +156,11 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedMultiUsedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedSecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SameRelationMultiUseDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoMany;
@@ -764,29 +764,29 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @Given there are :nb sameRelationMultiUseDummy objects having a manyToOneRelation and each :nbmtmr manyToManyRelations and having each :nbotmr oneToManyRelations
+     * @Given there are :nb multiRelationsDummy objects having each a manyToOneRelation, :nbmtmr manyToManyRelations and :nbotmr oneToManyRelations
      */
-    public function thereAreSameRelationMultiUseDummyObjectsHavingAManyToOneRelationAndEachManyToManyRelationsAndHavingEachOneToManyRelations(int $nb, int $nbmtmr, int $nbotmr): void
+    public function thereAreMultiRelationsDummyObjectsHavingEachAManyToOneRelationManyToManyRelationsAndOneToManyRelations(int $nb, int $nbmtmr, int $nbotmr): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $relatedDummy = $this->buildRelatedMultiUsedDummy();
-            $relatedDummy->setName('RelatedMultiUsedDummy #'.$i);
+            $relatedDummy = $this->buildMultiRelationsRelatedDummy();
+            $relatedDummy->name = 'RelatedManyToOneDummy #'.$i;
 
-            $dummy = $this->buildSameRelationMultiUseDummy();
-            $dummy->setName('Dummy #'.$i);
+            $dummy = $this->buildMultiRelationsDummy();
+            $dummy->name = 'Dummy #'.$i;
             $dummy->setManyToOneRelation($relatedDummy);
 
             for ($j = 1; $j <= $nbmtmr; ++$j) {
-                $manyToManyItem = $this->buildRelatedMultiUsedDummy();
-                $manyToManyItem->setName('RelatedManyToManyDummy'.$j.$i);
+                $manyToManyItem = $this->buildMultiRelationsRelatedDummy();
+                $manyToManyItem->name = 'RelatedManyToManyDummy'.$j.$i;
                 $this->manager->persist($manyToManyItem);
 
                 $dummy->addManyToManyRelation($manyToManyItem);
             }
 
             for ($j = 1; $j <= $nbotmr; ++$j) {
-                $oneToManyItem = $this->buildRelatedMultiUsedDummy();
-                $oneToManyItem->setName('RelatedOneToManyDummy'.$j.$i);
+                $oneToManyItem = $this->buildMultiRelationsRelatedDummy();
+                $oneToManyItem->name = 'RelatedOneToManyDummy'.$j.$i;
                 $oneToManyItem->setOneToManyRelation($dummy);
                 $this->manager->persist($oneToManyItem);
 
@@ -795,7 +795,6 @@ final class DoctrineContext implements Context
 
             $this->manager->persist($relatedDummy);
             $this->manager->persist($dummy);
-
         }
         $this->manager->flush();
     }
@@ -2342,13 +2341,13 @@ final class DoctrineContext implements Context
         return $this->isOrm() ? new Payment($amount) : new PaymentDocument($amount);
     }
 
-    private function buildSameRelationMultiUseDummy(): SameRelationMultiUseDummy|SameRelationMultiUseDummyDocument
+    private function buildMultiRelationsDummy(): MultiRelationsDummy|MultiRelationsDummyDocument
     {
-        return $this->isOrm() ? new SameRelationMultiUseDummy() : new SameRelationMultiUseDummyDocument();
+        return $this->isOrm() ? new MultiRelationsDummy() : new MultiRelationsDummyDocument();
     }
 
-    private function buildRelatedMultiUsedDummy(): RelatedMultiUsedDummy|RelatedMultiUsedDummyDocument
+    private function buildMultiRelationsRelatedDummy(): MultiRelationsRelatedDummy|MultiRelationsRelatedDummyDocument
     {
-        return $this->isOrm() ? new RelatedMultiUsedDummy() : new RelatedMultiUsedDummyDocument();
+        return $this->isOrm() ? new MultiRelationsRelatedDummy() : new MultiRelationsRelatedDummyDocument();
     }
 }

@@ -19,7 +19,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoInputOutput as DummyD
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
-use Doctrine\ORM\PersistentCollection;
 
 final class DummyDtoInputOutputProvider implements ProviderInterface
 {

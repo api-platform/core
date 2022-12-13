@@ -21,6 +21,54 @@ Feature: GraphQL query support
     And the JSON node "data.dummy.name_converted" should be equal to "Converted 1"
 
   @createSchema
+  Scenario: Retrieve an item with different relations to the same resource
+    Given there are 2 multiRelationsDummy objects having each a manyToOneRelation, 2 manyToManyRelations and 3 oneToManyRelations
+    When I send the following GraphQL request:
+    """
+    {
+      multiRelationsDummy(id: "/multi_relations_dummies/2") {
+        id
+        name
+        manyToOneRelation {
+          id
+          name
+        }
+        manyToManyRelations {
+          edges{
+            node {
+             id
+              name
+            }
+          }
+        }
+        oneToManyRelations {
+          edges{
+            node {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.multiRelationsDummy.id" should be equal to "/multi_relations_dummies/2"
+    And the JSON node "data.multiRelationsDummy.name" should be equal to "Dummy #2"
+    And the JSON node "data.multiRelationsDummy.manyToOneRelation.id" should not be null
+    And the JSON node "data.multiRelationsDummy.manyToOneRelation.name" should be equal to "RelatedManyToOneDummy #2"
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges" should have 2 element
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.id" should not be null
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[0].node.name" should be equal to "RelatedManyToManyDummy12"
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.name" should be equal to "RelatedManyToManyDummy22"
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges" should have 3 element
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[1].node.id" should not be null
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[0].node.name" should be equal to "RelatedOneToManyDummy12"
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[2].node.name" should be equal to "RelatedOneToManyDummy32"
+
+  @createSchema
   Scenario: Retrieve a Relay Node
     Given there are 2 dummy objects with relatedDummy
     When I send the following GraphQL request:
@@ -449,51 +497,3 @@ Feature: GraphQL query support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummyDifferentGraphQlSerializationGroup.name" should be equal to "Name #1"
     And the JSON node "data.dummyDifferentGraphQlSerializationGroup.title" should be equal to "Title #1"
-
-  @createSchema
-  Scenario: Execute a GraphQL query that includes a nested collection with different relations to same entity
-    Given there are 3 sameRelationMultiUseDummy objects having a manyToOneRelation and each 2 manyToManyRelations and having each 3 oneToManyRelations
-    When I send the following GraphQL request:
-    """
-    {
-      sameRelationMultiUseDummy(id: "/same_relation_multi_use_dummies/2") {
-        id
-        name
-        manyToOneRelation {
-          id
-          name
-        }
-        manyToManyRelations {
-          edges{
-            node {
-             id
-              name
-            }
-          }
-        }
-        oneToManyRelations {
-          edges{
-            node {
-              id
-              name
-            }
-          }
-        }
-      }
-    }
-    """
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.sameRelationMultiUseDummy.id" should be equal to "/same_relation_multi_use_dummies/2"
-    And the JSON node "data.sameRelationMultiUseDummy.name" should be equal to "Dummy #2"
-    And the JSON node "data.sameRelationMultiUseDummy.manyToOneRelation.id" should not be null
-    And the JSON node "data.sameRelationMultiUseDummy.manyToOneRelation.name" should be equal to "RelatedMultiUsedDummy #2"
-    And the JSON node "data.sameRelationMultiUseDummy.manyToManyRelations.edges" should have 2 element
-    And the JSON node "data.sameRelationMultiUseDummy.manyToManyRelations.edges[1].node.id" should not be null
-    And the JSON node "data.sameRelationMultiUseDummy.manyToManyRelations.edges[0].node.name" should be equal to "RelatedManyToManyDummy12"
-    And the JSON node "data.sameRelationMultiUseDummy.manyToManyRelations.edges[1].node.name" should be equal to "RelatedManyToManyDummy22"
-    And the JSON node "data.sameRelationMultiUseDummy.oneToManyRelations.edges" should have 3 element
-    And the JSON node "data.sameRelationMultiUseDummy.oneToManyRelations.edges[1].node.id" should not be null
-    And the JSON node "data.sameRelationMultiUseDummy.oneToManyRelations.edges[0].node.name" should be equal to "RelatedOneToManyDummy12"
-    And the JSON node "data.sameRelationMultiUseDummy.oneToManyRelations.edges[2].node.name" should be equal to "RelatedOneToManyDummy32"
