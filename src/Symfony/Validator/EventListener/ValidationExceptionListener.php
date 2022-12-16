@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Validator\EventListener;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -52,9 +53,14 @@ final class ValidationExceptionListener
         }
 
         $format = ErrorFormatGuesser::guessErrorFormat($event->getRequest(), $this->errorFormats);
+        
+        $context = [];
+        if ($exception instanceof ValidationException && !empty($exception->getHydraTitle())) {
+            $context['title'] = $exception->getHydraTitle();
+        }
 
         $event->setResponse(new Response(
-            $this->serializer->serialize($exception instanceof ConstraintViolationListAwareExceptionInterface ? $exception->getConstraintViolationList() : $exception, $format['key']),
+            $this->serializer->serialize($exception instanceof ConstraintViolationListAwareExceptionInterface ? $exception->getConstraintViolationList() : $exception, $format['key'], $context),
             $statusCode,
             [
                 'Content-Type' => sprintf('%s; charset=utf-8', $format['value'][0]),

@@ -23,9 +23,14 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, \Stringable
 {
-    public function __construct(private readonly ConstraintViolationListInterface $constraintViolationList, string $message = '', int $code = 0, \Exception $previous = null)
+    public function __construct(private readonly ConstraintViolationListInterface $constraintViolationList, string $message = '', int $code = 0, \Exception $previous = null, private readonly string $hydraTitle = '')
     {
         parent::__construct($message ?: $this->__toString(), $code, $previous);
+    }
+
+    public function getHydraTitle(): string
+    {
+        return $this->hydraTitle;
     }
 
     public function getConstraintViolationList(): ConstraintViolationListInterface
