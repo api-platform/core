@@ -116,7 +116,7 @@ final class Operation
     public function withResponse(int|string $status, Response $response): self
     {
         $clone = clone $this;
-        if (!is_array($clone->responses)) {
+        if (!\is_array($clone->responses)) {
             $clone->responses = [];
         }
         $clone->responses[(string) $status] = $response;
@@ -159,7 +159,7 @@ final class Operation
     public function withParameter(Parameter $parameter): self
     {
         $clone = clone $this;
-        if (!is_array($clone->parameters)) {
+        if (!\is_array($clone->parameters)) {
             $clone->parameters = [];
         }
         $clone->parameters[] = $parameter;
