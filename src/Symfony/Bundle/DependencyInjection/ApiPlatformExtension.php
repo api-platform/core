@@ -605,7 +605,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('http_cache_purger.xml');
 
-        foreach ($config['http_cache']['invalidatoin']['scoped_clients'] as $client) {
+        foreach ($config['http_cache']['invalidation']['scoped_clients'] as $client) {
             $definition = $container->getDefinition($client);
             $definition->addTag('api_platform.http_cache.http_client');
         }
