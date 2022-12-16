@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.0.8
+
+### Bug fixes
+
+* [26040444e](https://github.com/api-platform/core/commit/26040444e6199674212418127fa045e34e7f9c4a) fix(graphql): dont add graphql operations when disabled (#5265)
+* [3d3c2c744](https://github.com/api-platform/core/commit/3d3c2c74452dc891d0892c851f0f730bced7759a) fix(graphql): link relations requires the property (#5169)
+* [ddeda9c93](https://github.com/api-platform/core/commit/ddeda9c93a1ad7ac1da432fd7e6551ab85953cc9) fix(normalizer): normalize items in related collection with concrete class (#5261)
+* [e73878570](https://github.com/api-platform/core/commit/e73878570d5b18ec7366be6c93f573a73d13b31c) fix(jsonschema): remove @id @type @context from input schema  (#5267)
+
 ## v3.0.7
 
 ### Bug fixes
