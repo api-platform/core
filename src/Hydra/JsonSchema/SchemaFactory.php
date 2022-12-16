@@ -72,6 +72,10 @@ final class SchemaFactory implements SchemaFactoryInterface
             return $schema;
         }
 
+        if ('input' === $type) {
+            return $schema;
+        }
+
         $definitions = $schema->getDefinitions();
         if ($key = $schema->getRootDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_ROOT_PROPS + ($definitions[$key]['properties'] ?? []);
