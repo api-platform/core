@@ -130,12 +130,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
+            $openapiOperation = $operation->getOpenapi();
+
             // Operation ignored from OpenApi
-            if ($operation instanceof HttpOperation && false === $operation->getOpenapi()) {
+            if ($operation instanceof HttpOperation && false === $openapiOperation) {
                 continue;
             }
 
-            $uriVariables = $operation->getUriVariables();
             $resourceClass = $operation->getClass() ?? $resource->getClass();
             $routeName = $operation->getRouteName() ?? $operation->getName();
 
@@ -156,9 +157,70 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
+            if (!\is_object($openapiOperation)) {
+                $openapiOperation = new Model\Operation();
+            }
+
+            // Complete with defaults
+            $openapiOperation = new Model\Operation(
+                operationId: null !== $openapiOperation->getOperationId() ? $openapiOperation->getOperationId() : $this->normalizeOperationName($operationName),
+                tags: null !== $openapiOperation->getTags() ? $openapiOperation->getTags() : [$operation->getShortName() ?: $resourceShortName],
+                responses: null !== $openapiOperation->getResponses() ? $openapiOperation->getResponses() : [],
+                summary: null !== $openapiOperation->getSummary() ? $openapiOperation->getSummary() : $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface),
+                description: null !== $openapiOperation->getDescription() ? $openapiOperation->getDescription() : $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface),
+                externalDocs: $openapiOperation->getExternalDocs(),
+                parameters: null !== $openapiOperation->getParameters() ? $openapiOperation->getParameters() : [],
+                requestBody: $openapiOperation->getRequestBody(),
+                callbacks: $openapiOperation->getCallbacks(),
+                deprecated: null !== $openapiOperation->getDeprecated() ? $openapiOperation->getDeprecated() : (bool) $operation->getDeprecationReason(),
+                security: null !== $openapiOperation->getSecurity() ? $openapiOperation->getSecurity() : null,
+                servers: null !== $openapiOperation->getServers() ? $openapiOperation->getServers() : null,
+                extensionProperties: $openapiOperation->getExtensionProperties(),
+            );
+
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);
 
-            $operationId = $operation->getOpenapiContext()['operationId'] ?? $this->normalizeOperationName($operationName);
+            // TODO Remove in 4.0
+            foreach (['operationId', 'tags', 'summary', 'description', 'security', 'servers'] as $key) {
+                if (null !== ($operation->getOpenapiContext()[$key] ?? null)) {
+                    trigger_deprecation(
+                        'api-platform/core',
+                        '3.1',
+                        'The "openapiContext" option is deprecated, use "openapi" instead.'
+                    );
+                    $openapiOperation = $openapiOperation->{'with'.ucfirst($key)}($operation->getOpenapiContext()[$key]);
+                }
+            }
+
+            // TODO Remove in 4.0
+            if (null !== ($operation->getOpenapiContext()['externalDocs'] ?? null)) {
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
+                $openapiOperation = $openapiOperation->withExternalDocs(new ExternalDocumentation($operation->getOpenapiContext()['externalDocs']['description'] ?? null, $operation->getOpenapiContext()['externalDocs']['url']));
+            }
+
+            // TODO Remove in 4.0
+            if (null !== ($operation->getOpenapiContext()['callbacks'] ?? null)) {
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
+                $openapiOperation = $openapiOperation->withCallbacks(new \ArrayObject($operation->getOpenapiContext()['callbacks']));
+            }
+
+            // TODO Remove in 4.0
+            if (null !== ($operation->getOpenapiContext()['deprecated'] ?? null)) {
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
+                $openapiOperation = $openapiOperation->withDeprecated((bool) $operation->getOpenapiContext()['deprecated']);
+            }
 
             if ($path) {
                 $pathItem = $paths->getPath($path) ?: new PathItem();
@@ -178,36 +240,41 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
             }
 
-            $parameters = [];
-            $responses = [];
-
+            // TODO Remove in 4.0
             if ($operation->getOpenapiContext()['parameters'] ?? false) {
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
+                $parameters = [];
                 foreach ($operation->getOpenapiContext()['parameters'] as $parameter) {
                     $parameters[] = new Parameter($parameter['name'], $parameter['in'], $parameter['description'] ?? '', $parameter['required'] ?? false, $parameter['deprecated'] ?? false, $parameter['allowEmptyValue'] ?? false, $parameter['schema'] ?? [], $parameter['style'] ?? null, $parameter['explode'] ?? false, $parameter['allowReserved '] ?? false, $parameter['example'] ?? null, isset($parameter['examples']) ? new \ArrayObject($parameter['examples']) : null, isset($parameter['content']) ? new \ArrayObject($parameter['content']) : null);
                 }
+                $openapiOperation = $openapiOperation->withParameters($parameters);
             }
 
             // Set up parameters
-            foreach ($uriVariables ?? [] as $parameterName => $uriVariable) {
+            foreach ($operation->getUriVariables() ?? [] as $parameterName => $uriVariable) {
                 if ($uriVariable->getExpandedValue() ?? false) {
                     continue;
                 }
 
                 $parameter = new Parameter($parameterName, 'path', (new \ReflectionClass($uriVariable->getFromClass()))->getShortName().' identifier', true, false, false, ['type' => 'string']);
-                if ($this->hasParameter($parameter, $parameters)) {
+                if ($this->hasParameter($openapiOperation, $parameter)) {
                     continue;
                 }
 
-                $parameters[] = $parameter;
+                $openapiOperation = $openapiOperation->withParameter($parameter);
             }
 
             if ($operation instanceof CollectionOperationInterface && HttpOperation::METHOD_POST !== $method) {
                 foreach (array_merge($this->getPaginationParameters($operation), $this->getFiltersParameters($operation)) as $parameter) {
-                    if ($this->hasParameter($parameter, $parameters)) {
+                    if ($this->hasParameter($openapiOperation, $parameter)) {
                         continue;
                     }
 
-                    $parameters[] = $parameter;
+                    $openapiOperation = $openapiOperation->withParameter($parameter);
                 }
             }
 
@@ -216,48 +283,59 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 case HttpOperation::METHOD_GET:
                     $successStatus = (string) $operation->getStatus() ?: 200;
                     $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
-                    $responses[$successStatus] = new Response(sprintf('%s %s', $resourceShortName, $operation instanceof CollectionOperationInterface ? 'collection' : 'resource'), $responseContent);
+                    $openapiOperation = $openapiOperation->withResponse($successStatus, new Response(sprintf('%s %s', $resourceShortName, $operation instanceof CollectionOperationInterface ? 'collection' : 'resource'), $responseContent));
                     break;
                 case HttpOperation::METHOD_POST:
                     $responseLinks = $this->getLinks($resourceMetadataCollection, $operation);
                     $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
                     $successStatus = (string) $operation->getStatus() ?: 201;
-                    $responses[$successStatus] = new Response(sprintf('%s resource created', $resourceShortName), $responseContent, null, $responseLinks);
-                    $responses['400'] = new Response('Invalid input');
-                    $responses['422'] = new Response('Unprocessable entity');
+                    $openapiOperation = $openapiOperation->withResponse($successStatus, new Response(sprintf('%s resource created', $resourceShortName), $responseContent, null, $responseLinks));
+                    $openapiOperation = $openapiOperation->withResponse(400, new Response('Invalid input'));
+                    $openapiOperation = $openapiOperation->withResponse(422, new Response('Unprocessable entity'));
                     break;
                 case HttpOperation::METHOD_PATCH:
                 case HttpOperation::METHOD_PUT:
                     $responseLinks = $this->getLinks($resourceMetadataCollection, $operation);
                     $successStatus = (string) $operation->getStatus() ?: 200;
                     $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
-                    $responses[$successStatus] = new Response(sprintf('%s resource updated', $resourceShortName), $responseContent, null, $responseLinks);
-                    $responses['400'] = new Response('Invalid input');
-                    $responses['422'] = new Response('Unprocessable entity');
+                    $openapiOperation = $openapiOperation->withResponse($successStatus, new Response(sprintf('%s resource updated', $resourceShortName), $responseContent, null, $responseLinks));
+                    $openapiOperation = $openapiOperation->withResponse(400, new Response('Invalid input'));
+                    $openapiOperation = $openapiOperation->withResponse(422, new Response('Unprocessable entity'));
                     break;
                 case HttpOperation::METHOD_DELETE:
                     $successStatus = (string) $operation->getStatus() ?: 204;
-                    $responses[$successStatus] = new Response(sprintf('%s resource deleted', $resourceShortName));
+                    $openapiOperation = $openapiOperation->withResponse($successStatus, new Response(sprintf('%s resource deleted', $resourceShortName)));
                     break;
             }
 
             if (!$operation instanceof CollectionOperationInterface && HttpOperation::METHOD_POST !== $operation->getMethod()) {
-                $responses['404'] = new Response('Resource not found');
+                $openapiOperation = $openapiOperation->withResponse(404, new Response('Resource not found'));
             }
 
-            if (!$responses) {
-                $responses['default'] = new Response('Unexpected error');
+            if (!$openapiOperation->getResponses()) {
+                $openapiOperation = $openapiOperation->withResponse('default', new Response('Unexpected error'));
             }
 
             if ($contextResponses = $operation->getOpenapiContext()['responses'] ?? false) {
+                // TODO Remove this "elseif" in 4.0
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
                 foreach ($contextResponses as $statusCode => $contextResponse) {
-                    $responses[$statusCode] = new Response($contextResponse['description'] ?? '', isset($contextResponse['content']) ? new \ArrayObject($contextResponse['content']) : null, isset($contextResponse['headers']) ? new \ArrayObject($contextResponse['headers']) : null, isset($contextResponse['links']) ? new \ArrayObject($contextResponse['links']) : null);
+                    $openapiOperation = $openapiOperation->withResponse($statusCode, new Response($contextResponse['description'] ?? '', isset($contextResponse['content']) ? new \ArrayObject($contextResponse['content']) : null, isset($contextResponse['headers']) ? new \ArrayObject($contextResponse['headers']) : null, isset($contextResponse['links']) ? new \ArrayObject($contextResponse['links']) : null));
                 }
             }
 
-            $requestBody = null;
             if ($contextRequestBody = $operation->getOpenapiContext()['requestBody'] ?? false) {
-                $requestBody = new RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false);
+                // TODO Remove this "elseif" in 4.0
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
+                $openapiOperation = $openapiOperation->withRequestBody(new RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false));
             } elseif (\in_array($method, [HttpOperation::METHOD_PATCH, HttpOperation::METHOD_PUT, HttpOperation::METHOD_POST], true)) {
                 $operationInputSchemas = [];
                 foreach ($requestMimeTypes as $operationFormat) {
@@ -266,26 +344,35 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                 }
 
-                $requestBody = new RequestBody(sprintf('The %s %s resource', HttpOperation::METHOD_POST === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true);
+                $openapiOperation = $openapiOperation->withRequestBody(new RequestBody(sprintf('The %s %s resource', HttpOperation::METHOD_POST === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true));
             }
 
-            $pathItem = $pathItem->{'with'.ucfirst($method)}(new Model\Operation(
-                $operationId,
-                $operation->getOpenapiContext()['tags'] ?? [$operation->getShortName() ?: $resourceShortName],
-                $responses,
-                $operation->getOpenapiContext()['summary'] ?? $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface),
-                $operation->getOpenapiContext()['description'] ?? $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface),
-                isset($operation->getOpenapiContext()['externalDocs']) ? new ExternalDocumentation($operation->getOpenapiContext()['externalDocs']['description'] ?? null, $operation->getOpenapiContext()['externalDocs']['url']) : null,
-                $parameters,
-                $requestBody,
-                isset($operation->getOpenapiContext()['callbacks']) ? new \ArrayObject($operation->getOpenapiContext()['callbacks']) : null,
-                $operation->getOpenapiContext()['deprecated'] ?? (bool) $operation->getDeprecationReason(),
-                $operation->getOpenapiContext()['security'] ?? null,
-                $operation->getOpenapiContext()['servers'] ?? null,
-                array_filter($operation->getOpenapiContext() ?? [], static fn ($item): int|false => preg_match('/^x-.*$/i', (string) $item), \ARRAY_FILTER_USE_KEY)
-            ));
+            // TODO Remove in 4.0
+            if (null !== $operation->getOpenapiContext() && \count($operation->getOpenapiContext())) {
+                trigger_deprecation(
+                    'api-platform/core',
+                    '3.1',
+                    'The "openapiContext" option is deprecated, use "openapi" instead.'
+                );
+                $allowedProperties = array_map(fn (\ReflectionProperty $reflProperty): string => $reflProperty->getName(), (new \ReflectionClass(Model\Operation::class))->getProperties());
+                foreach ($operation->getOpenapiContext() as $key => $value) {
+                    $value = match ($key) {
+                        'externalDocs' => new ExternalDocumentation(description: $value['description'] ?? '', url: $value['url'] ?? ''),
+                        'requestBody' => new RequestBody(description: $value['description'] ?? '', content: isset($value['content']) ? new \ArrayObject($value['content'] ?? []) : null, required: $value['required'] ?? false),
+                        'callbacks' => new \ArrayObject($value ?? []),
+                        default => $value,
+                    };
 
-            $paths->addPath($path, $pathItem);
+                    if (\in_array($key, $allowedProperties, true)) {
+                        $openapiOperation = $openapiOperation->{'with'.ucfirst($key)}($value);
+                        continue;
+                    }
+
+                    $openapiOperation = $openapiOperation->withExtensionProperty((string) $key, $value);
+                }
+            }
+
+            $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
         }
     }
 
@@ -560,12 +647,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
     }
 
-    /**
-     * @param Model\Parameter[] $parameters
-     */
-    private function hasParameter(Parameter $parameter, array $parameters): bool
+    private function hasParameter(Model\Operation $operation, Parameter $parameter): bool
     {
-        foreach ($parameters as $existingParameter) {
+        foreach ($operation->getParameters() as $existingParameter) {
             if ($existingParameter->getName() === $parameter->getName() && $existingParameter->getIn() === $parameter->getIn()) {
                 return true;
             }

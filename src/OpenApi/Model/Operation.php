@@ -17,7 +17,7 @@ final class Operation
 {
     use ExtensionTrait;
 
-    public function __construct(private ?string $operationId = null, private array $tags = [], private array $responses = [], private string $summary = '', private string $description = '', private ?ExternalDocumentation $externalDocs = null, private array $parameters = [], private ?RequestBody $requestBody = null, private ?\ArrayObject $callbacks = null, private bool $deprecated = false, private ?array $security = null, private ?array $servers = null, array $extensionProperties = [])
+    public function __construct(private ?string $operationId = null, private ?array $tags = null, private ?array $responses = null, private ?string $summary = null, private ?string $description = null, private ?ExternalDocumentation $externalDocs = null, private ?array $parameters = null, private ?RequestBody $requestBody = null, private ?\ArrayObject $callbacks = null, private ?bool $deprecated = null, private ?array $security = null, private ?array $servers = null, array $extensionProperties = [])
     {
         $this->extensionProperties = $extensionProperties;
     }
@@ -29,27 +29,27 @@ final class Operation
         return $this;
     }
 
-    public function getOperationId(): string
+    public function getOperationId(): ?string
     {
         return $this->operationId;
     }
 
-    public function getTags(): array
+    public function getTags(): ?array
     {
         return $this->tags;
     }
 
-    public function getResponses(): array
+    public function getResponses(): ?array
     {
         return $this->responses;
     }
 
-    public function getSummary(): string
+    public function getSummary(): ?string
     {
         return $this->summary;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -59,7 +59,7 @@ final class Operation
         return $this->externalDocs;
     }
 
-    public function getParameters(): array
+    public function getParameters(): ?array
     {
         return $this->parameters;
     }
@@ -74,7 +74,7 @@ final class Operation
         return $this->callbacks;
     }
 
-    public function getDeprecated(): bool
+    public function getDeprecated(): ?bool
     {
         return $this->deprecated;
     }
@@ -113,6 +113,17 @@ final class Operation
         return $clone;
     }
 
+    public function withResponse(int|string $status, Response $response): self
+    {
+        $clone = clone $this;
+        if (!\is_array($clone->responses)) {
+            $clone->responses = [];
+        }
+        $clone->responses[(string) $status] = $response;
+
+        return $clone;
+    }
+
     public function withSummary(string $summary): self
     {
         $clone = clone $this;
@@ -141,6 +152,17 @@ final class Operation
     {
         $clone = clone $this;
         $clone->parameters = $parameters;
+
+        return $clone;
+    }
+
+    public function withParameter(Parameter $parameter): self
+    {
+        $clone = clone $this;
+        if (!\is_array($clone->parameters)) {
+            $clone->parameters = [];
+        }
+        $clone->parameters[] = $parameter;
 
         return $clone;
     }

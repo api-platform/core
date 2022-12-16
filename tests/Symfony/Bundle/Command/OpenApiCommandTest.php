@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\Command;
 
 use ApiPlatform\OpenApi\OpenApi;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -22,9 +23,15 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ *
+ * TODO Remove group legacy in 4.0
+ *
+ * @group legacy
  */
 class OpenApiCommandTest extends KernelTestCase
 {
+    use ExpectDeprecationTrait;
+
     private ApplicationTester $tester;
 
     protected function setUp(): void
@@ -36,6 +43,8 @@ class OpenApiCommandTest extends KernelTestCase
         $application->setAutoExit(false);
 
         $this->tester = new ApplicationTester($application);
+
+        $this->handleDeprecations();
     }
 
     public function testExecute(): void
@@ -108,5 +117,13 @@ YAML;
             $this->fail('Is not valid YAML: '.$exception->getMessage());
         }
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * TODO Remove in 4.0.
+     */
+    private function handleDeprecations(): void
+    {
+        $this->expectDeprecation('Since api-platform/core 3.1: The "%s" option is deprecated, use "openapi" instead.');
     }
 }

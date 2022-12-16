@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -35,7 +36,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 #[ApiFilter(PropertyFilter::class, arguments: ['parameterName' => 'foobar'])]
 #[ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'foobargroups'])]
 #[ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'foobargroups_override'], id: 'override')]
-#[ApiResource(operations: [new Get(openapiContext: ['tags' => []]), new Put(), new Delete(), new Post(), new GetCollection()], sunset: '2050-01-01', normalizationContext: ['groups' => ['colors']])]
+#[ApiResource(operations: [new Get(openapi: new OpenApiOperation(tags: [])), new Put(), new Delete(), new Post(), new GetCollection()], sunset: '2050-01-01', normalizationContext: ['groups' => ['colors']])]
 #[ODM\Document]
 class DummyCar
 {

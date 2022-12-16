@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Put extends HttpOperation
 {
@@ -43,7 +45,7 @@ final class Put extends HttpOperation
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
-        ?bool $openapi = null,
+        bool|OpenApiOperation|null $openapi = null,
         ?array $exceptionToStatus = null,
 
         ?bool $queryParameterValidationEnabled = null,

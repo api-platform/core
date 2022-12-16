@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+
 /**
  * A NotExposed operation is an operation declared for internal usage,
  * for example to generate an IRI on a resource without item operations.
@@ -51,7 +53,7 @@ final class NotExposed extends HttpOperation
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
-        ?bool $openapi = false,
+        bool|OpenApiOperation|null $openapi = false,
         ?array $exceptionToStatus = null,
 
         ?bool $queryParameterValidationEnabled = null,

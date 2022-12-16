@@ -43,9 +43,11 @@ use ApiPlatform\OpenApi\Model\MediaType;
 use ApiPlatform\OpenApi\Model\OAuthFlow;
 use ApiPlatform\OpenApi\Model\OAuthFlows;
 use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\OpenApi\Model\Response;
+use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
 use ApiPlatform\OpenApi\Model\SecurityScheme;
 use ApiPlatform\OpenApi\Model\Server;
 use ApiPlatform\OpenApi\OpenApi;
@@ -83,35 +85,48 @@ class OpenApiFactoryTest extends TestCase
             'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
             'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
             'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
-            'customDummyItem' => (new HttpOperation())->withMethod(HttpOperation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapiContext([
-                'x-visibility' => 'hide',
-                'description' => 'Custom description',
-                'parameters' => [
-                    ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'required' => true],
-                    ['description' => 'Replace parameter', 'name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string', 'format' => 'uuid']],
-                ],
-                'tags' => ['Dummy', 'Profile'],
-                'responses' => [
-                    '202' => [
-                        'description' => 'Success',
-                        'content' => [
+            'customDummyItem' => (new HttpOperation())->withMethod(HttpOperation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapi(new OpenApiOperation(
+                tags: ['Dummy', 'Profile'],
+                responses: [
+                    '202' => new OpenApiResponse(
+                        description: 'Success',
+                        content: new \ArrayObject([
                             'application/json' => [
                                 'schema' => ['$ref' => '#/components/schemas/Dummy'],
                             ],
-                        ],
-                        'headers' => [
+                        ]),
+                        headers: new \ArrayObject([
                             'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
-                        ],
-                        'links' => [
+                        ]),
+                        links: new \ArrayObject([
                             'Foo' => ['$ref' => '#/components/schemas/Dummy'],
-                        ],
-                    ],
-                    '205' => [],
+                        ]),
+                    ),
+                    '205' => new OpenApiResponse(),
                 ],
-                'requestBody' => [
-                    'required' => true,
-                    'description' => 'Custom request body',
-                    'content' => [
+                description: 'Custom description',
+                externalDocs: new ExternalDocumentation(
+                    description: 'See also',
+                    url: 'http://schema.example.com/Dummy',
+                ),
+                parameters: [
+                    new Parameter(
+                        name: 'param',
+                        in: 'path',
+                        description: 'Test parameter',
+                        required: true,
+                    ),
+                    new Parameter(
+                        name: 'id',
+                        in: 'path',
+                        description: 'Replace parameter',
+                        required: true,
+                        schema: ['type' => 'string', 'format' => 'uuid'],
+                    ),
+                ],
+                requestBody: new RequestBody(
+                    description: 'Custom request body',
+                    content: new \ArrayObject([
                         'multipart/form-data' => [
                             'schema' => [
                                 'type' => 'object',
@@ -123,19 +138,26 @@ class OpenApiFactoryTest extends TestCase
                                 ],
                             ],
                         ],
-                    ],
-                ],
-                'externalDocs' => ['url' => 'http://schema.example.com/Dummy', 'description' => 'See also'],
-            ]
-            ),
+                    ]),
+                    required: true,
+                ),
+                extensionProperties: ['x-visibility' => 'hide'],
+            )),
             'custom-http-verb' => (new HttpOperation())->withMethod('TEST')->withOperation($baseOperation),
             'withRoutePrefix' => (new GetCollection())->withUriTemplate('/dummies')->withRoutePrefix('/prefix')->withOperation($baseOperation),
             'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
-            'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenApiContext([
-                'parameters' => [
-                    ['description' => 'Test modified collection page number', 'name' => 'page', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'integer', 'default' => 1], 'allowEmptyValue' => true],
+            'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenapi(new OpenApiOperation(
+                parameters: [
+                    new Parameter(
+                        name: 'page',
+                        in: 'query',
+                        description: 'Test modified collection page number',
+                        required: false,
+                        allowEmptyValue: true,
+                        schema: ['type' => 'integer', 'default' => 1],
+                    ),
                 ],
-            ])->withOperation($baseOperation),
+            ))->withOperation($baseOperation),
             'postDummyCollection' => (new Post())->withUriTemplate('/dummies')->withOperation($baseOperation),
             // Filtered
             'filteredDummyCollection' => (new GetCollection())->withUriTemplate('/filtered')->withFilters(['f1', 'f2', 'f3', 'f4', 'f5'])->withOperation($baseOperation),

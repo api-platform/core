@@ -21,6 +21,10 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model\ExternalDocumentation;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\OpenApi\Model\RequestBody;
 use Symfony\Component\Config\Util\XmlUtils;
 
 /**
@@ -87,7 +91,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'schemes' => $this->buildArrayValue($resource, 'scheme'),
             'cacheHeaders' => $this->buildCacheHeaders($resource),
             'hydraContext' => isset($resource->hydraContext->values) ? $this->buildValues($resource->hydraContext->values) : null,
-            'openapiContext' => isset($resource->openapiContext->values) ? $this->buildValues($resource->openapiContext->values) : null,
+            'openapiContext' => isset($resource->openapiContext->values) ? $this->buildValues($resource->openapiContext->values) : null, // TODO Remove in 4.0
+            'openapi' => $this->buildOpenapi($resource),
             'paginationViaCursor' => $this->buildPaginationViaCursor($resource),
             'exceptionToStatus' => $this->buildExceptionToStatus($resource),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
@@ -154,6 +159,91 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $data;
+    }
+
+    private function buildOpenapi(\SimpleXMLElement $resource): bool|OpenApiOperation|null
+    {
+        if (!isset($resource->openapi) && !isset($resource['openapi'])) {
+            return null;
+        }
+
+        if (isset($resource['openapi']) && (\is_bool($resource['openapi']) || \in_array((string) $resource['openapi'], ['1', '0', 'true', 'false'], true))) {
+            return $this->phpize($resource, 'openapi', 'bool');
+        }
+
+        $openapi = $resource->openapi;
+        $data = [];
+        $attributes = $openapi->attributes();
+        foreach ($attributes as $attribute) {
+            $data[$attribute->getName()] = $this->phpize($attributes, 'deprecated', 'deprecated' === $attribute->getName() ? 'bool' : 'string');
+        }
+
+        $data['tags'] = $this->buildArrayValue($resource, 'tag');
+
+        if (isset($openapi->responses->response)) {
+            foreach ($openapi->responses->response as $response) {
+                $data['responses'][(string) $response->attributes()->status] = [
+                    'description' => $this->phpize($response, 'description', 'string'),
+                    'content' => isset($response->content->values) ? $this->buildValues($response->content->values) : null,
+                    'headers' => isset($response->headers->values) ? $this->buildValues($response->headers->values) : null,
+                    'links' => isset($response->links->values) ? $this->buildValues($response->links->values) : null,
+                ];
+            }
+        }
+
+        $data['externalDocs'] = isset($openapi->externalDocs) ? new ExternalDocumentation(
+            description: $this->phpize($resource, 'description', 'string'),
+            url: $this->phpize($resource, 'url', 'string'),
+        ) : null;
+
+        if (isset($openapi->parameters->parameter)) {
+            foreach ($openapi->parameters->parameter as $parameter) {
+                $data['parameters'][(string) $parameter->attributes()->name] = new Parameter(
+                    name: $this->phpize($parameter, 'name', 'string'),
+                    in: $this->phpize($parameter, 'in', 'string'),
+                    description: $this->phpize($parameter, 'description', 'string'),
+                    required: $this->phpize($parameter, 'required', 'bool'),
+                    deprecated: $this->phpize($parameter, 'deprecated', 'bool'),
+                    allowEmptyValue: $this->phpize($parameter, 'allowEmptyValue', 'bool'),
+                    schema: isset($parameter->schema->values) ? $this->buildValues($parameter->schema->values) : null,
+                    style: $this->phpize($parameter, 'style', 'string'),
+                    explode: $this->phpize($parameter, 'explode', 'bool'),
+                    allowReserved: $this->phpize($parameter, 'allowReserved', 'bool'),
+                    example: $this->phpize($parameter, 'example', 'string'),
+                    examples: isset($parameter->examples->values) ? new \ArrayObject($this->buildValues($parameter->examples->values)) : null,
+                    content: isset($parameter->content->values) ? new \ArrayObject($this->buildValues($parameter->content->values)) : null,
+                );
+            }
+        }
+        $data['requestBody'] = isset($openapi->requestBody) ? new RequestBody(
+            description: $this->phpize($openapi->requestBody, 'description', 'string'),
+            content: isset($openapi->requestBody->content->values) ? new \ArrayObject($this->buildValues($openapi->requestBody->values)) : null,
+            required: $this->phpize($openapi->requestBody, 'required', 'bool'),
+        ) : null;
+
+        $data['callbacks'] = isset($openapi->callbacks->values) ? new \ArrayObject($this->buildValues($openapi->callbacks->values)) : null;
+
+        $data['security'] = isset($openapi->security->values) ? $this->buildValues($openapi->security->values) : null;
+
+        if (isset($openapi->servers->server)) {
+            foreach ($openapi->servers->server as $server) {
+                $data['servers'][] = [
+                    'description' => $this->phpize($server, 'description', 'string'),
+                    'url' => $this->phpize($server, 'url', 'string'),
+                    'variables' => isset($server->variables->values) ? $this->buildValues($server->variables->values) : null,
+                ];
+            }
+        }
+
+        $data['extensionProperties'] = isset($openapi->extensionProperties->values) ? $this->buildValues($openapi->extensionProperties->values) : null;
+
+        foreach ($data as $key => $value) {
+            if (null === $value) {
+                unset($data[$key]);
+            }
+        }
+
+        return new OpenApiOperation(...$data);
     }
 
     private function buildUriVariables(\SimpleXMLElement $resource): ?array
@@ -300,7 +390,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             }
 
             $data[] = array_merge($datum, [
-                'openapi' => $this->phpize($operation, 'openapi', 'bool'),
                 'collection' => $this->phpize($operation, 'collection', 'bool'),
                 'class' => (string) $operation['class'],
                 'method' => $this->phpize($operation, 'method', 'string'),

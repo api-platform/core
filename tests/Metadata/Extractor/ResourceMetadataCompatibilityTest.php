@@ -32,6 +32,9 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\OperationDefaultsTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\OpenApi\Model\ExternalDocumentation;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\ResourceAdapterInterface;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlResourceAdapter;
@@ -135,8 +138,14 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'hydraContext' => [
                 'foo' => ['bar' => 'baz'],
             ],
+            // TODO Remove in 4.0
             'openapiContext' => [
                 'bar' => 'baz',
+            ],
+            'openapi' => [
+                'extensionProperties' => [
+                    'bar' => 'baz',
+                ],
             ],
             'validationContext' => [
                 'foo' => 'bar',
@@ -299,8 +308,14 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'hydraContext' => [
                         'foo' => ['bar' => 'baz'],
                     ],
+                    // TODO Remove in 4.0
                     'openapiContext' => [
                         'bar' => 'baz',
+                    ],
+                    'openapi' => [
+                        'extensionProperties' => [
+                            'bar' => 'baz',
+                        ],
                     ],
                     'validationContext' => [
                         'foo' => 'bar',
@@ -426,7 +441,9 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'schemes',
         'cacheHeaders',
         'hydraContext',
+        // TODO Remove in 4.0
         'openapiContext',
+        'openapi',
         'paginationViaCursor',
     ];
 
@@ -473,7 +490,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 // Build default operations
                 $operations = [];
                 foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
-                    $operationName = $this->getDefaultOperationName($operation, self::RESOURCE_CLASS);
                     [$name, $operation] = $this->getOperationWithDefaults($resource, $operation);
                     $operations[$name] = $operation;
                 }
@@ -510,6 +526,32 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         }
 
         return $resources;
+    }
+
+    private function withOpenapi(array|bool $values): bool|OpenApiOperation
+    {
+        if (\is_bool($values)) {
+            return $values;
+        }
+
+        $allowedProperties = array_map(fn (\ReflectionProperty $reflProperty): string => $reflProperty->getName(), (new \ReflectionClass(OpenApiOperation::class))->getProperties());
+        foreach ($values as $key => $value) {
+            $values[$key] = match ($key) {
+                'externalDocs' => new ExternalDocumentation(description: $value['description'] ?? '', url: $value['url'] ?? ''),
+                'requestBody' => new RequestBody(description: $value['description'] ?? '', content: isset($value['content']) ? new \ArrayObject($value['content']) : null, required: $value['required'] ?? false),
+                'callbacks' => new \ArrayObject($value),
+                default => $value,
+            };
+
+            if (\in_array($key, $allowedProperties, true)) {
+                continue;
+            }
+
+            $values['extensionProperties'][$key] = $value;
+            unset($values[$key]);
+        }
+
+        return new OpenApiOperation(...$values);
     }
 
     private function withUriVariables(array $values): array
