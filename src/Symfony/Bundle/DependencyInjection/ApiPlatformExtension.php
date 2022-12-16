@@ -190,6 +190,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.public', $config['defaults']['cache_headers']['public'] ?? $config['http_cache']['public']);
         $container->setParameter('api_platform.http_cache.invalidation.max_header_length', $config['defaults']['cache_headers']['invalidation']['max_header_length'] ?? $config['http_cache']['invalidation']['max_header_length']);
         $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? $config['http_cache']['invalidation']['xkey']['glue']);
+
         $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
 
         if ($config['name_converter']) {
@@ -604,34 +605,24 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('http_cache_purger.xml');
 
-        $definitions = [];
+        foreach ($config['http_cache']['invalidatoin']['scoped_clients'] as $client) {
+            $definition = $container->getDefinition($client);
+            $definition->addTag('api_platform.http_cache.http_client');
+        }
+
+        if (!($urls = $config['http_cache']['invalidation']['urls'])) {
+            $urls = $config['http_cache']['invalidation']['varnish_urls'];
+        }
+
+        foreach ($urls as $key => $url) {
+            $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);
+            $definition->setFactory([ScopingHttpClient::class, 'forBaseUri']);
+            $definition->addTag('api_platform.http_cache.http_client');
+
+            $container->setDefinition('api_platform.invalidation_http_client.'.$key, $definition);
+        }
 
         $serviceName = $config['http_cache']['invalidation']['purger'];
-        switch ($serviceName) {
-            case 'api_platform.http_cache.purger.souin':
-                foreach ($config['http_cache']['invalidation']['souin_urls'] as $key => $url) {
-                    $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);
-                    $definition->setFactory([ScopingHttpClient::class, 'forBaseUri']);
-
-                    $definitions[] = $definition;
-                }
-                break;
-            default:
-                foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
-                    $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);
-                    $definition->setFactory([ScopingHttpClient::class, 'forBaseUri']);
-
-                    $definitions[] = $definition;
-                }
-
-                foreach (['api_platform.http_cache.purger.varnish.ban', 'api_platform.http_cache.purger.varnish.xkey'] as $serviceName) {
-                    $container->findDefinition($serviceName)->setArguments([
-                        $definitions,
-                        $config['http_cache']['invalidation']['max_header_length'],
-                    ]);
-                }
-                break;
-        }
         $container->setAlias('api_platform.http_cache.purger', $serviceName);
     }
 

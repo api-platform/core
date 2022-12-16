@@ -888,35 +888,6 @@ class ApiPlatformExtensionTest extends TestCase
         ], $this->container->getDefinition('api_platform.doctrine.listener.http_cache.purge')->getTag('doctrine.event_listener'));
     }
 
-    public function testSouinHttpCacheConfiguration(): void
-    {
-        $config = self::DEFAULT_CONFIG;
-        $config['api_platform']['enable_swagger'] = true;
-        $config['api_platform']['http_cache']['invalidation']['purger'] = 'api_platform.http_cache.purger.souin';
-        $config['api_platform']['http_cache']['invalidation']['souin_urls'] = ['http://souin-instance-1', 'http://souin-instance-2'];
-        (new ApiPlatformExtension())->load($config, $this->container);
-
-        $services = [
-            'api_platform.http_cache.listener.response.configure',
-            'api_platform.doctrine.listener.http_cache.purge',
-            'api_platform.http_cache.purger.souin',
-            'api_platform.http_cache.listener.response.add_tags',
-        ];
-
-        $this->assertContainerHas($services);
-        $this->assertServiceHasTags('api_platform.http_cache.listener.response.configure', ['kernel.event_listener']);
-        $this->assertServiceHasTags('api_platform.doctrine.listener.http_cache.purge', ['doctrine.event_listener']);
-        $this->assertServiceHasTags('api_platform.http_cache.listener.response.add_tags', ['kernel.event_listener']);
-
-        $this->assertContainerHasAlias('api_platform.http_cache.purger');
-
-        $this->assertSame([
-            ['event' => 'preUpdate'],
-            ['event' => 'onFlush'],
-            ['event' => 'postFlush'],
-        ], $this->container->getDefinition('api_platform.doctrine.listener.http_cache.purge')->getTag('doctrine.event_listener'));
-    }
-
     public function testValidatorConfiguration(): void
     {
         if (!interface_exists(ValidatorInterface::class)) {
