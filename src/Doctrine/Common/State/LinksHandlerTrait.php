@@ -34,12 +34,18 @@ trait LinksHandlerTrait
             return $links;
         }
 
-        $newLinks = [];
+        $newLink = null;
+        $linkProperty = $context['linkProperty'] ?? null;
 
         foreach ($links as $link) {
-            if ($linkClass === $link->getFromClass()) {
-                $newLinks[] = $link;
+            if ($linkClass === $link->getFromClass() && $linkProperty === $link->getFromProperty()) {
+                $newLink = $link;
+                break;
             }
+        }
+
+        if ($newLink) {
+            return [$newLink];
         }
 
         // Using GraphQL, it's possible that we won't find a GraphQL Operation of the same type (e.g. it is disabled).
@@ -62,16 +68,17 @@ trait LinksHandlerTrait
         }
 
         foreach ($this->getOperationLinks($linkedOperation ?? null) as $link) {
-            if ($resourceClass === $link->getToClass()) {
-                $newLinks[] = $link;
+            if ($resourceClass === $link->getToClass() && $linkProperty === $link->getFromProperty()) {
+                $newLink = $link;
+                break;
             }
         }
 
-        if (!$newLinks) {
+        if (!$newLink) {
             throw new RuntimeException(sprintf('The class "%s" cannot be retrieved from "%s".', $resourceClass, $linkClass));
         }
 
-        return $newLinks;
+        return [$newLink];
     }
 
     private function getIdentifierValue(array &$identifiers, string $name = null): mixed

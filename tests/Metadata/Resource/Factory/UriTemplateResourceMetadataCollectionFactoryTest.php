@@ -107,6 +107,20 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
                     uriVariables: ['dummyId' => ['from_class' => Dummy::class, 'identifiers' => ['id']], 'id' => ['from_class' => AttributeResource::class, 'identifiers' => ['id']]],
                 ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
+                    operations: [
+                        new Get(
+                            shortName: 'AttributeResource',
+                            class: AttributeResource::class,
+                            controller: 'api_platform.action.placeholder',
+                            uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
+                            routePrefix: '/prefix',
+                        ),
+                    ]
+                ),
             ]),
         );
 
@@ -168,6 +182,21 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
                     uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id'], parameterName: 'dummyId'), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
                     operations: [],
+                ),
+                new ApiResource(
+                    uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    operations: [
+                        '_api_/prefix/attribute_resources/{id}{._format}_get' => new Get(
+                            uriTemplate: '/attribute_resources/{id}{._format}',
+                            shortName: 'AttributeResource',
+                            class: AttributeResource::class,
+                            controller: 'api_platform.action.placeholder',
+                            uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
+                            routePrefix: '/prefix',
+                            name: '_api_/prefix/attribute_resources/{id}{._format}_get'),
+                    ]
                 ),
             ]),
             $uriTemplateResourceMetadataCollectionFactory->create(AttributeResource::class)

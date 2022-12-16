@@ -31,7 +31,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 {
     use OperationDefaultsTrait;
 
-    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [], LoggerInterface $logger = null)
+    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [], LoggerInterface $logger = null, private readonly bool $graphQlEnabled = false)
     {
         $this->logger = $logger ?? new NullLogger();
         $this->defaults = $defaults;
@@ -85,7 +85,9 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 }
             }
 
-            $resource = $this->addGraphQlOperations($node['graphQlOperations'] ?? null, $resource);
+            if ($this->graphQlEnabled) {
+                $resource = $this->addGraphQlOperations($node['graphQlOperations'] ?? null, $resource);
+            }
 
             $resources[] = $this->addOperations($node['operations'] ?? null, $resource);
         }
