@@ -63,6 +63,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\IriOnlyDummy as IriOnlyDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsDummy as MultiRelationsDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsRelatedDummy as MultiRelationsRelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
@@ -138,6 +140,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Order;
@@ -756,6 +760,42 @@ final class DoctrineContext implements Context
             $this->manager->persist($dummy);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb multiRelationsDummy objects having each a manyToOneRelation, :nbmtmr manyToManyRelations and :nbotmr oneToManyRelations
+     */
+    public function thereAreMultiRelationsDummyObjectsHavingEachAManyToOneRelationManyToManyRelationsAndOneToManyRelations(int $nb, int $nbmtmr, int $nbotmr): void
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $relatedDummy = $this->buildMultiRelationsRelatedDummy();
+            $relatedDummy->name = 'RelatedManyToOneDummy #'.$i;
+
+            $dummy = $this->buildMultiRelationsDummy();
+            $dummy->name = 'Dummy #'.$i;
+            $dummy->setManyToOneRelation($relatedDummy);
+
+            for ($j = 1; $j <= $nbmtmr; ++$j) {
+                $manyToManyItem = $this->buildMultiRelationsRelatedDummy();
+                $manyToManyItem->name = 'RelatedManyToManyDummy'.$j.$i;
+                $this->manager->persist($manyToManyItem);
+
+                $dummy->addManyToManyRelation($manyToManyItem);
+            }
+
+            for ($j = 1; $j <= $nbotmr; ++$j) {
+                $oneToManyItem = $this->buildMultiRelationsRelatedDummy();
+                $oneToManyItem->name = 'RelatedOneToManyDummy'.$j.$i;
+                $oneToManyItem->setOneToManyRelation($dummy);
+                $this->manager->persist($oneToManyItem);
+
+                $dummy->addOneToManyRelation($oneToManyItem);
+            }
+
+            $this->manager->persist($relatedDummy);
+            $this->manager->persist($dummy);
+        }
         $this->manager->flush();
     }
 
@@ -2299,5 +2339,15 @@ final class DoctrineContext implements Context
     private function buildPayment(string $amount): Payment|PaymentDocument
     {
         return $this->isOrm() ? new Payment($amount) : new PaymentDocument($amount);
+    }
+
+    private function buildMultiRelationsDummy(): MultiRelationsDummy|MultiRelationsDummyDocument
+    {
+        return $this->isOrm() ? new MultiRelationsDummy() : new MultiRelationsDummyDocument();
+    }
+
+    private function buildMultiRelationsRelatedDummy(): MultiRelationsRelatedDummy|MultiRelationsRelatedDummyDocument
+    {
+        return $this->isOrm() ? new MultiRelationsRelatedDummy() : new MultiRelationsRelatedDummyDocument();
     }
 }

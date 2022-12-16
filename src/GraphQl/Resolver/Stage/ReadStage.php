@@ -83,6 +83,7 @@ final class ReadStage implements ReadStageInterface
         if (isset($source[$info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
             $uriVariables = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
             $normalizationContext['linkClass'] = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
+            $normalizationContext['linkProperty'] = $info->fieldName;
         }
 
         return $this->provider->provide($operation, $uriVariables, $normalizationContext);

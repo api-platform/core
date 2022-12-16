@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
@@ -24,6 +22,8 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class OperationNameResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use OperationDefaultsTrait;
+
     public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
     }
@@ -52,8 +52,7 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
                     continue;
                 }
 
-                $path = ($operation->getRoutePrefix() ?? '').($operation->getUriTemplate() ?? '');
-                $newOperationName = sprintf('_api_%s_%s%s', $path ?: ($operation->getShortName() ?? $this->getDefaultShortname($resourceClass)), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : '');
+                $newOperationName = $this->getDefaultOperationName($operation, $resourceClass);
                 $operations->remove($operationName)->add($newOperationName, $operation->withName($newOperationName));
             }
 
@@ -61,10 +60,5 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
         }
 
         return $resourceMetadataCollection;
-    }
-
-    private function getDefaultShortname(string $resourceClass): string
-    {
-        return (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
     }
 }
