@@ -32,6 +32,7 @@ final class DocumentationAction
 
     public function __invoke(Request $request = null): DocumentationInterface
     {
+        $context = [];
         if (null !== $request) {
             $context = ['base_url' => $request->getBaseUrl()];
             if ($request->query->getBoolean('api_gateway')) {
@@ -41,7 +42,7 @@ final class DocumentationAction
         }
 
         if ('json' === $request?->getRequestFormat() && null !== $this->openApiFactory) {
-            return $this->openApiFactory->__invoke($context ?? []);
+            return $this->openApiFactory->__invoke($context);
         }
 
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);
