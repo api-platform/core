@@ -598,23 +598,27 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('http_cache_purger.xml');
 
-        $definitions = [];
-        foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
-            $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);
-            $definition->setFactory([ScopingHttpClient::class, 'forBaseUri']);
-
-            $definitions[] = $definition;
+        foreach ($config['http_cache']['invalidation']['scoped_clients'] as $client) {
+            $definition = $container->getDefinition($client);
+            $definition->addTag('api_platform.http_cache.http_client');
         }
 
-        foreach (['api_platform.http_cache.purger.varnish.ban', 'api_platform.http_cache.purger.varnish.xkey'] as $serviceName) {
-            $container->findDefinition($serviceName)->setArguments([
-                $definitions,
-                $config['http_cache']['invalidation']['max_header_length'],
-            ]);
+        if (!($urls = $config['http_cache']['invalidation']['urls'])) {
+            $urls = $config['http_cache']['invalidation']['varnish_urls'];
+        }
+
+        foreach ($urls as $key => $url) {
+            $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);
+            $definition->setFactory([ScopingHttpClient::class, 'forBaseUri']);
+            $definition->addTag('api_platform.http_cache.http_client');
+            $container->setDefinition('api_platform.invalidation_http_client.'.$key, $definition);
         }
 
         $serviceName = $config['http_cache']['invalidation']['purger'];
-        $container->setAlias('api_platform.http_cache.purger', $serviceName);
+
+        if (!$container->hasDefinition('api_platform.http_cache.purger')) {
+            $container->setAlias('api_platform.http_cache.purger', $serviceName);
+        }
     }
 
     /**
