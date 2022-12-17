@@ -316,7 +316,7 @@ final class Configuration implements ConfigurationInterface
                             ->canBeEnabled()
                             ->children()
                                 ->arrayNode('varnish_urls')
-                                    ->setDeprecated('api-platform/core', '3.0', 'The "varnish_urls" configuration is deprecated, use "urls" or .')
+                                    ->setDeprecated('api-platform/core', '3.0', 'The "varnish_urls" configuration is deprecated, use "urls" or "scoped_clients".')
                                     ->defaultValue([])
                                     ->prototype('scalar')->end()
                                     ->info('URLs of the Varnish servers to purge using cache tags when a resource is updated.')

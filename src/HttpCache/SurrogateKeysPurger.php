@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache;
 
+use ApiPlatform\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -26,35 +27,36 @@ class SurrogateKeysPurger implements PurgerInterface
     private const MAX_HEADER_SIZE_PER_BATCH = 1500;
     private const SEPARATOR = ', ';
     private const HEADER = 'Surrogate-Key';
-    protected int $separatorLength = 2;
 
     /**
      * @param HttpClientInterface[] $clients
      */
     public function __construct(protected readonly array $clients, protected readonly int $maxHeaderLength = self::MAX_HEADER_SIZE_PER_BATCH, protected readonly string $header = self::HEADER, protected readonly string $separator = self::SEPARATOR)
     {
-        $this->separatorLength = \strlen($this->separator);
     }
 
     /**
-     * @return string[]
+     * @return \Iterator<string>
      */
-    private function getChunkedIris(array $iris): array
+    private function getChunkedIris(array $iris): \Iterator
     {
-        $str = implode($this->separator, $iris);
-        $batches = [];
-
-        while (\strlen($str) > $this->maxHeaderLength) {
-            $splitPosition = strrpos(str_split($str, $this->maxHeaderLength)[0], $this->separator);
-            if ($splitPosition) {
-                [$batches[], $str] = str_split($str, $splitPosition);
-                $str = substr($str, $this->separatorLength);
-            }
+        if (!$iris) {
+            return;
         }
 
-        $batches[] = $str;
+        $chunk = array_shift($iris);
+        foreach ($iris as $iri) {
+            $nextChunk = sprintf('%s%s%s', $chunk, $this->separator, $iri);
+            if (\strlen($nextChunk) <= $this->maxHeaderLength) {
+                $chunk = $nextChunk;
+                continue;
+            }
 
-        return $batches;
+            yield $chunk;
+            $chunk = $iri;
+        }
+
+        yield $chunk;
     }
 
     /**
@@ -63,6 +65,10 @@ class SurrogateKeysPurger implements PurgerInterface
     public function purge(array $iris): void
     {
         foreach ($this->getChunkedIris($iris) as $chunk) {
+            if (\strlen((string) $chunk) > $this->maxHeaderLength) {
+                throw new RuntimeException(sprintf('IRI "%s" is too long to fit current max header length (currently set to "%s"). You can increase it using the "api_platform.http_cache.invalidation.max_header_length" parameter.', $chunk, $this->maxHeaderLength));
+            }
+
             foreach ($this->clients as $client) {
                 $client->request(
                     Request::METHOD_PURGE,

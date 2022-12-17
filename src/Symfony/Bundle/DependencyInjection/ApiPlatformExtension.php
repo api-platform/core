@@ -618,12 +618,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);
             $definition->setFactory([ScopingHttpClient::class, 'forBaseUri']);
             $definition->addTag('api_platform.http_cache.http_client');
-
             $container->setDefinition('api_platform.invalidation_http_client.'.$key, $definition);
         }
 
         $serviceName = $config['http_cache']['invalidation']['purger'];
-        $container->setAlias('api_platform.http_cache.purger', $serviceName);
+
+        if (!$container->hasDefinition('api_platform.http_cache.purger')) {
+            $container->setAlias('api_platform.http_cache.purger', $serviceName);
+        }
     }
 
     /**

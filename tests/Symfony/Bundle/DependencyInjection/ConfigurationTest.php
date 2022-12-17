@@ -18,6 +18,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -32,6 +33,8 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  */
 class ConfigurationTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private Configuration $configuration;
 
     private Processor $processor;
@@ -177,6 +180,8 @@ class ConfigurationTest extends TestCase
                     'max_header_length' => 7500,
                     'purger' => 'api_platform.http_cache.purger.varnish',
                     'xkey' => ['glue' => ' '],
+                    'urls' => [],
+                    'scoped_clients' => [],
                 ],
                 'public' => null,
             ],

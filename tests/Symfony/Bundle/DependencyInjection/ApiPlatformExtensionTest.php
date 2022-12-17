@@ -72,6 +72,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
@@ -93,10 +94,6 @@ class ApiPlatformExtensionTest extends TestCase
         ],
         'http_cache' => ['invalidation' => [
             'enabled' => true,
-            'varnish_urls' => ['test'],
-            'xkey' => [
-                'glue' => ' ',
-            ],
             'purger' => 'api_platform.http_cache.purger.varnish.ban',
             'request_options' => [
                 'allow_redirects' => [
@@ -1208,5 +1205,31 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContains($kernelProjectDir.'/Entity', $resourceClassDirectories);
         $this->assertContains($kernelProjectDir.'/Document', $resourceClassDirectories);
         $this->assertContains(realpath(__DIR__.'/../../../Symfony/Bundle/DependencyInjection').'/../../../Fixtures/app/config/api_platform', $resourceClassDirectories);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedHttpCacheConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['varnish_urls'] = ['test'];
+        $config['api_platform']['http_cache']['invalidation']['xkey'] = ['glue' => ' '];
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+        $this->assertServiceHasTags('api_platform.invalidation_http_client.0', ['api_platform.http_cache.http_client']);
+    }
+
+    public function testHttpCacheUrlsConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['urls'] = ['test'];
+        $config['api_platform']['http_cache']['invalidation']['scoped_clients'] = ['my_scoped_client'];
+
+        $this->container->setDefinition('my_scoped_client', new Definition('my_scoped_client'));
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+        $this->assertServiceHasTags('api_platform.invalidation_http_client.0', ['api_platform.http_cache.http_client']);
+        $this->assertServiceHasTags('my_scoped_client', ['api_platform.http_cache.http_client']);
     }
 }
