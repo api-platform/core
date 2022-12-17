@@ -167,7 +167,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
             if (HttpOperation::METHOD_DELETE === $operation['method']) {
                 $newOperation = (new Delete())->withOperation($newOperation);
-            } elseif (HttpOperation::METHOD_POST === $operation['method'] && !isset($operation['path'])) {
+            } elseif (HttpOperation::METHOD_POST === $operation['method']) {
                 $newOperation = (new Post())->withOperation($newOperation)->withUriVariables([])->withRead(false);
             }
 
