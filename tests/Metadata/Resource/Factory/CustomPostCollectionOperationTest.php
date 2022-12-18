@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -77,6 +78,21 @@ final class CustomPostCollectionOperationTest extends TestCase
             GetCollection::class,
             $resourceMetadataCollection->getOperation('api_webbies_get_for_customer_collection')
         );
+
+        self::assertInstanceOf(
+            Post::class,
+            $resourceMetadataCollection->getOperation('api_webbies_post_item')
+        );
+
+        self::assertNOtInstanceOf(
+            Post::class,
+            $resourceMetadataCollection->getOperation('api_webbies_post_on_item')
+        );
+
+        self::assertInstanceOf(
+            HttpOperation::class,
+            $resourceMetadataCollection->getOperation('api_webbies_post_on_item')
+        );
     }
 
     private function getResourceMetadata(): ResourceMetadata
@@ -85,7 +101,16 @@ final class CustomPostCollectionOperationTest extends TestCase
             'Webby',
             '',
             '',
-            ['get' => ['method' => 'GET']],
+            [
+                'get' => ['method' => 'GET'],
+                'post' => [
+                    'method' => 'POST',
+                ],
+                'post_on_item' => [
+                    'method' => 'POST',
+                    'path' => '/webbies/{id}/action',
+                ],
+            ],
             [
                 'get' => ['method' => 'GET'],
                 'get_for_customer' => [
