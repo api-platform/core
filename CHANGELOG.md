@@ -4,7 +4,7 @@
 
 ### Bug fixes
 
-* Symfony: Fix swagger config to support Symfony ConfigBuilders  (#4691)
+* [4691](https://github.com/api-platform/core/pull/4691) Symfony: Fix swagger config to support Symfony ConfigBuilders  (#4691)
 
 ## v3.0.7
 
