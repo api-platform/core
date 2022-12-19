@@ -238,6 +238,8 @@ class AppKernel extends Kernel
             ],
         ]);
 
+        $loader->load(__DIR__.'/config/config_swagger.php');
+
         if ('mongodb' === $this->environment) {
             $c->prependExtensionConfig('api_platform', [
                 'mapping' => [
@@ -253,7 +255,5 @@ class AppKernel extends Kernel
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_orm'],
             ],
         ]);
-
-        $loader->load(__DIR__.'/config/config_swagger.php');
     }
 }
