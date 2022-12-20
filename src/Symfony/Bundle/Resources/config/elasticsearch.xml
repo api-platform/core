@@ -45,22 +45,6 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.elasticsearch.normalizer.item" class="ApiPlatform\Elasticsearch\Serializer\ItemNormalizer" decorates="api_platform.serializer.normalizer.item" public="false">
-            <argument type="service" id="api_platform.elasticsearch.normalizer.item.inner" />
-        </service>
-
-        <service id="api_platform.elasticsearch.normalizer.document" class="ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
-            <argument type="service" id="serializer.mapping.class_metadata_factory" />
-            <argument type="service" id="api_platform.elasticsearch.name_converter.inner_fields" />
-            <argument type="service" id="serializer.property_accessor" />
-            <argument type="service" id="property_info" on-invalid="ignore" />
-            <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
-
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-922" />
-        </service>
-
         <service id="api_platform.elasticsearch.item_data_provider" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\ItemDataProvider" public="false">
             <argument type="service" id="api_platform.elasticsearch.client" />
             <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" />
