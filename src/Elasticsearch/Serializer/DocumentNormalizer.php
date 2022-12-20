@@ -119,5 +119,3 @@ final class DocumentNormalizer extends ObjectNormalizer
         return $data;
     }
 }
-
-class_alias(DocumentNormalizer::class, \ApiPlatform\Core\Bridge\Elasticsearch\Serializer\DocumentNormalizer::class);

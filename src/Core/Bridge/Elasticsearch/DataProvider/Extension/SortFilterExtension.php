@@ -13,10 +13,34 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension;
 
-class_exists(\ApiPlatform\Elasticsearch\Extension\SortFilterExtension::class);
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\SortFilterInterface;
 
-if (false) {
-    final class SortFilterExtension extends \ApiPlatform\Elasticsearch\Extension\SortFilterExtension
+/**
+ * Applies filters on the sort parameter while querying resource collection.
+ *
+ * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html
+ *
+ * @experimental
+ *
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ */
+final class SortFilterExtension extends AbstractFilterExtension
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFilterInterface(): string
     {
+        return SortFilterInterface::class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function alterRequestBody(array $requestBody, array $clauseBody): array
+    {
+        $requestBody['sort'] = array_merge_recursive($requestBody['sort'] ?? [], $clauseBody);
+
+        return $requestBody;
     }
 }

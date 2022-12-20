@@ -85,8 +85,6 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata::class => ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata::class,
 
     ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter::class => ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter::class,
-    ApiPlatform\Core\Bridge\Elasticsearch\Serializer\DocumentNormalizer::class => ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer::class,
-    ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer::class => ApiPlatform\Elasticsearch\Serializer\ItemNormalizer::class,
     ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait::class => ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait::class,
 
     ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator::class => ApiPlatform\Elasticsearch\Paginator::class,

@@ -5,6 +5,18 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.elasticsearch.normalizer.item" class="ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer" public="false">
+            <argument type="service" id="api_platform.elasticsearch.identifier_extractor" />
+            <argument type="service" id="serializer.mapping.class_metadata_factory" />
+            <argument type="service" id="api_platform.elasticsearch.name_converter.inner_fields" />
+            <argument type="service" id="serializer.property_accessor" />
+            <argument type="service" id="property_info" on-invalid="ignore" />
+            <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
+
+            <!-- Run before serializer.normalizer.json_serializable -->
+            <tag name="serializer.normalizer" priority="-890" />
+        </service>
+
         <service id="api_platform.elasticsearch.request_body_search_extension.filter" public="false" abstract="true">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filter_locator" />
