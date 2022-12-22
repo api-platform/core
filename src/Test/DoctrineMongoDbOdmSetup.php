@@ -38,7 +38,7 @@ class DoctrineMongoDbOdmSetup
     public static function createAttributeMetadataConfiguration(array $paths, bool $isDevMode = false, string $proxyDir = null, string $hydratorDir = null, Cache $cache = null): Configuration
     {
         $config = self::createConfiguration($isDevMode, $proxyDir, $hydratorDir, $cache);
-        $config->setMetadataDriverImpl(new AttributeDriver($paths)); // @phpstan-ignore-line
+        $config->setMetadataDriverImpl(new AttributeDriver($paths));
 
         return $config;
     }
