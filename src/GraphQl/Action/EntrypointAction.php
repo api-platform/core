@@ -86,15 +86,16 @@ final class EntrypointAction
             return [$query, $operationName, $variables];
         }
 
-        if ('json' === $request->getContentType()) {
+        $contentType = method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType();
+        if ('json' === $contentType) {
             return $this->parseData($query, $operationName, $variables, $request->getContent());
         }
 
-        if ('graphql' === $request->getContentType()) {
+        if ('graphql' === $contentType) {
             $query = $request->getContent();
         }
 
-        if (\in_array($request->getContentType(), ['multipart', 'form'], true)) {
+        if (\in_array($contentType, ['multipart', 'form'], true)) {
             return $this->parseMultipartRequest($query, $operationName, $variables, $request->request->all(), $request->files->all());
         }
 
