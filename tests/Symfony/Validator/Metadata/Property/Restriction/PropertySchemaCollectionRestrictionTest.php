@@ -85,7 +85,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             'email' => [
                 new NotNull(),
                 new Length(['min' => 2, 'max' => 255]),
-                new Email(['mode' => Email::VALIDATION_MODE_LOOSE]),
+                new Email(['mode' => Email::VALIDATION_MODE_HTML5]),
             ],
             'phone' => new Optional([
                 new Type(['type' => 'string']),
