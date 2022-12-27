@@ -25,6 +25,8 @@ final class PropertySchemaRangeRestriction implements PropertySchemaRestrictionM
 {
     /**
      * {@inheritdoc}
+     *
+     * @param Range $constraint
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
