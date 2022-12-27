@@ -14,10 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\UriVariablesConverterInterface;
+use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -103,6 +106,24 @@ final class ReadListener
         ) {
             throw new NotFoundHttpException('Not Found');
         }
+
+        if ($operation->getUriVariables()) {
+            foreach ($operation->getUriVariables() as $key => $uriVariable) {
+                if (!$uriVariable instanceof Link || !$uriVariable->getSecurity()) {
+                    continue;
+                }
+                $operationUriVariables = $uriVariable->getIdentifiers();
+                $relationClass = $uriVariable->getFromClass();
+                try {
+                    //$uriVariables = $this->getOperationUriVariables($operation, $parameters, $resourceClass);
+                    $tmp = $this->provider->provide(new Get(uriVariables: $operationUriVariables, class: $relationClass, provider: ItemProvider::class), ['id' => $parameters[$key]], $context);
+                    $request->attributes->set($uriVariable->getToProperty(), $tmp);
+                } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
+                    throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+                }
+            }
+        }
+
 
         $request->attributes->set('data', $data);
         $request->attributes->set('previous_data', $this->clone($data));

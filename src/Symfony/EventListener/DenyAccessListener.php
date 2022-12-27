@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -96,6 +97,18 @@ final class DenyAccessListener
 
         if (!$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {
             throw new AccessDeniedException($message ?? 'Access Denied.');
+        }
+
+        if ($operation->getUriVariables()) {
+            foreach ($operation->getUriVariables() as $key => $uriVariable) {
+                if (!$uriVariable instanceof Link || !$uriVariable->getSecurity()) {
+                    continue;
+                }
+
+                if (!$this->resourceAccessChecker->isGranted($uriVariable->getToProperty(), $uriVariable->getSecurity(), $extraVariables)) {
+                    throw new AccessDeniedException($uriVariable->getSecurityMessage() ?? 'Access Denied.');
+                }
+            }
         }
     }
 }
