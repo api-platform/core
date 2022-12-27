@@ -25,8 +25,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Util\Inflector;
 use Elasticsearch\Client;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
-use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
@@ -44,7 +42,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             if ($operations = $resourceMetadata->getOperations()) {
                 foreach ($operations as $operationName => $operation) {
-                    $operations->add($operationName, $this->configureOperation($operation) ?? $operation);
+                    $operations->add($operationName, $this->configureOperation($operation, $resourceClass) ?? $operation);
                 }
                 $resourceMetadata = $resourceMetadata->withOperations($operations);
             }
@@ -52,7 +50,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
             // $graphqlOperations and $operations have not same type, we cannot combine function
             if ($graphQlOperations = $resourceMetadata->getGraphQlOperations()) {
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
-                    $graphQlOperations[$operationName] = $this->configureOperation($graphQlOperation) ?? $graphQlOperation;
+                    $graphQlOperations[$operationName] = $this->configureOperation($graphQlOperation, $resourceClass) ?? $graphQlOperation;
                 }
                 $resourceMetadata = $resourceMetadata->withGraphQlOperations($graphQlOperations);
             }
@@ -68,7 +66,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
         return Inflector::tableize($operation->getShortName());
     }
 
-    private function configureOperation(Operation $operation): ?ElasticsearchOperation
+    private function configureOperation(Operation $operation, string $resourceClass): ?ElasticsearchOperation
     {
         if (!$operation instanceof HttpOperation) {
             return null;
@@ -78,7 +76,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
         if ($operation instanceof ElasticsearchOperation) {
             if (false === $operation->getElasticsearch()) {
-                throw new \LogicException(sprintf('You cannot disable elasticsearch in %s, use %s instead', ElasticsearchOperation::class, Operation::class));
+                throw new \LogicException(sprintf('You cannot disable elasticsearch with %s, use %s instead', ElasticsearchOperation::class, Operation::class));
             }
             if (null === $operation->getIndex()) {
                 $operation = $operation->withIndex(self::guessIndexName($operation));
@@ -91,7 +89,6 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                 return null;
             }
 
-            $resourceClass = $operation->getClass();
             // 1. mapping
             $indexName = $this->mapping[$resourceClass]['index'] ?? null;
             $type = $this->mapping[$resourceClass]['type'] ?? null;
@@ -107,8 +104,9 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
             // 3. cat
             if (null === $indexName) {
                 $indexName = self::guessIndexName($operation);
+//                dd($this->indexExists($indexName));
                 if (!$this->indexExists($indexName)) {
-                    throw new \LogicException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
+                    throw new \LogicException(sprintf('No index exists with the name "%s".', $indexName));
                 }
             }
 
@@ -126,12 +124,6 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
     private function indexExists(string $name): bool
     {
-        try {
-            $this->client->cat()->indices(['index' => $name]);
-
-            return true;
-        } catch (Missing404Exception|NoNodesAvailableException) {
-            return false;
-        }
+        return $this->client->indices()->exists(['index' => $name]);
     }
 }
