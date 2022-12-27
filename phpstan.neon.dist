@@ -16,6 +16,8 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludePaths:
+		# Symfony config
+		- tests/Fixtures/app/config/config_swagger.php
 		# Symfony cache
 		- tests/Fixtures/app/var/
 		- tests/Fixtures/Symfony/Maker

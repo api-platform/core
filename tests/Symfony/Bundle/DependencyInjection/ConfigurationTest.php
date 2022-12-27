@@ -288,13 +288,13 @@ class ConfigurationTest extends TestCase
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'api_keys' => [$exampleConfig],
+                    'api_keys' => ['Some Authorization name, like JWT' => $exampleConfig],
                 ],
             ],
         ]);
 
         $this->assertArrayHasKey('api_keys', $config['swagger']);
-        $this->assertSame($exampleConfig, $config['swagger']['api_keys'][0]);
+        $this->assertSame($exampleConfig, $config['swagger']['api_keys']['Some Authorization name, like JWT']);
     }
 
     /**

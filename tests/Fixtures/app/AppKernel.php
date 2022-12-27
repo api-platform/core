@@ -238,6 +238,8 @@ class AppKernel extends Kernel
             ],
         ]);
 
+        $loader->load(__DIR__.'/config/config_swagger.php');
+
         if ('mongodb' === $this->environment) {
             $c->prependExtensionConfig('api_platform', [
                 'mapping' => [

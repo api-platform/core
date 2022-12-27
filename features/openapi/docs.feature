@@ -16,6 +16,28 @@ Feature: Documentation support
     And the JSON node "info.title" should be equal to "My Dummy API"
     And the JSON node "info.description" should contain "This is a test API."
     And the JSON node "info.description" should contain "Made with love"
+    # Security Schemes
+    And the JSON node "components.securitySchemes" should be equal to:
+    """
+    {
+        "oauth": {
+            "type": "oauth2",
+            "description": "OAuth 2.0 implicit Grant",
+            "flows": {
+                "implicit": {
+                    "authorizationUrl": "http://my-custom-server/openid-connect/auth",
+                    "scopes": {}
+                }
+            }
+        },
+        "Some Authorization Name": {
+            "type": "apiKey",
+            "description": "Value for the Authorization header parameter.",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+    """
     # Supported classes
     And the OpenAPI class "AbstractDummy" exists
     And the OpenAPI class "CircularReference" exists
