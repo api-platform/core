@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Util\Inflector;
 use Elasticsearch\Client;
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
@@ -85,7 +86,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
             if (false === $operation->getElasticsearch() || null !== $operation->getProvider()) {
                 return null;
             }
-            if (null === $operation->getElasticsearch() && !$this->indexExists(self::guessIndexName($operation))) {
+            if (null === $operation->getElasticsearch() && !$this->canFindIndex(self::guessIndexName($operation))) {
                 return null;
             }
 
@@ -104,8 +105,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
             // 3. cat
             if (null === $indexName) {
                 $indexName = self::guessIndexName($operation);
-//                dd($this->indexExists($indexName));
-                if (!$this->indexExists($indexName)) {
+                if (!$this->canFindIndex($indexName)) {
                     throw new \LogicException(sprintf('No index exists with the name "%s".', $indexName));
                 }
             }
@@ -122,8 +122,12 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
         return $operation->withProvider($isCollection ? CollectionProvider::class : ItemProvider::class);
     }
 
-    private function indexExists(string $name): bool
+    private function canFindIndex(string $name): bool
     {
-        return $this->client->indices()->exists(['index' => $name]);
+        try {
+            return $this->client->indices()->exists(['index' => $name]);
+        } catch (NoNodesAvailableException) {
+            return false;
+        }
     }
 }
