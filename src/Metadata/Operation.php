@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Elasticsearch\Metadata\Get;
+use ApiPlatform\Elasticsearch\Metadata\GetCollection;
+
 abstract class Operation
 {
     use WithResourceTrait;
@@ -92,6 +95,12 @@ abstract class Operation
         $processor = null,
         protected array $extraProperties = []
     ) {
+        if (null !== $this->elasticsearch) {
+            $solution = $this->elasticsearch
+                ? sprintf('Configure %s or %s instead', Get::class, GetCollection::class)
+                : 'You will have to remove it when upgrading to v4';
+            trigger_deprecation('api-platform/core', '3.1', sprintf('Setting "elasticsearch" is deprecated. %s', $solution));
+        }
         $this->input = $input;
         $this->output = $output;
         $this->provider = $provider;

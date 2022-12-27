@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\HttpOperation;
 abstract class Operation extends HttpOperation
 {
     public function __construct(
-        private ?string $index = null,
+        private string $index,
         private ?string $type = null,
         string $method = self::METHOD_GET,
         ?string $uriTemplate = null,
@@ -91,15 +91,15 @@ abstract class Operation extends HttpOperation
         $processor = null,
         array $extraProperties = []
     ) {
-        parent::__construct($method, $uriTemplate, $types, $formats, $inputFormats, $outputFormats, $uriVariables, $routePrefix, $routeName, $defaults, $requirements, $options, $stateless, $sunset, $acceptPatch, $status, $host, $schemes, $condition, $controller, $cacheHeaders, $hydraContext, $openapiContext, $openapi, $exceptionToStatus, $queryParameterValidationEnabled, $shortName, $class, $paginationEnabled, $paginationType, $paginationItemsPerPage, $paginationMaximumItemsPerPage, $paginationPartial, $paginationClientEnabled, $paginationClientItemsPerPage, $paginationClientPartial, $paginationFetchJoinCollection, $paginationUseOutputWalkers, $paginationViaCursor, $order, $description, $normalizationContext, $denormalizationContext, $security, $securityMessage, $securityPostDenormalize, $securityPostDenormalizeMessage, $securityPostValidation, $securityPostValidationMessage, $deprecationReason, $filters, $validationContext, $input, $output, $mercure, $messenger, $elasticsearch, $urlGenerationStrategy, $read, $deserialize, $validate, $write, $serialize, $fetchPartial, $forceEager, $priority, $name, $provider, $processor, $extraProperties);
+        parent::__construct(...\array_slice(\func_get_args(), 2));
     }
 
-    public function getIndex(): ?string
+    public function getIndex(): string
     {
         return $this->index;
     }
 
-    public function withIndex(?string $index): self
+    public function withIndex(string $index): self
     {
         $self = clone $this;
         $self->index = $index;

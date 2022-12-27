@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 class GetCollection extends Operation implements CollectionOperationInterface
 {
     public function __construct(
-        ?string $index = null,
+        string $index,
         ?string $type = null,
         string $method = self::METHOD_GET,
         ?string $uriTemplate = null,

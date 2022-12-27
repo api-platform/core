@@ -22,7 +22,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(operations: [new Get(), new GetCollection()], normalizationContext: ['groups' => ['book:read']])]
+#[ApiResource(operations: [new Get('book'), new GetCollection('book')], normalizationContext: ['groups' => ['book:read']])]
 #[ApiFilter(OrderFilter::class, properties: ['id', 'library.id'])]
 #[ApiFilter(MatchFilter::class, properties: ['message', 'library.firstName'])]
 class Book

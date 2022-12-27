@@ -423,7 +423,7 @@ final class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->children()
                                     ->scalarNode('index')->defaultNull()->end()
-                                    ->scalarNode('type')->defaultValue('_doc')->end()
+                                    ->scalarNode('type')->defaultValue(DocumentMetadata::DEFAULT_TYPE)->end()
                                 ->end()
                             ->end()
                         ->end()

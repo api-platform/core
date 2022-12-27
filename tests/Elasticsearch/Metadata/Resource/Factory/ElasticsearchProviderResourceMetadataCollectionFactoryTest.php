@@ -13,153 +13,94 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Metadata\Resource\Factory;
 
-use ApiPlatform\Doctrine\Odm\State\ItemProvider as DoctrineItemProvider;
 use ApiPlatform\Elasticsearch\Metadata\Get as ElasticsearchGet;
-use ApiPlatform\Elasticsearch\Metadata\Operation as ElasticsearchOperation;
+use ApiPlatform\Elasticsearch\Metadata\GetCollection as ElasticsearchGetCollection;
 use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory;
-use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
-use ApiPlatform\Util\Inflector;
+use ApiPlatform\Tests\Fixtures\TestBundle\Metadata\Get;
 use Elasticsearch\Client;
-use Elasticsearch\Namespaces\IndicesNamespace;
-use PHPUnit\Framework\MockObject\Stub;
+use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elasticsearch\Namespaces\CatNamespace;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
+/**
+ * @group legacy
+ */
 class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    public function testElasticsearchOperationWithElasticsearchEqualsToFalse(): void
+    /**
+     * @group legacy
+     */
+    public function testConstruct(): void
     {
-        $get = new ElasticsearchGet(shortName: 'Foo', elasticsearch: false);
-
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($this->getClient(), $this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]), []);
-        self::expectException(\LogicException::class);
-        self::expectExceptionMessage(sprintf('You cannot disable elasticsearch with %s, use %s instead', ElasticsearchOperation::class, Operation::class));
-        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-    }
-
-    public function testElasticsearchOperationWithIndexEqualsToNull(): void
-    {
-        $get = new ElasticsearchGet(shortName: 'Foo', elasticsearch: null);
-
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($this->getClient(), $this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]), []);
-        /** @var ElasticsearchGet $operationResult */
-        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-        self::assertSame(ItemProvider::class, $operationResult->getProvider());
-        self::assertSame(self::guessIndexName('Foo'), $operationResult->getIndex());
-    }
-
-    public function testOperationWithElasticsearchEqualsToFalse(): void
-    {
-        $get = new Get(shortName: 'Foo', elasticsearch: false);
-
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($this->getClient(), $this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]), []);
-        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-        self::assertSame($get, $operationResult);
-    }
-
-    public function testOperationWhichAlreadyHasAProvider(): void
-    {
-        $get = new Get(shortName: 'Foo', elasticsearch: null, provider: DoctrineItemProvider::class);
-
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($this->getClient(), $this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]), []);
-        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-        self::assertSame($get, $operationResult);
-    }
-
-    public function testOperationWithIndexWhichDoesNotExist(): void
-    {
-        $get = new Get(shortName: 'Foo', elasticsearch: null);
-
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($this->getClient(false), $this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]), []);
-        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-        self::assertSame($get, $operationResult);
-    }
-
-    public function testOperationWithElasticsearchEqualsToTrueAndIndexWhichDoesNotExist(): void
-    {
-        $get = new Get(shortName: 'Foo', elasticsearch: true);
-
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($this->getClient(false), $this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]), []);
-        self::expectException(\LogicException::class);
-        self::expectExceptionMessage('No index exists with the name "foo".');
-        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-    }
-
-    public function testOperationWithExistedIndexAndWithMapping(): void
-    {
-        $get = new Get(shortName: 'Foo');
-        $mapping = [Foo::class => ['index' => 'foo_mapping_index', 'type' => 'foo_mapping_type']];
-
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($this->getClient(), $this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]), $mapping);
-        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-        self::assertInstanceOf(ElasticsearchOperation::class, $operationResult);
-        self::assertSame('foo_mapping_index', $operationResult->getIndex());
-        self::assertSame('foo_mapping_type', $operationResult->getType());
-        self::assertSame(ItemProvider::class, $operationResult->getProvider());
-    }
-
-    public function testAttributesIndexAndTypeAreUsedIfNoMappingConfigured(): void
-    {
-        $get = new Get(shortName: 'Foo', extraProperties: ['elasticsearch_index' => 'foo_elasticsearch_index', 'elasticsearch_type' => 'foo_elasticsearch_type']);
-
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($this->getClient(), $this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]), []);
-        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-        self::assertInstanceOf(ElasticsearchOperation::class, $operationResult);
-        self::assertSame('foo_elasticsearch_index', $operationResult->getIndex());
-        self::assertSame('foo_elasticsearch_type', $operationResult->getType());
-        self::assertSame(ItemProvider::class, $operationResult->getProvider());
-    }
-
-    public function testResourceClassIsUsedForIndexIfMappingAndAttributesAreNotConfigured(): void
-    {
-        $get = new Get(shortName: 'Foo');
-
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($this->getClient(), $this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]), []);
-        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-        self::assertInstanceOf(ElasticsearchOperation::class, $operationResult);
-        self::assertSame('foo', $operationResult->getIndex());
-        self::assertNull($operationResult->getType());
-        self::assertSame(ItemProvider::class, $operationResult->getProvider());
+        $this->expectDeprecation('Since api-platform/core 3.1: ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory is deprecated and will be removed in v4');
+        self::assertInstanceOf(
+            ResourceMetadataCollectionFactoryInterface::class,
+            new ElasticsearchProviderResourceMetadataCollectionFactory(
+                $this->prophesize(Client::class)->reveal(),
+                $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal()
+            )
+        );
     }
 
     /**
-     * @param Operation[] $operations
-     *
-     * @return Stub&ResourceMetadataCollectionFactoryInterface
+     * @dataProvider elasticsearchProvider
      */
-    private function getResourceMetadataCollectionFactory(string $resourceClass, array $operations): Stub
+    public function testCreate(?bool $elasticsearchFlag, int $expectedCatCallCount, ?bool $expectedResult): void
     {
-        $resource = new ApiResource(operations: $operations);
-        $metadata = new ResourceMetadataCollection($resourceClass, [$resource]);
-        $decorated = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $decorated->method('create')->willReturn($metadata);
+        if (null !== $elasticsearchFlag) {
+            $solution = $elasticsearchFlag
+                ? sprintf('Configure %s or %s instead', ElasticsearchGet::class, ElasticsearchGetCollection::class)
+                : 'You will have to remove it when upgrading to v4';
+            $this->expectDeprecation(sprintf('Since api-platform/core 3.1: Setting "elasticsearch" is deprecated. %s', $solution));
+        }
+        $get = (new Get(elasticsearch: $elasticsearchFlag, shortName: 'Foo'));
+        $resource = (new ApiResource(operations: ['foo_get' => $get]));
+        $metadata = new ResourceMetadataCollection(Foo::class, [$resource]);
 
-        return $decorated;
+        $decorated = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->create(Foo::class)->willReturn($metadata)->shouldBeCalled();
+
+        $catNamespace = $this->prophesize(CatNamespace::class);
+        if ($elasticsearchFlag) {
+            $catNamespace->indices(['index' => 'foo'])->willReturn([[
+                'health' => 'yellow',
+                'status' => 'open',
+                'index' => 'foo',
+                'uuid' => '123456789abcdefghijklmn',
+                'pri' => '5',
+                'rep' => '1',
+                'docs.count' => '42',
+                'docs.deleted' => '0',
+                'store.size' => '42kb',
+                'pri.store.size' => '42kb',
+            ]]);
+        } else {
+            $catNamespace->indices(['index' => 'foo'])->willThrow(new Missing404Exception());
+        }
+
+        $client = $this->prophesize(Client::class);
+        $client->cat()->willReturn($catNamespace)->shouldBeCalledTimes($expectedCatCallCount);
+
+        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($client->reveal(), $decorated->reveal(), false);
+        $elasticsearchResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get')->getElasticsearch();
+        self::assertEquals($expectedResult, $elasticsearchResult);
     }
 
-    /**
-     * @return Stub&Client
-     */
-    private function getClient(bool $willIndexExist = true): Stub
+    public function elasticsearchProvider(): array
     {
-        $client = $this->createStub(Client::class);
-        $indicesNamespace = $this->createStub(IndicesNamespace::class);
-        $indicesNamespace->method('exists')->willReturn($willIndexExist);
-        $client->method('indices')->willReturn($indicesNamespace);
-
-        return $client;
-    }
-
-    private static function guessIndexName(string $shortName): string
-    {
-        return Inflector::tableize($shortName);
+        return [
+            'elasticsearch: false' => [false, 0, false],
+            'elasticsearch: null' => [null, 1, false],
+            'elasticsearch: true' => [true, 1, true],
+        ];
     }
 }

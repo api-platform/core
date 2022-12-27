@@ -148,50 +148,7 @@ class HttpOperation extends Operation
         $processor = null,
         array $extraProperties = []
     ) {
-        $this->shortName = $shortName;
-        $this->description = $description;
-        $this->class = $class;
-        $this->urlGenerationStrategy = $urlGenerationStrategy;
-        $this->deprecationReason = $deprecationReason;
-        $this->normalizationContext = $normalizationContext;
-        $this->denormalizationContext = $denormalizationContext;
-        $this->validationContext = $validationContext;
-        $this->filters = $filters;
-        $this->elasticsearch = $elasticsearch;
-        $this->mercure = $mercure;
-        $this->messenger = $messenger;
-        $this->input = $input;
-        $this->output = $output;
-        $this->order = $order;
-        $this->fetchPartial = $fetchPartial;
-        $this->forceEager = $forceEager;
-        $this->paginationClientEnabled = $paginationClientEnabled;
-        $this->paginationClientItemsPerPage = $paginationClientItemsPerPage;
-        $this->paginationClientPartial = $paginationClientPartial;
-        $this->paginationViaCursor = $paginationViaCursor;
-        $this->paginationEnabled = $paginationEnabled;
-        $this->paginationFetchJoinCollection = $paginationFetchJoinCollection;
-        $this->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-        $this->paginationItemsPerPage = $paginationItemsPerPage;
-        $this->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
-        $this->paginationPartial = $paginationPartial;
-        $this->paginationType = $paginationType;
-        $this->security = $security;
-        $this->securityMessage = $securityMessage;
-        $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-        $this->securityPostValidation = $securityPostValidation;
-        $this->securityPostValidationMessage = $securityPostValidationMessage;
-        $this->read = $read;
-        $this->deserialize = $deserialize;
-        $this->validate = $validate;
-        $this->write = $write;
-        $this->serialize = $serialize;
-        $this->priority = $priority;
-        $this->name = $name;
-        $this->provider = $provider;
-        $this->processor = $processor;
-        $this->extraProperties = $extraProperties;
+        parent::__construct(...\array_slice(\func_get_args(), 26));
     }
 
     public function getMethod(): ?string

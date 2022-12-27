@@ -14,38 +14,30 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
-use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
-use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Metadata\GetCollection;
 use ApiPlatform\Elasticsearch\Paginator;
-use ApiPlatform\Elasticsearch\State\CollectionProvider;
+use ApiPlatform\Elasticsearch\State\ElasticsearchCollectionProvider;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- * @group legacy
  */
-final class CollectionProviderTest extends TestCase
+final class ElasticsearchCollectionProviderTest extends TestCase
 {
-    use ProphecyTrait;
-
     public function testConstruct(): void
     {
         self::assertInstanceOf(
-            CollectionProvider::class,
-            new CollectionProvider(
-                $this->prophesize(Client::class)->reveal(),
-                $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
-                $this->prophesize(DenormalizerInterface::class)->reveal(),
+            ElasticsearchCollectionProvider::class,
+            new ElasticsearchCollectionProvider(
+                $this->createStub(Client::class),
+                $this->createStub(DenormalizerInterface::class),
                 new Pagination()
             )
         );
@@ -57,11 +49,8 @@ final class CollectionProviderTest extends TestCase
             'groups' => ['custom'],
         ];
 
-        $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
-        $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
-
-        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadataCollection(Foo::class));
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection(Foo::class));
 
         $documents = [
             'took' => 15,
@@ -102,37 +91,32 @@ final class CollectionProviderTest extends TestCase
             ],
         ];
 
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy
-            ->search(
-                Argument::allOf(
-                    Argument::withEntry('index', 'foo'),
-                    Argument::withEntry('body', Argument::allOf(
-                        Argument::withEntry('size', 2),
-                        Argument::withEntry('from', 0),
-                        Argument::withEntry('query', Argument::allOf(
-                            Argument::withEntry('match_all', Argument::type(\stdClass::class)),
-                            Argument::size(1)
-                        )),
-                        Argument::size(3)
-                    )),
-                    Argument::size(2)
-                )
+        $clientMock = $this->createMock(Client::class);
+        $clientMock
+            ->method('search')->with(
+                [
+                    'index' => 'foo',
+                    'body' => [
+                        'size' => 2,
+                        'from' => 0,
+                        'query' => [
+                            'match_all' => new \stdClass(),
+                        ],
+                    ],
+                ]
             )
-            ->willReturn($documents)
-            ->shouldBeCalled();
+            ->willReturn($documents);
 
-        $operation = (new GetCollection('foo'))->withName('get')->withClass(Foo::class);
+        $operation = (new GetCollection('foo', class: Foo::class, name: 'get'));
 
-        $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
-        $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, $operation, $context)->willReturn([])->shouldBeCalled();
+        $requestBodySearchCollectionExtension = $this->createMock(RequestBodySearchCollectionExtensionInterface::class);
+        $requestBodySearchCollectionExtension->expects($this->once())->method('applyToCollection')->willReturn([]);
 
-        $provider = new CollectionProvider(
-            $clientProphecy->reveal(),
-            $documentMetadataFactoryProphecy->reveal(),
-            $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(),
+        $provider = new ElasticsearchCollectionProvider(
+            $clientMock,
+            $denormalizer = $this->createStub(DenormalizerInterface::class),
             new Pagination(['items_per_page' => 2]),
-            [$requestBodySearchCollectionExtensionProphecy->reveal()]
+            [$requestBodySearchCollectionExtension]
         );
 
         self::assertEquals(
