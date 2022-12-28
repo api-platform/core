@@ -29,6 +29,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
  * @group legacy
  */
 final class ItemProviderTest extends TestCase
