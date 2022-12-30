@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Extractor;
 
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
@@ -379,6 +380,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     ],
                 ],
             ],
+            'persistenceMeans' => [
+                'elasticsearchDocument' => [
+                    'index' => 'foo_index',
+                    'type' => 'foo_type'
+                ]
+            ]
         ],
     ];
     private const BASE = [
@@ -417,6 +424,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'filters',
         'order',
         'extraProperties',
+        'persistenceMeans'
     ];
     private const EXTENDED_BASE = [
         'uriTemplate',

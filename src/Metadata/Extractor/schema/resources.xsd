@@ -19,6 +19,7 @@
             <xsd:group ref="extendedBase"/>
             <xsd:element name="operations" minOccurs="0" type="operations"/>
             <xsd:element name="graphQlOperations" minOccurs="0" type="graphQlOperations"/>
+            <xsd:element name="persistenceMeans" minOccurs="0" type="persistenceMeans"/>
         </xsd:sequence>
         <xsd:attributeGroup ref="extendedBase"/>
         <xsd:attribute type="xsd:string" name="uriTemplate"/>
@@ -382,6 +383,21 @@
             <xsd:element name="values" minOccurs="0" maxOccurs="unbounded" type="values"/>
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:complexType name="persistenceMeans">
+        <xsd:choice>
+            <xsd:element ref="elasticsearchDocument"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:element name="elasticsearchDocument">
+        <xsd:complexType>
+            <xsd:attribute name="index" type="xsd:string"/>
+            <xsd:attribute name="type" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+
 
     <xsd:group name="base">
         <xsd:sequence>

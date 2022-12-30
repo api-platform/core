@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -20,6 +21,7 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\PersistenceMeansInterface;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
@@ -64,6 +66,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 'class' => $this->phpize($resource, 'class', 'string'),
                 'operations' => $this->buildOperations($resource, $base),
                 'graphQlOperations' => $this->buildGraphQlOperations($resource, $base),
+                'persistenceMeans' => $this->buildPersistenceMeans($resource),
             ]);
         }
     }
@@ -449,5 +452,18 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $data;
+    }
+
+    private function buildPersistenceMeans(\SimpleXMLElement $resource): ?PersistenceMeansInterface
+    {
+        $persistenceMeans = $resource->persistenceMeans ?? null;
+        if(!isset($persistenceMeans)){
+            return null;
+        }
+        $elasticsearchDocument = $persistenceMeans->elasticsearchDocument ?? null;
+        if(isset($elasticsearchDocument)){
+            return new ElasticsearchDocument($elasticsearchDocument->attributes()->index, $elasticsearchDocument->attributes()->type);
+        }
+        throw new \DomainException();
     }
 }
