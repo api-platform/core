@@ -55,7 +55,8 @@ final class PurgeHttpCacheListener
         $this->gatherResourceAndItemTags($object, true);
 
         $changeSet = $eventArgs->getEntityChangeSet();
-        $associationMappings = $eventArgs->getEntityManager()->getClassMetadata(ClassUtils::getClass($eventArgs->getObject()))->getAssociationMappings();
+        $objectManager = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
+        $associationMappings = $objectManager->getClassMetadata(ClassUtils::getClass($eventArgs->getObject()))->getAssociationMappings();
 
         foreach ($changeSet as $key => $value) {
             if (!isset($associationMappings[$key])) {
@@ -72,7 +73,7 @@ final class PurgeHttpCacheListener
      */
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
-        $em = $eventArgs->getEntityManager();
+        $em = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
         $uow = $em->getUnitOfWork();
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
