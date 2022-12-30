@@ -132,7 +132,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             return $this->normalizeUriVariables($operation);
         }
 
-        $hasUserConfiguredUriVariables = !($operation->getExtraProperties['is_legacy_resource_metadata'] ?? false);
+        $hasUserConfiguredUriVariables = !($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false);
         if (!$operation->getUriVariables()) {
             $hasUserConfiguredUriVariables = false;
             $operation = $operation->withUriVariables($this->transformLinksToUriVariables($this->linkFactory->createLinksFromIdentifiers($operation)));
