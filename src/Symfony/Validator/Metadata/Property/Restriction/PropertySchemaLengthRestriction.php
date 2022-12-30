@@ -27,6 +27,8 @@ class PropertySchemaLengthRestriction implements PropertySchemaRestrictionMetada
 {
     /**
      * {@inheritdoc}
+     *
+     * @param Length $constraint
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
