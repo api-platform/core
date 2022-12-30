@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Metadata\Resource\Factory;
 
-use ApiPlatform\Elasticsearch\Metadata\Operation as ElasticsearchOperation;
 use ApiPlatform\Elasticsearch\State\ElasticsearchCollectionProvider;
 use ApiPlatform\Elasticsearch\State\ElasticsearchItemProvider;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\PersistenceMeansInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -37,18 +39,12 @@ class ElasticsearchOperationProviderResourceMetadataCollectionFactory implements
 
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             if ($operations = $resourceMetadata->getOperations()) {
-                foreach ($operations as $operationName => $operation) {
-                    $operations->add($operationName, $this->configureOperation($operation, $resourceClass) ?? $operation);
-                }
-                $resourceMetadata = $resourceMetadata->withOperations($operations);
+                $resourceMetadata = $resourceMetadata->withOperations(self::configureOperations($operations));
             }
 
             // $graphqlOperations and $operations have not same type, we cannot combine function
             if ($graphQlOperations = $resourceMetadata->getGraphQlOperations()) {
-                foreach ($graphQlOperations as $operationName => $graphQlOperation) {
-                    $graphQlOperations[$operationName] = $this->configureOperation($graphQlOperation, $resourceClass) ?? $graphQlOperation;
-                }
-                $resourceMetadata = $resourceMetadata->withGraphQlOperations($graphQlOperations);
+                $resourceMetadata = $resourceMetadata->withGraphQlOperations(self::configureOperations($graphQlOperations));
             }
 
             $resourceMetadataCollection[$i] = $resourceMetadata;
@@ -57,17 +53,42 @@ class ElasticsearchOperationProviderResourceMetadataCollectionFactory implements
         return $resourceMetadataCollection;
     }
 
-    private function configureOperation(Operation $operation, string $resourceClass): ?ElasticsearchOperation
+    /**
+     * @template  T of Operations|array<GraphQlOperation>
+     *
+     * @phpstan-param  T $operations
+     *
+     * @phpstan-return T
+     */
+    private static function configureOperations(Operations|array $operations): Operations|array
     {
-        if (!$operation instanceof ElasticsearchOperation) {
-            return null;
+        foreach ($operations as $operationName => $operation) {
+            $configuredOperation = self::configureOperation($operation);
+            if ($configuredOperation === $operation) {
+                continue;
+            }
+            if ($operations instanceof Operations) {
+                $operations->add($operationName, $configuredOperation);
+            } else {
+                $operations[$operationName] = $configuredOperation;
+            }
         }
 
-        $isCollection = $operation instanceof CollectionOperationInterface;
+        return $operations;
+    }
+
+    private static function configureOperation(Operation $operation): Operation
+    {
+        if (null !== $operation->getProvider()) {
+            return $operation;
+        }
+        if (!$operation->getPersistenceMeans() instanceof PersistenceMeansInterface) {
+            return $operation;
+        }
         if (false === $operation->getElasticsearch()) {
-            throw new \LogicException(sprintf('You cannot disable elasticsearch with %s, use %s instead', ElasticsearchOperation::class, Operation::class));
+            throw new \LogicException('You cannot set $elasticsearch to false while configuring an elasticsearch document');
         }
 
-        return $operation->withProvider($isCollection ? ElasticsearchCollectionProvider::class : ElasticsearchItemProvider::class);
+        return $operation->withProvider($operation instanceof CollectionOperationInterface ? ElasticsearchCollectionProvider::class : ElasticsearchItemProvider::class);
     }
 }

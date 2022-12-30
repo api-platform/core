@@ -101,7 +101,8 @@ final class NotExposed extends HttpOperation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        ?PersistenceMeansInterface $persistenceMeans = null,
     ) {
         parent::__construct(...\func_get_args());
 

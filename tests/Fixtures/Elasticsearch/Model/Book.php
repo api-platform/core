@@ -15,14 +15,13 @@ namespace ApiPlatform\Tests\Fixtures\Elasticsearch\Model;
 
 use ApiPlatform\Elasticsearch\Filter\MatchFilter;
 use ApiPlatform\Elasticsearch\Filter\OrderFilter;
-use ApiPlatform\Elasticsearch\Metadata\Get;
-use ApiPlatform\Elasticsearch\Metadata\GetCollection;
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(operations: [new Get('book'), new GetCollection('book')], normalizationContext: ['groups' => ['book:read']])]
+#[ApiResource(normalizationContext: ['groups' => ['book:read']], persistenceMeans: new ElasticsearchDocument('book'))]
 #[ApiFilter(OrderFilter::class, properties: ['id', 'library.id'])]
 #[ApiFilter(MatchFilter::class, properties: ['message', 'library.firstName'])]
 class Book

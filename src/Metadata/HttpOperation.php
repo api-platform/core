@@ -146,7 +146,8 @@ class HttpOperation extends Operation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        ?PersistenceMeansInterface $persistenceMeans = null,
     ) {
         parent::__construct(...\array_slice(\func_get_args(), 26));
     }

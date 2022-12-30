@@ -16,9 +16,9 @@ namespace ApiPlatform\Tests\Elasticsearch\State;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
-use ApiPlatform\Elasticsearch\Metadata\GetCollection;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
@@ -32,8 +32,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @group legacy
  */
 final class CollectionProviderTest extends TestCase
 {
@@ -123,7 +121,7 @@ final class CollectionProviderTest extends TestCase
             ->willReturn($documents)
             ->shouldBeCalled();
 
-        $operation = (new GetCollection('foo'))->withName('get')->withClass(Foo::class);
+        $operation = (new Get())->withName('get')->withClass(Foo::class);
 
         $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
         $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, $operation, $context)->willReturn([])->shouldBeCalled();

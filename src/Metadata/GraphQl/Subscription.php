@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\GraphQl;
 
+use ApiPlatform\Metadata\PersistenceMeansInterface;
+
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Subscription extends Operation
 {
@@ -68,7 +70,8 @@ final class Subscription extends Operation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        protected ?PersistenceMeansInterface $persistenceMeans = null,
     ) {
         parent::__construct(...\func_get_args());
         $this->name = $name ?: 'update_subscription';

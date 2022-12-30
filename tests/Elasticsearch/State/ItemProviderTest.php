@@ -15,9 +15,9 @@ namespace ApiPlatform\Tests\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
-use ApiPlatform\Elasticsearch\Metadata\Get;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
@@ -29,8 +29,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @group legacy
  */
 final class ItemProviderTest extends TestCase
 {
@@ -41,17 +39,17 @@ final class ItemProviderTest extends TestCase
         self::assertInstanceOf(
             ItemProvider::class,
             new ItemProvider(
-                $this->createStub(Client::class),
-                $this->createStub(DocumentMetadataFactoryInterface::class),
-                $this->createStub(DenormalizerInterface::class),
+                $this->prophesize(Client::class)->reveal(),
+                $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(DenormalizerInterface::class)->reveal()
             )
         );
     }
 
     public function testGetItem(): void
     {
-        $documentMetadataFactory = $this->createStub(DocumentMetadataFactoryInterface::class);
-        $documentMetadataFactory->method('create')->willReturn(new DocumentMetadata('foo'));
+        $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
+        $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
 
         $document = [
             '_index' => 'foo',
@@ -76,21 +74,21 @@ final class ItemProviderTest extends TestCase
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
         $denormalizerProphecy->denormalize($document, Foo::class, DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])->willReturn($foo)->shouldBeCalled();
 
-        $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactory, $denormalizerProphecy->reveal());
+        $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $denormalizerProphecy->reveal());
 
-        self::assertSame($foo, $itemDataProvider->provide((new Get('foo'))->withClass(Foo::class), ['id' => 1]));
+        self::assertSame($foo, $itemDataProvider->provide((new Get())->withClass(Foo::class), ['id' => 1]));
     }
 
     public function testGetItemWithMissing404Exception(): void
     {
-        $documentMetadataFactory = $this->createStub(DocumentMetadataFactoryInterface::class);
-        $documentMetadataFactory->method('create')->willReturn(new DocumentMetadata('foo'));
+        $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
+        $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
 
         $clientProphecy = $this->prophesize(Client::class);
         $clientProphecy->get(['index' => 'foo', 'id' => '404'])->willThrow(new Missing404Exception())->shouldBeCalled();
 
-        $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactory, $this->createStub(DenormalizerInterface::class));
+        $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal());
 
-        self::assertNull($itemDataProvider->provide((new Get('foo'))->withClass(Foo::class), ['id' => 404]));
+        self::assertNull($itemDataProvider->provide((new Get())->withClass(Foo::class), ['id' => 404]));
     }
 }

@@ -94,7 +94,8 @@ final class Put extends HttpOperation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        ?PersistenceMeansInterface $persistenceMeans = null,
     ) {
         parent::__construct(self::METHOD_PUT, ...\func_get_args());
     }

@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Metadata\Resource\Factory;
 
-use ApiPlatform\Elasticsearch\Metadata\Get as ElasticsearchGet;
-use ApiPlatform\Elasticsearch\Metadata\GetCollection as ElasticsearchGetCollection;
-use ApiPlatform\Elasticsearch\Metadata\Operation as ElasticsearchOperation;
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchOperationProviderResourceMetadataCollectionFactory;
-use ApiPlatform\Elasticsearch\State\ElasticsearchCollectionProvider;
 use ApiPlatform\Elasticsearch\State\ElasticsearchItemProvider;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -32,48 +32,61 @@ class ElasticsearchOperationProviderResourceMetadataCollectionFactoryTest extend
     /**
      * @group legacy
      */
-    public function testElasticsearchOperationWithElasticsearchEqualsToFalse(): void
+    public function testWithElasticsearchEqualsToFalse(): void
     {
-        $get = new ElasticsearchGet(index: 'foo_index', shortName: 'Foo', elasticsearch: false);
-
-        $resourceMetadataFactory = new ElasticsearchOperationProviderResourceMetadataCollectionFactory($this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]));
+        $get = new Get(elasticsearch: false, name: 'foo_get', persistenceMeans: new ElasticsearchDocument());
+        $resourceMetadataFactory = new ElasticsearchOperationProviderResourceMetadataCollectionFactory($this->getResourceMetadataCollectionFactory(Foo::class, $get));
         self::expectException(\LogicException::class);
-        self::expectExceptionMessage(sprintf('You cannot disable elasticsearch with %s, use %s instead', ElasticsearchOperation::class, Operation::class));
         $resourceMetadataFactory->create(Foo::class);
     }
 
-    public function testElasticsearchGetWithIndexAndType(): void
+    public function testWithElasticsearchDocument(): void
     {
-        $get = new ElasticsearchGet(index: 'foo_index', type: 'foo_type');
+        $get = new Get(name: 'foo_get', persistenceMeans: new ElasticsearchDocument());
 
-        $resourceMetadataFactory = new ElasticsearchOperationProviderResourceMetadataCollectionFactory($this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]));
-        /** @var ElasticsearchGet $operationResult */
+        $resourceMetadataFactory = new ElasticsearchOperationProviderResourceMetadataCollectionFactory($this->getResourceMetadataCollectionFactory(Foo::class, $get));
+        /** @var Get $operationResult */
         $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
         self::assertSame(ElasticsearchItemProvider::class, $operationResult->getProvider());
-        self::assertSame('foo_index', $operationResult->getIndex());
-        self::assertSame('foo_type', $operationResult->getType());
     }
 
-    public function testElasticsearchGetCollectionWithIndexAndType(): void
+    public function testWithoutElasticsearchDocument(): void
     {
-        $get = new ElasticsearchGetCollection(index: 'foo_index', type: 'foo_type');
+        $get = new Get(name: 'foo_get');
 
-        $resourceMetadataFactory = new ElasticsearchOperationProviderResourceMetadataCollectionFactory($this->getResourceMetadataCollectionFactory(Foo::class, ['foo_get' => $get]));
-        /** @var ElasticsearchGet $operationResult */
+        $resourceMetadataFactory = new ElasticsearchOperationProviderResourceMetadataCollectionFactory($this->getResourceMetadataCollectionFactory(Foo::class, $get));
         $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
-        self::assertSame(ElasticsearchCollectionProvider::class, $operationResult->getProvider());
-        self::assertSame('foo_index', $operationResult->getIndex());
-        self::assertSame('foo_type', $operationResult->getType());
+        self::assertNull($operationResult->getProvider());
+    }
+
+    public function testExistingProviderIsNotReplaced(): void
+    {
+        $get = new Get(name: 'foo_get', provider: 'foo', persistenceMeans: new ElasticsearchDocument());
+
+        $resourceMetadataFactory = new ElasticsearchOperationProviderResourceMetadataCollectionFactory($this->getResourceMetadataCollectionFactory(Foo::class, $get));
+        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get');
+        self::assertSame('foo', $operationResult->getProvider());
+    }
+
+    public function testWithGraphqlOperation(): void
+    {
+        $query = new Query(name: 'foo_query', persistenceMeans: new ElasticsearchDocument());
+
+        $resourceMetadataFactory = new ElasticsearchOperationProviderResourceMetadataCollectionFactory($this->getResourceMetadataCollectionFactory(Foo::class, $query));
+        $operationResult = $resourceMetadataFactory->create(Foo::class)->getOperation($query->getName());
+        self::assertSame(ElasticsearchItemProvider::class, $operationResult->getProvider());
     }
 
     /**
-     * @param Operation[] $operations
-     *
      * @return Stub&ResourceMetadataCollectionFactoryInterface
      */
-    private function getResourceMetadataCollectionFactory(string $resourceClass, array $operations): Stub
+    private function getResourceMetadataCollectionFactory(string $resourceClass, Operation $operation): Stub
     {
-        $resource = new ApiResource(operations: $operations);
+        if ($operation instanceof GraphQlOperation) {
+            $resource = new ApiResource(graphQlOperations: [$operation->getName() => $operation]);
+        } else {
+            $resource = new ApiResource(operations: [$operation->getName() => $operation]);
+        }
         $metadata = new ResourceMetadataCollection($resourceClass, [$resource]);
         $decorated = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $decorated->method('create')->willReturn($metadata);

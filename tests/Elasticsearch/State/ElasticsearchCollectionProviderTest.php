@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
-use ApiPlatform\Elasticsearch\Metadata\GetCollection;
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\State\ElasticsearchCollectionProvider;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
@@ -107,7 +108,7 @@ final class ElasticsearchCollectionProviderTest extends TestCase
             )
             ->willReturn($documents);
 
-        $operation = (new GetCollection('foo', class: Foo::class, name: 'get'));
+        $operation = (new GetCollection(class: Foo::class, name: 'get', persistenceMeans: new ElasticsearchDocument('foo')));
 
         $requestBodySearchCollectionExtension = $this->createMock(RequestBodySearchCollectionExtensionInterface::class);
         $requestBodySearchCollectionExtension->expects($this->once())->method('applyToCollection')->willReturn([]);

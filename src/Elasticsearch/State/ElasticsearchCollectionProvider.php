@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
-use ApiPlatform\Elasticsearch\Metadata\Operation as ElasticsearchOperation;
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Util\Inflector;
 use Elasticsearch\Client;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -40,8 +41,9 @@ final class ElasticsearchCollectionProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): Paginator
     {
-        if (!$operation instanceof ElasticsearchOperation) {
-            throw new \InvalidArgumentException(sprintf('$operation must be instance of %s, but %s given', ElasticsearchOperation::class, $operation::class));
+        $documentConfiguration = $operation->getPersistenceMeans();
+        if (!$documentConfiguration instanceof ElasticsearchDocument) {
+            throw new \LogicException(sprintf('Operation‘s persistence means must be instance of %s, but got %s', ElasticsearchDocument::class, get_debug_type($documentConfiguration)));
         }
         $resourceClass = $operation->getClass();
         $body = [];
@@ -58,12 +60,12 @@ final class ElasticsearchCollectionProvider implements ProviderInterface
         $offset = $body['from'] ??= $this->pagination->getOffset($operation, $context);
 
         $params = [
-            'index' => $operation->getIndex(),
+            'index' => $documentConfiguration->index ?? Inflector::tableize($operation->getShortName()),
             'body' => $body,
         ];
 
         if (ElasticsearchVersion::supportsMappingType()) {
-            $params['type'] = $operation->getType();
+            $params['type'] = $documentConfiguration->type;
         }
 
         $documents = $this->client->search($params);

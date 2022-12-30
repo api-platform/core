@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Metadata\Resource\Factory;
 
-use ApiPlatform\Elasticsearch\Metadata\Get as ElasticsearchGet;
-use ApiPlatform\Elasticsearch\Metadata\GetCollection as ElasticsearchGetCollection;
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -58,7 +57,7 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
     {
         if (null !== $elasticsearchFlag) {
             $solution = $elasticsearchFlag
-                ? sprintf('Configure %s or %s instead', ElasticsearchGet::class, ElasticsearchGetCollection::class)
+                ? sprintf('Pass an instance of %s to $persistenceMeans instead', ElasticsearchDocument::class)
                 : 'You will have to remove it when upgrading to v4';
             $this->expectDeprecation(sprintf('Since api-platform/core 3.1: Setting "elasticsearch" is deprecated. %s', $solution));
         }

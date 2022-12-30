@@ -11,9 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\GraphQl;
+namespace ApiPlatform\Metadata;
 
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class Mutation extends Operation
+/**
+ * Marker interface to be implemented by value objects encapsulating data needed by {@see ProviderInterface providers}
+ * to retrieve resources from a persistence layer.
+ */
+interface PersistenceMeansInterface
 {
 }

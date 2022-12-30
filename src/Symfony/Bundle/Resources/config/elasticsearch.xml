@@ -143,7 +143,7 @@
             <argument>false</argument>
         </service>
 
-        <service id="ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchOperationProviderResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="40">
+        <service id="ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchOperationProviderResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="41">
             <argument type="service" id="ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchOperationProviderResourceMetadataCollectionFactory.inner" />
         </service>
 

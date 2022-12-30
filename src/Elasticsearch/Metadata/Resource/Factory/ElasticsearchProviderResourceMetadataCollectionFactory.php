@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Metadata\Resource\Factory;
 
-use ApiPlatform\Elasticsearch\Metadata\Operation as ElasticsearchOperation;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Metadata\CollectionOperationInterface;
@@ -46,10 +45,6 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
             if ($operations) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if ($operation instanceof ElasticsearchOperation) {
-                        continue;
-                    }
-
                     if ($this->hasIndices($operation)) {
                         $operation = $operation->withElasticsearch(true);
                     }
@@ -68,10 +63,6 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
             if ($graphQlOperations) {
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
-                    if ($graphQlOperation instanceof ElasticsearchOperation) {
-                        continue;
-                    }
-
                     if ($this->hasIndices($graphQlOperation)) {
                         $graphQlOperation = $graphQlOperation->withElasticsearch(true);
                     }

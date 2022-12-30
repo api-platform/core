@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Elasticsearch\Metadata\Get;
-use ApiPlatform\Elasticsearch\Metadata\GetCollection;
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 
 abstract class Operation
 {
@@ -93,11 +92,12 @@ abstract class Operation
         protected ?string $name = null,
         $provider = null,
         $processor = null,
-        protected array $extraProperties = []
+        protected array $extraProperties = [],
+        protected ?PersistenceMeansInterface $persistenceMeans = null,
     ) {
         if (null !== $this->elasticsearch) {
             $solution = $this->elasticsearch
-                ? sprintf('Configure %s or %s instead', Get::class, GetCollection::class)
+                ? sprintf('Pass an instance of %s to $persistenceMeans instead', ElasticsearchDocument::class)
                 : 'You will have to remove it when upgrading to v4';
             trigger_deprecation('api-platform/core', '3.1', sprintf('Setting "elasticsearch" is deprecated. %s', $solution));
         }
@@ -696,6 +696,19 @@ abstract class Operation
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;
+
+        return $self;
+    }
+
+    public function getPersistenceMeans(): ?PersistenceMeansInterface
+    {
+        return $this->persistenceMeans;
+    }
+
+    public function withPersistenceMeans(?PersistenceMeansInterface $persistenceMeans): self
+    {
+        $self = clone $this;
+        $self->persistenceMeans = $persistenceMeans;
 
         return $self;
     }

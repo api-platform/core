@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\State;
 
-use ApiPlatform\Elasticsearch\Metadata\Get;
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Elasticsearch\State\ElasticsearchItemProvider;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
@@ -65,7 +66,7 @@ final class ElasticsearchItemProviderTest extends TestCase
 
         $itemDataProvider = new ElasticsearchItemProvider($client, $denormalizer);
 
-        self::assertSame($foo, $itemDataProvider->provide(new Get('foo', class: Foo::class), ['id' => 1]));
+        self::assertSame($foo, $itemDataProvider->provide(new Get(class: Foo::class, persistenceMeans: new ElasticsearchDocument('foo')), ['id' => 1]));
     }
 
     public function testGetItemWithMissing404Exception(): void
@@ -75,6 +76,6 @@ final class ElasticsearchItemProviderTest extends TestCase
 
         $itemDataProvider = new ElasticsearchItemProvider($client, $this->createStub(DenormalizerInterface::class));
 
-        self::assertNull($itemDataProvider->provide(new Get('foo', class: Foo::class), ['id' => 404]));
+        self::assertNull($itemDataProvider->provide(new Get(class: Foo::class, persistenceMeans: new ElasticsearchDocument('foo')), ['id' => 404]));
     }
 }

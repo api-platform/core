@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\GraphQl;
 
 use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\PersistenceMeansInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class DeleteMutation extends Mutation implements DeleteOperationInterface
@@ -70,7 +71,8 @@ class DeleteMutation extends Mutation implements DeleteOperationInterface
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        protected ?PersistenceMeansInterface $persistenceMeans = null,
     ) {
         parent::__construct(...\func_get_args());
     }

@@ -13,6 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Metadata;
 
-class Get extends Operation
+use ApiPlatform\Metadata\PersistenceMeansInterface;
+
+class ElasticsearchDocument implements PersistenceMeansInterface
 {
+    public function __construct(
+        public readonly ?string $index = null,
+        public readonly ?string $type = null,
+    ) {
+    }
 }

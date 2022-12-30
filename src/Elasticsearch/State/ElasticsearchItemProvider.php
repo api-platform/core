@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\State;
 
-use ApiPlatform\Elasticsearch\Metadata\Operation as ElasticsearchOperation;
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Util\Inflector;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -37,19 +38,20 @@ final class ElasticsearchItemProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        if (!$operation instanceof ElasticsearchOperation) {
-            throw new \InvalidArgumentException(sprintf('$operation must be instance of %s, but %s given', ElasticsearchOperation::class, $operation::class));
+        $documentConfiguration = $operation->getPersistenceMeans();
+        if (!$documentConfiguration instanceof ElasticsearchDocument) {
+            throw new \LogicException(sprintf('Operation‘s persistence means must be instance of %s, but got %s', ElasticsearchDocument::class, get_debug_type($documentConfiguration)));
+        }
+
+        $params = [
+            'index' => $documentConfiguration->index ?? Inflector::tableize($operation->getShortName()),
+            'id' => (string) reset($uriVariables),
+        ];
+        if (ElasticsearchVersion::supportsMappingType()) {
+            $params['type'] = $documentConfiguration->type;
         }
 
         try {
-            $params = [
-                'index' => $operation->getIndex(),
-                'id' => (string) reset($uriVariables),
-            ];
-            if (ElasticsearchVersion::supportsMappingType()) {
-                $params['type'] = $operation->getType();
-            }
-
             $document = $this->client->get($params);
         } catch (Missing404Exception) {
             return null;
