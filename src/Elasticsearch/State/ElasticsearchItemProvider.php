@@ -57,11 +57,6 @@ final class ElasticsearchItemProvider implements ProviderInterface
             return null;
         }
 
-        $item = $this->denormalizer->denormalize($document, $operation->getClass(), DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true]);
-        if (!\is_object($item) && null !== $item) {
-            throw new \UnexpectedValueException('Expected item to be an object or null.');
-        }
-
-        return $item;
+        return $this->denormalizer->denormalize($document, $operation->getClass(), DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true]);
     }
 }
