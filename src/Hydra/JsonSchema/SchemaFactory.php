@@ -112,6 +112,10 @@ final class SchemaFactory implements SchemaFactoryInterface
                     'type' => 'integer',
                     'minimum' => 0,
                 ],
+                'hydra:itemsPerPage' => [
+                    'type' => 'integer',
+                    'minimum' => 1,
+                ],
                 'hydra:view' => [
                     'type' => 'object',
                     'properties' => [

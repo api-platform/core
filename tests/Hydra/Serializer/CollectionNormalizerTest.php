@@ -132,6 +132,7 @@ class CollectionNormalizerTest extends TestCase
                     ],
                 ],
                 'hydra:totalItems' => 1312.,
+                'hydra:itemsPerPage' => 50.,
             ],
             $this->normalizePaginator()
         );
@@ -166,6 +167,7 @@ class CollectionNormalizerTest extends TestCase
             $paginatorProphecy->getTotalItems()->willReturn(1312);
         }
 
+        $paginatorProphecy->getItemsPerPage()->willReturn(50);
         $paginatorProphecy->rewind()->will(function (): void {});
         $paginatorProphecy->valid()->willReturn(true, false);
         $paginatorProphecy->current()->willReturn('foo');

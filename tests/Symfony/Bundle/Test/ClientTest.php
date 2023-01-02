@@ -119,6 +119,7 @@ class ClientTest extends ApiTestCase
         $this->assertJsonEquals([
             '@context' => '/contexts/SecuredDummy',
             '@id' => '/secured_dummies',
+            'hydra:itemsPerPage' => 3,
             '@type' => 'hydra:Collection',
             'hydra:member' => [],
             'hydra:totalItems' => 0,
