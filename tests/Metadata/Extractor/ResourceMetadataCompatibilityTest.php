@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\PersistenceMeansInterface;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
@@ -166,6 +167,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 ],
             ],
             'mercure' => true,
+            'persistenceMeans' => [
+                'elasticsearchDocument' => [
+                    'index' => 'foo_index',
+                    'type' => 'foo_type',
+                ],
+            ],
             'graphQlOperations' => [
                 'mutations' => [
                     [
@@ -380,12 +387,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     ],
                 ],
             ],
-            'persistenceMeans' => [
-                'elasticsearchDocument' => [
-                    'index' => 'foo_index',
-                    'type' => 'foo_type'
-                ]
-            ]
         ],
     ];
     private const BASE = [
@@ -424,7 +425,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'filters',
         'order',
         'extraProperties',
-        'persistenceMeans'
     ];
     private const EXTENDED_BASE = [
         'uriTemplate',
@@ -453,6 +453,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'openapiContext',
         'openapi',
         'paginationViaCursor',
+        'persistenceMeans',
     ];
 
     /**
@@ -661,5 +662,24 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         }
 
         return $operations;
+    }
+
+    private function withPersistenceMeans(array $values): ?PersistenceMeansInterface
+    {
+        if (!$values) {
+            return null;
+        }
+
+        if (1 !== \count($values)) {
+            throw new \InvalidArgumentException('Only one persistence means can be configured at a time.');
+        }
+
+        $configuration = reset($values);
+        switch (key($values)) {
+            case 'elasticsearchDocument':
+                return new ElasticsearchDocument($configuration['index'] ?? null, $configuration['type'] ?? null);
+        }
+
+        throw new \DomainException(sprintf('Unsupported "%s" persistence means.', key($values)));
     }
 }

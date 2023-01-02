@@ -19,7 +19,6 @@
             <xsd:group ref="extendedBase"/>
             <xsd:element name="operations" minOccurs="0" type="operations"/>
             <xsd:element name="graphQlOperations" minOccurs="0" type="graphQlOperations"/>
-            <xsd:element name="persistenceMeans" minOccurs="0" type="persistenceMeans"/>
         </xsd:sequence>
         <xsd:attributeGroup ref="extendedBase"/>
         <xsd:attribute type="xsd:string" name="uriTemplate"/>
@@ -397,8 +396,6 @@
         </xsd:complexType>
     </xsd:element>
 
-
-
     <xsd:group name="base">
         <xsd:sequence>
             <xsd:element name="denormalizationContext" minOccurs="0" type="sequenceWithValues"/>
@@ -425,6 +422,7 @@
             <xsd:element name="options" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="outputFormats" minOccurs="0" type="formats"/>
             <xsd:element name="paginationViaCursor" minOccurs="0" type="paginationViaCursor"/>
+            <xsd:element name="persistenceMeans" minOccurs="0" type="persistenceMeans"/>
             <xsd:element name="requirements" minOccurs="0" type="requirements"/>
             <xsd:element name="schemes" minOccurs="0" type="schemes"/>
             <xsd:element name="types" minOccurs="0" type="types"/>

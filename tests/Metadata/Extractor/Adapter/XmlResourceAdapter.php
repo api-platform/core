@@ -62,7 +62,7 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'securityPostValidation',
         'securityPostValidationMessage',
         'queryParameterValidationEnabled',
-        'persistenceMeans'
+        'persistenceMeans',
     ];
 
     /**
@@ -471,7 +471,7 @@ XML_WRAP
 
     private function buildPersistenceMeans(\SimpleXMLElement $resource, array $values): void
     {
-        $node = $resource->addChild('persistentMeans');
+        $node = $resource->addChild('persistenceMeans');
         $childNode = $node->addChild(array_key_first($values));
         $childNode->addAttribute('index', $values[array_key_first($values)]['index']);
         $childNode->addAttribute('type', $values[array_key_first($values)]['type']);

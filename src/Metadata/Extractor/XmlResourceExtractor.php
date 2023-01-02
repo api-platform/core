@@ -66,7 +66,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 'class' => $this->phpize($resource, 'class', 'string'),
                 'operations' => $this->buildOperations($resource, $base),
                 'graphQlOperations' => $this->buildGraphQlOperations($resource, $base),
-                'persistenceMeans' => $this->buildPersistenceMeans($resource),
             ]);
         }
     }
@@ -99,6 +98,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'paginationViaCursor' => $this->buildPaginationViaCursor($resource),
             'exceptionToStatus' => $this->buildExceptionToStatus($resource),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
+            'persistenceMeans' => $this->buildPersistenceMeans($resource),
         ]);
     }
 
@@ -457,12 +457,17 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
     private function buildPersistenceMeans(\SimpleXMLElement $resource): ?PersistenceMeansInterface
     {
         $persistenceMeans = $resource->persistenceMeans ?? null;
-        if(!isset($persistenceMeans)){
+        if (!isset($persistenceMeans)) {
             return null;
         }
         $elasticsearchDocument = $persistenceMeans->elasticsearchDocument ?? null;
-        if(isset($elasticsearchDocument)){
-            return new ElasticsearchDocument($elasticsearchDocument->attributes()->index, $elasticsearchDocument->attributes()->type);
+        if (isset($elasticsearchDocument)) {
+            $attributes = $elasticsearchDocument->attributes();
+
+            return new ElasticsearchDocument(
+                isset($attributes->index) ? (string) $attributes->index : null,
+                isset($attributes->type) ? (string) $attributes->type : null,
+            );
         }
         throw new \DomainException();
     }

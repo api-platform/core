@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
+use ApiPlatform\Elasticsearch\Metadata\ElasticsearchDocument;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -20,6 +21,7 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\PersistenceMeansInterface;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
@@ -122,6 +124,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'uriVariables' => $this->buildUriVariables($resource),
             'inputFormats' => $this->buildArrayValue($resource, 'inputFormats'),
             'outputFormats' => $this->buildArrayValue($resource, 'outputFormats'),
+            'persistenceMeans' => $this->buildPersistenceMeans($resource),
         ]);
     }
 
@@ -364,5 +367,29 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $data ?: null;
+    }
+
+    private function buildPersistenceMeans(array $resource): ?PersistenceMeansInterface
+    {
+        $persistenceMeans = $resource['persistenceMeans'] ?? [];
+        if (!\is_array($persistenceMeans)) {
+            return null;
+        }
+
+        if (!$persistenceMeans) {
+            return null;
+        }
+
+        if (1 !== \count($persistenceMeans)) {
+            throw new \InvalidArgumentException('Only one persistence means can be configured at a time.');
+        }
+
+        $configuration = reset($persistenceMeans);
+        switch (key($persistenceMeans)) {
+            case 'elasticsearchDocument':
+                return new ElasticsearchDocument($configuration['index'] ?? null, $configuration['type'] ?? null);
+        }
+
+        throw new \DomainException(sprintf('Unsupported "%s" persistence means.', key($persistenceMeans)));
     }
 }

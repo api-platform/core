@@ -98,6 +98,7 @@ class XmlExtractorTest extends TestCase
                     'provider' => null,
                     'read' => null,
                     'write' => null,
+                    'persistenceMeans' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments{._format}',
@@ -266,6 +267,7 @@ class XmlExtractorTest extends TestCase
                             'processor' => null,
                             'provider' => null,
                             'itemUriTemplate' => null,
+                            'persistenceMeans' => null,
                         ],
                         [
                             'name' => null,
@@ -362,6 +364,7 @@ class XmlExtractorTest extends TestCase
                             'priority' => null,
                             'processor' => null,
                             'provider' => null,
+                            'persistenceMeans' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -370,6 +373,7 @@ class XmlExtractorTest extends TestCase
                     'provider' => null,
                     'read' => null,
                     'write' => null,
+                    'persistenceMeans' => null,
                 ],
             ],
         ], $extractor->getResources());

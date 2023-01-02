@@ -98,6 +98,7 @@ class YamlExtractorTest extends TestCase
                     'provider' => null,
                     'read' => null,
                     'write' => null,
+                    'persistenceMeans' => null,
                 ],
             ],
             Program::class => [
@@ -166,6 +167,7 @@ class YamlExtractorTest extends TestCase
                     'provider' => null,
                     'read' => null,
                     'write' => null,
+                    'persistenceMeans' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/programs{._format}',
@@ -304,6 +306,7 @@ class YamlExtractorTest extends TestCase
                             'processor' => null,
                             'provider' => null,
                             'itemUriTemplate' => null,
+                            'persistenceMeans' => null,
                         ],
                         [
                             'name' => null,
@@ -381,6 +384,7 @@ class YamlExtractorTest extends TestCase
                             'priority' => null,
                             'processor' => null,
                             'provider' => null,
+                            'persistenceMeans' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -388,6 +392,7 @@ class YamlExtractorTest extends TestCase
                     'provider' => null,
                     'read' => null,
                     'write' => null,
+                    'persistenceMeans' => null,
                 ],
             ],
             SingleFileConfigDummy::class => [
@@ -456,6 +461,7 @@ class YamlExtractorTest extends TestCase
                     'provider' => null,
                     'read' => null,
                     'write' => null,
+                    'persistenceMeans' => null,
                 ],
             ],
         ], $extractor->getResources());
