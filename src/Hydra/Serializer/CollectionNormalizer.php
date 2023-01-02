@@ -110,6 +110,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         if ($object instanceof PaginatorInterface) {
             $data['hydra:totalItems'] = $object->getTotalItems();
+            $data['hydra:itemsPerPage'] = $object->getItemsPerPage();
         }
 
         if (\is_array($object) || ($object instanceof \Countable && !$object instanceof PartialPaginatorInterface)) {

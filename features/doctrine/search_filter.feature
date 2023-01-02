@@ -69,6 +69,7 @@ Feature: Search filter on collections
           "carBrand": "DummyBrand"
         }
       ],
+      "hydra:itemsPerPage": 3,
       "hydra:totalItems": 1,
       "hydra:view": {
         "@id": "/dummy_cars?colors.prop=red",
