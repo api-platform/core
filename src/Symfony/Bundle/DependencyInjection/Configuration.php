@@ -418,7 +418,7 @@ final class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                         ->arrayNode('mapping')
-                            ->setDeprecated('api-platform/core', '3.1', sprintf('The "%node%" option is deprecated. Configure an %s as $persistenceMeans.', ElasticsearchDocument::class))
+                            ->setDeprecated('api-platform/core', '3.1', sprintf('The "%%node%%" option is deprecated. Configure an %s as $persistenceMeans.', ElasticsearchDocument::class))
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('resource_class')
                             ->prototype('array')
