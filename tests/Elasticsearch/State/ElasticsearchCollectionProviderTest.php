@@ -125,4 +125,14 @@ final class ElasticsearchCollectionProviderTest extends TestCase
             $provider->provide($operation, [], $context)
         );
     }
+
+    public function testWithoutElasticsearchDocument(): void
+    {
+        $client = $this->createStub(Client::class);
+        $denormalizer = $this->createStub(DenormalizerInterface::class);
+
+        $itemDataProvider = new ElasticsearchCollectionProvider($client, $denormalizer, new Pagination(), []);
+        self::expectException(\LogicException::class);
+        $itemDataProvider->provide(new GetCollection(class: Foo::class), ['id' => 1]);
+    }
 }

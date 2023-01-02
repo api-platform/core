@@ -64,7 +64,7 @@ final class ElasticsearchCollectionProvider implements ProviderInterface
             'body' => $body,
         ];
 
-        if (ElasticsearchVersion::supportsMappingType()) {
+        if (isset($documentConfiguration->type) && ElasticsearchVersion::supportsMappingType()) {
             $params['type'] = $documentConfiguration->type;
         }
 

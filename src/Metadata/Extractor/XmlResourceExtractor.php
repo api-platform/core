@@ -460,15 +460,16 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         if (!isset($persistenceMeans)) {
             return null;
         }
+        if (1 !== \count($persistenceMeans)) {
+            throw new \DomainException('There can only be one configured persistence means. "resources.xsd" needs to be fixed.');
+        }
         $elasticsearchDocument = $persistenceMeans->elasticsearchDocument ?? null;
         if (isset($elasticsearchDocument)) {
-            $attributes = $elasticsearchDocument->attributes();
-
             return new ElasticsearchDocument(
-                isset($attributes->index) ? (string) $attributes->index : null,
-                isset($attributes->type) ? (string) $attributes->type : null,
+                isset($elasticsearchDocument['index']) ? (string) $elasticsearchDocument['index'] : null,
+                isset($elasticsearchDocument['type']) ? (string) $elasticsearchDocument['type'] : null,
             );
         }
-        throw new \DomainException();
+        throw new \DomainException(sprintf('Unsupported "%s" persistence means. "resources.xsd" needs to be fixed.', $persistenceMeans->children()?->getName()));
     }
 }

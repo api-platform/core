@@ -69,6 +69,16 @@ final class ElasticsearchItemProviderTest extends TestCase
         self::assertSame($foo, $itemDataProvider->provide(new Get(class: Foo::class, persistenceMeans: new ElasticsearchDocument('foo')), ['id' => 1]));
     }
 
+    public function testWithoutElasticsearchDocument(): void
+    {
+        $client = $this->createStub(Client::class);
+        $denormalizer = $this->createStub(DenormalizerInterface::class);
+
+        $itemDataProvider = new ElasticsearchItemProvider($client, $denormalizer);
+        self::expectException(\LogicException::class);
+        $itemDataProvider->provide(new Get(class: Foo::class), ['id' => 1]);
+    }
+
     public function testGetItemWithMissing404Exception(): void
     {
         $client = $this->createStub(Client::class);
