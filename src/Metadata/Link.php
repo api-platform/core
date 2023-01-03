@@ -138,8 +138,6 @@ final class Link
         return $this->securityMessage;
     }
 
-
-
     public function withSecurity(?string $security): self
     {
         $self = clone $this;
@@ -155,7 +153,6 @@ final class Link
 
         return $self;
     }
-
 
     public function withLink(self $link): self
     {
