@@ -210,3 +210,21 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should contain "ownerOnlyProperty"
     And the JSON node "ownerOnlyProperty" should be equal to the string "updated"
+
+  Scenario: An user can get related linked dummies for an secured dummy they own
+    Given there are 1 SecuredDummy objects owned by dunglas with related dummies
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies/4/related"
+    Then the response status code should be 200
+    And the response should contain "securedDummy"
+    And the JSON node "hydra:member[0].id" should be equal to 1"
+
+  Scenario: An user can not get related linked dummies for an secured dummy they do not own
+    Given there are 1 SecuredDummy objects owned by someone with related dummies
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies/5/related"
+    Then the response status code should be 403
