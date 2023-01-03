@@ -120,7 +120,14 @@ trait LinksHandlerTrait
             foreach ($identifierProperties as $identifierProperty) {
                 $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
                 $queryBuilder->andWhere("$joinAlias.$identifierProperty = :$placeholder");
-                $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
+
+                if ($doctrineClassMetadata->hasAssociation($link->getToProperty())) {
+                    $associationTargetClass = $doctrineClassMetadata->getAssociationMapping($link->getToProperty())['targetEntity'];
+                    $associationTargetDoctrineClassMetadata = $manager->getClassMetadata($associationTargetClass);
+                    $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $associationTargetDoctrineClassMetadata->getTypeOfField($identifierProperty));
+                } else {
+                    $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
+                }
             }
 
             $previousAlias = $joinAlias;
