@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Resource\Factory\OperationDefaultsTrait;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -115,8 +116,7 @@ final class ReadListener
                 $operationUriVariables = $uriVariable->getIdentifiers();
                 $relationClass = $uriVariable->getFromClass();
                 try {
-                    //$uriVariables = $this->getOperationUriVariables($operation, $parameters, $resourceClass);
-                    $tmp = $this->provider->provide(new Get(uriVariables: $operationUriVariables, class: $relationClass, provider: ItemProvider::class), ['id' => $parameters[$key]], $context);
+                    $tmp = $this->provider->provide($this->resourceMetadataCollectionFactory->create($relationClass)->getOperation(null, false, true), [$uriVariable->getIdentifiers()[0] => $parameters[$key]], $context);
                     $request->attributes->set($uriVariable->getToProperty(), $tmp);
                 } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
                     throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
