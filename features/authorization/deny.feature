@@ -211,6 +211,13 @@ Feature: Authorization checking
     And the response should contain "ownerOnlyProperty"
     And the JSON node "ownerOnlyProperty" should be equal to the string "updated"
 
+  Scenario: An non existing entity should return Not found
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies/40000/related"
+    Then the response status code should be 404
+
   Scenario: An user can get related linked dummies for an secured dummy they own
     Given there are 1 SecuredDummy objects owned by dunglas with related dummies
     When I add "Accept" header equal to "application/ld+json"

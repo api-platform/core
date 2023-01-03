@@ -110,10 +110,12 @@ final class ReadListener
                 if (!$uriVariable instanceof Link || !$uriVariable->getSecurity()) {
                     continue;
                 }
-                $operationUriVariables = $uriVariable->getIdentifiers();
                 $relationClass = $uriVariable->getFromClass();
                 try {
                     $tmp = $this->provider->provide($this->resourceMetadataCollectionFactory->create($relationClass)->getOperation(null, false, true), [$uriVariable->getIdentifiers()[0] => $parameters[$key]], $context);
+                    if (null === $tmp) {
+                        throw new NotFoundHttpException('Not Found');
+                    }
                     $request->attributes->set($uriVariable->getToProperty(), $tmp);
                 } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
                     throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
