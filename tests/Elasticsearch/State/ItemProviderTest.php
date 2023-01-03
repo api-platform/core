@@ -20,7 +20,6 @@ use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -55,7 +54,6 @@ final class ItemProviderTest extends TestCase
             '_index' => 'foo',
             '_type' => '_doc',
             '_id' => '1',
-            '_version' => 1,
             'found' => true,
             '_source' => [
                 'id' => 1,
@@ -69,7 +67,7 @@ final class ItemProviderTest extends TestCase
         $foo->setBar('erèinissor');
 
         $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->get(['index' => 'foo', 'id' => '1'])->willReturn($document)->shouldBeCalled();
+        $clientProphecy->get(['client' => ['ignore' => 404], 'index' => 'foo', 'id' => '1'])->willReturn($document)->shouldBeCalled();
 
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
         $denormalizerProphecy->denormalize($document, Foo::class, DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])->willReturn($foo)->shouldBeCalled();
@@ -79,13 +77,18 @@ final class ItemProviderTest extends TestCase
         self::assertSame($foo, $itemDataProvider->provide((new Get())->withClass(Foo::class), ['id' => 1]));
     }
 
-    public function testGetItemWithMissing404Exception(): void
+    public function testGetInexistantItem(): void
     {
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
 
         $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->get(['index' => 'foo', 'id' => '404'])->willThrow(new Missing404Exception())->shouldBeCalled();
+        $clientProphecy->get(['client' => ['ignore' => 404], 'index' => 'foo', 'id' => '404'])->willReturn([
+            '_index' => 'foo',
+            '_type' => '_doc',
+            '_id' => '404',
+            'found' => false,
+        ])->shouldBeCalled();
 
         $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal());
 

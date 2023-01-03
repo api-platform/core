@@ -19,7 +19,6 @@ use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Elasticsearch\Client;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -45,18 +44,18 @@ final class ItemProvider implements ProviderInterface
         $resourceClass = $operation->getClass();
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
 
-        try {
-            $params = [
-                'index' => $documentMetadata->getIndex(),
-                'id' => (string) reset($uriVariables),
-            ];
+        $params = [
+            'client' => ['ignore' => 404],
+            'index' => $documentMetadata->getIndex(),
+            'id' => (string) reset($uriVariables),
+        ];
 
-            if (ElasticsearchVersion::supportsMappingType()) {
-                $params['type'] = $documentMetadata->getType();
-            }
+        if (ElasticsearchVersion::supportsMappingType()) {
+            $params['type'] = $documentMetadata->getType();
+        }
 
-            $document = $this->client->get($params);
-        } catch (Missing404Exception) {
+        $document = $this->client->get($params);
+        if (!$document['found']) {
             return null;
         }
 
