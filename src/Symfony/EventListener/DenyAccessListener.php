@@ -86,16 +86,12 @@ final class DenyAccessListener
                 $message = $operation->getSecurityMessage();
         }
 
-        if (null === $isGranted) {
-            return;
-        }
-
         $extraVariables += $request->attributes->all();
         $extraVariables['object'] = $request->attributes->get('data');
         $extraVariables['previous_object'] = $request->attributes->get('previous_data');
         $extraVariables['request'] = $request;
 
-        if (!$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {
+        if ($isGranted && !$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {
             throw new AccessDeniedException($message ?? 'Access Denied.');
         }
 
@@ -105,7 +101,7 @@ final class DenyAccessListener
                     continue;
                 }
 
-                if (!$this->resourceAccessChecker->isGranted($uriVariable->getToProperty(), $uriVariable->getSecurity(), $extraVariables)) {
+                if (!$this->resourceAccessChecker->isGranted($uriVariable->getFromClass(), $uriVariable->getSecurity(), $extraVariables)) {
                     throw new AccessDeniedException($uriVariable->getSecurityMessage() ?? 'Access Denied.');
                 }
             }

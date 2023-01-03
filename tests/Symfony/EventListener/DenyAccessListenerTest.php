@@ -15,6 +15,8 @@ namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\EventListener\DenyAccessListener;
@@ -135,6 +137,92 @@ class DenyAccessListenerTest extends TestCase
 
         $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
         $resourceAccessCheckerProphecy->isGranted('Foo', 'is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
+
+        $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
+        $listener->onSecurity($event);
+    }
+
+    public function testIsGrantedLink(): void
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get_collection']);
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
+            new ApiResource(
+                uriTemplate: '/bars/{barId}/foos',
+                operations: [
+                    'get_collection' => new GetCollection(uriVariables: [
+                        'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")'),
+                    ], ),
+                ],
+            ),
+        ]));
+
+        $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessCheckerProphecy->isGranted('Bar', 'is_granted("some_voter", "bar")', Argument::type('array'))->willReturn(true)->shouldBeCalled();
+
+        $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
+        $listener->onSecurity($event);
+    }
+
+    public function testIsNotGrantedLink(): void
+    {
+        $this->expectException(AccessDeniedException::class);
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get_collection']);
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
+            new ApiResource(
+                uriTemplate: '/bars/{barId}/foos',
+                operations: [
+                    'get_collection' => new GetCollection(uriVariables: [
+                        'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")'),
+                    ], ),
+                ],
+            ),
+        ]));
+
+        $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessCheckerProphecy->isGranted('Bar', 'is_granted("some_voter", "bar")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
+
+        $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
+        $listener->onSecurity($event);
+    }
+
+    public function testSecurityMessageLink(): void
+    {
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('You are not admin.');
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get_collection']);
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
+            new ApiResource(
+                uriTemplate: '/bars/{barId}/foos',
+                operations: [
+                    'get_collection' => new GetCollection(uriVariables: [
+                        'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")', securityMessage: 'You are not admin.'),
+                    ], ),
+                ],
+            ),
+        ]));
+
+        $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessCheckerProphecy->isGranted('Bar', 'is_granted("some_voter", "bar")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
 
         $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
         $listener->onSecurity($event);
