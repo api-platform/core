@@ -34,7 +34,7 @@ class RelatedLinkedDummy
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
 
-    #[ODM\ReferenceOne(targetDocument: SecuredDummy::class)]
+    #[ODM\ReferenceOne(targetDocument: SecuredDummy::class, storeAs: 'id')]
     private SecuredDummy $securedDummy;
 
     public function getId()
