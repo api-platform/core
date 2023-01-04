@@ -80,6 +80,8 @@ api_platform:
         paths:
             - '%kernel.project_dir%/../TestBundle/Enum'
             - '%kernel.project_dir%/../TestBundle/Model'
+    mercure:
+        include_type: true
 
 parameters:
     container.autowiring.strict_mode: true

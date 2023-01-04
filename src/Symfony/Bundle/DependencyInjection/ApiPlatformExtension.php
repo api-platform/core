@@ -680,6 +680,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        $container->setParameter('api_platform.mercure.include_type', $config['mercure']['include_type']);
+
         $loader->load('mercure.xml');
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {

@@ -98,16 +98,16 @@ class PublishMercureUpdatesListenerTest extends TestCase
         ]))]));
 
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
-            'get' => (new Get())->withMercure(['hub' => 'managed', 'enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
+            'get' => (new Get())->withShortName('Dummy')->withMercure(['hub' => 'managed', 'enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
         ]))]));
         $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadataCollection(DummyCar::class, [(new ApiResource())->withOperations(new Operations([
             'get' => new Get(),
         ]))]));
         $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadataCollection(DummyFriend::class, [(new ApiResource())->withOperations(new Operations([
-            'get' => (new Get())->withMercure(['private' => true, 'retry' => 10, 'hub' => 'managed', 'enable_async_update' => false]),
+            'get' => (new Get())->withTypes('https://schema.org/Person')->withShortName('DummyFriend')->withMercure(['private' => true, 'retry' => 10, 'hub' => 'managed', 'enable_async_update' => false]),
         ]))]));
         $resourceMetadataFactoryProphecy->create(DummyOffer::class)->willReturn(new ResourceMetadataCollection(DummyOffer::class, [(new ApiResource())->withOperations(new Operations([
-            'get' => (new Get())->withMercure(['topics' => 'http://example.com/custom_topics/1', 'data' => 'mercure_custom_data', 'hub' => 'managed', 'enable_async_update' => false])->withNormalizationContext(['groups' => ['baz']]),
+            'get' => (new Get())->withShortName('DummyOffer')->withMercure(['topics' => 'http://example.com/custom_topics/1', 'data' => 'mercure_custom_data', 'hub' => 'managed', 'enable_async_update' => false])->withNormalizationContext(['groups' => ['baz']]),
         ]))]));
         $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadataCollection(DummyMercure::class, [(new ApiResource())->withOperations(new Operations([
             'get' => (new Get())->withMercure(['topics' => ['/dummies/1', '/users/3'], 'hub' => 'managed', 'enable_async_update' => false])->withNormalizationContext(['groups' => ['baz']]),
@@ -144,7 +144,11 @@ class PublishMercureUpdatesListenerTest extends TestCase
             null,
             new HubRegistry($this->createMock(HubInterface::class), [
                 'managed' => $managedHub,
-            ])
+            ]),
+            null,
+            null,
+            null,
+            true,
         );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
@@ -159,7 +163,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->onFlush($eventArgs);
         $listener->postFlush();
 
-        $this->assertEquals(['1', '2', 'mercure_custom_data', 'mercure_options', '{"@id":"\/dummies\/3"}', '{"@id":"\/dummy_friends\/4"}', '{"@id":"\/dummy_offers\/5"}'], $data);
+        $this->assertEquals(['1', '2', 'mercure_custom_data', 'mercure_options', '{"@id":"\/dummies\/3","@type":"Dummy"}', '{"@id":"\/dummy_friends\/4","@type":"https:\/\/schema.org\/Person"}', '{"@id":"\/dummy_offers\/5","@type":"DummyOffer"}'], $data);
         $this->assertEquals(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4', 'http://example.com/custom_topics/1'], $topics);
         $this->assertEquals([false, false, false, false, false, true, false], $private);
         $this->assertEquals([null, null, null, null, null, 10, null], $retry);
@@ -218,7 +222,9 @@ class PublishMercureUpdatesListenerTest extends TestCase
             null,
             new HubRegistry($defaultHub, ['default' => $defaultHub]),
             $graphQlSubscriptionManagerProphecy->reveal(),
-            $graphQlMercureSubscriptionIriGenerator->reveal()
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
         );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);

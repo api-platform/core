@@ -197,6 +197,7 @@ class ConfigurationTest extends TestCase
             'mercure' => [
                 'enabled' => true,
                 'hub_url' => null,
+                'include_type' => false,
             ],
             'resource_class_directories' => [],
             'asset_package' => null,
