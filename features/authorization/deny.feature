@@ -262,3 +262,24 @@ Feature: Authorization checking
     And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send a "GET" request to "/secured_dummies/5/to_from"
     Then the response status code should be 403
+
+  Scenario: I define a custom name of the security object
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies/5/with_name"
+    Then the response status code should be 403
+
+  Scenario: I define a from from link
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/related_linked_dummies/2/from_from"
+    Then the response status code should be 403
+
+  Scenario: I define multiple links with security
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies/5/related/2"
+    Then the response status code should be 403
