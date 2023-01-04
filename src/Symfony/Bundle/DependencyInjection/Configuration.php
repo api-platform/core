@@ -376,6 +376,10 @@ final class Configuration implements ConfigurationInterface
                             ->defaultNull()
                             ->info('The URL sent in the Link HTTP header. If not set, will default to the URL for MercureBundle\'s default hub.')
                         ->end()
+                        ->booleanNode('include_type')
+                            ->defaultFalse()
+                            ->info('Always include @type in updates (including delete ones).')
+                        ->end()
                     ->end()
                 ->end()
             ->end();

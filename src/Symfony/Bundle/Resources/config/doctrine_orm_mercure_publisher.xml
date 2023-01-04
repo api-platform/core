@@ -18,6 +18,8 @@
             <argument type="service" id="Symfony\Component\Mercure\HubRegistry" />
             <argument type="service" id="api_platform.graphql.subscription.subscription_manager" on-invalid="ignore" />
             <argument type="service" id="api_platform.graphql.subscription.mercure_iri_generator" on-invalid="ignore" />
+            <argument>null</argument>
+            <argument>%api_platform.mercure.include_type%</argument>
 
             <tag name="doctrine.event_listener" event="onFlush" />
             <tag name="doctrine.event_listener" event="postFlush" />
