@@ -21,10 +21,25 @@ use Doctrine\ORM\Mapping\Entity;
 
 #[ApiResource()]
 #[ApiResource(
-    uriTemplate: '/secured_dummies/{securedDummyId}/related',
+    uriTemplate: '/secured_dummies/{securedDummyId}/to_from',
     operations: [new GetCollection()],
     uriVariables: [
         'securedDummyId' => new Link(toProperty: 'securedDummy', fromClass: SecuredDummy::class, security: "is_granted('ROLE_USER') and securedDummy.getOwner() == user"),
+    ]
+)]
+#[ApiResource(
+    uriTemplate: '/secured_dummies/{securedDummyId}/with_name',
+    operations: [new GetCollection()],
+    uriVariables: [
+        'securedDummyId' => new Link(toProperty: 'securedDummy', fromClass: SecuredDummy::class, security: "is_granted('ROLE_USER') and testObj.getOwner() == user", securityObjectName: 'testObj'),
+    ]
+)]
+#[ApiResource(
+    uriTemplate: '/secured_dummies/{securedDummyId}/related/{id}',
+    operations: [new GetCollection()],
+    uriVariables: [
+        'securedDummyId' => new Link(toProperty: 'securedDummy', fromClass: SecuredDummy::class, security: "is_granted('ROLE_USER') and securedDummy.getOwner() == user"),
+        'id' => new Link(fromClass: RelatedLinkedDummy::class, security: "is_granted('ROLE_USER') and testObj.getSecuredDummy().getOwner() == user", securityObjectName: 'testObj'),
     ]
 )]
 #[Entity]

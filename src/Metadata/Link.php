@@ -16,7 +16,7 @@ namespace ApiPlatform\Metadata;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
 final class Link
 {
-    public function __construct(private ?string $parameterName = null, private ?string $fromProperty = null, private ?string $toProperty = null, private ?string $fromClass = null, private ?string $toClass = null, private ?array $identifiers = null, private ?bool $compositeIdentifier = null, private ?string $expandedValue = null, private ?string $security = null, private ?string $securityMessage = null)
+    public function __construct(private ?string $parameterName = null, private ?string $fromProperty = null, private ?string $toProperty = null, private ?string $fromClass = null, private ?string $toClass = null, private ?array $identifiers = null, private ?bool $compositeIdentifier = null, private ?string $expandedValue = null, private ?string $security = null, private ?string $securityMessage = null, private ?string $securityObjectName = null)
     {
         // For the inverse property shortcut
         if ($this->parameterName && class_exists($this->parameterName)) {
@@ -154,6 +154,19 @@ final class Link
         return $self;
     }
 
+    public function getSecurityObjectName(): ?string
+    {
+        return $this->securityObjectName;
+    }
+
+    public function withSecurityObjectName(?string $securityObjectName): self
+    {
+        $self = clone $this;
+        $self->securityObjectName = $securityObjectName;
+
+        return $self;
+    }
+
     public function withLink(self $link): self
     {
         $self = clone $this;
@@ -196,6 +209,10 @@ final class Link
 
         if (!$self->getSecurityMessage() && ($securityMessage = $link->getSecurityMessage())) {
             $self->securityMessage = $securityMessage;
+        }
+
+        if (!$self->getSecurityObjectName() && ($securityObjectName = $link->getSecurityObjectName())) {
+            $self->securityObjectName = $securityObjectName;
         }
 
         return $self;

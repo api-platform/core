@@ -101,7 +101,13 @@ final class DenyAccessListener
                     continue;
                 }
 
-                if (!$this->resourceAccessChecker->isGranted($uriVariable->getFromClass(), $uriVariable->getSecurity(), $extraVariables)) {
+                $targetResource = $uriVariable->getFromClass() ?? $uriVariable->getToClass();
+
+                if (!$targetResource) {
+                    continue;
+                }
+
+                if (!$this->resourceAccessChecker->isGranted($targetResource, $uriVariable->getSecurity(), $extraVariables)) {
                     throw new AccessDeniedException($uriVariable->getSecurityMessage() ?? 'Access Denied.');
                 }
             }

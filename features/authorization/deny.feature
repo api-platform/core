@@ -215,7 +215,7 @@ Feature: Authorization checking
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
     And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    And I send a "GET" request to "/secured_dummies/40000/related"
+    And I send a "GET" request to "/secured_dummies/40000/to_from"
     Then the response status code should be 404
 
   Scenario: An user can get related linked dummies for an secured dummy they own
@@ -223,9 +223,36 @@ Feature: Authorization checking
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
     And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    And I send a "GET" request to "/secured_dummies/4/related"
+    And I send a "GET" request to "/secured_dummies/4/to_from"
     Then the response status code should be 200
     And the response should contain "securedDummy"
+    And the JSON node "hydra:member[0].id" should be equal to 1"
+
+  Scenario: I define a custom name of the security object
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies/4/with_name"
+    Then the response status code should be 200
+    And the response should contain "securedDummy"
+    And the JSON node "hydra:member[0].id" should be equal to 1"
+
+  Scenario: I define a from from link
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/related_linked_dummies/1/from_from"
+    Then the response status code should be 200
+    And the response should contain "id"
+    And the JSON node "hydra:member[0].id" should be equal to 4"
+
+  Scenario: I define multiple links with security
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies/4/related/1"
+    Then the response status code should be 200
+    And the response should contain "id"
     And the JSON node "hydra:member[0].id" should be equal to 1"
 
   Scenario: An user can not get related linked dummies for an secured dummy they do not own
@@ -233,5 +260,5 @@ Feature: Authorization checking
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
     And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    And I send a "GET" request to "/secured_dummies/5/related"
+    And I send a "GET" request to "/secured_dummies/5/to_from"
     Then the response status code should be 403
