@@ -236,6 +236,9 @@ class AppKernel extends Kernel
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
             ],
+            'graphql' => [
+                'graphql_playground' => false,
+            ],
         ]);
 
         $loader->load(__DIR__.'/config/config_swagger.php');

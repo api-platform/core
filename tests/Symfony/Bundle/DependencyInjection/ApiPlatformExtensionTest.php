@@ -153,6 +153,9 @@ class ApiPlatformExtensionTest extends TestCase
         'asset_package' => null,
         'enable_entrypoint' => true,
         'enable_docs' => true,
+        'graphql' => [
+            'graphql_playground' => ['enabled' => false],
+        ],
     ]];
 
     private ContainerBuilder $container;
