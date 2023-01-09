@@ -25,6 +25,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.yaml.inner" />
             <argument>%api_platform.defaults%</argument>
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>%api_platform.graphql.enabled%</argument>
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory.yaml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" public="false">
