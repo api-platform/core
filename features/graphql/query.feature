@@ -68,6 +68,35 @@ Feature: GraphQL query support
     And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[0].node.name" should be equal to "RelatedOneToManyDummy12"
     And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[2].node.name" should be equal to "RelatedOneToManyDummy32"
 
+  @createSchema @!mongodb
+  Scenario: Retrieve an item with child relation to the same resource
+    Given there are tree dummies
+    When I send the following GraphQL request:
+    """
+    {
+      treeDummies {
+        edges {
+          node {
+            id
+            children {
+              totalCount
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    Then print last JSON response
+    And the JSON node "errors" should not exist
+    And the JSON node "data.treeDummies.edges[0].node.id" should be equal to "/tree_dummies/1"
+    And the JSON node "data.treeDummies.edges[0].node.children.totalCount" should be equal to "1"
+    And the JSON node "data.treeDummies.edges[1].node.id" should be equal to "/tree_dummies/2"
+    And the JSON node "data.treeDummies.edges[1].node.children.totalCount" should be equal to "0"
+
+
   @createSchema
   Scenario: Retrieve a Relay Node
     Given there are 2 dummy objects with relatedDummy
