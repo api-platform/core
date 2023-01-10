@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\State\OptionsInterface;
 
 class HttpOperation extends Operation
 {
@@ -146,7 +147,8 @@ class HttpOperation extends Operation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        ?OptionsInterface $stateOptions = null,
     ) {
         $this->shortName = $shortName;
         $this->description = $description;
@@ -192,6 +194,7 @@ class HttpOperation extends Operation
         $this->provider = $provider;
         $this->processor = $processor;
         $this->extraProperties = $extraProperties;
+        $this->stateOptions = $stateOptions;
     }
 
     public function getMethod(): ?string

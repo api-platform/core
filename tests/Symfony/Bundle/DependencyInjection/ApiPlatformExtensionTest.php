@@ -33,8 +33,6 @@ use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInte
 use ApiPlatform\Elasticsearch\Filter\MatchFilter;
 use ApiPlatform\Elasticsearch\Filter\TermFilter;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
-use ApiPlatform\Elasticsearch\State\CollectionProvider as ElasticsearchCollectionProvider;
-use ApiPlatform\Elasticsearch\State\ItemProvider as ElasticsearchItemProvider;
 use ApiPlatform\Exception\ExceptionInterface;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -1048,8 +1046,8 @@ class ApiPlatformExtensionTest extends TestCase
 
         $services = [
             // elasticsearch.xml
-            ElasticsearchItemProvider::class,
-            ElasticsearchCollectionProvider::class,
+            'api_platform.elasticsearch.state.item_provider',
+            'api_platform.elasticsearch.state.collection_provider',
             'api_platform.elasticsearch.client',
             'api_platform.elasticsearch.cache.metadata.document',
             'api_platform.elasticsearch.metadata.document.metadata_factory.configured',
@@ -1076,6 +1074,8 @@ class ApiPlatformExtensionTest extends TestCase
             TermFilter::class,
             MatchFilter::class,
             \ApiPlatform\Elasticsearch\Filter\OrderFilter::class,
+            \ApiPlatform\Elasticsearch\State\ItemProvider::class,
+            \ApiPlatform\Elasticsearch\State\CollectionProvider::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -1083,8 +1083,8 @@ class ApiPlatformExtensionTest extends TestCase
         // elasticsearch.xml
         $this->assertServiceHasTags('api_platform.elasticsearch.cache.metadata.document', ['cache.pool']);
         $this->assertServiceHasTags('api_platform.elasticsearch.normalizer.document', ['serializer.normalizer']);
-        $this->assertServiceHasTags(ElasticsearchItemProvider::class, ['api_platform.state_provider']);
-        $this->assertServiceHasTags(ElasticsearchCollectionProvider::class, ['api_platform.state_provider']);
+        $this->assertServiceHasTags('api_platform.elasticsearch.state.item_provider', ['api_platform.state_provider']);
+        $this->assertServiceHasTags('api_platform.elasticsearch.state.collection_provider', ['api_platform.state_provider']);
         $this->assertServiceHasTags('api_platform.elasticsearch.request_body_search_extension.constant_score_filter', ['api_platform.elasticsearch.request_body_search_extension.collection']);
         $this->assertServiceHasTags('api_platform.elasticsearch.request_body_search_extension.sort_filter', ['api_platform.elasticsearch.request_body_search_extension.collection']);
         $this->assertServiceHasTags('api_platform.elasticsearch.request_body_search_extension.sort', ['api_platform.elasticsearch.request_body_search_extension.collection']);

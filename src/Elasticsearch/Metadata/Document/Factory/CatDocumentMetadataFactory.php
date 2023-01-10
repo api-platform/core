@@ -24,8 +24,7 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
  * Creates document's metadata using indices from the cat APIs.
  *
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html
- *
- * @experimental
+ * @deprecated
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */

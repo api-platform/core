@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Extractor;
 
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
@@ -35,6 +36,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\State\OptionsInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\ResourceAdapterInterface;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlResourceAdapter;
@@ -165,6 +167,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 ],
             ],
             'mercure' => true,
+            'stateOptions' => [
+                'elasticsearchOptions' => [
+                    'index' => 'foo_index',
+                    'type' => 'foo_type',
+                ],
+            ],
             'graphQlOperations' => [
                 'mutations' => [
                     [
@@ -445,6 +453,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'openapiContext',
         'openapi',
         'paginationViaCursor',
+        'stateOptions',
     ];
 
     /**
@@ -653,5 +662,24 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         }
 
         return $operations;
+    }
+
+    private function withStateOptions(array $values): ?OptionsInterface
+    {
+        if (!$values) {
+            return null;
+        }
+
+        if (1 !== \count($values)) {
+            throw new \InvalidArgumentException('Only one options can be configured at a time.');
+        }
+
+        $configuration = reset($values);
+        switch (key($values)) {
+            case 'elasticsearchOptions':
+                return new Options($configuration['index'] ?? null, $configuration['type'] ?? null);
+        }
+
+        throw new \LogicException(sprintf('Unsupported "%s" state options.', key($values)));
     }
 }

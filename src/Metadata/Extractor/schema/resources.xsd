@@ -383,6 +383,19 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:complexType name="stateOptions">
+        <xsd:choice>
+            <xsd:element ref="elasticsearchOptions"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:element name="elasticsearchOptions">
+        <xsd:complexType>
+            <xsd:attribute name="index" type="xsd:string"/>
+            <xsd:attribute name="type" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:group name="base">
         <xsd:sequence>
             <xsd:element name="denormalizationContext" minOccurs="0" type="sequenceWithValues"/>
@@ -409,6 +422,7 @@
             <xsd:element name="options" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="outputFormats" minOccurs="0" type="formats"/>
             <xsd:element name="paginationViaCursor" minOccurs="0" type="paginationViaCursor"/>
+            <xsd:element name="stateOptions" minOccurs="0" type="stateOptions"/>
             <xsd:element name="requirements" minOccurs="0" type="requirements"/>
             <xsd:element name="schemes" minOccurs="0" type="schemes"/>
             <xsd:element name="types" minOccurs="0" type="types"/>

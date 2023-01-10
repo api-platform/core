@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
-use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
@@ -57,7 +56,6 @@ final class CollectionProviderTest extends TestCase
         ];
 
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
-        $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadataCollection(Foo::class));
@@ -121,7 +119,7 @@ final class CollectionProviderTest extends TestCase
             ->willReturn($documents)
             ->shouldBeCalled();
 
-        $operation = (new Get())->withName('get')->withClass(Foo::class);
+        $operation = (new Get())->withName('get')->withClass(Foo::class)->withShortName('foo');
 
         $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
         $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, $operation, $context)->willReturn([])->shouldBeCalled();

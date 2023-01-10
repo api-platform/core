@@ -11,9 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\GraphQl;
+namespace ApiPlatform\Elasticsearch\State;
 
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class Mutation extends Operation
+use ApiPlatform\State\OptionsInterface as AbstractOptionsInterface;
+
+interface OptionsInterface extends AbstractOptionsInterface
 {
+    public function getIndex(): ?string;
+
+    public function getType(): ?string;
 }

@@ -15,6 +15,7 @@ namespace ApiPlatform\Elasticsearch\Metadata\Resource\Factory;
 
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
+use ApiPlatform\Elasticsearch\State\OptionsInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -26,8 +27,11 @@ use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private readonly Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly bool $triggerDeprecation = true)
     {
+        if ($this->triggerDeprecation) {
+            trigger_deprecation('api-platform/core', '3.1', '%s is deprecated and will be removed in v4', self::class);
+        }
     }
 
     /**
@@ -42,6 +46,12 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
             if ($operations) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+                    if (null !== ($elasticsearch = $operation->getElasticsearch())) {
+                        $solution = $elasticsearch
+                            ? sprintf('Pass an instance of %s to $stateOptions instead', OptionsInterface::class)
+                            : 'You will have to remove it when upgrading to v4';
+                        trigger_deprecation('api-platform/core', '3.1', sprintf('Setting "elasticsearch" in Operation is deprecated. %s', $solution));
+                    }
                     if ($this->hasIndices($operation)) {
                         $operation = $operation->withElasticsearch(true);
                     }
@@ -60,6 +70,12 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
             if ($graphQlOperations) {
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
+                    if (null !== ($elasticsearch = $graphQlOperation->getElasticsearch())) {
+                        $solution = $elasticsearch
+                            ? sprintf('Pass an instance of %s to $stateOptions instead', OptionsInterface::class)
+                            : 'You will have to remove it when upgrading to v4';
+                        trigger_deprecation('api-platform/core', '3.1', sprintf('Setting "elasticsearch" in GraphQlOperation is deprecated. %s', $solution));
+                    }
                     if ($this->hasIndices($graphQlOperation)) {
                         $graphQlOperation = $graphQlOperation->withElasticsearch(true);
                     }
@@ -93,9 +109,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
             $this->client->cat()->indices(['index' => $index]);
 
             return true;
-        } catch (Missing404Exception) {
-            return false;
-        } catch (NoNodesAvailableException) {
+        } catch (Missing404Exception|NoNodesAvailableException) {
             return false;
         }
     }

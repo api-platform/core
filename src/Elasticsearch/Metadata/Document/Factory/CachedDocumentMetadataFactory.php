@@ -21,7 +21,7 @@ use Psr\Cache\CacheItemPoolInterface;
 /**
  * Caches document metadata.
  *
- * @experimental
+ * @deprecated
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */

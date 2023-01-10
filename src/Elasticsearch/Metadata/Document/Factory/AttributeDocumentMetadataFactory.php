@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 /**
  * Creates document's metadata using the attribute configuration.
  *
- * @experimental
+ * @deprecated
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */

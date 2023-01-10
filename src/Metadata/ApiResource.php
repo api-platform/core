@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\State\OptionsInterface;
 
 /**
  * Resource metadata attribute.
@@ -147,7 +148,8 @@ class ApiResource
         protected ?array $graphQlOperations = null,
         $provider = null,
         $processor = null,
-        protected array $extraProperties = []
+        protected array $extraProperties = [],
+        protected ?OptionsInterface $stateOptions = null,
     ) {
         $this->operations = null === $operations ? null : new Operations($operations);
         $this->provider = $provider;
@@ -616,11 +618,17 @@ class ApiResource
         return $self;
     }
 
+    /**
+     * @deprecated this will be removed in v4
+     */
     public function getElasticsearch(): ?bool
     {
         return $this->elasticsearch;
     }
 
+    /**
+     * @deprecated this will be removed in v4
+     */
     public function withElasticsearch(bool $elasticsearch): self
     {
         $self = clone $this;
@@ -1027,6 +1035,19 @@ class ApiResource
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;
+
+        return $self;
+    }
+
+    public function getStateOptions(): ?OptionsInterface
+    {
+        return $this->stateOptions;
+    }
+
+    public function withStateOptions(?OptionsInterface $stateOptions): self
+    {
+        $self = clone $this;
+        $self->stateOptions = $stateOptions;
 
         return $self;
     }

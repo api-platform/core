@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\GraphQl;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\State\OptionsInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class QueryCollection extends Query implements CollectionOperationInterface
@@ -71,6 +72,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         $provider = null,
         $processor = null,
         array $extraProperties = [],
+        protected ?OptionsInterface $stateOptions = null,
 
         protected ?bool $nested = null,
     ) {

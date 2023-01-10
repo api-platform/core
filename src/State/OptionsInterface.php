@@ -11,9 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\GraphQl;
+namespace ApiPlatform\State;
 
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class Mutation extends Operation
+interface OptionsInterface
 {
 }
