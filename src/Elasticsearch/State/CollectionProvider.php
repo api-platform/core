@@ -14,19 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
+use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Util\Inflector;
 use Elasticsearch\Client;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Collection provider for Elasticsearch.
- *
- * @experimental
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
@@ -46,7 +46,6 @@ final class CollectionProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): Paginator
     {
         $resourceClass = $operation->getClass();
-        $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {
@@ -60,13 +59,21 @@ final class CollectionProvider implements ProviderInterface
         $limit = $body['size'] ??= $this->pagination->getLimit($operation, $context);
         $offset = $body['from'] ??= $this->pagination->getOffset($operation, $context);
 
+        $index = Inflector::tableize($operation->getShortName());
+        $options = $operation->getStateOptions() instanceof Options ? $operation->getStateOptions() : new Options(index: $index);
+
+        // TODO: remove in 4.x
+        if ($operation->getElasticsearch() && !$operation->getStateOptions()) {
+            $options = $this->convertDocumentMetadata($this->documentMetadataFactory->create($resourceClass));
+        }
+
         $params = [
-            'index' => $documentMetadata->getIndex(),
+            'index' => $options->getIndex() ?? $index,
             'body' => $body,
         ];
 
-        if (ElasticsearchVersion::supportsMappingType()) {
-            $params['type'] = $documentMetadata->getType();
+        if (null !== $options->getType() && ElasticsearchVersion::supportsMappingType()) {
+            $params['type'] = $options->getType();
         }
 
         $documents = $this->client->search($params);
@@ -79,5 +86,10 @@ final class CollectionProvider implements ProviderInterface
             $offset,
             $context
         );
+    }
+
+    private function convertDocumentMetadata(DocumentMetadata $documentMetadata): Options
+    {
+        return new Options($documentMetadata->getIndex(), $documentMetadata->getType());
     }
 }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -122,6 +123,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'uriVariables' => $this->buildUriVariables($resource),
             'inputFormats' => $this->buildArrayValue($resource, 'inputFormats'),
             'outputFormats' => $this->buildArrayValue($resource, 'outputFormats'),
+            'stateOptions' => $this->buildStateOptions($resource),
         ]);
     }
 
@@ -364,5 +366,25 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $data ?: null;
+    }
+
+    private function buildStateOptions(array $resource): ?Options
+    {
+        $stateOptions = $resource['stateOptions'] ?? [];
+        if (!\is_array($stateOptions)) {
+            return null;
+        }
+
+        if (!$stateOptions) {
+            return null;
+        }
+
+        $configuration = reset($stateOptions);
+        switch (key($stateOptions)) {
+            case 'elasticsearchOptions':
+                return new Options($configuration['index'] ?? null, $configuration['type'] ?? null);
+        }
+
+        return null;
     }
 }

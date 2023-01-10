@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\State\OptionsInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class GetCollection extends HttpOperation implements CollectionOperationInterface
@@ -96,9 +97,10 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         $provider = null,
         $processor = null,
         array $extraProperties = [],
-        ?string $itemUriTemplate = null
+        ?string $itemUriTemplate = null,
+        ?OptionsInterface $stateOptions = null,
     ) {
-        parent::__construct(self::METHOD_GET, ...\func_get_args());
+        parent::__construct(self::METHOD_GET, $uriTemplate, $types, $formats, $inputFormats, $outputFormats, $uriVariables, $routePrefix, $routeName, $defaults, $requirements, $options, $stateless, $sunset, $acceptPatch, $status, $host, $schemes, $condition, $controller, $cacheHeaders, $hydraContext, $openapiContext, $openapi, $exceptionToStatus, $queryParameterValidationEnabled, $shortName, $class, $paginationEnabled, $paginationType, $paginationItemsPerPage, $paginationMaximumItemsPerPage, $paginationPartial, $paginationClientEnabled, $paginationClientItemsPerPage, $paginationClientPartial, $paginationFetchJoinCollection, $paginationUseOutputWalkers, $paginationViaCursor, $order, $description, $normalizationContext, $denormalizationContext, $security, $securityMessage, $securityPostDenormalize, $securityPostDenormalizeMessage, $securityPostValidation, $securityPostValidationMessage, $deprecationReason, $filters, $validationContext, $input, $output, $mercure, $messenger, $elasticsearch, $urlGenerationStrategy, $read, $deserialize, $validate, $write, $serialize, $fetchPartial, $forceEager, $priority, $name, $provider, $processor, $extraProperties, $stateOptions);
         $this->itemUriTemplate = $itemUriTemplate;
     }
 

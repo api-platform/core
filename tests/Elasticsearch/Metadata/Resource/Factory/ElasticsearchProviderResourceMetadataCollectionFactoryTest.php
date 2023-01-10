@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\Metadata\Resource\Factory;
 
 use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory;
+use ApiPlatform\Elasticsearch\State\OptionsInterface;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
@@ -25,13 +25,19 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Namespaces\CatNamespace;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
+/**
+ * @group legacy
+ */
 class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     public function testConstruct(): void
     {
+        $this->expectDeprecation('Since api-platform/core 3.1: ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory is deprecated and will be removed in v4');
         self::assertInstanceOf(
             ResourceMetadataCollectionFactoryInterface::class,
             new ElasticsearchProviderResourceMetadataCollectionFactory(
@@ -41,11 +47,19 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
         );
     }
 
-    /** @dataProvider elasticsearchProvider */
+    /**
+     * @dataProvider elasticsearchProvider
+     */
     public function testCreate(?bool $elasticsearchFlag, int $expectedCatCallCount, ?bool $expectedResult): void
     {
-        $get = (new Get())->withShortName('Foo')->withElasticsearch($elasticsearchFlag);
-        $resource = (new ApiResource())->withOperations(new Operations(['foo_get' => $get]));
+        if (null !== $elasticsearchFlag) {
+            $solution = $elasticsearchFlag
+                ? sprintf('Pass an instance of %s to $stateOptions instead', OptionsInterface::class)
+                : 'You will have to remove it when upgrading to v4';
+            $this->expectDeprecation(sprintf('Since api-platform/core 3.1: Setting "elasticsearch" in Operation is deprecated. %s', $solution));
+        }
+        $get = (new Get(elasticsearch: $elasticsearchFlag, shortName: 'Foo'));
+        $resource = (new ApiResource(operations: ['foo_get' => $get]));
         $metadata = new ResourceMetadataCollection(Foo::class, [$resource]);
 
         $decorated = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -72,7 +86,7 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
         $client = $this->prophesize(Client::class);
         $client->cat()->willReturn($catNamespace)->shouldBeCalledTimes($expectedCatCallCount);
 
-        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($client->reveal(), $decorated->reveal());
+        $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($client->reveal(), $decorated->reveal(), false);
         $elasticsearchResult = $resourceMetadataFactory->create(Foo::class)->getOperation('foo_get')->getElasticsearch();
         self::assertEquals($expectedResult, $elasticsearchResult);
     }

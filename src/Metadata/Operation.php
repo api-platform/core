@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\State\OptionsInterface;
+
 abstract class Operation
 {
     use WithResourceTrait;
@@ -90,7 +92,8 @@ abstract class Operation
         protected ?string $name = null,
         $provider = null,
         $processor = null,
-        protected array $extraProperties = []
+        protected array $extraProperties = [],
+        protected ?OptionsInterface $stateOptions = null,
     ) {
         $this->input = $input;
         $this->output = $output;
@@ -687,6 +690,19 @@ abstract class Operation
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;
+
+        return $self;
+    }
+
+    public function getStateOptions(): ?OptionsInterface
+    {
+        return $this->stateOptions;
+    }
+
+    public function withStateOptions(?OptionsInterface $stateOptions): self
+    {
+        $self = clone $this;
+        $self->stateOptions = $stateOptions;
 
         return $self;
     }

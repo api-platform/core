@@ -19,7 +19,7 @@ use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 /**
  * Creates document's metadata using the mapping configuration.
  *
- * @experimental
+ * @deprecated
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */

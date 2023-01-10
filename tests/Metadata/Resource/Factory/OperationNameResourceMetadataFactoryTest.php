@@ -42,15 +42,15 @@ class OperationNameResourceMetadataFactoryTest extends TestCase
         $this->assertEquals($operation->withName($expectedOperationName), $result->getOperation($expectedOperationName));
     }
 
-public function operationProvider(): array
-{
-    return [
-        [new Get(), '_api_a_get'],
-        [new Get(shortName: 'Foo'), '_api_Foo_get'],
-        [new Get(name: 'test'), 'test'],
-        [new Get(routePrefix: 'foo'), '_api_foo_get'],
-        [new Get(uriTemplate: '/foo'), '_api_/foo_get'],
-        [new Get(routePrefix: '/admin', uriTemplate: '/foo'), '_api_/admin/foo_get'],
-    ];
-}
+    public function operationProvider(): array
+    {
+        return [
+            [new Get(), '_api_a_get'],
+            [new Get(shortName: 'Foo'), '_api_Foo_get'],
+            [new Get(name: 'test'), 'test'],
+            [new Get(routePrefix: 'foo'), '_api_foo_get'],
+            [new Get(uriTemplate: '/foo'), '_api_/foo_get'],
+            [new Get(routePrefix: '/admin', uriTemplate: '/foo'), '_api_/admin/foo_get'],
+        ];
+    }
 }

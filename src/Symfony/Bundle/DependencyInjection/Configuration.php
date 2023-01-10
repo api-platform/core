@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiResource;
@@ -422,6 +423,7 @@ final class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                         ->arrayNode('mapping')
+                            ->setDeprecated('api-platform/core', '3.1', sprintf('The "%%node%%" option is deprecated. Configure an %s as $stateOptions.', Options::class))
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('resource_class')
                             ->prototype('array')

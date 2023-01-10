@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\GraphQl;
 
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation as AbstractOperation;
+use ApiPlatform\State\OptionsInterface;
 
 class Operation extends AbstractOperation
 {
@@ -74,7 +75,8 @@ class Operation extends AbstractOperation
         ?string $name = null,
         ?string $provider = null,
         ?string $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        protected ?OptionsInterface $stateOptions = null,
     ) {
         // Abstract operation properties
         $this->shortName = $shortName;

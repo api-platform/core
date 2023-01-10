@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -96,6 +97,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'paginationViaCursor' => $this->buildPaginationViaCursor($resource),
             'exceptionToStatus' => $this->buildExceptionToStatus($resource),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
+            'stateOptions' => $this->buildStateOptions($resource),
         ]);
     }
 
@@ -449,5 +451,22 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $data;
+    }
+
+    private function buildStateOptions(\SimpleXMLElement $resource): ?Options
+    {
+        $stateOptions = $resource->stateOptions ?? null;
+        if (!$stateOptions) {
+            return null;
+        }
+        $elasticsearchOptions = $stateOptions->elasticsearchOptions ?? null;
+        if ($elasticsearchOptions) {
+            return new Options(
+                isset($elasticsearchOptions['index']) ? (string) $elasticsearchOptions['index'] : null,
+                isset($elasticsearchOptions['type']) ? (string) $elasticsearchOptions['type'] : null,
+            );
+        }
+
+        return null;
     }
 }

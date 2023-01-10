@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\State\OptionsInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Delete extends HttpOperation implements DeleteOperationInterface
@@ -93,7 +94,8 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        ?OptionsInterface $stateOptions = null,
     ) {
         parent::__construct(self::METHOD_DELETE, ...\func_get_args());
     }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\State\OptionsInterface;
 
 /**
  * A NotExposed operation is an operation declared for internal usage,
@@ -101,7 +102,8 @@ final class NotExposed extends HttpOperation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
+        ?OptionsInterface $stateOptions = null,
     ) {
         parent::__construct(...\func_get_args());
 
