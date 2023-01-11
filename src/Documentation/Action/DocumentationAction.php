@@ -38,10 +38,10 @@ final class DocumentationAction
                 $context['api_gateway'] = true;
             }
             $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
-        }
 
-        if ('json' === $request?->getRequestFormat() && null !== $this->openApiFactory) {
-            return $this->openApiFactory->__invoke($context ?? []);
+            if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory) {
+                return $this->openApiFactory->__invoke($context);
+            }
         }
 
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);

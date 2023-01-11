@@ -58,8 +58,6 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument>null</argument>
-            <argument type="collection"/> <!-- default context -->
-
 
             <!-- Run after api_platform.jsonld.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->
             <tag name="serializer.normalizer" priority="-985" />

@@ -57,7 +57,7 @@ class ValidationExceptionListenerTest extends TestCase
         $list = new ConstraintViolationList([]);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize($list, 'hydra')->willReturn($exceptionJson)->shouldBeCalled();
+        $serializerProphecy->serialize($list, 'hydra', [])->willReturn($exceptionJson)->shouldBeCalled();
 
         $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
         $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new ValidationException($list));
@@ -89,7 +89,7 @@ class ValidationExceptionListenerTest extends TestCase
         };
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize($constraintViolationList, 'hydra')->willReturn($serializedConstraintViolationList)->shouldBeCalledOnce();
+        $serializerProphecy->serialize($constraintViolationList, 'hydra', [])->willReturn($serializedConstraintViolationList)->shouldBeCalledOnce();
 
         $exceptionEvent = new ExceptionEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -120,10 +120,31 @@ class ValidationExceptionListenerTest extends TestCase
         $exception = new FilterValidationException([], 'my message');
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize($exception, 'hydra')->willReturn($exceptionJson)->shouldBeCalled();
+        $serializerProphecy->serialize($exception, 'hydra', [])->willReturn($exceptionJson)->shouldBeCalled();
 
         $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
         $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, $exception);
+        $listener->onKernelException($event);
+
+        $response = $event->getResponse();
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame($exceptionJson, $response->getContent());
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $this->assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertSame('deny', $response->headers->get('X-Frame-Options'));
+    }
+
+    public function testValidationExceptionWithHydraTitle(): void
+    {
+        $exceptionJson = '{"foo": "bar"}';
+        $list = new ConstraintViolationList([]);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($list, 'hydra', ['title' => 'foo'])->willReturn($exceptionJson)->shouldBeCalled();
+
+        $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new ValidationException($list, errorTitle: 'foo'));
         $listener->onKernelException($event);
 
         $response = $event->getResponse();

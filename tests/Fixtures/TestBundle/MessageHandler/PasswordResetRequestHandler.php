@@ -16,9 +16,10 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\MessageHandler;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-class PasswordResetRequestHandler implements MessageHandlerInterface
+#[AsMessageHandler]
+class PasswordResetRequestHandler
 {
     public function __invoke(PasswordResetRequest $passwordResetRequest): PasswordResetRequestResult
     {

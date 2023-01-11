@@ -15,9 +15,10 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MessengerResponseInput;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-class MessengerWithResponseHandler implements MessageHandlerInterface
+#[AsMessageHandler]
+class MessengerWithResponseHandler
 {
     public function __invoke(MessengerResponseInput $data): Response
     {

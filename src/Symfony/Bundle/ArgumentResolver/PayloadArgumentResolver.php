@@ -18,10 +18,10 @@ use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-final class PayloadArgumentResolver implements ArgumentValueResolverInterface
+final class PayloadArgumentResolver implements ValueResolverInterface
 {
     use OperationRequestInitiatorTrait;
 
@@ -59,6 +59,10 @@ final class PayloadArgumentResolver implements ArgumentValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument): \Generator
     {
+        if (!$this->supports($request, $argument)) {
+            yield [];
+        }
+
         yield $request->attributes->get('data');
     }
 

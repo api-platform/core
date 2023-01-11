@@ -97,7 +97,7 @@ final class PublishMercureUpdatesListener
     public function onFlush(EventArgs $eventArgs): void
     {
         if ($eventArgs instanceof OrmOnFlushEventArgs) {
-            $uow = $eventArgs->getEntityManager()->getUnitOfWork();
+            $uow = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager()->getUnitOfWork() : $eventArgs->getEntityManager()->getUnitOfWork();
         } elseif ($eventArgs instanceof MongoDbOdmOnFlushEventArgs) {
             $uow = $eventArgs->getDocumentManager()->getUnitOfWork();
         } else {

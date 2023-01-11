@@ -60,6 +60,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
@@ -116,8 +117,11 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
         include:
           - php: '8.1'
+            coverage: true
+          - php: '8.2'
             coverage: true
       fail-fast: false
     steps:
@@ -168,6 +172,7 @@ jobs:
         if: matrix.coverage
         uses: codecov/codecov-action@v3
         with:
+          directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
           fail_ci_if_error: true
@@ -190,8 +195,11 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
         include:
           - php: '8.1'
+            coverage: true
+          - php: '8.2'
             coverage: true
       fail-fast: false
     steps:
@@ -250,6 +258,7 @@ jobs:
         if: matrix.coverage
         uses: codecov/codecov-action@v3
         with:
+          directory: build/logs/behat
           name: behat-php${{ matrix.php }}
           flags: behat
           fail_ci_if_error: true
@@ -292,6 +301,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: postgres
@@ -341,6 +351,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     services:
       mysql:
@@ -390,6 +401,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: mongodb
@@ -459,6 +471,7 @@ jobs:
       - name: Upload coverage results to Codecov
         uses: codecov/codecov-action@v3
         with:
+          directory: build/logs/behat
           name: behat-php${{ matrix.php }}
           flags: behat
           fail_ci_if_error: true
@@ -480,6 +493,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: elasticsearch
@@ -530,6 +544,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       SYMFONY_DEPRECATIONS_HELPER: max[total]=0
@@ -570,6 +585,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     # env:
       # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
@@ -580,7 +596,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: ${{ matrix.php }}
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
@@ -615,6 +631,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     steps:
       - name: Checkout
@@ -622,7 +639,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: ${{ matrix.php }}
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
@@ -659,6 +676,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: sqlite
@@ -701,6 +719,7 @@ jobs:
       matrix:
         php:
           - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: sqlite
