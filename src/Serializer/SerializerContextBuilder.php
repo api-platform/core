@@ -39,6 +39,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         if (null === $attributes && !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             throw new RuntimeException('Request attributes are not valid.');
         }
+
         $operation = $attributes['operation'] ?? $this->resourceMetadataFactory->create($attributes['resource_class'])->getOperation($attributes['operation_name']);
         $context = $normalization ? ($operation->getNormalizationContext() ?? []) : ($operation->getDenormalizationContext() ?? []);
         $context['operation_name'] = $operation->getName();

@@ -15,11 +15,10 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\UuidInterface;
 
-/**
- * DummyWithCollectDenormalizationErrors.
- */
 #[ApiResource(
     operations: [
         new Post(uriTemplate: 'dummy_collect_denormalization'),
@@ -40,6 +39,27 @@ class DummyWithCollectDenormalizationErrors
     #[ORM\Column(nullable: true)]
     public ?int $bar;
 
+    #[ORM\Column(nullable: true)]
+    private ?string $baz;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $qux;
+
+    #[ORM\Column(type: 'uuid', nullable: true)]
+    public ?UuidInterface $uuid = null;
+
+    #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
+    public ?RelatedDummy $relatedDummy = null;
+
+    #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
+    public Collection|iterable $relatedDummies;
+
+    public function __construct(string $baz, ?string $qux = null)
+    {
+        $this->baz = $baz;
+        $this->qux = $qux;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -47,7 +67,7 @@ class DummyWithCollectDenormalizationErrors
 
    public function getFoo(): ?bool
    {
-        return $this->foo;
+       return $this->foo;
    }
 
     public function setFoo(?bool $foo): void

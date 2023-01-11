@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\EventListener\DeserializeListener;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -27,9 +28,11 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -322,15 +325,14 @@ class DeserializeListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
             new ApiResource(operations: [
-                'put' => new Put(inputFormats: self::FORMATS),
                 'post' => new Post(inputFormats: self::FORMATS),
             ]),
         ]));
-        $notNormalizableValueException = \Symfony\Component\Serializer\Exception\NotNormalizableValueException::createForUnexpectedDataType('', [], ['bool'], 'foo', false, 0);
+        $notNormalizableValueException = NotNormalizableValueException::createForUnexpectedDataType('Message for user (hint)', [], ['bool', 'string'], 'foo', true, 0);
         $partialDenormalizationException = new PartialDenormalizationException('', [$notNormalizableValueException]);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->deserialize(Argument::cetera())->shouldBeCalled()->willThrow($partialDenormalizationException);
+        $serializerProphecy->deserialize(Argument::cetera())->willThrow($partialDenormalizationException);
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn(['input' => ['class' => 'Foo'], 'output' => ['class' => 'Foo'], 'resource_class' => 'Foo']);
@@ -339,24 +341,27 @@ class DeserializeListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/json');
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
 
         $listener = new DeserializeListener(
             $serializerProphecy->reveal(),
             $serializerContextBuilderProphecy->reveal(),
-            $resourceMetadataFactoryProphecy->reveal()
+            $resourceMetadataFactoryProphecy->reveal(),
+            new IdentityTranslator(),
         );
 
         try {
             $listener->onKernelRequest($eventProphecy->reveal());
             $this->fail('Test failed, a ValidationException should have been thrown');
-        } catch (\ApiPlatform\Symfony\Validator\Exception\ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->assertCount(1, $e->getConstraintViolationList());
             $list = $e->getConstraintViolationList();
             $violation = $list->get(0);
-            $this->assertSame($violation->getMessage(), 'The type of the "foo" attribute must be "bool", "array" given.');
-            $this->assertEmpty($violation->getMessageTemplate());
-            $this->assertIsArray($violation->getParameters());
+            $this->assertSame($violation->getMessage(), 'This value should be of type bool|string.');
+            $this->assertSame($violation->getMessageTemplate(), 'This value should be of type {{ type }}.');
+            $this->assertSame([
+                'hint' => 'Message for user (hint)',
+            ], $violation->getParameters());
             $this->assertNull($violation->getRoot());
             $this->assertSame($violation->getPropertyPath(), 'foo');
             $this->assertNull($violation->getInvalidValue());

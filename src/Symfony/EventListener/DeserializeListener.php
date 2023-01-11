@@ -26,8 +26,12 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorTrait;
 
 /**
  * Updates the entity retrieved by the data provider with data contained in the request body.
@@ -40,9 +44,15 @@ final class DeserializeListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'deserialize';
 
-    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
+        if (null === $this->translator) {
+            $this->translator = new class() implements TranslatorInterface, LocaleAwareInterface {
+                use TranslatorTrait;
+            };
+            $this->translator->setLocale('en');
+        }
     }
 
     /**
@@ -88,12 +98,12 @@ final class DeserializeListener
                 if (!$exception instanceof NotNormalizableValueException) {
                     continue;
                 }
-                $message = sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $exception->getPath(), implode(', ', $exception->getExpectedTypes() ?? []), $exception->getCurrentType());
+                $message = (new Type($exception->getExpectedTypes() ?? []))->message;
                 $parameters = [];
                 if ($exception->canUseMessageForUser()) {
                     $parameters['hint'] = $exception->getMessage();
                 }
-                $violations->add(new ConstraintViolation($message, '', $parameters, null, $exception->getPath(), null, null, (string) $exception->getCode()));
+                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $exception->getExpectedTypes() ?? [])], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) $exception->getCode()));
             }
             if (0 !== \count($violations)) {
                 throw new ValidationException($violations);

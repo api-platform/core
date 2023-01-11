@@ -29,7 +29,7 @@ final class UuidDenormalizer implements DenormalizerInterface
         try {
             return Uuid::fromString($data);
         } catch (InvalidUuidStringException $e) {
-            throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
+            throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, ['uuid'], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
         }
     }
 

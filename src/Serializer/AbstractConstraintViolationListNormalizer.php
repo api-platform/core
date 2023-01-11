@@ -62,6 +62,10 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
                 'code' => $violation->getCode(),
             ];
 
+            if ($hint = $violation->getParameters()['hint'] ?? false) {
+                $violationData['hint'] = $hint;
+            }
+
             $constraint = $violation instanceof ConstraintViolation ? $violation->getConstraint() : null;
             if (
                 [] !== $this->serializePayloadFields &&

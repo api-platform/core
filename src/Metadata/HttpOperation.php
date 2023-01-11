@@ -121,6 +121,7 @@ class HttpOperation extends Operation
         ?string $description = null,
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
+        ?bool $collectDenormalizationErrors = null,
         ?string $security = null,
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
@@ -149,7 +150,6 @@ class HttpOperation extends Operation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array $extraProperties = [],
-        ?bool $collectDenormalizationErrors = null,
     ) {
         $this->shortName = $shortName;
         $this->description = $description;
@@ -158,6 +158,7 @@ class HttpOperation extends Operation
         $this->deprecationReason = $deprecationReason;
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
+        $this->collectDenormalizationErrors = $collectDenormalizationErrors;
         $this->validationContext = $validationContext;
         $this->filters = $filters;
         $this->elasticsearch = $elasticsearch;
@@ -196,7 +197,6 @@ class HttpOperation extends Operation
         $this->processor = $processor;
         $this->extraProperties = $extraProperties;
         $this->stateOptions = $stateOptions;
-        $this->collectDenormalizationErrors = $collectDenormalizationErrors;
     }
 
     public function getMethod(): ?string
@@ -564,19 +564,6 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
-
-        return $self;
-    }
-
-    public function getCollectDenormalizationErrors(): ?bool
-    {
-        return $this->collectDenormalizationErrors;
-    }
-
-    public function withCollectDenormalizationErrors(bool $collectDenormalizationErrors = null): self
-    {
-        $self = clone $this;
-        $self->collectDenormalizationErrors = $collectDenormalizationErrors;
 
         return $self;
     }
