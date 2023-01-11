@@ -18,63 +18,121 @@ use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-final class PayloadArgumentResolver implements ValueResolverInterface
-{
-    use OperationRequestInitiatorTrait;
-
-    public function __construct(
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
-        private readonly SerializerContextBuilderInterface $serializationContextBuilder
-    ) {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-    }
-
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+if(class_exists(ValueResolverInterface::class)) {
+    final class PayloadArgumentResolver implements ValueResolverInterface
     {
-        if ($argument->isVariadic()) {
-            return false;
+        use OperationRequestInitiatorTrait;
+
+        public function __construct(
+            ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+            private readonly SerializerContextBuilderInterface $serializationContextBuilder
+        ) {
+            $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         }
 
-        $class = $argument->getType();
+        public function supports(Request $request, ArgumentMetadata $argument): bool
+        {
+            if ($argument->isVariadic()) {
+                return false;
+            }
 
-        if (null === $class) {
-            return false;
+            $class = $argument->getType();
+
+            if (null === $class) {
+                return false;
+            }
+
+            if (null === $request->attributes->get('data')) {
+                return false;
+            }
+
+            $inputClass = $this->getExpectedInputClass($request);
+
+            if (null === $inputClass) {
+                return false;
+            }
+
+            return $inputClass === $class || is_subclass_of($inputClass, $class);
         }
 
-        if (null === $request->attributes->get('data')) {
-            return false;
+        public function resolve(Request $request, ArgumentMetadata $argument): \Generator
+        {
+            if (!$this->supports($request, $argument)) {
+                yield [];
+            }
+
+            yield $request->attributes->get('data');
         }
 
-        $inputClass = $this->getExpectedInputClass($request);
+        private function getExpectedInputClass(Request $request): ?string
+        {
+            $operation = $this->initializeOperation($request);
+            if (Request::METHOD_DELETE === $request->getMethod() || $request->isMethodSafe() || !($operation?->canDeserialize() ?? true)) {
+                return null;
+            }
 
-        if (null === $inputClass) {
-            return false;
+            $context = $this->serializationContextBuilder->createFromRequest($request, false, RequestAttributesExtractor::extractAttributes($request));
+
+            return $context['input']['class'] ?? $context['resource_class'] ?? null;
         }
-
-        return $inputClass === $class || is_subclass_of($inputClass, $class);
     }
-
-    public function resolve(Request $request, ArgumentMetadata $argument): \Generator
+} else {
+    final class PayloadArgumentResolver implements ArgumentValueResolverInterface
     {
-        if (!$this->supports($request, $argument)) {
-            yield [];
+        use OperationRequestInitiatorTrait;
+
+        public function __construct(
+            ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+            private readonly SerializerContextBuilderInterface $serializationContextBuilder
+        ) {
+            $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         }
 
-        yield $request->attributes->get('data');
-    }
+        public function supports(Request $request, ArgumentMetadata $argument): bool
+        {
+            if ($argument->isVariadic()) {
+                return false;
+            }
 
-    private function getExpectedInputClass(Request $request): ?string
-    {
-        $operation = $this->initializeOperation($request);
-        if (Request::METHOD_DELETE === $request->getMethod() || $request->isMethodSafe() || !($operation?->canDeserialize() ?? true)) {
-            return null;
+            $class = $argument->getType();
+
+            if (null === $class) {
+                return false;
+            }
+
+            if (null === $request->attributes->get('data')) {
+                return false;
+            }
+
+            $inputClass = $this->getExpectedInputClass($request);
+
+            if (null === $inputClass) {
+                return false;
+            }
+
+            return $inputClass === $class || is_subclass_of($inputClass, $class);
         }
 
-        $context = $this->serializationContextBuilder->createFromRequest($request, false, RequestAttributesExtractor::extractAttributes($request));
+        public function resolve(Request $request, ArgumentMetadata $argument): \Generator
+        {
+            yield $request->attributes->get('data');
+        }
 
-        return $context['input']['class'] ?? $context['resource_class'] ?? null;
+        private function getExpectedInputClass(Request $request): ?string
+        {
+            $operation = $this->initializeOperation($request);
+            if (Request::METHOD_DELETE === $request->getMethod() || $request->isMethodSafe() || !($operation?->canDeserialize() ?? true)) {
+                return null;
+            }
+
+            $context = $this->serializationContextBuilder->createFromRequest($request, false, RequestAttributesExtractor::extractAttributes($request));
+
+            return $context['input']['class'] ?? $context['resource_class'] ?? null;
+        }
     }
 }
+
