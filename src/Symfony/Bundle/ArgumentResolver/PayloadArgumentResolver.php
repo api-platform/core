@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-if(class_exists(ValueResolverInterface::class)) {
+if (class_exists(ValueResolverInterface::class)) {
     final class PayloadArgumentResolver implements ValueResolverInterface
     {
         use OperationRequestInitiatorTrait;
@@ -135,4 +135,3 @@ if(class_exists(ValueResolverInterface::class)) {
         }
     }
 }
-
