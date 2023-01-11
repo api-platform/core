@@ -71,8 +71,8 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = [],
         protected ?OptionsInterface $stateOptions = null,
+        array $extraProperties = [],
 
         protected ?bool $nested = null,
     ) {

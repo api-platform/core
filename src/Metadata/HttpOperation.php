@@ -147,8 +147,8 @@ class HttpOperation extends Operation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = [],
         ?OptionsInterface $stateOptions = null,
+        array $extraProperties = [],
     ) {
         $this->shortName = $shortName;
         $this->description = $description;

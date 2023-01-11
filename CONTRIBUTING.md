@@ -56,6 +56,8 @@ Be sure to add only **your modified files**. If any other file is fixed by cs to
 
 API Platform is following the [Symfony Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
 
+As users need to use named arguments when using our attributes, they don't follow the backward compatibility rules applied to the constructor.
+
 When you are making a change, make sure no BC break is added.
 
 ### Deprecating Code
