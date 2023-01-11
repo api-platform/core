@@ -184,7 +184,7 @@ Feature: GraphQL subscription support
     And the JSON node "data.updateDummyMercureSubscribe.dummyMercure.id" should be equal to "/dummy_mercures/2"
     And the JSON node "data.updateDummyMercureSubscribe.mercureUrl" should match "@^https://demo.mercure.rocks/hub\?topic=http://example.com/subscriptions/[a-f0-9]+$@"
 
-  Scenario: Receive Mercure updates with different payloads from subscriptions
+  Scenario: Receive Mercure updates with different payloads from subscriptions (legacy PUT in non-standard mode)
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/dummy_mercures/1" with body:

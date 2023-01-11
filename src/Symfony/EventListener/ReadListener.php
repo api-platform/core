@@ -16,6 +16,8 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -38,10 +40,12 @@ final class ReadListener
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
-    public const OPERATION_ATTRIBUTE_KEY = 'read';
-
-    public function __construct(private readonly ProviderInterface $provider, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null, UriVariablesConverterInterface $uriVariablesConverter = null)
-    {
+    public function __construct(
+        private readonly ProviderInterface $provider,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
+        UriVariablesConverterInterface $uriVariablesConverter = null,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
     }
@@ -90,7 +94,13 @@ final class ReadListener
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
         }
 
-        if (null === $data) {
+        if (
+            null === $data &&
+            (
+                HttpOperation::METHOD_PUT !== $operation->getMethod() ||
+                ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
+            )
+        ) {
             throw new NotFoundHttpException('Not Found');
         }
 

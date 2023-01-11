@@ -64,6 +64,8 @@ api_platform:
             xkey: 
                 glue: ' '
     defaults:
+        extra_properties:
+            standard_put: true
         normalization_context: 
             skip_null_values: false
         pagination_client_enabled:            true

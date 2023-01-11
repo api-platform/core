@@ -147,9 +147,33 @@ Feature: Using custom normalized entity
     }
     """
 
-  Scenario: Update a resource
+  Scenario: Update a resource (legacy non-standard PUT)
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/custom_normalized_dummies/1" with body:
+    """
+    {
+      "name": "My Dummy modified"
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/custom_normalized_dummies/1"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/CustomNormalizedDummy",
+      "@id": "/custom_normalized_dummies/1",
+      "@type": "CustomNormalizedDummy",
+      "id": 1,
+      "name": "My Dummy modified",
+      "alias": "My alias"
+    }
+    """
+
+  Scenario: Update a resource
+    When I add "Content-Type" header equal to "application/merge-patch+json"
+    And I send a "PATCH" request to "/custom_normalized_dummies/1" with body:
     """
     {
       "name": "My Dummy modified"

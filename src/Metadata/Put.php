@@ -97,7 +97,20 @@ final class Put extends HttpOperation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array $extraProperties = [],
+        private ?bool $allowCreate = null,
     ) {
-        parent::__construct(self::METHOD_PUT, ...\func_get_args());
+        $args = \func_get_args();
+        parent::__construct(self::METHOD_PUT, ...$args);
+        $this->allowCreate = $allowCreate;
+    }
+
+    public function withAllowCreate(bool $allowCreate): void
+    {
+        $this->allowCreate = $allowCreate;
+    }
+
+    public function getAllowCreate(): ?bool
+    {
+        return $this->allowCreate;
     }
 }

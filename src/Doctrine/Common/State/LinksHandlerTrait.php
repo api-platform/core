@@ -20,9 +20,12 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 trait LinksHandlerTrait
 {
+    private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+
     /**
      * @return Link[]
      */
@@ -46,6 +49,10 @@ trait LinksHandlerTrait
 
         if ($newLink) {
             return [$newLink];
+        }
+
+        if (!$this->resourceMetadataCollectionFactory) {
+            return [];
         }
 
         // Using GraphQL, it's possible that we won't find a GraphQL Operation of the same type (e.g. it is disabled).

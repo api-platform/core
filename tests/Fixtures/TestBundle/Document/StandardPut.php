@@ -14,21 +14,28 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Kévin Dunglas <kevin@dunglas.fr>
  */
-#[ApiResource(mercure: true, extraProperties: ['standard_put' => false])]
+#[ApiResource(
+    operations: [new Get(), new Put(allowCreate: true)],
+    extraProperties: [
+        'standard_put' => true,
+    ]
+)]
 #[ODM\Document]
-class DummyMercure
+class StandardPut
 {
-    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
-    public $id;
-    #[ODM\Field(type: 'string')]
-    public $name;
-    #[ODM\Field(type: 'string')]
-    public $description;
-    #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
-    public $relatedDummy;
+    #[ODM\Id(strategy: 'NONE', type: 'int')]
+    public ?int $id = null;
+
+    #[ODM\Field]
+    public string $foo = '';
+
+    #[ODM\Field]
+    public string $bar = '';
 }

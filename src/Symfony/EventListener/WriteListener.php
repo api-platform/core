@@ -39,10 +39,13 @@ final class WriteListener
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
-    public const OPERATION_ATTRIBUTE_KEY = 'write';
-
-    public function __construct(private readonly ProcessorInterface $processor, private readonly IriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?UriVariablesConverterInterface $uriVariablesConverter = null)
-    {
+    public function __construct(
+        private readonly ProcessorInterface $processor,
+        private readonly IriConverterInterface $iriConverter,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?UriVariablesConverterInterface $uriVariablesConverter = null,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
     }
@@ -64,7 +67,7 @@ final class WriteListener
             return;
         }
 
-        if (!($operation?->canWrite() ?? true) || !$attributes['persist']) {
+        if (!$attributes['persist'] || !($operation?->canWrite() ?? true)) {
             return;
         }
 
@@ -72,7 +75,12 @@ final class WriteListener
             return;
         }
 
-        $context = ['operation' => $operation, 'resource_class' => $attributes['resource_class'], 'previous_data' => $attributes['previous_data'] ?? null];
+        $context = [
+            'operation' => $operation,
+            'resource_class' => $attributes['resource_class'],
+            'previous_data' => $attributes['previous_data'] ?? null,
+        ];
+
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
         } catch (InvalidIdentifierException $e) {

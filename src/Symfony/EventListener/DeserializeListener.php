@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\FormatMatcher;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -69,7 +70,14 @@ final class DeserializeListener
 
         $format = $this->getFormat($request, $operation?->getInputFormats() ?? []);
         $data = $request->attributes->get('data');
-        if (null !== $data) {
+        if (
+            null !== $data &&
+            (
+                HttpOperation::METHOD_POST === $method ||
+                HttpOperation::METHOD_PATCH === $method ||
+                (HttpOperation::METHOD_PUT === $method && !($operation->getExtraProperties()['standard_put'] ?? false))
+            )
+        ) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
 
