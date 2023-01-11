@@ -55,7 +55,7 @@ final class PersistProcessor implements ProcessorInterface
             // TODO: the call to getReference is most likely to fail with complex identifiers
             $newData = $data;
             if (isset($context['previous_data'])) {
-                $newData = 1 === \count($uriVariables) ? $manager->getReference($class, $uriVariables) : clone $context['previous_data'];
+                $newData = 1 === \count($uriVariables) ? $manager->getReference($class, current($uriVariables)) : clone $context['previous_data'];
             }
 
             $identifiers = array_reverse($uriVariables);

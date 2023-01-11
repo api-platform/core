@@ -25,7 +25,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 #[ODM\Document]
 class SoMany
 {
-    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    #[ODM\Id(strategy: 'NONE', type: 'int')]
     public $id;
     #[ODM\Field(nullable: true)]
     public $content;
