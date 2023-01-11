@@ -172,6 +172,7 @@ jobs:
         if: matrix.coverage
         uses: codecov/codecov-action@v3
         with:
+          directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
           fail_ci_if_error: true
@@ -257,6 +258,7 @@ jobs:
         if: matrix.coverage
         uses: codecov/codecov-action@v3
         with:
+          directory: build/logs/behat
           name: behat-php${{ matrix.php }}
           flags: behat
           fail_ci_if_error: true
@@ -469,6 +471,7 @@ jobs:
       - name: Upload coverage results to Codecov
         uses: codecov/codecov-action@v3
         with:
+          directory: build/logs/behat
           name: behat-php${{ matrix.php }}
           flags: behat
           fail_ci_if_error: true
