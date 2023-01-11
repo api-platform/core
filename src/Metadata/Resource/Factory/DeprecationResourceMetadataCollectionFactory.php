@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
@@ -31,8 +32,8 @@ class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCo
 
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operation) {
-                if (!($operation->getExtraProperties()['standard_put'] ?? false)) {
-                    $this->triggerDeprecationOnce($operation, 'standard_put', 'In API Platform 4 the "standard_put" option will default to "true". Set it on every operation to avoid breaking PUT\'s behavior.');
+                if ($operation instanceof Put && !($operation->getExtraProperties()['standard_put'] ?? false)) {
+                    $this->triggerDeprecationOnce($operation, 'extraProperties["standard_put"]', 'In API Platform 4 PUT will always replace the data, use extraProperties["standard_put"] to "true" on every operation to avoid breaking PUT\'s behavior. Use PATCH to use the old behavior.');
                 }
             }
         }
