@@ -17,6 +17,7 @@ use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -97,7 +98,7 @@ final class ReadListener
             null === $data &&
             (
                 HttpOperation::METHOD_PUT !== $operation->getMethod() ||
-                !($operation->getAllowCreate() ?? false)
+                ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
             )
         ) {
             throw new NotFoundHttpException('Not Found');

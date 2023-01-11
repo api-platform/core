@@ -52,7 +52,7 @@ trait LinksHandlerTrait
         }
 
         if (!$this->resourceMetadataCollectionFactory) {
-            return [$newLink];
+            return [];
         }
 
         // Using GraphQL, it's possible that we won't find a GraphQL Operation of the same type (e.g. it is disabled).
