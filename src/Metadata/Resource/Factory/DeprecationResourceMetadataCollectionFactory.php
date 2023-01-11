@@ -32,7 +32,7 @@ class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCo
 
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operation) {
-                if ($operation instanceof Put && !($operation->getExtraProperties()['standard_put'] ?? false)) {
+                if ($operation instanceof Put && null === ($operation->getExtraProperties()['standard_put'] ?? null)) {
                     $this->triggerDeprecationOnce($operation, 'extraProperties["standard_put"]', 'In API Platform 4 PUT will always replace the data, use extraProperties["standard_put"] to "true" on every operation to avoid breaking PUT\'s behavior. Use PATCH to use the old behavior.');
                 }
             }
