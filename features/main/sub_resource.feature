@@ -586,10 +586,10 @@ Feature: Sub-resource support
     And I send a "GET" request to "/subresource_organizations/1/subresource_employees"
     Then the response status code should be 200
     Given I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/subresource_organizations/1/subresource_employees" with body:
+    And I send a "PUT" request to "/subresource_organizations/1/subresource_employees/1" with body:
     """
     {
-      "name": "soyuka"
+      "name": "ok"
     }
     """
-    Then the response status code should be 201
+    Then the response status code should be 200

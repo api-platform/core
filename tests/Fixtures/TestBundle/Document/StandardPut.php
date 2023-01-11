@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @author Kévin Dunglas <kevin@dunglas.fr>
@@ -30,7 +30,7 @@ use ApiPlatform\Metadata\Put;
 #[ODM\Document]
 class StandardPut
 {
-    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    #[ODM\Id(strategy: 'NONE', type: 'int')]
     public ?int $id = null;
 
     #[ODM\Field]
@@ -39,4 +39,3 @@ class StandardPut
     #[ODM\Field]
     public string $bar = '';
 }
-

@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\Put;
 
-#[Put(extraProperties: ['standard_put' => true])]
+#[Put()]
 class ResourceImplementation implements ResourceInterface
 {
 }
