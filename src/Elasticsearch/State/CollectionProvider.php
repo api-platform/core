@@ -59,8 +59,7 @@ final class CollectionProvider implements ProviderInterface
         $limit = $body['size'] ??= $this->pagination->getLimit($operation, $context);
         $offset = $body['from'] ??= $this->pagination->getOffset($operation, $context);
 
-        $index = Inflector::tableize($operation->getShortName());
-        $options = $operation->getStateOptions() instanceof Options ? $operation->getStateOptions() : new Options(index: $index);
+        $options = $operation->getStateOptions() instanceof Options ? $operation->getStateOptions() : new Options(index: $this->getIndex($operation));
 
         // TODO: remove in 4.x
         if ($operation->getElasticsearch() && !$operation->getStateOptions()) {
@@ -68,7 +67,7 @@ final class CollectionProvider implements ProviderInterface
         }
 
         $params = [
-            'index' => $options->getIndex() ?? $index,
+            'index' => $options->getIndex() ?? $this->getIndex($operation),
             'body' => $body,
         ];
 
@@ -91,5 +90,10 @@ final class CollectionProvider implements ProviderInterface
     private function convertDocumentMetadata(DocumentMetadata $documentMetadata): Options
     {
         return new Options($documentMetadata->getIndex(), $documentMetadata->getType());
+    }
+
+    private function getIndex(Operation $operation): string
+    {
+        return Inflector::tableize($operation->getShortName());
     }
 }

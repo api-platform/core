@@ -70,8 +70,8 @@ final class Subscription extends Operation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = [],
         protected ?OptionsInterface $stateOptions = null,
+        array $extraProperties = [],
     ) {
         parent::__construct(...\func_get_args());
         $this->name = $name ?: 'update_subscription';

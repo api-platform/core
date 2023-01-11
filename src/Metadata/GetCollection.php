@@ -96,11 +96,11 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = [],
         ?string $itemUriTemplate = null,
         ?OptionsInterface $stateOptions = null,
+        array $extraProperties = [],
     ) {
-        parent::__construct(self::METHOD_GET, $uriTemplate, $types, $formats, $inputFormats, $outputFormats, $uriVariables, $routePrefix, $routeName, $defaults, $requirements, $options, $stateless, $sunset, $acceptPatch, $status, $host, $schemes, $condition, $controller, $cacheHeaders, $hydraContext, $openapiContext, $openapi, $exceptionToStatus, $queryParameterValidationEnabled, $shortName, $class, $paginationEnabled, $paginationType, $paginationItemsPerPage, $paginationMaximumItemsPerPage, $paginationPartial, $paginationClientEnabled, $paginationClientItemsPerPage, $paginationClientPartial, $paginationFetchJoinCollection, $paginationUseOutputWalkers, $paginationViaCursor, $order, $description, $normalizationContext, $denormalizationContext, $security, $securityMessage, $securityPostDenormalize, $securityPostDenormalizeMessage, $securityPostValidation, $securityPostValidationMessage, $deprecationReason, $filters, $validationContext, $input, $output, $mercure, $messenger, $elasticsearch, $urlGenerationStrategy, $read, $deserialize, $validate, $write, $serialize, $fetchPartial, $forceEager, $priority, $name, $provider, $processor, $extraProperties, $stateOptions);
+        parent::__construct(self::METHOD_GET, $uriTemplate, $types, $formats, $inputFormats, $outputFormats, $uriVariables, $routePrefix, $routeName, $defaults, $requirements, $options, $stateless, $sunset, $acceptPatch, $status, $host, $schemes, $condition, $controller, $cacheHeaders, $hydraContext, $openapiContext, $openapi, $exceptionToStatus, $queryParameterValidationEnabled, $shortName, $class, $paginationEnabled, $paginationType, $paginationItemsPerPage, $paginationMaximumItemsPerPage, $paginationPartial, $paginationClientEnabled, $paginationClientItemsPerPage, $paginationClientPartial, $paginationFetchJoinCollection, $paginationUseOutputWalkers, $paginationViaCursor, $order, $description, $normalizationContext, $denormalizationContext, $security, $securityMessage, $securityPostDenormalize, $securityPostDenormalizeMessage, $securityPostValidation, $securityPostValidationMessage, $deprecationReason, $filters, $validationContext, $input, $output, $mercure, $messenger, $elasticsearch, $urlGenerationStrategy, $read, $deserialize, $validate, $write, $serialize, $fetchPartial, $forceEager, $priority, $name, $provider, $processor, $stateOptions, $extraProperties);
         $this->itemUriTemplate = $itemUriTemplate;
     }
 

@@ -92,8 +92,8 @@ abstract class Operation
         protected ?string $name = null,
         $provider = null,
         $processor = null,
-        protected array $extraProperties = [],
         protected ?OptionsInterface $stateOptions = null,
+        protected array $extraProperties = [],
     ) {
         $this->input = $input;
         $this->output = $output;

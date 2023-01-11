@@ -148,8 +148,8 @@ class ApiResource
         protected ?array $graphQlOperations = null,
         $provider = null,
         $processor = null,
-        protected array $extraProperties = [],
         protected ?OptionsInterface $stateOptions = null,
+        protected array $extraProperties = [],
     ) {
         $this->operations = null === $operations ? null : new Operations($operations);
         $this->provider = $provider;

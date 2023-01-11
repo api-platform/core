@@ -75,8 +75,8 @@ class Operation extends AbstractOperation
         ?string $name = null,
         ?string $provider = null,
         ?string $processor = null,
-        array $extraProperties = [],
         protected ?OptionsInterface $stateOptions = null,
+        array $extraProperties = [],
     ) {
         // Abstract operation properties
         $this->shortName = $shortName;

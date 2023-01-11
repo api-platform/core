@@ -42,9 +42,8 @@ final class ItemProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         $resourceClass = $operation->getClass();
-        $index = Inflector::tableize($operation->getShortName());
 
-        $options = $operation->getStateOptions() instanceof Options ? $operation->getStateOptions() : new Options(index: $index);
+        $options = $operation->getStateOptions() instanceof Options ? $operation->getStateOptions() : new Options(index: $this->getIndex($operation));
 
         // TODO: remove in 4.x
         if ($operation->getElasticsearch() && !$operation->getStateOptions()) {
@@ -53,7 +52,7 @@ final class ItemProvider implements ProviderInterface
 
         $params = [
             'client' => ['ignore' => 404],
-            'index' => $options->getIndex() ?? $index,
+            'index' => $options->getIndex() ?? $this->getIndex($operation),
             'id' => (string) reset($uriVariables),
         ];
 
@@ -77,5 +76,10 @@ final class ItemProvider implements ProviderInterface
     private function convertDocumentMetadata(DocumentMetadata $documentMetadata): Options
     {
         return new Options($documentMetadata->getIndex(), $documentMetadata->getType());
+    }
+
+    private function getIndex(Operation $operation): string
+    {
+        return Inflector::tableize($operation->getShortName());
     }
 }
