@@ -53,7 +53,11 @@ final class PersistProcessor implements ProcessorInterface
         if ($operation instanceof HttpOperation && HttpOperation::METHOD_PUT === $operation->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? false)) {
             \assert(method_exists($manager, 'getReference'));
             // TODO: the call to getReference is most likely to fail with complex identifiers
-            $newData = isset($context['previous_data']) ? $manager->getReference($class, $uriVariables) : $data;
+            $newData = $data;
+            if (isset($context['previous_data'])) {
+                $newData = 1 === \count($uriVariables) ? $manager->getReference($class, $uriVariables) : clone $context['previous_data'];
+            }
+
             $identifiers = array_reverse($uriVariables);
             $links = $this->getLinks($class, $operation, $context);
             $reflectionProperties = $this->getReflectionProperties($data);
@@ -74,6 +78,11 @@ final class PersistProcessor implements ProcessorInterface
                 }
             } else {
                 foreach ($reflectionProperties as $propertyName => $reflectionProperty) {
+                    // Don't override the property if it's part of the subresource system
+                    if (isset($uriVariables[$propertyName])) {
+                        continue;
+                    }
+
                     foreach ($links as $link) {
                         $identifierProperties = $link->getIdentifiers();
                         if (\in_array($propertyName, $identifierProperties, true)) {

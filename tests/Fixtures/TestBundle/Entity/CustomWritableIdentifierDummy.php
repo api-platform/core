@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Custom Writable Identifier Dummy.
  */
-#[ApiResource]
+#[ApiResource(extraProperties: ['standard_put' => false])]
 #[ORM\Entity]
 class CustomWritableIdentifierDummy
 {

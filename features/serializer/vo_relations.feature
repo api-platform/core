@@ -80,7 +80,7 @@ Feature: Value object as ApiResource
     }
     """
 
-  Scenario: Update Value object with writable and non writable property
+  Scenario: Update Value object with writable and non writable property (legacy non-standard PUT)
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/vo_dummy_inspections/1" with body:
     """
@@ -101,6 +101,29 @@ Feature: Value object as ApiResource
         "performed": "2018-08-24T00:00:00+00:00"
     }
     """
+
+  Scenario: Update Value object with writable and non writable property
+    When I add "Content-Type" header equal to "application/merge-patch+json"
+    And I send a "PATCH" request to "/vo_dummy_inspections/1" with body:
+    """
+    {
+        "performed": "2018-08-24 00:00:00",
+        "accepted": false
+    }
+    """
+    Then the response status code should be 200
+    And the JSON should be equal to:
+    """
+    {
+        "@context": "/contexts/VoDummyInspection",
+        "@id": "/vo_dummy_inspections/1",
+        "@type": "VoDummyInspection",
+        "accepted": true,
+        "car": "/vo_dummy_cars/1",
+        "performed": "2018-08-24T00:00:00+00:00"
+    }
+    """
+
 
   @createSchema
   Scenario: Create Value object without required params

@@ -19,7 +19,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ApiResource(mercure: true)]
+#[ApiResource(mercure: true, extraProperties: ['standard_put' => false])]
 #[ODM\Document]
 class DummyMercure
 {

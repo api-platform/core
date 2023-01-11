@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ApiResource(mercure: true)]
+#[ApiResource(mercure: true, extraProperties: ['standard_put' => false])]
 #[ORM\Entity]
 class DummyMercure
 {

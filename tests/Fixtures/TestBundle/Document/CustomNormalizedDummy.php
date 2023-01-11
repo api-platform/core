@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Mikaël Labrut <labrut@gmail.com>
  */
-#[ApiResource(normalizationContext: ['groups' => ['output']], denormalizationContext: ['groups' => ['input']])]
+#[ApiResource(normalizationContext: ['groups' => ['output']], denormalizationContext: ['groups' => ['input']], extraProperties: ['standard_put' => false])]
 #[ODM\Document]
 class CustomNormalizedDummy
 {
