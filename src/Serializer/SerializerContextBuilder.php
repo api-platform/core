@@ -51,6 +51,11 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             throw new RuntimeException('Request attributes are not valid.');
         }
 
+        // TODO remove call to getContentType() when requiring symfony/http-foundation ≥ 6.2
+        $contentTypeFormat = method_exists($request, 'getContentTypeFormat')
+            ? $request->getContentTypeFormat()
+            : $request->getContentType();
+
         // TODO: 3.0 change the condition to remove the ResourceMetadataFactorym only used to skip null values
         if (
             $this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface
@@ -86,7 +91,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                     }
                 }
 
-                if ('csv' === $request->getContentType()) {
+                if ('csv' === $contentTypeFormat) {
                     $context[CsvEncoder::AS_COLLECTION_KEY] = false;
                 }
             }
@@ -124,7 +129,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 }
             }
 
-            if ('csv' === $request->getContentType()) {
+            if ('csv' === $contentTypeFormat) {
                 $context[CsvEncoder::AS_COLLECTION_KEY] = false;
             }
         }

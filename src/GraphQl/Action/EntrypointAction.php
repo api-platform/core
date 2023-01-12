@@ -111,15 +111,20 @@ final class EntrypointAction
             return [$query, $operationName, $variables];
         }
 
-        if ('json' === $request->getContentType()) {
+        // TODO remove call to getContentType() when requiring symfony/http-foundation ≥ 6.2
+        $contentTypeFormat = method_exists($request, 'getContentTypeFormat')
+            ? $request->getContentTypeFormat()
+            : $request->getContentType();
+
+        if ('json' === $contentTypeFormat) {
             return $this->parseData($query, $operationName, $variables, $request->getContent());
         }
 
-        if ('graphql' === $request->getContentType()) {
+        if ('graphql' === $contentTypeFormat) {
             $query = $request->getContent();
         }
 
-        if (\in_array($request->getContentType(), ['multipart', 'form'], true)) {
+        if (\in_array($contentTypeFormat, ['multipart', 'form'], true)) {
             return $this->parseMultipartRequest($query, $operationName, $variables, $request->request->all(), $request->files->all());
         }
 
