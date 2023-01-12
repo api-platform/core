@@ -16,29 +16,13 @@ namespace ApiPlatform\Metadata;
 abstract class Operation
 {
     use WithResourceTrait;
-    /**
-     * @var mixed|null
-     */
-    protected mixed $input;
-    /**
-     * @var mixed|null
-     */
-    protected mixed $output;
-    /**
-     * @var string|callable|null
-     */
-    protected $provider;
-    /**
-     * @var string|callable|null
-     */
-    protected $processor;
 
     /**
-     * @param string[]   $filters
-     * @param mixed|null $input
-     * @param mixed|null $output
-     * @param mixed|null $provider
-     * @param mixed|null $processor
+     * @param string[]|null          $filters
+     * @param string|array|bool|null $mercure
+     * @param string|bool|null       $messenger
+     * @param string|callable|null   $provider
+     * @param string|callable|null   $processor
      */
     public function __construct(
         protected ?string $shortName = null,
@@ -66,15 +50,9 @@ abstract class Operation
         protected ?string $deprecationReason = null,
         protected ?array $filters = null,
         protected ?array $validationContext = null,
-        $input = null,
-        $output = null,
-        /**
-         * @var string|array|bool|null
-         */
+        protected $input = null,
+        protected $output = null,
         protected $mercure = null,
-        /**
-         * @var string|bool|null
-         */
         protected $messenger = null,
         protected ?bool $elasticsearch = null,
         protected ?int $urlGenerationStrategy = null,
@@ -87,14 +65,10 @@ abstract class Operation
         protected ?bool $forceEager = null,
         protected ?int $priority = null,
         protected ?string $name = null,
-        $provider = null,
-        $processor = null,
+        protected $provider = null,
+        protected $processor = null,
         protected array $extraProperties = []
     ) {
-        $this->input = $input;
-        $this->output = $output;
-        $this->provider = $provider;
-        $this->processor = $processor;
     }
 
     public function withOperation($operation)
