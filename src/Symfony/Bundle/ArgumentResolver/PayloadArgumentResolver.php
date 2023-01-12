@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-final class PayloadArgumentResolver implements ValueResolverInterface
+final class PayloadArgumentResolver implements CompatibleValueResolverInterface
 {
     use OperationRequestInitiatorTrait;
 
@@ -59,8 +59,10 @@ final class PayloadArgumentResolver implements ValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument): \Generator
     {
-        if (!$this->supports($request, $argument)) {
-            yield [];
+        if (interface_exists(ValueResolverInterface::class)) {
+            if (!$this->supports($request, $argument)) {
+                yield [];
+            }
         }
 
         yield $request->attributes->get('data');
