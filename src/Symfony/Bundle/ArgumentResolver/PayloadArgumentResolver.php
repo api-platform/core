@@ -59,7 +59,7 @@ final class PayloadArgumentResolver implements ArgumentValueResolverInterface
         return $inputClass === $class || is_subclass_of($inputClass, $class);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): \Generator
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield $request->attributes->get('data');
     }
