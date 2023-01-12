@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\State;
 
+use ApiPlatform\State\OptionsInterface;
+
 class Options implements OptionsInterface
 {
     public function __construct(

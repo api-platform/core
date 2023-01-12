@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\Metadata\Resource\Factory;
 
 use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory;
-use ApiPlatform\Elasticsearch\State\OptionsInterface;
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -54,7 +54,7 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
     {
         if (null !== $elasticsearchFlag) {
             $solution = $elasticsearchFlag
-                ? sprintf('Pass an instance of %s to $stateOptions instead', OptionsInterface::class)
+                ? sprintf('Pass an instance of %s to $stateOptions instead', Options::class)
                 : 'You will have to remove it when upgrading to v4';
             $this->expectDeprecation(sprintf('Since api-platform/core 3.1: Setting "elasticsearch" in Operation is deprecated. %s', $solution));
         }

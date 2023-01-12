@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\OpenApi\Factory;
 
 use ApiPlatform\Api\FilterLocatorTrait;
+use ApiPlatform\Doctrine\Orm\State\Options as DoctrineOptions;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
@@ -532,7 +533,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
-            foreach ($filter->getDescription($operation->getClass()) as $name => $data) {
+            $entityClass = $operation->getClass();
+            if (($options = $operation->getStateOptions()) && $options instanceof DoctrineOptions && $options->getEntityClass()) {
+                $entityClass = $options->getEntityClass();
+            }
+
+            foreach ($filter->getDescription($entityClass) as $name => $data) {
                 $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string']);
 
                 $parameters[] = new Parameter(

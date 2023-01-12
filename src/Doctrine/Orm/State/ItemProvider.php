@@ -43,16 +43,20 @@ final class ItemProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        $resourceClass = $operation->getClass();
+        $entityClass = $operation->getClass();
+        if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+            $entityClass = $options->getEntityClass();
+        }
+
         /** @var EntityManagerInterface $manager */
-        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
+        $manager = $this->managerRegistry->getManagerForClass($entityClass);
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData) {
-            return $manager->getReference($resourceClass, $uriVariables);
+            return $manager->getReference($entityClass, $uriVariables);
         }
 
-        $repository = $manager->getRepository($resourceClass);
+        $repository = $manager->getRepository($entityClass);
         if (!method_exists($repository, 'createQueryBuilder')) {
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
         }
@@ -60,13 +64,13 @@ final class ItemProvider implements ProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
-        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operation);
+        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $entityClass, $operation);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $uriVariables, $operation, $context);
+            $extension->applyToItem($queryBuilder, $queryNameGenerator, $entityClass, $uriVariables, $operation, $context);
 
-            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operation, $context)) {
-                return $extension->getResult($queryBuilder, $resourceClass, $operation, $context);
+            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($entityClass, $operation, $context)) {
+                return $extension->getResult($queryBuilder, $entityClass, $operation, $context);
             }
         }
 

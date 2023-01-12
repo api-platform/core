@@ -16,6 +16,7 @@ namespace ApiPlatform\Hydra\Serializer;
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -87,6 +88,11 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                 $currentFilters[] = $filter;
             }
         }
+
+        if (($options = $operation?->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+            $resourceClass = $options->getEntityClass();
+        }
+
         if ($currentFilters) {
             $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters);
         }

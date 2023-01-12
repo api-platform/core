@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Orm\Metadata\Resource;
 
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
@@ -44,7 +45,12 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
             if ($operations) {
                 /** @var Operation $operation */
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if (!$this->managerRegistry->getManagerForClass($operation->getClass()) instanceof EntityManagerInterface) {
+                    $entityClass = $operation->getClass();
+                    if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+                        $entityClass = $options->getEntityClass();
+                    }
+
+                    if (!$this->managerRegistry->getManagerForClass($entityClass) instanceof EntityManagerInterface) {
                         continue;
                     }
 
@@ -58,7 +64,12 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
 
             if ($graphQlOperations) {
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
-                    if (!$this->managerRegistry->getManagerForClass($graphQlOperation->getClass()) instanceof EntityManagerInterface) {
+                    $entityClass = $graphQlOperation->getClass();
+                    if (($options = $graphQlOperation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+                        $entityClass = $options->getEntityClass();
+                    }
+
+                    if (!$this->managerRegistry->getManagerForClass($entityClass) instanceof EntityManagerInterface) {
                         continue;
                     }
 

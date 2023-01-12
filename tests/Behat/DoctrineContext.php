@@ -162,6 +162,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedSecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SeparatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoMany;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDummy;
@@ -2013,6 +2014,20 @@ final class DoctrineContext implements Context
     public function thereIsAPayment(): void
     {
         $this->manager->persist($this->buildPayment('123.45'));
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb separated entities
+     */
+    public function thereAreSeparatedEntities(int $nb): void
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $entity = new SeparatedEntity();
+            $entity->value = (string) $i;
+            $this->manager->persist($entity);
+        }
+
         $this->manager->flush();
     }
 

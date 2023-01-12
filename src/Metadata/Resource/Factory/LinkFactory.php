@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Link;
@@ -58,7 +59,12 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
             return [];
         }
 
-        $link = (new Link())->withFromClass($resourceClass)->withIdentifiers($identifiers);
+        $entityClass = $resourceClass;
+        if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+            $entityClass = $options->getEntityClass();
+        }
+
+        $link = (new Link())->withFromClass($entityClass)->withIdentifiers($identifiers);
         $parameterName = $identifiers[0];
 
         if (1 < \count($identifiers)) {

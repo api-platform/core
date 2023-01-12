@@ -104,7 +104,7 @@ final class IriConverter implements IriConverterInterface
      */
     public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
-        $resourceClass = \is_string($resource) ? $resource : $this->getObjectClass($resource);
+        $resourceClass = $context['force_resource_class'] ?? (\is_string($resource) ? $resource : $this->getObjectClass($resource));
 
         $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_c' : '_i');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
@@ -116,7 +116,7 @@ final class IriConverter implements IriConverterInterface
         }
 
         // This is only for when a class (that is not a resource) extends another one that is a resource, we should remove this behavior
-        if (!\is_string($resource)) {
+        if (!\is_string($resource) && !isset($context['force_resource_class'])) {
             $resourceClass = $this->getResourceClass($resource, true);
         }
 

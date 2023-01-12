@@ -15,7 +15,7 @@ namespace ApiPlatform\Elasticsearch\Metadata\Resource\Factory;
 
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
-use ApiPlatform\Elasticsearch\State\OptionsInterface;
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -48,7 +48,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     if (null !== ($elasticsearch = $operation->getElasticsearch())) {
                         $solution = $elasticsearch
-                            ? sprintf('Pass an instance of %s to $stateOptions instead', OptionsInterface::class)
+                            ? sprintf('Pass an instance of %s to $stateOptions instead', Options::class)
                             : 'You will have to remove it when upgrading to v4';
                         trigger_deprecation('api-platform/core', '3.1', sprintf('Setting "elasticsearch" in Operation is deprecated. %s', $solution));
                     }
@@ -72,7 +72,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
                     if (null !== ($elasticsearch = $graphQlOperation->getElasticsearch())) {
                         $solution = $elasticsearch
-                            ? sprintf('Pass an instance of %s to $stateOptions instead', OptionsInterface::class)
+                            ? sprintf('Pass an instance of %s to $stateOptions instead', Options::class)
                             : 'You will have to remove it when upgrading to v4';
                         trigger_deprecation('api-platform/core', '3.1', sprintf('Setting "elasticsearch" in GraphQlOperation is deprecated. %s', $solution));
                     }
