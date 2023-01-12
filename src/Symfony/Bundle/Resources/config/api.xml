@@ -189,8 +189,10 @@
             <tag name="api_platform.uri_variables.transformer" priority="-100" />
         </service>
 
-        <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener" parent="exception_listener">
+        <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener">
             <argument key="$controller">api_platform.action.exception</argument>
+            <argument key="$logger" type="service" id="logger" on-invalid="null" />
+            <argument key="$debug">%kernel.debug%</argument>
         </service>
     </services>
 </container>
