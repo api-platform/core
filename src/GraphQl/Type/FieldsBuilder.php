@@ -262,7 +262,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             }
 
             $resourceOperation = $rootOperation;
-            if ($resourceClass && $rootOperation->getClass() && $this->resourceClassResolver->isResourceClass($resourceClass) && $rootOperation->getClass() !== $resourceClass) {
+            if ($resourceClass && $depth >= 1 && $this->resourceClassResolver->isResourceClass($resourceClass)) {
                 $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
                 $resourceOperation = $resourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
             }
