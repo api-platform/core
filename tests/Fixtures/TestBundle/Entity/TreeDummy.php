@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
@@ -20,11 +29,11 @@ class TreeDummy
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: TreeDummy::class, inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
     public ?TreeDummy $parent = null;
 
     /** @var Collection<int, TreeDummy> */
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: TreeDummy::class)]
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     public Collection $children;
 
     public function __construct()
@@ -37,12 +46,12 @@ class TreeDummy
         return $this->id;
     }
 
-    public function getParent(): ?TreeDummy
+    public function getParent(): ?self
     {
         return $this->parent;
     }
 
-    public function setParent(?TreeDummy $parent): void
+    public function setParent(?self $parent): void
     {
         $this->parent = $parent;
     }
