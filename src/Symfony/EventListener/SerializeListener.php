@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ResourceList;
@@ -90,6 +91,9 @@ final class SerializeListener
         $resourcesToPush = new ResourceList();
         $context['resources_to_push'] = &$resourcesToPush;
         $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'resources_to_push';
+        if (($options = $operation?->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+            $context['force_resource_class'] = $operation->getClass();
+        }
 
         $request->attributes->set('_api_normalization_context', $context);
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));

@@ -77,7 +77,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        $class = $this->getObjectClass($data);
+        $class = $context['force_resource_class'] ?? $this->getObjectClass($data);
         if (($context['output']['class'] ?? null) === $class) {
             return true;
         }
@@ -100,7 +100,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $resourceClass = $this->getObjectClass($object);
+        $resourceClass = $context['force_resource_class'] ?? $this->getObjectClass($object);
         if ($outputClass = $this->getOutputClass($context)) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');

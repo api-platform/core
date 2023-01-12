@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
@@ -399,7 +400,12 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                 continue;
             }
 
-            foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $value) {
+            $entityClass = $resourceClass;
+            if (($options = $resourceOperation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+                $entityClass = $options->getEntityClass();
+            }
+
+            foreach ($this->filterLocator->get($filterId)->getDescription($entityClass) as $key => $value) {
                 $nullable = isset($value['required']) ? !$value['required'] : true;
                 $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
                 $graphqlFilterType = $this->convertType($filterType, false, $resourceOperation, $rootOperation, $resourceClass, $rootResource, $property, $depth);

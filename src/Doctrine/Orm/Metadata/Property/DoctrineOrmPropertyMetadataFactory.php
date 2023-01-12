@@ -67,10 +67,6 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
             }
         }
 
-        if (null === $propertyMetadata->isIdentifier()) {
-            $propertyMetadata = $propertyMetadata->withIdentifier(false);
-        }
-
         if ($doctrineClassMetadata instanceof ClassMetadataInfo && \in_array($property, $doctrineClassMetadata->getFieldNames(), true)) {
             /** @var mixed[] */
             $fieldMapping = $doctrineClassMetadata->getFieldMapping($property);

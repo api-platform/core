@@ -23,17 +23,17 @@ trait LinksHandlerTrait
 {
     use CommonLinksHandlerTrait;
 
-    private function handleLinks(QueryBuilder $queryBuilder, array $identifiers, QueryNameGenerator $queryNameGenerator, array $context, string $resourceClass, Operation $operation): void
+    private function handleLinks(QueryBuilder $queryBuilder, array $identifiers, QueryNameGenerator $queryNameGenerator, array $context, string $entityClass, Operation $operation): void
     {
         if (!$identifiers) {
             return;
         }
 
-        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
-        $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
+        $manager = $this->managerRegistry->getManagerForClass($entityClass);
+        $doctrineClassMetadata = $manager->getClassMetadata($entityClass);
         $alias = $queryBuilder->getRootAliases()[0];
 
-        $links = $this->getLinks($resourceClass, $operation, $context);
+        $links = $this->getLinks($entityClass, $operation, $context);
 
         if (!$links) {
             return;
@@ -54,7 +54,7 @@ trait LinksHandlerTrait
 
             if (!$link->getFromProperty() && !$link->getToProperty()) {
                 $doctrineClassMetadata = $manager->getClassMetadata($link->getFromClass());
-                $currentAlias = $link->getFromClass() === $resourceClass ? $alias : $queryNameGenerator->generateJoinAlias($alias);
+                $currentAlias = $link->getFromClass() === $entityClass ? $alias : $queryNameGenerator->generateJoinAlias($alias);
 
                 foreach ($identifierProperties as $identifierProperty) {
                     $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
