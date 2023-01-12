@@ -50,6 +50,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
         normalizationContext: ['groups' => ['user_password_reset_request']],
         denormalizationContext: ['groups' => ['user_password_reset_request']]
     ),
+    new Get('users-with-groups/{id}', normalizationContext: ['groups' => ['api-test-case-group']]),
+    new GetCollection('users-with-groups', normalizationContext: ['groups' => ['api-test-case-group']]),
 ], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]
 #[ORM\Entity]
 #[ORM\Table(name: 'user_test')]
@@ -62,7 +64,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user'])]
     private ?string $email = null;
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['user'])]
+    #[Groups(['user', 'api-test-case-group'])]
     private ?string $fullname = null;
     #[Groups(['user-write'])]
     private ?string $plainPassword = null;
