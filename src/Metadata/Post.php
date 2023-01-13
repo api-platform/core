@@ -16,11 +16,6 @@ namespace ApiPlatform\Metadata;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Post extends HttpOperation
 {
-    private $itemUriTemplate;
-
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         ?string $uriTemplate = null,
         ?array $types = null,
@@ -42,16 +37,12 @@ final class Post extends HttpOperation
         ?string $condition = null,
         ?string $controller = null,
         ?array $cacheHeaders = null,
-        ?array $paginationViaCursor = null,
-
         ?array $hydraContext = null,
         ?array $openapiContext = null,
         ?bool $openapi = null,
         ?array $exceptionToStatus = null,
-
         ?bool $queryParameterValidationEnabled = null,
 
-        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -64,6 +55,7 @@ final class Post extends HttpOperation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
+        ?array $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -95,10 +87,81 @@ final class Post extends HttpOperation
         $provider = null,
         $processor = null,
         array $extraProperties = [],
-        ?string $itemUriTemplate = null
+
+        private ?string $itemUriTemplate = null
     ) {
-        parent::__construct(self::METHOD_POST, ...\func_get_args());
-        $this->itemUriTemplate = $itemUriTemplate;
+        parent::__construct(
+            self::METHOD_POST,
+            $uriTemplate,
+            $types,
+            $formats,
+            $inputFormats,
+            $outputFormats,
+            $uriVariables,
+            $routePrefix,
+            $routeName,
+            $defaults,
+            $requirements,
+            $options,
+            $stateless,
+            $sunset,
+            $acceptPatch,
+            $status,
+            $host,
+            $schemes,
+            $condition,
+            $controller,
+            $cacheHeaders,
+            $hydraContext,
+            $openapiContext,
+            $openapi,
+            $exceptionToStatus,
+            $queryParameterValidationEnabled,
+            $shortName,
+            $class,
+            $paginationEnabled,
+            $paginationType,
+            $paginationItemsPerPage,
+            $paginationMaximumItemsPerPage,
+            $paginationPartial,
+            $paginationClientEnabled,
+            $paginationClientItemsPerPage,
+            $paginationClientPartial,
+            $paginationFetchJoinCollection,
+            $paginationUseOutputWalkers,
+            $paginationViaCursor,
+            $order,
+            $description,
+            $normalizationContext,
+            $denormalizationContext,
+            $security,
+            $securityMessage,
+            $securityPostDenormalize,
+            $securityPostDenormalizeMessage,
+            $securityPostValidation,
+            $securityPostValidationMessage,
+            $deprecationReason,
+            $filters,
+            $validationContext,
+            $input,
+            $output,
+            $mercure,
+            $messenger,
+            $elasticsearch,
+            $urlGenerationStrategy,
+            $read,
+            $deserialize,
+            $validate,
+            $write,
+            $serialize,
+            $fetchPartial,
+            $forceEager,
+            $priority,
+            $name,
+            $provider,
+            $processor,
+            $extraProperties
+        );
     }
 
     public function getItemUriTemplate(): ?string
