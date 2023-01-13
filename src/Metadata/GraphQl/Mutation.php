@@ -16,15 +16,11 @@ namespace ApiPlatform\Metadata\GraphQl;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Mutation extends Operation
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         ?string $resolver = null,
         ?array $args = null,
         ?array $links = null,
 
-        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -37,6 +33,7 @@ class Mutation extends Operation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
+        ?array $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -67,8 +64,56 @@ class Mutation extends Operation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
     ) {
-        parent::__construct(...\func_get_args());
+        parent::__construct(
+            $resolver,
+            $args,
+            $links,
+            $shortName,
+            $class,
+            $paginationEnabled,
+            $paginationType,
+            $paginationItemsPerPage,
+            $paginationMaximumItemsPerPage,
+            $paginationPartial,
+            $paginationClientEnabled,
+            $paginationClientItemsPerPage,
+            $paginationClientPartial,
+            $paginationFetchJoinCollection,
+            $paginationUseOutputWalkers,
+            $paginationViaCursor,
+            $order,
+            $description,
+            $normalizationContext,
+            $denormalizationContext,
+            $security,
+            $securityMessage,
+            $securityPostDenormalize,
+            $securityPostDenormalizeMessage,
+            $securityPostValidation,
+            $securityPostValidationMessage,
+            $deprecationReason,
+            $filters,
+            $validationContext,
+            $input,
+            $output,
+            $mercure,
+            $messenger,
+            $elasticsearch,
+            $urlGenerationStrategy,
+            $read,
+            $deserialize,
+            $validate,
+            $write,
+            $serialize,
+            $fetchPartial,
+            $forceEager,
+            $priority,
+            $name,
+            $provider,
+            $processor,
+            $extraProperties
+        );
     }
 }
