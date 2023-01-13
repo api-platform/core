@@ -168,6 +168,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'shortName' => self::SHORT_NAME,
                         'description' => 'A list of Comments',
                         'class' => Mutation::class,
+                        'name' => 'create',
                         'urlGenerationStrategy' => 0,
                         'deprecationReason' => 'I don\'t know',
                         'normalizationContext' => [
@@ -606,7 +607,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     throw new \RuntimeException(sprintf('Unknown GraphQlOperation parameter "%s".', $parameter));
                 }
 
-                $operations[] = $operation;
+                $operationName = $operation->getName();
+                $operations[$operationName] = $operation;
             }
         }
 

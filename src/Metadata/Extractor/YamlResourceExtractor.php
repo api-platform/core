@@ -326,6 +326,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                     'write' => $this->phpize($operation, 'write', 'bool'),
                     'serialize' => $this->phpize($operation, 'serialize', 'bool'),
                     'priority' => $this->phpize($operation, 'priority', 'integer'),
+                    'name' => $this->phpize($operation, 'name', 'string'),
                 ]);
             }
         }

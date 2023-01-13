@@ -168,7 +168,8 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 $operation = $operation->withExtraProperties(array_merge($operation->getExtraProperties(), [$key => $value]));
             }
 
-            $operations[] = $operation;
+            [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
+            $operations[$key] = $operation;
         }
 
         $resource = $resource->withGraphQlOperations($operations);
