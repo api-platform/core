@@ -19,18 +19,25 @@ use ApiPlatform\Metadata\Operation as AbstractOperation;
 class Operation extends AbstractOperation
 {
     /**
-     * @param mixed|null  $input
-     * @param mixed|null  $output
-     * @param mixed|null  $mercure
-     * @param mixed|null  $messenger
      * @param Link[]|null $links
+     * @param array{
+     *     class?: string|null,
+     *     name?: string,
+     * }|string|false|null $input {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
+     * @param array{
+     *     class?: string|null,
+     *     name?: string,
+     * }|string|false|null $output {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
+     * @param string|array|bool|null $mercure   {@see https://api-platform.com/docs/core/mercure}
+     * @param string|bool|null       $messenger {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
+     * @param string|null            $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
+     * @param string|null            $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
      */
     public function __construct(
         protected ?string $resolver = null,
         protected ?array $args = null,
         protected ?array $links = null,
 
-        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -43,6 +50,7 @@ class Operation extends AbstractOperation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
+        ?array $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -75,50 +83,52 @@ class Operation extends AbstractOperation
         ?string $processor = null,
         array $extraProperties = []
     ) {
-        // Abstract operation properties
-        $this->shortName = $shortName;
-        $this->class = $class;
-        $this->paginationEnabled = $paginationEnabled;
-        $this->paginationType = $paginationType;
-        $this->paginationItemsPerPage = $paginationItemsPerPage;
-        $this->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
-        $this->paginationPartial = $paginationPartial;
-        $this->paginationClientEnabled = $paginationClientEnabled;
-        $this->paginationClientItemsPerPage = $paginationClientItemsPerPage;
-        $this->paginationClientPartial = $paginationClientPartial;
-        $this->paginationFetchJoinCollection = $paginationFetchJoinCollection;
-        $this->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-        $this->order = $order;
-        $this->description = $description;
-        $this->normalizationContext = $normalizationContext;
-        $this->denormalizationContext = $denormalizationContext;
-        $this->security = $security;
-        $this->securityMessage = $securityMessage;
-        $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-        $this->securityPostValidation = $securityPostValidation;
-        $this->securityPostValidationMessage = $securityPostValidationMessage;
-        $this->deprecationReason = $deprecationReason;
-        $this->filters = $filters;
-        $this->validationContext = $validationContext;
-        $this->input = $input;
-        $this->output = $output;
-        $this->mercure = $mercure;
-        $this->messenger = $messenger;
-        $this->elasticsearch = $elasticsearch;
-        $this->urlGenerationStrategy = $urlGenerationStrategy;
-        $this->read = $read;
-        $this->deserialize = $deserialize;
-        $this->validate = $validate;
-        $this->write = $write;
-        $this->serialize = $serialize;
-        $this->fetchPartial = $fetchPartial;
-        $this->forceEager = $forceEager;
-        $this->priority = $priority;
-        $this->name = $name;
-        $this->provider = $provider;
-        $this->processor = $processor;
-        $this->extraProperties = $extraProperties;
+        parent::__construct(
+            $shortName,
+            $class,
+            $paginationEnabled,
+            $paginationType,
+            $paginationItemsPerPage,
+            $paginationMaximumItemsPerPage,
+            $paginationPartial,
+            $paginationClientEnabled,
+            $paginationClientItemsPerPage,
+            $paginationClientPartial,
+            $paginationFetchJoinCollection,
+            $paginationUseOutputWalkers,
+            $paginationViaCursor,
+            $order,
+            $description,
+            $normalizationContext,
+            $denormalizationContext,
+            $security,
+            $securityMessage,
+            $securityPostDenormalize,
+            $securityPostDenormalizeMessage,
+            $securityPostValidation,
+            $securityPostValidationMessage,
+            $deprecationReason,
+            $filters,
+            $validationContext,
+            $input,
+            $output,
+            $mercure,
+            $messenger,
+            $elasticsearch,
+            $urlGenerationStrategy,
+            $read,
+            $deserialize,
+            $validate,
+            $write,
+            $serialize,
+            $fetchPartial,
+            $forceEager,
+            $priority,
+            $name,
+            $provider,
+            $processor,
+            $extraProperties
+        );
     }
 
     public function getResolver(): ?string
