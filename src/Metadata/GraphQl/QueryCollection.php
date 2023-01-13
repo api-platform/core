@@ -39,7 +39,6 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        ?bool $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,

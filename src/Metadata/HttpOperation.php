@@ -34,6 +34,7 @@ class HttpOperation extends Operation
      * @param string|int|null                                                 $status
      * @param string|null                                                     $deprecationReason              https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param array|null                                                      $cacheHeaders                   https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
+     * @param array|null                                                      $paginationViaCursor            https://api-platform.com/docs/core/pagination/#cursor-based-pagination
      * @param array|null                                                      $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
      * @param array|null                                                      $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
      * @param string[]                                                        $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
@@ -50,7 +51,6 @@ class HttpOperation extends Operation
      * @param bool|null                                                       $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
      * @param bool|null                                                       $paginationClientItemsPerPage   https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3
      * @param bool|null                                                       $paginationClientPartial        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6
-     * @param array|null                                                      $paginationViaCursor            https://api-platform.com/docs/core/pagination/#cursor-based-pagination
      * @param bool|null                                                       $paginationEnabled              https://api-platform.com/docs/core/pagination/#for-a-specific-resource
      * @param bool|null                                                       $paginationFetchJoinCollection  https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator
      * @param int|null                                                        $paginationItemsPerPage         https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page
@@ -91,6 +91,7 @@ class HttpOperation extends Operation
         protected ?string $condition = null,
         protected ?string $controller = null,
         protected ?array $cacheHeaders = null,
+        protected ?array $paginationViaCursor = null,
 
         protected ?array $hydraContext = null,
         protected ?array $openapiContext = null,
@@ -112,7 +113,6 @@ class HttpOperation extends Operation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        ?array $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -165,7 +165,6 @@ class HttpOperation extends Operation
         $this->paginationClientEnabled = $paginationClientEnabled;
         $this->paginationClientItemsPerPage = $paginationClientItemsPerPage;
         $this->paginationClientPartial = $paginationClientPartial;
-        $this->paginationViaCursor = $paginationViaCursor;
         $this->paginationEnabled = $paginationEnabled;
         $this->paginationFetchJoinCollection = $paginationFetchJoinCollection;
         $this->paginationUseOutputWalkers = $paginationUseOutputWalkers;
@@ -478,6 +477,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->cacheHeaders = $cacheHeaders;
+
+        return $self;
+    }
+
+    public function getPaginationViaCursor(): ?array
+    {
+        return $this->paginationViaCursor;
+    }
+
+    public function withPaginationViaCursor(array $paginationViaCursor): self
+    {
+        $self = clone $this;
+        $self->paginationViaCursor = $paginationViaCursor;
 
         return $self;
     }
