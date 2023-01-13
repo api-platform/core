@@ -112,6 +112,7 @@ class ApiResource
         protected ?array $cacheHeaders = null,
         protected ?array $normalizationContext = null,
         protected ?array $denormalizationContext = null,
+        protected ?bool $collectDenormalizationErrors = null,
         protected ?array $hydraContext = null,
         protected ?array $openapiContext = null, // TODO Remove in 4.0
         protected bool|OpenApiOperation|null $openapi = null,
@@ -533,6 +534,19 @@ class ApiResource
     {
         $self = clone $this;
         $self->denormalizationContext = $denormalizationContext;
+
+        return $self;
+    }
+
+    public function getCollectDenormalizationErrors(): ?bool
+    {
+        return $this->collectDenormalizationErrors;
+    }
+
+    public function withCollectDenormalizationErrors(bool $collectDenormalizationErrors = null): self
+    {
+        $self = clone $this;
+        $self->collectDenormalizationErrors = $collectDenormalizationErrors;
 
         return $self;
     }

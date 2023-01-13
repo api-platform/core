@@ -137,6 +137,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'denormalizationContext' => [
                 'groups' => ['comment:write', 'comment:custom'],
             ],
+            'collectDenormalizationErrors' => true,
             'hydraContext' => [
                 'foo' => ['bar' => 'baz'],
             ],
@@ -421,6 +422,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'securityPostValidationMessage',
         'normalizationContext',
         'denormalizationContext',
+        'collectDenormalizationErrors',
         'validationContext',
         'filters',
         'order',

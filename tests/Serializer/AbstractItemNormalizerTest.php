@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -35,6 +34,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -821,8 +821,8 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testBadRelationType(): void
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected IRI or nested document for attribute "relatedDummy", "integer" given.');
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the "relatedDummy" attribute must be "array" (nested document) or "string" (IRI), "integer" given.');
 
         $data = [
             'relatedDummy' => 22,
@@ -1048,7 +1048,7 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testDenormalizeBadKeyType(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('The type of the key "a" must be "int", "string" given.');
 
         $data = [

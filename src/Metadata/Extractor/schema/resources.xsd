@@ -459,6 +459,7 @@
         <xsd:attribute type="xsd:string" name="securityPostDenormalizeMessage"/>
         <xsd:attribute type="xsd:string" name="securityPostValidation"/>
         <xsd:attribute type="xsd:string" name="securityPostValidationMessage"/>
+        <xsd:attribute type="xsd:boolean" name="collectDenormalizationErrors"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="extendedBase">

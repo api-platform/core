@@ -192,12 +192,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      *
      * @throws RuntimeException
-     * @throws NotNormalizableValueException
+     * @throws UnexpectedValueException
      */
     protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): object
     {
         if (!\is_array($value) || !isset($value['id'], $value['type'])) {
-            throw new NotNormalizableValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
+            throw new UnexpectedValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
         }
 
         try {

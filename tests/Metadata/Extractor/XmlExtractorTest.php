@@ -80,6 +80,7 @@ class XmlExtractorTest extends TestCase
                     'cacheHeaders' => null,
                     'normalizationContext' => null,
                     'denormalizationContext' => null,
+                    'collectDenormalizationErrors' => null,
                     'hydraContext' => null,
                     'openapiContext' => null,
                     'openapi' => null,
@@ -159,6 +160,7 @@ class XmlExtractorTest extends TestCase
                     'denormalizationContext' => [
                         'groups' => 'comment:write',
                     ],
+                    'collectDenormalizationErrors' => null,
                     'hydraContext' => [
                         'foo' => ['bar' => 'baz'],
                     ],
@@ -238,6 +240,7 @@ class XmlExtractorTest extends TestCase
                             'denormalizationContext' => [
                                 'groups' => 'comment:write',
                             ],
+                            'collectDenormalizationErrors' => null,
                             'hydraContext' => [
                                 'foo' => ['bar' => 'baz'],
                             ],
@@ -334,6 +337,7 @@ class XmlExtractorTest extends TestCase
                             'denormalizationContext' => [
                                 'groups' => 'comment:write',
                             ],
+                            'collectDenormalizationErrors' => null,
                             'hydraContext' => [
                                 'foo' => ['bar' => 'baz'],
                             ],

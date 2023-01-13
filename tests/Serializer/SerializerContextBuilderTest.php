@@ -118,4 +118,14 @@ class SerializerContextBuilderTest extends TestCase
         $expected = ['bar' => 'baz', 'operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation];
         $this->assertEquals($expected, $this->builder->createFromRequest(Request::create('/foos/1'), false, ['resource_class' => 'Foo', 'operation_name' => 'get']));
     }
+
+    public function testCreateFromRequestKeyCollectDenormalizationErrorsIsInContext(): void
+    {
+        $operationWithCollectDenormalizationErrors = $this->operation->withCollectDenormalizationErrors(true);
+        $request = Request::create('/foos', 'POST');
+        $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'post', '_api_format' => 'xml', '_api_mime_type' => 'text/xml', '_api_operation' => $operationWithCollectDenormalizationErrors]);
+        $serializerContext = $this->builder->createFromRequest($request, false);
+        $this->assertArrayHasKey('collect_denormalization_errors', $serializerContext);
+        $this->assertTrue($serializerContext['collect_denormalization_errors']);
+    }
 }

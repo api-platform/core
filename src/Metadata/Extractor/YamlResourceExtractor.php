@@ -159,6 +159,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'output' => $this->phpize($resource, 'output', 'bool|string'),
             'normalizationContext' => $this->buildArrayValue($resource, 'normalizationContext'),
             'denormalizationContext' => $this->buildArrayValue($resource, 'denormalizationContext'),
+            'collectDenormalizationErrors' => $this->phpize($resource, 'collectDenormalizationErrors', 'bool'),
             'validationContext' => $this->buildArrayValue($resource, 'validationContext'),
             'filters' => $this->buildArrayValue($resource, 'filters'),
             'order' => $this->buildArrayValue($resource, 'order'),

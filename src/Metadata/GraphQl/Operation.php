@@ -49,6 +49,7 @@ class Operation extends AbstractOperation
         ?string $description = null,
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
+        ?bool $collectDenormalizationErrors = null,
         ?string $security = null,
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
@@ -75,7 +76,7 @@ class Operation extends AbstractOperation
         ?string $name = null,
         ?string $provider = null,
         ?string $processor = null,
-        protected ?OptionsInterface $stateOptions = null,
+        ?OptionsInterface $stateOptions = null,
         array $extraProperties = [],
     ) {
         // Abstract operation properties
@@ -96,6 +97,7 @@ class Operation extends AbstractOperation
         $this->description = $description;
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
+        $this->collectDenormalizationErrors = $collectDenormalizationErrors;
         $this->security = $security;
         $this->securityMessage = $securityMessage;
         $this->securityPostDenormalize = $securityPostDenormalize;
@@ -122,6 +124,7 @@ class Operation extends AbstractOperation
         $this->name = $name;
         $this->provider = $provider;
         $this->processor = $processor;
+        $this->stateOptions = $stateOptions;
         $this->extraProperties = $extraProperties;
     }
 

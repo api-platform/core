@@ -17,13 +17,22 @@ use ApiPlatform\Api\FormatMatcher;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorTrait;
 
 /**
  * Updates the entity retrieved by the data provider with data contained in the request body.
@@ -36,9 +45,15 @@ final class DeserializeListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'deserialize';
 
-    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
+        if (null === $this->translator) {
+            $this->translator = new class() implements TranslatorInterface, LocaleAwareInterface {
+                use TranslatorTrait;
+            };
+            $this->translator->setLocale('en');
+        }
     }
 
     /**
@@ -80,11 +95,28 @@ final class DeserializeListener
         ) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
-
-        $request->attributes->set(
-            'data',
-            $this->serializer->deserialize($request->getContent(), $context['resource_class'], $format, $context)
-        );
+        try {
+            $request->attributes->set(
+                'data',
+                $this->serializer->deserialize($request->getContent(), $context['resource_class'], $format, $context)
+            );
+        } catch (PartialDenormalizationException $e) {
+            $violations = new ConstraintViolationList();
+            foreach ($e->getErrors() as $exception) {
+                if (!$exception instanceof NotNormalizableValueException) {
+                    continue;
+                }
+                $message = (new Type($exception->getExpectedTypes() ?? []))->message;
+                $parameters = [];
+                if ($exception->canUseMessageForUser()) {
+                    $parameters['hint'] = $exception->getMessage();
+                }
+                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $exception->getExpectedTypes() ?? [])], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) $exception->getCode()));
+            }
+            if (0 !== \count($violations)) {
+                throw new ValidationException($violations);
+            }
+        }
     }
 
     /**
