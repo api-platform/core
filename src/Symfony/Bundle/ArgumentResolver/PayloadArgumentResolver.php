@@ -57,7 +57,7 @@ final class PayloadArgumentResolver implements CompatibleValueResolverInterface
         return $inputClass === $class || is_subclass_of($inputClass, $class);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve(Request $request, ArgumentMetadata $argument): \Generator
     {
         if (interface_exists(ValueResolverInterface::class)) {
             if (!$this->supports($request, $argument)) {
