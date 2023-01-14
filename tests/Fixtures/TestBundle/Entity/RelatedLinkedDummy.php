@@ -54,7 +54,7 @@ class RelatedLinkedDummy
     private $id;
 
     #[ORM\ManyToOne(targetEntity: SecuredDummy::class)]
-    private SecuredDummy $securedDummy;
+    private ?SecuredDummy $securedDummy = null;
 
     public function getId()
     {
@@ -66,12 +66,12 @@ class RelatedLinkedDummy
         $this->id = $id;
     }
 
-    public function getSecuredDummy(): SecuredDummy
+    public function getSecuredDummy(): ?SecuredDummy
     {
         return $this->securedDummy;
     }
 
-    public function setSecuredDummy(SecuredDummy $securedDummy): void
+    public function setSecuredDummy(?SecuredDummy $securedDummy): void
     {
         $this->securedDummy = $securedDummy;
     }
