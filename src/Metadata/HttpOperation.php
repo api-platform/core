@@ -51,6 +51,10 @@ class HttpOperation extends Operation
      *     stale_while_revalidate?: int,
      *     stale-if-error?: int,
      * }|null $cacheHeaders {@see https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers}
+     * @param array{
+     *     field: string,
+     *     direction: string,
+     * }|null $paginationViaCursor {@see https://api-platform.com/docs/core/pagination/#cursor-based-pagination}
      * @param array|null $normalizationContext   {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
      * @param array|null $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
      * @param array|null $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}
@@ -90,6 +94,7 @@ class HttpOperation extends Operation
         protected ?string $condition = null,
         protected ?string $controller = null,
         protected ?array $cacheHeaders = null,
+        protected ?array $paginationViaCursor = null,
         protected ?array $hydraContext = null,
         protected ?array $openapiContext = null,
         protected ?bool $openapi = null,
@@ -108,7 +113,6 @@ class HttpOperation extends Operation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        ?array $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -154,7 +158,6 @@ class HttpOperation extends Operation
             $paginationClientPartial,
             $paginationFetchJoinCollection,
             $paginationUseOutputWalkers,
-            $paginationViaCursor,
             $order,
             $description,
             $normalizationContext,
@@ -461,6 +464,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->cacheHeaders = $cacheHeaders;
+
+        return $self;
+    }
+
+    public function getPaginationViaCursor(): ?array
+    {
+        return $this->paginationViaCursor;
+    }
+
+    public function withPaginationViaCursor(array $paginationViaCursor): self
+    {
+        $self = clone $this;
+        $self->paginationViaCursor = $paginationViaCursor;
 
         return $self;
     }
