@@ -61,7 +61,7 @@ final class PayloadArgumentResolver implements CompatibleValueResolverInterface
     {
         if (interface_exists(ValueResolverInterface::class)) {
             if (!$this->supports($request, $argument)) {
-                yield [];
+                return [];
             }
         }
 
