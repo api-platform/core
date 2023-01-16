@@ -19,18 +19,25 @@ use ApiPlatform\Metadata\Operation as AbstractOperation;
 class Operation extends AbstractOperation
 {
     /**
-     * @param mixed|null  $input
-     * @param mixed|null  $output
-     * @param mixed|null  $mercure
-     * @param mixed|null  $messenger
      * @param Link[]|null $links
+     * @param array{
+     *     class?: string|null,
+     *     name?: string,
+     * }|string|false|null $input {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
+     * @param array{
+     *     class?: string|null,
+     *     name?: string,
+     * }|string|false|null $output {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
+     * @param string|array|bool|null $mercure   {@see https://api-platform.com/docs/core/mercure}
+     * @param string|bool|null       $messenger {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
+     * @param string|callable|null   $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
+     * @param string|callable|null   $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
      */
     public function __construct(
         protected ?string $resolver = null,
         protected ?array $args = null,
         protected ?array $links = null,
 
-        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -71,54 +78,55 @@ class Operation extends AbstractOperation
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
-        ?string $provider = null,
-        ?string $processor = null,
+        $provider = null,
+        $processor = null,
         array $extraProperties = []
     ) {
-        // Abstract operation properties
-        $this->shortName = $shortName;
-        $this->class = $class;
-        $this->paginationEnabled = $paginationEnabled;
-        $this->paginationType = $paginationType;
-        $this->paginationItemsPerPage = $paginationItemsPerPage;
-        $this->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
-        $this->paginationPartial = $paginationPartial;
-        $this->paginationClientEnabled = $paginationClientEnabled;
-        $this->paginationClientItemsPerPage = $paginationClientItemsPerPage;
-        $this->paginationClientPartial = $paginationClientPartial;
-        $this->paginationFetchJoinCollection = $paginationFetchJoinCollection;
-        $this->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-        $this->order = $order;
-        $this->description = $description;
-        $this->normalizationContext = $normalizationContext;
-        $this->denormalizationContext = $denormalizationContext;
-        $this->security = $security;
-        $this->securityMessage = $securityMessage;
-        $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-        $this->securityPostValidation = $securityPostValidation;
-        $this->securityPostValidationMessage = $securityPostValidationMessage;
-        $this->deprecationReason = $deprecationReason;
-        $this->filters = $filters;
-        $this->validationContext = $validationContext;
-        $this->input = $input;
-        $this->output = $output;
-        $this->mercure = $mercure;
-        $this->messenger = $messenger;
-        $this->elasticsearch = $elasticsearch;
-        $this->urlGenerationStrategy = $urlGenerationStrategy;
-        $this->read = $read;
-        $this->deserialize = $deserialize;
-        $this->validate = $validate;
-        $this->write = $write;
-        $this->serialize = $serialize;
-        $this->fetchPartial = $fetchPartial;
-        $this->forceEager = $forceEager;
-        $this->priority = $priority;
-        $this->name = $name;
-        $this->provider = $provider;
-        $this->processor = $processor;
-        $this->extraProperties = $extraProperties;
+        parent::__construct(
+            shortName: $shortName,
+            class: $class,
+            paginationEnabled: $paginationEnabled,
+            paginationType: $paginationType,
+            paginationItemsPerPage: $paginationItemsPerPage,
+            paginationMaximumItemsPerPage: $paginationMaximumItemsPerPage,
+            paginationPartial: $paginationPartial,
+            paginationClientEnabled: $paginationClientEnabled,
+            paginationClientItemsPerPage: $paginationClientItemsPerPage,
+            paginationClientPartial: $paginationClientPartial,
+            paginationFetchJoinCollection: $paginationFetchJoinCollection,
+            paginationUseOutputWalkers: $paginationUseOutputWalkers,
+            order: $order,
+            description: $description,
+            normalizationContext: $normalizationContext,
+            denormalizationContext: $denormalizationContext,
+            security: $security,
+            securityMessage: $securityMessage,
+            securityPostDenormalize: $securityPostDenormalize,
+            securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
+            securityPostValidation: $securityPostValidation,
+            securityPostValidationMessage: $securityPostValidationMessage,
+            deprecationReason: $deprecationReason,
+            filters: $filters,
+            validationContext: $validationContext,
+            input: $input,
+            output: $output,
+            mercure: $mercure,
+            messenger: $messenger,
+            elasticsearch: $elasticsearch,
+            urlGenerationStrategy: $urlGenerationStrategy,
+            read: $read,
+            deserialize: $deserialize,
+            validate: $validate,
+            write: $write,
+            serialize: $serialize,
+            fetchPartial: $fetchPartial,
+            forceEager: $forceEager,
+            priority: $priority,
+            name: $name,
+            provider: $provider,
+            processor: $processor,
+            extraProperties: $extraProperties
+        );
     }
 
     public function getResolver(): ?string

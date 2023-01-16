@@ -16,9 +16,6 @@ namespace ApiPlatform\Metadata;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Delete extends HttpOperation implements DeleteOperationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         ?string $uriTemplate = null,
         ?array $types = null,
@@ -41,12 +38,10 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         ?string $controller = null,
         ?array $cacheHeaders = null,
         ?array $paginationViaCursor = null,
-
         ?array $hydraContext = null,
         ?array $openapiContext = null,
         ?bool $openapi = null,
         ?array $exceptionToStatus = null,
-
         ?bool $queryParameterValidationEnabled = null,
 
         ?string $shortName = null,
@@ -91,8 +86,79 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
     ) {
-        parent::__construct(self::METHOD_DELETE, ...\func_get_args());
+        parent::__construct(
+            method: self::METHOD_DELETE,
+            uriTemplate: $uriTemplate,
+            types: $types,
+            formats: $formats,
+            inputFormats: $inputFormats,
+            outputFormats: $outputFormats,
+            uriVariables: $uriVariables,
+            routePrefix: $routePrefix,
+            routeName: $routeName,
+            defaults: $defaults,
+            requirements: $requirements,
+            options: $options,
+            stateless: $stateless,
+            sunset: $sunset,
+            acceptPatch: $acceptPatch,
+            status: $status,
+            host: $host,
+            schemes: $schemes,
+            condition: $condition,
+            controller: $controller,
+            cacheHeaders: $cacheHeaders,
+            paginationViaCursor: $paginationViaCursor,
+            hydraContext: $hydraContext,
+            openapiContext: $openapiContext,
+            openapi: $openapi,
+            exceptionToStatus: $exceptionToStatus,
+            queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            shortName: $shortName,
+            class: $class,
+            paginationEnabled: $paginationEnabled,
+            paginationType: $paginationType,
+            paginationItemsPerPage: $paginationItemsPerPage,
+            paginationMaximumItemsPerPage: $paginationMaximumItemsPerPage,
+            paginationPartial: $paginationPartial,
+            paginationClientEnabled: $paginationClientEnabled,
+            paginationClientItemsPerPage: $paginationClientItemsPerPage,
+            paginationClientPartial: $paginationClientPartial,
+            paginationFetchJoinCollection: $paginationFetchJoinCollection,
+            paginationUseOutputWalkers: $paginationUseOutputWalkers,
+            order: $order,
+            description: $description,
+            normalizationContext: $normalizationContext,
+            denormalizationContext: $denormalizationContext,
+            security: $security,
+            securityMessage: $securityMessage,
+            securityPostDenormalize: $securityPostDenormalize,
+            securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
+            securityPostValidation: $securityPostValidation,
+            securityPostValidationMessage: $securityPostValidationMessage,
+            deprecationReason: $deprecationReason,
+            filters: $filters,
+            validationContext: $validationContext,
+            input: $input,
+            output: $output,
+            mercure: $mercure,
+            messenger: $messenger,
+            elasticsearch: $elasticsearch,
+            urlGenerationStrategy: $urlGenerationStrategy,
+            read: $read,
+            deserialize: $deserialize,
+            validate: $validate,
+            write: $write,
+            serialize: $serialize,
+            fetchPartial: $fetchPartial,
+            forceEager: $forceEager,
+            priority: $priority,
+            name: $name,
+            provider: $provider,
+            processor: $processor,
+            extraProperties: $extraProperties
+        );
     }
 }

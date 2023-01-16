@@ -24,50 +24,53 @@ class HttpOperation extends Operation
     public const METHOD_OPTIONS = 'OPTIONS';
 
     /**
-     * @param array|null                                                      $types                          the RDF types of this property
-     * @param array|string|null                                               $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array|string|null                                               $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array|string|null                                               $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array<string, Link>|array<string, mixed[]>|string[]|string|null $uriVariables
-     * @param string|null                                                     $routePrefix                    https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
-     * @param string|null                                                     $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
-     * @param string|int|null                                                 $status
-     * @param string|null                                                     $deprecationReason              https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param array|null                                                      $cacheHeaders                   https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
-     * @param array|null                                                      $paginationViaCursor            https://api-platform.com/docs/core/pagination/#cursor-based-pagination
-     * @param array|null                                                      $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
-     * @param array|null                                                      $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
-     * @param string[]                                                        $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
-     * @param array|null                                                      $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param string[]|null                                                   $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
-     * @param bool|null                                                       $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
-     * @param mixed|null                                                      $mercure                        https://api-platform.com/docs/core/mercure
-     * @param mixed|null                                                      $messenger                      https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus
-     * @param mixed|null                                                      $input                          https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
-     * @param mixed|null                                                      $output                         https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
-     * @param array|null                                                      $order                          https://api-platform.com/docs/core/default-order/#overriding-default-order
-     * @param bool|null                                                       $fetchPartial                   https://api-platform.com/docs/core/performance/#fetch-partial
-     * @param bool|null                                                       $forceEager                     https://api-platform.com/docs/core/performance/#force-eager
-     * @param bool|null                                                       $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
-     * @param bool|null                                                       $paginationClientItemsPerPage   https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3
-     * @param bool|null                                                       $paginationClientPartial        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6
-     * @param bool|null                                                       $paginationEnabled              https://api-platform.com/docs/core/pagination/#for-a-specific-resource
-     * @param bool|null                                                       $paginationFetchJoinCollection  https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator
-     * @param int|null                                                        $paginationItemsPerPage         https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page
-     * @param int|null                                                        $paginationMaximumItemsPerPage  https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page
-     * @param bool|null                                                       $paginationPartial              https://api-platform.com/docs/core/performance/#partial-pagination
-     * @param string|null                                                     $paginationType                 https://api-platform.com/docs/core/graphql/#using-the-page-based-pagination
-     * @param string|null                                                     $security                       https://api-platform.com/docs/core/security
-     * @param string|null                                                     $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param string|null                                                     $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param string|null                                                     $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param bool|null                                                       $read                           https://api-platform.com/docs/core/events/#the-event-system
-     * @param bool|null                                                       $deserialize                    https://api-platform.com/docs/core/events/#the-event-system
-     * @param bool|null                                                       $validate                       https://api-platform.com/docs/core/events/#the-event-system
-     * @param bool|null                                                       $write                          https://api-platform.com/docs/core/events/#the-event-system
-     * @param bool|null                                                       $serialize                      https://api-platform.com/docs/core/events/#the-event-system
-     * @param mixed|null                                                      $provider
-     * @param mixed|null                                                      $processor
+     * @param string[]|null                              $types         the RDF types of this property
+     * @param array<string, string|string[]>|string|null $formats       {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
+     * @param array<string, string|string[]>|string|null $inputFormats  {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
+     * @param array<string, string|string[]>|string|null $outputFormats {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
+     * @param array<string,array{
+     *     0: string,
+     *     1: string
+     * }|array{
+     *     from_property?: string,
+     *     to_property?: string,
+     *     from_class?: string,
+     *     to_class?: string,
+     *     identifiers?: string[],
+     *     composite_identifier?: bool,
+     *     expanded_value?: string,
+     * }|Link>|string[]|string|null $uriVariables {@see https://api-platform.com/docs/core/subresources/}
+     * @param string|null     $routePrefix {@see https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations}
+     * @param string|null     $sunset      {@see https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed}
+     * @param string|int|null $status      {@see https://api-platform.com/docs/core/operations/#configuring-operations}
+     * @param array{
+     *     max_age?: int,
+     *     vary?: string|string[],
+     *     public?: bool,
+     *     shared_max_age?: int,
+     *     stale_while_revalidate?: int,
+     *     stale-if-error?: int,
+     * }|null $cacheHeaders {@see https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers}
+     * @param array{
+     *     field: string,
+     *     direction: string,
+     * }|null $paginationViaCursor {@see https://api-platform.com/docs/core/pagination/#cursor-based-pagination}
+     * @param array|null $normalizationContext   {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
+     * @param array|null $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
+     * @param array|null $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}
+     * @param array|null $openapiContext         {@see https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts}
+     * @param array{
+     *     class?: string|null,
+     *     name?: string,
+     * }|string|false|null $input {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
+     * @param array{
+     *     class?: string|null,
+     *     name?: string,
+     * }|string|false|null $output {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
+     * @param string|array|bool|null $mercure   {@see https://api-platform.com/docs/core/mercure}
+     * @param string|bool|null       $messenger {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
+     * @param string|callable|null   $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
+     * @param string|callable|null   $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
      */
     public function __construct(
         protected string $method = self::METHOD_GET,
@@ -92,15 +95,12 @@ class HttpOperation extends Operation
         protected ?string $controller = null,
         protected ?array $cacheHeaders = null,
         protected ?array $paginationViaCursor = null,
-
         protected ?array $hydraContext = null,
         protected ?array $openapiContext = null,
         protected ?bool $openapi = null,
         protected ?array $exceptionToStatus = null,
-
         protected ?bool $queryParameterValidationEnabled = null,
 
-        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -143,54 +143,56 @@ class HttpOperation extends Operation
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        array $extraProperties = [],
     ) {
-        $this->shortName = $shortName;
-        $this->description = $description;
-        $this->class = $class;
-        $this->urlGenerationStrategy = $urlGenerationStrategy;
-        $this->deprecationReason = $deprecationReason;
-        $this->normalizationContext = $normalizationContext;
-        $this->denormalizationContext = $denormalizationContext;
-        $this->validationContext = $validationContext;
-        $this->filters = $filters;
-        $this->elasticsearch = $elasticsearch;
-        $this->mercure = $mercure;
-        $this->messenger = $messenger;
-        $this->input = $input;
-        $this->output = $output;
-        $this->order = $order;
-        $this->fetchPartial = $fetchPartial;
-        $this->forceEager = $forceEager;
-        $this->paginationClientEnabled = $paginationClientEnabled;
-        $this->paginationClientItemsPerPage = $paginationClientItemsPerPage;
-        $this->paginationClientPartial = $paginationClientPartial;
-        $this->paginationEnabled = $paginationEnabled;
-        $this->paginationFetchJoinCollection = $paginationFetchJoinCollection;
-        $this->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-        $this->paginationItemsPerPage = $paginationItemsPerPage;
-        $this->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
-        $this->paginationPartial = $paginationPartial;
-        $this->paginationType = $paginationType;
-        $this->security = $security;
-        $this->securityMessage = $securityMessage;
-        $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-        $this->securityPostValidation = $securityPostValidation;
-        $this->securityPostValidationMessage = $securityPostValidationMessage;
-        $this->read = $read;
-        $this->deserialize = $deserialize;
-        $this->validate = $validate;
-        $this->write = $write;
-        $this->serialize = $serialize;
-        $this->priority = $priority;
-        $this->name = $name;
-        $this->provider = $provider;
-        $this->processor = $processor;
-        $this->extraProperties = $extraProperties;
+        parent::__construct(
+            shortName: $shortName,
+            class: $class,
+            paginationEnabled: $paginationEnabled,
+            paginationType: $paginationType,
+            paginationItemsPerPage: $paginationItemsPerPage,
+            paginationMaximumItemsPerPage: $paginationMaximumItemsPerPage,
+            paginationPartial: $paginationPartial,
+            paginationClientEnabled: $paginationClientEnabled,
+            paginationClientItemsPerPage: $paginationClientItemsPerPage,
+            paginationClientPartial: $paginationClientPartial,
+            paginationFetchJoinCollection: $paginationFetchJoinCollection,
+            paginationUseOutputWalkers: $paginationUseOutputWalkers,
+            order: $order,
+            description: $description,
+            normalizationContext: $normalizationContext,
+            denormalizationContext: $denormalizationContext,
+            security: $security,
+            securityMessage: $securityMessage,
+            securityPostDenormalize: $securityPostDenormalize,
+            securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
+            securityPostValidation: $securityPostValidation,
+            securityPostValidationMessage: $securityPostValidationMessage,
+            deprecationReason: $deprecationReason,
+            filters: $filters,
+            validationContext: $validationContext,
+            input: $input,
+            output: $output,
+            mercure: $mercure,
+            messenger: $messenger,
+            elasticsearch: $elasticsearch,
+            urlGenerationStrategy: $urlGenerationStrategy,
+            read: $read,
+            deserialize: $deserialize,
+            validate: $validate,
+            write: $write,
+            serialize: $serialize,
+            fetchPartial: $fetchPartial,
+            forceEager: $forceEager,
+            priority: $priority,
+            name: $name,
+            provider: $provider,
+            processor: $processor,
+            extraProperties: $extraProperties
+        );
     }
 
-    public function getMethod(): ?string
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -232,9 +234,6 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    /**
-     * @return array|mixed|string|null
-     */
     public function getFormats()
     {
         return $this->formats;
@@ -248,9 +247,6 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    /**
-     * @return array|mixed|string|null
-     */
     public function getInputFormats()
     {
         return $this->inputFormats;
@@ -264,9 +260,6 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    /**
-     * @return array|mixed|string|null
-     */
     public function getOutputFormats()
     {
         return $this->outputFormats;
@@ -280,17 +273,11 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    /**
-     * @return array<string, Link>|array<string, array>|string[]|string|null
-     */
     public function getUriVariables()
     {
         return $this->uriVariables;
     }
 
-    /**
-     * @param array<string, Link>|array<string, array>|string[]|string $uriVariables
-     */
     public function withUriVariables($uriVariables): self
     {
         $self = clone $this;
@@ -494,9 +481,6 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    /**
-     * @return string[]
-     */
     public function getHydraContext(): ?array
     {
         return $this->hydraContext;
