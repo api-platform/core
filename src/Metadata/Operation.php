@@ -53,7 +53,6 @@ abstract class Operation
         protected ?bool $paginationClientPartial = null,
         protected ?bool $paginationFetchJoinCollection = null,
         protected ?bool $paginationUseOutputWalkers = null,
-        protected ?array $paginationViaCursor = null,
         protected ?array $order = null,
         protected ?string $description = null,
         protected ?array $normalizationContext = null,
@@ -255,19 +254,6 @@ abstract class Operation
     {
         $self = clone $this;
         $self->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-
-        return $self;
-    }
-
-    public function getPaginationViaCursor(): ?array
-    {
-        return $this->paginationViaCursor;
-    }
-
-    public function withPaginationViaCursor(array $paginationViaCursor): self
-    {
-        $self = clone $this;
-        $self->paginationViaCursor = $paginationViaCursor;
 
         return $self;
     }

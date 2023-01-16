@@ -42,6 +42,7 @@ final class Post extends HttpOperation
         ?string $condition = null,
         ?string $controller = null,
         ?array $cacheHeaders = null,
+        ?array $paginationViaCursor = null,
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
@@ -63,7 +64,6 @@ final class Post extends HttpOperation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        ?array $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,

@@ -157,84 +157,96 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             ],
             'mercure' => true,
             'graphQlOperations' => [
-                'mutations' => [
-                    [
-                        'args' => [
-                            'foo' => [
-                                'type' => 'custom',
-                                'bar' => 'baz',
-                            ],
+                [
+                    'args' => [
+                        'foo' => [
+                            'type' => 'custom',
+                            'bar' => 'baz',
                         ],
-                        'shortName' => self::SHORT_NAME,
-                        'description' => 'A list of Comments',
-                        'class' => Mutation::class,
-                        'urlGenerationStrategy' => 0,
-                        'deprecationReason' => 'I don\'t know',
-                        'normalizationContext' => [
-                            'groups' => 'comment:read_collection',
+                    ],
+                    'shortName' => self::SHORT_NAME,
+                    'description' => 'Creates a Comment.',
+                    'class' => Mutation::class,
+                    'name' => 'create',
+                    'urlGenerationStrategy' => 0,
+                    'deprecationReason' => 'I don\'t know',
+                    'normalizationContext' => [
+                        'groups' => 'comment:read_collection',
+                    ],
+                    'denormalizationContext' => [
+                        'groups' => ['comment:write'],
+                    ],
+                    'validationContext' => [
+                        'foo' => 'bar',
+                    ],
+                    'filters' => ['comment.another_custom_filter'],
+                    'elasticsearch' => false,
+                    'mercure' => [
+                        'private' => true,
+                    ],
+                    'messenger' => 'input',
+                    'input' => 'App\Dto\CreateCommentInput',
+                    'output' => 'App\Dto\CommentCollectionOutut',
+                    'order' => ['userId'],
+                    'fetchPartial' => false,
+                    'forceEager' => false,
+                    'paginationClientEnabled' => false,
+                    'paginationClientItemsPerPage' => false,
+                    'paginationClientPartial' => false,
+                    'paginationEnabled' => false,
+                    'paginationFetchJoinCollection' => false,
+                    'paginationUseOutputWalkers' => false,
+                    'paginationItemsPerPage' => 54,
+                    'paginationMaximumItemsPerPage' => 200,
+                    'paginationPartial' => false,
+                    'paginationType' => 'page',
+                    'security' => 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
+                    'securityMessage' => 'Sorry, you can\'t access this collection.',
+                    'securityPostDenormalize' => 'is_granted(\'ROLE_CUSTOM_ADMIN\')',
+                    'securityPostDenormalizeMessage' => 'Sorry, you must an admin to access this collection.',
+                    'read' => true,
+                    'deserialize' => false,
+                    'validate' => false,
+                    'write' => false,
+                    'serialize' => true,
+                    'priority' => 200,
+                    'extraProperties' => [
+                        'custom_property' => 'Lorem ipsum dolor sit amet',
+                        'another_custom_property' => [
+                            'Lorem ipsum' => 'Dolor sit amet',
                         ],
-                        'denormalizationContext' => [
-                            'groups' => ['comment:write'],
-                        ],
-                        'validationContext' => [
-                            'foo' => 'bar',
-                        ],
-                        'filters' => ['comment.another_custom_filter'],
-                        'elasticsearch' => false,
-                        'mercure' => [
-                            'private' => true,
-                        ],
-                        'messenger' => 'input',
-                        'input' => 'App\Dto\CreateCommentInput',
-                        'output' => 'App\Dto\CommentCollectionOutut',
-                        'order' => ['userId'],
-                        'fetchPartial' => false,
-                        'forceEager' => false,
-                        'paginationClientEnabled' => false,
-                        'paginationClientItemsPerPage' => false,
-                        'paginationClientPartial' => false,
-                        'paginationEnabled' => false,
-                        'paginationFetchJoinCollection' => false,
-                        'paginationUseOutputWalkers' => false,
-                        'paginationItemsPerPage' => 54,
-                        'paginationMaximumItemsPerPage' => 200,
-                        'paginationPartial' => false,
-                        'paginationType' => 'page',
-                        'security' => 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
-                        'securityMessage' => 'Sorry, you can\'t access this collection.',
-                        'securityPostDenormalize' => 'is_granted(\'ROLE_CUSTOM_ADMIN\')',
-                        'securityPostDenormalizeMessage' => 'Sorry, you must an admin to access this collection.',
-                        'read' => true,
-                        'deserialize' => false,
-                        'validate' => false,
-                        'write' => false,
-                        'serialize' => true,
-                        'priority' => 200,
-                        'extraProperties' => [
-                            'custom_property' => 'Lorem ipsum dolor sit amet',
-                            'another_custom_property' => [
-                                'Lorem ipsum' => 'Dolor sit amet',
-                            ],
-                            'foo' => 'bar',
-                            'route_prefix' => '/v1', // from defaults
+                        'foo' => 'bar',
+                        'route_prefix' => '/v1', // from defaults
+                    ],
+                ],
+                [
+                    'class' => Query::class,
+                    'extraProperties' => [
+                        'route_prefix' => '/v1',
+                        'custom_property' => 'Lorem ipsum dolor sit amet',
+                        'another_custom_property' => [
+                            'Lorem ipsum' => 'Dolor sit amet',
                         ],
                     ],
                 ],
-                'queries' => [
-                    [
-                        'class' => Query::class,
-                        'extraProperties' => ['route_prefix' => '/v1'],
-                    ],
-                    [
-                        'class' => QueryCollection::class,
-                        'collection' => true,
-                        'extraProperties' => ['route_prefix' => '/v1'],
+                [
+                    'class' => QueryCollection::class,
+                    'extraProperties' => [
+                        'route_prefix' => '/v1',
+                        'custom_property' => 'Lorem ipsum dolor sit amet',
+                        'another_custom_property' => [
+                            'Lorem ipsum' => 'Dolor sit amet',
+                        ],
                     ],
                 ],
-                'subscriptions' => [
-                    [
-                        'class' => Subscription::class,
-                        'extraProperties' => ['route_prefix' => '/v1'],
+                [
+                    'class' => Subscription::class,
+                    'extraProperties' => [
+                        'route_prefix' => '/v1',
+                        'custom_property' => 'Lorem ipsum dolor sit amet',
+                        'another_custom_property' => [
+                            'Lorem ipsum' => 'Dolor sit amet',
+                        ],
                     ],
                 ],
             ],
@@ -581,33 +593,32 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     private function withGraphQlOperations(array $values, ?array $fixtures): array
     {
         $operations = [];
-        foreach ($values as $graphQlOperations) {
-            foreach ($graphQlOperations as $value) {
-                $class = $value['class'];
-                $operation = new $class();
-                unset($value['collection']);
+        foreach ($values as $value) {
+            $class = $value['class'];
+            unset($value['class']);
+            $operation = (new $class())->withClass(self::RESOURCE_CLASS);
 
-                foreach (self::BASE as $parameter) {
-                    if ((!\array_key_exists($parameter, $value) || null === $value[$parameter]) && isset($fixtures[$parameter])) {
-                        $value[$parameter] = $fixtures[$parameter];
-                    }
+            foreach (self::BASE as $parameter) {
+                if ((!\array_key_exists($parameter, $value) || null === $value[$parameter]) && isset($fixtures[$parameter])) {
+                    $value[$parameter] = $fixtures[$parameter];
                 }
-
-                foreach ($value as $parameter => $parameterValue) {
-                    if (method_exists($this, 'with'.ucfirst($parameter))) {
-                        $parameterValue = $this->{'with'.ucfirst($parameter)}($parameterValue);
-                    }
-
-                    if (method_exists($operation, 'with'.ucfirst($parameter))) {
-                        $operation = $operation->{'with'.ucfirst($parameter)}($parameterValue);
-                        continue;
-                    }
-
-                    throw new \RuntimeException(sprintf('Unknown GraphQlOperation parameter "%s".', $parameter));
-                }
-
-                $operations[] = $operation;
             }
+
+            foreach ($value as $parameter => $parameterValue) {
+                if (method_exists($this, 'with'.ucfirst($parameter))) {
+                    $parameterValue = $this->{'with'.ucfirst($parameter)}($parameterValue);
+                }
+
+                if (method_exists($operation, 'with'.ucfirst($parameter))) {
+                    $operation = $operation->{'with'.ucfirst($parameter)}($parameterValue);
+                    continue;
+                }
+
+                throw new \RuntimeException(sprintf('Unknown GraphQlOperation parameter "%s".', $parameter));
+            }
+
+            $operationName = $operation->getName();
+            $operations[$operationName] = $operation;
         }
 
         return $operations;

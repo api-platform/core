@@ -15,11 +15,6 @@ namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\GraphQl\DeleteMutation;
-use ApiPlatform\Metadata\GraphQl\Mutation;
-use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Post;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -292,42 +287,45 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         $data = [];
-        foreach (['mutations' => Mutation::class, 'queries' => Query::class, 'subscriptions' => Subscription::class] as $type => $class) {
-            if (!\array_key_exists($type, $resource['graphQlOperations'])) {
-                continue;
+        foreach ($resource['graphQlOperations'] as $class => $operation) {
+            if (null === $operation) {
+                $operation = [];
             }
 
-            foreach ($resource['graphQlOperations'][$type] as $operation) {
-                $datum = $this->buildBase($operation);
-                foreach ($datum as $key => $value) {
-                    if (null === $value) {
-                        $datum[$key] = $root[$key];
-                    }
+            if (\array_key_exists('class', $operation)) {
+                if (!\array_key_exists('name', $operation) && \is_string($class)) {
+                    $operation['name'] = $class;
                 }
-
-                $collection = $this->phpize($operation, 'collection', 'bool', false);
-                if (Query::class === $class && $collection) {
-                    $class = QueryCollection::class;
-                }
-
-                $delete = $this->phpize($operation, 'delete', 'bool', false);
-                if (Mutation::class === $class && $delete) {
-                    $class = DeleteMutation::class;
-                }
-
-                $data[] = array_merge($datum, [
-                    'graphql_operation_class' => $class,
-                    'resolver' => $this->phpize($operation, 'resolver', 'string'),
-                    'args' => $operation['args'] ?? null,
-                    'class' => $this->phpize($operation, 'class', 'string'),
-                    'read' => $this->phpize($operation, 'read', 'bool'),
-                    'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
-                    'validate' => $this->phpize($operation, 'validate', 'bool'),
-                    'write' => $this->phpize($operation, 'write', 'bool'),
-                    'serialize' => $this->phpize($operation, 'serialize', 'bool'),
-                    'priority' => $this->phpize($operation, 'priority', 'integer'),
-                ]);
+                $class = $operation['class'];
             }
+
+            if (empty($class)) {
+                throw new InvalidArgumentException('Missing "class" attribute');
+            }
+
+            if (!class_exists($class)) {
+                throw new InvalidArgumentException(sprintf('Operation class "%s" does not exist', $class));
+            }
+
+            $datum = $this->buildBase($operation);
+            foreach ($datum as $key => $value) {
+                if (null === $value) {
+                    $datum[$key] = $root[$key];
+                }
+            }
+
+            $data[] = array_merge($datum, [
+                'resolver' => $this->phpize($operation, 'resolver', 'string'),
+                'args' => $operation['args'] ?? null,
+                'class' => (string) $class,
+                'read' => $this->phpize($operation, 'read', 'bool'),
+                'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
+                'validate' => $this->phpize($operation, 'validate', 'bool'),
+                'write' => $this->phpize($operation, 'write', 'bool'),
+                'serialize' => $this->phpize($operation, 'serialize', 'bool'),
+                'priority' => $this->phpize($operation, 'priority', 'integer'),
+                'name' => $this->phpize($operation, 'name', 'string'),
+            ]);
         }
 
         return $data ?: null;

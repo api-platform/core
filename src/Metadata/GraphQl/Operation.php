@@ -43,7 +43,6 @@ class Operation extends AbstractOperation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        ?array $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -89,7 +88,6 @@ class Operation extends AbstractOperation
         $this->paginationClientPartial = $paginationClientPartial;
         $this->paginationFetchJoinCollection = $paginationFetchJoinCollection;
         $this->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-        $this->paginationViaCursor = $paginationViaCursor;
         $this->order = $order;
         $this->description = $description;
         $this->normalizationContext = $normalizationContext;
