@@ -52,7 +52,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             try {
                 simplexml_import_dom(XmlUtils::loadFile($path, XmlPropertyExtractor::SCHEMA));
             } catch (\InvalidArgumentException) {
-                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+                throw new InvalidArgumentException(sprintf('Error while parsing %s: %s', $path, $e->getMessage()), $e->getCode(), $e);
             }
 
             // It's a property: ignore error
