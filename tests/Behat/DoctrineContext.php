@@ -65,6 +65,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\IriOnlyDummy as IriOnlyDummyD
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsDummy as MultiRelationsDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsRelatedDummy as MultiRelationsRelatedDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MusicGroup as MusicGroupDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
@@ -88,6 +89,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\UrlEncodedId as UrlEncodedIdDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\VideoGame as VideoGameDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\WithJsonDummy as WithJsonDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy;
@@ -142,6 +144,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MusicGroup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Order;
@@ -171,6 +174,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UrlEncodedId;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\VideoGame;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\WithJsonDummy;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
@@ -2031,6 +2035,27 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there is a video game with music groups
+     */
+    public function thereAreVideoGamesWithMusicGroups(): void
+    {
+        $sum41 = $this->buildMusicGroup();
+        $sum41->name = 'Sum 41';
+        $this->manager->persist($sum41);
+        $franz = $this->buildMusicGroup();
+        $franz->name = 'Franz Ferdinand';
+        $this->manager->persist($franz);
+
+        $videoGame = $this->buildVideoGame();
+        $videoGame->name = 'Guitar Hero';
+        $videoGame->addMusicGroup($sum41);
+        $videoGame->addMusicGroup($franz);
+        $this->manager->persist($videoGame);
+
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -2364,5 +2389,15 @@ final class DoctrineContext implements Context
     private function buildMultiRelationsRelatedDummy(): MultiRelationsRelatedDummy|MultiRelationsRelatedDummyDocument
     {
         return $this->isOrm() ? new MultiRelationsRelatedDummy() : new MultiRelationsRelatedDummyDocument();
+    }
+
+    private function buildMusicGroup(): MusicGroup|MusicGroupDocument
+    {
+        return $this->isOrm() ? new MusicGroup() : new MusicGroupDocument();
+    }
+
+    private function buildVideoGame(): VideoGame|VideoGameDocument
+    {
+        return $this->isOrm() ? new VideoGame() : new VideoGameDocument();
     }
 }
