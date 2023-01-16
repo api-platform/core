@@ -51,9 +51,7 @@
 
     <xsd:complexType name="graphQlOperations">
         <xsd:sequence maxOccurs="unbounded">
-            <xsd:element name="mutation" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
-            <xsd:element name="query" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
-            <xsd:element name="subscription" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
+            <xsd:element name="graphQlOperation" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -64,9 +62,7 @@
         </xsd:sequence>
         <xsd:attributeGroup ref="base"/>
         <xsd:attribute type="xsd:string" name="resolver"/>
-        <xsd:attribute type="xsd:string" name="class"/>
-        <xsd:attribute type="xsd:boolean" name="collection"/>
-        <xsd:attribute type="xsd:boolean" name="delete"/>
+        <xsd:attribute type="xsd:string" name="class" use="required"/>
         <xsd:attribute type="xsd:boolean" name="read"/>
         <xsd:attribute type="xsd:boolean" name="deserialize"/>
         <xsd:attribute type="xsd:boolean" name="validate"/>

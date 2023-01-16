@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -148,10 +149,13 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         foreach ($data as $attributes) {
-            /** @var HttpOperation $operation */
-            $operation = (new $attributes['graphql_operation_class']())->withShortName($resource->getShortName());
-            unset($attributes['graphql_operation_class']);
+            if (!class_exists($attributes['class'])) {
+                throw new \InvalidArgumentException(sprintf('Operation "%s" does not exist.', $attributes['class']));
+            }
 
+            /** @var GraphQlOperation $operation */
+            $operation = (new $attributes['class']())->withShortName($resource->getShortName());
+            unset($attributes['class']);
             foreach ($attributes as $key => $value) {
                 if (null === $value) {
                     continue;
@@ -168,7 +172,8 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 $operation = $operation->withExtraProperties(array_merge($operation->getExtraProperties(), [$key => $value]));
             }
 
-            $operations[] = $operation;
+            [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
+            $operations[$key] = $operation;
         }
 
         $resource = $resource->withGraphQlOperations($operations);

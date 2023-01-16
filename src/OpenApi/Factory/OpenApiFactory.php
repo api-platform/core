@@ -477,7 +477,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $operationName === $operation->getName() ||
                     isset($links[$operationName]) ||
                     $operation instanceof CollectionOperationInterface ||
-                    HttpOperation::METHOD_GET !== ($method ?? null)
+                    HttpOperation::METHOD_GET !== $method
                 ) {
                     continue;
                 }

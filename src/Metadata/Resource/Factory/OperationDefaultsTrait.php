@@ -208,7 +208,7 @@ trait OperationDefaultsTrait
         return sprintf(
             '_api_%s_%s%s',
             $path ?: ($operation->getShortName() ?? $this->getDefaultShortname($resourceClass)),
-            strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET),
+            strtolower($operation->getMethod()),
             $operation instanceof CollectionOperationInterface ? '_collection' : '');
     }
 }

@@ -1,5 +1,25 @@
 # Changelog
 
+## v3.0.10
+
+### Bug fixes
+
+* [ec67b3f47](https://github.com/api-platform/core/commit/ec67b3f4745e5907f6b199d07c59af946f47a35d) fix: fix argument resolver error (#5342)
+
+## v3.0.9
+
+### Bug fixes
+
+* [3d8371a56](https://github.com/api-platform/core/commit/3d8371a56f12468df7b0fa8974a9babe35578b26) fix(graphql): use depth for nested resource class operation (#5314)
+* [6f9289eb8](https://github.com/api-platform/core/commit/6f9289eb8795e9ae121b97122336c754cd69acc4) fix(serializer): use symfony's default serializer context (#5305)
+* [af98b645f](https://github.com/api-platform/core/commit/af98b645f6063b70c5e50e489ee933acfe0ad3a5) fix: compatibility with PHP 8.2 (#5292)
+* [b5734a73e](https://github.com/api-platform/core/commit/b5734a73e1f9c01db80a57ec0d6c24c7d4122bb7) fix(graphql): pass graphql enabled flag (#5315)
+
+
+### Features
+
+* [9632b6416](https://github.com/api-platform/core/commit/9632b64160272620f68db771e35712b573ccd040) feat: serialize error title from ValidationException (#5313)
+
 ## v3.0.8
 
 ### Bug fixes
@@ -123,6 +143,17 @@ Breaking changes:
 * Serializer: `skip_null_values` now defaults to `true`
 * Metadata: `Patch` is added to the automatic CRUD
 * Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
+    
+## v2.7.6
+
+### Bug fixes
+
+* [31215c623](https://github.com/api-platform/core/commit/31215c62365c6b9095486c307d29837e53c0357a) ci: fix mongod startup (#5248)
+* [444f339ae](https://github.com/api-platform/core/commit/444f339ae8c73d2b1a23a703f44adbc6f8d52305) fix: avoid unneeded use of covariance to keep compatibility with PHP < 7.4 (#5327)
+* [5baea781c](https://github.com/api-platform/core/commit/5baea781cf20249032fac337728da2f5617789db) fix(metadata): fix extra properties method (#5294)
+* [a6f0d9aac](https://github.com/api-platform/core/commit/a6f0d9aac5b13c13694ebfa67e2a13b4a216c329) fix(symfony): http cache wrong metadata argument
+* [ab6822f77](https://github.com/api-platform/core/commit/ab6822f775ab63070adaab68ae13adc01a6e3dd7) fix: Set twig.exception_listener as service parent (#5059)
+* [f22fa73f4](https://github.com/api-platform/core/commit/f22fa73f41663f2c6a2391d3c1b8623098a51a0d) fix(elasticsearch): elasticsearch BC
 
 ## v2.7.5
 
