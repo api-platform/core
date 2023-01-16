@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.10
+
+### Bug fixes
+
+* [ec67b3f47](https://github.com/api-platform/core/commit/ec67b3f4745e5907f6b199d07c59af946f47a35d) fix: fix argument resolver error (#5342)
+
 ## v3.0.9
 
 ### Bug fixes
