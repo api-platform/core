@@ -395,7 +395,7 @@ class XmlExtractorTest extends TestCase
         return [
             [
                 __DIR__.'/xml/invalid/required_class.xml',
-                "/^Error while parsing .+\/xml\/invalid\/required_class.xml:\n\[ERROR 1868\] Element '\{https:\/\/api-platform\.com\/schema\/metadata\/resources-3\.0\}resource': The attribute 'class' is required but missing\./",
+                "/^Error while parsing .+\/xml\/invalid\/required_class.xml: \[ERROR 1868\] Element '\{https:\/\/api-platform\.com\/schema\/metadata\/resources-3\.0\}resource': The attribute 'class' is required but missing\./",
             ],
         ];
     }
