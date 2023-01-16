@@ -30,8 +30,8 @@ class Operation extends AbstractOperation
      * }|string|false|null $output {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
      * @param string|array|bool|null $mercure   {@see https://api-platform.com/docs/core/mercure}
      * @param string|bool|null       $messenger {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
-     * @param string|null            $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
-     * @param string|null            $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
+     * @param string|callable|null   $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
+     * @param string|callable|null   $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
      */
     public function __construct(
         protected ?string $resolver = null,
@@ -79,8 +79,8 @@ class Operation extends AbstractOperation
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
-        ?string $provider = null,
-        ?string $processor = null,
+        $provider = null,
+        $processor = null,
         array $extraProperties = []
     ) {
         parent::__construct(
