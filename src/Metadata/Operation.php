@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+/**
+ * ⚠ This class and its children offer no backward compatibility regarding positional parameters.
+ */
 abstract class Operation
 {
     use WithResourceTrait;
