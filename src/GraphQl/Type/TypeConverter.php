@@ -167,16 +167,14 @@ final class TypeConverter implements TypeConverterInterface
 
         // We're retrieving the type of a property which is a relation to the root resource.
         if ($resourceClass !== $rootResource && $rootOperation instanceof Query) {
-            $operationName = $isCollection ? 'collection_query' : 'item_query';
-        }
-
-        try {
-            $operation = $resourceMetadataCollection->getOperation($operationName);
-        } catch (OperationNotFoundException) {
-            $operation = $resourceMetadataCollection->getOperation($isCollection ? 'collection_query' : 'item_query');
-        }
-        if (!$operation instanceof Operation) {
-            throw new OperationNotFoundException();
+            $operation = $resourceMetadataCollection->getGraphQlOperation(null, $isCollection);
+        } else {
+            try {
+                $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+            } catch (OperationNotFoundException) {
+                // try to fetch the default operation in case we didn't found the named one
+                $operation = $resourceMetadataCollection->getGraphQlOperation(null, $isCollection);
+            }
         }
 
         return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadataCollection, $operation, $input, false, $depth);

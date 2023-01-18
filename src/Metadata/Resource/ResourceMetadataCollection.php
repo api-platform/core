@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 
@@ -92,6 +93,38 @@ final class ResourceMetadataCollection extends \ArrayObject
         // if ($metadata) {
         //     return (new class extends HttpOperation {})->withResource($metadata);
         // }
+
+        $this->handleNotFound($operationName, $metadata);
+    }
+
+    public function getGraphQlOperation(?string $operationName = null, bool $forceCollection = false): GraphQlOperation
+    {
+        $operationName ??= '';
+        $cachePrefix = ($forceCollection ? self::FORCE_COLLECTION : '');
+        $gqlCacheKey = self::GRAPHQL_PREFIX.$cachePrefix.$operationName;
+        if (isset($this->operationCache[$gqlCacheKey])) {
+            return $this->operationCache[$gqlCacheKey];
+        }
+
+        $it = $this->getIterator();
+
+        while ($it->valid()) {
+            /** @var ApiResource $metadata */
+            $metadata = $it->current();
+
+            foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
+                $isCollection = $operation instanceof CollectionOperationInterface;
+                if ('' === $operationName && ($forceCollection ? $isCollection : !$isCollection)) {
+                    return $this->operationCache[$gqlCacheKey] = $operation;
+                }
+
+                if ($name === $operationName) {
+                    return $this->operationCache[$gqlCacheKey] = $operation;
+                }
+            }
+
+            $it->next();
+        }
 
         $this->handleNotFound($operationName, $metadata);
     }

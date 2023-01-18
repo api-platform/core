@@ -78,6 +78,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
             return [];
         }
 
+        // TODO: it'd be nice to get rid of this hard coded name
         $fieldName = lcfirst('item_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $operation)) {
@@ -287,7 +288,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
             $resourceOperation = $rootOperation;
             if ($resourceClass && $depth >= 1 && $this->resourceClassResolver->isResourceClass($resourceClass)) {
                 $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-                $resourceOperation = $resourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
+                $resourceOperation = $resourceMetadataCollection->getGraphQlOperation(null, $isCollectionType);
             }
 
             if (!$resourceOperation instanceof Operation) {

@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
@@ -73,10 +74,12 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
             $shortName .= 'Payload';
         }
 
-        if ('item_query' === $operationName || 'collection_query' === $operationName) {
+        if (!$operation->getResolver() && ($operation instanceof Query || $operation instanceof QueryCollection)) {
             // Test if the collection/item has different groups
-            if ($resourceMetadataCollection->getOperation($operation instanceof CollectionOperationInterface ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
-                $shortName .= $operation instanceof CollectionOperationInterface ? 'Collection' : 'Item';
+            $isCollection = $operation instanceof CollectionOperationInterface;
+            $otherOperation = $resourceMetadataCollection->getGraphQlOperation(null, !$isCollection);
+            if ($otherOperation->getNormalizationContext() !== $operation->getNormalizationContext()) {
+                $shortName .= $isCollection ? 'Collection' : 'Item';
             }
         }
 
@@ -104,12 +107,12 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
             'name' => $shortName,
             'description' => $operation->getDescription(),
             'resolveField' => $this->defaultFieldResolver,
-            'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
+            'fields' => function () use ($resourceClass, $operation, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
                     $queryNormalizationContext = $this->getQueryOperation($resourceMetadataCollection)?->getNormalizationContext() ?? [];
 
                     try {
-                        $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
+                        $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($operation->getNormalizationContext() ?? []) : [];
                     } catch (OperationNotFoundException) {
                         $mutationNormalizationContext = [];
                     }
@@ -117,13 +120,11 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
                     // If not, use the query type in order to ensure the client cache could be used.
                     $useWrappedType = $queryNormalizationContext !== $mutationNormalizationContext;
 
-                    $wrappedOperationName = $operationName;
+                    $wrappedOperation = $operation;
 
                     if (!$useWrappedType) {
-                        $wrappedOperationName = $operation instanceof Query ? $operationName : 'item_query';
+                        $wrappedOperation = $resourceMetadataCollection->getGraphQlOperation(null, forceCollection: $operation instanceof Query);
                     }
-
-                    $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
 
                     $fields = [
                         lcfirst($wrappedOperation->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadataCollection, $wrappedOperation instanceof Operation ? $wrappedOperation : null, $input, true, $depth),
