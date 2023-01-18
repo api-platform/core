@@ -413,30 +413,20 @@ XML_WRAP
     private function buildGraphQlOperations(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('graphQlOperations');
-        foreach ($values as $type => $operations) {
-            $operationType = match ($type) {
-                'queries' => 'query',
-                default => substr($type, 0, -1),
-            };
-
-            foreach ($operations as $key => $value) {
-                $child = $node->addChild($operationType);
-                if (\is_string($key)) {
-                    $child->addAttribute('name', $key);
+        foreach ($values as $value) {
+            $child = $node->addChild('graphQlOperation');
+            foreach ($value as $index => $data) {
+                if (method_exists($this, 'build'.ucfirst($index))) {
+                    $this->{'build'.ucfirst($index)}($child, $data);
+                    continue;
                 }
-                foreach ($value as $index => $data) {
-                    if (method_exists($this, 'build'.ucfirst($index))) {
-                        $this->{'build'.ucfirst($index)}($child, $data);
-                        continue;
-                    }
 
-                    if (\is_string($data) || null === $data || is_numeric($data) || \is_bool($data)) {
-                        $child->addAttribute($index, $this->parse($data));
-                        continue;
-                    }
-
-                    throw new \LogicException(sprintf('Cannot adapt graphQlOperation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), self::class));
+                if (\is_string($data) || null === $data || is_numeric($data) || \is_bool($data)) {
+                    $child->addAttribute($index, $this->parse($data));
+                    continue;
                 }
+
+                throw new \LogicException(sprintf('Cannot adapt graphQlOperation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), self::class));
             }
         }
     }

@@ -51,9 +51,7 @@
 
     <xsd:complexType name="graphQlOperations">
         <xsd:sequence maxOccurs="unbounded">
-            <xsd:element name="mutation" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
-            <xsd:element name="query" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
-            <xsd:element name="subscription" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
+            <xsd:element name="graphQlOperation" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -64,9 +62,7 @@
         </xsd:sequence>
         <xsd:attributeGroup ref="base"/>
         <xsd:attribute type="xsd:string" name="resolver"/>
-        <xsd:attribute type="xsd:string" name="class"/>
-        <xsd:attribute type="xsd:boolean" name="collection"/>
-        <xsd:attribute type="xsd:boolean" name="delete"/>
+        <xsd:attribute type="xsd:string" name="class" use="required"/>
         <xsd:attribute type="xsd:boolean" name="read"/>
         <xsd:attribute type="xsd:boolean" name="deserialize"/>
         <xsd:attribute type="xsd:boolean" name="validate"/>
@@ -405,6 +401,7 @@
             <xsd:element name="normalizationContext" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="order" minOccurs="0" type="order"/>
             <xsd:element name="validationContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="stateOptions" minOccurs="0" type="stateOptions"/>
         </xsd:sequence>
     </xsd:group>
 
@@ -422,7 +419,6 @@
             <xsd:element name="options" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="outputFormats" minOccurs="0" type="formats"/>
             <xsd:element name="paginationViaCursor" minOccurs="0" type="paginationViaCursor"/>
-            <xsd:element name="stateOptions" minOccurs="0" type="stateOptions"/>
             <xsd:element name="requirements" minOccurs="0" type="requirements"/>
             <xsd:element name="schemes" minOccurs="0" type="schemes"/>
             <xsd:element name="types" minOccurs="0" type="types"/>

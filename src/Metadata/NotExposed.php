@@ -51,6 +51,7 @@ final class NotExposed extends HttpOperation
         ?string $condition = null,
         ?string $controller = 'api_platform.action.not_exposed',
         ?array $cacheHeaders = null,
+        ?array $paginationViaCursor = null,
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
@@ -71,7 +72,6 @@ final class NotExposed extends HttpOperation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        ?array $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,

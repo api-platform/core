@@ -168,6 +168,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoMany;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\TreeDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UrlEncodedId;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
@@ -797,6 +798,22 @@ final class DoctrineContext implements Context
             $this->manager->persist($relatedDummy);
             $this->manager->persist($dummy);
         }
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are tree dummies
+     */
+    public function thereAreTreeDummies(): void
+    {
+        $parentDummy = new TreeDummy();
+        $this->manager->persist($parentDummy);
+
+        $childDummy = new TreeDummy();
+        $childDummy->setParent($parentDummy);
+
+        $this->manager->persist($childDummy);
+
         $this->manager->flush();
     }
 

@@ -19,11 +19,6 @@ use ApiPlatform\State\OptionsInterface;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class GetCollection extends HttpOperation implements CollectionOperationInterface
 {
-    private $itemUriTemplate;
-
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         ?string $uriTemplate = null,
         ?array $types = null,
@@ -45,12 +40,11 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?string $condition = null,
         ?string $controller = null,
         ?array $cacheHeaders = null,
-
+        ?array $paginationViaCursor = null,
         ?array $hydraContext = null,
         ?array $openapiContext = null,
         bool|OpenApiOperation|null $openapi = null,
         ?array $exceptionToStatus = null,
-
         ?bool $queryParameterValidationEnabled = null,
 
         ?string $shortName = null,
@@ -65,7 +59,6 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        ?array $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -97,12 +90,83 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?string $name = null,
         $provider = null,
         $processor = null,
-        ?string $itemUriTemplate = null,
         ?OptionsInterface $stateOptions = null,
         array $extraProperties = [],
+        private ?string $itemUriTemplate = null,
     ) {
-        parent::__construct(self::METHOD_GET, $uriTemplate, $types, $formats, $inputFormats, $outputFormats, $uriVariables, $routePrefix, $routeName, $defaults, $requirements, $options, $stateless, $sunset, $acceptPatch, $status, $host, $schemes, $condition, $controller, $cacheHeaders, $hydraContext, $openapiContext, $openapi, $exceptionToStatus, $queryParameterValidationEnabled, $shortName, $class, $paginationEnabled, $paginationType, $paginationItemsPerPage, $paginationMaximumItemsPerPage, $paginationPartial, $paginationClientEnabled, $paginationClientItemsPerPage, $paginationClientPartial, $paginationFetchJoinCollection, $paginationUseOutputWalkers, $paginationViaCursor, $order, $description, $normalizationContext, $denormalizationContext, $collectDenormalizationErrors, $security, $securityMessage, $securityPostDenormalize, $securityPostDenormalizeMessage, $securityPostValidation, $securityPostValidationMessage, $deprecationReason, $filters, $validationContext, $input, $output, $mercure, $messenger, $elasticsearch, $urlGenerationStrategy, $read, $deserialize, $validate, $write, $serialize, $fetchPartial, $forceEager, $priority, $name, $provider, $processor, $stateOptions, $extraProperties);
-        $this->itemUriTemplate = $itemUriTemplate;
+        parent::__construct(
+            uriTemplate: $uriTemplate,
+            types: $types,
+            formats: $formats,
+            inputFormats: $inputFormats,
+            outputFormats: $outputFormats,
+            uriVariables: $uriVariables,
+            routePrefix: $routePrefix,
+            routeName: $routeName,
+            defaults: $defaults,
+            requirements: $requirements,
+            options: $options,
+            stateless: $stateless,
+            sunset: $sunset,
+            acceptPatch: $acceptPatch,
+            status: $status,
+            host: $host,
+            schemes: $schemes,
+            condition: $condition,
+            controller: $controller,
+            cacheHeaders: $cacheHeaders,
+            paginationViaCursor: $paginationViaCursor,
+            hydraContext: $hydraContext,
+            openapiContext: $openapiContext,
+            openapi: $openapi,
+            exceptionToStatus: $exceptionToStatus,
+            queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            shortName: $shortName,
+            class: $class,
+            paginationEnabled: $paginationEnabled,
+            paginationType: $paginationType,
+            paginationItemsPerPage: $paginationItemsPerPage,
+            paginationMaximumItemsPerPage: $paginationMaximumItemsPerPage,
+            paginationPartial: $paginationPartial,
+            paginationClientEnabled: $paginationClientEnabled,
+            paginationClientItemsPerPage: $paginationClientItemsPerPage,
+            paginationClientPartial: $paginationClientPartial,
+            paginationFetchJoinCollection: $paginationFetchJoinCollection,
+            paginationUseOutputWalkers: $paginationUseOutputWalkers,
+            order: $order,
+            description: $description,
+            normalizationContext: $normalizationContext,
+            denormalizationContext: $denormalizationContext,
+            collectDenormalizationErrors: $collectDenormalizationErrors,
+            security: $security,
+            securityMessage: $securityMessage,
+            securityPostDenormalize: $securityPostDenormalize,
+            securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
+            securityPostValidation: $securityPostValidation,
+            securityPostValidationMessage: $securityPostValidationMessage,
+            deprecationReason: $deprecationReason,
+            filters: $filters,
+            validationContext: $validationContext,
+            input: $input,
+            output: $output,
+            mercure: $mercure,
+            messenger: $messenger,
+            elasticsearch: $elasticsearch,
+            urlGenerationStrategy: $urlGenerationStrategy,
+            read: $read,
+            deserialize: $deserialize,
+            validate: $validate,
+            write: $write,
+            serialize: $serialize,
+            fetchPartial: $fetchPartial,
+            forceEager: $forceEager,
+            priority: $priority,
+            name: $name,
+            provider: $provider,
+            processor: $processor,
+            extraProperties: $extraProperties,
+            stateOptions: $stateOptions,
+        );
     }
 
     public function getItemUriTemplate(): ?string

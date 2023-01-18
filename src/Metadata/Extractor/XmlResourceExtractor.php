@@ -16,11 +16,6 @@ namespace ApiPlatform\Metadata\Extractor;
 use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\GraphQl\DeleteMutation;
-use ApiPlatform\Metadata\GraphQl\Mutation;
-use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
@@ -412,43 +407,31 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
 
     private function buildGraphQlOperations(\SimpleXMLElement $resource, array $root): ?array
     {
-        if (!isset($resource->graphQlOperations->mutation) && !isset($resource->graphQlOperations->query) && !isset($resource->graphQlOperations->subscription)) {
+        if (!isset($resource->graphQlOperations->graphQlOperation)) {
             return null;
         }
 
         $data = [];
-        foreach (['mutation' => Mutation::class, 'query' => Query::class, 'subscription' => Subscription::class] as $type => $class) {
-            foreach ($resource->graphQlOperations->{$type} as $operation) {
-                $datum = $this->buildBase($operation);
-                foreach ($datum as $key => $value) {
-                    if (null === $value) {
-                        $datum[$key] = $root[$key];
-                    }
+        foreach ($resource->graphQlOperations->graphQlOperation as $operation) {
+            $datum = $this->buildBase($operation);
+            foreach ($datum as $key => $value) {
+                if (null === $value) {
+                    $datum[$key] = $root[$key];
                 }
-
-                $collection = $this->phpize($operation, 'collection', 'bool', false);
-                if (Query::class === $class && $collection) {
-                    $class = QueryCollection::class;
-                }
-
-                $delete = $this->phpize($operation, 'delete', 'bool', false);
-                if (Mutation::class === $class && $delete) {
-                    $class = DeleteMutation::class;
-                }
-
-                $data[] = array_merge($datum, [
-                    'graphql_operation_class' => $class,
-                    'resolver' => $this->phpize($operation, 'resolver', 'string'),
-                    'args' => $this->buildArgs($operation),
-                    'class' => $this->phpize($operation, 'class', 'string'),
-                    'read' => $this->phpize($operation, 'read', 'bool'),
-                    'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
-                    'validate' => $this->phpize($operation, 'validate', 'bool'),
-                    'write' => $this->phpize($operation, 'write', 'bool'),
-                    'serialize' => $this->phpize($operation, 'serialize', 'bool'),
-                    'priority' => $this->phpize($operation, 'priority', 'integer'),
-                ]);
             }
+
+            $data[] = array_merge($datum, [
+                'resolver' => $this->phpize($operation, 'resolver', 'string'),
+                'args' => $this->buildArgs($operation),
+                'class' => (string) $operation['class'],
+                'read' => $this->phpize($operation, 'read', 'bool'),
+                'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
+                'validate' => $this->phpize($operation, 'validate', 'bool'),
+                'write' => $this->phpize($operation, 'write', 'bool'),
+                'serialize' => $this->phpize($operation, 'serialize', 'bool'),
+                'priority' => $this->phpize($operation, 'priority', 'integer'),
+                'name' => $this->phpize($operation, 'name', 'string'),
+            ]);
         }
 
         return $data;
