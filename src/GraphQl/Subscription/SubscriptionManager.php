@@ -83,7 +83,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
             $resolverContext = ['fields' => $subscriptionFields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
             /** @var Operation */
-            $operation = (new Subscription())->withName('update_subscription')->withShortName($shortName);
+            $operation = new Subscription(name: 'update', shortName: $shortName);
             $data = ($this->serializeStage)($object, $resourceClass, $operation, $resolverContext);
             unset($data['clientSubscriptionId']);
 

@@ -52,7 +52,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
             if (!$operation) {
-                $operation = new Query();
+                $operation = new Query(name: 'item_query');
             }
 
             $item = ($this->readStage)($resourceClass, $rootClass, $operation, $resolverContext);

@@ -147,10 +147,6 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
         }
 
         $subscriptionName = $operation->getName();
-        // TODO: 3.0 change this
-        if ('update_subscription' === $subscriptionName) {
-            $subscriptionName = 'update';
-        }
 
         $subscriptionFields[$subscriptionName.$operation->getShortName().'Subscribe'] = $fieldConfiguration;
 

@@ -113,7 +113,7 @@ final class Subscription extends Operation
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
-            name: $name ?: 'update_subscription',
+            name: $name,
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,

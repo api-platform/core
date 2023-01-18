@@ -82,10 +82,7 @@ final class TypeConverter implements TypeConverterInterface
                         } catch (ResourceClassNotFoundException|OperationNotFoundException) {
                         }
                         /** @var Query $enumOperation */
-                        $enumOperation = (new Query())
-                            ->withClass($type->getClassName())
-                            ->withShortName($operation?->getShortName() ?? (new \ReflectionClass($type->getClassName()))->getShortName())
-                            ->withDescription($operation?->getDescription());
+                        $enumOperation = new Query(name: 'item_query', class: $type->getClassName(), shortName: $operation?->getShortName() ?? (new \ReflectionClass($type->getClassName()))->getShortName(), description: $operation?->getDescription());
 
                         return $this->typeBuilder->getEnumType($enumOperation);
                     }

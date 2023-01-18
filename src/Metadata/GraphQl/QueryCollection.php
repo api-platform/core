@@ -67,7 +67,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         ?string $name = null,
         $provider = null,
         $processor = null,
-        protected ?OptionsInterface $stateOptions = null,
+        ?OptionsInterface $stateOptions = null,
         array $extraProperties = [],
 
         ?bool $nested = null,
@@ -116,10 +116,11 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
-            name: $name ?: 'collection_query',
+            name: $name,
             provider: $provider,
             processor: $processor,
             extraProperties: $extraProperties,
+            stateOptions: $stateOptions,
             nested: $nested,
         );
     }

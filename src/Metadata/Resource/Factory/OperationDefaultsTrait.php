@@ -93,13 +93,13 @@ trait OperationDefaultsTrait
     private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource
     {
         $graphQlOperations = [];
-        foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $operation) {
+        foreach ([new QueryCollection(name: 'collection_query'), new Query(name: 'item_query'), new Mutation(name: 'update'), new DeleteMutation(name: 'delete'), new Mutation(name: 'create')] as $operation) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
             $graphQlOperations[$key] = $operation;
         }
 
         if ($resource->getMercure()) {
-            [$key, $operation] = $this->getOperationWithDefaults($resource, (new Subscription())->withDescription("Subscribes to the update event of a {$operation->getShortName()}."));
+            [$key, $operation] = $this->getOperationWithDefaults($resource, new Subscription(name: 'update', description: "Subscribes to the update event of a {$operation->getShortName()}."));
             $graphQlOperations[$key] = $operation;
         }
 
@@ -127,11 +127,11 @@ trait OperationDefaultsTrait
         }
 
         if (!$hasQueryOperation) {
-            $queryOperation = (new Query())->withNested(true);
+            $queryOperation = new Query(name: 'item_query', nested: true);
             $graphQlOperations[$queryOperation->getName()] = $queryOperation;
         }
         if (!$hasQueryCollectionOperation) {
-            $queryCollectionOperation = (new QueryCollection())->withNested(true);
+            $queryCollectionOperation = new QueryCollection(name: 'collection_query', nested: true);
             $graphQlOperations[$queryCollectionOperation->getName()] = $queryCollectionOperation;
         }
 
@@ -168,7 +168,7 @@ trait OperationDefaultsTrait
 
         if ($operation instanceof GraphQlOperation) {
             if (!$operation->getName()) {
-                throw new RuntimeException('No GraphQL operation name.');
+                $operation = $operation->withName($this->getDefaultGraphQlOperationName($operation));
             }
 
             if ($operation instanceof Mutation) {
@@ -187,7 +187,6 @@ trait OperationDefaultsTrait
             $operation = $operation->withName($operation->getRouteName());
         }
 
-        $path = ($operation->getRoutePrefix() ?? '').($operation->getUriTemplate() ?? '');
         $operationName = $operation->getName() ?? $this->getDefaultOperationName($operation, $resource->getClass());
 
         return [
@@ -210,5 +209,16 @@ trait OperationDefaultsTrait
             $path ?: ($operation->getShortName() ?? $this->getDefaultShortname($resourceClass)),
             strtolower($operation->getMethod()),
             $operation instanceof CollectionOperationInterface ? '_collection' : '');
+    }
+
+    private function getDefaultGraphQlOperationName(GraphQlOperation $operation): string
+    {
+        return match ($class = \get_class($operation)) {
+            Query::class => 'item_query',
+            QueryCollection::class => 'collection_query',
+            Mutation::class => 'update',
+            Subscription::class => 'update',
+            default => '_api_graphql_'.$this->getDefaultShortname($class),
+        };
     }
 }

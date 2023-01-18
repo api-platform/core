@@ -115,7 +115,7 @@ class Query extends Operation
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
-            name: $name ?: 'item_query',
+            name: $name,
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
