@@ -92,6 +92,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
             description: $description,
             normalizationContext: $normalizationContext,
             denormalizationContext: $denormalizationContext,
+            collectDenormalizationErrors: $collectDenormalizationErrors,
             security: $security,
             securityMessage: $securityMessage,
             securityPostDenormalize: $securityPostDenormalize,

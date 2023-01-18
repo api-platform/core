@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
 
 class HttpOperation extends Operation
@@ -98,8 +99,8 @@ class HttpOperation extends Operation
         protected ?array $cacheHeaders = null,
         protected ?array $paginationViaCursor = null,
         protected ?array $hydraContext = null,
-        protected ?array $openapiContext = null,
-        protected ?bool $openapi = null,
+        protected ?array $openapiContext = null, // TODO Remove in 4.0
+        protected bool|OpenApiOperation|null $openapi = null,
         protected ?array $exceptionToStatus = null,
         protected ?bool $queryParameterValidationEnabled = null,
 
@@ -513,12 +514,12 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    public function getOpenapi(): ?bool
+    public function getOpenapi(): bool|OpenApiOperation|null
     {
         return $this->openapi;
     }
 
-    public function withOpenapi(bool $openapi): self
+    public function withOpenapi(bool|OpenApiOperation $openapi): self
     {
         $self = clone $this;
         $self->openapi = $openapi;

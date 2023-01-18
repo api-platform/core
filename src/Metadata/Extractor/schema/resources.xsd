@@ -401,6 +401,7 @@
             <xsd:element name="normalizationContext" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="order" minOccurs="0" type="order"/>
             <xsd:element name="validationContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="stateOptions" minOccurs="0" type="stateOptions"/>
         </xsd:sequence>
     </xsd:group>
 
@@ -418,7 +419,6 @@
             <xsd:element name="options" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="outputFormats" minOccurs="0" type="formats"/>
             <xsd:element name="paginationViaCursor" minOccurs="0" type="paginationViaCursor"/>
-            <xsd:element name="stateOptions" minOccurs="0" type="stateOptions"/>
             <xsd:element name="requirements" minOccurs="0" type="requirements"/>
             <xsd:element name="schemes" minOccurs="0" type="schemes"/>
             <xsd:element name="types" minOccurs="0" type="types"/>

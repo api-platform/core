@@ -236,6 +236,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'foo' => 'bar',
                         'route_prefix' => '/v1', // from defaults
                     ],
+                    'stateOptions' => [
+                        'elasticsearchOptions' => [
+                            'index' => 'foo_index',
+                            'type' => 'foo_type',
+                        ],
+                    ],
                 ],
                 [
                     'class' => Query::class,
@@ -244,6 +250,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'custom_property' => 'Lorem ipsum dolor sit amet',
                         'another_custom_property' => [
                             'Lorem ipsum' => 'Dolor sit amet',
+                        ],
+                    ],
+                    'stateOptions' => [
+                        'elasticsearchOptions' => [
+                            'index' => 'foo_index',
+                            'type' => 'foo_type',
                         ],
                     ],
                 ],
@@ -256,6 +268,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                             'Lorem ipsum' => 'Dolor sit amet',
                         ],
                     ],
+                    'stateOptions' => [
+                        'elasticsearchOptions' => [
+                            'index' => 'foo_index',
+                            'type' => 'foo_type',
+                        ],
+                    ],
                 ],
                 [
                     'class' => Subscription::class,
@@ -264,6 +282,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'custom_property' => 'Lorem ipsum dolor sit amet',
                         'another_custom_property' => [
                             'Lorem ipsum' => 'Dolor sit amet',
+                        ],
+                    ],
+                    'stateOptions' => [
+                        'elasticsearchOptions' => [
+                            'index' => 'foo_index',
+                            'type' => 'foo_type',
                         ],
                     ],
                 ],
@@ -488,6 +512,13 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
         }
 
+        // if (null === $this->buildApiResources()[1]->getStateOptions()) {
+        //     dd('test');
+        // }
+        if (null === $this->buildApiResources()[1]->getGraphQlOperations()['item_query']->getStateOptions()) {
+            dd('test');
+        }
+        // dd($collection[1]);
         $this->assertEquals(new ResourceMetadataCollection(self::RESOURCE_CLASS, $this->buildApiResources()), $collection);
     }
 

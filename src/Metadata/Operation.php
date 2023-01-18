@@ -699,4 +699,3 @@ abstract class Operation
         return $self;
     }
 }
-
