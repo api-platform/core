@@ -447,7 +447,7 @@ $deprecatedClassesWithoutAliases = [
 ];
 
 spl_autoload_register(function ($className) use ($deprecatedInterfaces, $deprecatedClassesWithoutAliases, $deprecatedClassesWithAliases) {
-    // We can not class alias when working with doctrine annotations
+    // We can not use class alias when working with doctrine annotations
     static $deprecatedAnnotations = [
         'ApiResource' => [ApiPlatform\Core\Annotation\ApiResource::class, ApiPlatform\Metadata\ApiResource::class],
         'ApiProperty' => [ApiPlatform\Core\Annotation\ApiProperty::class, ApiPlatform\Metadata\ApiProperty::class],
