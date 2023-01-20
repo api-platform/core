@@ -9,10 +9,6 @@
 * [9f5a408a1](https://github.com/api-platform/core/commit/9f5a408a1c20b9268a6dc37abb3bc2b1bc38e49d) fix(metadata): attributes parameter order (#5317)
 * [d0fcd70c3](https://github.com/api-platform/core/commit/d0fcd70c34e79e1b072032a847b3a6e94f63db72) fix(graphql): remove inline styles and add twig blocks to aid overriding templates in strict CSP environments (#5251)
 
-** Backward compatibility**
-
-- only use named arguments on metadata attributes (`Get`, `Query`, `Operation`, `ApiProperty` etc.) as we don't guarantee the backward compatibility on positional arguments 
-
 ### Features
 
 * [3a845f1fb](https://github.com/api-platform/core/commit/3a845f1fb0ee80d6a8dc547a2aa97633fcda0830) fix(symfony): use `swagger.api_keys` with a key to handle multiple authorizations (#4691)
@@ -30,6 +26,10 @@
 * [c145ec700](https://github.com/api-platform/core/commit/c145ec700116be11afebff28f4d4b115cd45bb41) feat(openapi): add ApiResource::openapi and deprecate openapiContext (#5254)
 * [e5f1be056](https://github.com/api-platform/core/commit/e5f1be0561efe6fd90933b381f605bff81486aac) feat: add @type property on mercure delete update (#2688)
 * [f1ecc30a3](https://github.com/api-platform/core/commit/f1ecc30a38e50536a2a65ae85ef23eb6dc095af3) feat(openapi): add backed enum support (#5120)
+
+### Backward compatibility
+
+- only use named arguments on metadata attributes (`Get`, `Query`, `Operation`, `ApiProperty` etc.) as we don't guarantee the backward compatibility on positional arguments 
 
 ## v3.0.11
 
