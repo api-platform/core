@@ -29,7 +29,7 @@ class DummyCollectionValidatedEntity
      *         "email"={
      *             @Assert\NotNull,
      *             @Assert\Length(min=2, max=255),
-     *             @Assert\Email(mode=Assert\Email::VALIDATION_MODE_LOOSE)
+     *             @Assert\Email(mode=Assert\Email::VALIDATION_MODE_HTML5)
      *         },
      *         "phone"=@Assert\Optional({
      *             @Assert\Type(type="string"),
