@@ -219,6 +219,8 @@ JSON;
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);
 
+
+        // if ($manager->getConnection()->getDatabasePlatform() instanceof ) 
         $schemaTool->dropSchema($classes);
         $schemaTool->createSchema($classes);
     }
