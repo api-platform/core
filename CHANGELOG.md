@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.0.11
+
+### Bug fixes
+
+* [0154bf13c](https://github.com/api-platform/core/commit/0154bf13c3aa99b6bfe2c17c875a51e876aca43f) fix(metadata): homogenize operations constructor (#5344)
+* [722802c13](https://github.com/api-platform/core/commit/722802c13200179cd9ce7b2812738471a9340f27) fix(graphql): usable YAML/XML configuration (#5333)
+
+**Backward compatibility**
+
+Removal of `paginationViaCursor` on GraphQl operations (it had no effect anyways).
+
 ## v3.0.10
 
 ### Bug fixes
