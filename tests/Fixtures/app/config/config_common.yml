@@ -61,8 +61,6 @@ api_platform:
     http_cache:
         invalidation:
             enabled: true
-            xkey: 
-                glue: ' '
     defaults:
         extra_properties:
             standard_put: true

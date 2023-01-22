@@ -73,7 +73,7 @@ class SouinPurgerTest extends TestCase
                 throw new \LogicException('Not implemented');
             }
 
-            public function request(string $method, $uri, array $options = []): ResponseInterface
+            public function request($method, $uri, array $options = []): ResponseInterface
             {
                 $this->sentRegexes[] = $options['headers']['Surrogate-Key'];
 

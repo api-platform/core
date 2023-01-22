@@ -59,7 +59,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     env:
@@ -300,7 +299,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     env:
@@ -350,7 +348,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     services:
@@ -492,7 +489,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     env:
@@ -543,7 +539,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     env:
@@ -584,7 +579,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     # env:
@@ -630,7 +624,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     steps:
@@ -675,7 +668,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     env:
@@ -718,7 +710,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     env:
@@ -761,7 +752,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
       # env:
@@ -805,7 +795,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
       fail-fast: false
     steps:
