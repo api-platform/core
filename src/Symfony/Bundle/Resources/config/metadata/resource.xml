@@ -57,7 +57,7 @@
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.filters" class="ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="200" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.filters.inner" />
-            <argument type="service" id="annotation_reader" />
+            <argument type="service" id="annotation_reader" on-invalid="null" />
         </service>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.alternate_uri" class="ApiPlatform\Metadata\Resource\Factory\AlternateUriResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="200" public="false">
