@@ -84,7 +84,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
 
             $parameterName = $link->getParameterName();
-            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass(), $link->getIdentifiers()[0], $parameterName);
+            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass(), $link->getIdentifiers()[0], $parameterName, $link->getToProperty());
         }
 
         return $identifiers;
@@ -93,7 +93,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     /**
      * Gets the value of the given class property.
      */
-    private function getIdentifierValue(object $item, string $class, string $property, string $parameterName): float|bool|int|string
+    private function getIdentifierValue(object $item, string $class, string $property, string $parameterName, ?string $toProperty = null): float|bool|int|string
     {
         if ($item instanceof $class) {
             try {
@@ -101,6 +101,10 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             } catch (NoSuchPropertyException $e) {
                 throw new RuntimeException('Not able to retrieve identifiers.', $e->getCode(), $e);
             }
+        }
+
+        if ($toProperty) {
+            return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$toProperty.$property"), $parameterName);
         }
 
         $resourceClass = $this->getResourceClass($item, true);
