@@ -164,6 +164,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedSecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationMultiple;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SeparatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
@@ -2048,6 +2049,27 @@ final class DoctrineContext implements Context
             $entity->value = (string) $i;
             $this->manager->persist($entity);
         }
+    }
+
+    /**
+     * @Given there is a relationMultiple object
+     */
+    public function thereIsARelationMultipleObject(): void
+    {
+        $first = $this->buildDummy();
+        $first->setId(1);
+        $first->setName('foo');
+        $second = $this->buildDummy();
+        $second->setId(2);
+        $second->setName('bar');
+
+        $relationMultiple = (new RelationMultiple());
+        $relationMultiple->first = $first;
+        $relationMultiple->second = $second;
+
+        $this->manager->persist($first);
+        $this->manager->persist($second);
+        $this->manager->persist($relationMultiple);
 
         $this->manager->flush();
     }
@@ -2069,6 +2091,36 @@ final class DoctrineContext implements Context
         $videoGame->addMusicGroup($sum41);
         $videoGame->addMusicGroup($franz);
         $this->manager->persist($videoGame);
+    }
+
+    /**
+     * @Given there is a dummy object with many multiple relation
+     */
+    public function thereIsADummyObjectWithManyMultipleRelation(): void
+    {
+        $first = $this->buildDummy();
+        $first->setId(1);
+        $first->setName('foo');
+        $second = $this->buildDummy();
+        $second->setId(2);
+        $second->setName('bar');
+        $third = $this->buildDummy();
+        $third->setId(3);
+        $third->setName('foobar');
+
+        $relationMultiple1 = (new RelationMultiple());
+        $relationMultiple1->first = $first;
+        $relationMultiple1->second = $second;
+
+        $relationMultiple2 = (new RelationMultiple());
+        $relationMultiple2->first = $first;
+        $relationMultiple2->second = $third;
+
+        $this->manager->persist($first);
+        $this->manager->persist($second);
+        $this->manager->persist($third);
+        $this->manager->persist($relationMultiple1);
+        $this->manager->persist($relationMultiple2);
 
         $this->manager->flush();
     }
