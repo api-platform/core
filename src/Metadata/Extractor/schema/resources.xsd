@@ -59,6 +59,7 @@
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:group ref="base"/>
             <xsd:element name="args" minOccurs="0" type="args"/>
+            <xsd:element name="extraArgs" minOccurs="0" type="args"/>
         </xsd:sequence>
         <xsd:attributeGroup ref="base"/>
         <xsd:attribute type="xsd:string" name="resolver"/>

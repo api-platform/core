@@ -82,7 +82,8 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
-            $configuration['args'] = $args ?: $configuration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]];
+            $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
+            $configuration['args'] = $args ?: $configuration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]] + $extraArgs;
 
             return [$fieldName => array_merge($fieldConfiguration, $configuration)];
         }
@@ -103,7 +104,8 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
-            $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'];
+            $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
+            $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'] + $extraArgs;
 
             return [Inflector::pluralize($fieldName) => array_merge($fieldConfiguration, $configuration)];
         }
@@ -195,7 +197,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
             return $fields;
         }
 
-        if (!$input || ('create' !== $operation->getName() && !$operation->getInput())) {
+        if (!$input || (!$operation->getResolver() && 'create' !== $operation->getName())) {
             $fields['id'] = $idField;
         }
         if ($input && $depth >= 1) {

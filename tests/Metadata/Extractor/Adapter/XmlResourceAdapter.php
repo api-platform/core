@@ -410,6 +410,16 @@ XML_WRAP
         }
     }
 
+    private function buildExtraArgs(\SimpleXMLElement $resource, array $args): void
+    {
+        $child = $resource->addChild('extraArgs');
+        foreach ($args as $id => $values) {
+            $grandChild = $child->addChild('arg');
+            $grandChild->addAttribute('id', $id);
+            $this->buildValues($grandChild, $values);
+        }
+    }
+
     private function buildGraphQlOperations(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('graphQlOperations');
