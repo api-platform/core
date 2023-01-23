@@ -2049,6 +2049,27 @@ final class DoctrineContext implements Context
             $entity->value = (string) $i;
             $this->manager->persist($entity);
         }
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a video game with music groups
+     */
+    public function thereAreVideoGamesWithMusicGroups(): void
+    {
+        $sum41 = $this->buildMusicGroup();
+        $sum41->name = 'Sum 41';
+        $this->manager->persist($sum41);
+        $franz = $this->buildMusicGroup();
+        $franz->name = 'Franz Ferdinand';
+        $this->manager->persist($franz);
+
+        $videoGame = $this->buildVideoGame();
+        $videoGame->name = 'Guitar Hero';
+        $videoGame->addMusicGroup($sum41);
+        $videoGame->addMusicGroup($franz);
+        $this->manager->persist($videoGame);
+        $this->manager->flush();
     }
 
     /**
@@ -2072,25 +2093,6 @@ final class DoctrineContext implements Context
         $this->manager->persist($relationMultiple);
 
         $this->manager->flush();
-    }
-
-    /**
-     * @Given there is a video game with music groups
-     */
-    public function thereAreVideoGamesWithMusicGroups(): void
-    {
-        $sum41 = $this->buildMusicGroup();
-        $sum41->name = 'Sum 41';
-        $this->manager->persist($sum41);
-        $franz = $this->buildMusicGroup();
-        $franz->name = 'Franz Ferdinand';
-        $this->manager->persist($franz);
-
-        $videoGame = $this->buildVideoGame();
-        $videoGame->name = 'Guitar Hero';
-        $videoGame->addMusicGroup($sum41);
-        $videoGame->addMusicGroup($franz);
-        $this->manager->persist($videoGame);
     }
 
     /**
