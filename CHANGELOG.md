@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.7.7
+
+### Bug fixes
+
+* [53cb25fab](https://github.com/api-platform/core/commit/53cb25fab0fcec2d336590c7e82e1c6a8728d00a) fix(symfony): annotation reader argument optional (#5358)
+
 ## v2.7.6
 
 ### Bug fixes
