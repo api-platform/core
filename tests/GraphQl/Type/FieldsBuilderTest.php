@@ -697,6 +697,31 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
+            'mutation using input DTO' => ['resourceClass', (new Mutation())->withName('mutation')->withInput(GraphQLType::string()),
+                [
+                    'property' => new ApiProperty(),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
+                    'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                ],
+                true, 0, null,
+                [
+                    'propertyBool' => [
+                        'type' => GraphQLType::nonNull(GraphQLType::string()),
+                        'description' => 'propertyBool description',
+                        'args' => [],
+                        'resolve' => null,
+                        'deprecationReason' => 'not useful',
+                    ],
+                    'propertySubresource' => [
+                        'type' => GraphQLType::nonNull(GraphQLType::string()),
+                        'description' => null,
+                        'args' => [],
+                        'resolve' => null,
+                        'deprecationReason' => null,
+                    ],
+                    'clientMutationId' => GraphQLType::string(),
+                ],
+            ],
             'mutation nested input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
                 [
                     'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
