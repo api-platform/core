@@ -16,9 +16,8 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -35,7 +34,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function createLinkFromProperty(ApiResource|Operation $operation, string $property): Link
+    public function createLinkFromProperty(Metadata $operation, string $property): Link
     {
         $metadata = $this->propertyMetadataFactory->create($resourceClass = $operation->getClass(), $property);
         $relationClass = $this->getPropertyClassType($metadata->getBuiltinTypes());
@@ -51,7 +50,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromIdentifiers(ApiResource|Operation $operation): array
+    public function createLinksFromIdentifiers(Metadata $operation): array
     {
         $identifiers = $this->getIdentifiersFromResourceClass($resourceClass = $operation->getClass());
 
@@ -78,7 +77,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromRelations(ApiResource|Operation $operation): array
+    public function createLinksFromRelations(Metadata $operation): array
     {
         $links = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass = $operation->getClass()) as $property) {
@@ -99,7 +98,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromAttributes(ApiResource|Operation $operation): array
+    public function createLinksFromAttributes(Metadata $operation): array
     {
         $links = [];
         try {
