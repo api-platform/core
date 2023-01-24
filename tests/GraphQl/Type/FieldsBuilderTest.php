@@ -697,24 +697,15 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'mutation using input DTO' => ['resourceClass', (new Mutation())->withName('mutation')->withInput(GraphQLType::string()),
+            'custom mutation' => ['resourceClass', (new Mutation())->withResolver('resolver')->withName('mutation'),
                 [
-                    'property' => new ApiProperty(),
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
-                    'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true),
                 ],
                 true, 0, null,
                 [
                     'propertyBool' => [
                         'type' => GraphQLType::nonNull(GraphQLType::string()),
                         'description' => 'propertyBool description',
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => 'not useful',
-                    ],
-                    'propertySubresource' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
                         'args' => [],
                         'resolve' => null,
                         'deprecationReason' => null,

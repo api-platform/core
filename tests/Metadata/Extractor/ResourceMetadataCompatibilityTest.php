@@ -182,6 +182,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                             'bar' => 'baz',
                         ],
                     ],
+                    'extraArgs' => [
+                        'bar' => [
+                            'type' => 'custom',
+                            'baz' => 'qux',
+                        ],
+                    ],
                     'shortName' => self::SHORT_NAME,
                     'description' => 'Creates a Comment.',
                     'class' => Mutation::class,

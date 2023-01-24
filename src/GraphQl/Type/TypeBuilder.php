@@ -147,6 +147,9 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
                 if ($input && $operation instanceof Mutation && null !== $mutationArgs = $operation->getArgs()) {
                     return $fieldsBuilder->resolveResourceArgs($mutationArgs, $operation) + ['clientMutationId' => $fields['clientMutationId']];
                 }
+                if ($input && $operation instanceof Mutation && null !== $extraMutationArgs = $operation->getExtraArgs()) {
+                    return $fields + $fieldsBuilder->resolveResourceArgs($extraMutationArgs, $operation);
+                }
 
                 return $fields;
             },
