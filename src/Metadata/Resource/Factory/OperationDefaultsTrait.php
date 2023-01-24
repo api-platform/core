@@ -42,7 +42,7 @@ trait OperationDefaultsTrait
 
     private function addGlobalDefaults(ApiResource|Operation $operation): ApiResource|Operation
     {
-        $extraProperties = [];
+        $extraProperties = $this->defaults['extra_properties'] ?? [];
         foreach ($this->defaults as $key => $value) {
             $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
             $getter = 'get'.$upperKey;
