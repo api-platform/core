@@ -423,6 +423,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             $data[] = array_merge($datum, [
                 'resolver' => $this->phpize($operation, 'resolver', 'string'),
                 'args' => $this->buildArgs($operation),
+                'extraArgs' => $this->buildExtraArgs($operation),
                 'class' => (string) $operation['class'],
                 'read' => $this->phpize($operation, 'read', 'bool'),
                 'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
