@@ -25,7 +25,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderType;
 use ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\ObjectType;
@@ -86,7 +86,7 @@ class TypeConverterTest extends TestCase
             [new Type(Type::BUILTIN_TYPE_ARRAY), false, 0, 'Iterable'],
             [new Type(Type::BUILTIN_TYPE_ITERABLE), false, 0, 'Iterable'],
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class), false, 0, GraphQLType::string()],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class), false, 0, new EnumType(['name' => 'GenderTypeEnum'])],
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderType::class), false, 0, new EnumType(['name' => 'GenderTypeEnum'])],
             [new Type(Type::BUILTIN_TYPE_OBJECT), false, 0, null],
             [new Type(Type::BUILTIN_TYPE_CALLABLE), false, 0, null],
             [new Type(Type::BUILTIN_TYPE_NULL), false, 0, null],

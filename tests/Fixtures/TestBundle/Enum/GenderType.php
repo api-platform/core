@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\ApiProperty;
 /**
  * An enumeration of genders.
  */
-enum GenderTypeEnum: string
+enum GenderType: string
 {
     /** The male gender. */
     case MALE = 'male';

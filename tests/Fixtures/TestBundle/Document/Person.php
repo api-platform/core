@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -32,9 +32,9 @@ class Person
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
-    #[ODM\Field(type: 'string', enumType: GenderTypeEnum::class, nullable: true)]
+    #[ODM\Field(type: 'string', enumType: GenderType::class, nullable: true)]
     #[Groups(['people.pets'])]
-    public ?GenderTypeEnum $genderType = GenderTypeEnum::MALE;
+    public ?GenderType $genderType = GenderType::MALE;
 
     #[Groups(['people.pets'])]
     #[ODM\Field(type: 'string')]

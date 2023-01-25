@@ -590,7 +590,7 @@ Feature: GraphQL introspection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.person.fields[1].type.name" should be equal to "GenderTypeEnum"
+    And the JSON node "data.person.fields[1].type.name" should be equal to "GenderType"
     #And the JSON node "data.person.fields[1].type.description" should be equal to "An enumeration of genders."
     And the JSON node "data.person.fields[1].type.enumValues[0].name" should be equal to "MALE"
     #And the JSON node "data.person.fields[1].type.enumValues[0].description" should be equal to "The male gender."

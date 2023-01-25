@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -34,9 +34,9 @@ class Person
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', enumType: GenderTypeEnum::class, nullable: true)]
+    #[ORM\Column(type: 'string', enumType: GenderType::class, nullable: true)]
     #[Groups(['people.pets'])]
-    public ?GenderTypeEnum $genderType = GenderTypeEnum::MALE;
+    public ?GenderType $genderType = GenderType::MALE;
 
     #[ORM\Column(type: 'string')]
     #[Groups(['people.pets'])]

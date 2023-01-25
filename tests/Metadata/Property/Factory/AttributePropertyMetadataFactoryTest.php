@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\AttributePropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPhp8ApiPropertyAttribute;
-use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -40,7 +40,7 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $metadata = $factory->create(DummyPhp8ApiPropertyAttribute::class, 'foo');
         $this->assertSame('a foo', $metadata->getDescription());
 
-        $metadata = $factory->create(GenderTypeEnum::class, 'FEMALE');
+        $metadata = $factory->create(GenderType::class, 'FEMALE');
         $this->assertSame('The female gender.', $metadata->getDescription());
     }
 

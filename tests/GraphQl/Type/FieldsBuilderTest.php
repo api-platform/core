@@ -33,7 +33,7 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
-use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderType;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -830,20 +830,20 @@ class FieldsBuilderTest extends TestCase
 
     public function testGetEnumFields(): void
     {
-        $enumClass = GenderTypeEnum::class;
+        $enumClass = GenderType::class;
 
-        $this->propertyMetadataFactoryProphecy->create($enumClass, GenderTypeEnum::MALE->name)->willReturn(new ApiProperty(
+        $this->propertyMetadataFactoryProphecy->create($enumClass, GenderType::MALE->name)->willReturn(new ApiProperty(
             description: 'Description of MALE case',
         ));
-        $this->propertyMetadataFactoryProphecy->create($enumClass, GenderTypeEnum::FEMALE->name)->willReturn(new ApiProperty(
+        $this->propertyMetadataFactoryProphecy->create($enumClass, GenderType::FEMALE->name)->willReturn(new ApiProperty(
             description: 'Description of FEMALE case',
         ));
 
         $enumFields = $this->fieldsBuilder->getEnumFields($enumClass);
 
         $this->assertSame([
-            GenderTypeEnum::MALE->name => ['value' => GenderTypeEnum::MALE->value, 'description' => 'Description of MALE case'],
-            GenderTypeEnum::FEMALE->name => ['value' => GenderTypeEnum::FEMALE->value, 'description' => 'Description of FEMALE case'],
+            GenderType::MALE->name => ['value' => GenderType::MALE->value, 'description' => 'Description of MALE case'],
+            GenderType::FEMALE->name => ['value' => GenderType::FEMALE->value, 'description' => 'Description of FEMALE case'],
         ], $enumFields);
     }
 
