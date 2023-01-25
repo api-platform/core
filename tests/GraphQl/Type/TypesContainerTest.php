@@ -52,6 +52,14 @@ class TypesContainerTest extends TestCase
         $this->assertSame($type, $this->typesContainer->get('test'));
     }
 
+    public function testGetEnum(): void
+    {
+        $type = $this->prophesize(GraphQLType::class)->reveal();
+
+        $this->typesContainer->set('testEnum', $type);
+        $this->assertSame($type, $this->typesContainer->get('test'));
+    }
+
     public function testGetTypeNotFound(): void
     {
         $this->expectException(TypeNotFoundException::class);

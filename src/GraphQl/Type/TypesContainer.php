@@ -41,6 +41,10 @@ final class TypesContainer implements TypesContainerInterface
             return $this->graphqlTypes[$id];
         }
 
+        if ($this->has($id . 'Enum')) {
+            return $this->graphqlTypes[$id . 'Enum'];
+        }
+
         throw new TypeNotFoundException(sprintf('Type with id "%s" is not present in the types container', $id), $id);
     }
 
