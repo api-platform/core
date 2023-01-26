@@ -31,7 +31,7 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
     private $reader;
     private $decorated;
 
-    public function __construct(Reader $reader, PropertyMetadataFactoryInterface $decorated)
+    public function __construct(Reader $reader = null, PropertyMetadataFactoryInterface $decorated)
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
@@ -54,6 +54,10 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
             $reflectionProperty = $reflectionClass->getProperty($property);
             if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionProperty->getAttributes(ApiSubresource::class)) {
                 return $this->updateMetadata($attributes[0]->newInstance(), $propertyMetadata, $resourceClass, $property);
+            }
+
+            if (!$this->reader) {
+                return $propertyMetadata;
             }
 
             $annotation = $this->reader->getPropertyAnnotation($reflectionProperty, ApiSubresource::class);
