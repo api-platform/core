@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -174,5 +175,16 @@ class VarnishPurgerTest extends TestCase
                 sprintf('(%s)($|\,)', implode('|', array_fill(0, 1402, '/foo'))),
             ],
         ];
+    }
+
+    public function testConstructor(): void
+    {
+        $clientProphecy = $this->prophesize(HttpClientInterface::class);
+        $clientProphecy->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
+        $purger = new VarnishPurger(new RewindableGenerator(static function () use ($clientProphecy) {
+            yield $clientProphecy->reveal();
+        }, 1));
+
+        $purger->purge(['/foo']);
     }
 }
