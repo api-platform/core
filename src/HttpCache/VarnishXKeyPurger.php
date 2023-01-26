@@ -28,7 +28,7 @@ final class VarnishXKeyPurger extends SurrogateKeysPurger
     /**
      * @param HttpClientInterface[] $clients
      */
-    public function __construct(array $clients, int $maxHeaderLength = self::VARNISH_MAX_HEADER_LENGTH, string $xkeyGlue = self::VARNISH_SEPARATOR)
+    public function __construct(iterable $clients, int $maxHeaderLength = self::VARNISH_MAX_HEADER_LENGTH, string $xkeyGlue = self::VARNISH_SEPARATOR)
     {
         parent::__construct($clients, $maxHeaderLength, 'xkey', $xkeyGlue);
     }
