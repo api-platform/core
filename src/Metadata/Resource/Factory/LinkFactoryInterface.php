@@ -13,9 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Metadata;
 
 /**
  * @internal
@@ -27,21 +26,21 @@ interface LinkFactoryInterface
      *
      * @return Link[]
      */
-    public function createLinksFromIdentifiers(ApiResource|Operation $operation);
+    public function createLinksFromIdentifiers(Metadata $operation);
 
     /**
      * Create Links from the relations metadata information.
      *
      * @return Link[]
      */
-    public function createLinksFromRelations(ApiResource|Operation $operation);
+    public function createLinksFromRelations(Metadata $operation);
 
     /**
      * Create Links by using PHP attribute Links found on properties.
      *
      * @return Link[]
      */
-    public function createLinksFromAttributes(ApiResource|Operation $operation): array;
+    public function createLinksFromAttributes(Metadata $operation): array;
 
     /**
      * Complete a link with identifiers information.

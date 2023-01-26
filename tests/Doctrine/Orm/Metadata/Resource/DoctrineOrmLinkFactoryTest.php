@@ -15,10 +15,9 @@ namespace ApiPlatform\Tests\Doctrine\Orm\Metadata\Resource;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmLinkFactory;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactoryInterface;
@@ -77,22 +76,22 @@ final class DoctrineOrmLinkFactoryTest extends TestCase
 
 class LinkFactoryStub implements LinkFactoryInterface, PropertyLinkFactoryInterface
 {
-    public function createLinkFromProperty(ApiResource|Operation $operation, string $property): Link
+    public function createLinkFromProperty(Metadata $operation, string $property): Link
     {
         return new Link();
     }
 
-    public function createLinksFromIdentifiers(ApiResource|Operation $operation): array
+    public function createLinksFromIdentifiers(Metadata $operation): array
     {
         return [];
     }
 
-    public function createLinksFromRelations(ApiResource|Operation $operation): array
+    public function createLinksFromRelations(Metadata $operation): array
     {
         return [];
     }
 
-    public function createLinksFromAttributes(ApiResource|Operation $operation): array
+    public function createLinksFromAttributes(Metadata $operation): array
     {
         return [];
     }
