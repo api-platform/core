@@ -149,11 +149,12 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 'shared_max_age' => 120,
                 'public' => true,
             ],
+            'extra_properties' => ['standard_put' => true],
             'non_existing_attribute' => 'foo',
         ]);
 
         // Check the AttributeDefaultOperations it specifies a shared_max_age that should not be overridden
-        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, cacheHeaders: ['max_age' => 60, 'shared_max_age' => 60, 'public' => true], paginationItemsPerPage: 10, extraProperties: ['non_existing_attribute' => 'foo', 'generated_operation' => true]);
+        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, cacheHeaders: ['max_age' => 60, 'shared_max_age' => 60, 'public' => true], paginationItemsPerPage: 10, extraProperties: ['non_existing_attribute' => 'foo', 'generated_operation' => true, 'standard_put' => true]);
 
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
@@ -170,7 +171,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 ],
                 cacheHeaders: ['max_age' => 60, 'shared_max_age' => 60, 'public' => true],
                 paginationItemsPerPage: 10,
-                extraProperties: ['non_existing_attribute' => 'foo']
+                extraProperties: ['non_existing_attribute' => 'foo', 'standard_put' => true]
             ),
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
     }
