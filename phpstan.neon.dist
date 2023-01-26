@@ -66,6 +66,7 @@ parameters:
 		- src/Core/Bridge/Elasticsearch/DataProvider/Paginator.php
 		- src/Core/Bridge/Elasticsearch/Exception/IndexNotFoundException.php
 		- src/Core/Bridge/Elasticsearch/Exception/NonUniqueIdentifierException.php
+		- src/Core/Bridge/Elasticsearch/Extension/RequestBodySearchCollectionExtensionInterface.php
 		- src/Core/Bridge/Elasticsearch/Metadata/Document/DocumentMetadata.php
 		- src/Core/Bridge/Elasticsearch/Metadata/Document/Factory/AttributeDocumentMetadataFactory.php
 		- src/Core/Bridge/Elasticsearch/Metadata/Document/Factory/CachedDocumentMetadataFactory.php

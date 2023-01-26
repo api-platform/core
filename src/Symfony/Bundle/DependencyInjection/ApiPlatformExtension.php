@@ -17,6 +17,7 @@ use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Annotation\ApiResource as ApiResourceAnnotation;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter as DoctrineOrmAbstractContextAwareFilter;
+use ApiPlatform\Core\Bridge\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface as LegacyRequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -913,6 +914,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
+            ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
+
+        $container->registerForAutoconfiguration(LegacyRequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
 
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
