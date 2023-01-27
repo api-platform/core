@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.7.8
+
+### Bug fixes
+
+* [b15a97d7f](https://github.com/api-platform/core/commit/b15a97d7fa65ec78934e24a30289cb499d4365e7) fix(symfony): autoconfigure elasticsearch extension (#5376)
+* [cbe7355d1](https://github.com/api-platform/core/commit/cbe7355d184d75465a5e5acc51f9c4f24ab5b52c) fix(metadata): annotation reader should be nullable
+
 ## v2.7.7
 
 ### Bug fixes
