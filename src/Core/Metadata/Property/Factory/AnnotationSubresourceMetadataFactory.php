@@ -83,6 +83,10 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
                 return $this->updateMetadata($attributes[0]->newInstance(), $propertyMetadata, $resourceClass, $property);
             }
 
+            if (!$this->reader) {
+                return $propertyMetadata;
+            }
+
             $annotation = $this->reader->getMethodAnnotation($reflectionMethod, ApiSubresource::class);
             if ($annotation instanceof ApiSubresource) {
                 return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass, $property);
