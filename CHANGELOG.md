@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.1.1
+
+### Bug fixes
+
+* [186cd69d4](https://github.com/api-platform/core/commit/186cd69d446133fd19f321ac6c8a355ba98658cf) fix(symfony): wrong purger clients type (#5373)
+* [4eb0ab5a9](https://github.com/api-platform/core/commit/4eb0ab5a936c2ff95baee1421c3156ce707fbae6) fix(openapi): fix openapi requestbody decoration (#5377)
+* [78ae12298](https://github.com/api-platform/core/commit/78ae122980532d91df69a412d17e05488a379cd1) fix(metadata): allow custom http status code for put (#5375)
+* [a5fb2aa28](https://github.com/api-platform/core/commit/a5fb2aa2850bbc2494137ea65549a0299500e659) fix(metadata): defaults extra properties (#5362)
+* [f7c70b17d](https://github.com/api-platform/core/commit/f7c70b17d195a311e7a4a923de224d6663cfdb50) fix(graphql): name and key should be the same for an enum without Enum suffix in class name (#5369)
+
 ## v3.1.0
 
 ### Bug fixes
