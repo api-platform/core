@@ -61,12 +61,12 @@ parameters:
 		- src/Core/Bridge/Doctrine/Orm/Util/QueryNameGenerator.php
 		- src/Core/Bridge/Elasticsearch/DataProvider/Extension/AbstractFilterExtension.php
 		- src/Core/Bridge/Elasticsearch/DataProvider/Extension/ConstantScoreFilterExtension.php
+		- src/Core/Bridge/Elasticsearch/DataProvider/Extension/RequestBodySearchCollectionExtensionInterface.php
 		- src/Core/Bridge/Elasticsearch/DataProvider/Extension/SortExtension.php
 		- src/Core/Bridge/Elasticsearch/DataProvider/Extension/SortFilterExtension.php
 		- src/Core/Bridge/Elasticsearch/DataProvider/Paginator.php
 		- src/Core/Bridge/Elasticsearch/Exception/IndexNotFoundException.php
 		- src/Core/Bridge/Elasticsearch/Exception/NonUniqueIdentifierException.php
-		- src/Core/Bridge/Elasticsearch/Extension/RequestBodySearchCollectionExtensionInterface.php
 		- src/Core/Bridge/Elasticsearch/Metadata/Document/DocumentMetadata.php
 		- src/Core/Bridge/Elasticsearch/Metadata/Document/Factory/AttributeDocumentMetadataFactory.php
 		- src/Core/Bridge/Elasticsearch/Metadata/Document/Factory/CachedDocumentMetadataFactory.php
