@@ -30,6 +30,7 @@ class JsonSchemaContextDummy
      * @var int The id
      *
      * @ApiProperty(identifier=true)
+     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;

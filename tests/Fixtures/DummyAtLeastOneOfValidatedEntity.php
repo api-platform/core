@@ -21,7 +21,9 @@ class DummyAtLeastOneOfValidatedEntity
      * @var string
      *
      * @Assert\AtLeastOneOf({
+     *
      *     @Assert\Regex("/#/"),
+     *
      *     @Assert\Length(min=10)
      * })
      */

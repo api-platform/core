@@ -31,7 +31,9 @@ class DummyValidatedEntity
      * @var string A dummy
      *
      * @Assert\NotBlank
+     *
      * @Assert\Length(max="4", min="10")
+     *
      * @Assert\Regex(pattern="/^dummy$/")
      */
     public $dummy;
