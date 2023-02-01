@@ -168,6 +168,28 @@ class OpenApiFactoryTest extends TestCase
                                            ->withPaginationItemsPerPage(20)
                                        ->withPaginationMaximumItemsPerPage(80)
                                                ->withOperation($baseOperation),
+            'postDummyCollectionWithRequestBody' => (new Post())->withUriTemplate('/dummiesRequestBody')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                requestBody: new RequestBody(
+                    description: 'List of Ids',
+                    content: new \ArrayObject([
+                        'application/json' => [
+                            'schema' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'ids' => [
+                                        'type' => 'array',
+                                        'items' => ['type' => 'string'],
+                                        'example' => [
+                                            '1e677e04-d461-4389-bedc-6d1b665cc9d6',
+                                            '01111b43-f53a-4d50-8639-148850e5da19',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
+                ),
+            )),
         ])
         );
 
@@ -628,5 +650,49 @@ class OpenApiFactoryTest extends TestCase
                 ]),
             ]
         ), $paginatedPath->getGet());
+
+        $requestBodyPath = $paths->getPath('/dummiesRequestBody');
+        $this->assertEquals(new Operation(
+            'postDummyCollectionWithRequestBody',
+            ['Dummy'],
+            [
+                '201' => new Response(
+                    'Dummy resource created',
+                    new \ArrayObject([
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '400' => new Response('Invalid input'),
+                '422' => new Response('Unprocessable entity'),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [],
+            new RequestBody(
+                'List of Ids',
+                new \ArrayObject([
+                    'application/json' => [
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'ids' => [
+                                    'type' => 'array',
+                                    'items' => ['type' => 'string'],
+                                    'example' => [
+                                        '1e677e04-d461-4389-bedc-6d1b665cc9d6',
+                                        '01111b43-f53a-4d50-8639-148850e5da19',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+                false
+            ),
+            deprecated: false,
+        ), $requestBodyPath->getPost());
     }
 }

@@ -590,7 +590,7 @@ class TypeBuilderTest extends TestCase
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->willReturn($fieldsBuilderProphecy->reveal());
 
         self::assertEquals(new EnumType([
-            'name' => $enumName,
+            'name' => 'GamePlayModeEnum',
             'description' => $enumDescription,
             'values' => $enumValues,
         ]), $this->typeBuilder->getEnumType($operation));

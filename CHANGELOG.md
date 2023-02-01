@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.1.1
+
+### Bug fixes
+
+* [186cd69d4](https://github.com/api-platform/core/commit/186cd69d446133fd19f321ac6c8a355ba98658cf) fix(symfony): wrong purger clients type (#5373)
+* [4eb0ab5a9](https://github.com/api-platform/core/commit/4eb0ab5a936c2ff95baee1421c3156ce707fbae6) fix(openapi): fix openapi requestbody decoration (#5377)
+* [78ae12298](https://github.com/api-platform/core/commit/78ae122980532d91df69a412d17e05488a379cd1) fix(metadata): allow custom http status code for put (#5375)
+* [a5fb2aa28](https://github.com/api-platform/core/commit/a5fb2aa2850bbc2494137ea65549a0299500e659) fix(metadata): defaults extra properties (#5362)
+* [f7c70b17d](https://github.com/api-platform/core/commit/f7c70b17d195a311e7a4a923de224d6663cfdb50) fix(graphql): name and key should be the same for an enum without Enum suffix in class name (#5369)
+
 ## v3.1.0
 
 ### Bug fixes
@@ -36,11 +46,11 @@
 ### Bug fixes
 
 * [0154bf13c](https://github.com/api-platform/core/commit/0154bf13c3aa99b6bfe2c17c875a51e876aca43f) fix(metadata): homogenize operations constructor (#5344)
-* [722802c13](https://github.com/api-platform/core/commit/722802c13200179cd9ce7b2812738471a9340f27) fix(graphql): usable YAML/XML configuration (#5333)
-
-**Backward compatibility**
-
-Removal of `paginationViaCursor` on GraphQl operations (it had no effect anyways).
+    Note: we made clear that we are supporting only named arguments on our Attributes. We do not support backward compatibility on positional arguments.
+* [53cb25fab](https://github.com/api-platform/core/commit/53cb25fab0fcec2d336590c7e82e1c6a8728d00a) fix(symfony): annotation reader argument optional (#5358)
+* [722802c13](https://github.com/api-platform/core/commit/722802c13200179cd9ce7b2812738471a9340f27) fix(graphql): usable YAML/XML configuration (#5333) 
+    Note: `paginationViaCursor` was removed from GraphQl operations as it had no behavior
+* [937786efe](https://github.com/api-platform/core/commit/937786efeab77f939d67973d7b4e7bc4fd8eec17) fix(metadata): extract identifier using `Link::toProperty` (#5352)
 
 ## v3.0.10
 
@@ -186,6 +196,19 @@ Breaking changes:
 * Metadata: `Patch` is added to the automatic CRUD
 * Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
     
+## v2.7.8
+
+### Bug fixes
+
+* [b15a97d7f](https://github.com/api-platform/core/commit/b15a97d7fa65ec78934e24a30289cb499d4365e7) fix(symfony): autoconfigure elasticsearch extension (#5376)
+* [cbe7355d1](https://github.com/api-platform/core/commit/cbe7355d184d75465a5e5acc51f9c4f24ab5b52c) fix(metadata): annotation reader should be nullable
+
+## v2.7.7
+
+### Bug fixes
+
+* [53cb25fab](https://github.com/api-platform/core/commit/53cb25fab0fcec2d336590c7e82e1c6a8728d00a) fix(symfony): annotation reader argument optional (#5358)
+
 ## v2.7.6
 
 ### Bug fixes

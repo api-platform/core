@@ -145,6 +145,11 @@ services:
         tags:
             - { name: 'api_platform.state_provider' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\RelationMultipleProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelationMultipleProvider'
+        tags:
+            - { name: 'api_platform.state_provider' }
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor'
         tags:
