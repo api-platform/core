@@ -17,11 +17,13 @@ final class Paths
 {
     private array $paths = [];
 
-    public function addPath(string $path, PathItem $pathItem): void
+    public function addPath(string $path, PathItem $pathItem, bool $ksort = true): void
     {
         $this->paths[$path] = $pathItem;
 
-        ksort($this->paths);
+        if ($ksort) {
+            ksort($this->paths);
+        }
     }
 
     public function getPath(string $path): ?PathItem
