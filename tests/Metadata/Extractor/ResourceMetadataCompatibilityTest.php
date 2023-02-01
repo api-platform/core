@@ -512,13 +512,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
         }
 
-        // if (null === $this->buildApiResources()[1]->getStateOptions()) {
-        //     dd('test');
-        // }
-        if (null === $this->buildApiResources()[1]->getGraphQlOperations()['item_query']->getStateOptions()) {
-            dd('test');
-        }
-        // dd($collection[1]);
         $this->assertEquals(new ResourceMetadataCollection(self::RESOURCE_CLASS, $this->buildApiResources()), $collection);
     }
 
