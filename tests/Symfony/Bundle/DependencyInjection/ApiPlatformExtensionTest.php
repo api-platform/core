@@ -1236,4 +1236,15 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.invalidation_http_client.0', ['api_platform.http_cache.http_client']);
         $this->assertServiceHasTags('my_scoped_client', ['api_platform.http_cache.http_client']);
     }
+
+    public function testHttpCacheBanConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $service = $this->container->getDefinition('api_platform.http_cache.purger.varnish.ban');
+        $this->assertCount(1, $service->getArguments());
+        $this->assertEquals('api_platform.http_cache.http_client', $service->getArgument(0)->getTag());
+    }
 }
