@@ -90,7 +90,7 @@ final class RespondListener
         ) {
             $status = 301;
             $headers['Location'] = $this->iriConverter->getIriFromResource($request->attributes->get('data'), UrlGeneratorInterface::ABS_PATH, $operation);
-        } elseif (HttpOperation::METHOD_PUT === $method && !($attributes['previous_data'] ?? null)) {
+        } elseif (HttpOperation::METHOD_PUT === $method && !($attributes['previous_data'] ?? null) && null === $status) {
             $status = Response::HTTP_CREATED;
         }
 

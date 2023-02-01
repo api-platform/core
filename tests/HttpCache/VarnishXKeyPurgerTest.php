@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -204,5 +205,16 @@ class VarnishXKeyPurgerTest extends TestCase
                 implode(' ', array_fill(0, 1402, '/foo')),
             ],
         ];
+    }
+
+    public function testConstructor(): void
+    {
+        $clientProphecy = $this->prophesize(ClientInterface::class);
+        $clientProphecy->request('PURGE', '', ['headers' => ['xkey' => '/foo']])->willReturn(new Response())->shouldBeCalled();
+        $purger = new VarnishXKeyPurger(new RewindableGenerator(static function () use ($clientProphecy) {
+            yield $clientProphecy->reveal();
+        }, 1));
+
+        $purger->purge(['/foo']);
     }
 }

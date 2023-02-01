@@ -28,7 +28,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[Get]
 #[Patch(inputFormats: ['json' => ['application/merge-patch+json']])]
 #[Post]
-#[Put]
+#[Put(extraProperties: ['standard_put' => false])]
 #[Delete]
 class OperationResource
 {
