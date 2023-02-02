@@ -121,6 +121,7 @@ class HttpOperation extends Operation
         ?string $description = null,
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
+        ?bool $collectDenormalizationErrors = null,
         ?string $security = null,
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
@@ -157,6 +158,7 @@ class HttpOperation extends Operation
         $this->deprecationReason = $deprecationReason;
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
+        $this->collectDenormalizationErrors = $collectDenormalizationErrors;
         $this->validationContext = $validationContext;
         $this->filters = $filters;
         $this->elasticsearch = $elasticsearch;

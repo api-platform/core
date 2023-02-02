@@ -502,7 +502,7 @@ Feature: Relations support
           "pattern": "^An error occurred$"
         },
         "hydra:description": {
-          "pattern": "^Expected IRI or document for resource \"ApiPlatform\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\RelatedDummy\", \"integer\" given.$"
+          "pattern": "^The type of the \"ApiPlatform\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\RelatedDummy\" resource must be \"array\" \\(nested document\\) or \"string\" \\(IRI\\), \"integer\" given.$"
         }
       },
       "required": [

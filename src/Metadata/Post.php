@@ -71,6 +71,7 @@ final class Post extends HttpOperation
         ?string $description = null,
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
+        ?bool $collectDenormalizationErrors = null,
         ?string $security = null,
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,

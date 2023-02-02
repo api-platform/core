@@ -135,6 +135,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'securityPostValidationMessage' => $this->phpize($resource, 'securityPostValidationMessage', 'string'),
             'normalizationContext' => isset($resource->normalizationContext->values) ? $this->buildValues($resource->normalizationContext->values) : null,
             'denormalizationContext' => isset($resource->denormalizationContext->values) ? $this->buildValues($resource->denormalizationContext->values) : null,
+            'collectDenormalizationErrors' => $this->phpize($resource, 'collectDenormalizationErrors', 'bool'),
             'validationContext' => isset($resource->validationContext->values) ? $this->buildValues($resource->validationContext->values) : null,
             'filters' => $this->buildArrayValue($resource, 'filter'),
             'order' => isset($resource->order->values) ? $this->buildValues($resource->order->values) : null,

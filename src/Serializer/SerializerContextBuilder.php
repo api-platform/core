@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * {@inheritdoc}
@@ -75,6 +76,9 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             if ('csv' === (method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType())) {
                 $context[CsvEncoder::AS_COLLECTION_KEY] = false;
             }
+        }
+        if ($operation->getCollectDenormalizationErrors() ?? false) {
+            $context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS] = true;
         }
 
         return $context;
