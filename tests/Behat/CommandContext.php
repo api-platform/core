@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Behat;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
+use GraphQL\Error\Error;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -70,7 +71,12 @@ final class CommandContext implements Context
      */
     public function theCommandOutputShouldContain(PyStringNode $expectedOutput): void
     {
-        $expectedOutput = str_replace('###', '"""', $expectedOutput->getRaw());
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_GRAPHQL')) {
+            $expectedOutput = str_replace('###', '"""', $expectedOutput->getRaw());
+        } else {
+            $expectedOutput = str_replace('###', '"', $expectedOutput->getRaw());
+        }
 
         Assert::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay());
     }

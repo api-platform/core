@@ -26,7 +26,7 @@ class UuidIdentifierDummy
     /**
      * @var string The custom identifier
      */
-    #[ODM\Id(strategy: 'UUID')]
+    #[ODM\Id(strategy: 'none', type: 'string')]
     private ?string $uuid = null;
     /**
      * @var string The dummy name

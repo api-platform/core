@@ -10,6 +10,7 @@
             <argument type="service" id="doctrine_mongodb.odm.default_document_manager" />
             <tag name="property_info.list_extractor" priority="-1001" />
             <tag name="property_info.type_extractor" priority="-999" />
+            <tag name="property_info.access_extractor" priority="-999" />
         </service>
 
         <service id="api_platform.doctrine.metadata_factory" class="Doctrine\Persistence\Mapping\ClassMetadataFactory" public="false">

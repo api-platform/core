@@ -40,7 +40,8 @@ class GraphQlExportCommand extends Command
     {
         $this
             ->setDescription('Export the GraphQL schema in Schema Definition Language (SDL)')
-            ->addOption('comment-descriptions', null, InputOption::VALUE_NONE, 'Use preceding comments as the description')
+            ->addOption('comment-descriptions', null, InputOption::VALUE_NONE, 'Use preceding comments as the description (deprecated: graphql-php < 15)')
+            ->addOption('sort-types', null, InputOption::VALUE_NONE, 'Order types alphabetically')
             ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Write output to file');
     }
 
@@ -53,8 +54,12 @@ class GraphQlExportCommand extends Command
 
         $options = [];
 
+        // Removed in graphql-php 15
         if ($input->getOption('comment-descriptions')) {
             $options['commentDescriptions'] = true;
+        }
+        if ($input->getOption('sort-types')) {
+            $options['sortTypes'] = true;
         }
 
         $schemaExport = SchemaPrinter::doPrint($this->schemaBuilder->getSchema(), $options);

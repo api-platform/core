@@ -35,7 +35,10 @@ final class HttpExceptionNormalizer implements NormalizerInterface
         $error = FormattedError::createFromException($object);
         $error['message'] = $httpException->getMessage();
         $error['extensions']['status'] = $statusCode = $httpException->getStatusCode();
-        $error['extensions']['category'] = $statusCode < 500 ? 'user' : Error::CATEGORY_INTERNAL;
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_INTERNAL')) {
+            $error['extensions']['category'] = $statusCode < 500 ? 'user' : Error::CATEGORY_INTERNAL;
+        }
 
         return $error;
     }
