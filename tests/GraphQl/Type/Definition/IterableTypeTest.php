@@ -67,7 +67,7 @@ class IterableTypeTest extends TestCase
         $iterableType = new IterableType();
 
         $this->expectException(\Exception::class);
-        $iterableType->parseLiteral(new IntValueNode(['value' => 1]));
+        $iterableType->parseLiteral(new IntValueNode(['value' => '1']));
 
         $listValueNode = new ListValueNode(['values' => []]);
         $this->assertEquals([], $iterableType->parseLiteral($listValueNode));

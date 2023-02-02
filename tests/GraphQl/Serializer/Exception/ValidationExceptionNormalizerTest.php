@@ -47,7 +47,10 @@ class ValidationExceptionNormalizerTest extends TestCase
         $normalizedError = $this->validationExceptionNormalizer->normalize($error);
         $this->assertSame($exceptionMessage, $normalizedError['message']);
         $this->assertSame(422, $normalizedError['extensions']['status']);
-        $this->assertSame('user', $normalizedError['extensions']['category']);
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_INTERNAL')) {
+            $this->assertSame('user', $normalizedError['extensions']['category']);
+        }
         $this->assertArrayHasKey('violations', $normalizedError['extensions']);
         $this->assertEquals([
             [

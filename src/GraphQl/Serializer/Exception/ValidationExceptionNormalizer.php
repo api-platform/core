@@ -53,7 +53,10 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
             }
         }
         $error['extensions']['status'] = $statusCode;
-        $error['extensions']['category'] = 'user';
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_INTERNAL')) {
+            $error['extensions']['category'] = 'user';
+        }
         $error['extensions']['violations'] = [];
 
         /** @var ConstraintViolation $violation */

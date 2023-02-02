@@ -20,6 +20,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behatch\Context\RestContext;
 use Behatch\HttpCall\Request;
+use GraphQL\Error\Error;
 use GraphQL\Type\Introspection;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -31,6 +32,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 final class GraphqlContext implements Context
 {
     private ?RestContext $restContext = null;
+    private ?JsonContext $jsonContext = null;
 
     private array $graphqlRequest;
 
@@ -47,15 +49,14 @@ final class GraphqlContext implements Context
      */
     public function gatherContexts(BeforeScenarioScope $scope): void
     {
-        /**
-         * @var InitializedContextEnvironment $environment
-         */
+        /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
-        /**
-         * @var RestContext $restContext
-         */
+        /** @var RestContext $restContext */
         $restContext = $environment->getContext(RestContext::class);
         $this->restContext = $restContext;
+        /** @var JsonContext $jsonContext */
+        $jsonContext = $environment->getContext(JsonContext::class);
+        $this->jsonContext = $jsonContext;
     }
 
     /**
@@ -154,6 +155,20 @@ final class GraphqlContext implements Context
         }
 
         throw new ExpectationFailedException(sprintf('The field "%s" is not deprecated.', $fieldName));
+    }
+
+    /**
+     * @Then the GraphQL debug message should be equal to :expectedDebugMessage
+     */
+    public function theGraphQLDebugMessageShouldBeEqualTo(string $expectedDebugMessage): void
+    {
+        $jsonNode = 'errors[0].extensions.debugMessage';
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_INTERNAL')) {
+            $jsonNode = 'errors[0].debugMessage';
+        }
+
+        $this->jsonContext->theJsonNodeShouldBeEqualTo($jsonNode, $expectedDebugMessage);
     }
 
     private function sendGraphqlRequest(): void

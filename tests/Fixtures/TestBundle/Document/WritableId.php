@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class WritableId
 {
     #[Assert\Uuid]
-    #[ODM\Id(strategy: 'UUID', type: 'string')]
+    #[ODM\Id(strategy: 'none', type: 'string')]
     public $id;
     #[ODM\Field]
     public $name;

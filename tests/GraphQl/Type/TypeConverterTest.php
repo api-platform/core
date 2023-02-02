@@ -86,7 +86,7 @@ class TypeConverterTest extends TestCase
             [new Type(Type::BUILTIN_TYPE_ARRAY), false, 0, 'Iterable'],
             [new Type(Type::BUILTIN_TYPE_ITERABLE), false, 0, 'Iterable'],
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class), false, 0, GraphQLType::string()],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class), false, 0, new EnumType(['name' => 'GenderTypeEnum'])],
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class), false, 0, new EnumType(['name' => 'GenderTypeEnum', 'values' => []])],
             [new Type(Type::BUILTIN_TYPE_OBJECT), false, 0, null],
             [new Type(Type::BUILTIN_TYPE_CALLABLE), false, 0, null],
             [new Type(Type::BUILTIN_TYPE_NULL), false, 0, null],
@@ -156,7 +156,7 @@ class TypeConverterTest extends TestCase
         /** @var Operation $operation */
         $operation = new Query();
         $graphqlResourceMetadata = new ResourceMetadataCollection('dummy', [(new ApiResource())->withGraphQlOperations(['item_query' => $operation])]);
-        $expectedGraphqlType = new ObjectType(['name' => 'resourceObjectType']);
+        $expectedGraphqlType = new ObjectType(['name' => 'resourceObjectType', 'fields' => []]);
 
         $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->willReturn($graphqlResourceMetadata);
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
@@ -190,8 +190,8 @@ class TypeConverterTest extends TestCase
     public function convertTypeResourceProvider(): array
     {
         return [
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType'])],
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType'])],
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
+            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
         ];
     }
 

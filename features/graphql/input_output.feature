@@ -143,15 +143,12 @@ Feature: GraphQL DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "errors": [
         {
           "message": "Cannot query field \"id\" on type \"DummyDtoNoOutput\".",
-          "extensions": {
-            "category": "graphql"
-          },
           "locations": [
             {
               "line": 4,
@@ -175,37 +172,8 @@ Feature: GraphQL DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON should be equal to:
-    """
-    {
-      "errors": [
-        {
-          "message": "Field \"lorem\" is not defined by type createDummyDtoNoInputInput.",
-          "extensions": {
-            "category": "graphql"
-          },
-          "locations": [
-            {
-              "line": 2,
-              "column": 33
-            }
-          ]
-        },
-        {
-          "message": "Field \"ipsum\" is not defined by type createDummyDtoNoInputInput.",
-          "extensions": {
-            "category": "graphql"
-          },
-          "locations": [
-            {
-              "line": 2,
-              "column": 53
-            }
-          ]
-        }
-      ]
-    }
-    """
+    And the JSON node "errors[0].message" should match '/^Field "lorem" is not defined by type "?createDummyDtoNoInputInput"?\.$/'
+    And the JSON node "errors[1].message" should match '/^Field "ipsum" is not defined by type "?createDummyDtoNoInputInput"?\.$/'
 
   Scenario: Use messenger with GraphQL and an input where the handler gives a synchronous result
     When I send the following GraphQL request:
