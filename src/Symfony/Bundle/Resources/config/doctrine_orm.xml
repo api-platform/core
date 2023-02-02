@@ -167,6 +167,13 @@
             <argument type="service" id="api_platform.doctrine.orm.metadata.resource.metadata_collection_factory.inner" />
         </service>
 
+        <service id="api_platform.doctrine.orm.metadata.resource.link_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmLinkFactory" decorates="api_platform.metadata.resource.link_factory" decoration-priority="40">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.doctrine.orm.metadata.resource.link_factory.inner" />
+        </service>
+
     </services>
 
 </container>

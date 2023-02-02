@@ -42,7 +42,7 @@ trait OperationDefaultsTrait
 
     private function addGlobalDefaults(ApiResource|Operation $operation): ApiResource|Operation
     {
-        $extraProperties = [];
+        $extraProperties = $this->defaults['extra_properties'] ?? [];
         foreach ($this->defaults as $key => $value) {
             $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
             $getter = 'get'.$upperKey;
@@ -208,7 +208,7 @@ trait OperationDefaultsTrait
         return sprintf(
             '_api_%s_%s%s',
             $path ?: ($operation->getShortName() ?? $this->getDefaultShortname($resourceClass)),
-            strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET),
+            strtolower($operation->getMethod()),
             $operation instanceof CollectionOperationInterface ? '_collection' : '');
     }
 }

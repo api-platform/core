@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -77,6 +78,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         $isPaginatedWithCursor = false;
         $cursorPaginationAttribute = null;
         if ($this->resourceMetadataFactory && isset($context['resource_class']) && $paginated) {
+            /** @var HttpOperation $operation */
             $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation($context['operation_name'] ?? null);
             $isPaginatedWithCursor = [] !== $cursorPaginationAttribute = ($operation->getPaginationViaCursor() ?? []);
         }

@@ -31,7 +31,7 @@ class SurrogateKeysPurger implements PurgerInterface
     /**
      * @param HttpClientInterface[] $clients
      */
-    public function __construct(protected readonly array $clients, protected readonly int $maxHeaderLength = self::MAX_HEADER_SIZE_PER_BATCH, protected readonly string $header = self::HEADER, protected readonly string $separator = self::SEPARATOR)
+    public function __construct(protected readonly iterable $clients, protected readonly int $maxHeaderLength = self::MAX_HEADER_SIZE_PER_BATCH, protected readonly string $header = self::HEADER, protected readonly string $separator = self::SEPARATOR)
     {
     }
 

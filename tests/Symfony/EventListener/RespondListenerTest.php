@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Symfony\EventListener;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\EventListener\RespondListener;
@@ -225,6 +226,28 @@ class RespondListenerTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
             new ApiResource(operations: [
                 'get' => new Get(status: Response::HTTP_ACCEPTED),
+            ]),
+        ]));
+
+        $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $this->assertSame(Response::HTTP_ACCEPTED, $event->getResponse()->getStatusCode());
+    }
+
+    public function testSetCustomStatusForPut(): void
+    {
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'put', '_api_respond' => true], [], [], ['REQUEST_METHOD' => 'PUT']);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
+            'bar'
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            new ApiResource(operations: [
+                'put' => new Put(status: Response::HTTP_ACCEPTED),
             ]),
         ]));
 

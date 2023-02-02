@@ -337,7 +337,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     'The "openapiContext" option is deprecated, use "openapi" instead.'
                 );
                 $openapiOperation = $openapiOperation->withRequestBody(new RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false));
-            } elseif (\in_array($method, [HttpOperation::METHOD_PATCH, HttpOperation::METHOD_PUT, HttpOperation::METHOD_POST], true)) {
+            } elseif (null === $openapiOperation->getRequestBody() && \in_array($method, [HttpOperation::METHOD_PATCH, HttpOperation::METHOD_PUT, HttpOperation::METHOD_POST], true)) {
                 $operationInputSchemas = [];
                 foreach ($requestMimeTypes as $operationFormat) {
                     $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
@@ -477,7 +477,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $operationName === $operation->getName() ||
                     isset($links[$operationName]) ||
                     $operation instanceof CollectionOperationInterface ||
-                    HttpOperation::METHOD_GET !== ($method ?? null)
+                    HttpOperation::METHOD_GET !== $method
                 ) {
                     continue;
                 }

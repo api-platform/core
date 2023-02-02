@@ -91,6 +91,36 @@ Feature: GraphQL collection support
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges[1].node.name" should be equal to "RelatedDummy23"
 
   @createSchema
+  Scenario: Retrieve a collection with a nested collection (inverse side) through a GraphQL query
+    Given there is a video game with music groups
+    When I send the following GraphQL request:
+    """
+    {
+      musicGroups {
+        edges {
+          node {
+            name
+            videoGames {
+              edges {
+                node {
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.musicGroups.edges[0].node.name" should be equal to "Sum 41"
+    And the JSON node "data.musicGroups.edges[0].node.videoGames.edges[0].node.name" should be equal to "Guitar Hero"
+    And the JSON node "data.musicGroups.edges[1].node.name" should be equal to "Franz Ferdinand"
+    And the JSON node "data.musicGroups.edges[1].node.videoGames.edges[0].node.name" should be equal to "Guitar Hero"
+
+  @createSchema
   Scenario: Retrieve a collection and an item through a GraphQL query
     Given there are 3 dummy objects with dummyDate
     And there are 2 dummy group objects

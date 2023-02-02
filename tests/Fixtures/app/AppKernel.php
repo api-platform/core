@@ -191,7 +191,6 @@ class AppKernel extends Kernel
         }
 
         if (class_exists(NativePasswordHasher::class)) {
-            $securityConfig['enable_authenticator_manager'] = true;
             unset($securityConfig['firewalls']['default']['anonymous']);
         }
 

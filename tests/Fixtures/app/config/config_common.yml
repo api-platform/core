@@ -61,8 +61,6 @@ api_platform:
     http_cache:
         invalidation:
             enabled: true
-            xkey: 
-                glue: ' '
     defaults:
         extra_properties:
             standard_put: true
@@ -144,6 +142,11 @@ services:
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\EmptyArrayAsObjectProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\EmptyArrayAsObjectProvider'
+        tags:
+            - { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\RelationMultipleProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelationMultipleProvider'
         tags:
             - { name: 'api_platform.state_provider' }
 
