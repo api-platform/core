@@ -29,61 +29,51 @@ class DummyValidatedEntity
 
     /**
      * @var string A dummy
-     *
-     * @Assert\NotBlank
-     *
-     * @Assert\Length(max="4", min="10")
-     *
-     * @Assert\Regex(pattern="/^dummy$/")
      */
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 4, min: 10)]
+    #[Assert\Regex(pattern: '/^dummy$/')]
     public $dummy;
 
     /**
      * @var string
-     *
-     * @Assert\Email
      */
+    #[Assert\Email]
     public $dummyEmail;
 
     /**
      * @var string
-     *
-     * @Assert\Uuid
      */
+    #[Assert\Uuid]
     public $dummyUuid;
 
     /**
      * @var string
-     *
-     * @Assert\Ip
      */
+    #[Assert\Ip]
     public $dummyIpv4;
 
     /**
      * @var string
-     *
-     * @Assert\Ip(version="6")
      */
+    #[Assert\Ip(version: '6')]
     public $dummyIpv6;
 
     /**
      * @var \DateTimeInterface A dummy date
-     *
-     * @Assert\Date
      */
+    #[Assert\Date]
     public $dummyDate;
 
     /**
      * @var string A dummy group
-     *
-     * @Assert\NotNull(groups={"dummy"})
      */
+    #[Assert\NotNull(groups: ['dummy'])]
     public $dummyGroup;
 
     /**
      * @var string A dummy url
-     *
-     * @Assert\Url
      */
+    #[Assert\Url]
     public $dummyUrl;
 }
