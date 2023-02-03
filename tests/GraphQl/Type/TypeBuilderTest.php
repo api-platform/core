@@ -184,7 +184,6 @@ class TypeBuilderTest extends TestCase
         $this->assertInstanceOf(InputObjectType::class, $wrappedType);
         $this->assertSame('customShortNameInput', $wrappedType->name);
         $this->assertSame('description', $wrappedType->description);
-        $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
@@ -210,7 +209,6 @@ class TypeBuilderTest extends TestCase
         $this->assertInstanceOf(InputObjectType::class, $wrappedType);
         $this->assertSame('customShortNameNestedInput', $wrappedType->name);
         $this->assertSame('description', $wrappedType->description);
-        $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
@@ -236,7 +234,6 @@ class TypeBuilderTest extends TestCase
         $this->assertInstanceOf(InputObjectType::class, $wrappedType);
         $this->assertSame('customShortNameInput', $wrappedType->name);
         $this->assertSame('description', $wrappedType->description);
-        $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);

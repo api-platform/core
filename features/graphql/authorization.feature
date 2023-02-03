@@ -19,7 +19,6 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].extensions.status" should be equal to 403
-    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
     And the JSON node "data.securedDummy" should be null
 
@@ -42,7 +41,6 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].extensions.status" should be equal to 403
-    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
     And the JSON node "data.securedDummies" should be null
 
@@ -87,7 +85,6 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.securedDummies" should be null
     And the JSON node "errors[0].extensions.status" should be equal to 403
-    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
     And the JSON node "data.securedDummies" should be null
 
@@ -107,7 +104,6 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].extensions.status" should be equal to 403
-    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Only admins can create a secured dummy."
     And the JSON node "data.createSecuredDummy" should be null
 
@@ -206,7 +202,6 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].extensions.status" should be equal to 403
-    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
     And the JSON node "data.relatedSecuredDummy" should be null
 
@@ -228,7 +223,6 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].extensions.status" should be equal to 403
-    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
     And the JSON node "data.relatedSecuredDummies" should be null
 
@@ -427,7 +421,6 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].extensions.status" should be equal to 403
-    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
     And the JSON node "data.securedDummy" should be null
 
@@ -560,7 +553,6 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].extensions.status" should be equal to 403
-    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
     And the JSON node "data.updateSecuredDummy" should be null
 

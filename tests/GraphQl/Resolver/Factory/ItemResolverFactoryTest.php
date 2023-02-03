@@ -72,6 +72,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
@@ -130,6 +131,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = [];
@@ -150,6 +152,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = null;
@@ -170,6 +173,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
@@ -190,6 +194,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
@@ -226,6 +231,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();

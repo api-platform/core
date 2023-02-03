@@ -302,7 +302,14 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
 
             $graphqlType = $this->convertType($type, $input, $resourceOperation, $rootOperation, $resourceClass ?? '', $rootResource, $property, $depth, $forceNullable);
 
-            $graphqlWrappedType = $graphqlType instanceof WrappingType ? $graphqlType->getWrappedType(true) : $graphqlType;
+            $graphqlWrappedType = $graphqlType;
+            if ($graphqlType instanceof WrappingType) {
+                if (method_exists($graphqlType, 'getInnermostType')) {
+                    $graphqlWrappedType = $graphqlType->getInnermostType();
+                } else {
+                    $graphqlWrappedType = $graphqlType->getWrappedType(true);
+                }
+            }
             $isStandardGraphqlType = \in_array($graphqlWrappedType, GraphQLType::getStandardTypes(), true);
             if ($isStandardGraphqlType) {
                 $resourceClass = '';

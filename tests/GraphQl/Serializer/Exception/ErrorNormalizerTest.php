@@ -39,7 +39,10 @@ class ErrorNormalizerTest extends TestCase
 
         $normalizedError = $this->errorNormalizer->normalize($error);
         $this->assertSame($errorMessage, $normalizedError['message']);
-        $this->assertSame(Error::CATEGORY_GRAPHQL, $normalizedError['extensions']['category']);
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_GRAPHQL')) {
+            $this->assertSame(Error::CATEGORY_GRAPHQL, $normalizedError['extensions']['category']);
+        }
     }
 
     public function testSupportsNormalization(): void

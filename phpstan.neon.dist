@@ -60,10 +60,6 @@ parameters:
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
 			path: src/Symfony/EventListener/AddFormatListener.php
-		- '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
-		-
-			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
-			path: tests/GraphQl/Type/TypeBuilderTest.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
 			message: '#Service "test" is not registered in the container\.#'
@@ -78,6 +74,8 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
+		- '#Method GraphQL\\Type\\Definition\\WrappingType::getWrappedType\(\) invoked with 1 parameter, 0 required\.#'
+		- '#Access to an undefined property GraphQL\\Type\\Definition\\NamedType&GraphQL\\Type\\Definition\\Type::\$name\.#'
 		# See https://github.com/phpstan/phpstan-symfony/issues/27
 		-
 			message: '#^Service "[^"]+" is private.$#'

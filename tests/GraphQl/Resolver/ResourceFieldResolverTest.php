@@ -18,6 +18,7 @@ use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\GraphQl\Resolver\ResourceFieldResolver;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -34,7 +35,13 @@ class ResourceFieldResolverTest extends TestCase
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, null, ['uri_variables' => ['id' => 1]])->willReturn('/dummies/1')->shouldBeCalled();
 
-        $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+        // graphql-php < 15
+        if (method_exists(FieldDefinition::class, 'create')) {
+            $fieldDefinition = FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => '', 'fields' => []])]);
+        } else {
+            $fieldDefinition = new FieldDefinition(['name' => 'id', 'type' => new ObjectType(['name' => '', 'fields' => []])]);
+        }
+        $resolveInfo = new ResolveInfo($fieldDefinition, new \ArrayObject(), new ObjectType(['name' => '', 'fields' => []]), [], new Schema([]), [], null, new OperationDefinitionNode([]), []);
 
         $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
         $this->assertSame('/dummies/1', $resolver([ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => Dummy::class, ItemNormalizer::ITEM_IDENTIFIERS_KEY => ['id' => 1]], [], [], $resolveInfo));
@@ -44,7 +51,13 @@ class ResourceFieldResolverTest extends TestCase
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => '_id', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+        // graphql-php < 15
+        if (method_exists(FieldDefinition::class, 'create')) {
+            $fieldDefinition = FieldDefinition::create(['name' => '_id', 'type' => new ObjectType(['name' => '', 'fields' => []])]);
+        } else {
+            $fieldDefinition = new FieldDefinition(['name' => '_id', 'type' => new ObjectType(['name' => '', 'fields' => []])]);
+        }
+        $resolveInfo = new ResolveInfo($fieldDefinition, new \ArrayObject(), new ObjectType(['name' => '', 'fields' => []]), [], new Schema([]), [], null, new OperationDefinitionNode([]), []);
 
         $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
         $this->assertSame(1, $resolver(['id' => 1], [], [], $resolveInfo));
@@ -54,7 +67,13 @@ class ResourceFieldResolverTest extends TestCase
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => 'foo', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+        // graphql-php < 15
+        if (method_exists(FieldDefinition::class, 'create')) {
+            $fieldDefinition = FieldDefinition::create(['name' => 'foo', 'type' => new ObjectType(['name' => '', 'fields' => []])]);
+        } else {
+            $fieldDefinition = new FieldDefinition(['name' => 'foo', 'type' => new ObjectType(['name' => '', 'fields' => []])]);
+        }
+        $resolveInfo = new ResolveInfo($fieldDefinition, new \ArrayObject(), new ObjectType(['name' => '', 'fields' => []]), [], new Schema([]), [], null, new OperationDefinitionNode([]), []);
 
         $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
         $this->assertSame('bar', $resolver(['foo' => 'bar'], [], [], $resolveInfo));
@@ -66,7 +85,13 @@ class ResourceFieldResolverTest extends TestCase
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummies/1')->shouldNotBeCalled();
 
-        $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+        // graphql-php < 15
+        if (method_exists(FieldDefinition::class, 'create')) {
+            $fieldDefinition = FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => '', 'fields' => []])]);
+        } else {
+            $fieldDefinition = new FieldDefinition(['name' => 'id', 'type' => new ObjectType(['name' => '', 'fields' => []])]);
+        }
+        $resolveInfo = new ResolveInfo($fieldDefinition, new \ArrayObject(), new ObjectType(['name' => '', 'fields' => []]), [], new Schema([]), [], null, new OperationDefinitionNode([]), []);
 
         $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
         $this->assertNull($resolver([], [], [], $resolveInfo));

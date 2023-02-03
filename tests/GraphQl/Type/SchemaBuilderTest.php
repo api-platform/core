@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\StringType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -66,13 +67,11 @@ class SchemaBuilderTest extends TestCase
      */
     public function testGetSchema(string $resourceClass, ResourceMetadataCollection $resourceMetadata, ObjectType $expectedQueryType, ?ObjectType $expectedMutationType, ?ObjectType $expectedSubscriptionType): void
     {
-        $type = $this->prophesize(GraphQLType::class)->reveal();
-        $type->name = 'MyType';
+        $type = new StringType(['name' => 'MyType']);
         $this->typesFactoryProphecy->getTypes()->shouldBeCalled()->willReturn(['typeId' => $type]);
         $this->typesContainerProphecy->set('typeId', $type)->shouldBeCalled();
         $this->typesContainerProphecy->get('MyType')->willReturn($type);
-        $typeFoo = $this->prophesize(GraphQLType::class)->reveal();
-        $typeFoo->name = 'Foo';
+        $typeFoo = new StringType(['name' => 'Foo']);
         $this->typesContainerProphecy->get('Foo')->willReturn(GraphQLType::listOf($typeFoo));
         $this->fieldsBuilderProphecy->getNodeQueryFields()->shouldBeCalled()->willReturn(['node_fields']);
         $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'item_query' === $arg->getName()), [])->willReturn(['query' => ['query_fields']]);
@@ -84,6 +83,14 @@ class SchemaBuilderTest extends TestCase
 
         $this->resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([$resourceClass]));
         $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+
+        $this->typesContainerProphecy->set('Query', $expectedQueryType)->shouldBeCalled();
+        if ($expectedMutationType) {
+            $this->typesContainerProphecy->set('Mutation', $expectedMutationType)->shouldBeCalled();
+        }
+        if ($expectedSubscriptionType) {
+            $this->typesContainerProphecy->set('Subscription', $expectedSubscriptionType)->shouldBeCalled();
+        }
 
         $schema = $this->schemaBuilder->getSchema();
         $this->assertEquals($expectedQueryType, $schema->getQueryType());

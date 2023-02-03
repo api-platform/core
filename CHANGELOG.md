@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.1.2
+
+### Bug fixes
+
+* [85209558c](https://github.com/api-platform/core/commit/85209558ce5906b3a6e4218d7740231968446ce6) fix(symfony): missing http clients varnish purger (#5383)
+* [a76ebf271](https://github.com/api-platform/core/commit/a76ebf27196c9d7d92997d5f100268aa38438060) fix: missing parent construct calls with named arguments (#5385)
+
 ## v3.1.1
 
 ### Bug fixes
@@ -196,6 +203,13 @@ Breaking changes:
 * Metadata: `Patch` is added to the automatic CRUD
 * Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
     
+## v2.7.9
+
+### Bug fixes
+
+* [1983089d9](https://github.com/api-platform/core/commit/1983089d9c2de4bb9fc36c60929aff538af89b8e) fix(metadata): reader should be nullable (#5378)
+* [80aeb3158](https://github.com/api-platform/core/commit/80aeb3158311ff4ce9ad28b7f813dedee7744828) fix(symfony): autoconfigure elasticsearch extension (#5379)
+
 ## v2.7.8
 
 ### Bug fixes

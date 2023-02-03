@@ -216,7 +216,9 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
      */
     public function getPaginatedCollectionType(GraphQLType $resourceType, Operation $operation): GraphQLType
     {
-        $shortName = $resourceType->name;
+        $namedType = GraphQLType::getNamedType($resourceType);
+        // graphql-php 15: name() exists
+        $shortName = method_exists($namedType, 'name') ? $namedType->name() : $namedType->name;
         $paginationType = $this->pagination->getGraphQlPaginationType($operation);
 
         $connectionTypeKey = sprintf('%s%sConnection', $shortName, ucfirst($paginationType));
@@ -285,7 +287,9 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
 
     private function getCursorBasedPaginationFields(GraphQLType $resourceType): array
     {
-        $shortName = $resourceType->name;
+        $namedType = GraphQLType::getNamedType($resourceType);
+        // graphql-php 15: name() exists
+        $shortName = method_exists($namedType, 'name') ? $namedType->name() : $namedType->name;
 
         $edgeObjectTypeConfiguration = [
             'name' => "{$shortName}Edge",
@@ -320,7 +324,9 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
 
     private function getPageBasedPaginationFields(GraphQLType $resourceType): array
     {
-        $shortName = $resourceType->name;
+        $namedType = GraphQLType::getNamedType($resourceType);
+        // graphql-php 15: name() exists
+        $shortName = method_exists($namedType, 'name') ? $namedType->name() : $namedType->name;
 
         $paginationInfoObjectTypeConfiguration = [
             'name' => "{$shortName}PaginationInfo",

@@ -673,7 +673,7 @@ Feature: GraphQL mutation support
       }
     }
     """
-    And the response should be in JSON
+    Then the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.createWritableId.writableId.id" should be equal to "/writable_ids/c6b722fe-0331-48c4-a214-f81f9f1ca082"
     And the JSON node "data.createWritableId.writableId._id" should be equal to "c6b722fe-0331-48c4-a214-f81f9f1ca082"
