@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.1.2
+
+### Bug fixes
+
+* [85209558c](https://github.com/api-platform/core/commit/85209558ce5906b3a6e4218d7740231968446ce6) fix(symfony): missing http clients varnish purger (#5383)
+* [a76ebf271](https://github.com/api-platform/core/commit/a76ebf27196c9d7d92997d5f100268aa38438060) fix: missing parent construct calls with named arguments (#5385)
+
 ## v3.1.1
 
 ### Bug fixes
