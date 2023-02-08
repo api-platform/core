@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -32,7 +32,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
 
     private readonly ?array $serializePayloadFields;
 
-    public function __construct(array $serializePayloadFields = null, private readonly ?NameConverterInterface $nameConverter = null)
+    public function __construct(array $serializePayloadFields = null, private readonly ?AdvancedNameConverterInterface $nameConverter = null)
     {
         $this->serializePayloadFields = null === $serializePayloadFields ? null : array_flip($serializePayloadFields);
     }

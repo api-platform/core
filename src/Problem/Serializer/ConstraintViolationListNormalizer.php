@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Problem\Serializer;
 
 use ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 
 /**
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} the API Problem spec (RFC 7807).
@@ -34,7 +34,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
         self::TITLE => 'An error occurred',
     ];
 
-    public function __construct(array $serializePayloadFields = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
+    public function __construct(array $serializePayloadFields = null, AdvancedNameConverterInterface $nameConverter = null, array $defaultContext = [])
     {
         parent::__construct($serializePayloadFields, $nameConverter);
 
