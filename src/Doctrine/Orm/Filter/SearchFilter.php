@@ -26,6 +26,8 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Doctrine\UuidType as RamseyUuidType;
+use Symfony\Bridge\Doctrine\Types\UuidType as SymfonyUuidType;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -40,6 +42,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     use SearchFilterTrait;
 
     public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
+    public const DOCTRINE_UUID_TYPE = [RamseyUuidType::NAME, SymfonyUuidType::NAME];
 
     public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null, NameConverterInterface $nameConverter = null)
     {

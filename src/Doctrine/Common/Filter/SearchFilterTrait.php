@@ -18,7 +18,9 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid as RamseyUuid;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Uid\Uuid as SymfonyUuid;
 
 /**
  * Trait for filtering the collection by given properties.
@@ -162,6 +164,17 @@ trait SearchFilterTrait
         foreach ($values as $value) {
             if (null !== $value && \in_array($type, (array) self::DOCTRINE_INTEGER_TYPE, true) && false === filter_var($value, \FILTER_VALIDATE_INT)) {
                 return false;
+            }
+
+            if (null !== $value && \in_array($type, (array) self::DOCTRINE_UUID_TYPE, true)) {
+                if (class_exists(RamseyUuid::class)) {
+                    return RamseyUuid::isValid($value);
+                }
+                if (class_exists(SymfonyUuid::class)) {
+                    return SymfonyUuid::isValid($value);
+                }
+
+                return 1 === preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $value);
             }
         }
 
