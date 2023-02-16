@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Handles validation errors.
+ * todo remove this class.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -37,6 +38,7 @@ final class ValidationExceptionListener
      */
     public function onKernelException(ExceptionEvent $event): void
     {
+        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated and will be removed in 4.x.', __CLASS__));
         $exception = $event->getThrowable();
         if (!$exception instanceof ConstraintViolationListAwareExceptionInterface && !$exception instanceof FilterValidationException) {
             return;

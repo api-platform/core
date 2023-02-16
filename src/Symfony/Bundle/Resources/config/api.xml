@@ -178,9 +178,14 @@
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener">
-            <argument key="$controller">api_platform.action.exception</argument>
+            <argument key="$controller">api_platform.action.placeholder</argument>
             <argument key="$logger" type="service" id="logger" on-invalid="null" />
             <argument key="$debug">%kernel.debug%</argument>
+            <argument key="$resourceMetadataCollectionFactory" type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument key="$errorFormats">%api_platform.error_formats%</argument>
+            <argument key="$exceptionToStatus">%api_platform.exception_to_status%</argument>
+            <argument key="$identifiersExtractor" type="service" id="api_platform.api.identifiers_extractor"/>
+            <argument key="$resourceClassResolver" type="service" id="api_platform.resource_class_resolver"/>
         </service>
     </services>
 </container>

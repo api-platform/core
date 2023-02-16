@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter as DoctrineMongoDbOdmAbstractFilter;
@@ -33,6 +34,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -96,6 +98,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $formats = $this->getFormats($config['formats']);
         $patchFormats = $this->getFormats($config['patch_formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
+
+        if (!isset($errorFormats['html']) && $config['enable_swagger'] && $config['enable_swagger_ui']) {
+            $errorFormats['html'] = ['text/html'];
+        }
 
         // Backward Compatibility layer
         if (isset($formats['jsonapi']) && !isset($patchFormats['jsonapi'])) {
@@ -247,6 +253,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
 
+        $container->setParameter('api_platform.class_name_resources', $this->getClassNameResources());
+
         $loader->load('metadata/resource_name.xml');
         $loader->load('metadata/property_name.xml');
 
@@ -275,6 +283,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->replaceArgument(0, $yamlResources);
             $container->getDefinition('api_platform.metadata.property_extractor.yaml')->replaceArgument(0, $yamlResources);
         }
+    }
+
+    private function getClassNameResources(): array
+    {
+        return [
+            Error::class,
+            ValidationException::class,
+        ];
     }
 
     private function getBundlesResourcesPaths(ContainerBuilder $container, array $config): array

@@ -98,7 +98,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['item_uri_template'] = $itemUriTemplate;
         }
 
-        if ($iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
+        if (true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
             $context['iri'] = $iri;
             $metadata['@id'] = $iri;
         }

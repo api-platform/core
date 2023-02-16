@@ -26,11 +26,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class ContextAction
 {
-    public const RESERVED_SHORT_NAMES = [
-        'ConstraintViolationList' => true,
-        'Error' => true,
-    ];
-
     public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
     }
@@ -44,10 +39,6 @@ final class ContextAction
     {
         if ('Entrypoint' === $shortName) {
             return ['@context' => $this->contextBuilder->getEntrypointContext()];
-        }
-
-        if (isset(self::RESERVED_SHORT_NAMES[$shortName])) {
-            return ['@context' => $this->contextBuilder->getBaseContext()];
         }
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {

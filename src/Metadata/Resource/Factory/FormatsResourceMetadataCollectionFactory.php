@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Operations;
@@ -32,7 +33,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class FormatsResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly array $formats, private readonly array $patchFormats)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly array $formats, private readonly array $patchFormats, private readonly ?array $errorFormats = null)
     {
     }
 
@@ -52,6 +53,9 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
             $resourceFormats = null === $rawResourceFormats ? $this->formats : $this->normalizeFormats($rawResourceFormats);
             $resourceInputFormats = $resourceMetadata->getInputFormats() ? $this->normalizeFormats($resourceMetadata->getInputFormats()) : $resourceFormats;
             $resourceOutputFormats = $resourceMetadata->getOutputFormats() ? $this->normalizeFormats($resourceMetadata->getOutputFormats()) : $resourceFormats;
+            if ($resourceMetadata instanceof ErrorResource) {
+                $resourceOutputFormats = $resourceMetadata->getOutputFormats() ? $this->normalizeFormats($resourceMetadata->getOutputFormats()) : ($this->errorFormats ?? []);
+            }
 
             $resourceMetadataCollection[$index] = $resourceMetadataCollection[$index]->withOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $resourceMetadata->getOperations()));
         }

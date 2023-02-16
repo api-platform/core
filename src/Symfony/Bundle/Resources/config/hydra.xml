@@ -46,6 +46,7 @@
             <tag name="serializer.normalizer" priority="-800" />
         </service>
 
+        <!-- deprecated -->
         <service id="api_platform.hydra.normalizer.error" class="ApiPlatform\Hydra\Serializer\ErrorNormalizer" public="false">
             <argument type="service" id="api_platform.router" />
             <argument>%kernel.debug%</argument>

@@ -19,6 +19,7 @@
             <tag name="serializer.normalizer" priority="-780" />
         </service>
 
+        <!-- deprecated -->
         <service id="api_platform.problem.normalizer.error" class="ApiPlatform\Problem\Serializer\ErrorNormalizer" public="false">
             <argument>%kernel.debug%</argument>
 
