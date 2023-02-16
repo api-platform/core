@@ -21,6 +21,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
+use ReflectionObject;
 
 final class PersistProcessor implements ProcessorInterface
 {
@@ -52,10 +53,34 @@ final class PersistProcessor implements ProcessorInterface
         // https://github.com/doctrine/orm/issues/8461#issuecomment-1250233555
         if ($operation instanceof HttpOperation && HttpOperation::METHOD_PUT === $operation->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? false)) {
             \assert(method_exists($manager, 'getReference'));
-            // TODO: the call to getReference is most likely to fail with complex identifiers
             $newData = $data;
             if (isset($context['previous_data'])) {
-                $newData = 1 === \count($uriVariables) ? $manager->getReference($class, current($uriVariables)) : clone $context['previous_data'];
+                // the correct entity need to be fetched, we need to get the ORM ids from previous data
+                $reflectionProperties = $this->getReflectionProperties($context['previous_data']);
+                $ormIds = [];
+                assert(method_exists($manager, 'getClassMetadata'));
+                foreach ($manager->getClassMetadata($class)->getIdentifier() as $identifier) {
+                    if (array_key_exists($identifier, $reflectionProperties)) {
+                        $value = $reflectionProperties[$identifier]->getValue($context['previous_data']);
+                    } else {
+                        //This id is not from current class, let's move up in class hierarchy
+                        $parent = (new ReflectionObject($data))->getParentClass();
+                        while (!isset($value) && false !== $parent) {
+                            foreach ($parent->getProperties() as $property) {
+                                if ($property->name === $identifier) {
+                                    $value = $property->getValue($context['previous_data']);
+                                }
+                            }
+                            $parent = $parent->getParentClass();
+                        }
+                    }
+                    if (!isset($value)) {
+                        //can this actually happen? the identifier has to exist in the class hierarchy somewhere...
+                        throw new \Exception('identifier not found : ' . $identifier);
+                    }
+                    $ormIds[$identifier] = $value;
+                }
+                $newData = $manager->getReference($class, $ormIds);
             }
 
             $identifiers = array_reverse($uriVariables);
@@ -79,7 +104,7 @@ final class PersistProcessor implements ProcessorInterface
             } else {
                 foreach ($reflectionProperties as $propertyName => $reflectionProperty) {
                     // Don't override the property if it's part of the subresource system
-                    if (isset($uriVariables[$propertyName])) {
+                    if (isset($uriVariables[$propertyName]) || isset($ormIds[$propertyName])) {
                         continue;
                     }
 
