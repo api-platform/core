@@ -155,6 +155,10 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             return (string) $identifierValue;
         }
 
+        if ($identifierValue instanceof \BackedEnum) {
+            return (string) $identifierValue->value;
+        }
+
         throw new RuntimeException(sprintf('We were not able to resolve the identifier matching parameter "%s".', $parameterName));
     }
 }

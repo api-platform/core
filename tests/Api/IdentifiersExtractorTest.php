@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyWithEnumIdentifier;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationMultiple;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\RelationMultipleProvider;
 use PHPUnit\Framework\TestCase;
@@ -172,6 +173,46 @@ class IdentifiersExtractorTest extends TestCase
                 'secondId' => 2,
             ],
             $identifiersExtractor->getIdentifiersFromItem($item, $operation)
+        );
+    }
+
+    public function testGetIdentifierWithEnumValues(): void
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
+        $resourceClassResolver = $resourceClassResolverProphecy->reveal();
+
+        $identifiersExtractor = new IdentifiersExtractor(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolver,
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal()
+        );
+
+        $operation = (new Get())
+            ->withUriTemplate('/resources/{stringEnumAsIdentifier}/{intEnumAsIdentifier}')
+            ->withUriVariables([
+                'stringEnumAsIdentifier' => (new Link())
+                    ->withFromClass(DummyWithEnumIdentifier::class)
+                    ->withParameterName('stringEnumAsIdentifier')
+                    ->withIdentifiers(['stringEnumAsIdentifier']),
+                'intEnumAsIdentifier' => (new Link())
+                    ->withFromClass(DummyWithEnumIdentifier::class)
+                    ->withParameterName('intEnumAsIdentifier')
+                    ->withIdentifiers(['intEnumAsIdentifier']),
+            ])
+            ->withClass(DummyWithEnumIdentifier::class);
+
+        $this->assertSame(
+            [
+                'stringEnumAsIdentifier' => 'foo',
+                'intEnumAsIdentifier' => '1',
+            ],
+            $identifiersExtractor->getIdentifiersFromItem(new DummyWithEnumIdentifier(), $operation)
         );
     }
 }
