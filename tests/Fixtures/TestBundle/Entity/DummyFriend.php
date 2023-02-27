@@ -34,7 +34,9 @@ class DummyFriend
      * @var int|null The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -43,8 +45,11 @@ class DummyFriend
      * @var string The dummy name
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
+     *
      * @Groups({"fakemanytomany", "friends"})
      */
     private $name;

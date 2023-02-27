@@ -33,7 +33,9 @@ class ThirdLevel
      * @var int|null The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -42,6 +44,7 @@ class ThirdLevel
      * @var int
      *
      * @ORM\Column(type="integer")
+     *
      * @Groups({"barcelona", "chicago"})
      */
     private $level = 3;
@@ -57,6 +60,7 @@ class ThirdLevel
      * @ApiSubresource
      *
      * @ORM\ManyToOne(targetEntity="FourthLevel", cascade={"persist"})
+     *
      * @Groups({"barcelona", "chicago", "friends"})
      */
     public $fourthLevel;

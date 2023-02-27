@@ -24,6 +24,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @ApiResource
  *
  * @ODM\Document
+ *
  * @ApiFilter(NumericFilter::class, properties={"nameConverted"})
  * @ApiFilter(RangeFilter::class, properties={"nameConverted"})
  * @ApiFilter(OrderFilter::class, properties={"nameConverted"})

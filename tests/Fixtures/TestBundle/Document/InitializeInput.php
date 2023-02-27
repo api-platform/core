@@ -19,6 +19,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ApiResource(input=InitializeInputDto::class)
+ *
  * @ODM\Document
  */
 class InitializeInput

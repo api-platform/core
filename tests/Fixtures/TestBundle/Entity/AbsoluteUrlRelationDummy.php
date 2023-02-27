@@ -21,13 +21,16 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource(urlGenerationStrategy=UrlGeneratorInterface::ABS_URL)
+ *
  * @ORM\Entity
  */
 class AbsoluteUrlRelationDummy
 {
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
      */
     private $id;

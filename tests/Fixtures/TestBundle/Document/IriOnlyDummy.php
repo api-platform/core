@@ -27,6 +27,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *         "jsonld_embed_context"=true
  *     }
  * )
+ *
  * @ODM\Document
  */
 class IriOnlyDummy

@@ -31,6 +31,7 @@ class EmbeddableDummy
      * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
+     *
      * @Groups({"embed"})
      */
     private $dummyName;
@@ -46,6 +47,7 @@ class EmbeddableDummy
      * @var \DateTime|null A dummy date
      *
      * @ODM\Field(type="date")
+     *
      * @Assert\DateTime
      */
     public $dummyDate;
@@ -66,6 +68,7 @@ class EmbeddableDummy
 
     /**
      * @ODM\Field(type="string")
+     *
      * @Groups({"barcelona", "chicago"})
      */
     protected $symfony;

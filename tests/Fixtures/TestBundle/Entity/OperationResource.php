@@ -36,7 +36,9 @@ class OperationResource
 {
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
      */
     #[ApiProperty(identifier: true)]

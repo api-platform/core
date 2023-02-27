@@ -21,6 +21,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Custom Identifier Dummy.
  *
  * @ApiResource(compositeIdentifier=false)
+ *
  * @ODM\Document
  */
 class CustomMultipleIdentifierDummy
@@ -36,6 +37,7 @@ class CustomMultipleIdentifierDummy
      * @var int The custom identifier
      *
      * @ApiProperty(identifier=true)
+     *
      * @ODM\Field(type="int")
      */
     private $secondId;

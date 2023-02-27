@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Dummy with a custom GraphQL mutation resolver.
  *
  * @ORM\Entity
+ *
  * @ApiResource(graphql={
  *     "sum"={
  *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
@@ -61,7 +62,9 @@ class DummyCustomMutation
      * @var int|null
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -77,6 +80,7 @@ class DummyCustomMutation
      * @var int|null
      *
      * @Groups({"sum"})
+     *
      * @ORM\Column(type="integer", nullable=true)
      */
     private $operandB;
@@ -85,6 +89,7 @@ class DummyCustomMutation
      * @var int|null
      *
      * @Groups({"result"})
+     *
      * @ORM\Column(type="integer", nullable=true)
      */
     private $result;

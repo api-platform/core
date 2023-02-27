@@ -27,6 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
  *         "jsonld_embed_context"=true
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class IriOnlyDummy
@@ -35,7 +36,9 @@ class IriOnlyDummy
      * @var int|null The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

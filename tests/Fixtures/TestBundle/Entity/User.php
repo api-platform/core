@@ -26,7 +26,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * A User.
  *
  * @ORM\Entity
+ *
  * @ORM\Table(name="user_test")
+ *
  * @ApiResource(
  *     attributes={
  *         "normalization_context"={"groups"={"user", "user-read"}},
@@ -65,7 +67,9 @@ class User extends AbstractSecurityUser
      * @var int|null
      *
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -81,6 +85,7 @@ class User extends AbstractSecurityUser
      * @var string|null
      *
      * @ORM\Column(type="string", length=255, nullable=true)
+     *
      * @Groups({"user"})
      */
     private $fullname;

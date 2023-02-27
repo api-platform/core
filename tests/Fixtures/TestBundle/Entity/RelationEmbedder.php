@@ -37,37 +37,44 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "custom2"={"path"="/api/custom-call/{id}", "method"="PUT"},
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class RelationEmbedder
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
 
     /**
      * @ORM\Column
+     *
      * @Groups({"chicago"})
      */
     public $paris = 'Paris';
 
     /**
      * @ORM\Column
+     *
      * @Groups({"barcelona", "chicago"})
      */
     public $krondstadt = 'Krondstadt';
 
     /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy", cascade={"persist"})
+     *
      * @Groups({"chicago", "barcelona"})
      */
     public $anotherRelated;
 
     /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     *
      * @Groups({"barcelona", "chicago"})
      */
     protected $related;

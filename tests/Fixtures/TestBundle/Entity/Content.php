@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "groups"={"get_content"},
  *     },
  * )
+ *
  * @ORM\Entity
  */
 class Content implements \JsonSerializable
@@ -34,7 +35,9 @@ class Content implements \JsonSerializable
      * @var int|null
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -56,6 +59,7 @@ class Content implements \JsonSerializable
      *     orphanRemoval=true,
      *     indexBy="name",
      * )
+     *
      * @ORM\OrderBy({"id"="ASC"})
      */
     private $fields;

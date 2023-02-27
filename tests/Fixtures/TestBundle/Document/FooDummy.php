@@ -29,6 +29,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *         "collection_query"={"pagination_type"="page"}
  *     }
  * )
+ *
  * @ODM\Document
  */
 class FooDummy

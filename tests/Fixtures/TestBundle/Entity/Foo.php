@@ -37,6 +37,7 @@ use Doctrine\ORM\Mapping as ORM;
  *         "get_asc_custom"={"method"="GET", "path"="custom_collection_asc_foos", "order"={ "name"="ASC"}},
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class Foo
@@ -45,7 +46,9 @@ class Foo
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

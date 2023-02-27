@@ -21,7 +21,9 @@ namespace ApiPlatform\Core\Annotation;
  * @Annotation
  *
  * @Target({"METHOD", "PROPERTY"})
+ *
  * @Attributes(
+ *
  *     @Attribute("maxDepth", type="int"),
  * )
  */

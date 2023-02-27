@@ -54,6 +54,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "delete"={"method"="DELETE"}
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class OverriddenOperationDummy
@@ -62,7 +63,9 @@ class OverriddenOperationDummy
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -71,8 +74,11 @@ class OverriddenOperationDummy
      * @var string The dummy name
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
+     *
      * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_write", "overridden_operation_dummy_get"})
+     *
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
@@ -81,7 +87,9 @@ class OverriddenOperationDummy
      * @var string|null The dummy name alias
      *
      * @ORM\Column(nullable=true)
+     *
      * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_put", "overridden_operation_dummy_get"})
+     *
      * @ApiProperty(iri="https://schema.org/alternateName")
      */
     private $alias;
@@ -90,13 +98,16 @@ class OverriddenOperationDummy
      * @var string|null A short description of the item
      *
      * @ORM\Column(nullable=true)
+     *
      * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_write", "overridden_operation_dummy_get", "overridden_operation_dummy_put"})
+     *
      * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;
 
     /**
      * @ORM\Column(nullable=true)
+     *
      * @Groups({"overridden_operation_dummy_write"})
      */
     public $notGettable;

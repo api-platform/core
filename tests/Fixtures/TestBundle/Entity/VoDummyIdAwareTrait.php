@@ -21,7 +21,9 @@ trait VoDummyIdAwareTrait
      * @var int
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
      */
     protected $id;

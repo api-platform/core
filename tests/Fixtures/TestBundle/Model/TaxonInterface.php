@@ -36,7 +36,9 @@ interface TaxonInterface
 
     /**
      * @ApiProperty(identifier=true)
+     *
      * @Groups({"product_read", "taxon_read"})
+     *
      * @Assert\NotBlank
      */
     public function getCode(): ?string;

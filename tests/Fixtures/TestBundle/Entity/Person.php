@@ -26,25 +26,30 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @ApiResource(attributes={"normalization_context"={"groups"={"people.pets"}}})
+ *
  * @ORM\Entity
  */
 class Person
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string")
+     *
      * @Groups({"people.pets"})
      */
     public $name;
 
     /**
      * @ORM\OneToMany(targetEntity="PersonToPet", mappedBy="person")
+     *
      * @Groups({"people.pets"})
      *
      * @var Collection<int, PersonToPet>

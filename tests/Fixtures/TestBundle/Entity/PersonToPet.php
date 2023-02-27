@@ -27,8 +27,11 @@ class PersonToPet
 {
     /**
      * @ORM\Id
+     *
      * @ORM\ManyToOne(targetEntity="Pet")
+     *
      * @ORM\JoinColumn(referencedColumnName="id")
+     *
      * @Groups({"people.pets"})
      *
      * @var Pet
@@ -37,7 +40,9 @@ class PersonToPet
 
     /**
      * @ORM\Id
+     *
      * @ORM\ManyToOne(targetEntity="Person")
+     *
      * @ORM\JoinColumn(referencedColumnName="id")
      *
      * @var Person

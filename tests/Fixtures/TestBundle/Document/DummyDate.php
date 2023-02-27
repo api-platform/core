@@ -28,12 +28,14 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_date.mongodb.date"}
  * })
+ *
  * @ApiFilter(SearchFilter::class, properties={"dummyDate"})
  * @ApiFilter(DateFilter::class, properties={
  *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
  *     "dateIncludeNullBeforeAndAfter"=DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER
  * })
+ *
  * @ODM\Document
  */
 class DummyDate

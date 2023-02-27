@@ -26,6 +26,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ApiResource(attributes={"input"=InputDto::class, "output"=OutputDto::class})
+ *
  * @ORM\Entity
  */
 class DummyDtoInputOutput
@@ -39,7 +40,9 @@ class DummyDtoInputOutput
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;

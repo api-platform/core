@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Custom Identifier Dummy.
  *
  * @ApiResource(compositeIdentifier=false)
+ *
  * @ORM\Entity
  */
 class CustomMultipleIdentifierDummy
@@ -28,6 +29,7 @@ class CustomMultipleIdentifierDummy
      * @var int The custom identifier
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
      */
     private $firstId;
@@ -36,6 +38,7 @@ class CustomMultipleIdentifierDummy
      * @var int The custom identifier
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
      */
     private $secondId;

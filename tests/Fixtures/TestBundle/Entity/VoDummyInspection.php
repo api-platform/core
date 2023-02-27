@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     },
  *     graphql={}
  * )
+ *
  * @ORM\Entity
  */
 class VoDummyInspection
@@ -36,6 +37,7 @@ class VoDummyInspection
      * @var bool
      *
      * @ORM\Column(type="boolean")
+     *
      * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
     private $accepted;
@@ -44,6 +46,7 @@ class VoDummyInspection
      * @var VoDummyCar|null
      *
      * @ORM\ManyToOne(targetEntity="VoDummyCar", inversedBy="inspections")
+     *
      * @Groups({"inspection_read", "inspection_write"})
      */
     private $car;
@@ -52,6 +55,7 @@ class VoDummyInspection
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
+     *
      * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
     private $performed;

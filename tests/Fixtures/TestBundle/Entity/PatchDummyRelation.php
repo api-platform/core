@@ -30,19 +30,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "patch"={"input_formats"={"json"={"application/merge-patch+json"}, "jsonapi"}}
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class PatchDummyRelation
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     *
      * @Groups({"chicago"})
      */
     protected $related;

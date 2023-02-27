@@ -19,8 +19,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\InheritanceType("JOINED")
+ *
  * @ORM\DiscriminatorColumn(name="discr", type="string")
+ *
  * @ORM\DiscriminatorMap({
  *     "dummyTableInheritance"="DummyTableInheritance",
  *     "dummyTableInheritanceChild"="DummyTableInheritanceChild",
@@ -36,8 +39,11 @@ class DummyTableInheritance
      * @var int|null The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      * @Groups({"default"})
      */
     private $id;
@@ -46,6 +52,7 @@ class DummyTableInheritance
      * @var string The dummy name
      *
      * @ORM\Column
+     *
      * @Groups({"default"})
      */
     private $name;
@@ -54,6 +61,7 @@ class DummyTableInheritance
      * @var DummyTableInheritanceRelated|null
      *
      * @ORM\ManyToOne(targetEntity="DummyTableInheritanceRelated", inversedBy="children")
+     *
      * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
     private $parent;

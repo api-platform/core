@@ -25,6 +25,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ODM\Document
+ *
  * @ApiResource(
  *     attributes={
  *         "input"=false,

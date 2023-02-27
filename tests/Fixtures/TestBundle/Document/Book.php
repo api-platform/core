@@ -25,6 +25,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *     "get",
  *     "get_by_isbn"={"method"="GET", "path"="/books/by_isbn/{isbn}.{_format}", "requirements"={"isbn"=".+"}, "identifiers"="isbn"}
  * })
+ *
  * @ODM\Document
  */
 class Book

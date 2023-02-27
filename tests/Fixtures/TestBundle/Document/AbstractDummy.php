@@ -28,9 +28,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     itemOperations={"get", "put", "delete"},
  *     attributes={"filters"={"my_dummy.mongodb.search", "my_dummy.mongodb.order", "my_dummy.mongodb.date"}}
  * )
+ *
  * @ODM\Document
+ *
  * @ODM\InheritanceType("SINGLE_COLLECTION")
+ *
  * @ODM\DiscriminatorField(value="discr")
+ *
  * @ODM\DiscriminatorMap({"concrete"=ConcreteDummy::class})
  */
 abstract class AbstractDummy
@@ -46,7 +50,9 @@ abstract class AbstractDummy
      * @var string The dummy name
      *
      * @ODM\Field
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;

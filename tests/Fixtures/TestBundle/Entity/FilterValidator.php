@@ -42,6 +42,7 @@ use Doctrine\ORM\Mapping as ORM;
  *         RequiredAllowEmptyFilter::class
  *     }
  * })
+ *
  * @ORM\Entity
  */
 class FilterValidator
@@ -50,7 +51,9 @@ class FilterValidator
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -59,6 +62,7 @@ class FilterValidator
      * @var string A name
      *
      * @ORM\Column
+     *
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;

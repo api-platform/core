@@ -21,6 +21,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ApiResource(urlGenerationStrategy=UrlGeneratorInterface::ABS_URL)
+ *
  * @ODM\Document
  */
 class AbsoluteUrlRelationDummy

@@ -39,6 +39,7 @@ class FourthLevel
      * @var int|null
      *
      * @ODM\Field(type="int")
+     *
      * @Groups({"barcelona", "chicago"})
      */
     private $level = 4;

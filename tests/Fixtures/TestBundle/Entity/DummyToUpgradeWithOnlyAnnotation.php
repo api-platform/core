@@ -36,10 +36,15 @@ class DummyToUpgradeWithOnlyAnnotation
      * @var int
      *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
+     *
      * @Groups({"chicago", "friends"})
+     *
      * @ApiProperty(writable=false)
+     *
      * @ApiFilter(DateFilter::class)
      */
     private $id;
@@ -48,12 +53,15 @@ class DummyToUpgradeWithOnlyAnnotation
      * @var DummyToUpgradeProduct
      *
      * @ORM\ManyToOne(targetEntity="DummyToUpgradeProduct", cascade={"persist"}, inversedBy="dummysToUpgradeWithOnlyAnnotation")
+     *
      * @ORM\JoinColumn(nullable=false)
+     *
      * @Groups({"barcelona", "chicago", "friends"})
      *
      * @ApiSubresource
      *
      * @ApiProperty(iri="DummyToUpgradeWithOnlyAnnotation.dummyToUpgradeProduct")
+     *
      * @ApiFilter(SearchFilter::class)
      * @ApiFilter(ExistsFilter::class)
      */

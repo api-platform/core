@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "normalization_context"={"groups"={"output"}},
  *     "denormalization_context"={"groups"={"input"}}
  * })
+ *
  * @ODM\Document
  */
 class CustomNormalizedDummy
@@ -36,6 +37,7 @@ class CustomNormalizedDummy
      * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
+     *
      * @Groups({"input", "output"})
      */
     private $id;
@@ -44,8 +46,11 @@ class CustomNormalizedDummy
      * @var string|null The dummy name
      *
      * @ODM\Field
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
+     *
      * @Groups({"input", "output"})
      */
     private $name;
@@ -54,7 +59,9 @@ class CustomNormalizedDummy
      * @var string|null The dummy name alias
      *
      * @ODM\Field(nullable=true)
+     *
      * @ApiProperty(iri="https://schema.org/alternateName")
+     *
      * @Groups({"input", "output"})
      */
     private $alias;

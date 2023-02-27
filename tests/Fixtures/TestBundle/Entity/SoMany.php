@@ -21,12 +21,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ApiResource(attributes={
  *     "pagination_partial"=true,
  *     "pagination_via_cursor"={
  *         {"field"="id", "direction"="DESC"}
  *     }
  * })
+ *
  * @ApiFilter(RangeFilter::class, properties={"id"})
  * @ApiFilter(OrderFilter::class, properties={"id"="DESC"})
  */
@@ -34,7 +36,9 @@ class SoMany
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;

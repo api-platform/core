@@ -30,6 +30,7 @@ class VoDummyDriver
      * @var string
      *
      * @ODM\Field
+     *
      * @Groups({"car_read", "car_write"})
      */
     private $firstName;
@@ -38,6 +39,7 @@ class VoDummyDriver
      * @var string
      *
      * @ODM\Field
+     *
      * @Groups({"car_read", "car_write"})
      */
     private $lastName;

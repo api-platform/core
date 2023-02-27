@@ -25,6 +25,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *         "patch"={"input_formats"={"json"={"application/merge-patch+json"}, "jsonapi"}}
  *     }
  * )
+ *
  * @ODM\Document
  */
 class PatchDummy

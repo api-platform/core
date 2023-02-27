@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ApiResource(
  *     attributes={"normalization_context"={"groups"={"order_read"}}}
  * )
+ *
  * @ODM\Document
  */
 class Customer
@@ -30,18 +31,21 @@ class Customer
      * @var int
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
+     *
      * @Groups({"order_read"})
      */
     private $id;
 
     /**
      * @ODM\Field(type="string")
+     *
      * @Groups({"order_read"})
      */
     public $name;
 
     /**
      * @ODM\ReferenceMany(targetDocument=Address::class)
+     *
      * @Groups({"order_read"})
      */
     public $addresses;

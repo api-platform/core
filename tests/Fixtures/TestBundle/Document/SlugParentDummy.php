@@ -24,6 +24,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Custom Identifier Dummy With Subresource.
  *
  * @ApiResource(attributes={"identifiers"="slug"})
+ *
  * @ODM\Document
  */
 class SlugParentDummy
@@ -32,6 +33,7 @@ class SlugParentDummy
      * @var int|null The database identifier
      *
      * @ApiProperty(identifier=false)
+     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
@@ -40,6 +42,7 @@ class SlugParentDummy
      * @var string|null The slug used a API identifier
      *
      * @ApiProperty(identifier=true)
+     *
      * @ODM\Field
      */
     private $slug;

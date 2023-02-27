@@ -28,6 +28,7 @@ class DummyTableInheritanceDifferentChild extends DummyTableInheritance
      * @var string The dummy email
      *
      * @ORM\Column
+     *
      * @Groups({"default"})
      */
     private $email;

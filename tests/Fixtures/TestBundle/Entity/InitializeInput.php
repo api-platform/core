@@ -19,12 +19,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource(input=InitializeInputDto::class)
+ *
  * @ORM\Entity
  */
 class InitializeInput
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
      */
     public $id;

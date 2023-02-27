@@ -33,7 +33,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
  * @ApiResource(graphql={"item_query", "update"={"normalization_context"={"groups"={"chicago", "fakemanytomany"}}, "denormalization_context"={"groups"={"friends"}}}}, iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.mongodb.friends"}})
+ *
  * @ODM\Document
+ *
  * @ApiFilter(SearchFilter::class, properties={"id"})
  */
 class RelatedDummy extends ParentDummy
@@ -44,6 +46,7 @@ class RelatedDummy extends ParentDummy
      * @ApiSubresource
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
+     *
      * @Groups({"chicago", "friends"})
      */
     private $id;
@@ -52,13 +55,16 @@ class RelatedDummy extends ParentDummy
      * @var string A name
      *
      * @ODM\Field(type="string", nullable=true)
+     *
      * @Groups({"friends"})
      */
     public $name;
 
     /**
      * @ODM\Field(type="string")
+     *
      * @Groups({"barcelona", "chicago", "friends"})
+     *
      * @ApiFilter(SearchFilter::class)
      * @ApiFilter(ExistsFilter::class)
      */
@@ -68,8 +74,11 @@ class RelatedDummy extends ParentDummy
      * @var \DateTime A dummy date
      *
      * @ODM\Field(type="date", nullable=true)
+     *
      * @Assert\DateTime
+     *
      * @Groups({"friends"})
+     *
      * @ApiFilter(DateFilter::class)
      */
     public $dummyDate;
@@ -78,6 +87,7 @@ class RelatedDummy extends ParentDummy
      * @ApiSubresource
      *
      * @ODM\ReferenceOne(targetDocument=ThirdLevel::class, cascade={"persist"}, nullable=true, storeAs="id")
+     *
      * @Groups({"barcelona", "chicago", "friends"})
      */
     public $thirdLevel;
@@ -86,6 +96,7 @@ class RelatedDummy extends ParentDummy
      * @ApiSubresource
      *
      * @ODM\ReferenceMany(targetDocument=RelatedToDummyFriend::class, cascade={"persist"}, mappedBy="relatedDummy", storeAs="id")
+     *
      * @Groups({"fakemanytomany", "friends"})
      */
     public $relatedToDummyFriend;
@@ -94,6 +105,7 @@ class RelatedDummy extends ParentDummy
      * @var bool A dummy bool
      *
      * @ODM\Field(type="bool")
+     *
      * @Groups({"friends"})
      */
     public $dummyBoolean;
@@ -102,6 +114,7 @@ class RelatedDummy extends ParentDummy
      * @var EmbeddableDummy
      *
      * @ODM\EmbedOne(targetDocument=EmbeddableDummy::class)
+     *
      * @Groups({"friends"})
      */
     public $embeddedDummy;

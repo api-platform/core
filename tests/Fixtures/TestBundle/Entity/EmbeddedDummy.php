@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}},
  *     itemOperations={"get", "put", "delete", "groups"={"method"="GET", "path"="/embedded_dummies_groups/{id}", "normalization_context"={"groups"={"embed"}}}}
  * )
+ *
  * @ORM\Entity
  */
 class EmbeddedDummy
@@ -35,7 +36,9 @@ class EmbeddedDummy
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -44,6 +47,7 @@ class EmbeddedDummy
      * @var string|null The dummy name
      *
      * @ORM\Column(nullable=true)
+     *
      * @Groups({"embed"})
      */
     private $name;
@@ -52,6 +56,7 @@ class EmbeddedDummy
      * @var \DateTime|null A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
+     *
      * @Assert\DateTime
      */
     public $dummyDate;
@@ -60,6 +65,7 @@ class EmbeddedDummy
      * @var EmbeddableDummy
      *
      * @ORM\Embedded(class="EmbeddableDummy")
+     *
      * @Groups({"embed"})
      */
     public $embeddedDummy;

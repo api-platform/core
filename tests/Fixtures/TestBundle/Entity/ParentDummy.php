@@ -29,6 +29,7 @@ class ParentDummy
      * @var int|null The age
      *
      * @ORM\Column(type="integer", nullable=true)
+     *
      * @Groups({"friends"})
      */
     private $age;

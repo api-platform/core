@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  *
  * @ODM\Document
+ *
  * @ApiResource(
  *     attributes={
  *         "normalization_context"={"groups"={"dummy_read"}},
@@ -50,6 +51,7 @@ class DummyProperty
      * @var int|null
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
+     *
      * @Groups({"dummy_read", "dummy_graphql_read"})
      */
     private $id;
@@ -58,6 +60,7 @@ class DummyProperty
      * @var string|null
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"dummy_read", "dummy_write"})
      */
     public $foo;
@@ -66,6 +69,7 @@ class DummyProperty
      * @var string|null
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $bar;
@@ -74,6 +78,7 @@ class DummyProperty
      * @var string|null
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $baz;
@@ -82,6 +87,7 @@ class DummyProperty
      * @var DummyGroup|null
      *
      * @ODM\ReferenceOne(targetDocument=DummyGroup::class, cascade={"persist"}, nullable=true)
+     *
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $group;
@@ -90,6 +96,7 @@ class DummyProperty
      * @var DummyGroup[]|null
      *
      * @ODM\ReferenceMany(targetDocument=DummyGroup::class, cascade={"persist"})
+     *
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $groups;
@@ -98,6 +105,7 @@ class DummyProperty
      * @var string|null
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"dummy_read", "dummy_write"})
      */
     public $nameConverted;

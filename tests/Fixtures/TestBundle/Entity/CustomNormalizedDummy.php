@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "normalization_context"={"groups"={"output"}},
  *     "denormalization_context"={"groups"={"input"}}
  * })
+ *
  * @ORM\Entity
  */
 class CustomNormalizedDummy
@@ -36,8 +37,11 @@ class CustomNormalizedDummy
      * @var int|null The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      * @Groups({"input", "output"})
      */
     private $id;
@@ -46,8 +50,11 @@ class CustomNormalizedDummy
      * @var string The dummy name
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
+     *
      * @Groups({"input", "output"})
      */
     private $name;
@@ -56,7 +63,9 @@ class CustomNormalizedDummy
      * @var string|null The dummy name alias
      *
      * @ORM\Column(nullable=true)
+     *
      * @ApiProperty(iri="https://schema.org/alternateName")
+     *
      * @Groups({"input", "output"})
      */
     private $alias;

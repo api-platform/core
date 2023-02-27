@@ -38,6 +38,7 @@ class DummyCarColor
      * @var DummyCar
      *
      * @ODM\ReferenceOne(targetDocument=DummyCar::class, inversedBy="colors", storeAs="id")
+     *
      * @Assert\NotBlank
      */
     private $car;
@@ -46,8 +47,11 @@ class DummyCarColor
      * @var string
      *
      * @ODM\Field(nullable=false)
+     *
      * @ApiFilter(SearchFilter::class)
+     *
      * @Assert\NotBlank
+     *
      * @Serializer\Groups({"colors"})
      */
     private $prop = '';

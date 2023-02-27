@@ -48,6 +48,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "create"={"security"="is_granted('ROLE_ADMIN')", "security_message"="Only admins can create a secured dummy."}
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class SecuredDummy
@@ -56,7 +57,9 @@ class SecuredDummy
      * @var int|null
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -65,6 +68,7 @@ class SecuredDummy
      * @var string The title
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
      */
     private $title;
@@ -80,6 +84,7 @@ class SecuredDummy
      * @var string The dummy secret property, only readable/writable by specific users
      *
      * @ORM\Column
+     *
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     private $adminOnlyProperty = '';
@@ -88,6 +93,7 @@ class SecuredDummy
      * @var string Secret property, only readable/writable by owners
      *
      * @ORM\Column
+     *
      * @ApiProperty(
      *     security="object == null or object.getOwner() == user",
      *     securityPostDenormalize="object.getOwner() == user",
@@ -99,6 +105,7 @@ class SecuredDummy
      * @var string The owner
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
      */
     private $owner;
@@ -109,7 +116,9 @@ class SecuredDummy
      * @var Collection<RelatedDummy> Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
+     *
      * @ORM\JoinTable(name="secured_dummy_related_dummy")
+     *
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     public $relatedDummies;
@@ -120,7 +129,9 @@ class SecuredDummy
      * @var RelatedDummy|null
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     *
      * @ORM\JoinColumn(name="related_dummy_id")
+     *
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     protected $relatedDummy;
@@ -131,7 +142,9 @@ class SecuredDummy
      * @var Collection<RelatedSecuredDummy> Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedSecuredDummy")
+     *
      * @ORM\JoinTable(name="secured_dummy_related_secured_dummy")
+     *
      * @ApiProperty(security="is_granted('ROLE_USER')")
      */
     public $relatedSecuredDummies;
@@ -142,7 +155,9 @@ class SecuredDummy
      * @var RelatedSecuredDummy|null
      *
      * @ORM\ManyToOne(targetEntity="RelatedSecuredDummy")
+     *
      * @ORM\JoinColumn(name="related_secured_dummy_id")
+     *
      * @ApiProperty(security="is_granted('ROLE_USER')")
      */
     protected $relatedSecuredDummy;
@@ -153,6 +168,7 @@ class SecuredDummy
      * @var Collection<RelatedSecuredDummy> Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedSecuredDummy")
+     *
      * @ORM\JoinTable(name="secured_dummy_public_related_secured_dummy")
      */
     public $publicRelatedSecuredDummies;
@@ -163,6 +179,7 @@ class SecuredDummy
      * @var RelatedSecuredDummy|null
      *
      * @ORM\ManyToOne(targetEntity="RelatedSecuredDummy")
+     *
      * @ORM\JoinColumn(name="public_related_secured_dummy_id")
      */
     protected $publicRelatedSecuredDummy;

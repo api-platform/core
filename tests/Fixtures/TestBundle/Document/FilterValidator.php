@@ -43,6 +43,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *         RequiredAllowEmptyFilter::class
  *     }
  * })
+ *
  * @ODM\Document
  */
 class FilterValidator
@@ -58,6 +59,7 @@ class FilterValidator
      * @var string A name
      *
      * @ODM\Field
+     *
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;

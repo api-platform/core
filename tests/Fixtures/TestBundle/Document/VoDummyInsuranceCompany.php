@@ -30,6 +30,7 @@ class VoDummyInsuranceCompany
      * @var string
      *
      * @ODM\Field
+     *
      * @Groups({"car_read", "car_write"})
      */
     private $name;

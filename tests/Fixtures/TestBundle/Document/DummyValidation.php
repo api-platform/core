@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ODM\Document
+ *
  * @ApiResource(
  *     collectionOperations={
  *         "get"={"method"="GET"},
@@ -41,6 +42,7 @@ class DummyValidation
      * @var string|null The dummy name
      *
      * @ODM\Field(nullable=true)
+     *
      * @Assert\NotNull(groups={"a"})
      */
     private $name;
@@ -49,6 +51,7 @@ class DummyValidation
      * @var string|null The dummy title
      *
      * @ODM\Field(nullable=true)
+     *
      * @Assert\NotNull(groups={"b"})
      */
     private $title;

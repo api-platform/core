@@ -25,7 +25,9 @@ class Greeting
 {
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -37,12 +39,14 @@ class Greeting
 
     /**
      * @ORM\ManyToOne(targetEntity="Person", inversedBy="sentGreetings")
+     *
      * @ORM\JoinColumn(name="sender_id")
      */
     public $sender;
 
     /**
      * @ORM\ManyToOne(targetEntity="Person")
+     *
      * @ORM\JoinColumn(name="recipient_id", nullable=true)
      */
     public $recipient;

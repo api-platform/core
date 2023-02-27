@@ -19,6 +19,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ApiResource(deprecationReason="This resource is deprecated")
+ *
  * @ODM\Document
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -34,6 +35,7 @@ class DeprecatedResource
      * @var string
      *
      * @ApiProperty(attributes={"deprecation_reason"="This field is deprecated"})
+     *
      * @ODM\Field
      */
     public $deprecatedField;

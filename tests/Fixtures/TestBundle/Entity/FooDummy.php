@@ -29,6 +29,7 @@ use Doctrine\ORM\Mapping as ORM;
  *         "collection_query"={"pagination_type"="page"}
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class FooDummy
@@ -37,7 +38,9 @@ class FooDummy
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

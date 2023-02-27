@@ -44,6 +44,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "my_dummy.property"
  *     }
  * })
+ *
  * @ODM\Document
  */
 class Dummy
@@ -59,7 +60,9 @@ class Dummy
      * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
@@ -68,6 +71,7 @@ class Dummy
      * @var string|null The dummy name alias
      *
      * @ODM\Field(nullable=true)
+     *
      * @ApiProperty(iri="https://schema.org/alternateName")
      */
     private $alias;
@@ -81,6 +85,7 @@ class Dummy
      * @var string|null A short description of the item
      *
      * @ODM\Field(type="string", nullable=true)
+     *
      * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;
@@ -103,6 +108,7 @@ class Dummy
      * @var \DateTime|null A dummy date
      *
      * @ODM\Field(type="date", nullable=true)
+     *
      * @ApiProperty(iri="http://schema.org/DateTime")
      */
     public $dummyDate;

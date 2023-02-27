@@ -21,12 +21,14 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ODM\Document
+ *
  * @ApiResource(attributes={
  *     "pagination_partial"=true,
  *     "pagination_via_cursor"={
  *         {"field"="id", "direction"="DESC"}
  *     }
  * })
+ *
  * @ApiFilter(RangeFilter::class, properties={"id"})
  * @ApiFilter(OrderFilter::class, properties={"id"="DESC"})
  */

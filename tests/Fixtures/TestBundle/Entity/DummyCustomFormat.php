@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(attributes={"formats"={"xml", "jsonld", "csv"={"text/csv"}, "pdf"="application/pdf"}})
+ *
  * @ORM\Entity
  */
 class DummyCustomFormat
@@ -27,7 +28,9 @@ class DummyCustomFormat
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -36,6 +39,7 @@ class DummyCustomFormat
      * @var string
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
      */
     private $name;

@@ -49,6 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "create"={"security"="is_granted('ROLE_ADMIN')", "security_message"="Only admins can create a secured dummy."}
  *     }
  * )
+ *
  * @ODM\Document
  */
 class SecuredDummy
@@ -64,6 +65,7 @@ class SecuredDummy
      * @var string|null The title
      *
      * @ODM\Field
+     *
      * @Assert\NotBlank
      */
     private $title;
@@ -79,6 +81,7 @@ class SecuredDummy
      * @var string The dummy secret property, only readable/writable by specific users
      *
      * @ODM\Field
+     *
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     private $adminOnlyProperty = '';
@@ -87,6 +90,7 @@ class SecuredDummy
      * @var string Secret property, only readable/writable by owners
      *
      * @ODM\Field
+     *
      * @ApiProperty(
      *     security="object == null or object.getOwner() == user",
      *     securityPostDenormalize="object.getOwner() == user",
@@ -98,6 +102,7 @@ class SecuredDummy
      * @var string|null The owner
      *
      * @ODM\Field
+     *
      * @Assert\NotBlank
      */
     private $owner;
@@ -106,6 +111,7 @@ class SecuredDummy
      * @var Collection<RelatedDummy> Several dummies
      *
      * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
+     *
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     public $relatedDummies;
@@ -114,6 +120,7 @@ class SecuredDummy
      * @var RelatedDummy
      *
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
+     *
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     protected $relatedDummy;
@@ -124,6 +131,7 @@ class SecuredDummy
      * @var Collection<RelatedSecuredDummy> Several dummies
      *
      * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
+     *
      * @ApiProperty(security="is_granted('ROLE_USER')")
      */
     public $relatedSecuredDummies;
@@ -134,6 +142,7 @@ class SecuredDummy
      * @var RelatedSecuredDummy
      *
      * @ODM\ReferenceOne(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
+     *
      * @ApiProperty(security="is_granted('ROLE_USER')")
      */
     protected $relatedSecuredDummy;

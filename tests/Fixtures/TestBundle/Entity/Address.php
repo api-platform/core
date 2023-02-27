@@ -28,14 +28,18 @@ class Address
      * @var int
      *
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      * @Groups({"order_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string")
+     *
      * @Groups({"order_read"})
      */
     public $name;

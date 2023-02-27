@@ -22,6 +22,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @author Daniel West <daniel@silverback.is>
  *
  * @ApiResource(attributes={"output"=DummyDtoOutputSameClass::class})
+ *
  * @ODM\Document
  */
 class DummyDtoOutputSameClass

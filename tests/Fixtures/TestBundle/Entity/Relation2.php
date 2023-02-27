@@ -28,7 +28,9 @@ class Relation2
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
      */
     public $id;

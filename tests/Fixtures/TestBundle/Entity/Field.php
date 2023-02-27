@@ -24,7 +24,9 @@ class Field implements \JsonSerializable
      * @var int|null
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -33,6 +35,7 @@ class Field implements \JsonSerializable
      * @var Content
      *
      * @ORM\ManyToOne(targetEntity=Content::class, inversedBy="fields")
+     *
      * @ORM\JoinColumn(nullable=false)
      */
     private $content;

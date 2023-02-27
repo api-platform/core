@@ -26,7 +26,9 @@ class Question
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -38,6 +40,7 @@ class Question
 
     /**
      * @ORM\OneToOne(targetEntity="Answer", inversedBy="question")
+     *
      * @ORM\JoinColumn(name="answer_id", referencedColumnName="id", unique=true)
      *
      * @ApiSubresource

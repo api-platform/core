@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Grégoire Hébert gregoire@les-tilleuls.coop
  *
  * @ORM\Entity
+ *
  * @ApiResource(
  *     collectionOperations={"post"},
  *     itemOperations={"put"}
@@ -33,7 +34,9 @@ class DummyNoGetOperation
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

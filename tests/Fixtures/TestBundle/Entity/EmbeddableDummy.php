@@ -30,6 +30,7 @@ class EmbeddableDummy
      * @var string The dummy name
      *
      * @ORM\Column(nullable=true)
+     *
      * @Groups({"embed"})
      */
     private $dummyName;
@@ -45,6 +46,7 @@ class EmbeddableDummy
      * @var \DateTime|null A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
+     *
      * @Assert\DateTime
      */
     public $dummyDate;
@@ -65,6 +67,7 @@ class EmbeddableDummy
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     *
      * @Groups({"barcelona", "chicago"})
      */
     protected $symfony;

@@ -25,13 +25,16 @@ use Doctrine\ORM\Mapping as ORM;
  *     "get",
  *     "get_by_isbn"={"method"="GET", "path"="/books/by_isbn/{isbn}.{_format}", "requirements"={"isbn"=".+"}, "identifiers"="isbn"}
  * })
+ *
  * @ORM\Entity
  */
 class Book
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

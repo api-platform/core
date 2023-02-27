@@ -32,7 +32,9 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  *         "normalization_context"={"groups"={"colors"}}
  *     }
  * )
+ *
  * @ORM\Entity
+ *
  * @ApiFilter(DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
  * @ApiFilter(BooleanFilter::class)
  * @ApiFilter(PropertyFilter::class, arguments={"parameterName"="foobar"})
@@ -45,6 +47,7 @@ class DummyCar
      * @var DummyCarIdentifier The entity Id
      *
      * @ORM\Id
+     *
      * @ORM\OneToOne(targetEntity="DummyCarIdentifier", cascade={"persist"})
      */
     private $id;
@@ -53,7 +56,9 @@ class DummyCar
      * @var mixed Something else
      *
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
+     *
      * @Serializer\Groups({"colors"})
+     *
      * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
      */
     private $colors;
@@ -62,7 +67,9 @@ class DummyCar
      * @var mixed Something else
      *
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
+     *
      * @Serializer\Groups({"colors"})
+     *
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
     private $secondColors;
@@ -71,7 +78,9 @@ class DummyCar
      * @var mixed Something else
      *
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
+     *
      * @Serializer\Groups({"colors"})
+     *
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
     private $thirdColors;
@@ -80,11 +89,14 @@ class DummyCar
      * @var mixed Something else
      *
      * @ORM\ManyToMany(targetEntity="UuidIdentifierDummy", indexBy="uuid")
+     *
      * * @ORM\JoinTable(name="uuid_cars",
      *     joinColumns={@ORM\JoinColumn(name="car_id", referencedColumnName="id_id")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="uuid_uuid", referencedColumnName="uuid")}
      * )
+     *
      * @Serializer\Groups({"colors"})
+     *
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
     private $uuid;
@@ -93,6 +105,7 @@ class DummyCar
      * @var string
      *
      * @ORM\Column(type="string")
+     *
      * @ApiFilter(SearchFilter::class, strategy="partial")
      */
     private $name;
@@ -115,7 +128,9 @@ class DummyCar
      * @var string
      *
      * @Serializer\Groups({"colors"})
+     *
      * @Serializer\SerializedName("carBrand")
+     *
      * @ORM\Column
      */
     private $brand = 'DummyBrand';

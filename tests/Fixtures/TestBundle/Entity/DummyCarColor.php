@@ -31,7 +31,9 @@ class DummyCarColor
      * @var int The entity Id
      *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -40,7 +42,9 @@ class DummyCarColor
      * @var DummyCar
      *
      * @ORM\ManyToOne(targetEntity="DummyCar", inversedBy="colors")
+     *
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE", referencedColumnName="id_id")
+     *
      * @Assert\NotBlank
      */
     private $car;
@@ -49,8 +53,11 @@ class DummyCarColor
      * @var string
      *
      * @ORM\Column(nullable=false)
+     *
      * @ApiFilter(SearchFilter::class)
+     *
      * @Assert\NotBlank
+     *
      * @Serializer\Groups({"colors"})
      */
     private $prop = '';

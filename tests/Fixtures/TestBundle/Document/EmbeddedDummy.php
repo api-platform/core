@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     attributes={"filters"={"my_dummy.mongodb.search", "my_dummy.mongodb.order", "my_dummy.mongodb.date", "my_dummy.mongodb.boolean"}},
  *     itemOperations={"get", "put", "delete", "groups"={"method"="GET", "path"="/embedded_dummies_groups/{id}", "normalization_context"={"groups"={"embed"}}}}
  * )
+ *
  * @ODM\Document
  */
 class EmbeddedDummy
@@ -43,6 +44,7 @@ class EmbeddedDummy
      * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
+     *
      * @Groups({"embed"})
      */
     private $name;
@@ -51,6 +53,7 @@ class EmbeddedDummy
      * @var \DateTime|null A dummy date
      *
      * @ODM\Field(type="date")
+     *
      * @Assert\DateTime
      */
     public $dummyDate;
@@ -59,6 +62,7 @@ class EmbeddedDummy
      * @var EmbeddableDummy
      *
      * @ODM\EmbedOne(targetDocument=EmbeddableDummy::class)
+     *
      * @Groups({"embed"})
      */
     public $embeddedDummy;

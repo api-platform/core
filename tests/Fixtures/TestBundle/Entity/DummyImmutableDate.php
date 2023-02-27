@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_immutable_date.date"}
  * })
+ *
  * @ORM\Entity
  */
 class DummyImmutableDate
@@ -30,7 +31,9 @@ class DummyImmutableDate
      * @var int|null The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

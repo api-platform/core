@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @ApiResource(attributes={"normalization_context"={"groups"={"people.pets"}}})
+ *
  * @ODM\Document
  */
 class Person
@@ -36,12 +37,14 @@ class Person
 
     /**
      * @ODM\Field(type="string")
+     *
      * @Groups({"people.pets"})
      */
     public $name;
 
     /**
      * @ODM\ReferenceMany(targetDocument=PersonToPet::class, mappedBy="person")
+     *
      * @Groups({"people.pets"})
      *
      * @var ArrayCollection

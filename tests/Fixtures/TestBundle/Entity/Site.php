@@ -25,7 +25,9 @@ class Site
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -39,6 +41,7 @@ class Site
     private $description;
     /**
      * @ORM\OneToOne(targetEntity="AbstractUser", cascade={"persist", "remove"})
+     *
      * @ORM\JoinColumn(nullable=false)
      */
     private $owner;

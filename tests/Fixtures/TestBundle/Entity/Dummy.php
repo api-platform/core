@@ -38,6 +38,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "my_dummy.property"
  *     }
  * })
+ *
  * @ORM\Entity
  */
 class Dummy
@@ -46,7 +47,9 @@ class Dummy
      * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -55,7 +58,9 @@ class Dummy
      * @var string The dummy name
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
@@ -64,6 +69,7 @@ class Dummy
      * @var string|null The dummy name alias
      *
      * @ORM\Column(nullable=true)
+     *
      * @ApiProperty(iri="https://schema.org/alternateName")
      */
     private $alias;
@@ -77,6 +83,7 @@ class Dummy
      * @var string|null A short description of the item
      *
      * @ORM\Column(nullable=true)
+     *
      * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;
@@ -99,6 +106,7 @@ class Dummy
      * @var \DateTime|null A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
+     *
      * @ApiProperty(iri="http://schema.org/DateTime")
      */
     public $dummyDate;
@@ -121,6 +129,7 @@ class Dummy
      * @var RelatedDummy|null A related dummy
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     *
      * @ApiProperty(push=true)
      */
     public $relatedDummy;
