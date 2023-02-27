@@ -19,8 +19,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ODM\Document
+ *
  * @ODM\InheritanceType("SINGLE_COLLECTION")
+ *
  * @ODM\DiscriminatorField(value="discr")
+ *
  * @ODM\DiscriminatorMap({
  *     "dummyTableInheritance"=DummyTableInheritance::class,
  *     "dummyTableInheritanceChild"=DummyTableInheritanceChild::class,
@@ -36,6 +39,7 @@ class DummyTableInheritance
      * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
+     *
      * @Groups({"default"})
      */
     private $id;
@@ -44,6 +48,7 @@ class DummyTableInheritance
      * @var string|null The dummy name
      *
      * @ODM\Field
+     *
      * @Groups({"default"})
      */
     private $name;

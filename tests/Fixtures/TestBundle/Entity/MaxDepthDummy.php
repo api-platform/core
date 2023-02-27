@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  *     "normalization_context"={"groups"={"default"}, "enable_max_depth"=true},
  *     "denormalization_context"={"groups"={"default"}, "enable_max_depth"=true}
  * })
+ *
  * @ORM\Entity
  *
  * @author Brian Fox <brian@brianfox.fr>
@@ -32,22 +33,29 @@ class MaxDepthDummy
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      * @Groups({"default"})
      */
     private $id;
 
     /**
      * @ORM\Column(name="name", type="string", length=30)
+     *
      * @Groups({"default"})
      */
     public $name;
 
     /**
      * @ORM\ManyToOne(targetEntity="MaxDepthDummy", cascade={"persist"})
+     *
      * @ApiProperty(attributes={"fetch_eager"=false})
+     *
      * @Groups({"default"})
+     *
      * @MaxDepth(1)
      */
     public $child;

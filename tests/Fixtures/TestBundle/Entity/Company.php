@@ -40,7 +40,9 @@ class Company
      * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

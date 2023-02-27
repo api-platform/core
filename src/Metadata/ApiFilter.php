@@ -82,7 +82,7 @@ final class ApiFilter
             $this->arguments = $arguments;
         }
 
-        if (!\is_string($this->filterClass)) {
+        if (!\is_string($this->filterClass)) { /* @phpstan-ignore-line Doctrine annotations */
             throw new InvalidArgumentException('This annotation needs a value representing the filter class.');
         }
 

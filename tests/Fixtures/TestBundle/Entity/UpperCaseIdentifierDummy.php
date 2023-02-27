@@ -31,6 +31,7 @@ class UpperCaseIdentifierDummy
      * @var string The custom identifier
      *
      * @ORM\Column(type="guid")
+     *
      * @ORM\Id
      */
     private $Uuid;

@@ -29,19 +29,23 @@ class CompositeItem
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     *
      * @Groups({"default"})
      */
     private $field1;
 
     /**
      * @ORM\OneToMany(targetEntity="CompositeRelation", mappedBy="compositeItem", fetch="EAGER")
+     *
      * @Groups({"default"})
      */
     private $compositeValues;

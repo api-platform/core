@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "groups"={"tweet:read"}
  *     }
  * )
+ *
  * @ApiFilter(OrderFilter::class, properties={"id", "author.id"})
  * @ApiFilter(MatchFilter::class, properties={"message", "author.firstName"})
  */
@@ -33,6 +34,7 @@ class Tweet
 {
     /**
      * @ApiProperty(identifier=true)
+     *
      * @Groups({"tweet:read", "user:read"})
      */
     private $id;

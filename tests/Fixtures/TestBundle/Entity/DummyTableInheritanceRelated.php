@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
+ *
  * @ApiResource(
  *     attributes={
  *         "normalization_context"={"groups"={"default"}},
@@ -34,8 +35,11 @@ class DummyTableInheritanceRelated
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      * @Groups({"default"})
      */
     private $id;
@@ -44,7 +48,9 @@ class DummyTableInheritanceRelated
      * @var Collection<int, DummyTableInheritance> Related children
      *
      * @ORM\OneToMany(targetEntity="DummyTableInheritance", mappedBy="parent")
+     *
      * @ORM\OrderBy({"id"="ASC"})
+     *
      * @Groups({"default"})
      */
     private $children;

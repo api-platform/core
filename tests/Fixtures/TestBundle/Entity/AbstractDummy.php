@@ -28,9 +28,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     itemOperations={"get", "put", "delete"},
  *     attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date"}}
  * )
+ *
  * @ORM\Entity
+ *
  * @ORM\InheritanceType("SINGLE_TABLE")
+ *
  * @ORM\DiscriminatorColumn(name="discr", type="string", length=16)
+ *
  * @ORM\DiscriminatorMap({"concrete"="ConcreteDummy"})
  */
 abstract class AbstractDummy
@@ -39,7 +43,9 @@ abstract class AbstractDummy
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -48,7 +54,9 @@ abstract class AbstractDummy
      * @var string The dummy name
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;

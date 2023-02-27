@@ -29,6 +29,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *         ArrayRequiredFilter::class
  *     }
  * })
+ *
  * @ODM\Document
  */
 class ArrayFilterValidator
@@ -44,6 +45,7 @@ class ArrayFilterValidator
      * @var string A name
      *
      * @ODM\Field
+     *
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;

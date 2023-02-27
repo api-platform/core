@@ -37,6 +37,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *         "get_asc_custom"={"method"="GET", "path"="custom_collection_asc_foos", "order"={ "name"="ASC"}},
  *     }
  * )
+ *
  * @ODM\Document
  */
 class Foo

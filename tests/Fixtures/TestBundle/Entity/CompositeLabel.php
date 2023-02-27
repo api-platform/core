@@ -28,13 +28,16 @@ class CompositeLabel
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     *
      * @Groups({"default"})
      */
     private $value;

@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "collection_query"={"normalization_context"={"groups"={"collection_query"}}}
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class DummyDifferentGraphQlSerializationGroup
@@ -36,8 +37,11 @@ class DummyDifferentGraphQlSerializationGroup
      * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      * @Groups({"item_query", "collection_query"})
      */
     private $id;
@@ -46,6 +50,7 @@ class DummyDifferentGraphQlSerializationGroup
      * @var string The dummy name
      *
      * @ORM\Column
+     *
      * @Groups({"item_query", "collection_query"})
      */
     private $name;
@@ -54,6 +59,7 @@ class DummyDifferentGraphQlSerializationGroup
      * @var string|null The dummy title
      *
      * @ORM\Column(nullable=true)
+     *
      * @Groups({"item_query"})
      */
     private $title;

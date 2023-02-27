@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     attributes={"normalization_context"={"groups"={"order_read"}}},
  *     forceEager=false
  * )
+ *
  * @ODM\Document
  */
 class Order
@@ -31,19 +32,23 @@ class Order
      * @var int
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
+     *
      * @Groups({"order_read"})
      */
     private $id;
 
     /**
      * @ODM\ReferenceOne(targetDocument=Customer::class)
+     *
      * @Groups({"order_read"})
      */
     public $customer;
 
     /**
      * @ODM\ReferenceOne(targetDocument=Customer::class)
+     *
      * @Assert\NotNull
+     *
      * @Groups({"order_read"})
      */
     public $recipient;

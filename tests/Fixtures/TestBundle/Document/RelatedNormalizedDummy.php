@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "normalization_context"={"groups"={"related_output", "output"}},
  *     "denormalization_context"={"groups"={"related_input", "input"}}
  * })
+ *
  * @ODM\Document
  */
 class RelatedNormalizedDummy
@@ -38,6 +39,7 @@ class RelatedNormalizedDummy
      * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
+     *
      * @Groups({"related_output", "related_input"})
      */
     private $id;
@@ -46,8 +48,11 @@ class RelatedNormalizedDummy
      * @var string|null The dummy name
      *
      * @ODM\Field
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
+     *
      * @Groups({"related_output", "related_input"})
      */
     private $name;
@@ -56,6 +61,7 @@ class RelatedNormalizedDummy
      * @var iterable Several Normalized dummies
      *
      * @ODM\ReferenceMany(targetDocument=CustomNormalizedDummy::class)
+     *
      * @Groups({"related_output", "related_input"})
      */
     public $customNormalizedDummy;

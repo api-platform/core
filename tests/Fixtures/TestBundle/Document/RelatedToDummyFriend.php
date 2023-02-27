@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Related To Dummy Friend represent an association table for a manytomany relation.
  *
  * @ApiResource(attributes={"normalization_context"={"groups"={"fakemanytomany"}}, "filters"={"related_to_dummy_friend.mongodb.name"}})
+ *
  * @ODM\Document
  */
 class RelatedToDummyFriend
@@ -36,8 +37,11 @@ class RelatedToDummyFriend
      * @var string The dummy name
      *
      * @ODM\Field(type="string")
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
+     *
      * @Groups({"fakemanytomany", "friends"})
      */
     private $name;
@@ -46,19 +50,23 @@ class RelatedToDummyFriend
      * @var string|null The dummy description
      *
      * @ODM\Field(type="string")
+     *
      * @Groups({"fakemanytomany", "friends"})
      */
     private $description;
 
     /**
      * @ODM\ReferenceOne(targetDocument=DummyFriend::class, storeAs="id")
+     *
      * @Groups({"fakemanytomany", "friends"})
+     *
      * @Assert\NotNull
      */
     private $dummyFriend;
 
     /**
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, inversedBy="relatedToDummyFriend", storeAs="id")
+     *
      * @Assert\NotNull
      */
     private $relatedDummy;

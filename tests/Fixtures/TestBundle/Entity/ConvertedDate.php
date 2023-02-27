@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource
  *
  * @ORM\Entity
+ *
  * @ApiFilter(DateFilter::class)
  */
 class ConvertedDate
@@ -30,7 +31,9 @@ class ConvertedDate
      * @var int|null
      *
      * @ORM\Column(type="integer", nullable=true)
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

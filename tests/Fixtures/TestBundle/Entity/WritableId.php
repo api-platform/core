@@ -28,7 +28,9 @@ class WritableId
 {
     /**
      * @ORM\Id
+     *
      * @Assert\Uuid
+     *
      * @ORM\Column(type="guid")
      */
     public $id;

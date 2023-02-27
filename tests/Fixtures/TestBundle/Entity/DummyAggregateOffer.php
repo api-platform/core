@@ -35,7 +35,9 @@ class DummyAggregateOffer
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

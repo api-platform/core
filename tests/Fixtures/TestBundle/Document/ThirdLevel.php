@@ -41,6 +41,7 @@ class ThirdLevel
      * @var int
      *
      * @ODM\Field(type="int")
+     *
      * @Groups({"barcelona", "chicago"})
      */
     private $level = 3;
@@ -56,6 +57,7 @@ class ThirdLevel
      * @ApiSubresource
      *
      * @ODM\ReferenceOne(targetDocument=FourthLevel::class, cascade={"persist"}, storeAs="id")
+     *
      * @Groups({"barcelona", "chicago", "friends"})
      */
     public $fourthLevel;

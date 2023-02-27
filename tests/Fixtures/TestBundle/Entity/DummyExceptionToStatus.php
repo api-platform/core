@@ -31,7 +31,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *         NotFoundHttpException::class=400
  *     }
  * )
+ *
  * @ApiFilter(RequiredFilter::class)
+ *
  * @ORM\Entity
  */
 class DummyExceptionToStatus
@@ -40,7 +42,9 @@ class DummyExceptionToStatus
      * @var int|null The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id = null;

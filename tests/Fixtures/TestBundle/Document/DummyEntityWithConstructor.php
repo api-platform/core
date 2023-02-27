@@ -30,6 +30,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "put"={"denormalization_context"={"groups"={"put"}}}
  *     }
  * )
+ *
  * @ODM\Document
  */
 class DummyEntityWithConstructor
@@ -59,6 +60,7 @@ class DummyEntityWithConstructor
      * @var string|null
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"put"})
      */
     private $baz;

@@ -32,6 +32,7 @@ class ConcreteDummy extends AbstractDummy
      * @var string a concrete thing
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
      */
     private $instance;

@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Resource with an ID that will be URL encoded
  *
  * @ORM\Entity
+ *
  * @ApiResource(
  *     itemOperations={
  *         "get"={
@@ -35,6 +36,7 @@ class UrlEncodedId
 {
     /**
      * @ORM\Column(type="string")
+     *
      * @ORM\Id
      */
     private $id = '%encode:id';

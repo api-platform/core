@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * A User.
  *
  * @ODM\Document(collection="user_test")
+ *
  * @ApiResource(
  *     attributes={
  *         "normalization_context"={"groups"={"user", "user-read"}},
@@ -78,6 +79,7 @@ class User extends AbstractSecurityUser
      * @var string|null
      *
      * @ODM\Field(type="string", nullable=true)
+     *
      * @Groups({"user"})
      */
     protected $fullname;

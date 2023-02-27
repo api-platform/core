@@ -25,13 +25,16 @@ use Doctrine\ORM\Mapping as ORM;
  *         "patch"={"input_formats"={"json"={"application/merge-patch+json"}, "jsonapi"}}
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class PatchDummy
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;

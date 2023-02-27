@@ -33,6 +33,7 @@ class CompositeLabel
 
     /**
      * @ODM\Field(type="string", nullable=true)
+     *
      * @Groups({"default"})
      */
     private $value;

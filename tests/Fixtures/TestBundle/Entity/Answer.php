@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  * Answer.
  *
  * @ORM\Entity
+ *
  * @ApiResource(collectionOperations={
  *     "get_subresource_answer"={"method"="GET", "normalization_context"={"groups"={"foobar"}}}
  * })
@@ -32,20 +33,25 @@ class Answer
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      * @Serializer\Groups({"foobar"})
      */
     private $id;
 
     /**
      * @ORM\Column(nullable=false)
+     *
      * @Serializer\Groups({"foobar"})
      */
     private $content;
 
     /**
      * @ORM\OneToOne(targetEntity="Question", mappedBy="answer")
+     *
      * @Serializer\Groups({"foobar"})
      */
     private $question;
@@ -54,6 +60,7 @@ class Answer
      * @var Collection<int, Question>
      *
      * @ORM\OneToMany(targetEntity="Question", mappedBy="answer")
+     *
      * @Serializer\Groups({"foobar"})
      *
      * @ApiSubresource

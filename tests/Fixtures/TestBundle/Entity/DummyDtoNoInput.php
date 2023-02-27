@@ -25,6 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ORM\Entity
+ *
  * @ApiResource(
  *     attributes={
  *         "input"=false,
@@ -56,7 +57,9 @@ class DummyDtoNoInput
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

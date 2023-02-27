@@ -30,6 +30,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *         "collection_query"={"security"="is_granted('ROLE_ADMIN')"},
  *     }
  * )
+ *
  * @ODM\Document
  */
 class RelatedSecuredDummy

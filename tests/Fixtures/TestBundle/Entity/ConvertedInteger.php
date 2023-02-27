@@ -24,6 +24,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource
  *
  * @ORM\Entity
+ *
  * @ApiFilter(NumericFilter::class, properties={"nameConverted"})
  * @ApiFilter(RangeFilter::class, properties={"nameConverted"})
  * @ApiFilter(OrderFilter::class, properties={"nameConverted"})
@@ -34,7 +35,9 @@ class ConvertedInteger
      * @var int|null
      *
      * @ORM\Column(type="integer", nullable=true)
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

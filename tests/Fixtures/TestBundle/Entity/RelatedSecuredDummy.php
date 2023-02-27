@@ -30,6 +30,7 @@ use Doctrine\ORM\Mapping as ORM;
  *         "collection_query"={"security"="is_granted('ROLE_ADMIN')"},
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class RelatedSecuredDummy
@@ -38,7 +39,9 @@ class RelatedSecuredDummy
      * @var int
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

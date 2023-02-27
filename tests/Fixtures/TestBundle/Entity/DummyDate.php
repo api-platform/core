@@ -27,12 +27,14 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_date.date"}
  * })
+ *
  * @ApiFilter(SearchFilter::class, properties={"dummyDate"})
  * @ApiFilter(DateFilter::class, properties={
  *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
  *     "dateIncludeNullBeforeAndAfter"=DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER
  * })
+ *
  * @ORM\Entity
  */
 class DummyDate
@@ -41,7 +43,9 @@ class DummyDate
      * @var int|null The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

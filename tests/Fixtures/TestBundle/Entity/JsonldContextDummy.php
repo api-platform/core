@@ -30,8 +30,11 @@ class JsonldContextDummy
      * @var int The id
      *
      * @ApiProperty(identifier=true)
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

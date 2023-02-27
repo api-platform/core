@@ -29,6 +29,7 @@ abstract class VoDummyVehicle
      * @var string
      *
      * @ORM\Column
+     *
      * @Groups({"car_read", "car_write"})
      */
     private $make;
@@ -37,6 +38,7 @@ abstract class VoDummyVehicle
      * @var VoDummyInsuranceCompany|null
      *
      * @ORM\ManyToOne(targetEntity="VoDummyInsuranceCompany", cascade={"persist"})
+     *
      * @Groups({"car_read", "car_write"})
      */
     private $insuranceCompany;
@@ -45,6 +47,7 @@ abstract class VoDummyVehicle
      * @var VoDummyDriver[]|Collection
      *
      * @ORM\ManyToMany(targetEntity="VoDummyDriver", cascade={"persist"})
+     *
      * @Groups({"car_read", "car_write"})
      */
     private $drivers;

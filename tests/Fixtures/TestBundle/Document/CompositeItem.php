@@ -33,12 +33,14 @@ class CompositeItem
 
     /**
      * @ODM\Field(type="string", nullable=true)
+     *
      * @Groups({"default"})
      */
     private $field1;
 
     /**
      * @ODM\ReferenceMany(targetDocument=CompositeRelation::class, mappedBy="compositeItem")
+     *
      * @Groups({"default"})
      */
     private $compositeValues;

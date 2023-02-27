@@ -29,6 +29,7 @@ class CustomWritableIdentifierDummy
      * @var string The special identifier
      *
      * @ORM\Column(name="slug", type="string", length=30)
+     *
      * @ORM\Id
      */
     private $slug;

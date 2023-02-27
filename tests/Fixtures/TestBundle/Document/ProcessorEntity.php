@@ -40,6 +40,7 @@ class ProcessorEntity
      * @var string
      *
      * @ODM\Field
+     *
      * @Assert\NotBlank
      */
     private $foo;

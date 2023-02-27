@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @ODM\Document
+ *
  * @ApiResource(
  *     attributes={
  *         "normalization_context"={"groups"={"dummy_read"}},
@@ -52,6 +53,7 @@ class DummyGroup
      * @var int|null
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
+     *
      * @Groups({"dummy", "dummy_read", "dummy_id"})
      */
     private $id;
@@ -60,6 +62,7 @@ class DummyGroup
      * @var string|null
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"dummy", "dummy_read", "dummy_write", "dummy_foo"})
      */
     public $foo;
@@ -68,6 +71,7 @@ class DummyGroup
      * @var string|null
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"dummy", "dummy_read", "dummy_write", "dummy_bar"})
      */
     public $bar;
@@ -76,6 +80,7 @@ class DummyGroup
      * @var string|null
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"dummy", "dummy_read", "dummy_baz"})
      */
     public $baz;
@@ -84,6 +89,7 @@ class DummyGroup
      * @var string|null
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"dummy", "dummy_write", "dummy_qux"})
      */
     public $qux;

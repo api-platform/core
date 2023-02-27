@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ApiResource(itemOperations={
  *     "get",
  *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies/{id}"},
@@ -39,7 +40,9 @@ class CustomActionDummy
      * @var int|null
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

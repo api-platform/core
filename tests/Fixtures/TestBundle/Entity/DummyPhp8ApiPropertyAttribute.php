@@ -25,6 +25,7 @@ class DummyPhp8ApiPropertyAttribute
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
      */
     #[ApiProperty(identifier: true, description: 'the identifier')]

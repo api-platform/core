@@ -23,7 +23,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     attributes={"normalization_context"={"groups"={"order_read"}}},
  *     forceEager=false
  * )
+ *
  * @ORM\Entity
+ *
  * @ORM\Table(name="`order`")
  */
 class Order
@@ -32,23 +34,31 @@ class Order
      * @var int
      *
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      * @Groups({"order_read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Customer")
+     *
      * @ORM\JoinColumn(nullable=false)
+     *
      * @Groups({"order_read"})
      */
     public $customer;
 
     /**
      * @ORM\ManyToOne(targetEntity="Customer")
+     *
      * @ORM\JoinColumn(nullable=false)
+     *
      * @Assert\NotNull
+     *
      * @Groups({"order_read"})
      */
     public $recipient;

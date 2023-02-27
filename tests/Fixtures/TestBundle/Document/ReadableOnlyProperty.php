@@ -35,6 +35,7 @@ class ReadableOnlyProperty
      * @var string The foo name
      *
      * @ODM\Field
+     *
      * @ApiProperty(writable=false)
      */
     private $name;

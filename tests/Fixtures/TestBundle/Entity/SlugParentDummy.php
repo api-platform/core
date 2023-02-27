@@ -24,6 +24,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Custom Identifier Dummy With Subresource.
  *
  * @ApiResource(attributes={"identifiers"="slug"})
+ *
  * @ORM\Entity
  */
 class SlugParentDummy
@@ -32,8 +33,11 @@ class SlugParentDummy
      * @var int|null The database identifier
      *
      * @ApiProperty(identifier=false)
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -42,6 +46,7 @@ class SlugParentDummy
      * @var string The slug used a API identifier
      *
      * @ApiProperty(identifier=true)
+     *
      * @ORM\Column(type="string", length=255, unique=true)
      */
     private $slug;

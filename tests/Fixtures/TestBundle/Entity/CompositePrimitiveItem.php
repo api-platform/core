@@ -27,12 +27,14 @@ class CompositePrimitiveItem
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="string")
      */
     private $name;
 
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
      */
     private $year;

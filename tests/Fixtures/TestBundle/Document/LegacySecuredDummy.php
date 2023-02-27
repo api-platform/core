@@ -39,6 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "create"={"access_control"="is_granted('ROLE_ADMIN')", "access_control_message"="Only admins can create a secured dummy."}
  *     }
  * )
+ *
  * @ODM\Document
  */
 class LegacySecuredDummy
@@ -54,6 +55,7 @@ class LegacySecuredDummy
      * @var string|null The title
      *
      * @ODM\Field
+     *
      * @Assert\NotBlank
      */
     private $title;
@@ -69,6 +71,7 @@ class LegacySecuredDummy
      * @var string|null The owner
      *
      * @ODM\Field
+     *
      * @Assert\NotBlank
      */
     private $owner;

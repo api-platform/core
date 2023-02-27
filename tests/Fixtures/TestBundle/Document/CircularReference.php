@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ApiResource(attributes={"normalization_context"={"groups"={"circular"}}})
+ *
  * @ODM\Document
  */
 class CircularReference
@@ -35,12 +36,14 @@ class CircularReference
 
     /**
      * @ODM\ReferenceOne(targetDocument=CircularReference::class, inversedBy="children")
+     *
      * @Groups({"circular"})
      */
     public $parent;
 
     /**
      * @ODM\ReferenceMany(targetDocument=CircularReference::class, mappedBy="parent")
+     *
      * @Groups({"circular"})
      */
     public $children;

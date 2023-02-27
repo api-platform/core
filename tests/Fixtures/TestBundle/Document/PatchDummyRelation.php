@@ -30,6 +30,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "patch"={"input_formats"={"json"={"application/merge-patch+json"}, "jsonapi"}}
  *     }
  * )
+ *
  * @ODM\Document
  */
 class PatchDummyRelation
@@ -41,6 +42,7 @@ class PatchDummyRelation
 
     /**
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class)
+     *
      * @Groups({"chicago"})
      */
     protected $related;

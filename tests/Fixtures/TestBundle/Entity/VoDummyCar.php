@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     "normalization_context"={"groups"={"car_read"}},
  *     "denormalization_context"={"groups"={"car_write"}}
  * })
+ *
  * @ORM\Entity
  */
 class VoDummyCar extends VoDummyVehicle
@@ -32,6 +33,7 @@ class VoDummyCar extends VoDummyVehicle
      * @var int
      *
      * @ORM\Column(type="integer")
+     *
      * @Groups({"car_read", "car_write"})
      */
     private $mileage;
@@ -40,6 +42,7 @@ class VoDummyCar extends VoDummyVehicle
      * @var string
      *
      * @ORM\Column
+     *
      * @Groups({"car_read", "car_write"})
      */
     private $bodyType;
@@ -48,6 +51,7 @@ class VoDummyCar extends VoDummyVehicle
      * @var VoDummyInspection[]|Collection
      *
      * @ORM\OneToMany(targetEntity="VoDummyInspection", mappedBy="car", cascade={"persist"})
+     *
      * @Groups({"car_read", "car_write"})
      */
     private $inspections;

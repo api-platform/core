@@ -54,7 +54,7 @@ final class ApiFilter
     public $arguments = [];
 
     /**
-     * @param string $filterClass
+     * @param mixed  $filterClass
      * @param string $id
      * @param string $strategy
      */
@@ -65,9 +65,9 @@ final class ApiFilter
         array $properties = [],
         array $arguments = []
     ) {
-        if (\is_array($filterClass)) { /** @phpstan-ignore-line Doctrine annotations */
+        if (\is_array($filterClass)) {
             $options = $filterClass;
-            $this->filterClass = $options['value'] ?? null; /* @phpstan-ignore-line Doctrine annotations */
+            $this->filterClass = $options['value'] ?? null;
             unset($options['value']);
 
             foreach ($options as $key => $value) {

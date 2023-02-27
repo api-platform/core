@@ -25,12 +25,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "groups"={"user:read"}
  *     }
  * )
+ *
  * @ApiFilter(TermFilter::class, properties={"id", "gender", "age", "firstName", "tweets.id", "tweets.date"})
  */
 class User
 {
     /**
      * @ApiProperty(identifier=true)
+     *
      * @Groups({"user:read", "tweet:read"})
      */
     private $id;

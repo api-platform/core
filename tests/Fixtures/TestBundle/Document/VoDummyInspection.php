@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     },
  *     graphql={}
  * )
+ *
  * @ODM\Document
  */
 class VoDummyInspection
@@ -35,6 +36,7 @@ class VoDummyInspection
      * @var bool
      *
      * @ODM\Field(type="bool")
+     *
      * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
     private $accepted;
@@ -43,6 +45,7 @@ class VoDummyInspection
      * @var VoDummyCar
      *
      * @ODM\ReferenceOne(targetDocument=VoDummyCar::class, inversedBy="inspections")
+     *
      * @Groups({"inspection_read", "inspection_write"})
      */
     private $car;
@@ -51,6 +54,7 @@ class VoDummyInspection
      * @var \DateTime
      *
      * @ODM\Field(type="date")
+     *
      * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
     private $performed;

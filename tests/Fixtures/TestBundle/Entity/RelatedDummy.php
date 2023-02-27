@@ -32,7 +32,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ApiResource(graphql={"item_query", "update"={"normalization_context"={"groups"={"chicago", "fakemanytomany"}}, "denormalization_context"={"groups"={"friends"}}}}, iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.friends", "related_dummy.complex_sub_query"}})
+ *
  * @ORM\Entity
+ *
  * @ApiFilter(SearchFilter::class, properties={"id"})
  */
 class RelatedDummy extends ParentDummy
@@ -43,8 +45,11 @@ class RelatedDummy extends ParentDummy
      * @ApiSubresource
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      * @Groups({"chicago", "friends"})
      */
     private $id;
@@ -53,15 +58,20 @@ class RelatedDummy extends ParentDummy
      * @var string|null A name
      *
      * @ApiProperty(iri="RelatedDummy.name")
+     *
      * @ORM\Column(nullable=true)
+     *
      * @Groups({"friends"})
      */
     public $name;
 
     /**
      * @ApiProperty(attributes={"deprecation_reason"="This property is deprecated for upgrade test"})
+     *
      * @ORM\Column
+     *
      * @Groups({"barcelona", "chicago", "friends"})
+     *
      * @ApiFilter(SearchFilter::class)
      * @ApiFilter(ExistsFilter::class)
      */
@@ -71,8 +81,11 @@ class RelatedDummy extends ParentDummy
      * @var \DateTime|null A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
+     *
      * @Assert\DateTime
+     *
      * @Groups({"friends"})
+     *
      * @ApiFilter(DateFilter::class)
      */
     public $dummyDate;
@@ -81,6 +94,7 @@ class RelatedDummy extends ParentDummy
      * @ApiSubresource
      *
      * @ORM\ManyToOne(targetEntity="ThirdLevel", cascade={"persist"})
+     *
      * @Groups({"barcelona", "chicago", "friends"})
      */
     public $thirdLevel;
@@ -89,6 +103,7 @@ class RelatedDummy extends ParentDummy
      * @ApiSubresource
      *
      * @ORM\OneToMany(targetEntity="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy")
+     *
      * @Groups({"fakemanytomany", "friends"})
      */
     public $relatedToDummyFriend;
@@ -97,6 +112,7 @@ class RelatedDummy extends ParentDummy
      * @var bool|null A dummy bool
      *
      * @ORM\Column(type="boolean", nullable=true)
+     *
      * @Groups({"friends"})
      */
     public $dummyBoolean;
@@ -105,6 +121,7 @@ class RelatedDummy extends ParentDummy
      * @var EmbeddableDummy
      *
      * @ORM\Embedded(class="EmbeddableDummy")
+     *
      * @Groups({"friends"})
      */
     public $embeddedDummy;

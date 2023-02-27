@@ -30,6 +30,7 @@ class ParentDummy
      * @var int The age
      *
      * @ODM\Field(type="int", nullable=true)
+     *
      * @Groups({"friends"})
      */
     private $age;

@@ -23,7 +23,9 @@ use ApiPlatform\Exception\InvalidArgumentException;
  * @Annotation
  *
  * @Target({"CLASS"})
+ *
  * @Attributes(
+ *
  *     @Attribute("accessControl", type="string"),
  *     @Attribute("accessControlMessage", type="string"),
  *     @Attribute("attributes", type="array"),

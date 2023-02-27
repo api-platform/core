@@ -32,7 +32,9 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  *         "normalization_context"={"groups"={"colors"}}
  *     }
  * )
+ *
  * @ODM\Document
+ *
  * @ApiFilter(DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
  * @ApiFilter(BooleanFilter::class)
  * @ApiFilter(PropertyFilter::class, arguments={"parameterName"="foobar"})
@@ -52,7 +54,9 @@ class DummyCar
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
+     *
      * @Serializer\Groups({"colors"})
+     *
      * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
      */
     private $colors;
@@ -61,7 +65,9 @@ class DummyCar
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
+     *
      * @Serializer\Groups({"colors"})
+     *
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
     private $secondColors;
@@ -70,7 +76,9 @@ class DummyCar
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
+     *
      * @Serializer\Groups({"colors"})
+     *
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
     private $thirdColors;
@@ -79,7 +87,9 @@ class DummyCar
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=UuidIdentifierDummy::class)
+     *
      * @Serializer\Groups({"colors"})
+     *
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
     private $uuid;
@@ -88,6 +98,7 @@ class DummyCar
      * @var string
      *
      * @ODM\Field(type="string")
+     *
      * @ApiFilter(SearchFilter::class, strategy="partial")
      */
     private $name;
@@ -110,7 +121,9 @@ class DummyCar
      * @var string
      *
      * @Serializer\Groups({"colors"})
+     *
      * @Serializer\SerializedName("carBrand")
+     *
      * @ODM\Field
      */
     private $brand = 'DummyBrand';

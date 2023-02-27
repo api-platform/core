@@ -36,6 +36,7 @@ class Pet
 
     /**
      * @ODM\Field(type="string")
+     *
      * @Groups({"people.pets"})
      */
     public $name;

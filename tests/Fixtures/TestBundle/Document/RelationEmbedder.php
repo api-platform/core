@@ -37,6 +37,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "custom2"={"path"="/api/custom-call/{id}", "method"="PUT"},
  *     }
  * )
+ *
  * @ODM\Document
  */
 class RelationEmbedder
@@ -48,24 +49,28 @@ class RelationEmbedder
 
     /**
      * @ODM\Field
+     *
      * @Groups({"chicago"})
      */
     public $paris = 'Paris';
 
     /**
      * @ODM\Field
+     *
      * @Groups({"barcelona", "chicago"})
      */
     public $krondstadt = 'Krondstadt';
 
     /**
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, cascade={"persist"})
+     *
      * @Groups({"chicago", "barcelona"})
      */
     public $anotherRelated;
 
     /**
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class)
+     *
      * @Groups({"barcelona", "chicago"})
      */
     protected $related;

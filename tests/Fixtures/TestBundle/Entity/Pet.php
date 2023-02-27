@@ -32,13 +32,16 @@ class Pet
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string")
+     *
      * @Groups({"people.pets"})
      */
     public $name;

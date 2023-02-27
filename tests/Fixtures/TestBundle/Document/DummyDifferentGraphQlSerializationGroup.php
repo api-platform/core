@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "collection_query"={"normalization_context"={"groups"={"collection_query"}}}
  *     }
  * )
+ *
  * @ODM\Document
  */
 class DummyDifferentGraphQlSerializationGroup
@@ -36,6 +37,7 @@ class DummyDifferentGraphQlSerializationGroup
      * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
+     *
      * @Groups({"item_query", "collection_query"})
      */
     private $id;
@@ -44,6 +46,7 @@ class DummyDifferentGraphQlSerializationGroup
      * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
+     *
      * @Groups({"item_query", "collection_query"})
      */
     private $name;
@@ -52,6 +55,7 @@ class DummyDifferentGraphQlSerializationGroup
      * @var string|null The dummy title
      *
      * @ODM\Field(nullable=true)
+     *
      * @Groups({"item_query"})
      */
     private $title;

@@ -29,6 +29,7 @@ class SlugChildDummy
      * @var int The identifier
      *
      * @ApiProperty(identifier=false)
+     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
@@ -37,6 +38,7 @@ class SlugChildDummy
      * @var string The slug used as API identifier
      *
      * @ApiProperty(identifier=true)
+     *
      * @ODM\Field
      */
     private $slug;

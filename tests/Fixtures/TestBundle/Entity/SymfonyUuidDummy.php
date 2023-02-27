@@ -31,7 +31,9 @@ if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidTy
     {
         /**
          * @ORM\Id
+         *
          * @ORM\Column(type="symfony_uuid", unique=true)
+         *
          * @ORM\GeneratedValue(strategy="NONE")
          */
         private $id;

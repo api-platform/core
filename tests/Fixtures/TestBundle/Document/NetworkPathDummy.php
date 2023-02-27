@@ -19,6 +19,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ApiResource(urlGenerationStrategy=UrlGeneratorInterface::NET_PATH)
+ *
  * @ODM\Document
  */
 class NetworkPathDummy

@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  * No Collection Dummy.
  *
  * @ApiResource(collectionOperations={})
+ *
  * @ORM\Entity
  */
 class NoCollectionDummy
@@ -28,7 +29,9 @@ class NoCollectionDummy
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

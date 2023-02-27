@@ -24,6 +24,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @ApiResource(iri="https://schema.org/Product")
+ *
  * @ODM\Document
  */
 class RelatedOwningDummy

@@ -27,13 +27,16 @@ class VoidPayment
      * @var int|null
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @ORM\OneToOne(targetEntity=Payment::class, inversedBy="voidPayment")
+     *
      * @ORM\JoinColumn(nullable=false)
      */
     private $payment;

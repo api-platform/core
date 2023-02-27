@@ -23,13 +23,16 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
  *
  * @ApiResource(iri="https://schema.org/Product")
+ *
  * @ORM\Entity
  */
 class RelatedOwningDummy
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

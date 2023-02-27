@@ -18,6 +18,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ApiResource(filters={"dummy_travel.property"})
+ *
  * @ODM\Document
  */
 class DummyTravel

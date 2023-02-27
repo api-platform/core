@@ -18,6 +18,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ODM\Document
+ *
  * @ApiResource(itemOperations={
  *     "get",
  *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies/{id}"},

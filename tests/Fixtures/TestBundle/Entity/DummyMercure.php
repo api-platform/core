@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ApiResource(mercure=true)
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -26,7 +27,9 @@ class DummyMercure
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer")
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;

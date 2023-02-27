@@ -18,6 +18,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ODM\Document
+ *
  * @ApiResource(mercure=true)
  *
  * @author Kévin Dunglas <dunglas@gmail.com>

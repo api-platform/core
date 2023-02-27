@@ -18,7 +18,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\InheritanceType("JOINED")
+ *
  * @ApiResource(
  *     collectionOperations={
  *         "get"={"path"="/custom_users"}
@@ -32,7 +34,9 @@ abstract class AbstractUser
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

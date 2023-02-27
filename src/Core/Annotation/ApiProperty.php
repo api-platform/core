@@ -23,7 +23,9 @@ use ApiPlatform\Exception\InvalidArgumentException;
  * @Annotation
  *
  * @Target({"METHOD", "PROPERTY"})
+ *
  * @Attributes(
+ *
  *     @Attribute("deprecationReason", type="string"),
  *     @Attribute("fetchable", type="bool"),
  *     @Attribute("fetchEager", type="bool"),

@@ -27,7 +27,9 @@ class DummyPassenger
      * @var int The entity Id
      *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
      */
     private $id;

@@ -32,6 +32,7 @@ class PersonToPet
 
     /**
      * @ODM\ReferenceOne(targetDocument=Pet::class)
+     *
      * @Groups({"people.pets"})
      *
      * @var Pet

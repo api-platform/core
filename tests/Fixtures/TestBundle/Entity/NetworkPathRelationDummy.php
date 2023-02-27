@@ -21,13 +21,16 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource(urlGenerationStrategy=UrlGeneratorInterface::NET_PATH)
+ *
  * @ORM\Entity
  */
 class NetworkPathRelationDummy
 {
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
      */
     private $id;

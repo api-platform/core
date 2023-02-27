@@ -32,7 +32,9 @@ class FourthLevel
      * @var int|null The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
      */
     private $id;
@@ -41,6 +43,7 @@ class FourthLevel
      * @var int
      *
      * @ORM\Column(type="integer")
+     *
      * @Groups({"barcelona", "chicago"})
      */
     private $level = 4;

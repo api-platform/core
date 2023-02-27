@@ -29,8 +29,11 @@ class CustomGeneratedIdentifier
      * @var mixed
      *
      * @ORM\Id
+     *
      * @ORM\Column(type="string")
+     *
      * @ORM\GeneratedValue(strategy="CUSTOM")
+     *
      * @ORM\CustomIdGenerator(class="ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\UuidGenerator")
      */
     private $id;

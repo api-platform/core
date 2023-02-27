@@ -28,7 +28,9 @@ class ReadableOnlyProperty
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -37,6 +39,7 @@ class ReadableOnlyProperty
      * @var string The foo name
      *
      * @ORM\Column
+     *
      * @ApiProperty(writable=false)
      */
     private $name;

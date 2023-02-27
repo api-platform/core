@@ -30,6 +30,7 @@ use Doctrine\ORM\Mapping as ORM;
  *         },
  *     },
  * )
+ *
  * @ORM\Entity
  */
 class DisableItemOperation
@@ -38,7 +39,9 @@ class DisableItemOperation
      * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;

@@ -20,6 +20,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * No Collection Dummy.
  *
  * @ApiResource(collectionOperations={})
+ *
  * @ODM\Document
  */
 class NoCollectionDummy

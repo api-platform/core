@@ -24,25 +24,30 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ApiResource(attributes={"normalization_context"={"groups"={"circular"}}})
+ *
  * @ORM\Entity
  */
 class CircularReference
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="CircularReference", inversedBy="children")
+     *
      * @Groups({"circular"})
      */
     public $parent;
 
     /**
      * @ORM\OneToMany(targetEntity="CircularReference", mappedBy="parent")
+     *
      * @Groups({"circular"})
      */
     public $children;

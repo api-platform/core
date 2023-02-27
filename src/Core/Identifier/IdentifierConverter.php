@@ -71,7 +71,7 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
                 try {
                     $identifiers[$parameter] = $identifierTransformer->denormalize($value, $type);
                     break;
-                } catch (InvalidIdentifierException $e) {
+                } catch (InvalidIdentifierException $e) { // @phpstan-ignore-line wrong choice of interface, was fixed in 3.0
                     throw new InvalidIdentifierException(sprintf('Identifier "%s" could not be denormalized.', $parameter), $e->getCode(), $e);
                 }
             }

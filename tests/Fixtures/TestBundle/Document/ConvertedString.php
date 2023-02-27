@@ -22,6 +22,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @ApiResource
  *
  * @ODM\Document
+ *
  * @ApiFilter(ExistsFilter::class, properties={"nameConverted"})
  */
 class ConvertedString

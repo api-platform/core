@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(attributes={"formats"={"xml", "jsonld", "csv"={"text/csv"}, "pdf"="application/pdf"}})
+ *
  * @ODM\Document
  */
 class DummyCustomFormat
@@ -34,6 +35,7 @@ class DummyCustomFormat
      * @var string
      *
      * @ODM\Field
+     *
      * @Assert\NotBlank
      */
     private $name;

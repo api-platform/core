@@ -28,6 +28,7 @@ use Doctrine\ORM\Mapping as ORM;
  *         ArrayRequiredFilter::class
  *     }
  * })
+ *
  * @ORM\Entity
  */
 class ArrayFilterValidator
@@ -36,7 +37,9 @@ class ArrayFilterValidator
      * @var int The id
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -45,6 +48,7 @@ class ArrayFilterValidator
      * @var string A name
      *
      * @ORM\Column
+     *
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;

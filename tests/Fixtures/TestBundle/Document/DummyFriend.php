@@ -42,8 +42,11 @@ class DummyFriend
      * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
+     *
      * @Assert\NotBlank
+     *
      * @ApiProperty(iri="http://schema.org/name")
+     *
      * @Groups({"fakemanytomany", "friends"})
      */
     private $name;

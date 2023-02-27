@@ -29,7 +29,9 @@ class DummyToUpgradeWithOnlyAttribute
      * @var int
      *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
      */
     #[Groups(['chicago', 'friends'])]
@@ -40,6 +42,7 @@ class DummyToUpgradeWithOnlyAttribute
      * @var DummyToUpgradeProduct
      *
      * @ORM\ManyToOne(targetEntity="DummyToUpgradeProduct", inversedBy="dummysToUpgradeWithOnlyAttribute")
+     *
      * @ORM\JoinColumn(nullable=false)
      */
     #[Groups(['barcelona', 'chicago', 'friends'])]

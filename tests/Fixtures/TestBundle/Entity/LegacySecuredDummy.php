@@ -39,6 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "create"={"access_control"="is_granted('ROLE_ADMIN')", "access_control_message"="Only admins can create a secured dummy."}
  *     }
  * )
+ *
  * @ORM\Entity
  */
 class LegacySecuredDummy
@@ -47,7 +48,9 @@ class LegacySecuredDummy
      * @var int|null
      *
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
@@ -56,6 +59,7 @@ class LegacySecuredDummy
      * @var string The title
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
      */
     private $title;
@@ -71,6 +75,7 @@ class LegacySecuredDummy
      * @var string The owner
      *
      * @ORM\Column
+     *
      * @Assert\NotBlank
      */
     private $owner;

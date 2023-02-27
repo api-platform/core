@@ -18,19 +18,23 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource(filters={"dummy_travel.property"})
+ *
  * @ORM\Entity
  */
 class DummyTravel
 {
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="DummyCar")
+     *
      * @ORM\JoinColumn(name="car_id", referencedColumnName="id_id")
      */
     public $car;
@@ -41,6 +45,7 @@ class DummyTravel
     public $confirmed;
     /**
      * @ORM\ManyToOne(targetEntity="DummyPassenger")
+     *
      * @ORM\JoinColumn(name="passenger_id", referencedColumnName="id")
      */
     public $passenger;
