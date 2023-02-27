@@ -190,6 +190,55 @@ class OpenApiFactoryTest extends TestCase
                     ]),
                 ),
             )),
+            'putDummyItemWithResponse' => (new Put())->withUriTemplate('/dummyitems/{id}')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                responses: [
+                    '200' => new OpenApiResponse(
+                        description: 'Success',
+                        content: new \ArrayObject([
+                            'application/json' => [
+                                'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                            ],
+                        ]),
+                        headers: new \ArrayObject([
+                            'API_KEY' => ['description' => 'Api Key', 'schema' => ['type' => 'string']],
+                        ]),
+                        links: new \ArrayObject([
+                            'link' => ['$ref' => '#/components/schemas/Dummy'],
+                        ]),
+                    ),
+                    '400' => new OpenApiResponse(
+                        description: 'Error',
+                    ),
+                ],
+            )),
+            'getDummyItemImageCollection' => (new GetCollection())->withUriTemplate('/dummyitems/{id}/images')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                responses: [
+                    '200' => new OpenApiResponse(
+                        description: 'Success',
+                    ),
+                ],
+            )),
+            'postDummyItemWithResponse' => (new Post())->withUriTemplate('/dummyitems')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                responses: [
+                    '201' => new OpenApiResponse(
+                        description: 'Created',
+                        content: new \ArrayObject([
+                            'application/json' => [
+                                'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                            ],
+                        ]),
+                        headers: new \ArrayObject([
+                            'API_KEY' => ['description' => 'Api Key', 'schema' => ['type' => 'string']],
+                        ]),
+                        links: new \ArrayObject([
+                            'link' => ['$ref' => '#/components/schemas/Dummy'],
+                        ]),
+                    ),
+                    '400' => new OpenApiResponse(
+                        description: 'Error',
+                    ),
+                ],
+            )),
         ])
         );
 
@@ -694,5 +743,107 @@ class OpenApiFactoryTest extends TestCase
             ),
             deprecated: false,
         ), $requestBodyPath->getPost());
+
+        $dummyItemPath = $paths->getPath('/dummyitems/{id}');
+        $this->assertEquals(new Operation(
+            'putDummyItemWithResponse',
+            ['Dummy'],
+            [
+                '200' => new Response(
+                    'Success',
+                    new \ArrayObject([
+                        'application/json' => [
+                            'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                        ],
+                    ]),
+                    new \ArrayObject([
+                        'API_KEY' => ['description' => 'Api Key', 'schema' => ['type' => 'string']],
+                    ]),
+                    new \ArrayObject([
+                        'link' => ['$ref' => '#/components/schemas/Dummy'],
+                    ])
+                ),
+                '400' => new Response('Error'),
+                '422' => new Response('Unprocessable entity'),
+                '404' => new Response('Resource not found'),
+            ],
+            'Replaces the Dummy resource.',
+            'Replaces the Dummy resource.',
+            null,
+            [],
+            new RequestBody(
+                'The updated Dummy resource',
+                new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                ]),
+                true
+            ),
+            deprecated: false
+        ), $dummyItemPath->getPut());
+
+        $dummyItemPath = $paths->getPath('/dummyitems');
+        $this->assertEquals(new Operation(
+            'postDummyItemWithResponse',
+            ['Dummy'],
+            [
+                '201' => new Response(
+                    'Created',
+                    new \ArrayObject([
+                        'application/json' => [
+                            'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                        ],
+                    ]),
+                    new \ArrayObject([
+                        'API_KEY' => ['description' => 'Api Key', 'schema' => ['type' => 'string']],
+                    ]),
+                    new \ArrayObject([
+                        'link' => ['$ref' => '#/components/schemas/Dummy'],
+                    ])
+                ),
+                '400' => new Response('Error'),
+                '422' => new Response('Unprocessable entity'),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [],
+            new RequestBody(
+                'The new Dummy resource',
+                new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                ]),
+                true
+            ),
+            deprecated: false
+        ), $dummyItemPath->getPost());
+
+        $dummyItemPath = $paths->getPath('/dummyitems/{id}/images');
+
+        $this->assertEquals(new Operation(
+            'getDummyItemImageCollection',
+            ['Dummy'],
+            [
+                '200' => new Response(
+                    'Success'
+                ),
+            ],
+            'Retrieves the collection of Dummy resources.',
+            'Retrieves the collection of Dummy resources.',
+            null,
+            [
+                new Parameter('page', 'query', 'The collection page number', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 1,
+                ]),
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 30,
+                    'minimum' => 0,
+                ]),
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                    'type' => 'boolean',
+                ]),
+            ]
+        ), $dummyItemPath->getGet());
     }
 }
