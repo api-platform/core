@@ -28,7 +28,7 @@ class ApiFilterTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('This annotation needs a value representing the filter class.');
 
-        new ApiFilter(null); // @phpstan-ignore-line
+        new ApiFilter(null);
     }
 
     public function testInvalidFilter()
@@ -36,7 +36,7 @@ class ApiFilterTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The filter class "ApiPlatform\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" does not implement "ApiPlatform\\Api\\FilterInterface". Did you forget a use statement?');
 
-        new ApiFilter(['value' => Dummy::class]); // @phpstan-ignore-line
+        new ApiFilter(['value' => Dummy::class]);
     }
 
     public function testInvalidProperty()
@@ -44,12 +44,12 @@ class ApiFilterTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Property "foo" does not exist on the ApiFilter annotation.');
 
-        new ApiFilter(['value' => DummyFilter::class, 'foo' => 'bar']); // @phpstan-ignore-line
+        new ApiFilter(['value' => DummyFilter::class, 'foo' => 'bar']);
     }
 
     public function testAssignation()
     {
-        $resource = new ApiFilter(['value' => DummyFilter::class, 'strategy' => 'test', 'properties' => ['one', 'two'], 'arguments' => ['args']]); // @phpstan-ignore-line
+        $resource = new ApiFilter(['value' => DummyFilter::class, 'strategy' => 'test', 'properties' => ['one', 'two'], 'arguments' => ['args']]);
 
         $this->assertEquals($resource->filterClass, DummyFilter::class);
         $this->assertEquals($resource->strategy, 'test');
