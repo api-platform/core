@@ -56,8 +56,8 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     protected function getPaginationData(iterable $object, array $context = []): array
     {
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
-        $context = $this->initContext($resourceClass, $context);
-        $context['api_collection_sub_level'] = true;
+        // This adds "jsonld_has_context" by reference, we moved the code to this class.
+        // To follow a note I wrote in the ItemNormalizer, we need to change the JSON-LD context generation as it is more complicated then it should.
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         $data['@id'] = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         $data['@type'] = 'hydra:Collection';
@@ -104,10 +104,18 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
             if ($iriOnly) {
                 $data['hydra:member'][] = $this->iriConverter->getIriFromResource($obj);
             } else {
-                $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
+                $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context + ['jsonld_has_context' => true]);
             }
         }
 
         return $data;
+    }
+
+    protected function initContext(string $resourceClass, array $context): array
+    {
+        $context = parent::initContext($resourceClass, $context);
+        $context['api_collection_sub_level'] = true;
+
+        return $context;
     }
 }
