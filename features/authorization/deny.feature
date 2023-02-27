@@ -217,5 +217,3 @@ Feature: Authorization checking
     And I send a "GET" request to "/secured_dummies"
     Then the response status code should be 200
     And the response should contain "ownerOnlyProperty"
-
- 
