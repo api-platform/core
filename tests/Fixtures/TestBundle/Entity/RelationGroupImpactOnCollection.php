@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\Operation;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    provider: [RelationGroupImpactOnCollection::class, 'getData']
+    provider: [RelationGroupImpactOnCollection::class, 'getData'],
 )]
 #[GetCollection]
 #[Get(normalizationContext: ['groups' => 'related'])]

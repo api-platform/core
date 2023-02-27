@@ -34,11 +34,11 @@ trait CacheKeyTrait
         unset($context['cache_key']); // avoid artificially different keys
 
         try {
-            return hash('xxh128', $format.serialize([
+            return hash('md5', $format.serialize([
                 'context' => $context,
                 'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));
-        } catch (\Exception) {
+        } catch (\Exception $e) {
             // The context cannot be serialized, skip the cache
             return false;
         }
