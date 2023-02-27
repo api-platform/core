@@ -19,6 +19,7 @@ use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -112,6 +113,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $context[self::ALLOW_EXTRA_ATTRIBUTES] = false;
 
             return $this->serializer->normalize($object, $format, $context);
+        }
+
+        if (isset($context['operation']) && $context['operation'] instanceof CollectionOperationInterface) {
+            unset($context['operation']);
+            unset($context['iri']);
         }
 
         if ($this->resourceClassResolver->isResourceClass($resourceClass)) {

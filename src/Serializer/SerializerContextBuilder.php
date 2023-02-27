@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 /**
  * {@inheritdoc}
@@ -76,6 +77,10 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 $context[CsvEncoder::AS_COLLECTION_KEY] = false;
             }
         }
+
+        // to keep the cache computation smaller, we have "operation_name" and "iri" anyways
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'root_operation';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'operation';
 
         return $context;
     }
