@@ -75,10 +75,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return parent::normalize($object, $format, $context);
         }
 
-        if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getCacheKey($format, $context);
-        }
-
         if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         }
@@ -91,6 +87,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
+
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getCacheKey($format, $context);
+        }
 
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {

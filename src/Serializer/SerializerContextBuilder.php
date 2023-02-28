@@ -86,6 +86,10 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'root_operation';
         $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'operation';
 
+        // to keep the cache computation smaller, we have "operation_name" and "iri" anyways
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'root_operation';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'operation';
+
         return $context;
     }
 }
