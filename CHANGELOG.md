@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.7.10
+
+### Bug fixes
+
+* [5723d6836](https://github.com/api-platform/core/commit/5723d68369722feefeb11e42528d9580db5dd0fb) fix(serializer): reset cache key on collection items CVE-2023-25575
+
 ## v2.7.9
 
 ### Bug fixes
