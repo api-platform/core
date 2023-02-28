@@ -165,7 +165,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             return null;
         }
 
-        if (isset($resource['openapi']) && (\is_bool($resource['openapi']) || \in_array((string) $resource['openapi'], ['1', '0', 'true', 'false'], true))) {
+        if (isset($resource['openapi']) && \in_array((string) $resource['openapi'], ['1', '0', 'true', 'false'], true)) {
             return $this->phpize($resource, 'openapi', 'bool');
         }
 
