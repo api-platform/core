@@ -24,6 +24,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(HttpOperation::class);
+
 /**
  * Generates a resource JSON Schema.
  *

@@ -17,6 +17,7 @@ use ApiPlatform\Api\FormatMatcher;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Symfony\Translation\DefaultTranslator;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
@@ -30,9 +31,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Contracts\Translation\TranslatorTrait;
 
 /**
  * Updates the entity retrieved by the data provider with data contained in the request body.
@@ -49,9 +48,7 @@ final class DeserializeListener
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
         if (null === $this->translator) {
-            $this->translator = new class() implements TranslatorInterface, LocaleAwareInterface {
-                use TranslatorTrait;
-            };
+            $this->translator = new DefaultTranslator();
             $this->translator->setLocale('en');
         }
     }
