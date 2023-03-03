@@ -697,6 +697,22 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
+            'custom mutation' => ['resourceClass', (new Mutation())->withResolver('resolver')->withName('mutation'),
+                [
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true),
+                ],
+                true, 0, null,
+                [
+                    'propertyBool' => [
+                        'type' => GraphQLType::nonNull(GraphQLType::string()),
+                        'description' => 'propertyBool description',
+                        'args' => [],
+                        'resolve' => null,
+                        'deprecationReason' => null,
+                    ],
+                    'clientMutationId' => GraphQLType::string(),
+                ],
+            ],
             'mutation nested input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
                 [
                     'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),

@@ -28,23 +28,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
     new Mutation(
         name: 'sum',
         resolver: 'app.graphql.mutation_resolver.dummy_custom',
+        extraArgs: ['id' => ['type' => 'ID!']],
         normalizationContext: ['groups' => ['result']],
         denormalizationContext: ['groups' => ['sum']]
     ),
     new Mutation(
         name: 'sumNotPersisted',
         resolver: 'app.graphql.mutation_resolver.dummy_custom_not_persisted',
+        extraArgs: ['id' => ['type' => 'ID!']],
         normalizationContext: ['groups' => ['result']],
         denormalizationContext: ['groups' => ['sum']]
     ),
     new Mutation(name: 'sumNoWriteCustomResult',
         resolver: 'app.graphql.mutation_resolver.dummy_custom_no_write_custom_result',
+        extraArgs: ['id' => ['type' => 'ID!']],
         normalizationContext: ['groups' => ['result']],
         denormalizationContext: ['groups' => ['sum']],
         write: false
     ),
     new Mutation(name: 'sumOnlyPersist',
         resolver: 'app.graphql.mutation_resolver.dummy_custom_only_persist',
+        extraArgs: ['id' => ['type' => 'ID!']],
         normalizationContext: ['groups' => ['result']],
         denormalizationContext: ['groups' => ['sum']],
         read: false,
