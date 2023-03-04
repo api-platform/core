@@ -73,6 +73,7 @@
         <!-- Action -->
 
         <service id="api_platform.action.placeholder" class="ApiPlatform\Action\PlaceholderAction" public="true" />
+        <service id="ApiPlatform\Action\PlaceholderAction" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" public="true" />
