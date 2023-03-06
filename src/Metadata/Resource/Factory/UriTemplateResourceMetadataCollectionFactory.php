@@ -18,9 +18,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Operation\PathSegmentNameGeneratorInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -165,53 +165,58 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             $uriTemplate = substr($uriTemplate, 0, -10);
         }
 
-        $route = (new Route($uriTemplate))->compile();
-        $variables = $route->getPathVariables();
+        // TODO: move this to the Symfony bridge
+        if (class_exists(Route::class)) {
+            $route = (new Route($uriTemplate))->compile();
+            $variables = $route->getPathVariables();
 
-        if (\count($variables) !== \count($uriVariables)) {
-            if ($hasUserConfiguredUriVariables) {
+            if (\count($variables) !== \count($uriVariables)) {
+                if ($hasUserConfiguredUriVariables) {
+                    return $operation;
+                }
+
+                $newUriVariables = [];
+                foreach ($variables as $variable) {
+                    if (isset($uriVariables[$variable])) {
+                        $newUriVariables[$variable] = $uriVariables[$variable];
+                        continue;
+                    }
+
+                    $entityClass = $operation->getClass();
+                    if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+                        $entityClass = $options->getEntityClass();
+                    }
+
+                    $newUriVariables[$variable] = (new Link())
+                        ->withFromClass($entityClass)
+                        ->withIdentifiers([property_exists($entityClass, $variable) ? $variable : 'id'])
+                        ->withParameterName($variable);
+                }
+
+                return $operation->withUriVariables($newUriVariables);
+            }
+
+            // When an operation is generated we need to find properties matching it's uri variables
+            if (!($operation->getExtraProperties()['generated_operation'] ?? false) || !$this->linkFactory instanceof PropertyLinkFactoryInterface) {
                 return $operation;
             }
 
-            $newUriVariables = [];
-            foreach ($variables as $variable) {
-                if (isset($uriVariables[$variable])) {
-                    $newUriVariables[$variable] = $uriVariables[$variable];
-                    continue;
-                }
-
-                $entityClass = $operation->getClass();
-                if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
-                    $entityClass = $options->getEntityClass();
-                }
-
-                $newUriVariables[$variable] = (new Link())
-                    ->withFromClass($entityClass)
-                    ->withIdentifiers([property_exists($entityClass, $variable) ? $variable : 'id'])
-                    ->withParameterName($variable);
+            $diff = array_diff($variables, array_keys($uriVariables));
+            if (0 === \count($diff)) {
+                return $operation;
             }
 
-            return $operation->withUriVariables($newUriVariables);
+            // We generated this operation but there're some missing identifiers
+            $uriVariables = HttpOperation::METHOD_POST === $operation->getMethod() || $operation instanceof CollectionOperationInterface ? [] : $operation->getUriVariables();
+
+            foreach ($diff as $key) {
+                $uriVariables[$key] = $this->linkFactory->createLinkFromProperty($operation, $key);
+            }
+
+            return $operation->withUriVariables($uriVariables);
         }
 
-        // When an operation is generated we need to find properties matching it's uri variables
-        if (!($operation->getExtraProperties()['generated_operation'] ?? false) || !$this->linkFactory instanceof PropertyLinkFactoryInterface) {
-            return $operation;
-        }
-
-        $diff = array_diff($variables, array_keys($uriVariables));
-        if (0 === \count($diff)) {
-            return $operation;
-        }
-
-        // We generated this operation but there're some missing identifiers
-        $uriVariables = HttpOperation::METHOD_POST === $operation->getMethod() || $operation instanceof CollectionOperationInterface ? [] : $operation->getUriVariables();
-
-        foreach ($diff as $key) {
-            $uriVariables[$key] = $this->linkFactory->createLinkFromProperty($operation, $key);
-        }
-
-        return $operation->withUriVariables($uriVariables);
+        return $operation;
     }
 
     private function normalizeUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation

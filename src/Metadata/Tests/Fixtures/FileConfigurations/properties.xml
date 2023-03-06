@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+
+<properties xmlns="https://api-platform.com/schema/metadata/properties-3.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://api-platform.com/schema/metadata/properties-3.0
+           https://api-platform.com/schema/metadata/properties-3.0.xsd">
+    <property resource="ApiPlatform\Metadata\Tests\Fixtures\ApiResource\FileConfigDummy" name="foo"
+              description="The dummy foo" readable="true" writable="true" readableLink="false" writableLink="false"
+              required="true"/>
+
+    <property resource="ApiPlatform\Metadata\Tests\Fixtures\ApiResource\FileConfigDummy" name="name"
+              description="The dummy name"/>
+</properties>

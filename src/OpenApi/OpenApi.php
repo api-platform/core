@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi;
 
-use ApiPlatform\Documentation\DocumentationInterface;
 use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\ExtensionTrait;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Paths;
 
-final class OpenApi implements DocumentationInterface
+final class OpenApi
 {
     use ExtensionTrait;
 

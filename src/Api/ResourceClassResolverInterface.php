@@ -13,27 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+interface_exists(\ApiPlatform\Metadata\ResourceClassResolverInterface::class);
 
-/**
- * Guesses which resource is associated with a given object.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-interface ResourceClassResolverInterface
-{
-    /**
-     * Guesses the associated resource.
-     *
-     * @param string $resourceClass The expected resource class
-     * @param bool   $strict        If true, value must match the expected resource class
-     *
-     * @throws InvalidArgumentException
-     */
-    public function getResourceClass(mixed $value, string $resourceClass = null, bool $strict = false): string;
-
-    /**
-     * Is the given class a resource class?
-     */
-    public function isResourceClass(string $type): bool;
+/* @phpstan-ignore-next-line */
+if (false) {
+    interface ResourceClassResolverInterface extends \ApiPlatform\Metadata\ResourceClassResolverInterface
+    {
+    }
 }

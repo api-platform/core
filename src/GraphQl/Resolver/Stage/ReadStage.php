@@ -19,9 +19,9 @@ use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Util\ArrayTrait;
-use ApiPlatform\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

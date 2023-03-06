@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 
 /**
  * Creates a property metadata value object.

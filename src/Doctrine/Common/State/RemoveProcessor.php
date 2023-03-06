@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Common\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
 

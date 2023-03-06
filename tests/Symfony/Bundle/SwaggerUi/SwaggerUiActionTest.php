@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\SwaggerUi;
 
-use ApiPlatform\Documentation\DocumentationInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -62,7 +61,7 @@ class SwaggerUiActionTest extends TestCase
         ]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::any(), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
@@ -177,7 +176,7 @@ class SwaggerUiActionTest extends TestCase
         ]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::any(), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
         $twigProphecy = $this->prophesize(TwigEnvironment::class);
         $twigProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [

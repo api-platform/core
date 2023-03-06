@@ -1,0 +1,19 @@
+name: subtree
+on:
+  push:
+    tags:
+    branches:
+      - main
+      - 3.1
+
+jobs:
+  split:
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Install splitsh'
+        run: | 
+          curl -L https://github.com/splitsh/lite/releases/download/v1.0.1/lite_linux_amd64.tar.gz > lite_linux_amd64.tar.gz
+          tar -zxpf lite_linux_amd64.tar.gz
+          chmod +x splitsh-lite
+      - name: 'Split to manyrepo'
+        run: find src -maxdepth 2 -name composer.json -exec bash subtree.sh ${{ github.ref }} \;

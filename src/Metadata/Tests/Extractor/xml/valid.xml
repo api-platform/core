@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+           https://api-platform.com/schema/metadata/resources-3.0.xsd">
+    <resource class="ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment"/>
+
+    <resource
+        uriTemplate="/users/{author}/comments{._format}"
+        description="User comments"
+        messenger="input"
+        class="ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment">
+
+        <types>
+            <type>someirischema</type>
+            <type>anotheririschema</type>
+        </types>
+
+        <formats>
+            <format>jsonld</format>
+            <format name="xlsx">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</format>
+        </formats>
+
+        <uriVariables>
+            <uriVariable parameterName="author"/>
+        </uriVariables>
+
+        <inputFormats>
+            <format name="json">application/merge-patch+json</format>
+        </inputFormats>
+
+        <outputFormats>
+            <format name="json">application/merge-patch+json</format>
+        </outputFormats>
+
+        <cacheHeaders>
+            <cacheHeader name="max_age">60</cacheHeader>
+            <cacheHeader name="shared_max_age">120</cacheHeader>
+            <cacheHeader name="vary">
+                <values>
+                    <value>Authorization</value>
+                    <value>Accept-Language</value>
+                </values>
+            </cacheHeader>
+        </cacheHeaders>
+
+        <normalizationContext>
+            <values>
+                <value name="groups">
+                    <values>
+                        <value>comment:read</value>
+                        <value>comment:custom-read</value>
+                    </values>
+                </value>
+                <value name="enabled">true</value>
+            </values>
+        </normalizationContext>
+
+        <denormalizationContext>
+            <values>
+                <value name="groups">comment:write</value>
+            </values>
+        </denormalizationContext>
+
+        <hydraContext>
+            <values>
+                <value name="foo">
+                    <values>
+                        <value name="bar">baz</value>
+                    </values>
+                </value>
+            </values>
+        </hydraContext>
+
+        <filters>
+            <filter>comment.custom_filter</filter>
+        </filters>
+
+        <mercure private="true"/>
+
+        <order>
+            <values>
+                <value>foo</value>
+                <value>bar</value>
+            </values>
+        </order>
+
+        <paginationViaCursor>
+            <paginationField field="id" direction="DESC"/>
+        </paginationViaCursor>
+
+        <exceptionToStatus>
+            <exception class="Symfony\Component\Serializer\Exception\ExceptionInterface" statusCode="400"/>
+        </exceptionToStatus>
+
+        <operations>
+            <operation class="ApiPlatform\Metadata\GetCollection" name="custom_operation_name"/>
+            <operation class="ApiPlatform\Metadata\Get" uriTemplate="/users/{userId}/comments/{id}{._format}">
+                <uriVariables>
+                    <uriVariable parameterName="userId" fromClass="ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User" fromProperty="author"/>
+                    <uriVariable parameterName="id"/>
+                </uriVariables>
+
+                <extraProperties>
+                    <values>
+                        <value name="foo">bar</value>
+                    </values>
+                </extraProperties>
+            </operation>
+        </operations>
+    </resource>
+</resources>

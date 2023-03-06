@@ -100,7 +100,7 @@ class ConfigurationTest extends TestCase
                 FilterValidationException::class => Response::HTTP_BAD_REQUEST,
                 OptimisticLockException::class => Response::HTTP_CONFLICT,
             ],
-            'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
+            'path_segment_name_generator' => 'api_platform.metadata.path_segment_name_generator.underscore',
             'validator' => [
                 'serialize_payload_fields' => [],
                 'query_parameter_validation' => true,

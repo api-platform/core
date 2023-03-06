@@ -24,7 +24,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\WriteStageInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
