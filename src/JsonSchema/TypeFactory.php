@@ -117,14 +117,16 @@ final class TypeFactory implements TypeFactoryInterface
             ];
         }
         if (!$this->isResourceClass($className) && is_a($className, \BackedEnum::class, true)) {
-            $rEnum = new \ReflectionEnum($className);
-            $enumCases = array_map(static fn (\ReflectionEnumBackedCase $rCase) => $rCase->getBackingValue(), $rEnum->getCases());
+            $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
+
+            $type = \is_string($enumCases[0] ?? '') ? 'string' : 'int';
+
             if ($nullable) {
                 $enumCases[] = null;
             }
 
             return [
-                'type' => (string) $rEnum->getBackingType(),
+                'type' => $type,
                 'enum' => $enumCases,
             ];
         }
