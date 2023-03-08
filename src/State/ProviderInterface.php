@@ -29,5 +29,5 @@ interface ProviderInterface
      *
      * @return T|Pagination\PartialPaginatorInterface<T>|iterable<T>|null
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null;
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|iterable|null;
 }
