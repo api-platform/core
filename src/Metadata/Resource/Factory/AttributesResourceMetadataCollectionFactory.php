@@ -82,9 +82,11 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         $resources = [];
         $index = -1;
         $operationPriority = 0;
+        $hasApiResource = false;
 
         foreach ($attributes as $attribute) {
             if (is_a($attribute->getName(), ApiResource::class, true)) {
+                $hasApiResource = true;
                 $resource = $this->getResourceWithDefaults($resourceClass, $shortName, $attribute->newInstance());
                 $operations = [];
                 foreach ($resource->getOperations() ?? new Operations() as $operation) {
@@ -140,6 +142,11 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             }
 
             if (null === $graphQlOperations) {
+                if (!$hasApiResource) {
+                    $resources[$index] = $resources[$index]->withGraphQlOperations([]);
+                    continue;
+                }
+
                 // Add default GraphQL operations on the first resource
                 if (0 === $index) {
                     $resources[$index] = $this->addDefaultGraphQlOperations($resources[$index]);
