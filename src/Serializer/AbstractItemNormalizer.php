@@ -116,6 +116,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (isset($context['operation']) && $context['operation'] instanceof CollectionOperationInterface) {
+            unset($context['operation_name']);
             unset($context['operation']);
             unset($context['iri']);
         }
