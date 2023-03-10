@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.7.11
+
+### Bug fixes
+
+* [01ce3f811](https://github.com/api-platform/core/commit/01ce3f8110b2e3fe13077bec3fadaff653e4a512) fix(serializer): find parent class operation (#5449)
+
 ## v2.7.10
 
 ### Bug fixes
