@@ -76,7 +76,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                             : 'You will have to remove it when upgrading to v4';
                         trigger_deprecation('api-platform/core', '3.1', sprintf('Setting "elasticsearch" in GraphQlOperation is deprecated. %s', $solution));
                     }
-                    if ($this->hasIndices($graphQlOperation)) {
+                    if (null !== $elasticsearch && $this->hasIndices($graphQlOperation)) {
                         $graphQlOperation = $graphQlOperation->withElasticsearch(true);
                     }
 
