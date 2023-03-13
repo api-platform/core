@@ -641,6 +641,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->serializer->normalize($attributeValue, $format, $childContext);
         }
 
+        if ($type && 'array' === $type->getBuiltinType()) {
+            $childContext = $this->createChildContext($context, $attribute, $format);
+            unset($childContext['iri'], $childContext['uri_variables']);
+
+            return $this->serializer->normalize($attributeValue, $format, $childContext);
+        }
+
         return $this->serializer->normalize($attributeValue, $format, $context);
     }
 
