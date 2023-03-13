@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -80,6 +81,10 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         if ($operation->getCollectDenormalizationErrors() ?? false) {
             $context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS] = true;
         }
+
+        // to keep the cache computation smaller, we have "operation_name" and "iri" anyways
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'root_operation';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'operation';
 
         return $context;
     }

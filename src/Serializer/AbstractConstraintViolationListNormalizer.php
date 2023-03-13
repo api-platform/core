@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -56,8 +57,17 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
 
         foreach ($constraintViolationList as $violation) {
             $class = \is_object($root = $violation->getRoot()) ? $root::class : null;
+
+            if ($this->nameConverter instanceof AdvancedNameConverterInterface) {
+                $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath(), $class, static::FORMAT);
+            } elseif ($this->nameConverter instanceof NameConverterInterface) {
+                $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath());
+            } else {
+                $propertyPath = $violation->getPropertyPath();
+            }
+
             $violationData = [
-                'propertyPath' => $this->nameConverter ? $this->nameConverter->normalize($violation->getPropertyPath(), $class, static::FORMAT) : $violation->getPropertyPath(),
+                'propertyPath' => $propertyPath,
                 'message' => $violation->getMessage(),
                 'code' => $violation->getCode(),
             ];

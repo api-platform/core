@@ -185,7 +185,10 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                     $entityClass = $options->getEntityClass();
                 }
 
-                $newUriVariables[$variable] = (new Link())->withFromClass($entityClass)->withIdentifiers(['id'])->withParameterName($variable);
+                $newUriVariables[$variable] = (new Link())
+                    ->withFromClass($entityClass)
+                    ->withIdentifiers([property_exists($entityClass, $variable) ? $variable : 'id'])
+                    ->withParameterName($variable);
             }
 
             return $operation->withUriVariables($newUriVariables);

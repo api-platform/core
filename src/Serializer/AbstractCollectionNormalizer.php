@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -89,6 +90,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
         unset($context['operation']);
         unset($context['operation_type'], $context['operation_name']);
+
         $itemsData = $this->getItemsData($object, $format, $context);
 
         return array_merge_recursive($data, $paginationData, $itemsData);
@@ -135,6 +137,13 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         }
 
         return [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems];
+    }
+
+    protected function getOperation(array $context = []): Operation
+    {
+        $metadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? '');
+
+        return $metadata->getOperation($context['operation_name'] ?? null);
     }
 
     /**

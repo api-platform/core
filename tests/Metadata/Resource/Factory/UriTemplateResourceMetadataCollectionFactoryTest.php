@@ -121,6 +121,16 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                         ),
                     ]
                 ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/attribute_resources/by_name/{name}',
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/attribute_resources/{foo}',
+                ),
             ]),
         );
 
@@ -197,6 +207,20 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                             routePrefix: '/prefix',
                             name: '_api_/prefix/attribute_resources/{id}{._format}_get'),
                     ]
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/attribute_resources/by_name/{name}',
+                    uriVariables: ['name' => new Link(fromClass: AttributeResource::class, identifiers: ['name'], parameterName: 'name')],
+                    operations: [],
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/attribute_resources/{foo}',
+                    uriVariables: ['foo' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'foo')],
+                    operations: [],
                 ),
             ]),
             $uriTemplateResourceMetadataCollectionFactory->create(AttributeResource::class)

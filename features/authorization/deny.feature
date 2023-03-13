@@ -210,3 +210,10 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should contain "ownerOnlyProperty"
     And the JSON node "ownerOnlyProperty" should be equal to the string "updated"
+
+  Scenario: A user retrieves a resource with an admin only viewable property
+    When I add "Accept" header equal to "application/json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies"
+    Then the response status code should be 200
+    And the response should contain "ownerOnlyProperty"

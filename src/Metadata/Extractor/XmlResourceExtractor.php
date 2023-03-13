@@ -165,7 +165,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             return null;
         }
 
-        if (isset($resource['openapi']) && (\is_bool($resource['openapi']) || \in_array((string) $resource['openapi'], ['1', '0', 'true', 'false'], true))) {
+        if (isset($resource['openapi']) && \in_array((string) $resource['openapi'], ['1', '0', 'true', 'false'], true)) {
             return $this->phpize($resource, 'openapi', 'bool');
         }
 
@@ -215,7 +215,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
         $data['requestBody'] = isset($openapi->requestBody) ? new RequestBody(
             description: $this->phpize($openapi->requestBody, 'description', 'string'),
-            content: isset($openapi->requestBody->content->values) ? new \ArrayObject($this->buildValues($openapi->requestBody->values)) : null,
+            content: isset($openapi->requestBody->content->values) ? new \ArrayObject($this->buildValues($openapi->requestBody->content->values)) : null,
             required: $this->phpize($openapi->requestBody, 'required', 'bool'),
         ) : null;
 
