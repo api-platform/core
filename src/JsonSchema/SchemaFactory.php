@@ -290,7 +290,7 @@ final class SchemaFactory implements SchemaFactoryInterface
                         }
 
                         if (!$operation) {
-                            $operation = new HttpOperation();
+                            $operation = new HttpOperation(shortName: $resourceMetadata->getShortName());
                         }
                     }
                 }
