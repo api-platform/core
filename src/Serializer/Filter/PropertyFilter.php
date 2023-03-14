@@ -76,6 +76,7 @@ final class PropertyFilter implements FilterInterface
                 'type' => 'string',
                 'is_collection' => true,
                 'required' => false,
+                'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
                 'swagger' => [
                     'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
                     'name' => "$this->parameterName[]",
