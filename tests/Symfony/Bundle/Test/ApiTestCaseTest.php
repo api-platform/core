@@ -219,7 +219,7 @@ JSON;
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);
 
-        $schemaTool->dropSchema($classes);
-        $schemaTool->createSchema($classes);
+        @$schemaTool->dropSchema($classes);
+        @$schemaTool->createSchema($classes);
     }
 }

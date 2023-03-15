@@ -43,9 +43,9 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->schemaTool = new SchemaTool($this->manager);
         /** @var ClassMetadata[] $classes */
         $classes = $this->manager->getMetadataFactory()->getAllMetadata();
-        $this->schemaTool->dropSchema($classes);
+        @$this->schemaTool->dropSchema($classes);
         $this->manager->clear();
-        $this->schemaTool->createSchema($classes);
+        @$this->schemaTool->createSchema($classes);
 
         $this->ensureKernelShutdown();
     }
