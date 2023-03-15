@@ -27,5 +27,10 @@
             <argument>%api_platform.resource_class_directories%</argument>
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory.attributes.inner" />
         </service>
+
+        <service id="api_platform.metadata.resource.name_collection_factory.array" class="ApiPlatform\Metadata\Resource\Factory\ArrayResourceNameCollectionFactory" decorates="api_platform.metadata.resource.name_collection_factory" public="false">
+            <argument type="collection"></argument>
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory.array.inner" />
+        </service>
     </services>
 </container>

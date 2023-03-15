@@ -63,6 +63,11 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.alternate_uri.inner" />
         </service>
 
+        <service id="api_platform.metadata.resource.metadata_collection_factory.array" class="ApiPlatform\Metadata\Resource\Factory\ControllerAttributeResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="700" public="false">
+            <argument type="collection"></argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.array.inner" />
+        </service>
+
         <service id="api_platform.metadata.resource.metadata_collection_factory.deprecations" class="ApiPlatform\Metadata\Resource\Factory\DeprecationResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" public="false" decoration-priority="1000">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.deprecations.inner" />
         </service>

@@ -11,6 +11,17 @@
 
             <tag name="controller.argument_value_resolver" />
         </service>
+
+        <service id="api_platform.api_resource.argument_resolver.payload" class="ApiPlatform\Symfony\Bundle\ArgumentResolver\ApiResourceArgumentResolver" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="http_kernel" />
+            <argument type="service" id="api_platform.listener.request.deserialize" />
+            <argument type="service" id="api_platform.listener.request.read" />
+            <argument type="service" id="api_platform.security.listener.request.deny_access" />
+            <argument type="service" id="api_platform.listener.view.validate" />
+            <argument type="service" id="api_platform.listener.view.write" />
+            <tag name="controller.argument_value_resolver" />
+        </service>
     </services>
 
 </container>

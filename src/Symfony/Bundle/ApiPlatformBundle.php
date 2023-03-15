@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Bundle;
 
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ControllerResourcePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
@@ -52,5 +53,6 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new MetadataAwareNameConverterPass());
         $container->addCompilerPass(new TestClientPass());
         $container->addCompilerPass(new AuthenticatorManagerPass());
+        $container->addCompilerPass(new ControllerResourcePass());
     }
 }

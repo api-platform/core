@@ -24,7 +24,7 @@ use ApiPlatform\State\OptionsInterface;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
 class ApiResource extends Metadata
 {
     use WithResourceTrait;
