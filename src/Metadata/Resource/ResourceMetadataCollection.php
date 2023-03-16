@@ -89,9 +89,9 @@ final class ResourceMetadataCollection extends \ArrayObject
         }
 
         // Idea:
-        // if ($metadata) {
-        //     return (new class extends HttpOperation {})->withResource($metadata);
-        // }
+//         if ($metadata) {
+//             return (new class extends HttpOperation {})->withResource($metadata);
+//         }
 
         $this->handleNotFound($operationName, $metadata);
     }
@@ -102,7 +102,7 @@ final class ResourceMetadataCollection extends \ArrayObject
     private function handleNotFound(string $operationName, ?ApiResource $metadata): void
     {
         // Hide the FQDN in the exception message if possible
-        $shortName = $metadata ? $metadata->getShortName() : $this->resourceClass;
+        $shortName = $metadata?->getShortName() ? $metadata->getShortName() : $this->resourceClass;
         if (!$metadata && false !== $pos = strrpos($shortName, '\\')) {
             $shortName = substr($shortName, $pos + 1);
         }
