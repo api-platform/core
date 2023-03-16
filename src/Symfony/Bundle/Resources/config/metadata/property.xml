@@ -69,7 +69,6 @@
             <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.cached.inner" />
         </service>
 
-
         <!-- Cache -->
         <service id="api_platform.cache.metadata.property" parent="cache.system" public="false">
             <tag name="cache.pool" />
