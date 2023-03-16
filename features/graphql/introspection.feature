@@ -562,7 +562,6 @@ Feature: GraphQL introspection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the GraphQL debug message should be equal to 'Type with id "VoDummyInspectionCursorConnection" is not present in the types container'
     And the JSON node "data.typeNotAvailable" should be null
     And the JSON node "data.typeOwner.fields[1].type.name" should be equal to "VoDummyInspectionCursorConnection"
 

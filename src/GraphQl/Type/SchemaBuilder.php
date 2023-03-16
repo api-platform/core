@@ -87,8 +87,12 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
         $schema = [
             'query' => $queryType,
-            'typeLoader' => function (string $typeName): Type&NamedType {
-                $type = $this->typesContainer->get($typeName);
+            'typeLoader' => function (string $typeName): ?NamedType {
+                try {
+                    $type = $this->typesContainer->get($typeName);
+                } catch (TypeNotFoundException) {
+                    return null;
+                }
 
                 return Type::getNamedType($type);
             },
