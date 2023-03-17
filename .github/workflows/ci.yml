@@ -9,6 +9,10 @@ env:
   COVERAGE: '0'
   SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   commitlint:
     if: github.event_name == 'pull_request'
