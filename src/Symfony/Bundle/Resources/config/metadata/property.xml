@@ -64,6 +64,10 @@
             <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.identifier.inner" />
         </service>
 
+        <service id="api_platform.metadata.property.identifier_metadata_factory.cached" class="ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="-10" public="false">
+            <argument type="service" id="api_platform.cache.metadata.property" />
+            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.cached.inner" />
+        </service>
 
         <!-- Cache -->
         <service id="api_platform.cache.metadata.property" parent="cache.system" public="false">
