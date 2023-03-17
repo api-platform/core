@@ -13,8 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Pagination;
 
+/**
+ * @template T of object
+ *
+ * @implements PaginatorInterface<T>
+ * @implements \IteratorAggregate<T>
+ */
 final class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
 {
+    /**
+     * @param \Traversable<T> $traversable
+     */
     public function __construct(private readonly \Traversable $traversable, private readonly float $currentPage, private readonly float $itemsPerPage, private readonly float $totalItems)
     {
     }
