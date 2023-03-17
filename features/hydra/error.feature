@@ -104,6 +104,18 @@ Feature: Error handling
     And the JSON node "hydra:description" should be equal to "Update is not allowed for this operation."
     And the JSON node "trace" should exist
 
+  Scenario: Get an error because of sending bad type property
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/greetings" with body:
+    """
+    {
+      "0": 1
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
   @createSchema
   Scenario: Populate database with related dummies. Check that id will be "/related_dummies/1"
     Given I add "Content-Type" header equal to "application/ld+json"

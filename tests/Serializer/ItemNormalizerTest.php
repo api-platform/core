@@ -143,7 +143,7 @@ class ItemNormalizerTest extends TestCase
     {
         $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];
 
-        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollection = new PropertyNameCollection(['id', 'name']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
 
