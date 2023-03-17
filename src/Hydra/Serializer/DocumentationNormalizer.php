@@ -318,44 +318,42 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return $jsonldContext['@type'];
         }
 
-        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
-        if (null === $type) {
-            return null;
-        }
+        $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-        if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
-            $type = $collectionType;
-        }
+        foreach ($types as $type) {
+            if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
+                $type = $collectionType;
+            }
 
-        switch ($type->getBuiltinType()) {
-            case Type::BUILTIN_TYPE_STRING:
-                return 'xmls:string';
-            case Type::BUILTIN_TYPE_INT:
-                return 'xmls:integer';
-            case Type::BUILTIN_TYPE_FLOAT:
-                return 'xmls:decimal';
-            case Type::BUILTIN_TYPE_BOOL:
-                return 'xmls:boolean';
-            case Type::BUILTIN_TYPE_OBJECT:
-                if (null === $className = $type->getClassName()) {
-                    return null;
-                }
-
-                if (is_a($className, \DateTimeInterface::class, true)) {
-                    return 'xmls:dateTime';
-                }
-
-                if ($this->resourceClassResolver->isResourceClass($className)) {
-                    $resourceMetadata = $this->resourceMetadataFactory->create($className);
-                    $operation = $resourceMetadata->getOperation();
-
-                    if (!$operation instanceof HttpOperation) {
-                        return "#{$operation->getShortName()}";
+            switch ($type->getBuiltinType()) {
+                case Type::BUILTIN_TYPE_STRING:
+                    return 'xmls:string';
+                case Type::BUILTIN_TYPE_INT:
+                    return 'xmls:integer';
+                case Type::BUILTIN_TYPE_FLOAT:
+                    return 'xmls:decimal';
+                case Type::BUILTIN_TYPE_BOOL:
+                    return 'xmls:boolean';
+                case Type::BUILTIN_TYPE_OBJECT:
+                    if (null === $className = $type->getClassName()) {
+                        return null;
                     }
 
-                    return $operation->getTypes()[0] ?? "#{$operation->getShortName()}";
-                }
+                    if (is_a($className, \DateTimeInterface::class, true)) {
+                        return 'xmls:dateTime';
+                    }
+
+                    if ($this->resourceClassResolver->isResourceClass($className)) {
+                        $resourceMetadata = $this->resourceMetadataFactory->create($className);
+                        $operation = $resourceMetadata->getOperation();
+
+                        if (!$operation instanceof HttpOperation) {
+                            return "#{$operation->getShortName()}";
+                        }
+
+                        return $operation->getTypes()[0] ?? "#{$operation->getShortName()}";
+                    }
+            }
         }
 
         return null;
@@ -463,11 +461,13 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'domain' => $prefixedShortName,
         ];
 
-        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-        if (null !== $type && !$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
-            $propertyData['owl:maxCardinality'] = 1;
+        foreach ($types as $type) {
+            if (!$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
+                $propertyData['owl:maxCardinality'] = 1;
+                break;
+            }
         }
 
         $property = [

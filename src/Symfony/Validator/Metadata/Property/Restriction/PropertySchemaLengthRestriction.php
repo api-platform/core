@@ -50,6 +50,8 @@ class PropertySchemaLengthRestriction implements PropertySchemaRestrictionMetada
      */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
-        return $constraint instanceof Length && null !== ($type = $propertyMetadata->getBuiltinTypes()[0] ?? null) && Type::BUILTIN_TYPE_STRING === $type->getBuiltinType();
+        $types = array_map(fn (Type $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+
+        return $constraint instanceof Length && \count($types) && \in_array(Type::BUILTIN_TYPE_STRING, $types, true);
     }
 }

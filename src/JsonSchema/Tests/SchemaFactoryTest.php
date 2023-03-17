@@ -109,6 +109,85 @@ class SchemaFactoryTest extends TestCase
         $this->assertSame('male', $definitions[$rootDefinitionKey]['properties']['genderType']['example']);
     }
 
+    public function testBuildSchemaForNonResourceClassWithUnionIntersectTypes(): void
+    {
+        $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
+        $typeFactoryProphecy->getType(Argument::allOf(
+            Argument::type(Type::class),
+            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)
+        ), Argument::cetera())->willReturn([
+            'type' => 'string',
+            'nullable' => true,
+        ]);
+        $typeFactoryProphecy->getType(Argument::allOf(
+            Argument::type(Type::class),
+            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_INT)
+        ), Argument::cetera())->willReturn([
+            'type' => 'integer',
+            'nullable' => true,
+        ]);
+        $typeFactoryProphecy->getType(Argument::allOf(
+            Argument::type(Type::class),
+            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_FLOAT)
+        ), Argument::cetera())->willReturn([
+            'type' => 'integer',
+            'nullable' => true,
+        ]);
+        $typeFactoryProphecy->getType(Argument::allOf(
+            Argument::type(Type::class),
+            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_OBJECT)
+        ), Argument::cetera())->willReturn([
+            'type' => 'object',
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, Argument::cetera())->willReturn(new PropertyNameCollection(['ignoredProperty', 'unionType', 'intersectType']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'ignoredProperty', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, nullable: true)])->withReadable(true)->withSchema(['type' => 'string']));
+        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'unionType', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, nullable: true), new Type(Type::BUILTIN_TYPE_INT, nullable: true), new Type(Type::BUILTIN_TYPE_FLOAT, nullable: true)])->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'intersectType', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, class: Serializable::class), new Type(Type::BUILTIN_TYPE_OBJECT, class: DummyResourceInterface::class)])->withReadable(true));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(NotAResourceWithUnionIntersectTypes::class)->willReturn(false);
+
+        $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $resultSchema = $schemaFactory->buildSchema(NotAResourceWithUnionIntersectTypes::class);
+
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+        $definitions = $resultSchema->getDefinitions();
+
+        $this->assertSame((new \ReflectionClass(NotAResourceWithUnionIntersectTypes::class))->getShortName(), $rootDefinitionKey);
+        // @noRector
+        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
+        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
+        $this->assertArrayNotHasKey('additionalProperties', $definitions[$rootDefinitionKey]);
+        $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
+
+        $this->assertArrayHasKey('ignoredProperty', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['ignoredProperty']);
+        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['ignoredProperty']['type']);
+        $this->assertArrayNotHasKey('nullable', $definitions[$rootDefinitionKey]['properties']['ignoredProperty']);
+
+        $this->assertArrayHasKey('unionType', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('oneOf', $definitions[$rootDefinitionKey]['properties']['unionType']);
+        $this->assertCount(2, $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf']);
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]);
+        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]['type']);
+        $this->assertArrayHasKey('nullable', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]);
+        $this->assertTrue($definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]['nullable']);
+        $this->assertSame('integer', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][1]['type']);
+        $this->assertArrayHasKey('nullable', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][1]);
+        $this->assertTrue($definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][1]['nullable']);
+
+        $this->assertArrayHasKey('intersectType', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['intersectType']);
+        $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['intersectType']['type']);
+    }
+
     public function testBuildSchemaWithSerializerGroups(): void
     {
         $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);

@@ -123,6 +123,14 @@ final class SchemaFactory implements SchemaFactoryInterface
             $definition['externalDocs'] = ['url' => $operation->getTypes()[0]];
         }
 
+        // build ReflectionClass to retrieve ReflectionProperties to detect union/intersect types on buildPropertySchema
+        try {
+            $reflectionClass = new \ReflectionClass($className);
+        } catch (\ReflectionException) {
+            // class does not exist
+            $reflectionClass = null;
+        }
+
         $options = $this->getFactoryOptions($serializerContext, $validationGroups, $operation instanceof HttpOperation ? $operation : null);
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
@@ -135,13 +143,19 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $definition['required'][] = $normalizedPropertyName;
             }
 
-            $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format);
+            try {
+                $reflectionProperty = $reflectionClass?->getProperty($propertyName);
+            } catch (\ReflectionException) {
+                $reflectionProperty = null;
+            }
+
+            $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $reflectionProperty);
         }
 
         return $schema;
     }
 
-    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format): void
+    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, ?\ReflectionProperty $reflectionProperty): void
     {
         $version = $schema->getVersion();
         $swagger = Schema::VERSION_SWAGGER === $version;
@@ -179,10 +193,9 @@ final class SchemaFactory implements SchemaFactoryInterface
             $propertySchema['externalDocs'] = ['url' => $iri];
         }
 
-        // TODO: 3.0 support multiple types
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-        if (!isset($propertySchema['default']) && !empty($default = $propertyMetadata->getDefault()) && (null === $type?->getClassName() || !$this->isResourceClass($type->getClassName()))) {
+        if (!isset($propertySchema['default']) && !empty($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }
@@ -197,8 +210,26 @@ final class SchemaFactory implements SchemaFactoryInterface
             $propertySchema['example'] = $propertySchema['default'];
         }
 
+        // never override the following keys if at least one is already set (by user or restrictions)
+        if (
+            0 < \count(
+                array_intersect(
+                    ['type', '$ref', 'anyOf', 'allOf', 'oneOf'],
+                    array_keys($propertySchema)
+                )
+            )
+            || [] === $types
+        ) {
+            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
+
+            return;
+        }
+
+        // add one of the following key: type, $ref, oneOf, allOf, anyOf
+
         $valueSchema = [];
-        if (null !== $type) {
+
+        foreach ($types as $type) {
             if ($isCollection = $type->isCollection()) {
                 $keyType = $type->getCollectionKeyTypes()[0] ?? null;
                 $valueType = $type->getCollectionValueTypes()[0] ?? null;
@@ -215,15 +246,37 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $className = $valueType->getClassName();
             }
 
-            $valueSchema = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
+            $valueSchema[] = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
         }
 
-        if (\array_key_exists('type', $propertySchema) && \array_key_exists('$ref', $valueSchema)) {
-            $propertySchema = new \ArrayObject($propertySchema);
-        } else {
-            $propertySchema = new \ArrayObject($propertySchema + $valueSchema);
+        $valueSchema = array_unique($valueSchema, \SORT_REGULAR);
+
+        // only one builtInType detected (should be "type" or "$ref")
+        if (1 === \count($valueSchema)) {
+            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema + $valueSchema[0]);
+
+            return;
         }
-        $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = $propertySchema;
+
+        // multiple builtInTypes detected: determine anyOf/oneOf/allOf if union vs intersect types
+        $reflectionType = $reflectionProperty?->getType();
+        switch (true) {
+            default:
+                // cannot detect union/intersect types
+                $composition = 'anyOf';
+                break;
+            case $reflectionType instanceof \ReflectionUnionType:
+                $composition = 'oneOf';
+                break;
+            case $reflectionType instanceof \ReflectionIntersectionType:
+                $composition = 'allOf';
+                break;
+        }
+
+        $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject([
+            ...$propertySchema,
+            ...[$composition => $valueSchema],
+        ]);
     }
 
     private function buildDefinitionName(string $className, string $format = 'json', string $inputOrOutputClass = null, Operation $operation = null, array $serializerContext = null): string
