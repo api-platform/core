@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -43,7 +44,12 @@ trait OperationDefaultsTrait
     private function addGlobalDefaults(ApiResource|Operation $operation): ApiResource|Operation
     {
         $extraProperties = $this->defaults['extra_properties'] ?? [];
+
         foreach ($this->defaults as $key => $value) {
+            if ('operations' === $key) {
+                continue;
+            }
+
             $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
             $getter = 'get'.$upperKey;
 
@@ -82,6 +88,16 @@ trait OperationDefaultsTrait
 
     private function getDefaultHttpOperations($resource): iterable
     {
+        if (($defaultOperations = $this->defaults['operations'] ?? null) && null === $resource->getOperations()) {
+            $operations = [];
+
+            foreach ($defaultOperations as $defaultOperation) {
+                $operations[] = new $defaultOperation();
+            }
+
+            return new Operations($operations);
+        }
+
         $post = new Post();
         if ($resource->getUriTemplate() && !$resource->getProvider()) {
             $post = $post->withProvider(CreateProvider::class);
