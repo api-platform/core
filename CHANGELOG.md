@@ -11,7 +11,7 @@
 * [a5aa52923](https://github.com/api-platform/core/commit/a5aa5292391acb10e49d24a8bb56bdd622a05e41) fix(metadata): remove ReflectionEnum usage (#5453)
 * [bf29fb973](https://github.com/api-platform/core/commit/bf29fb973271d30d5e3ab878d65b75f2805d5928) fix(openapi): document PropertyFilter within parameter (#5458)
 * [cfdc9ad9b](https://github.com/api-platform/core/commit/cfdc9ad9baa2a7bc8d206e92b51ee7513abe575a) fix(metadata): add default operations config (#5459)
-
+* [6e35a714f](https://github.com/api-platform/core/commit/cfdc9ad9baa2a7bc8d206e92b51ee7513abe575a) perf(symfony): cache identifier metadata factory (#5466) 
 
 Notes: 
 
