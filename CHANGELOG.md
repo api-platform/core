@@ -1,5 +1,31 @@
 # Changelog
 
+## v3.1.5
+
+### Bug fixes
+
+* [1f23344b0](https://github.com/api-platform/core/commit/1f23344b0c08a5c7710e4d9a5edc12d49bac24c2) fix(symfony): status at 200 when allowCreate is false (#5465)
+* [42c5c3e64](https://github.com/api-platform/core/commit/42c5c3e6466cc546db2325f5e8a9c09ead5453e2) fix(symfony): query parameter validation after security (#5473)
+* [8a88e0cbc](https://github.com/api-platform/core/commit/8a88e0cbc92629f28408265ef3143da3cc8fb8fc) fix(metadata): no deprecation when elasticsearch is null (#5450)
+* [9421ba537](https://github.com/api-platform/core/commit/9421ba5378edec3ea93fd81a1a6de6a2cfda0ffb) fix(serializer): propertyFilter should apply to arrays as well (#5444)
+* [a5aa52923](https://github.com/api-platform/core/commit/a5aa5292391acb10e49d24a8bb56bdd622a05e41) fix(metadata): remove ReflectionEnum usage (#5453)
+* [bf29fb973](https://github.com/api-platform/core/commit/bf29fb973271d30d5e3ab878d65b75f2805d5928) fix(openapi): document PropertyFilter within parameter (#5458)
+* [cfdc9ad9b](https://github.com/api-platform/core/commit/cfdc9ad9baa2a7bc8d206e92b51ee7513abe575a) fix(metadata): add default operations config (#5459)
+* [6e35a714f](https://github.com/api-platform/core/commit/cfdc9ad9baa2a7bc8d206e92b51ee7513abe575a) perf(symfony): cache identifier metadata factory (#5466) 
+
+Notes: 
+
+- #5473 changes the priority of the `ApiPlatform\Symfony\EventListener\QueryParameterValidateListener` from 16 to 2 so that it occurs after the security listener.
+- ReflectionEnum was removed as it was causing segfaults with opcache preload and an unidentified PHP extension
+- #5459 fixes the `defaults` operation declaration such as:
+    ```
+    defaults:
+      - ApiPlatform\Metadata\Get
+      - ApiPlatform\Metadata\GetCollection
+    ```
+
+  very useful for read only APIs, this was possible in 2.7 but not backported correctly
+
 ## v3.1.4
 
 ### Bug fixes

@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AttributeConfigOperations;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PasswordResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeDefaultOperations;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeOnlyOperation;
@@ -174,6 +175,22 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 extraProperties: ['non_existing_attribute' => 'foo', 'standard_put' => true]
             ),
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
+    }
+
+    public function testCreateWithConfigOperations(): void
+    {
+        $attributesResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: ['operations' => [Get::class, Post::class]]);
+
+        $this->assertEquals(new ResourceMetadataCollection(AttributeConfigOperations::class, [
+            new ApiResource(
+                shortName: 'AttributeConfigOperations',
+                operations: [
+                    '_api_AttributeConfigOperations_get' => new Get(shortName: 'AttributeConfigOperations', class: AttributeConfigOperations::class, priority: 0, extraProperties: ['generated_operation' => true]),
+                    '_api_AttributeConfigOperations_post' => new Post(shortName: 'AttributeConfigOperations', class: AttributeConfigOperations::class, priority: 1, extraProperties: ['generated_operation' => true]),
+                ],
+                class: AttributeConfigOperations::class,
+            ),
+        ]), $attributesResourceMetadataCollectionFactory->create(AttributeConfigOperations::class));
     }
 
     public function testCreateShouldNotOverrideWithDefault(): void

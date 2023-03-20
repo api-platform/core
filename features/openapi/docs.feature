@@ -70,6 +70,7 @@ Feature: Documentation support
     And the OpenAPI class "User-user_user-write" exists
     And the OpenAPI class "UuidIdentifierDummy" exists
     And the OpenAPI class "ThirdLevel" exists
+    And the OpenAPI class "DummyCar" exists
     And the OpenAPI class "ParentDummy" doesn't exist
     And the OpenAPI class "UnknownDummy" doesn't exist
     And the OpenAPI path "/relation_embedders/{id}/custom" exists
@@ -111,6 +112,9 @@ Feature: Documentation support
     And the JSON node "paths./dummies.get.parameters[3].in" should be equal to "query"
     And the JSON node "paths./dummies.get.parameters[3].required" should be false
     And the JSON node "paths./dummies.get.parameters[3].schema.type" should be equal to "boolean"
+
+    And the JSON node "paths./dummy_cars.get.parameters[8].name" should be equal to "foobar[]"
+    And the JSON node "paths./dummy_cars.get.parameters[8].description" should be equal to "Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: foobar[]={propertyName}&foobar[]={anotherPropertyName}&foobar[{nestedPropertyParent}][]={nestedProperty}"
 
     # Subcollection - check filter on subResource
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[0].name" should be equal to "id"

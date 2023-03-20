@@ -65,10 +65,10 @@ class DummyWithCollectDenormalizationErrors
         return $this->id;
     }
 
-   public function getFoo(): ?bool
-   {
-       return $this->foo;
-   }
+    public function getFoo(): ?bool
+    {
+        return $this->foo;
+    }
 
     public function setFoo(?bool $foo): void
     {

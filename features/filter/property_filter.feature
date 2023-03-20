@@ -18,3 +18,11 @@ Feature: Set properties to include
     And the JSON node "alias" should be equal to "Alias #0"
     And the JSON node "relatedDummy.name" should be equal to "RelatedDummy #1"
     And the JSON node "relatedDummies" should not exist
+
+  Scenario: Test property filter on not resource relations
+    When I send a "GET" request to "/dummy-with-array-of-objects/1?properties[notResourceObject][]=foo&properties[arrayOfNotResourceObjects][]=bar"
+    Then the JSON node "notResourceObject.foo" should be equal to "foo"
+    And the JSON node "notResourceObject.bar" should not exist
+    And the JSON node "arrayOfNotResourceObjects[0].foo" should not exist
+    And the JSON node "arrayOfNotResourceObjects[0].bar" should be equal to "bar"
+    And the JSON node "id" should not exist

@@ -34,8 +34,8 @@ class ClientTest extends ApiTestCase
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);
 
-        $schemaTool->dropSchema($classes);
-        $schemaTool->createSchema($classes);
+        @$schemaTool->dropSchema($classes);
+        @$schemaTool->createSchema($classes);
     }
 
     public function testRequest(): void
