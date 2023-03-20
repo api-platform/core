@@ -245,10 +245,18 @@ jobs:
       - name: Merge code coverage reports
         if: matrix.coverage
         run: |
+          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
           chmod +x /usr/local/bin/phpcov
           mkdir -p build/coverage
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
+        continue-on-error: true
+      - name: Upload test artifacts (cov)
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: behat-coverage-php${{ matrix.php }}
+          path: build/coverage
         continue-on-error: true
       - name: Upload test artifacts
         if: always()
