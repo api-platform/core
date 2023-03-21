@@ -6,8 +6,12 @@ on:
       - main
       - 3.1
 
+env:
+  COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   split:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: 'Install splitsh'
