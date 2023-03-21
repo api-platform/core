@@ -1,0 +1,24 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\FlexConfig: ~
+
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        -   ~
+        -   uriTemplate: /users/{author}/programs{._format}
+            uriVariables: ['author']
+            types: ['someirischema']
+            description: User programs
+            normalizationContext:
+                groups: ['foo', 'bar']
+                enabled: false
+            operations:
+                ApiPlatform\Metadata\GetCollection: ~
+                ApiPlatform\Metadata\Get:
+                    uriTemplate: /users/{userId}/programs/{id}{._format}
+                    types: ['anotheririschema']
+                    uriVariables:
+                        userId: [ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User, 'author']
+                        id: 'id'
+
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SingleFileConfigDummy:
+        shortName: single_file_config
+        description: File configured resource

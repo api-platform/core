@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\OpenApi\Factory\OpenApiFactory;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -38,6 +37,8 @@ final class SchemaFactory implements SchemaFactoryInterface
 {
     use ResourceClassInfoTrait;
     private array $distinctFormats = [];
+
+    public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
     public function __construct(private readonly TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
@@ -244,7 +245,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $prefix .= '.'.$format;
         }
 
-        $definitionName = $serializerContext[OpenApiFactory::OPENAPI_DEFINITION_NAME] ?? null;
+        $definitionName = $serializerContext[self::OPENAPI_DEFINITION_NAME] ?? null;
         if ($definitionName) {
             $name = sprintf('%s-%s', $prefix, $definitionName);
         } else {

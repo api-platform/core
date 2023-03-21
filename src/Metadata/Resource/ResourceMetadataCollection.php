@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource;
 
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 

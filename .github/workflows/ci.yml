@@ -186,6 +186,36 @@ jobs:
           php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
+  phpunit-components:
+    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.1'
+          - '8.2'
+        component:
+          - JsonSchema
+          - OpenApi
+          - Metadata
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: latest
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          ini-values: memory_limit=-1
+      - name: Run ${{ matrix.component }} tests
+        working-directory: src/${{ matrix.component }}
+        run: |
+            composer update
+            vendor/bin/simple-phpunit
+
   behat:
     name: Behat (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest

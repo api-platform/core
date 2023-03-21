@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 

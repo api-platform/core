@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 
 /**
  * Populates defaults values of the resource properties using the default PHP values of properties.

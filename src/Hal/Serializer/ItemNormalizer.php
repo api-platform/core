@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Hal\Serializer;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
-use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;

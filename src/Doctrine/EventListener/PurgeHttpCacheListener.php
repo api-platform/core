@@ -21,7 +21,7 @@ use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;

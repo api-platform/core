@@ -19,7 +19,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 

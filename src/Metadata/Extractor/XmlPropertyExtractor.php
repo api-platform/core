@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Util\XmlUtils;
 
 /**

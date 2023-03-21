@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Factory;
 
-use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Doctrine\Orm\State\Options as DoctrineOptions;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
@@ -57,18 +56,17 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class OpenApiFactory implements OpenApiFactoryInterface
 {
-    use FilterLocatorTrait;
     use NormalizeOperationNameTrait;
 
     public const BASE_URL = 'base_url';
-    public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
     private readonly Options $openApiOptions;
     private readonly PaginationOptions $paginationOptions;
     private ?RouteCollection $routeCollection = null;
+    private ?ContainerInterface $filterLocator = null;
 
     public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, private readonly TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, private readonly array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
     {
-        $this->setFilterLocator($filterLocator, true);
+        $this->filterLocator = $filterLocator;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
     }
@@ -551,10 +549,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         $resourceFilters = $operation->getFilters();
         foreach ($resourceFilters ?? [] as $filterId) {
-            if (!$filter = $this->getFilter($filterId)) {
+            if (!$this->filterLocator->has($filterId)) {
                 continue;
             }
 
+            $filter = $this->filterLocator->get($filterId);
             $entityClass = $operation->getClass();
             if (($options = $operation->getStateOptions()) && $options instanceof DoctrineOptions && $options->getEntityClass()) {
                 $entityClass = $options->getEntityClass();

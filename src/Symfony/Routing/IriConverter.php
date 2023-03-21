@@ -30,11 +30,11 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\AttributesExtractor;
-use ApiPlatform\Util\ClassInfoTrait;
-use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 
