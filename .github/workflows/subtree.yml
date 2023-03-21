@@ -20,4 +20,4 @@ jobs:
           tar -zxpf lite_linux_amd64.tar.gz
           chmod +x splitsh-lite
       - name: 'Split to manyrepo'
-        run: find src -maxdepth 2 -name composer.json -exec bash subtree.sh ${{ github.ref }} \;
+        run: find src -maxdepth 2 -name composer.json -exec bash subtree.sh {} ${{ github.ref }} \;
