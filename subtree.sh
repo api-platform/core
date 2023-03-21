@@ -6,7 +6,7 @@
 # See the subtree workflow
 package=$(jq -r .name $1)
 directory=$(dirname $1)
-repository="git@github.com/$package"
+repository="git@github.com:$package"
 git remote add $package $repository
 sha=$(splitsh-lite --prefix=$directory)
 git push $package $sha:$2
