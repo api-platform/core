@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
@@ -21,6 +22,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
@@ -269,30 +271,24 @@ final class SchemaFactory implements SchemaFactoryInterface
             ];
         }
 
-        // The best here is to use an Operation when calling `buildSchema`, we try to do a smart guess otherwise
-        if (!$operation || !$operation->getClass()) {
+        if (null === $operation) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($className);
+            try {
+                $operation = $resourceMetadataCollection->getOperation();
+            } catch (OperationNotFoundException $e) {
+                $operation = new HttpOperation();
+            }
 
-            if ($operation && $operation->getName()) {
-                $operation = $resourceMetadataCollection->getOperation($operation->getName());
-            } else {
-                // Guess the operation and use the first one that matches criterias
-                foreach ($resourceMetadataCollection as $resourceMetadata) {
-                    foreach ($resourceMetadata->getOperations() ?? [] as $op) {
-                        if ($operation instanceof CollectionOperationInterface && $op instanceof CollectionOperationInterface) {
-                            $operation = $op;
-                            break 2;
-                        }
+            $operation = $this->findOperationForType($resourceMetadataCollection, $type, $operation);
+        } else {
+            // The best here is to use an Operation when calling `buildSchema`, we try to do a smart guess otherwise
+            if (!$operation->getClass()) {
+                $resourceMetadataCollection = $this->resourceMetadataFactory->create($className);
 
-                        if (Schema::TYPE_INPUT === $type && \in_array($op->getMethod(), ['POST', 'PATCH', 'PUT'], true)) {
-                            $operation = $op;
-                            break 2;
-                        }
-
-                        if (!$operation) {
-                            $operation = new HttpOperation();
-                        }
-                    }
+                if ($operation->getName()) {
+                    $operation = $resourceMetadataCollection->getOperation($operation->getName());
+                } else {
+                    $operation = $this->findOperationForType($resourceMetadataCollection, $type, $operation);
                 }
             }
         }
@@ -318,6 +314,26 @@ final class SchemaFactory implements SchemaFactoryInterface
             $this->getValidationGroups($operation),
             $inputOrOutput['class'] ?? $inputOrOutput->class,
         ];
+    }
+
+    private function findOperationForType(ResourceMetadataCollection $resourceMetadataCollection, string $type, Operation $operation)
+    {
+        // Find the operation and use the first one that matches criterias
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            foreach ($resourceMetadata->getOperations() ?? [] as $op) {
+                if ($operation instanceof CollectionOperationInterface && $op instanceof CollectionOperationInterface) {
+                    $operation = $op;
+                    break 2;
+                }
+
+                if (Schema::TYPE_INPUT === $type && \in_array($op->getMethod(), ['POST', 'PATCH', 'PUT'], true)) {
+                    $operation = $op;
+                    break 2;
+                }
+            }
+        }
+
+        return $operation;
     }
 
     private function getSerializerContext(Operation $operation, string $type = Schema::TYPE_OUTPUT): array

@@ -299,3 +299,24 @@ Feature: Documentation support
     And the JSON node "components.schemas.RamseyUuidDummy.properties.id.description" should be equal to "The dummy id."
     And the JSON node "components.schemas.RelatedDummy-barcelona" should not exist
     And the JSON node "components.schemas.RelatedDummybarcelona" should exist
+
+  @!mongodb
+  Scenario: Retrieve the OpenAPI documentation to see if shortName property is used
+    Given I send a "GET" request to "/docs.json"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the OpenAPI class "Resource" exists
+    And the OpenAPI class "ResourceRelated" exists
+    And the "resourceRelated" property for the OpenAPI class "Resource" should be equal to:
+    """
+    {
+      "readOnly":true,
+      "anyOf":[
+        {
+          "$ref":"#/components/schemas/ResourceRelated"
+        }
+      ],
+      "nullable":true
+    }
+    """
