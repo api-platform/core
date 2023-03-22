@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -232,6 +233,14 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
 
             $resource['openapi']['extensionProperties'][$key] = $value;
             unset($resource['openapi'][$key]);
+        }
+
+        $parameters = [];
+        if (\array_key_exists('parameters', $resource['openapi'])) {
+            foreach ($resource['openapi']['parameters'] as $parameter) {
+                $parameters[] = new Parameter($parameter['name'], $parameter['in'], $parameter['description'] ?? '', $parameter['required'] ?? false, $parameter['deprecated'] ?? false, $parameter['allowEmptyValue'] ?? false, $parameter['schema'] ?? [], $parameter['style'] ?? null, $parameter['explode'] ?? false, $parameter['allowReserved '] ?? false, $parameter['example'] ?? null, isset($parameter['examples']) ? new \ArrayObject($parameter['examples']) : null, isset($parameter['content']) ? new \ArrayObject($parameter['content']) : null);
+            }
+            $resource['openapi']['parameters'] = $parameters;
         }
 
         return new OpenApiOperation(...$resource['openapi']);
