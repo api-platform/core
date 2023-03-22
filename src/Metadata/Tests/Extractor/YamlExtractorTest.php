@@ -473,6 +473,24 @@ class YamlExtractorTest extends TestCase
         ], $extractor->getResources());
     }
 
+    public function testOpenApiParameters(): void
+    {
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/openapi.yaml']);
+        $resources = $extractor->getResources();
+
+        $this->assertArrayHasKey(Program::class, $resources);
+        $this->assertArrayHasKey('openapi', $resources[Program::class][0]);
+
+        $this->assertIsObject($resources[Program::class][0]['operations'][0]['openapi']);
+
+        $operation = $resources[Program::class][0]['operations'][0]['openapi'];
+        $this->assertIsArray($operation->getParameters());
+
+        $this->assertEquals('author', $operation->getParameters()[0]->getName());
+        $this->assertEquals('path', $operation->getParameters()[0]->getIn());
+        $this->assertEquals('john-doe', $operation->getParameters()[0]->getExample());
+    }
+
     public function testInputAndOutputAreBooleans(): void
     {
         $extractor = new YamlResourceExtractor([__DIR__.'/yaml/input-and-output-are-booleans.yaml']);
