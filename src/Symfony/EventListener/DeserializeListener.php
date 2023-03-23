@@ -96,9 +96,31 @@ final class DeserializeListener
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
         try {
+            $inputData = $this->serializer->deserialize(
+                $request->getContent(),
+                $context['resource_class'],
+                $format,
+                $context
+            );
+
+            /**
+             * If deserialized request object is an instance of an Input DTO overwrite `previous_data`
+             * with `data` in order to be able to use `previous_data` for updates in State Processor
+             * without the need to load the original object explicitly.
+             */
+            foreach ($operation->getInput() as $input) {
+                if($inputData instanceof $input) {
+                    $request->attributes->set(
+                        'previous_data',
+                        $data,
+                    );
+                    break;
+                }
+            }
+
             $request->attributes->set(
                 'data',
-                $this->serializer->deserialize($request->getContent(), $context['resource_class'], $format, $context)
+                $inputData
             );
         } catch (PartialDenormalizationException $e) {
             $violations = new ConstraintViolationList();
