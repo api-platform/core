@@ -22,9 +22,7 @@ final class OpenApi
 {
     use ExtensionTrait;
 
-    // We're actually supporting 3.1 but swagger ui has a version constraint
-    // public const VERSION = '3.1.0';
-    public const VERSION = '3.0.0';
+    public const VERSION = '3.1.0';
 
     private string $openapi = self::VERSION;
 
