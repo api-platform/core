@@ -29,7 +29,7 @@ Feature: Documentation support
                 }
             }
         },
-        "Some Authorization Name": {
+        "Some_Authorization_Name": {
             "type": "apiKey",
             "description": "Value for the Authorization header parameter.",
             "name": "Authorization",

@@ -1247,4 +1247,16 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertCount(1, $service->getArguments());
         $this->assertEquals('api_platform.http_cache.http_client', $service->getArgument(0)->getTag());
     }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyOpenApiApiKeysConfiguration(): void
+    {
+        $this->expectDeprecation('Since api-platform/core 3.1: The swagger api_keys key "Some Authorization Name" is not valid with OpenAPI 3.1 it should match "^[a-zA-Z0-9._-]+$"');
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['swagger']['api_keys']['Some Authorization Name'] = ['name' => 'a', 'type' => 'header'];
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+    }
 }

@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Config\ApiPlatformConfig;
 
 return static function (ApiPlatformConfig $apiPlatformConfig): void {
-    $apiPlatformConfig->swagger()->apiKeys('Some Authorization Name')
+    $apiPlatformConfig->swagger()->apiKeys('Some_Authorization_Name')
         ->name('Authorization')
         ->type('header');
 };
