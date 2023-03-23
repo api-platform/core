@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Util;
 
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Util\ClassInfoTrait;
 use PHPUnit\Framework\TestCase;
 
 class ClassInfoTraitTest extends TestCase

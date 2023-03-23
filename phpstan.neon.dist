@@ -16,6 +16,7 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludePaths:
+		- src/Symfony/Bundle/Command/OpenApiCommand.php
 		# Symfony config
 		- tests/Fixtures/app/config/config_swagger.php
 		# Symfony cache
@@ -47,6 +48,7 @@ parameters:
 			message: '#is never written, only read.#'
 			paths:
 				- tests/Fixtures/TestBundle/Document/
+				- src/Metadata/Tests/Fixtures/ApiResource/
 		-
 			message: '#Parameter \#1 \$constraint of method#'
 			paths:

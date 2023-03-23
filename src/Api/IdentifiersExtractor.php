@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;

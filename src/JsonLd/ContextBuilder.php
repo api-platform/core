@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**

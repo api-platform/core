@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Elasticsearch\State\Options;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Tests\Fixtures\StateOptions;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -368,7 +369,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         return $data ?: null;
     }
 
-    private function buildStateOptions(array $resource): ?Options
+    private function buildStateOptions(array $resource): ?OptionsInterface
     {
         $stateOptions = $resource['stateOptions'] ?? [];
         if (!\is_array($stateOptions)) {
@@ -382,7 +383,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         $configuration = reset($stateOptions);
         switch (key($stateOptions)) {
             case 'elasticsearchOptions':
-                return new Options($configuration['index'] ?? null, $configuration['type'] ?? null);
+                return new StateOptions($configuration['index'] ?? null, $configuration['type'] ?? null);
         }
 
         return null;

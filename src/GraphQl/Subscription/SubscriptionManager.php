@@ -19,7 +19,7 @@ use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\Util\SortTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Cache\CacheItemPoolInterface;

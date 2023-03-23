@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;

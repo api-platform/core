@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -31,9 +31,9 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use ApiPlatform\State\CreateProvider;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 trait OperationDefaultsTrait
 {

@@ -75,6 +75,7 @@ api_platform:
             shared_max_age:                   3600
             vary:                             ['Accept', 'Cookie']
             public:                           true
+
     doctrine_mongodb_odm: false
     mapping:
         paths:

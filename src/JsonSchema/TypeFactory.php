@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Uid\Ulid;

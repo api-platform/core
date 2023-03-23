@@ -1,0 +1,8 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        -   uriTemplate: /users/{author}/programs.{_format}
+            uriVariables: ['author']
+            operations:
+                ApiPlatform\Metadata\Post:
+                    input: ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ProgramInput
+                    output: ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ProgramOutput

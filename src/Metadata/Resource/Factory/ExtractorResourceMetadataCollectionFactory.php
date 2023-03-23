@@ -19,9 +19,9 @@ use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * Creates a resource metadata from {@see Resource} extractors (XML, YAML).
