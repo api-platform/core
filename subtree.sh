@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 # Subtree split on tag this script gets called using find:
 # find src -maxdepth 2 -name composer.json -exec bash subtree.sh {} refs/tags/3.1.5 \;
 # find src -maxdepth 2 -name composer.json -exec bash subtree.sh {} refs/heads/3.1 \;

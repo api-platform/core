@@ -8,7 +8,6 @@ on:
 
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  SUBTREE_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
   split:
@@ -24,4 +23,6 @@ jobs:
           chmod +x splitsh-lite
           echo "$(pwd)" >> $GITHUB_PATH
       - name: 'Split to manyrepo'
+        env:
+            SUBTREE_TOKEN: ${{ secrets.GH_TOKEN }}
         run: find src -maxdepth 2 -name composer.json -exec bash subtree.sh {} ${{ github.ref }} \;
