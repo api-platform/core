@@ -9,6 +9,7 @@ set -x
 package=$(jq -r .name $1)
 directory=$(dirname $1)
 repository="https://${SUBTREE_TOKEN}@github.com/$package"
+git remote rm $package
 git remote add $package $repository
 sha=$(splitsh-lite --prefix=$directory)
 git push $package $sha:$2
