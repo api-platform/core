@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.1.6
+
+### Bug fixes
+
+* [2be8b4f74](https://github.com/api-platform/core/commit/2be8b4f743d8104c6cd8e4533dc8958079188543) fix(symfony): OperationMetadataFactoryInterface service alias (#5491)
+* [4c87a97c2](https://github.com/api-platform/core/commit/4c87a97c29765eea9316b01c213353911de6648d) fix(openapi): deprecate api_keys names not compatible with 3.1 (#5490)
+* [e47162227](https://github.com/api-platform/core/commit/e471622271dc8fe1b31adfd6c8232693e354c004) fix(jsonschema): find the related operation instead of assuming one (#5469)
+* [e7114b7ed](https://github.com/api-platform/core/commit/e7114b7ed1d622a86748add518b5e09de90f1437) fix(elasticsearch): remove old bridge service (#5488)
+
 ## v3.1.5
 
 ### Bug fixes
