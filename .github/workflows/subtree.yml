@@ -8,6 +8,7 @@ on:
 
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SUBTREE_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
   split:
