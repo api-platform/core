@@ -8,8 +8,7 @@ set -x
 # See the subtree workflow
 package=$(jq -r .name $1)
 directory=$(dirname $1)
-repository="https://soyuka:${SUBTREE_TOKEN}@github.com/$package"
-git remote rm $package
+repository="https://github.com/$package"
 git remote add $package $repository
 sha=$(splitsh-lite --prefix=$directory)
 git push $package $sha:$2
