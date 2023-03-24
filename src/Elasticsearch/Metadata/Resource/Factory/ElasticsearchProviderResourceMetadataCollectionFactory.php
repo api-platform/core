@@ -52,7 +52,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                             : 'You will have to remove it when upgrading to v4';
                         trigger_deprecation('api-platform/core', '3.1', sprintf('Setting "elasticsearch" in Operation is deprecated. %s', $solution));
                     }
-                    if ($this->hasIndices($operation)) {
+                    if (null !== $elasticsearch && $this->hasIndices($operation)) {
                         $operation = $operation->withElasticsearch(true);
                     }
 
