@@ -2,7 +2,7 @@ name: subtree
 on:
   push:
     tags:
-      - *
+      - v*
     branches:
       - main
       - 3.1
