@@ -58,8 +58,9 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups);
+        $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-        if (!$this->isResourceClass($resourceClass) && ($types = $propertyMetadata->getBuiltinTypes())) {
+        if (!$this->isResourceClass($resourceClass) && $types) {
             foreach ($types as $builtinType) {
                 if ($builtinType->isCollection()) {
                     return $propertyMetadata->withReadableLink(true)->withWritableLink(true);
@@ -67,7 +68,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             }
         }
 
-        return $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups);
+        return $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups, $types);
     }
 
     /**
@@ -105,14 +106,12 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
-    private function transformLinkStatus(ApiProperty $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null): ApiProperty
+    private function transformLinkStatus(ApiProperty $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null, array $types = null): ApiProperty
     {
         // No need to check link status if property is not readable and not writable
         if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
             return $propertyMetadata;
         }
-
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
         foreach ($types as $type) {
             if (

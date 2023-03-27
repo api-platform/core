@@ -211,14 +211,8 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         // never override the following keys if at least one is already set (by user or restrictions)
-        if (
-            0 < \count(
-                array_intersect(
-                    ['type', '$ref', 'anyOf', 'allOf', 'oneOf'],
-                    array_keys($propertySchema)
-                )
-            )
-            || [] === $types
+        if ([] === $types
+            || ($propertySchema['type'] ?? $propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
         ) {
             $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
 
@@ -246,10 +240,11 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $className = $valueType->getClassName();
             }
 
-            $valueSchema[] = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
+            $propertyType = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
+            if (!\in_array($propertyType, $valueSchema)) {
+                $valueSchema[] = $propertyType;
+            }
         }
-
-        $valueSchema = array_unique($valueSchema, \SORT_REGULAR);
 
         // only one builtInType detected (should be "type" or "$ref")
         if (1 === \count($valueSchema)) {
