@@ -754,6 +754,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\Client::class;
+
+        $clientDefinition = new Definition($clientClass);
+        $clientDefinition->setPublic(false);
+
+        $container->setDefinition('api_platform.elasticsearch.client', $clientDefinition);
+
         $loader->load('elasticsearch.xml');
 
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)

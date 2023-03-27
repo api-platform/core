@@ -17,11 +17,12 @@ use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInte
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Paginator;
-use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
+use Elastic\Elasticsearch\ClientInterface;
+use Elastic\Elasticsearch\Response\Elasticsearch;
 use Elasticsearch\Client;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -34,9 +35,10 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class CollectionProvider implements ProviderInterface
 {
     /**
+     * @param Client|ClientInterface                          $client
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(private readonly Client $client, private readonly DocumentMetadataFactoryInterface $documentMetadataFactory, private readonly DenormalizerInterface $denormalizer, private readonly Pagination $pagination, private readonly iterable $collectionExtensions = [])
+    public function __construct(private $client, private readonly DocumentMetadataFactoryInterface $documentMetadataFactory, private readonly DenormalizerInterface $denormalizer, private readonly Pagination $pagination, private readonly iterable $collectionExtensions = [])
     {
     }
 
@@ -71,11 +73,11 @@ final class CollectionProvider implements ProviderInterface
             'body' => $body,
         ];
 
-        if (null !== $options->getType() && ElasticsearchVersion::supportsMappingType()) {
-            $params['type'] = $options->getType();
-        }
-
         $documents = $this->client->search($params);
+
+        if ($documents instanceof Elasticsearch) {
+            $documents = $documents->asArray();
+        }
 
         return new Paginator(
             $this->denormalizer,
@@ -89,7 +91,7 @@ final class CollectionProvider implements ProviderInterface
 
     private function convertDocumentMetadata(DocumentMetadata $documentMetadata): Options
     {
-        return new Options($documentMetadata->getIndex(), $documentMetadata->getType());
+        return new Options($documentMetadata->getIndex());
     }
 
     private function getIndex(Operation $operation): string

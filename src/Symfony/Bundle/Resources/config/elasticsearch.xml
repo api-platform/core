@@ -5,8 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.elasticsearch.client" class="Elasticsearch\Client" public="false" />
-
         <service id="api_platform.elasticsearch.cache.metadata.document" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>

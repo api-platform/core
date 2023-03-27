@@ -18,7 +18,6 @@ use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Elasticsearch\Tests\Fixtures\Foo;
 use ApiPlatform\Metadata\Get;
-use Elasticsearch\Client;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -34,10 +33,12 @@ final class ItemProviderTest extends TestCase
 
     public function testConstruct(): void
     {
+        $client = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\ClientInterface::class;
+
         self::assertInstanceOf(
             ItemProvider::class,
             new ItemProvider(
-                $this->prophesize(Client::class)->reveal(),
+                $this->prophesize($client)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(DenormalizerInterface::class)->reveal()
             )
@@ -64,8 +65,10 @@ final class ItemProviderTest extends TestCase
         $foo->setName('Rossinière');
         $foo->setBar('erèinissor');
 
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->get(['client' => ['ignore' => 404], 'index' => 'foo', 'id' => '1'])->willReturn($document)->shouldBeCalled();
+        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\ClientInterface::class;
+
+        $clientProphecy = $this->prophesize($clientClass);
+        $clientProphecy->get(['index' => 'foo', 'id' => '1'])->willReturn($document)->shouldBeCalled();
 
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
         $denormalizerProphecy->denormalize($document, Foo::class, DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])->willReturn($foo)->shouldBeCalled();
@@ -79,8 +82,10 @@ final class ItemProviderTest extends TestCase
     {
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
 
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->get(['client' => ['ignore' => 404], 'index' => 'foo', 'id' => '404'])->willReturn([
+        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\ClientInterface::class;
+
+        $clientProphecy = $this->prophesize($clientClass);
+        $clientProphecy->get(['index' => 'foo', 'id' => '404'])->willReturn([
             '_index' => 'foo',
             '_type' => '_doc',
             '_id' => '404',

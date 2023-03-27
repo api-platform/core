@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Behat;
 
 use Behat\Behat\Context\Context;
+use Elastic\Elasticsearch\ClientInterface;
 use Elasticsearch\Client;
 use Symfony\Component\Finder\Finder;
 
@@ -24,7 +25,7 @@ use Symfony\Component\Finder\Finder;
  */
 final class ElasticsearchContext implements Context
 {
-    public function __construct(private readonly Client $client, private readonly string $elasticsearchMappingsPath, private readonly string $elasticsearchFixturesPath)
+    public function __construct(private readonly Client|ClientInterface $client, private readonly string $elasticsearchMappingsPath, private readonly string $elasticsearchFixturesPath)
     {
     }
 
@@ -88,15 +89,17 @@ final class ElasticsearchContext implements Context
         $finder = new Finder();
         $finder->files()->in($this->elasticsearchMappingsPath)->name('*.json');
 
-        $indexClient = $this->client->indices();
+        $indexes = [];
 
         foreach ($finder as $file) {
-            $index = $file->getBasename('.json');
-            if (!$indexClient->exists(['index' => $index])) {
-                continue;
-            }
+            $indexes[] = $file->getBasename('.json');
+        }
 
-            $indexClient->delete(['index' => $index]);
+        if ([] !== $indexes) {
+            $this->client->indices()->delete([
+                'index' => implode(',', $indexes),
+                'ignore_unavailable' => true,
+            ]);
         }
     }
 
@@ -113,9 +116,9 @@ final class ElasticsearchContext implements Context
 
             foreach (json_decode($file->getContents(), true, 512, \JSON_THROW_ON_ERROR) as $document) {
                 if (null === ($document['id'] ?? null)) {
-                    $bulk[] = ['index' => ['_index' => $index, '_type' => '_doc']];
+                    $bulk[] = ['index' => ['_index' => $index]];
                 } else {
-                    $bulk[] = ['create' => ['_index' => $index, '_type' => '_doc', '_id' => (string) $document['id']]];
+                    $bulk[] = ['create' => ['_index' => $index, '_id' => (string) $document['id']]];
                 }
 
                 $bulk[] = $document;

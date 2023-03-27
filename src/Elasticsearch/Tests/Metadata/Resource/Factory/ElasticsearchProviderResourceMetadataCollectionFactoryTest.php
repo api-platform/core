@@ -37,11 +37,13 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
 
     public function testConstruct(): void
     {
+        $client = class_exists(Client::class) ? Client::class : \Elastic\Elasticsearch\ClientInterface::class;
+
         $this->expectDeprecation('Since api-platform/core 3.1: ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory is deprecated and will be removed in v4');
         self::assertInstanceOf(
             ResourceMetadataCollectionFactoryInterface::class,
             new ElasticsearchProviderResourceMetadataCollectionFactory(
-                $this->prophesize(Client::class)->reveal(),
+                $this->prophesize($client)->reveal(),
                 $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal()
             )
         );
@@ -52,6 +54,10 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
      */
     public function testCreate(?bool $elasticsearchFlag, int $expectedCatCallCount, ?bool $expectedResult): void
     {
+        if (class_exists(\Elastic\Elasticsearch\ClientInterface::class)) {
+            $this->markTestSkipped('\Elastic\Elasticsearch\ClientInterface doesn\'t have cat method signature.');
+        }
+
         if (null !== $elasticsearchFlag) {
             $solution = $elasticsearchFlag
                 ? sprintf('Pass an instance of %s to $stateOptions instead', Options::class)

@@ -21,13 +21,16 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Util\Inflector;
+use Elastic\Elasticsearch\ClientInterface;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Transport\Exception\NoNodeAvailableException;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly bool $triggerDeprecation = true)
+    public function __construct(private readonly Client|ClientInterface $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly bool $triggerDeprecation = true)
     {
         if ($this->triggerDeprecation) {
             trigger_deprecation('api-platform/core', '3.1', '%s is deprecated and will be removed in v4', self::class);
@@ -109,7 +112,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
             $this->client->cat()->indices(['index' => $index]);
 
             return true;
-        } catch (Missing404Exception|NoNodesAvailableException) {
+        } catch (Missing404Exception|NoNodesAvailableException|ClientResponseException|NoNodeAvailableException) {
             return false;
         }
     }

@@ -22,7 +22,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
-use Elasticsearch\Client;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -38,10 +37,12 @@ final class CollectionProviderTest extends TestCase
 
     public function testConstruct(): void
     {
+        $client = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\ClientInterface::class;
+
         self::assertInstanceOf(
             CollectionProvider::class,
             new CollectionProvider(
-                $this->prophesize(Client::class)->reveal(),
+                $this->prophesize($client)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(DenormalizerInterface::class)->reveal(),
                 new Pagination()
@@ -99,7 +100,9 @@ final class CollectionProviderTest extends TestCase
             ],
         ];
 
-        $clientProphecy = $this->prophesize(Client::class);
+        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\ClientInterface::class;
+
+        $clientProphecy = $this->prophesize($clientClass);
         $clientProphecy
             ->search(
                 Argument::allOf(

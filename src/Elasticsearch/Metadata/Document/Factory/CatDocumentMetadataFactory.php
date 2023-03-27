@@ -17,6 +17,8 @@ use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\Inflector;
+use Elastic\Elasticsearch\ClientInterface;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 
@@ -30,7 +32,7 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
  */
 final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    public function __construct(private readonly Client $client, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ?DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly Client|ClientInterface $client, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ?DocumentMetadataFactoryInterface $decorated = null)
     {
     }
 
@@ -63,7 +65,7 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
 
         try {
             $this->client->cat()->indices(['index' => $index]);
-        } catch (Missing404Exception) {
+        } catch (Missing404Exception|ClientResponseException) {
             return $this->handleNotFound($documentMetadata, $resourceClass);
         }
 

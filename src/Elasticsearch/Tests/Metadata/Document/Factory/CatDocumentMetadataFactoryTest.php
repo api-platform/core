@@ -33,6 +33,13 @@ class CatDocumentMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
+    protected function setUp(): void
+    {
+        if (class_exists(\Elastic\Elasticsearch\ClientInterface::class)) {
+            $this->markTestSkipped('\Elastic\Elasticsearch\ClientInterface doesn\'t have cat method signature.');
+        }
+    }
+
     public function testConstruct(): void
     {
         self::assertInstanceOf(
