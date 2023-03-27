@@ -5,36 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.elasticsearch.client" class="Elasticsearch\Client" public="false" />
-
-        <service id="api_platform.elasticsearch.cache.metadata.document" parent="cache.system" public="false">
-            <tag name="cache.pool" />
-        </service>
-
-        <service id="api_platform.elasticsearch.metadata.document.metadata_factory" alias="api_platform.elasticsearch.metadata.document.metadata_factory.configured" />
-
-        <service id="ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface" alias="api_platform.elasticsearch.metadata.document.metadata_factory" />
-
-        <service id="api_platform.elasticsearch.metadata.document.metadata_factory.configured" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory" public="false">
-            <argument>%api_platform.elasticsearch.mapping%</argument>
-        </service>
-
-        <service id="api_platform.elasticsearch.metadata.document.metadata_factory.attribute" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory" decorates="api_platform.elasticsearch.metadata.document.metadata_factory" decoration-priority="20" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory.attribute.inner" />
-        </service>
-
-        <service id="api_platform.elasticsearch.metadata.document.metadata_factory.cat" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory" decorates="api_platform.elasticsearch.metadata.document.metadata_factory" decoration-priority="10" public="false">
-            <argument type="service" id="api_platform.elasticsearch.client" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory.cat.inner" />
-        </service>
-
-        <service id="api_platform.elasticsearch.metadata.document.metadata_factory.cached" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory" decorates="api_platform.elasticsearch.metadata.document.metadata_factory" decoration-priority="-10" public="false">
-            <argument type="service" id="api_platform.elasticsearch.cache.metadata.document" />
-            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory.cached.inner" />
-        </service>
-
         <service id="api_platform.elasticsearch.name_converter.inner_fields" class="ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter" public="false">
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
@@ -102,7 +72,7 @@
 
         <service id="api_platform.elasticsearch.state.item_provider" class="ApiPlatform\Elasticsearch\State\ItemProvider" public="false">
             <argument type="service" id="api_platform.elasticsearch.client" />
-            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" />
+            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" on-invalid="null" />
             <argument type="service" id="serializer" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Elasticsearch\State\ItemProvider"/>
@@ -112,7 +82,7 @@
 
         <service id="api_platform.elasticsearch.state.collection_provider" class="ApiPlatform\Elasticsearch\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.elasticsearch.client" />
-            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" />
+            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" on-invalid="null" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.pagination" />
             <argument type="tagged" tag="api_platform.elasticsearch.request_body_search_extension.collection" />
@@ -123,7 +93,7 @@
         <service id="ApiPlatform\Elasticsearch\State\CollectionProvider" alias="api_platform.elasticsearch.state.collection_provider"/>
 
         <service id="api_platform.elasticsearch.metadata.resource.metadata_collection_factory" class="ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="40">
-            <argument type="service" id="api_platform.elasticsearch.client" />
+            <argument type="service" id="api_platform.elasticsearch.client_for_metadata" on-invalid="null" />
             <argument type="service" id="api_platform.elasticsearch.metadata.resource.metadata_collection_factory.inner" />
             <argument>false</argument>
         </service>

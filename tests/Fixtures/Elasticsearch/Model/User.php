@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\Elasticsearch\Model;
 
 use ApiPlatform\Elasticsearch\Filter\TermFilter;
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(normalizationContext: ['groups' => ['user:read']])]
+#[ApiResource(normalizationContext: ['groups' => ['user:read']], stateOptions: new Options(index: 'user'))]
 #[ApiFilter(TermFilter::class, properties: ['id', 'gender', 'age', 'firstName', 'tweets.id', 'tweets.date'])]
 class User
 {

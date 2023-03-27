@@ -17,6 +17,7 @@ use ApiPlatform\Elasticsearch\Filter\MatchFilter;
 use ApiPlatform\Elasticsearch\Filter\OrderFilter;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -24,7 +25,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(operations: [new Get(provider: ItemProvider::class), new GetCollection(provider: CollectionProvider::class)], normalizationContext: ['groups' => ['book:read']])]
+#[ApiResource(operations: [new Get(provider: ItemProvider::class), new GetCollection(provider: CollectionProvider::class)], normalizationContext: ['groups' => ['book:read']], stateOptions: new Options(index: 'book'))]
 #[ApiFilter(OrderFilter::class, properties: ['id', 'library.id'])]
 #[ApiFilter(MatchFilter::class, properties: ['message', 'library.firstName'])]
 class Book

@@ -33,6 +33,13 @@ class CatDocumentMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
+    protected function setUp(): void
+    {
+        if (interface_exists(\Elastic\Elasticsearch\ClientInterface::class)) {
+            $this->markTestSkipped('\Elastic\Elasticsearch\ClientInterface doesn\'t have cat method signature.');
+        }
+    }
+
     public function testConstruct(): void
     {
         self::assertInstanceOf(
@@ -127,6 +134,7 @@ class CatDocumentMetadataFactoryTest extends TestCase
         $resourceMetadataFactory->create(Foo::class)->willReturn($resourceMetadata)->shouldBeCalled();
 
         $catNamespaceProphecy = $this->prophesize(CatNamespace::class);
+        // @phpstan-ignore-next-line
         $catNamespaceProphecy->indices(['index' => 'foo'])->willThrow(new Missing404Exception())->shouldBeCalled();
 
         $clientProphecy = $this->prophesize(Client::class);

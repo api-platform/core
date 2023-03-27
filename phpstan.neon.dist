@@ -86,3 +86,6 @@ parameters:
 		-
 			message: '#^Property .+ is unused.$#'
 			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php
+		-
+			message: '#^Class .+ not found.$#'
+			path: src/Elasticsearch/Tests

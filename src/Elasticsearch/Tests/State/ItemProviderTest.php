@@ -18,7 +18,7 @@ use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Elasticsearch\Tests\Fixtures\Foo;
 use ApiPlatform\Metadata\Get;
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\ClientInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -34,10 +34,14 @@ final class ItemProviderTest extends TestCase
 
     public function testConstruct(): void
     {
+        if (interface_exists(ClientInterface::class)) {
+            $this->markTestSkipped('Can not test using Elasticsearch 8.');
+        }
+
         self::assertInstanceOf(
             ItemProvider::class,
             new ItemProvider(
-                $this->prophesize(Client::class)->reveal(),
+                $this->prophesize(\Elasticsearch\Client::class)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(DenormalizerInterface::class)->reveal()
             )
@@ -46,6 +50,10 @@ final class ItemProviderTest extends TestCase
 
     public function testGetItem(): void
     {
+        if (interface_exists(ClientInterface::class)) {
+            $this->markTestSkipped('Can not test using Elasticsearch 8.');
+        }
+
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
 
         $document = [
@@ -64,8 +72,8 @@ final class ItemProviderTest extends TestCase
         $foo->setName('Rossinière');
         $foo->setBar('erèinissor');
 
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->get(['client' => ['ignore' => 404], 'index' => 'foo', 'id' => '1'])->willReturn($document)->shouldBeCalled();
+        $clientProphecy = $this->prophesize(\Elasticsearch\Client::class);
+        $clientProphecy->get(['index' => 'foo', 'id' => '1'])->willReturn($document)->shouldBeCalled();
 
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
         $denormalizerProphecy->denormalize($document, Foo::class, DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])->willReturn($foo)->shouldBeCalled();
@@ -77,10 +85,16 @@ final class ItemProviderTest extends TestCase
 
     public function testGetInexistantItem(): void
     {
+        if (interface_exists(ClientInterface::class)) {
+            $this->markTestSkipped('Can not test using Elasticsearch 8.');
+        }
+
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
 
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->get(['client' => ['ignore' => 404], 'index' => 'foo', 'id' => '404'])->willReturn([
+        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\ClientInterface::class;
+
+        $clientProphecy = $this->prophesize($clientClass);
+        $clientProphecy->get(['index' => 'foo', 'id' => '404'])->willReturn([
             '_index' => 'foo',
             '_type' => '_doc',
             '_id' => '404',

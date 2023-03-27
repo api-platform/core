@@ -25,7 +25,6 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
-use Elasticsearch\Client as ElasticsearchClient;
 use GraphQL\GraphQL;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\MakerBundle\MakerBundle;
@@ -420,7 +419,7 @@ final class Configuration implements ConfigurationInterface
                             ->validate()
                                 ->ifTrue()
                                 ->then(static function (bool $v): bool {
-                                    if (!class_exists(ElasticsearchClient::class)) {
+                                    if (!(class_exists(\Elasticsearch\Client::class) || class_exists(\Elastic\Elasticsearch\Client::class))) {
                                         throw new InvalidConfigurationException('The elasticsearch/elasticsearch package is required for Elasticsearch support.');
                                     }
 
