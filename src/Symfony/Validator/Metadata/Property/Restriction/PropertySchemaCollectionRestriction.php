@@ -52,6 +52,10 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
             }
 
             $restriction['properties'][$field] = $this->mergeConstraintRestrictions($baseConstraint, $propertyMetadata);
+
+            if ([] === $restriction['properties'][$field]) {
+                $restriction['properties'][$field] = new \ArrayObject();
+            }
         }
 
         if ($required) {

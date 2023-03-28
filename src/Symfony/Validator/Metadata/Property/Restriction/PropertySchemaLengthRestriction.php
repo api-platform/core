@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Validator\Metadata\Property\Restriction;
 
 use ApiPlatform\Metadata\ApiProperty;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Length;
 
@@ -50,6 +49,6 @@ class PropertySchemaLengthRestriction implements PropertySchemaRestrictionMetada
      */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
-        return $constraint instanceof Length && null !== ($type = $propertyMetadata->getBuiltinTypes()[0] ?? null) && Type::BUILTIN_TYPE_STRING === $type->getBuiltinType();
+        return $constraint instanceof Length && null !== ($type = $propertyMetadata->getBuiltinTypes()[0] ?? null);
     }
 }
