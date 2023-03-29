@@ -138,7 +138,7 @@ final class IriConverter implements IriConverterInterface
         // In symfony the operation name is the route name, try to find one if none provided
         if (
             !$operation->getName()
-            || ($operation instanceof HttpOperation && HttpOperation::METHOD_POST === $operation->getMethod())
+            || ($operation instanceof HttpOperation && 'POST' === $operation->getMethod())
         ) {
             $forceCollection = $operation instanceof CollectionOperationInterface;
             try {

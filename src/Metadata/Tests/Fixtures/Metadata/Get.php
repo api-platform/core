@@ -23,6 +23,6 @@ final class Get extends HttpOperation
      */
     public function __construct(...$args)
     {
-        parent::__construct(self::METHOD_GET, ...$args);
+        parent::__construct('GET', ...$args);
     }
 }

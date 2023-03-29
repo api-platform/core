@@ -95,7 +95,7 @@ final class Post extends HttpOperation
         private ?string $itemUriTemplate = null
     ) {
         parent::__construct(
-            method: self::METHOD_POST,
+            method: 'POST',
             uriTemplate: $uriTemplate,
             types: $types,
             formats: $formats,

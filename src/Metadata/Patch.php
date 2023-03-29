@@ -94,7 +94,7 @@ final class Patch extends HttpOperation
         array $extraProperties = [],
     ) {
         parent::__construct(
-            method: self::METHOD_PATCH,
+            method: 'PATCH',
             uriTemplate: $uriTemplate,
             types: $types,
             formats: $formats,

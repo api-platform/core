@@ -95,7 +95,7 @@ final class Put extends HttpOperation
         private ?bool $allowCreate = null,
     ) {
         parent::__construct(
-            method: self::METHOD_PUT,
+            method: 'PUT',
             uriTemplate: $uriTemplate,
             types: $types,
             formats: $formats,

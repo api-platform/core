@@ -30,7 +30,7 @@ final class NotExposed extends HttpOperation
      * {@inheritdoc}
      */
     public function __construct(
-        string $method = self::METHOD_GET,
+        string $method = 'GET',
         ?string $uriTemplate = null,
         ?array $types = null,
         $formats = null,

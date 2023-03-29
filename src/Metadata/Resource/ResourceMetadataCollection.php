@@ -59,8 +59,8 @@ final class ResourceMetadataCollection extends \ArrayObject
 
             foreach ($metadata->getOperations() ?? [] as $name => $operation) {
                 $isCollection = $operation instanceof CollectionOperationInterface;
-                $method = $operation->getMethod() ?? HttpOperation::METHOD_GET;
-                $isGetOperation = HttpOperation::METHOD_GET === $method || HttpOperation::METHOD_OPTIONS === $method || HttpOperation::METHOD_HEAD === $method;
+                $method = $operation->getMethod() ?? 'GET';
+                $isGetOperation = 'GET' === $method || 'OPTIONS' === $method || 'HEAD' === $method;
                 if ('' === $operationName && $isGetOperation && ($forceCollection ? $isCollection : !$isCollection)) {
                     return $this->operationCache[$httpCacheKey] = $operation;
                 }

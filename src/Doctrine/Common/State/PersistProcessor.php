@@ -50,7 +50,7 @@ final class PersistProcessor implements ProcessorInterface
         // PUT: reset the existing object managed by Doctrine and merge data sent by the user in it
         // This custom logic is needed because EntityManager::merge() has been deprecated and UPSERT isn't supported:
         // https://github.com/doctrine/orm/issues/8461#issuecomment-1250233555
-        if ($operation instanceof HttpOperation && HttpOperation::METHOD_PUT === $operation->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? false)) {
+        if ($operation instanceof HttpOperation && 'PUT' === $operation->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? false)) {
             \assert(method_exists($manager, 'getReference'));
             // TODO: the call to getReference is most likely to fail with complex identifiers
             $newData = $data;
