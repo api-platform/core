@@ -66,6 +66,11 @@
             <argument type="service" id="api_platform.serializer.mapping.class_metadata_factory.inner" />
         </service>
 
+        <service id="api_platform.serializer.mapping.cache_class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory" decorates="api_platform.serializer.mapping.class_metadata_factory" decoration-priority="-2" public="false">
+            <argument type="service" id="api_platform.serializer.mapping.cache_class_metadata_factory.inner" />
+            <argument type="service" id="serializer.mapping.cache.symfony" />
+        </service>
+
         <!-- Resources Operations path resolver -->
         <service id="api_platform.path_segment_name_generator.underscore" class="ApiPlatform\Operation\UnderscorePathSegmentNameGenerator" public="false" />
         <service id="api_platform.path_segment_name_generator.dash" class="ApiPlatform\Operation\DashPathSegmentNameGenerator" public="false" />
