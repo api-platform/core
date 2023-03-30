@@ -49,30 +49,29 @@ trait LinksHandlerTrait
                 continue;
             }
 
+            $fromClassMetadata = $manager->getClassMetadata($link->getFromClass());
             $identifierProperties = $link->getIdentifiers();
             $hasCompositeIdentifiers = 1 < \count($identifierProperties);
 
             if (!$link->getFromProperty() && !$link->getToProperty()) {
-                $doctrineClassMetadata = $manager->getClassMetadata($link->getFromClass());
                 $currentAlias = $link->getFromClass() === $entityClass ? $alias : $queryNameGenerator->generateJoinAlias($alias);
 
                 foreach ($identifierProperties as $identifierProperty) {
                     $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
                     $queryBuilder->andWhere("$currentAlias.$identifierProperty = :$placeholder");
-                    $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
+                    $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $fromClassMetadata->getTypeOfField($identifierProperty));
                 }
 
                 $previousAlias = $currentAlias;
-                $previousJoinProperties = $doctrineClassMetadata->getIdentifierFieldNames();
+                $previousJoinProperties = $fromClassMetadata->getIdentifierFieldNames();
                 continue;
             }
 
             $joinProperties = $doctrineClassMetadata->getIdentifierFieldNames();
 
             if ($link->getFromProperty() && !$link->getToProperty()) {
-                $doctrineClassMetadata = $manager->getClassMetadata($link->getFromClass());
                 $joinAlias = $queryNameGenerator->generateJoinAlias('m');
-                $associationMapping = $doctrineClassMetadata->getAssociationMapping($link->getFromProperty()); // @phpstan-ignore-line
+                $associationMapping = $fromClassMetadata->getAssociationMapping($link->getFromProperty()); // @phpstan-ignore-line
                 $relationType = $associationMapping['type'];
 
                 if ($relationType & ClassMetadataInfo::TO_MANY) {
@@ -81,7 +80,7 @@ trait LinksHandlerTrait
                     foreach ($identifierProperties as $identifierProperty) {
                         $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
                         $whereClause[] = "$nextAlias.{$identifierProperty} = :$placeholder";
-                        $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
+                        $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $fromClassMetadata->getTypeOfField($identifierProperty));
                     }
 
                     $property = $associationMapping['mappedBy'] ?? $joinProperties[0];
@@ -106,7 +105,7 @@ trait LinksHandlerTrait
                 foreach ($identifierProperties as $identifierProperty) {
                     $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
                     $queryBuilder->andWhere("$joinAlias.$identifierProperty = :$placeholder");
-                    $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
+                    $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $fromClassMetadata->getTypeOfField($identifierProperty));
                 }
 
                 $previousAlias = $joinAlias;
@@ -120,7 +119,7 @@ trait LinksHandlerTrait
             foreach ($identifierProperties as $identifierProperty) {
                 $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
                 $queryBuilder->andWhere("$joinAlias.$identifierProperty = :$placeholder");
-                $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $doctrineClassMetadata->getTypeOfField($identifierProperty));
+                $queryBuilder->setParameter($placeholder, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null), $fromClassMetadata->getTypeOfField($identifierProperty));
             }
 
             $previousAlias = $joinAlias;
