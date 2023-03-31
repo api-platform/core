@@ -95,7 +95,7 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
     {
         return [
             'elasticsearch: false' => [false, 0, false],
-            'elasticsearch: null' => [null, 0, false],
+            'elasticsearch: null' => [null, 1, false],
             'elasticsearch: true' => [true, 1, true],
         ];
     }
