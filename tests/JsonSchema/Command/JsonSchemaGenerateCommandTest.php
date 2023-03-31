@@ -80,4 +80,17 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->assertStringNotContainsString('@context', $result);
         $this->assertStringNotContainsString('@type', $result);
     }
+
+    /**
+     * Test issue #5501, the locations relation inside BrokenDocs is a Resource (named Related) but its only operation is a NotExposed.
+     * Still, serializer groups are set, and therefore it is a "readableLink" so we actually want to compute the schema, even if it's not accessible
+     * directly, it is accessible through that relation.
+     */
+    public function testExecuteWithNotExposedResourceAndReadableLink(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs', '--type' => 'output']);
+        $result = $this->tester->getDisplay();
+
+        $this->assertStringContainsString('Related.jsonld-location.read_collection', $result);
+    }
 }
