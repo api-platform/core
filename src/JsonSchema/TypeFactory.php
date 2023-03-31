@@ -152,6 +152,7 @@ final class TypeFactory implements TypeFactoryInterface
             throw new \LogicException('The schema factory must be injected by calling the "setSchemaFactory" method.');
         }
 
+        $serializerContext += [SchemaFactory::FORCE_SUBSCHEMA => true];
         $subSchema = $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext, false);
 
         return ['$ref' => $subSchema['$ref']];

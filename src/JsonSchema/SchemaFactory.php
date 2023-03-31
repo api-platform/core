@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\Related;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -38,6 +39,8 @@ final class SchemaFactory implements SchemaFactoryInterface
     use ResourceClassInfoTrait;
     private array $distinctFormats = [];
 
+    // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
+    public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
     public function __construct(private readonly TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
@@ -295,29 +298,23 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         $inputOrOutput = ['class' => $className];
+        $inputOrOutput = Schema::TYPE_OUTPUT === $type ? ($operation->getOutput() ?? $inputOrOutput) : ($operation->getInput() ?? $inputOrOutput);
+        $outputClass = ($serializerContext[self::FORCE_SUBSCHEMA] ?? false) ? ($inputOrOutput['class'] ?? $inputOrOutput->class ?? $operation->getClass()) : ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null);
 
-        if ($operation) {
-            $inputOrOutput = Schema::TYPE_OUTPUT === $type ? ($operation->getOutput() ?? $inputOrOutput) : ($operation->getInput() ?? $inputOrOutput);
-        }
-
-        if (null === ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null)) {
+        if (null === $outputClass) {
             // input or output disabled
             return null;
-        }
-
-        if (!$operation) {
-            return [$operation, $serializerContext ?? [], [], $inputOrOutput['class'] ?? $inputOrOutput->class];
         }
 
         return [
             $operation,
             $serializerContext ?? $this->getSerializerContext($operation, $type),
             $this->getValidationGroups($operation),
-            $inputOrOutput['class'] ?? $inputOrOutput->class,
+            $outputClass,
         ];
     }
 
-    private function findOperationForType(ResourceMetadataCollection $resourceMetadataCollection, string $type, Operation $operation)
+    private function findOperationForType(ResourceMetadataCollection $resourceMetadataCollection, string $type, Operation $operation): Operation
     {
         // Find the operation and use the first one that matches criterias
         foreach ($resourceMetadataCollection as $resourceMetadata) {
