@@ -64,6 +64,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private ?RouteCollection $routeCollection = null;
     private ?ContainerInterface $filterLocator = null;
 
+    /**
+     * @deprecated use SchemaFactory::OPENAPI_DEFINITION_NAME this will be removed in API Platform 4.
+     */
+    public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
+
     public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, private readonly TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, private readonly array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
     {
         $this->filterLocator = $filterLocator;
