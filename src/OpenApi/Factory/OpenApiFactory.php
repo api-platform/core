@@ -65,7 +65,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private ?ContainerInterface $filterLocator = null;
 
     /**
-     * @deprecated use SchemaFactory::OPENAPI_DEFINITION_NAME this will be removed in API Platform 4.
+     * @deprecated use SchemaFactory::OPENAPI_DEFINITION_NAME this will be removed in API Platform 4
      */
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
