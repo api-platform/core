@@ -42,33 +42,6 @@
             <argument type="service" id="api_platform.metadata.property_extractor.xml" />
         </service>
 
-        <!-- Property metadata used to compute identifiers, we want to avoid using the serializer property metadata factory -->
-        <!-- TODO: in 3.0 the serializer property metadata factory doesn't need the resource metadata anymore so these will be removed -->
-        <service id="api_platform.metadata.property.identifier_metadata_factory" alias="api_platform.metadata.property.identifier_metadata_factory.property_info" />
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.property_info" class="ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory" public="false">
-            <argument type="service" id="api_platform.property_info" />
-        </service>
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.attribute" class="ApiPlatform\Metadata\Property\Factory\AttributePropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" public="false" decoration-priority="20">
-            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.attribute.inner" />
-        </service>
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.xml" decorates="api_platform.metadata.property.identifier_metadata_factory" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" public="false" decoration-priority="10">
-            <argument type="service" id="api_platform.metadata.property_extractor.xml" />
-            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.xml.inner" />
-        </service>
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.identifier" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="30" class="ApiPlatform\Metadata\Property\Factory\IdentifierPropertyMetadataFactory" public="false">
-            <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.identifier.inner" />
-        </service>
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.cached" class="ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="-10" public="false">
-            <argument type="service" id="api_platform.cache.metadata.property" />
-            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.cached.inner" />
-        </service>
-
         <!-- Cache -->
         <service id="api_platform.cache.metadata.property" parent="cache.system" public="false">
             <tag name="cache.pool" />
