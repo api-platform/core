@@ -23,6 +23,11 @@ class IntegerUriVariableTransformerTest extends TestCase
         $this->assertSame(2, (new IntegerUriVariableTransformer())->transform('2', ['int']));
     }
 
+    public function testCastString(): void
+    {
+        $this->assertSame('7foo', (new IntegerUriVariableTransformer())->transform('7foo', ['int']));
+    }
+
     public function testSupportsTransformation(): void
     {
         $normalizer = new IntegerUriVariableTransformer();

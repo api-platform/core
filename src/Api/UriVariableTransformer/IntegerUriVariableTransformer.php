@@ -18,9 +18,9 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class IntegerUriVariableTransformer implements UriVariableTransformerInterface
 {
-    public function transform(mixed $value, array $types, array $context = []): int
+    public function transform(mixed $value, array $types, array $context = []): int|string
     {
-        return (int) $value;
+        return is_numeric($value) ? (int) $value : $value;
     }
 
     public function supportsTransformation(mixed $value, array $types, array $context = []): bool
