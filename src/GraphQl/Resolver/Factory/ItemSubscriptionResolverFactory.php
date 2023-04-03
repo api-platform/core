@@ -20,7 +20,7 @@ use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
-use ApiPlatform\Util\CloneTrait;
+use ApiPlatform\Metadata\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
