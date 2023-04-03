@@ -24,7 +24,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -42,7 +41,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
-    public function __construct(private readonly TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
@@ -158,7 +157,6 @@ final class SchemaFactory implements SchemaFactoryInterface
     private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, ?\ReflectionProperty $reflectionProperty): void
     {
         $version = $schema->getVersion();
-        $swagger = Schema::VERSION_SWAGGER === $version;
         if (Schema::VERSION_SWAGGER === $version || Schema::VERSION_OPENAPI === $version) {
             $additionalPropertySchema = $propertyMetadata->getOpenapiContext();
         } else {
@@ -170,108 +168,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $additionalPropertySchema ?? []
         );
 
-        if (false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
-            $propertySchema['readOnly'] = true;
-        }
-        if (!$swagger && false === $propertyMetadata->isReadable()) {
-            $propertySchema['writeOnly'] = true;
-        }
-        if (null !== $description = $propertyMetadata->getDescription()) {
-            $propertySchema['description'] = $description;
-        }
-
-        $deprecationReason = $propertyMetadata->getDeprecationReason();
-
-        // see https://github.com/json-schema-org/json-schema-spec/pull/737
-        if (!$swagger && null !== $deprecationReason) {
-            $propertySchema['deprecated'] = true;
-        }
-        // externalDocs is an OpenAPI specific extension, but JSON Schema allows additional keys, so we always add it
-        // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
-        $iri = $propertyMetadata->getTypes()[0] ?? null;
-        if (null !== $iri) {
-            $propertySchema['externalDocs'] = ['url' => $iri];
-        }
-
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
-
-        if (!isset($propertySchema['default']) && !empty($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
-            if ($default instanceof \BackedEnum) {
-                $default = $default->value;
-            }
-            $propertySchema['default'] = $default;
-        }
-
-        if (!isset($propertySchema['example']) && !empty($example = $propertyMetadata->getExample())) {
-            $propertySchema['example'] = $example;
-        }
-
-        if (!isset($propertySchema['example']) && isset($propertySchema['default'])) {
-            $propertySchema['example'] = $propertySchema['default'];
-        }
-
-        // never override the following keys if at least one is already set (by user or restrictions)
-        if ([] === $types
-            || ($propertySchema['type'] ?? $propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
-        ) {
-            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
-
-            return;
-        }
-
-        // add one of the following key: type, $ref, oneOf, allOf, anyOf
-
-        $valueSchema = [];
-
-        foreach ($types as $type) {
-            if ($isCollection = $type->isCollection()) {
-                $keyType = $type->getCollectionKeyTypes()[0] ?? null;
-                $valueType = $type->getCollectionValueTypes()[0] ?? null;
-            } else {
-                $keyType = null;
-                $valueType = $type;
-            }
-
-            if (null === $valueType) {
-                $builtinType = 'string';
-                $className = null;
-            } else {
-                $builtinType = $valueType->getBuiltinType();
-                $className = $valueType->getClassName();
-            }
-
-            $propertyType = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
-            if (!\in_array($propertyType, $valueSchema)) {
-                $valueSchema[] = $propertyType;
-            }
-        }
-
-        // only one builtInType detected (should be "type" or "$ref")
-        if (1 === \count($valueSchema)) {
-            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema + $valueSchema[0]);
-
-            return;
-        }
-
-        // multiple builtInTypes detected: determine anyOf/oneOf/allOf if union vs intersect types
-        $reflectionType = $reflectionProperty?->getType();
-        switch (true) {
-            default:
-                // cannot detect union/intersect types
-                $composition = 'anyOf';
-                break;
-            case $reflectionType instanceof \ReflectionUnionType:
-                $composition = 'oneOf';
-                break;
-            case $reflectionType instanceof \ReflectionIntersectionType:
-                $composition = 'allOf';
-                break;
-        }
-
-        $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject([
-            ...$propertySchema,
-            ...[$composition => $valueSchema],
-        ]);
+        $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
     }
 
     private function buildDefinitionName(string $className, string $format = 'json', string $inputOrOutputClass = null, Operation $operation = null, array $serializerContext = null): string
