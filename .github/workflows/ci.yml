@@ -195,6 +195,7 @@ jobs:
           - Elasticsearch
           - HttpCache
           - RamseyUuid
+          - GraphQl
       fail-fast: false
     steps:
       - name: Checkout

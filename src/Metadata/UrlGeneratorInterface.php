@@ -82,3 +82,5 @@ interface UrlGeneratorInterface
      */
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABS_PATH): string;
 }
+
+class_alias(UrlGeneratorInterface::class, \ApiPlatform\Api\UrlGeneratorInterface::class);
