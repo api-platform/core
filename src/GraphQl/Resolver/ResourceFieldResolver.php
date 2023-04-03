@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 

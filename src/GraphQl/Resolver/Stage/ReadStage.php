@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Operation;
-use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Util\ArrayTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -32,8 +30,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class ReadStage implements ReadStageInterface
 {
-    use ArrayTrait;
-    use ClassInfoTrait;
     use IdentifierTrait;
 
     public function __construct(private readonly IriConverterInterface $iriConverter, private readonly ProviderInterface $provider, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private readonly string $nestingSeparator)
@@ -132,5 +128,63 @@ final class ReadStage implements ReadStageInterface
         }
 
         return $filters;
+    }
+
+    public function isSequentialArrayOfArrays(array $array): bool
+    {
+        if (!$this->isSequentialArray($array)) {
+            return false;
+        }
+
+        return $this->arrayContainsOnly($array, 'array');
+    }
+
+    public function isSequentialArray(array $array): bool
+    {
+        if ([] === $array) {
+            return false;
+        }
+
+        return array_is_list($array);
+    }
+
+    public function arrayContainsOnly(array $array, string $type): bool
+    {
+        return $array === array_filter($array, static fn ($item): bool => $type === \gettype($item));
+    }
+
+    /**
+     * Get class name of the given object.
+     */
+    private function getObjectClass(object $object): string
+    {
+        return $this->getRealClassName($object::class);
+    }
+
+    /**
+     * Get the real class name of a class name that could be a proxy.
+     */
+    private function getRealClassName(string $className): string
+    {
+        // __CG__: Doctrine Common Marker for Proxy (ODM < 2.0 and ORM < 3.0)
+        // __PM__: Ocramius Proxy Manager (ODM >= 2.0)
+        $positionCg = strrpos($className, '\\__CG__\\');
+        $positionPm = strrpos($className, '\\__PM__\\');
+
+        if (false === $positionCg && false === $positionPm) {
+            return $className;
+        }
+
+        if (false !== $positionCg) {
+            return substr($className, $positionCg + 8);
+        }
+
+        $className = ltrim($className, '\\');
+
+        return substr(
+            $className,
+            8 + $positionPm,
+            strrpos($className, '\\') - ($positionPm + 8)
+        );
     }
 }
