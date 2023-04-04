@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Filter;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Elasticsearch\Filter\ConstantScoreFilterInterface;
 use ApiPlatform\Elasticsearch\Filter\TermFilter;
-use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

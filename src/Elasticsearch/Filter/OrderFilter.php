@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Filter;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**

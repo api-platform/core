@@ -13,21 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
-use ApiPlatform\Metadata\Operation;
+interface_exists(\ApiPlatform\Metadata\State\ProviderInterface::class);
 
-/**
- * Retrieves data from a persistence layer.
- *
- * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @template T of object
- */
-interface ProviderInterface
-{
-    /**
-     * Provides data.
-     *
-     * @return T|Pagination\PartialPaginatorInterface<T>|iterable<T>|null
-     */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null;
+/* @phpstan-ignore-next-line */
+if (false) {
+    interface ProviderInterface extends \ApiPlatform\Metadata\State\ProviderInterface
+    {
+    }
 }

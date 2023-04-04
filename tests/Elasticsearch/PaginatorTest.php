@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Elasticsearch\DataProvider;
+namespace ApiPlatform\Tests\Elasticsearch;
 
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
-use ApiPlatform\State\Pagination\PaginatorInterface;
+use ApiPlatform\Metadata\State\Pagination\PaginatorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;

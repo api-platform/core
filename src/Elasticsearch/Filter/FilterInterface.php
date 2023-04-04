@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Filter;
 
-use ApiPlatform\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Metadata\FilterInterface as BaseFilterInterface;
 use ApiPlatform\Metadata\Operation;
 
 /**

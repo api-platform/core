@@ -20,7 +20,7 @@ use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\Metadata\State\Pagination\Pagination;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
 use PHPUnit\Framework\TestCase;

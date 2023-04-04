@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Util;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
-use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;

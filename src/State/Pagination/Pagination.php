@@ -19,6 +19,8 @@ use ApiPlatform\Metadata\Operation;
 /**
  * Pagination configuration.
  *
+ * @deprecated replaced by ApiPlatform\Metadata\State\Pagination\Pagination
+ *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class Pagination
@@ -28,6 +30,8 @@ final class Pagination
 
     public function __construct(array $options = [], array $graphQlOptions = [])
     {
+        trigger_deprecation('api-platform', '3.1', sprintf('%s is deprecated in favor of %s. This class will be removed in 4.0.', self::class, \ApiPlatform\Metadata\State\Pagination\Pagination::class));
+
         $this->options = array_merge([
             'enabled' => true,
             'client_enabled' => false,
