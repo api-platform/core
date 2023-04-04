@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Serializer\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\Serializer\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;

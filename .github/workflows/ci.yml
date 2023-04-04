@@ -200,6 +200,8 @@ jobs:
           - OpenApi
           - Metadata
           - Elasticsearch
+          - Security
+          - Serializer
       fail-fast: false
     steps:
       - name: Checkout
