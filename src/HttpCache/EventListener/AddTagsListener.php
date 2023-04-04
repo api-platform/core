@@ -18,9 +18,9 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Metadata\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Metadata\Util\RequestAttributesExtractor;
+use ApiPlatform\State\UriVariablesResolverTrait;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
