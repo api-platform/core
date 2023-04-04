@@ -96,6 +96,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
                     'property' => $property,
                     'type' => $hasAssociation ? 'string' : $this->getPhpType($type),
                     'required' => false,
+                    'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
                 ];
             }
         }
