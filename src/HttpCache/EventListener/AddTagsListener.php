@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache\EventListener;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\Metadata\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Metadata\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
