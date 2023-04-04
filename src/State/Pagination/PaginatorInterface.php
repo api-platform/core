@@ -13,11 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Pagination;
 
-interface_exists(\ApiPlatform\Metadata\State\Pagination\PaginatorInterface::class);
+/**
+ * The \Countable implementation should return the number of items on the
+ * current page, as an integer.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @template T of object
+ *
+ * @extends PartialPaginatorInterface<T>
+ */
+interface PaginatorInterface extends PartialPaginatorInterface
+{
+    /**
+     * Gets last page.
+     */
+    public function getLastPage(): float;
 
-/* @phpstan-ignore-next-line */
-if (false) {
-    interface PaginatorInterface extends \ApiPlatform\Metadata\State\Pagination\PaginatorInterface
-    {
-    }
+    /**
+     * Gets the number of items in the whole collection.
+     */
+    public function getTotalItems(): float;
 }

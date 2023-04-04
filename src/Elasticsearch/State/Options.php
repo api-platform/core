@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\State;
 
-use ApiPlatform\Metadata\State\OptionsInterface;
+use ApiPlatform\State\OptionsInterface;
 
 class Options implements OptionsInterface
 {

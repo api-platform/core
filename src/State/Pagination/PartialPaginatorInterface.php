@@ -13,11 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Pagination;
 
-interface_exists(\ApiPlatform\Metadata\State\Pagination\PartialPaginatorInterface::class);
+/**
+ * Partial Paginator Interface.
+ *
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ *
+ * @template T of object
+ *
+ * @extends \Traversable<T>
+ */
+interface PartialPaginatorInterface extends \Traversable, \Countable
+{
+    /**
+     * Gets the current page number.
+     */
+    public function getCurrentPage(): float;
 
-/* @phpstan-ignore-next-line */
-if (false) {
-    interface PartialPaginatorInterface extends \ApiPlatform\Metadata\State\Pagination\PartialPaginatorInterface
-    {
-    }
+    /**
+     * Gets the number of items by page.
+     */
+    public function getItemsPerPage(): float;
 }

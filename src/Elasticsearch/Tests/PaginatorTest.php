@@ -16,7 +16,7 @@ namespace ApiPlatform\Elasticsearch\Tests;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Tests\Fixtures\Foo;
-use ApiPlatform\Metadata\State\Pagination\PaginatorInterface;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;

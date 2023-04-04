@@ -18,8 +18,8 @@ use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryI
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\State\ProviderInterface;
 use ApiPlatform\Metadata\Util\Inflector;
+use ApiPlatform\State\ProviderInterface;
 use Elasticsearch\Client;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
