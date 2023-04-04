@@ -353,9 +353,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.metadata_factory.cached',
             'api_platform.metadata.property.metadata_factory.default_property',
             'api_platform.metadata.property.metadata_factory.xml',
-            'api_platform.metadata.property.identifier_metadata_factory.attribute',
-            'api_platform.metadata.property.identifier_metadata_factory.xml',
-            'api_platform.metadata.property.identifier_metadata_factory.yaml',
             'api_platform.cache.metadata.property',
 
             // metadata/property_name.xml
@@ -400,7 +397,6 @@ class ApiPlatformExtensionTest extends TestCase
             PropertyNameCollectionFactoryInterface::class,
 
             // metadata/property.xml
-            'api_platform.metadata.property.identifier_metadata_factory',
             'api_platform.metadata.property.metadata_factory',
 
             // metadata/resource.xml
@@ -815,7 +811,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine_mongodb.odm.aggregation_extension.filter',
             'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination',
             'api_platform.doctrine_mongodb.odm.aggregation_extension.order',
-            'api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory',
         ];
 
         $aliases = [
