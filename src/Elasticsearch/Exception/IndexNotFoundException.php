@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Exception;
 
-use ApiPlatform\Metadata\Exception\ExceptionInterface;
-
 /**
  * Index not found exception.
  *

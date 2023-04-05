@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Tests\Exception;
 
+use ApiPlatform\Elasticsearch\Exception\ExceptionInterface;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
-use ApiPlatform\Metadata\Exception\ExceptionInterface;
 use PHPUnit\Framework\TestCase;
 
 class IndexNotFoundExceptionTest extends TestCase
