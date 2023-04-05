@@ -15,7 +15,7 @@ namespace ApiPlatform\Doctrine\Orm\Extension;
 
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Doctrine\ORM\EntityManagerInterface;

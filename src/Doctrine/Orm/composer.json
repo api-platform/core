@@ -1,0 +1,81 @@
+{
+  "name": "api-platform/doctrine-orm",
+  "description": "API Resource-oriented metadata attributes and factories",
+  "type": "library",
+  "keywords": [
+    "Doctrine",
+    "Object",
+    "Relational",
+    "Mapping"
+  ],
+  "homepage": "https://api-platform.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Kévin Dunglas",
+      "email": "kevin@dunglas.fr",
+      "homepage": "https://dunglas.fr"
+    },
+    {
+      "name": "API Platform Community",
+      "homepage": "https://api-platform.com/community/contributors"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "api-platform/state": "*@dev || ^3.1",
+    "api-platform/metadata": "*@dev || ^3.1",
+    "doctrine/inflector": "^2.0",
+    "psr/cache": "^3.0",
+    "psr/log": "^1.0 || ^2.0 || ^3.0",
+    "symfony/property-info": "^6.1",
+    "doctrine/orm": "^2.14",
+    "symfony/serializer": "^6.1"
+  },
+  "require-dev": {
+    "phpstan/phpdoc-parser": "^1.16",
+    "phpspec/prophecy-phpunit": "^2.0",
+    "symfony/phpunit-bridge": "^6.1",
+    "symfony/routing": "^6.1",
+    "symfony/yaml": "^6.1",
+    "symfony/config": "^6.1"
+  },
+  "suggest": {
+    "phpstan/phpdoc-parser": "For PHP documentation support.",
+    "symfony/yaml": "For YAML resource configuration.",
+    "symfony/config": "For XML resource configuration."
+  },
+  "autoload": {
+    "psr-4": {
+      "ApiPlatform\\Doctrine\\Orm\\": ""
+    }
+  },
+  "config": {
+    "preferred-install": {
+      "*": "dist"
+    },
+    "sort-packages": true,
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true,
+      "phpstan/extension-installer": true
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "3.2.x-dev"
+    },
+    "symfony": {
+      "require": "^6.1"
+    }
+  },
+  "repositories": [
+      {
+          "type": "path",
+          "url": "../../Metadata"
+      },
+      {
+          "type": "path",
+          "url": "../../State"
+      }
+  ]
+}

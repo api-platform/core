@@ -15,10 +15,10 @@ namespace ApiPlatform\Doctrine\Orm\Extension;
 
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\PropertyNotFoundException;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;

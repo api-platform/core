@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\State;
 
-use ApiPlatform\Doctrine\Common\State\LinksHandlerTrait as CommonLinksHandlerTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;

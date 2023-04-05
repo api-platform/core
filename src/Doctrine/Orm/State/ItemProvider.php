@@ -16,7 +16,7 @@ namespace ApiPlatform\Doctrine\Orm\State;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
