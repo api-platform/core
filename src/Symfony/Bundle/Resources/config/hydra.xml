@@ -24,6 +24,7 @@
 
         <service id="api_platform.hydra.listener.response.add_link_header" class="ApiPlatform\Hydra\EventListener\AddLinkHeaderListener">
             <argument type="service" id="api_platform.router" />
+            <argument>%api_platform.enable_docs%</argument>
 
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>

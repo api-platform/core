@@ -29,7 +29,7 @@ final class AddLinkHeaderListener
 {
     use CorsTrait;
 
-    public function __construct(private readonly UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly UrlGeneratorInterface $urlGenerator, private readonly bool $enableDocs)
     {
     }
 
@@ -41,6 +41,11 @@ final class AddLinkHeaderListener
         $request = $event->getRequest();
         // Prevent issues with NelmioCorsBundle
         if ($this->isPreflightRequest($request)) {
+            return;
+        }
+
+        // Prevent adding Link header when docs is disabled
+        if (!$this->enableDocs) {
             return;
         }
 
