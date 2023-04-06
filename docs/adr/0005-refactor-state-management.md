@@ -36,7 +36,7 @@ The default one will use the Symfony Serializer component to do so, but this wil
 This will also allow the user to access the raw body if necessary, and will enable a whole class of optimizations, extra validations (e.g. validating a raw JSON string against a JSON Schema) etc.
 Similarly, transforming PHP data structures into strings to be stored in response bodies will now be the responsibility of a state provider.
 
-This will dramatically simplify the code base and the whole design of API Platform.
+This will reduce the weigth of the code base and improve the whole design of API Platform.
 
 This new design will also replace what we currently call [the "DTO" feature](https://api-platform.com/docs/core/dto/): a "data transformer" will now be just another state provider or processor.
 
