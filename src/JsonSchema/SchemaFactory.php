@@ -122,14 +122,6 @@ final class SchemaFactory implements SchemaFactoryInterface
             $definition['externalDocs'] = ['url' => $operation->getTypes()[0]];
         }
 
-        // build ReflectionClass to retrieve ReflectionProperties to detect union/intersect types on buildPropertySchema
-        try {
-            $reflectionClass = new \ReflectionClass($className);
-        } catch (\ReflectionException) {
-            // class does not exist
-            $reflectionClass = null;
-        }
-
         $options = $this->getFactoryOptions($serializerContext, $validationGroups, $operation instanceof HttpOperation ? $operation : null);
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
@@ -142,19 +134,13 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $definition['required'][] = $normalizedPropertyName;
             }
 
-            try {
-                $reflectionProperty = $reflectionClass?->getProperty($propertyName);
-            } catch (\ReflectionException) {
-                $reflectionProperty = null;
-            }
-
-            $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $reflectionProperty);
+            $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format);
         }
 
         return $schema;
     }
 
-    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, ?\ReflectionProperty $reflectionProperty): void
+    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format): void
     {
         $version = $schema->getVersion();
         if (Schema::VERSION_SWAGGER === $version || Schema::VERSION_OPENAPI === $version) {
@@ -167,6 +153,47 @@ final class SchemaFactory implements SchemaFactoryInterface
             $propertyMetadata->getSchema() ?? [],
             $additionalPropertySchema ?? []
         );
+
+        $types = $propertyMetadata->getBuiltinTypes() ?? [];
+
+        // never override the following keys if at least one is already set
+        // or if property has no type(s) defined
+        // or if property schema is already fully defined (type=string + format || enum)
+        $propertySchemaType = $propertySchema['type'] ?? false;
+        if ([] === $types
+            || ($propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
+            || (\is_array($propertySchemaType) ? \array_key_exists('string', $propertySchemaType) : 'string' !== $propertySchemaType)
+            || ($propertySchema['format'] ?? $propertySchema['enum'] ?? false)
+        ) {
+            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
+
+            return;
+        }
+
+        // property schema is created in SchemaPropertyMetadataFactory, but it cannot build resource reference ($ref)
+        // complete property schema with resource reference ($ref) only if it's related to an object
+
+        $version = $schema->getVersion();
+        $subSchema = new Schema($version);
+        $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
+
+        foreach ($types as $type) {
+            if ($type->isCollection()) {
+                $valueType = $type->getCollectionValueTypes()[0] ?? null;
+            } else {
+                $valueType = $type;
+            }
+
+            $className = $valueType?->getClassName();
+            if (null === $className || !$this->isResourceClass($className)) {
+                continue;
+            }
+
+            $subSchema = $this->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext, false);
+            $propertySchema['anyOf'] = [['$ref' => $subSchema['$ref']], ['type' => 'null']];
+            unset($propertySchema['type']);
+            break;
+        }
 
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
     }

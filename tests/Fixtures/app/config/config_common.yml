@@ -425,6 +425,10 @@ services:
         tags:
             - { name: 'api_platform.state_processor' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer\AddGroupNormalizer:
+        tags:
+            -  { name: 'serializer.normalizer' }
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\AuthorItemProvider:
         tags:
             - { name: 'api_platform.state_provider' }
@@ -436,8 +440,3 @@ services:
     ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\LibraryItemProvider:
         tags:
             - { name: 'api_platform.state_provider' }
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer\AddGroupNormalizer:
-        tags:
-            -  { name: 'serializer.normalizer' }
-

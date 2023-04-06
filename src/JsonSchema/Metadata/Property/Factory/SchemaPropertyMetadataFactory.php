@@ -16,7 +16,8 @@ namespace ApiPlatform\JsonSchema\Metadata\Property\Factory;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Uid\Ulid;
@@ -29,8 +30,9 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 {
     use ResourceClassInfoTrait;
 
-    public function __construct(private readonly ?PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly ?PropertyMetadataFactoryInterface $decorated = null)
     {
+        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
@@ -47,43 +49,43 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         $propertySchema = $propertyMetadata->getSchema() ?? [];
 
-        if (!array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
+        if (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
             $propertySchema['readOnly'] = true;
         }
 
-        if (!array_key_exists('writeOnly', $propertySchema) && false === $propertyMetadata->isReadable()) {
+        if (!\array_key_exists('writeOnly', $propertySchema) && false === $propertyMetadata->isReadable()) {
             $propertySchema['writeOnly'] = true;
         }
 
-        if (!array_key_exists('description', $propertySchema) && null !== ($description = $propertyMetadata->getDescription())) {
+        if (!\array_key_exists('description', $propertySchema) && null !== ($description = $propertyMetadata->getDescription())) {
             $propertySchema['description'] = $description;
         }
 
         // see https://github.com/json-schema-org/json-schema-spec/pull/737
-        if (!array_key_exists('deprecated', $propertySchema) && null !== $propertyMetadata->getDeprecationReason()) {
+        if (!\array_key_exists('deprecated', $propertySchema) && null !== $propertyMetadata->getDeprecationReason()) {
             $propertySchema['deprecated'] = true;
         }
 
         // externalDocs is an OpenAPI specific extension, but JSON Schema allows additional keys, so we always add it
         // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
-        if (!array_key_exists('externalDocs', $propertySchema) && null !== ($iri = $propertyMetadata->getTypes()[0] ?? null)) {
+        if (!\array_key_exists('externalDocs', $propertySchema) && null !== ($iri = $propertyMetadata->getTypes()[0] ?? null)) {
             $propertySchema['externalDocs'] = ['url' => $iri];
         }
 
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-        if (!array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
+        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }
             $propertySchema['default'] = $default;
         }
 
-        if (!array_key_exists('example', $propertySchema) && !empty($example = $propertyMetadata->getExample())) {
+        if (!\array_key_exists('example', $propertySchema) && !empty($example = $propertyMetadata->getExample())) {
             $propertySchema['example'] = $example;
         }
 
-        if (!array_key_exists('example', $propertySchema) && array_key_exists('default', $propertySchema)) {
+        if (!\array_key_exists('example', $propertySchema) && \array_key_exists('default', $propertySchema)) {
             $propertySchema['example'] = $propertySchema['default'];
         }
 
@@ -115,7 +117,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             }
 
             $propertyType = $this->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $propertyMetadata->isReadableLink());
-            if (!\in_array($propertyType, $valueSchema)) {
+            if (!\in_array($propertyType, $valueSchema, true)) {
                 $valueSchema[] = $propertyType;
             }
         }
@@ -217,7 +219,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             ];
         }
 
-        if (is_a($className, \BackedEnum::class, true)) {
+        if (!$this->isResourceClass($className) && is_a($className, \BackedEnum::class, true)) {
             $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
 
             $type = \is_string($enumCases[0] ?? '') ? 'string' : 'int';
@@ -229,6 +231,13 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return [
                 'type' => $type,
                 'enum' => $enumCases,
+            ];
+        }
+
+        if (true !== $readableLink && $this->isResourceClass($className)) {
+            return [
+                'type' => 'string',
+                'format' => 'iri-reference',
             ];
         }
 

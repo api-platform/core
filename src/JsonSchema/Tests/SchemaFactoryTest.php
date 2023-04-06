@@ -16,9 +16,11 @@ namespace ApiPlatform\JsonSchema\Tests;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\OverriddenOperationDummy;
+use ApiPlatform\JsonSchema\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\JsonSchema\Tests\Fixtures\Enum\GenderTypeEnum;
 use ApiPlatform\JsonSchema\Tests\Fixtures\NotAResource;
-use ApiPlatform\JsonSchema\TypeFactoryInterface;
+use ApiPlatform\JsonSchema\Tests\Fixtures\NotAResourceWithUnionIntersectTypes;
+use ApiPlatform\JsonSchema\Tests\Fixtures\Serializable;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Operations;
@@ -41,40 +43,38 @@ class SchemaFactoryTest extends TestCase
 
     public function testBuildSchemaForNonResourceClass(): void
     {
-        $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)
-        ), Argument::cetera())->willReturn([
-            'type' => 'string',
-        ]);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_INT)
-        ), Argument::cetera())->willReturn([
-            'type' => 'integer',
-        ]);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_OBJECT)
-        ), Argument::cetera())->willReturn([
-            'type' => 'object',
-        ]);
-
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar', 'genderType']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(true)->withDefault('default_bar')->withExample('example_bar'));
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'genderType', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT)])->withReadable(true)->withDefault(GenderTypeEnum::MALE));
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withReadable(true)
+                ->withSchema(['type' => 'string'])
+        );
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withReadable(true)
+                ->withDefault('default_bar')
+                ->withExample('example_bar')
+                ->withSchema(['type' => 'integer', 'default' => 'default_bar', 'example' => 'example_bar'])
+        );
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'genderType', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT)])
+                ->withReadable(true)
+                ->withDefault('male')
+                ->withSchema(['type' => 'object', 'default' => 'male', 'example' => 'male'])
+        );
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
 
-        $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $schemaFactory = new SchemaFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
         $resultSchema = $schemaFactory->buildSchema(NotAResource::class);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
@@ -111,49 +111,38 @@ class SchemaFactoryTest extends TestCase
 
     public function testBuildSchemaForNonResourceClassWithUnionIntersectTypes(): void
     {
-        $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)
-        ), Argument::cetera())->willReturn([
-            'type' => 'string',
-            'nullable' => true,
-        ]);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_INT)
-        ), Argument::cetera())->willReturn([
-            'type' => 'integer',
-            'nullable' => true,
-        ]);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_FLOAT)
-        ), Argument::cetera())->willReturn([
-            'type' => 'integer',
-            'nullable' => true,
-        ]);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_OBJECT)
-        ), Argument::cetera())->willReturn([
-            'type' => 'object',
-        ]);
-
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, Argument::cetera())->willReturn(new PropertyNameCollection(['ignoredProperty', 'unionType', 'intersectType']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'ignoredProperty', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, nullable: true)])->withReadable(true)->withSchema(['type' => 'string']));
-        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'unionType', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, nullable: true), new Type(Type::BUILTIN_TYPE_INT, nullable: true), new Type(Type::BUILTIN_TYPE_FLOAT, nullable: true)])->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'intersectType', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, class: Serializable::class), new Type(Type::BUILTIN_TYPE_OBJECT, class: DummyResourceInterface::class)])->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'ignoredProperty', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, nullable: true)])
+                ->withReadable(true)
+                ->withSchema(['type' => ['string', 'null']])
+        );
+        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'unionType', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, nullable: true), new Type(Type::BUILTIN_TYPE_INT, nullable: true), new Type(Type::BUILTIN_TYPE_FLOAT, nullable: true)])
+                ->withReadable(true)
+                ->withSchema(['oneOf' => [
+                    ['type' => ['string', 'null']],
+                    ['type' => ['integer', 'null']],
+                ]])
+        );
+        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'intersectType', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, class: Serializable::class), new Type(Type::BUILTIN_TYPE_OBJECT, class: DummyResourceInterface::class)])
+                ->withReadable(true)
+                ->withSchema(['type' => 'object'])
+        );
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResourceWithUnionIntersectTypes::class)->willReturn(false);
 
-        $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $schemaFactory = new SchemaFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
         $resultSchema = $schemaFactory->buildSchema(NotAResourceWithUnionIntersectTypes::class);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
@@ -169,19 +158,14 @@ class SchemaFactoryTest extends TestCase
 
         $this->assertArrayHasKey('ignoredProperty', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['ignoredProperty']);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['ignoredProperty']['type']);
-        $this->assertArrayNotHasKey('nullable', $definitions[$rootDefinitionKey]['properties']['ignoredProperty']);
+        $this->assertSame(['string', 'null'], $definitions[$rootDefinitionKey]['properties']['ignoredProperty']['type']);
 
         $this->assertArrayHasKey('unionType', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('oneOf', $definitions[$rootDefinitionKey]['properties']['unionType']);
         $this->assertCount(2, $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]['type']);
-        $this->assertArrayHasKey('nullable', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]);
-        $this->assertTrue($definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]['nullable']);
-        $this->assertSame('integer', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][1]['type']);
-        $this->assertArrayHasKey('nullable', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][1]);
-        $this->assertTrue($definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][1]['nullable']);
+        $this->assertSame(['string', 'null'], $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]['type']);
+        $this->assertSame(['integer', 'null'], $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][1]['type']);
 
         $this->assertArrayHasKey('intersectType', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['intersectType']);
@@ -190,20 +174,6 @@ class SchemaFactoryTest extends TestCase
 
     public function testBuildSchemaWithSerializerGroups(): void
     {
-        $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)
-        ), Argument::cetera())->willReturn([
-            'type' => 'string',
-        ]);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_OBJECT)
-        ), Argument::cetera())->willReturn([
-            'type' => 'object',
-        ]);
-
         $shortName = (new \ReflectionClass(OverriddenOperationDummy::class))->getShortName();
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $operation = (new Put())->withName('put')->withNormalizationContext([
@@ -223,15 +193,31 @@ class SchemaFactoryTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(OverriddenOperationDummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['alias', 'description', 'genderType']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'genderType', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)])->withReadable(true)->withDefault(GenderTypeEnum::MALE));
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::type('array'))->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withReadable(true)
+                ->withSchema(['type' => 'string'])
+        );
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::type('array'))->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withReadable(true)
+                ->withSchema(['type' => 'string'])
+        );
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'genderType', Argument::type('array'))->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)])
+                ->withReadable(true)
+                ->withDefault(GenderTypeEnum::MALE)
+                ->withSchema(['type' => 'object'])
+        );
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(GenderTypeEnum::class)->willReturn(true);
 
-        $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $schemaFactory = new SchemaFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
         $resultSchema = $schemaFactory->buildSchema(OverriddenOperationDummy::class, 'json', Schema::TYPE_OUTPUT, null, null, ['groups' => $serializerGroup, AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
@@ -259,46 +245,29 @@ class SchemaFactoryTest extends TestCase
 
     public function testBuildSchemaForAssociativeArray(): void
     {
-        $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING),
-            Argument::which('isCollection', true),
-            Argument::that(function (Type $type): bool {
-                $keyTypes = $type->getCollectionKeyTypes();
-
-                return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_INT === $keyTypes[0]->getBuiltinType();
-            })
-        ), Argument::cetera())->willReturn([
-            'type' => 'array',
-        ]);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING),
-            Argument::which('isCollection', true),
-            Argument::that(function (Type $type): bool {
-                $keyTypes = $type->getCollectionKeyTypes();
-
-                return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_STRING === $keyTypes[0]->getBuiltinType();
-            })
-        ), Argument::cetera())->willReturn([
-            'type' => 'object',
-            'additionalProperties' => Type::BUILTIN_TYPE_STRING,
-        ]);
-
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))])->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING))])->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))])
+                ->withReadable(true)
+                ->withSchema(['type' => 'array', 'items' => ['string', 'int']])
+        );
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING))])
+                ->withReadable(true)
+                ->withSchema(['type' => 'object', 'additionalProperties' => 'string'])
+        );
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
 
-        $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $schemaFactory = new SchemaFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
         $resultSchema = $schemaFactory->buildSchema(NotAResource::class);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();

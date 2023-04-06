@@ -17,7 +17,6 @@ use ApiPlatform\Hal\JsonSchema\SchemaFactory;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
-use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -39,7 +38,6 @@ class SchemaFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $typeFactory = $this->prophesize(TypeFactoryInterface::class);
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->create(Dummy::class)->willReturn(
             new ResourceMetadataCollection(Dummy::class, [
@@ -52,7 +50,6 @@ class SchemaFactoryTest extends TestCase
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $baseSchemaFactory = new BaseSchemaFactory(
-            $typeFactory->reveal(),
             $resourceMetadataFactory->reveal(),
             $propertyNameCollectionFactory->reveal(),
             $propertyMetadataFactory->reveal()
