@@ -378,10 +378,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
 
             if (
-                $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
-                (
-                    isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
-                    isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
+                $this->isAllowedAttribute($classOrObject, $propertyName, null, $context)
+                && (
+                    isset($context['api_normalize']) && $propertyMetadata->isReadable()
+                    || isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
                 )
             ) {
                 $allowedAttributes[] = $propertyName;
@@ -598,11 +598,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
 
         if (
-            $type &&
-            $type->isCollection() &&
-            ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) &&
-            ($className = $collectionValueType->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $type
+            && $type->isCollection()
+            && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null)
+            && ($className = $collectionValueType->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             if (!is_iterable($attributeValue)) {
                 throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
@@ -616,9 +616,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $type &&
-            ($className = $type->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $type
+            && ($className = $type->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             if (!\is_object($attributeValue) && null !== $attributeValue) {
                 throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
@@ -758,10 +758,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $type->isCollection() &&
-            null !== $collectionValueType &&
-            null !== ($className = $collectionValueType->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $type->isCollection()
+            && null !== $collectionValueType
+            && null !== ($className = $collectionValueType->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $context['resource_class'] = $resourceClass;
@@ -770,8 +770,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            null !== ($className = $type->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            null !== ($className = $type->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
@@ -784,9 +784,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $type->isCollection() &&
-            null !== $collectionValueType &&
-            null !== ($className = $collectionValueType->getClassName())
+            $type->isCollection()
+            && null !== $collectionValueType
+            && null !== ($className = $collectionValueType->getClassName())
         ) {
             if (!$this->serializer instanceof DenormalizerInterface) {
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));

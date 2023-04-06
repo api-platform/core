@@ -116,8 +116,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         if (
-            $type->isCollection() &&
-            $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
+            $type->isCollection()
+            && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
         ) {
             $relatedClass = $collectionValueType->getClassName();
         } else {

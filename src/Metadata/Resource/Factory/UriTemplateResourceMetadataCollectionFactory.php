@@ -127,8 +127,8 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     {
         // We will generate the collection route, don't initialize variables here
         if ($operation instanceof HttpOperation && (
-            [] === $operation->getUriVariables() ||
-            (
+            [] === $operation->getUriVariables()
+            || (
                 $operation instanceof CollectionOperationInterface
                 && null === $operation->getUriTemplate()
             )

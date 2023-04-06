@@ -39,11 +39,11 @@ class Validator implements ValidatorInterface
     {
         if (null !== $validationGroups = $context['groups'] ?? null) {
             if (
-                $this->container &&
-                \is_string($validationGroups) &&
-                $this->container->has($validationGroups) &&
-                ($service = $this->container->get($validationGroups)) &&
-                \is_callable($service)
+                $this->container
+                && \is_string($validationGroups)
+                && $this->container->has($validationGroups)
+                && ($service = $this->container->get($validationGroups))
+                && \is_callable($service)
             ) {
                 $validationGroups = $service($data);
             } elseif (\is_callable($validationGroups)) {

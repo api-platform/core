@@ -34,9 +34,9 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
     protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            !\is_array($values) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass)
+            !\is_array($values)
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }

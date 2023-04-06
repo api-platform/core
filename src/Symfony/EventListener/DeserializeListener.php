@@ -86,11 +86,11 @@ final class DeserializeListener
         $format = $this->getFormat($request, $operation?->getInputFormats() ?? []);
         $data = $request->attributes->get('data');
         if (
-            null !== $data &&
-            (
-                HttpOperation::METHOD_POST === $method ||
-                HttpOperation::METHOD_PATCH === $method ||
-                (HttpOperation::METHOD_PUT === $method && !($operation->getExtraProperties()['standard_put'] ?? false))
+            null !== $data
+            && (
+                HttpOperation::METHOD_POST === $method
+                || HttpOperation::METHOD_PATCH === $method
+                || (HttpOperation::METHOD_PUT === $method && !($operation->getExtraProperties()['standard_put'] ?? false))
             )
         ) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;

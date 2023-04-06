@@ -118,8 +118,8 @@ final class TypeConverter implements TypeConverterInterface
     private function getResourceType(Type $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType
     {
         if (
-            $this->typeBuilder->isCollection($type) &&
-            $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
+            $this->typeBuilder->isCollection($type)
+            && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
         ) {
             $resourceClass = $collectionValueType->getClassName();
         } else {

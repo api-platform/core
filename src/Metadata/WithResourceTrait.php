@@ -25,10 +25,10 @@ trait WithResourceTrait
         $self = clone $this;
         foreach (get_class_methods($resource) as $method) {
             if (
-                method_exists($self, $method) &&
-                preg_match('/^(?:get|is|can)(.*)/', (string) $method, $matches) &&
-                null === $self->{$method}() &&
-                null !== $val = $resource->{$method}()
+                method_exists($self, $method)
+                && preg_match('/^(?:get|is|can)(.*)/', (string) $method, $matches)
+                && null === $self->{$method}()
+                && null !== $val = $resource->{$method}()
             ) {
                 $self = $self->{"with{$matches[1]}"}($val);
             }
