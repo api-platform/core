@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
+namespace ApiPlatform\Doctrine\Odm\Tests\Filter;
 
 use ApiPlatform\Doctrine\Odm\Filter\ExistsFilter;
 use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;

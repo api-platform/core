@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
-use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
+use ApiPlatform\Doctrine\Odm\CommonPropertyHelperTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
@@ -30,8 +30,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class OrderExtension implements AggregationCollectionExtensionInterface
 {
+    use CommonPropertyHelperTrait;
     use MongoDbOdmPropertyHelperTrait;
-    use PropertyHelperTrait;
 
     public function __construct(private readonly ?string $order = null, private readonly ?ManagerRegistry $managerRegistry = null)
     {

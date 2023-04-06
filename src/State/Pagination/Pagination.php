@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Pagination;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 
 /**

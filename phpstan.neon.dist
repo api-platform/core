@@ -84,4 +84,4 @@ parameters:
 			path: src
 		-
 			message: '#^Property .+ is unused.$#'
-			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php
+			path: src/Doctrine/Odm/Tests/PropertyInfo/Fixtures/DoctrineDummy.php
