@@ -95,10 +95,10 @@ final class ReadListener
         }
 
         if (
-            null === $data &&
-            (
-                HttpOperation::METHOD_PUT !== $operation->getMethod() ||
-                ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
+            null === $data
+            && (
+                HttpOperation::METHOD_PUT !== $operation->getMethod()
+                || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
             )
         ) {
             throw new NotFoundHttpException('Not Found');

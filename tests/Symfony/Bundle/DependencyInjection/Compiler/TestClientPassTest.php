@@ -57,9 +57,9 @@ final class TestClientPassTest extends TestCase
                 'test.api_platform.client',
                 Argument::allOf(
                     Argument::type(Definition::class),
-                    Argument::that(fn (Definition $testClientDefinition) => Client::class === $testClientDefinition->getClass() &&
-                    !$testClientDefinition->isShared() &&
-                    $testClientDefinition->isPublic())
+                    Argument::that(fn (Definition $testClientDefinition) => Client::class === $testClientDefinition->getClass()
+                    && !$testClientDefinition->isShared()
+                    && $testClientDefinition->isPublic())
                 )
             )
             ->shouldBeCalledOnce();

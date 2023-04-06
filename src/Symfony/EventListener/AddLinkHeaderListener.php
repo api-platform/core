@@ -45,8 +45,8 @@ final class AddLinkHeaderListener
         $operation = $this->initializeOperation($request);
 
         if (
-            null === $request->attributes->get('_api_resource_class') ||
-            !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            null === $request->attributes->get('_api_resource_class')
+            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
         ) {
             return;
         }
