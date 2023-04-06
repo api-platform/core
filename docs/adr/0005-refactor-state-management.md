@@ -12,11 +12,19 @@ and to generate resource representations from states retrieved from the data sou
 The REST susbystem uses [Symfony-specific kernel event listeners](https://api-platform.com/docs/core/events/#built-in-event-listeners)
 while the GraphQL subsystem relies on [an ad-hoc resolver system](https://api-platform.com/docs/core/graphql/#workflow-of-the-resolvers).
 
-
 Also, while it's possible [to use API Platform as a standalone PHP library](https://api-platform.com/docs/core/bootstrap/),
 this requires writing boilerplate code doing mostly what is done in the Symfony-specific listeners.
 As we're working on integrating API Platform with Laravel, the Laravel package will contain similar code to the one in the Symfony
 event listeners too.
+
+As Martin Fowler writes in the _Patterns of Enterprise Application Architecture_:
+
+> There’s just one controller, so you can easily enhance its behavior at
+runtime with decorators [Gang of Four](https://en.wikipedia.org/wiki/Design_Patterns). You can have decorators for
+authentication, character encoding, internationalization, and so forth,
+and add them using a configuration file or even while the server is
+running. ([Alur et al.](http://www.corej2eepatterns.com/InterceptingFilter.htm) describe this approach in detail under the name
+Intercepting Filter.)
 
 For API Platform 3, we refactored the whole metadata susbsytem to be more flexible, powerful, and covering more use cases.
 This led to the refactoring of the two main interfaces allowing to plug a data source in API Platform: the state provider and the state processor interfaces.
