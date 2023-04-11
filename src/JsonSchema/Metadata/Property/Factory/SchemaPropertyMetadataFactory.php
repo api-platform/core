@@ -116,6 +116,14 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
                 $className = $valueType->getClassName();
             }
 
+            if (!\array_key_exists('owl:maxCardinality', $propertySchema) &&
+                !$isCollection
+                && null !== $className
+                && $this->resourceClassResolver->isResourceClass($className)
+            ) {
+                $propertySchema['owl:maxCardinality'] = 1;
+            }
+
             $propertyType = $this->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $propertyMetadata->isReadableLink());
             if (!\in_array($propertyType, $valueSchema, true)) {
                 $valueSchema[] = $propertyType;
@@ -142,24 +150,24 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
     private function getType(Type $type, ?bool $readableLink = null): array
     {
-    if (!$type->isCollection()) {
-      return $this->addNullabilityToTypeDefinition($this->makeBasicType($type, $readableLink), $type);
-    }
+        if (!$type->isCollection()) {
+            return $this->addNullabilityToTypeDefinition($this->typeToArray($type, $readableLink), $type);
+        }
 
-    $keyType = $type->getCollectionKeyTypes()[0] ?? null;
-    $subType = ($type->getCollectionValueTypes()[0] ?? null) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
+        $keyType = $type->getCollectionKeyTypes()[0] ?? null;
+        $subType = ($type->getCollectionValueTypes()[0] ?? null) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
 
-    if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
-      return $this->addNullabilityToTypeDefinition([
-          'type' => 'object',
-          'additionalProperties' => $this->getType($subType, $readableLink),
-      ], $type);
-    }
+        if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
+            return $this->addNullabilityToTypeDefinition([
+                'type' => 'object',
+                'additionalProperties' => $this->getType($subType, $readableLink),
+            ], $type);
+        }
 
-    return $this->addNullabilityToTypeDefinition([
-        'type' => 'array',
-        'items' => $this->getType($subType, $readableLink),
-    ], $type);
+        return $this->addNullabilityToTypeDefinition([
+            'type' => 'array',
+            'items' => $this->getType($subType, $readableLink),
+        ], $type);
     }
 
     private function typeToArray(Type $type, ?bool $readableLink = null): array

@@ -191,6 +191,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
             $subSchema = $this->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext, false);
             $propertySchema['anyOf'] = [['$ref' => $subSchema['$ref']], ['type' => 'null']];
+            // prevent "type" and "anyOf" conflict
             unset($propertySchema['type']);
             break;
         }

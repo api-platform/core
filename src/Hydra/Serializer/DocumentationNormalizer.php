@@ -310,7 +310,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets the range of the property.
      */
-    private function getRange(ApiProperty $propertyMetadata): ?string
+    private function getRange(ApiProperty $propertyMetadata): array|string|null
     {
         $jsonldContext = $propertyMetadata->getJsonldContext();
 
@@ -318,45 +318,69 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return $jsonldContext['@type'];
         }
 
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
+        $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
+        $types = [];
 
-        foreach ($types as $type) {
+        foreach ($builtInTypes as $type) {
             if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
                 $type = $collectionType;
             }
 
             switch ($type->getBuiltinType()) {
                 case Type::BUILTIN_TYPE_STRING:
-                    return 'xmls:string';
+                    if (!\in_array('xmls:string', $types, true)) {
+                        $types[] = 'xmls:string';
+                    }
+                    break;
                 case Type::BUILTIN_TYPE_INT:
-                    return 'xmls:integer';
+                    if (!\in_array('xmls:integer', $types, true)) {
+                        $types[] = 'xmls:integer';
+                    }
+                    break;
                 case Type::BUILTIN_TYPE_FLOAT:
-                    return 'xmls:decimal';
+                    if (!\in_array('xmls:decimal', $types, true)) {
+                        $types[] = 'xmls:decimal';
+                    }
+                    break;
                 case Type::BUILTIN_TYPE_BOOL:
-                    return 'xmls:boolean';
+                    if (!\in_array('xmls:boolean', $types, true)) {
+                        $types[] = 'xmls:boolean';
+                    }
+                    break;
                 case Type::BUILTIN_TYPE_OBJECT:
                     if (null === $className = $type->getClassName()) {
-                        return null;
+                        continue 2;
                     }
 
                     if (is_a($className, \DateTimeInterface::class, true)) {
-                        return 'xmls:dateTime';
+                        if (!\in_array('xmls:dateTime', $types, true)) {
+                            $types[] = 'xmls:dateTime';
+                        }
+                        break;
                     }
 
                     if ($this->resourceClassResolver->isResourceClass($className)) {
                         $resourceMetadata = $this->resourceMetadataFactory->create($className);
                         $operation = $resourceMetadata->getOperation();
 
-                        if (!$operation instanceof HttpOperation) {
-                            return "#{$operation->getShortName()}";
+                        if (!$operation instanceof HttpOperation || !$operation->getTypes()) {
+                            if (!\in_array("#{$operation->getShortName()}", $types, true)) {
+                                $types[] = "#{$operation->getShortName()}";
+                            }
+                            break;
                         }
 
-                        return $operation->getTypes()[0] ?? "#{$operation->getShortName()}";
+                        $types = array_unique(array_merge($types, $operation->getTypes()));
+                        break;
                     }
             }
         }
 
-        return null;
+        if ([] === $types) {
+            return null;
+        }
+
+        return 1 === \count($types) ? $types[0] : $types;
     }
 
     /**
@@ -461,15 +485,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'domain' => $prefixedShortName,
         ];
 
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
-
-        foreach ($types as $type) {
-            if (!$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
-                $propertyData['owl:maxCardinality'] = 1;
-                break;
-            }
-        }
-
         $property = [
             '@type' => 'hydra:SupportedProperty',
             'hydra:property' => $propertyData,
@@ -487,7 +502,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $property['hydra:description'] = $description;
         }
 
-        if ($deprecationReason = $propertyMetadata->getDeprecationReason()) {
+        if ($propertyMetadata->getDeprecationReason()) {
             $property['owl:deprecated'] = true;
         }
 

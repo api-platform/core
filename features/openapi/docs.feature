@@ -98,6 +98,7 @@ Feature: Documentation support
     And the "playMode" property for the OpenAPI class "VideoGame" should be equal to:
     """
     {
+      "owl:maxCardinality": 1,
       "type": "string",
       "format": "iri-reference"
     }
@@ -308,13 +309,14 @@ Feature: Documentation support
     And the "resourceRelated" property for the OpenAPI class "Resource" should be equal to:
     """
     {
-      "readOnly":true,
-      "anyOf":[
+      "owl:maxCardinality": 1,
+      "readOnly": true,
+      "anyOf": [
         {
-          "$ref":"#/components/schemas/ResourceRelated"
+          "$ref": "#/components/schemas/ResourceRelated"
         },
         {
-          "type":"null"
+          "type": "null"
         }
       ]
     }

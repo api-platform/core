@@ -125,7 +125,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
             // if property is not a resource relation, don't set link status (as it would have no meaning)
             if (null === $relatedClass || !$this->isResourceClass($relatedClass)) {
-                return $propertyMetadata;
+                continue;
             }
 
             // find the resource class
