@@ -132,3 +132,13 @@ Feature: JSON-LD non-resource handling
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "totalPrice.@id" should not exist
+
+  @!mongodb
+  @createSchema
+  Scenario: Get a resource using entityClass with a DateTime attribute
+    Given there is a resource using entityClass with a DateTime attribute
+    When I send a "GET" request to "/EntityClassWithDateTime/1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "start" should exist
