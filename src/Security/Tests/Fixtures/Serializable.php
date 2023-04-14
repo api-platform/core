@@ -11,13 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Serializer\Exception;
+namespace ApiPlatform\Security\Tests\Fixtures;
 
-/**
- * Base exception interface.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-interface ExceptionInterface extends \Throwable
+interface Serializable
 {
+    public function __serialize(): array;
+
+    public function __unserialize(array $data);
 }

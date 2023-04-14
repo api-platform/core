@@ -26,7 +26,6 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -52,13 +51,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies')], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
 #[ApiFilter(filterClass: SearchFilter::class, properties: ['id'])]
-#[ORM\Entity]
 class RelatedDummy extends ParentDummy implements \Stringable
 {
     #[ApiProperty(writable: false)]
-    #[ORM\Column(type: 'integer')]
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[Groups(['chicago', 'friends'])]
     private $id;
 
@@ -66,12 +61,10 @@ class RelatedDummy extends ParentDummy implements \Stringable
      * @var string|null A name
      */
     #[ApiProperty(iris: ['RelatedDummy.name'])]
-    #[ORM\Column(nullable: true)]
     #[Groups(['friends'])]
     public $name;
 
     #[ApiProperty(deprecationReason: 'This property is deprecated for upgrade test')]
-    #[ORM\Column]
     #[Groups(['barcelona', 'chicago', 'friends'])]
     #[ApiFilter(filterClass: SearchFilter::class)]
     #[ApiFilter(filterClass: ExistsFilter::class)]
@@ -80,28 +73,23 @@ class RelatedDummy extends ParentDummy implements \Stringable
     /**
      * @var \DateTime|null A dummy date
      */
-    #[ORM\Column(type: 'datetime', nullable: true)]
     #[Assert\DateTime]
     #[Groups(['friends'])]
     #[ApiFilter(filterClass: DateFilter::class)]
     public $dummyDate;
 
-    #[ORM\ManyToOne(targetEntity: ThirdLevel::class, cascade: ['persist'])]
     #[Groups(['barcelona', 'chicago', 'friends'])]
     public ?ThirdLevel $thirdLevel = null;
 
-    #[ORM\OneToMany(targetEntity: RelatedToDummyFriend::class, cascade: ['persist'], mappedBy: 'relatedDummy')]
     #[Groups(['fakemanytomany', 'friends'])]
     public Collection|iterable $relatedToDummyFriend;
 
     /**
      * @var bool|null A dummy bool
      */
-    #[ORM\Column(type: 'boolean', nullable: true)]
     #[Groups(['friends'])]
     public ?bool $dummyBoolean = null;
 
-    #[ORM\Embedded(class: 'EmbeddableDummy')]
     #[Groups(['friends'])]
     public ?EmbeddableDummy $embeddedDummy = null;
 

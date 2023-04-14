@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Util;
 
-use ApiPlatform\Util\AttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

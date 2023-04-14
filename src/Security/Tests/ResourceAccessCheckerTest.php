@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Security\Tests;
 
 use ApiPlatform\Security\ResourceAccessChecker;
-use ApiPlatform\Tests\Fixtures\Serializable;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Security\Tests\Fixtures\Serializable;
+use ApiPlatform\Security\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;

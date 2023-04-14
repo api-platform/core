@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Serializer\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Security\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -29,17 +30,22 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], extraProperties: ['standard_put' => false])]
 #[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()])]
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()])]
+#[ORM\Entity]
 class Dummy
 {
     /**
      * @var int|null The id
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string The dummy name
      */
     #[ApiProperty(iris: ['https://schema.org/name'])]
+    #[ORM\Column]
     #[Assert\NotBlank]
     private string $name;
 
@@ -47,6 +53,7 @@ class Dummy
      * @var string|null The dummy name alias
      */
     #[ApiProperty(iris: ['https://schema.org/alternateName'])]
+    #[ORM\Column(nullable: true)]
     private $alias;
 
     /**
@@ -58,62 +65,75 @@ class Dummy
      * @var string|null A short description of the item
      */
     #[ApiProperty(iris: ['https://schema.org/description'])]
+    #[ORM\Column(nullable: true)]
     public $description;
 
     /**
      * @var string|null A dummy
      */
+    #[ORM\Column(nullable: true)]
     public $dummy;
 
     /**
      * @var bool|null A dummy boolean
      */
+    #[ORM\Column(type: 'boolean', nullable: true)]
 
     public ?bool $dummyBoolean = null;
     /**
      * @var \DateTime|null A dummy date
      */
     #[ApiProperty(iris: ['https://schema.org/DateTime'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     public $dummyDate;
 
     /**
      * @var float|null A dummy float
      */
+    #[ORM\Column(type: 'float', nullable: true)]
     public $dummyFloat;
 
     /**
      * @var string|null A dummy price
      */
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     public $dummyPrice;
 
     #[ApiProperty(push: true)]
+    #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
     public ?RelatedDummy $relatedDummy = null;
 
+    #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
     public Collection|iterable $relatedDummies;
 
     /**
      * @var array|null serialize data
      */
+    #[ORM\Column(type: 'json', nullable: true)]
     public $jsonData = [];
 
     /**
      * @var array|null
      */
+    #[ORM\Column(type: 'simple_array', nullable: true)]
     public $arrayData = [];
 
     /**
      * @var string|null
      */
+    #[ORM\Column(nullable: true)]
     public $nameConverted;
 
     /**
      * @var RelatedOwnedDummy|null
      */
+    #[ORM\OneToOne(targetEntity: RelatedOwnedDummy::class, cascade: ['persist'], mappedBy: 'owningDummy')]
     public $relatedOwnedDummy;
 
     /**
      * @var RelatedOwningDummy|null
      */
+    #[ORM\OneToOne(targetEntity: RelatedOwningDummy::class, cascade: ['persist'], inversedBy: 'ownedDummy')]
     public $relatedOwningDummy;
 
     public static function staticMethod(): void

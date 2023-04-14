@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Serializer\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

@@ -11,13 +11,22 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Api;
+namespace ApiPlatform\Metadata;
+
+use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Operation;
 
 /**
  * Extracts identifiers for a given Resource according to the retrieved Metadata.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-interface IdentifiersExtractorInterface extends \ApiPlatform\Metadata\IdentifiersExtractorInterface
+interface IdentifiersExtractorInterface
 {
+    /**
+     * Finds identifiers from an Item (object).
+     *
+     * @throws RuntimeException
+     */
+    public function getIdentifiersFromItem(object $item, ?Operation $operation = null, array $context = []): array;
 }

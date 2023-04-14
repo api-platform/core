@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Tests;
 
-use ApiPlatform\Api\FilterInterface;
-use ApiPlatform\Serializer\Exception\RuntimeException;
+use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;

@@ -16,8 +16,6 @@ namespace ApiPlatform\Symfony\Security;
 interface_exists(\ApiPlatform\Security\ResourceAccessCheckerInterface::class);
 
 /* @phpstan-ignore-next-line */
-if (false) {
-    interface ResourceAccessCheckerInterface extends \ApiPlatform\Security\ResourceAccessCheckerInterface
-    {
-    }
+interface ResourceAccessCheckerInterface extends \ApiPlatform\Security\ResourceAccessCheckerInterface
+{
 }

@@ -19,62 +19,67 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 
-/**
- * UriVariables converter that chains uri variables transformers.
- *
- * @author Antoine Bluchet <soyuka@gmail.com>
- */
-final class UriVariablesConverter implements UriVariablesConverterInterface
-{
+
+if (false) {
     /**
-     * @param iterable<UriVariableTransformerInterface> $uriVariableTransformers
+     * UriVariables converter that chains uri variables transformers.
+     *
+     * @author Antoine Bluchet <soyuka@gmail.com>
      */
-    public function __construct(private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly iterable $uriVariableTransformers)
+    final class UriVariablesConverter implements UriVariablesConverterInterface
     {
-    }
+        /**
+         * @param iterable<UriVariableTransformerInterface> $uriVariableTransformers
+         */
+        public function __construct(private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly iterable $uriVariableTransformers)
+        {
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function convert(array $uriVariables, string $class, array $context = []): array
-    {
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($class)->getOperation();
-        $context += ['operation' => $operation];
-        $uriVariablesDefinitions = $operation->getUriVariables() ?? [];
+        /**
+         * {@inheritdoc}
+         */
+        public function convert(array $uriVariables, string $class, array $context = []): array
+        {
+            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($class)->getOperation();
+            $context += ['operation' => $operation];
+            $uriVariablesDefinitions = $operation->getUriVariables() ?? [];
 
-        foreach ($uriVariables as $parameterName => $value) {
-            $uriVariableDefinition = $uriVariablesDefinitions[$parameterName] ?? $uriVariablesDefinitions['id'] ?? new Link();
-            if ([] === $types = $this->getIdentifierTypes($uriVariableDefinition->getFromClass() ?? $class, $uriVariableDefinition->getIdentifiers() ?? [$parameterName])) {
-                continue;
-            }
-
-            foreach ($this->uriVariableTransformers as $uriVariableTransformer) {
-                if (!$uriVariableTransformer->supportsTransformation($value, $types, $context)) {
+            foreach ($uriVariables as $parameterName => $value) {
+                $uriVariableDefinition = $uriVariablesDefinitions[$parameterName] ?? $uriVariablesDefinitions['id'] ?? new Link();
+                if ([] === $types = $this->getIdentifierTypes($uriVariableDefinition->getFromClass() ?? $class, $uriVariableDefinition->getIdentifiers() ?? [$parameterName])) {
                     continue;
                 }
 
-                try {
-                    $uriVariables[$parameterName] = $uriVariableTransformer->transform($value, $types, $context);
-                    break;
-                } catch (InvalidUriVariableException $e) {
-                    throw new InvalidUriVariableException(sprintf('Identifier "%s" could not be transformed.', $parameterName), $e->getCode(), $e);
+                foreach ($this->uriVariableTransformers as $uriVariableTransformer) {
+                    if (!$uriVariableTransformer->supportsTransformation($value, $types, $context)) {
+                        continue;
+                    }
+
+                    try {
+                        $uriVariables[$parameterName] = $uriVariableTransformer->transform($value, $types, $context);
+                        break;
+                    } catch (InvalidUriVariableException $e) {
+                        throw new InvalidUriVariableException(sprintf('Identifier "%s" could not be transformed.', $parameterName), $e->getCode(), $e);
+                    }
                 }
             }
+
+            return $uriVariables;
         }
 
-        return $uriVariables;
-    }
-
-    private function getIdentifierTypes(string $resourceClass, array $properties): array
-    {
-        $types = [];
-        foreach ($properties as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
-            foreach ($propertyMetadata->getBuiltinTypes() as $type) {
-                $types[] = Type::BUILTIN_TYPE_OBJECT === ($builtinType = $type->getBuiltinType()) ? $type->getClassName() : $builtinType;
+        private function getIdentifierTypes(string $resourceClass, array $properties): array
+        {
+            $types = [];
+            foreach ($properties as $property) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+                foreach ($propertyMetadata->getBuiltinTypes() as $type) {
+                    $types[] = Type::BUILTIN_TYPE_OBJECT === ($builtinType = $type->getBuiltinType()) ? $type->getClassName() : $builtinType;
+                }
             }
-        }
 
-        return $types;
+            return $types;
+        }
     }
 }
+
+class_alias(\ApiPlatform\Metadata\UriVariablesConverter::class, UriVariablesConverter::class);

@@ -11,21 +11,21 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Serializer\Exception;
+namespace ApiPlatform\Metadata\Exception;
 
 use ApiPlatform\Exception\InvalidArgumentException as LegacyInvalidArgumentException;
 
 if (class_exists(LegacyInvalidArgumentException::class)) {
-    class InvalidArgumentException extends LegacyInvalidArgumentException
+    class InvalidIdentifierException extends LegacyInvalidArgumentException
     {
     }
 } else {
     /**
-     * Invalid argument exception.
+     * Identifier is not valid exception.
      *
-     * @author Kévin Dunglas <dunglas@gmail.com>
+     * @author Antoine Bluchet <soyuka@gmail.com>
      */
-    class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
+    class InvalidIdentifierException extends \Exception implements ExceptionInterface
     {
     }
 }

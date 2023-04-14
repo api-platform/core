@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -26,36 +25,28 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 #[ApiResource(graphQlOperations: [new Query(name: 'item_query', normalizationContext: ['groups' => ['dummy_foo']]), new QueryCollection(name: 'collection_query', normalizationContext: ['groups' => ['dummy_foo']]), new Mutation(name: 'delete'), new Mutation(name: 'create', normalizationContext: ['groups' => ['dummy_bar']], denormalizationContext: ['groups' => ['dummy_bar', 'dummy_baz']])], normalizationContext: ['groups' => ['dummy_read']], denormalizationContext: ['groups' => ['dummy_write']], filters: ['dummy_group.group', 'dummy_group.override_group', 'dummy_group.whitelist_group', 'dummy_group.override_whitelist_group'])]
-#[ORM\Entity]
 class DummyGroup
 {
-    #[ORM\Id]
-    #[ORM\Column(type: 'integer')]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[Groups(['dummy', 'dummy_read', 'dummy_id'])]
     private ?int $id = null;
     /**
      * @var string|null
      */
-    #[ORM\Column(nullable: true)]
     #[Groups(['dummy', 'dummy_read', 'dummy_write', 'dummy_foo'])]
     public $foo;
     /**
      * @var string|null
      */
-    #[ORM\Column(nullable: true)]
     #[Groups(['dummy', 'dummy_read', 'dummy_write', 'dummy_bar'])]
     public $bar;
     /**
      * @var string|null
      */
-    #[ORM\Column(nullable: true)]
     #[Groups(['dummy', 'dummy_read', 'dummy_baz'])]
     public $baz;
     /**
      * @var string|null
      */
-    #[ORM\Column(nullable: true)]
     #[Groups(['dummy', 'dummy_write', 'dummy_qux'])]
     public $qux;
 

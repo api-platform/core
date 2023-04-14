@@ -15,19 +15,23 @@ namespace ApiPlatform\Api;
 
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 
-/**
- * The first path you will see in the API.
- *
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- */
-final class Entrypoint
-{
-    public function __construct(private readonly ResourceNameCollection $resourceNameCollection)
+if (!class_exists(\ApiPlatform\Metadata\Entrypoint::class)) {
+    /**
+     * The first path you will see in the API.
+     *
+     * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+     */
+    final class Entrypoint
     {
-    }
+        public function __construct(private readonly ResourceNameCollection $resourceNameCollection)
+        {
+        }
 
-    public function getResourceNameCollection(): ResourceNameCollection
-    {
-        return $this->resourceNameCollection;
+        public function getResourceNameCollection(): ResourceNameCollection
+        {
+            return $this->resourceNameCollection;
+        }
     }
+} else {
+    class_alias(\ApiPlatform\Metadata\Entrypoint::class, Entrypoint::class);
 }

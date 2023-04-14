@@ -26,13 +26,15 @@
     "api-platform/metadata": "*@dev || ^3.1",
     "api-platform/security": "*@dev || ^3.1",
     "api-platform/state": "*@dev || ^3.1",
+    "symfony/http-foundation": "^6.1",
+    "symfony/property-access": "^6.2",
     "symfony/serializer": "^6.1",
-    "symfony/validator": "^6.1",
-    "symfony/http-foundation": "^6.1"
+    "symfony/validator": "^6.1"
   },
   "require-dev": {
     "phpspec/prophecy-phpunit": "^2.0",
-    "symfony/phpunit-bridge": "^6.1"
+    "symfony/phpunit-bridge": "^6.1",
+    "doctrine/collections": "^2.1"
   },
   "autoload": {
     "psr-4": {
