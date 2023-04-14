@@ -640,6 +640,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         unset($context['resource_class']);
+        unset($context['force_resource_class']);
 
         if ($type && $type->getClassName()) {
             $childContext = $this->createChildContext($context, $attribute, $format);
