@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
-use ApiPlatform\Doctrine\Common\Filter\RangeFilterInterface;
-use ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait;
+use ApiPlatform\Doctrine\Odm\Filter\Interface\RangeFilterInterface;
+use ApiPlatform\Doctrine\Odm\Filter\Trait\RangeFilterTrait;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 

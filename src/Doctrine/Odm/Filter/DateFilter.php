@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
-use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
-use ApiPlatform\Doctrine\Common\Filter\DateFilterTrait;
+use ApiPlatform\Doctrine\Odm\Filter\Interface\DateFilterInterface;
+use ApiPlatform\Doctrine\Odm\Filter\Trait\DateFilterTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;

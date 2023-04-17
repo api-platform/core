@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
-use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait;
+use ApiPlatform\Doctrine\Odm\Filter\Interface\OrderFilterInterface;
+use ApiPlatform\Doctrine\Odm\Filter\Trait\OrderFilterTrait;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\Persistence\ManagerRegistry;
