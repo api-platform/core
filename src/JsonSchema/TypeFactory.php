@@ -119,7 +119,7 @@ final class TypeFactory implements TypeFactoryInterface
         if (!$this->isResourceClass($className) && is_a($className, \BackedEnum::class, true)) {
             $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
 
-            $type = \is_string($enumCases[0] ?? '') ? 'string' : 'int';
+            $type = \is_string($enumCases[0] ?? '') ? 'string' : 'integer';
 
             if ($nullable) {
                 $enumCases[] = null;
