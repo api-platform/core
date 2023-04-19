@@ -18,7 +18,7 @@ use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\DBAL\Types\Types;
@@ -89,7 +89,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $caseSensitive = true;
         $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
-        // prefixing the strategy with i makes it case insensitive
+        // prefixing the strategy with I make it case in-sensitive
         if (str_starts_with($strategy, 'i')) {
             $strategy = substr($strategy, 1);
             $caseSensitive = false;

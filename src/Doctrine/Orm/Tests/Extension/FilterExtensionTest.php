@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Orm\Extension\FilterExtension;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\FilterInterface as ApiFilterInterface;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\QueryBuilder;
@@ -64,5 +65,18 @@ class FilterExtensionTest extends TestCase
 
         $filterExtensionTest = new FilterExtension($filterLocatorProphecy->reveal());
         $filterExtensionTest->applyToCollection($this->prophesize(QueryBuilder::class)->reveal(), new QueryNameGenerator(), Dummy::class, new GetCollection(filters: ['dummyFilter', 'dummyBadFilter']));
+    }
+
+    public function testApplyToCollectionWithoutClassShouldThrowException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+
+        $filterLocatorProphecy->has(Argument::cetera())->willReturn(false);
+        $filterLocatorProphecy->get(Argument::cetera())->shouldNotBeCalled();
+
+        $filterExtensionTest = new FilterExtension($filterLocatorProphecy->reveal());
+        $filterExtensionTest->applyToCollection($this->prophesize(QueryBuilder::class)->reveal(), new QueryNameGenerator(), null, new GetCollection(filters: ['dummyFilter', 'dummyBadFilter']));
     }
 }

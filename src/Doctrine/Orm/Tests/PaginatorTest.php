@@ -90,6 +90,14 @@ class PaginatorTest extends TestCase
         new Paginator($doctrinePaginator->reveal());
     }
 
+    public function testPaginatorWithoutMaxResults(): void
+    {
+        $paginator = $this->getPaginator(maxResults: 0);
+
+        $this->assertSame((float) 1., $paginator->getCurrentPage());
+        $this->assertSame((float) 1., $paginator->getLastPage());
+    }
+
     public function initializeProvider(): array
     {
         return [

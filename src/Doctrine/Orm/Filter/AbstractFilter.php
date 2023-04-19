@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
-use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
+use ApiPlatform\Doctrine\Orm\CommonPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
@@ -25,8 +25,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 abstract class AbstractFilter implements FilterInterface
 {
+    use CommonPropertyHelperTrait;
     use OrmPropertyHelperTrait;
-    use PropertyHelperTrait;
     protected LoggerInterface $logger;
 
     public function __construct(protected ManagerRegistry $managerRegistry, LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
