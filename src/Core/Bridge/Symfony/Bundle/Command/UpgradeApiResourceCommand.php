@@ -31,6 +31,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\Parser\Php7;
 use PhpParser\PrettyPrinter\Standard;
 use SebastianBergmann\Diff\Differ;
+use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -215,7 +216,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
     private function printDiff(string $oldCode, string $newCode, OutputInterface $output): void
     {
         $consoleFormatter = new ColorConsoleDiffFormatter();
-        $differ = new Differ();
+        $differ = new Differ(new UnifiedDiffOutputBuilder());
         $diff = $differ->diff($oldCode, $newCode);
         $output->write($consoleFormatter->format($diff));
     }
