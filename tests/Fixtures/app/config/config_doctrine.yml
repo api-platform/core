@@ -75,27 +75,27 @@ services:
         tags:
             -  name: 'api_platform.state_provider'
 
-    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider: 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider:
         arguments:
             $decorated: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
         tags:
             - name: 'api_platform.state_provider'
 
-    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProvider: 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProvider:
         arguments:
             $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
             $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
         tags:
             - name: 'api_platform.state_provider'
 
-    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomOutputDtoProvider: 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomOutputDtoProvider:
         arguments:
             $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
             $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
         tags:
             - name: 'api_platform.state_provider'
 
-    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor: 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor:
         arguments:
             $registry: '@doctrine'
         tags:
@@ -107,9 +107,16 @@ services:
         tags:
             - name: 'api_platform.state_processor'
 
-    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomInputDtoProcessor: 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomInputDtoProcessor:
         arguments:
             $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
         tags:
             - name: 'api_platform.state_processor'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\EntityClassAndCustomProviderResourceProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\EntityClassAndCustomProviderResourceProvider'
+        tags:
+            -  { name: 'api_platform.state_provider' }
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'

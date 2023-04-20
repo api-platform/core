@@ -225,6 +225,9 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
         $normalizedUriVariables = [];
         $resourceClass = $operation->getClass();
+        if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+            $resourceClass = $options->getEntityClass();
+        }
 
         foreach ($uriVariables as $parameterName => $uriVariable) {
             $normalizedParameterName = $parameterName;
