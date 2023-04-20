@@ -216,7 +216,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
     private function printDiff(string $oldCode, string $newCode, OutputInterface $output): void
     {
         $consoleFormatter = new ColorConsoleDiffFormatter();
-        $differ = new Differ(new UnifiedDiffOutputBuilder());
+        $differ = class_exists(UnifiedDiffOutputBuilder::class) ? new Differ(new UnifiedDiffOutputBuilder()) :  new Differ();
         $diff = $differ->diff($oldCode, $newCode);
         $output->write($consoleFormatter->format($diff));
     }
