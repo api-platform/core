@@ -27,7 +27,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument>%api_platform.validator.query_parameter_validation%</argument>
 
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="16" />
         </service>
     </services>
 
