@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
@@ -182,14 +181,9 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                         continue;
                     }
 
-                    $entityClass = $operation->getClass();
-                    if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
-                        $entityClass = $options->getEntityClass();
-                    }
-
                     $newUriVariables[$variable] = (new Link())
-                        ->withFromClass($entityClass)
-                        ->withIdentifiers([property_exists($entityClass, $variable) ? $variable : 'id'])
+                        ->withFromClass($operation->getClass())
+                        ->withIdentifiers([property_exists($operation->getClass(), $variable) ? $variable : 'id'])
                         ->withParameterName($variable);
                 }
 
