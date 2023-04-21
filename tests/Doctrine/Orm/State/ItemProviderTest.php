@@ -267,6 +267,9 @@ class ItemProviderTest extends TestCase
             Employee::class => $employeeClassMetadataProphecy->reveal(),
         ]);
 
+        $managerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $managerRegistryProphecy->getManagerForClass(Employee::class)->willReturn($managerProphecy->reveal());
+
         /** @var HttpOperation */
         $operation = (new Get())->withUriVariables([
             'employeeId' => (new Link())->withFromClass(Employee::class)

@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -38,9 +39,10 @@ class EntityClassAndCustomProviderResourceProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
+        $operation = ($stateOptions = $operation->getStateOptions()) instanceof Options ? $operation->withClass($stateOptions->getEntityClass()) : $operation;
         if ($operation instanceof CollectionOperationInterface) {
             $data = $this->collectionProvider->provide(
-                $operation->withClass($operation->getStateOptions()->getEntityClass()),
+                $operation,
                 $uriVariables,
                 $context);
 
@@ -54,7 +56,7 @@ class EntityClassAndCustomProviderResourceProvider implements ProviderInterface
         }
 
         $data = $this->itemProvider->provide(
-            $operation->withClass($operation->getStateOptions()->getEntityClass()),
+            $operation,
             $uriVariables,
             $context
         );
@@ -74,6 +76,7 @@ class EntityClassAndCustomProviderResourceProvider implements ProviderInterface
         $resource = new EntityClassAndCustomProviderResource();
         $resource->id = $data->id;
         $resource->value = $data->value;
+
         return $resource;
     }
 }
