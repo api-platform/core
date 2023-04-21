@@ -225,7 +225,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $hydraOperations = [];
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operation) {
-                if ((HttpOperation::METHOD_POST === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
+                if (('POST' === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                     continue;
                 }
 
@@ -241,7 +241,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      */
     private function getHydraOperation(HttpOperation $operation, string $prefixedShortName): array
     {
-        $method = $operation->getMethod() ?: HttpOperation::METHOD_GET;
+        $method = $operation->getMethod() ?: 'GET';
 
         $hydraOperation = $operation->getHydraContext() ?? [];
         if ($operation->getDeprecationReason()) {

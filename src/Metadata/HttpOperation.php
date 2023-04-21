@@ -76,7 +76,7 @@ class HttpOperation extends Operation
      * @param string|callable|null   $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
      */
     public function __construct(
-        protected string $method = self::METHOD_GET,
+        protected string $method = 'GET',
         protected ?string $uriTemplate = null,
         protected ?array $types = null,
         protected $formats = null,

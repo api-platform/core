@@ -94,7 +94,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         array $extraProperties = [],
     ) {
         parent::__construct(
-            method: self::METHOD_DELETE,
+            method: 'DELETE',
             uriTemplate: $uriTemplate,
             types: $types,
             formats: $formats,

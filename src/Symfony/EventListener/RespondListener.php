@@ -15,7 +15,6 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -91,7 +90,7 @@ final class RespondListener
         ) {
             $status = 301;
             $headers['Location'] = $this->iriConverter->getIriFromResource($request->attributes->get('data'), UrlGeneratorInterface::ABS_PATH, $operation);
-        } elseif (HttpOperation::METHOD_PUT === $method && !($attributes['previous_data'] ?? null) && null === $status && ($operation instanceof Put && ($operation->getAllowCreate() ?? false))) {
+        } elseif ('PUT' === $method && !($attributes['previous_data'] ?? null) && null === $status && ($operation instanceof Put && ($operation->getAllowCreate() ?? false))) {
             $status = Response::HTTP_CREATED;
         }
 
@@ -100,7 +99,7 @@ final class RespondListener
         if ($request->attributes->has('_api_write_item_iri')) {
             $headers['Content-Location'] = $request->attributes->get('_api_write_item_iri');
 
-            if ((Response::HTTP_CREATED === $status || (300 <= $status && $status < 400)) && HttpOperation::METHOD_POST === $method) {
+            if ((Response::HTTP_CREATED === $status || (300 <= $status && $status < 400)) && 'POST' === $method) {
                 $headers['Location'] = $request->attributes->get('_api_write_item_iri');
             }
         }
