@@ -35,7 +35,7 @@ class CompositeItem implements \Stringable
     private ?string $field1 = null;
     #[ORM\OneToMany(targetEntity: CompositeRelation::class, mappedBy: 'compositeItem', fetch: 'EAGER')]
     #[Groups(['default'])]
-    private Collection|iterable $compositeValues; // @phpstan-ignore-line
+    private Collection|iterable $compositeValues;
 
     public function __construct()
     {

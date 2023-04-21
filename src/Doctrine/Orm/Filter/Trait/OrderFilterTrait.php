@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Filter\Trait;
 
 use ApiPlatform\Doctrine\Orm\CommonPropertyHelperTrait;
+use ApiPlatform\Doctrine\Orm\Filter\Interface\OrderFilterInterface;
 
 /**
  * Trait for ordering the collection by given properties.

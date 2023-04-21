@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * and for each property a direction value can be specified.
  *
  * For each property passed, if the resource does not have such property or if the
- * direction value is different from "asc" or "desc" (case insensitive), the property
+ * direction value is different from "asc" or "desc" (case in-sensitive), the property
  * is ignored.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>

@@ -49,6 +49,7 @@ parameters:
 			paths:
 				- tests/Fixtures/TestBundle/Document/
 				- src/Metadata/Tests/Fixtures/ApiResource/
+				- src/Doctrine/Orm/Tests/Fixtures/TestBundle/Entity/
 		-
 			message: '#Parameter \#1 \$constraint of method#'
 			paths:
