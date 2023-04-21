@@ -1,5 +1,19 @@
 # Changelog
 
+## v3.1.8
+
+### Bug fixes
+
+* [1f28efc56](https://github.com/api-platform/core/commit/1f28efc56e7aa18dd3ef265e54b9517ffe883189) fix(graphql): send headers in GraphiQL (#5539)
+* [25861348d](https://github.com/api-platform/core/commit/25861348d02a41b0e2a99537e0943d5506831593) fix(elasticsearch): add is_collection to documentation (#5497)
+* [60082d7a5](https://github.com/api-platform/core/commit/60082d7a5f83022d68e2e59c7683dd0fc586d1b7) fix(doctrine): use fromClass metadata for each link (#5508)
+* [62510b2bb](https://github.com/api-platform/core/commit/62510b2bbe514dca93ae3b081f43f1cb56fef984) fix(jsonschema): change type to integer in json schema for int backed enums (#5553)
+* [6d2f883d1](https://github.com/api-platform/core/commit/6d2f883d17c6866bb41ab72ca84d3d8358625476) fix(metadata): remove identifier_metadata_factory services (#5518)
+* [6d7aaf7de](https://github.com/api-platform/core/commit/6d7aaf7dee263ee43894c5ae504c970d822e715a) fix: class already declared with preloading (#5523)
+* [aa7f4b8fe](https://github.com/api-platform/core/commit/aa7f4b8fe8c70a3fd7c2161c68e21c0edc6de89f) Revert "fix(symfony): query parameter validation after authentication (#5473)" (#5556)
+* [e4fa5a234](https://github.com/api-platform/core/commit/e4fa5a234b05652630c07ab375c5d4b9e46e17f8) fix(serializer): no forced resource class relation (#5542)
+* [f3935749e](https://github.com/api-platform/core/commit/f3935749e83176c9be0afe8628b5b617529577bd) fix: the stateOptions::entityClass should be used when present while building Links (#5550)
+
 ## v3.1.7
 
 ### Bug fixes
