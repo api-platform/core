@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.1.9
+
+* [0fc5ad580](https://github.com/api-platform/core/commit/0fc5ad58024e49c434ef0d68a04b2fcc83308e5f) Fixes wrong interfaces aliases (#5563)
+
 ## v3.1.8
 
 ### Bug fixes
