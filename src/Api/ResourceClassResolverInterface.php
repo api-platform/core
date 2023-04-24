@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-/* @phpstan-ignore-next-line */
 interface ResourceClassResolverInterface extends \ApiPlatform\Metadata\ResourceClassResolverInterface
 {
 }

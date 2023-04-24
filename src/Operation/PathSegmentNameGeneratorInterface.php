@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Operation;
 
-/* @phpstan-ignore-next-line */
 interface PathSegmentNameGeneratorInterface extends \ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface
 {
 }
