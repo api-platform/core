@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -25,6 +24,7 @@ use ApiPlatform\Metadata\Resource\Factory\LinkFactory;
 use ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelatedDummy;
