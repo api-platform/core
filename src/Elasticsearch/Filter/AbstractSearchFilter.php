@@ -114,22 +114,18 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
      */
     protected function getPhpType(Type $type): string
     {
-        switch ($builtinType = $type->getBuiltinType()) {
-            case Type::BUILTIN_TYPE_ARRAY:
-            case Type::BUILTIN_TYPE_INT:
-            case Type::BUILTIN_TYPE_FLOAT:
-            case Type::BUILTIN_TYPE_BOOL:
-            case Type::BUILTIN_TYPE_STRING:
-                return $builtinType;
-            case Type::BUILTIN_TYPE_OBJECT:
+        return match ($builtinType = $type->getBuiltinType()) {
+            Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_INT,
+            Type::BUILTIN_TYPE_FLOAT, Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_STRING => $builtinType,
+            Type::BUILTIN_TYPE_OBJECT => (function () use ($type) {
                 if (null !== ($className = $type->getClassName()) && is_a($className, \DateTimeInterface::class, true)) {
                     return \DateTimeInterface::class;
                 }
 
-                // no break
-            default:
                 return 'string';
-        }
+            })(),
+            default => 'string'
+        };
     }
 
     /**

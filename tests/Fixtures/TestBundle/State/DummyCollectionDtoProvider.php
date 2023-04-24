@@ -24,20 +24,17 @@ class DummyCollectionDtoProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $class = $operation->getOutput()['class'];
-        switch ($class) {
-            case DummyCollectionDtoOutput::class:
-            case DummyFooCollectionDto::class:
-                return [
-                    new $class('lorem', 1),
-                    new $class('ipsum', 2),
-                ];
-            case DummyIdCollectionDtoOutput::class:
-                return [
-                    new $class(1, 'lorem', 1),
-                    new $class(2, 'ipsum', 2),
-                ];
-            default:
-                return [];
-        }
+
+        return match ($class) {
+            DummyCollectionDtoOutput::class, DummyFooCollectionDto::class => [
+                new $class('lorem', 1),
+                new $class('ipsum', 2),
+            ],
+            DummyIdCollectionDtoOutput::class => [
+                new $class(1, 'lorem', 1),
+                new $class(2, 'ipsum', 2),
+            ],
+            default => []
+        };
     }
 }

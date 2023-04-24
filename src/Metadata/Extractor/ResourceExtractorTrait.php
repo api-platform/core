@@ -53,22 +53,19 @@ trait ResourceExtractorTrait
             return $default;
         }
 
-        switch ($type) {
-            case 'bool|string':
-                return \is_bool($resource[$key]) || \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string');
-            case 'string':
-                return (string) $resource[$key];
-            case 'integer':
-                return (int) $resource[$key];
-            case 'bool':
+        return match ($type) {
+            'bool|string' => \is_bool($resource[$key]) || \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string'),
+            'string' => (string) $resource[$key],
+            'int' => (int) $resource[$key],
+            'bool' => (function () use ($resource, $key) {
                 if (\is_object($resource) && $resource instanceof \SimpleXMLElement) {
                     return (bool) XmlUtils::phpize($resource[$key]);
                 }
 
                 return \in_array($resource[$key], ['1', 'true', 1, true], false);
-        }
-
-        throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key])));
+            })(),
+            default => throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key])))
+        };
     }
 
     private function buildArgs(\SimpleXMLElement $resource): ?array

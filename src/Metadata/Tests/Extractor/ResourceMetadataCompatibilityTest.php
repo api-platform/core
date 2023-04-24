@@ -731,12 +731,11 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         }
 
         $configuration = reset($values);
-        switch (key($values)) {
-            case 'elasticsearchOptions':
-                return new StateOptions($configuration['index'] ?? null, $configuration['type'] ?? null);
-        }
 
-        throw new \LogicException(sprintf('Unsupported "%s" state options.', key($values)));
+        return match (key($values)) {
+            'elasticsearchOptions' => new StateOptions($configuration['index'] ?? null, $configuration['type'] ?? null),
+            default => throw new \LogicException(sprintf('Unsupported "%s" state options.', key($values)))
+        };
     }
 
     private function withLinks(array $values): ?array
