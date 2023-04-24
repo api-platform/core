@@ -29,7 +29,3 @@ interface PathSegmentNameGeneratorInterface
      */
     public function getSegmentName(string $name, bool $collection = true): string;
 }
-
-if (!interface_exists(\ApiPlatform\Operation\PathSegmentNameGeneratorInterface::class)) {
-    class_alias(PathSegmentNameGeneratorInterface::class, \ApiPlatform\Operation\PathSegmentNameGeneratorInterface::class);
-}

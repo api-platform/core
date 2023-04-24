@@ -13,11 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Operation;
 
-interface_exists(\ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface::class);
-
 /* @phpstan-ignore-next-line */
-if (false) {
-    interface PathSegmentNameGeneratorInterface extends \ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface
-    {
-    }
+interface PathSegmentNameGeneratorInterface extends \ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface
+{
 }

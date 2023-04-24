@@ -54,7 +54,3 @@ interface FilterInterface
      */
     public function getDescription(string $resourceClass): array;
 }
-
-if (!interface_exists(\ApiPlatform\Api\FilterInterface::class)) {
-    class_alias(FilterInterface::class, \ApiPlatform\Api\FilterInterface::class);
-}

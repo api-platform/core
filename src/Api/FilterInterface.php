@@ -13,11 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-interface_exists(\ApiPlatform\Metadata\FilterInterface::class);
-
-/* @phpstan-ignore-next-line */
-if (false) {
-    interface FilterInterface extends \ApiPlatform\Metadata\FilterInterface
-    {
-    }
+interface FilterInterface extends \ApiPlatform\Metadata\FilterInterface
+{
 }
