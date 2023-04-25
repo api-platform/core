@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Api;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\FilterInterface;
 use Psr\Container\ContainerInterface;
 
 /**
