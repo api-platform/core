@@ -14,12 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\Exception;
 
 /**
- * Non unique identifier exception.
+ * Base exception interface.
  *
- * @experimental
- *
- * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class NonUniqueIdentifierException extends \Exception implements ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 }

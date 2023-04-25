@@ -34,8 +34,14 @@ final class ApiFilter
         public array $properties = [],
         public array $arguments = [],
     ) {
-        if (!is_a($this->filterClass, FilterInterface::class, true) || !is_a($this->filterClass, LegacyFilterInterface::class, true)) {
-            throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s". Did you forget a use statement?', $this->filterClass, FilterInterface::class));
+        if (is_a($this->filterClass, FilterInterface::class, true)) {
+            return;
         }
+
+        if (is_a($this->filterClass, LegacyFilterInterface::class, true)) {
+            return;
+        }
+
+        throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s". Did you forget a use statement?', $this->filterClass, FilterInterface::class));
     }
 }

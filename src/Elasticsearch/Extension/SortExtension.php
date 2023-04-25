@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Extension;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
