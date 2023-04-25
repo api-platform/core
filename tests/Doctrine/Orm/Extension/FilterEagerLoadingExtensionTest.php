@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Extension;
 
-use ApiPlatform\Api\ResourceClassResolver;
 use ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
