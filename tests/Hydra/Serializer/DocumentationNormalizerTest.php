@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hydra\Serializer;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer;
 use ApiPlatform\Metadata\ApiProperty;
@@ -30,6 +28,8 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

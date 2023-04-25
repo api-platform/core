@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Util\ArrayTrait;

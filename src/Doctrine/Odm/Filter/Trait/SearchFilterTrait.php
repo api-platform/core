@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter\Trait;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Doctrine\Odm\CommonPropertyHelperTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\IriConverterInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hal\Serializer;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Util\IriHelper;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;

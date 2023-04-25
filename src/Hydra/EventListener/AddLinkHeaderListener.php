@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\EventListener;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Util\CorsTrait;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\WebLink\GenericLinkProvider;
