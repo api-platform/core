@@ -192,6 +192,7 @@ jobs:
           - JsonSchema
           - OpenApi
           - Metadata
+          - Elasticsearch
       fail-fast: false
     steps:
       - name: Checkout
