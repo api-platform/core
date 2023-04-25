@@ -13,11 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-interface_exists(\ApiPlatform\Metadata\UrlGeneratorInterface::class);
-
-/* @phpstan-ignore-next-line */
-if (false) {
-    interface UrlGeneratorInterface extends \ApiPlatform\Metadata\UrlGeneratorInterface
-    {
-    }
+interface UrlGeneratorInterface extends \ApiPlatform\Metadata\UrlGeneratorInterface
+{
 }

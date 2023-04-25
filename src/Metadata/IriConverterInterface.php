@@ -42,5 +42,3 @@ interface IriConverterInterface
      */
     public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string;
 }
-
-class_alias(IriConverterInterface::class, \ApiPlatform\Api\IriConverterInterface::class);

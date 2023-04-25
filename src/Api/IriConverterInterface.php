@@ -13,11 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-interface_exists(\ApiPlatform\Metadata\IriConverterInterface::class);
-
-/* @phpstan-ignore-next-line */
-if (false) {
-    interface IriConverterInterface extends \ApiPlatform\Metadata\IriConverterInterface
-    {
-    }
+interface IriConverterInterface extends \ApiPlatform\Metadata\IriConverterInterface
+{
 }
