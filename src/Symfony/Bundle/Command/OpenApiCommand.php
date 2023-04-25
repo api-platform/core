@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\Command;
 
 class_exists(\ApiPlatform\OpenApi\Command\OpenApiCommand::class);
+class_alias(\ApiPlatform\OpenApi\Command\OpenApiCommand::class, \ApiPlatform\Symfony\Bundle\Command\OpenApiCommand::class);
 
 if (false) {
     final class OpenApiCommand extends \ApiPlatform\OpenApi\Command\OpenApiCommand
