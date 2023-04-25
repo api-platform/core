@@ -16,7 +16,7 @@ namespace ApiPlatform\Elasticsearch\Metadata\Document\Factory;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\Inflector;
+use ApiPlatform\Metadata\Util\Inflector;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 
