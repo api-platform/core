@@ -17,7 +17,7 @@ interface ValidatorInterface
 {
     /**
      * @param string               $name              the parameter name to validate
-     * @param array<string, mixed> $filterDescription the filter descriptions as returned by `\ApiPlatform\Api\FilterInterface::getDescription()`
+     * @param array<string, mixed> $filterDescription the filter descriptions as returned by `\ApiPlatform\Metadata\FilterInterface::getDescription()`
      * @param array<string, mixed> $queryParameters   the list of query parameter
      */
     public function validate(string $name, array $filterDescription, array $queryParameters): array;
