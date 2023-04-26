@@ -1298,7 +1298,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class, 'xml');
     }
 
-    public function testDenormalizePopulatingNonCloneableObject()
+    public function testDenormalizePopulatingNonCloneableObject(): void
     {
         $dummy = new NonCloneableDummy();
         $dummy->setName('foo');
@@ -1331,13 +1331,11 @@ class AbstractItemNormalizerTest extends TestCase
             $propertyAccessorProphecy->reveal(),
             null,
             null,
-            null,
-            false,
-            [],
             [],
             null,
             null,
         ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $context = [AbstractItemNormalizer::OBJECT_TO_POPULATE => $dummy];
