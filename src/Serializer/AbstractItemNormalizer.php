@@ -33,6 +33,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Util\CloneTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -59,6 +60,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 {
     use ClassInfoTrait;
+    use CloneTrait;
     use ContextTrait;
     use InputOutputMetadataTrait;
 
@@ -360,10 +362,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $item;
         }
 
-        $previousObject = null !== $objectToPopulate ? clone $objectToPopulate : null;
+        $previousObject = $this->clone($objectToPopulate);
         $object = parent::denormalize($data, $resourceClass, $format, $context);
 
         if (!$this->resourceClassResolver->isResourceClass($context['resource_class'])) {
+            return $object;
+        }
+
+        // Bypass the post-denormalize attribute revert logic if the object could not be
+        // cloned since we cannot possibly revert any changes made to it.
+        if (null !== $objectToPopulate && null === $previousObject) {
             return $object;
         }
 
