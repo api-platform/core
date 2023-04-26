@@ -25,6 +25,8 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Util\CloneTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -51,6 +53,7 @@ use Symfony\Component\Serializer\Serializer;
 abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 {
     use ClassInfoTrait;
+    use CloneTrait;
     use ContextTrait;
     use InputOutputMetadataTrait;
 
@@ -214,11 +217,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" resource must be "array" (nested document) or "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null);
         }
 
-        $previousObject = isset($objectToPopulate) ? clone $objectToPopulate : null;
-
+        $previousObject = $this->clone($objectToPopulate);
         $object = parent::denormalize($data, $class, $format, $context);
 
         if (!$this->resourceClassResolver->isResourceClass($class)) {
+            return $object;
+        }
+
+        // Bypass the post-denormalize attribute revert logic if the object could not be
+        // cloned since we cannot possibly revert any changes made to it.
+        if (null !== $objectToPopulate && null === $previousObject) {
             return $object;
         }
 
