@@ -113,7 +113,7 @@ final class PersistProcessor implements ProcessorInterface
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {
         $classMetadata = $manager->getClassMetadata($this->getObjectClass($data));
-        if ((is_a($classMetadata, 'Doctrine\ORM\Mapping\ClassMetadataInfo') || is_a($classMetadata, 'Doctrine\ODM\MongoDB\Mapping\ClassMetadata')) && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
+        if (method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
             return $classMetadata->isChangeTrackingDeferredExplicit();
         }
 

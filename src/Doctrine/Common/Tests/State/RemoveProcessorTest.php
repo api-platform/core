@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Doctrine\Common\State;
+namespace ApiPlatform\Doctrine\Common\Tests\State;
 
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;

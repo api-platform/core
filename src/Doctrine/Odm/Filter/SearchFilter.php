@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDBClassMetadata;
