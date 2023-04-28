@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
-use ApiPlatform\Doctrine\Odm\Filter\Interface\ExistsFilterInterface;
-use ApiPlatform\Doctrine\Odm\Filter\Trait\ExistsFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ExistsFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;

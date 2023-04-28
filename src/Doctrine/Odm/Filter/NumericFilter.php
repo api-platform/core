@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
-use ApiPlatform\Doctrine\Odm\Filter\Trait\NumericFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\NumericFilterTrait;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
