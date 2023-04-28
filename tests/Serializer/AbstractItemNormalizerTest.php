@@ -551,7 +551,8 @@ class AbstractItemNormalizerTest extends TestCase
         $relatedDummyChildContext = Argument::allOf(
             Argument::type('array'),
             Argument::withEntry('resource_class', RelatedDummy::class),
-            Argument::not(Argument::withKey('iri'))
+            Argument::not(Argument::withKey('iri')),
+            Argument::not(Argument::withKey('force_resource_class'))
         );
         $serializerProphecy->normalize($relatedDummy, null, $relatedDummyChildContext)->willReturn(['foo' => 'hello']);
         $serializerProphecy->normalize(['foo' => 'hello'], null, Argument::type('array'))->willReturn(['foo' => 'hello']);
@@ -577,6 +578,7 @@ class AbstractItemNormalizerTest extends TestCase
         ];
         $this->assertSame($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
+            'force_resource_class' => Dummy::class,
         ]));
     }
 
