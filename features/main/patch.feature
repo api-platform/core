@@ -58,3 +58,47 @@ Feature: Sending PATCH requets
       }
     }
     """
+
+  Scenario: Patch the oneToMany relation
+    Given there is PatchOneToManyDummy with "2" related patchOneToManyDummyRelationWithConstructor objects
+    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Content-Type" header equal to "application/merge-patch+json"
+    And I send a "PATCH" request to "/patch_one_to_many_dummies/1" with body:
+    """
+    {
+      "relations": [
+        {
+          "id": "/patch_one_to_many_dummy_relation_with_constructors/1",
+          "name": "Relation 1"
+        },
+        {
+          "name": "Relation 3"
+        }
+      ]
+    }
+    """
+    Then the response status code should be 200
+    And the JSON should be equal to:
+    """
+      {
+        "@context": "/contexts/PatchOneToManyDummy",
+        "@id": "/patch_one_to_many_dummies/1",
+        "@type": "PatchOneToManyDummy",
+        "id": 1,
+        "relations": ["/patch_one_to_many_dummy_relation_with_constructors/1", "/patch_one_to_many_dummy_relation_with_constructors/3"]
+      }
+    """
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/patch_one_to_many_dummy_relation_with_constructors/1"
+    Then the response status code should be 200
+    And the JSON should be equal to:
+    """
+      {
+        "@context": "/contexts/PatchOneToManyDummyRelationWithConstructor",
+        "@id": "/patch_one_to_many_dummy_relation_with_constructors/1",
+        "@type": "PatchOneToManyDummyRelationWithConstructor",
+        "id": 1,
+        "name": "Relation 1",
+        "related": "/patch_one_to_many_dummies/1"
+      }
+    """
