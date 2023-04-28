@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.7.12
+
+### Bug fixes
+
+* [810e4455b](https://github.com/api-platform/core/commit/810e4455b34070c12404bc65ea0366c48d54d43d) fix(serializer): fix denormalizing to non-cloneable objects (#5569)
+* [b6dc7728b](https://github.com/api-platform/core/commit/b6dc7728b68db71242e00beab4b09030254a323f) fix(symfony): update for PHPUnit 10 (#5551)
+
 ## v2.7.11
 
 ### Bug fixes
