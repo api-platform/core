@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\Interface\ExistsFilterInterface;
-use ApiPlatform\Doctrine\Orm\Filter\Trait\ExistsFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ExistsFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;

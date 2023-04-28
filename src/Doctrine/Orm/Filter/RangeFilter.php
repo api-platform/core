@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\Interface\RangeFilterInterface;
-use ApiPlatform\Doctrine\Orm\Filter\Trait\RangeFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\RangeFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\Query\Expr\Join;

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\Interface\OrderFilterInterface;
-use ApiPlatform\Doctrine\Orm\Filter\Trait\OrderFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\Query\Expr\Join;

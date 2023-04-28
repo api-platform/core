@@ -30,7 +30,8 @@
     "psr/log": "^1.0 || ^2.0 || ^3.0",
     "symfony/property-info": "^6.1",
     "doctrine/orm": "^2.14",
-    "symfony/serializer": "^6.1"
+    "symfony/serializer": "^6.1",
+    "api-platform/doctrine-common": "*@dev || ^3.1"
   },
   "require-dev": {
     "phpstan/phpdoc-parser": "^1.16",
@@ -76,6 +77,10 @@
       {
           "type": "path",
           "url": "../../State"
+      },
+      {
+          "type": "path",
+          "url": "../../Doctrine/Common"
       }
   ]
 }

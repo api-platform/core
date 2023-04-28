@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\Trait\NumericFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\NumericFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\DBAL\Types\Types;
