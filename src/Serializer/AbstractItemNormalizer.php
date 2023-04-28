@@ -25,7 +25,6 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
-use ApiPlatform\Util\ClassInfoTrait;
 use ApiPlatform\Util\CloneTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -43,7 +42,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Base item normalizer.
@@ -707,7 +705,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
-            $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $context);
+            $relatedContext = $context;
+            unset($relatedContext['force_resource_class']);
+            $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $relatedContext);
             if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
                 throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
             }
