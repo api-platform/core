@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Doctrine\Common\State;
+namespace ApiPlatform\Doctrine\Common\Tests\State;
 
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
