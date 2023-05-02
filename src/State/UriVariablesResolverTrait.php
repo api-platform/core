@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\State;
 
 use ApiPlatform\Api\CompositeIdentifierParser;
-use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\UriVariablesConverterInterface;
 
 trait UriVariablesResolverTrait
 {
