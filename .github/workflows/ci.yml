@@ -200,6 +200,7 @@ jobs:
           - OpenApi
           - Metadata
           - Elasticsearch
+          - RamseyUuid
       fail-fast: false
     steps:
       - name: Checkout
