@@ -94,7 +94,6 @@ final class MatchesJsonSchema extends Constraint
         if (!\is_string($document)) {
             throw new \UnexpectedValueException('JSON encode failed.');
         }
-
         $document = json_decode($document, null, 512, \JSON_THROW_ON_ERROR);
         if (!\is_array($document) && !\is_object($document)) {
             throw new \UnexpectedValueException('JSON decode failed.');

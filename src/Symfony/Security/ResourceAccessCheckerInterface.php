@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Security;
 
-interface_exists(\ApiPlatform\Security\ResourceAccessCheckerInterface::class);
-
 /* @phpstan-ignore-next-line */
 interface ResourceAccessCheckerInterface extends \ApiPlatform\Security\ResourceAccessCheckerInterface
 {
