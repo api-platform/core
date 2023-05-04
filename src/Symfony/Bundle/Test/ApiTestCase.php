@@ -99,7 +99,7 @@ abstract class ApiTestCase extends KernelTestCase
 
         return $iriConverter->getIriFromResource($item);
     }
-    
+
     /**
      * Generate the IRI of a resource item.
      */
