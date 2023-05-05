@@ -100,7 +100,7 @@ abstract class ApiTestCase extends KernelTestCase
     /**
      * Generate the IRI of a resource item.
      */
-    protected function getIriForResource(object $resource): ?string
+    protected function getIriFromResource(object $resource): ?string
     {
         /** @var IriConverterInterface $iriConverter */
         $iriConverter = static::getContainer()->get('api_platform.iri_converter');
