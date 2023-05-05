@@ -100,3 +100,11 @@ Feature: Resource attributes
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:description" should be equal to 'Unable to generate an IRI for the item of type "ApiPlatform\Tests\Fixtures\TestBundle\Entity\IncompleteUriVariableConfigured"'
+
+  Scenario: Uri variables with Post operation
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/post_with_uri_variables/{id}" with body:
+    """
+    {}
+    """
+    Then the response status code should be 201
