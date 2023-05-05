@@ -194,7 +194,6 @@ class ItemNormalizerTest extends TestCase
 
         $propertyMetadata = (new ApiProperty())->withReadable(true)->withWritable(true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::cetera())->willReturn($propertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::cetera())->willReturn($propertyMetadata)->shouldBeCalled();
 
         $uriVariables = [
