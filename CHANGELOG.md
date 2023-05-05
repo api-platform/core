@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.1.11
+
+### Bug fixes
+
+* [2121d15c3](https://github.com/api-platform/core/commit/2121d15c3d3401f43ee3af4aedbb9d45d36adce3) fix(symfony): allow post with uri variables and no provider
+* [ed4bca9b9](https://github.com/api-platform/core/commit/ed4bca9b95571984f5c94924640dd0bbd0aa3ce9) fix(serializer): Guess uri variables with the operation and the data instead of hardcoding id (#5546)
+
 ## v3.1.10
 
 ### Bug fixes
