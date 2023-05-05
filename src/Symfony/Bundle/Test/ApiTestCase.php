@@ -94,7 +94,7 @@ abstract class ApiTestCase extends KernelTestCase
             return null;
         }
 
-        return $this->getIriForResource($item);
+        return $this->getIriFromResource($item);
     }
 
     /**
