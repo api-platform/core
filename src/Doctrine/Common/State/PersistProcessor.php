@@ -41,8 +41,8 @@ final class PersistProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (
-            !\is_object($data) ||
-            !$manager = $this->managerRegistry->getManagerForClass($class = $this->getObjectClass($data))
+            !\is_object($data)
+            || !$manager = $this->managerRegistry->getManagerForClass($class = $this->getObjectClass($data))
         ) {
             return $data;
         }

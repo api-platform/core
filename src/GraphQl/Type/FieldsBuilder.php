@@ -282,8 +282,8 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
             $isCollectionType = $this->typeBuilder->isCollection($type);
 
             if (
-                $isCollectionType &&
-                $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
+                $isCollectionType
+                && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
             ) {
                 $resourceClass = $collectionValueType->getClassName();
             } else {

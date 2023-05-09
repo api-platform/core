@@ -126,11 +126,6 @@
             <argument type="service" id="api_platform.doctrine.orm.metadata.property.metadata_factory.inner" />
         </service>
 
-        <service id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="40">
-            <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory.inner" />
-        </service>
-
         <service id="api_platform.doctrine.orm.state.collection_provider" class="ApiPlatform\Doctrine\Orm\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />

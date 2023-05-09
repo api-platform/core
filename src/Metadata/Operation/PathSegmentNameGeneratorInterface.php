@@ -29,5 +29,3 @@ interface PathSegmentNameGeneratorInterface
      */
     public function getSegmentName(string $name, bool $collection = true): string;
 }
-
-class_alias(PathSegmentNameGeneratorInterface::class, \ApiPlatform\Operation\PathSegmentNameGeneratorInterface::class);

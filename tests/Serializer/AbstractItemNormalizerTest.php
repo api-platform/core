@@ -25,6 +25,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceRelated;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NonCloneableDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -550,7 +551,8 @@ class AbstractItemNormalizerTest extends TestCase
         $relatedDummyChildContext = Argument::allOf(
             Argument::type('array'),
             Argument::withEntry('resource_class', RelatedDummy::class),
-            Argument::not(Argument::withKey('iri'))
+            Argument::not(Argument::withKey('iri')),
+            Argument::not(Argument::withKey('force_resource_class'))
         );
         $serializerProphecy->normalize($relatedDummy, null, $relatedDummyChildContext)->willReturn(['foo' => 'hello']);
         $serializerProphecy->normalize(['foo' => 'hello'], null, Argument::type('array'))->willReturn(['foo' => 'hello']);
@@ -576,6 +578,7 @@ class AbstractItemNormalizerTest extends TestCase
         ];
         $this->assertSame($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
+            'force_resource_class' => Dummy::class,
         ]));
     }
 
@@ -1295,6 +1298,54 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->denormalize($data, Dummy::class, 'xml');
+    }
+
+    public function testDenormalizePopulatingNonCloneableObject(): void
+    {
+        $dummy = new NonCloneableDummy();
+        $dummy->setName('foo');
+
+        $data = [
+            'name' => 'bar',
+        ];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(NonCloneableDummy::class, [])->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(NonCloneableDummy::class, 'name', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(false)->withWritable(true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, NonCloneableDummy::class)->willReturn(NonCloneableDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, NonCloneableDummy::class)->willReturn(NonCloneableDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(NonCloneableDummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            [],
+            null,
+            null,
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $context = [AbstractItemNormalizer::OBJECT_TO_POPULATE => $dummy];
+        $actual = $normalizer->denormalize($data, NonCloneableDummy::class, null, $context);
+
+        $this->assertInstanceOf(NonCloneableDummy::class, $actual);
+        $this->assertSame($dummy, $actual);
+        $propertyAccessorProphecy->setValue($actual, 'name', 'bar')->shouldHaveBeenCalled();
     }
 }
 

@@ -119,7 +119,7 @@ final class TypeFactory implements TypeFactoryInterface
         if (!$this->isResourceClass($className) && is_a($className, \BackedEnum::class, true)) {
             $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
 
-            $type = \is_string($enumCases[0] ?? '') ? 'string' : 'int';
+            $type = \is_string($enumCases[0] ?? '') ? 'string' : 'integer';
 
             if ($nullable) {
                 $enumCases[] = null;
@@ -152,6 +152,7 @@ final class TypeFactory implements TypeFactoryInterface
             throw new \LogicException('The schema factory must be injected by calling the "setSchemaFactory" method.');
         }
 
+        $serializerContext += [SchemaFactory::FORCE_SUBSCHEMA => true];
         $subSchema = $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext, false);
 
         return ['$ref' => $subSchema['$ref']];

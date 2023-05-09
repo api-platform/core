@@ -13,7 +13,7 @@
         },
         {
             "name": "API Platform Community",
-            "homepage": "https://api-platform.com/contributors"
+            "homepage": "https://api-platform.com/community/contributors"
         }
     ],
     "require": {

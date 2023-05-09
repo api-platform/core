@@ -353,9 +353,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.metadata_factory.cached',
             'api_platform.metadata.property.metadata_factory.default_property',
             'api_platform.metadata.property.metadata_factory.xml',
-            'api_platform.metadata.property.identifier_metadata_factory.attribute',
-            'api_platform.metadata.property.identifier_metadata_factory.xml',
-            'api_platform.metadata.property.identifier_metadata_factory.yaml',
             'api_platform.cache.metadata.property',
 
             // metadata/property_name.xml
@@ -400,7 +397,6 @@ class ApiPlatformExtensionTest extends TestCase
             PropertyNameCollectionFactoryInterface::class,
 
             // metadata/property.xml
-            'api_platform.metadata.property.identifier_metadata_factory',
             'api_platform.metadata.property.metadata_factory',
 
             // metadata/resource.xml
@@ -815,7 +811,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine_mongodb.odm.aggregation_extension.filter',
             'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination',
             'api_platform.doctrine_mongodb.odm.aggregation_extension.order',
-            'api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory',
         ];
 
         $aliases = [
@@ -1246,5 +1241,17 @@ class ApiPlatformExtensionTest extends TestCase
         $service = $this->container->getDefinition('api_platform.http_cache.purger.varnish.ban');
         $this->assertCount(1, $service->getArguments());
         $this->assertEquals('api_platform.http_cache.http_client', $service->getArgument(0)->getTag());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyOpenApiApiKeysConfiguration(): void
+    {
+        $this->expectDeprecation('Since api-platform/core 3.1: The swagger api_keys key "Some Authorization Name" is not valid with OpenAPI 3.1 it should match "^[a-zA-Z0-9._-]+$"');
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['swagger']['api_keys']['Some Authorization Name'] = ['name' => 'a', 'type' => 'header'];
+
+        (new ApiPlatformExtension())->load($config, $this->container);
     }
 }

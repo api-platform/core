@@ -390,6 +390,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
+        foreach (array_keys($config['swagger']['api_keys']) as $keyName) {
+            if (!preg_match('/^[a-zA-Z0-9._-]+$/', $keyName)) {
+                trigger_deprecation('api-platform/core', '3.1', sprintf('The swagger api_keys key "%s" is not valid with OpenAPI 3.1 it should match "^[a-zA-Z0-9._-]+$"', $keyName));
+            }
+        }
+
         $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
 
         if (!$config['enable_swagger'] && $config['enable_swagger_ui']) {

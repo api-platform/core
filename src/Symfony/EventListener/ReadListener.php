@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
@@ -91,11 +92,14 @@ final class ReadListener
             $data = $this->provider->provide($operation, $uriVariables, $context);
         } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+        } catch (RuntimeException $e) {
+            $data = null;
         }
 
         if (
-            null === $data &&
-            (
+            null === $data
+            && 'POST' !== $operation->getMethod()
+            && (
                 'PUT' !== $operation->getMethod() ||
                 ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
             )

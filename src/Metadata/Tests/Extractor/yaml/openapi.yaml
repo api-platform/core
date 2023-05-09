@@ -1,0 +1,14 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        -   uriTemplate: /users/{author}/programs.{_format}
+            uriVariables: ['author']
+            operations:
+                ApiPlatform\Metadata\Post:
+                    openapi:
+                        parameters:
+                            username:
+                                name: author
+                                in: path
+                                example: "john-doe"
+                                examples: ["John-doe"]
+                                foo: "bar"

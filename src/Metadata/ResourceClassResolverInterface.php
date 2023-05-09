@@ -37,5 +37,3 @@ interface ResourceClassResolverInterface
      */
     public function isResourceClass(string $type): bool;
 }
-
-class_alias(ResourceClassResolverInterface::class, \ApiPlatform\Api\ResourceClassResolverInterface::class);

@@ -132,6 +132,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiReso
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EntityClassWithDateTime;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
@@ -2124,6 +2125,17 @@ final class DoctrineContext implements Context
         $this->manager->persist($relationMultiple1);
         $this->manager->persist($relationMultiple2);
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a resource using entityClass with a DateTime attribute
+     */
+    public function thereIsAResourceUsingEntityClassAndDateTime(): void
+    {
+        $entity = new EntityClassWithDateTime();
+        $entity->setStart(new \DateTime());
+        $this->manager->persist($entity);
         $this->manager->flush();
     }
 
