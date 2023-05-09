@@ -25,7 +25,7 @@ if (class_exists(LegacyInvalidUriVariableException::class)) {
      *
      * @author Antoine Bluchet <soyuka@gmail.com>
      */
-    class InvalidUriVariableException extends \Exception implements ExceptionInterface
+    final class InvalidUriVariableException extends \Exception implements ExceptionInterface
     {
     }
 }
