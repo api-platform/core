@@ -33,6 +33,7 @@ parameters:
 			- handleNotFound
 	ignoreErrors:
 		# False positives
+		-   message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\).#'
 		-
 			message: '#but database expects#'
 			paths:

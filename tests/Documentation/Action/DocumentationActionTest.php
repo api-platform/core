@@ -41,14 +41,17 @@ class DocumentationActionTest extends TestCase
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
         $openApiFactoryProphecy->__invoke(Argument::any())->shouldBeCalled()->willReturn($openApi);
         $requestProphecy = $this->prophesize(Request::class);
-        $requestProphecy->getRequestFormat()->willReturn('json');
+        $requestProphecy->getMimeType('json')->willReturn('application/json');
+        $requestProphecy->getRequestFormat('')->willReturn('json');
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
         $queryProphecy = $this->prophesize(ParameterBag::class);
         $requestProphecy->attributes = $attributesProphecy->reveal();
         $requestProphecy->query = $queryProphecy->reveal();
+        $requestProphecy->headers = $this->prophesize(ParameterBagInterface::class)->reveal();
         $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
         $queryProphecy->getBoolean('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
         $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
+        $attributesProphecy->get('_format')->willReturn(null)->shouldBeCalledTimes(1);
         $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true])->shouldBeCalledTimes(1);
 
         $documentation = new DocumentationAction($this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(), 'my api', '', '1.0.0', $openApiFactoryProphecy->reveal());
@@ -60,8 +63,11 @@ class DocumentationActionTest extends TestCase
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
         $openApiFactoryProphecy->__invoke(Argument::any())->shouldNotBeCalled();
         $requestProphecy = $this->prophesize(Request::class);
-        $requestProphecy->getRequestFormat()->willReturn('json');
+        $requestProphecy->getRequestFormat('')->willReturn('json');
+        $requestProphecy->headers = $this->prophesize(ParameterBagInterface::class)->reveal();
+        $requestProphecy->getMimeType('json')->willReturn('application/json');
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
+        $attributesProphecy->get('_format')->willReturn(null)->shouldBeCalledTimes(1);
         $queryProphecy = $this->prophesize(ParameterBag::class);
         $requestProphecy->attributes = $attributesProphecy->reveal();
         $requestProphecy->query = $queryProphecy->reveal();

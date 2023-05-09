@@ -13,24 +13,34 @@ declare(strict_types=1);
 
 namespace ApiPlatform\ApiResource;
 
+use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Error as Operation;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
-use ApiPlatform\Metadata\Get;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\WebLink\Link;
 
 #[ErrorResource(
     uriTemplate: '/errors/{status}',
-    provider: 'api_platform.state_provider.default_error',
     types: ['hydra:Error'],
+    openapi: false,
     operations: [
-        new Get(name: '_api_errors_hydra', outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]),
-        new Get(name: '_api_errors_problem', outputFormats: ['json' => ['application/problem+json']], normalizationContext: ['groups' => ['jsonproblem'], 'skip_null_values' => true]),
-        new Get(name: '_api_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true], provider: 'api_platform.json_api.state_provider.default_error'),
+        new Operation(name: '_api_errors_problem', outputFormats: ['json' => ['application/problem+json']], normalizationContext: ['groups' => ['jsonproblem'], 'skip_null_values' => true]),
+        new Operation(
+            name: '_api_errors_hydra',
+            outputFormats: ['jsonld' => ['application/problem+json']],
+            normalizationContext: [
+                'groups' => ['jsonld'],
+                'skip_null_values' => true,
+            ],
+            links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')]
+        ),
+        new Operation(name: '_api_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]),
     ]
 )]
 class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface
@@ -39,8 +49,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         private readonly string $title,
         private readonly string $detail,
         #[ApiProperty(identifier: true)] private readonly int $status,
-        #[Groups(['trace'])]
-        public readonly array $trace,
+        private readonly array $originalTrace,
         private ?string $instance = null,
         private string $type = 'about:blank',
         private array $headers = []
@@ -53,6 +62,13 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     public function getHydraTitle(): string
     {
         return $this->title;
+    }
+
+    #[SerializedName('trace')]
+    #[Groups(['trace'])]
+    public function getOriginalTrace(): array
+    {
+        return $this->originalTrace;
     }
 
     #[SerializedName('hydra:description')]

@@ -76,6 +76,10 @@ final class DeserializeListener
 
         $operation = $this->initializeOperation($request);
 
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
+
         if (!($operation?->canDeserialize() ?? true)) {
             return;
         }

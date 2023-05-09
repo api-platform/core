@@ -46,6 +46,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         bool|OpenApiOperation $openapi = null,
         array $exceptionToStatus = null,
         bool $queryParameterValidationEnabled = null,
+        array $links = null,
 
         string $shortName = null,
         string $class = null,
@@ -121,6 +122,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             openapi: $openapi,
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            links: $links,
             shortName: $shortName,
             class: $class,
             paginationEnabled: $paginationEnabled,

@@ -97,6 +97,8 @@ class SwaggerUiActionTest extends TestCase
                 'graphiQlEnabled' => false,
                 'graphQlPlaygroundEnabled' => false,
                 'assetPackage' => null,
+                'originalRoute' => null,
+                'originalRouteParams' => [],
                 'swagger_data' => [
                     'url' => '/url',
                     'spec' => self::SPEC,
@@ -137,6 +139,8 @@ class SwaggerUiActionTest extends TestCase
                 'graphiQlEnabled' => false,
                 'graphQlPlaygroundEnabled' => false,
                 'assetPackage' => null,
+                'originalRoute' => null,
+                'originalRouteParams' => [],
                 'swagger_data' => [
                     'url' => '/url',
                     'spec' => self::SPEC,
@@ -196,6 +200,8 @@ class SwaggerUiActionTest extends TestCase
             'graphiQlEnabled' => false,
             'graphQlPlaygroundEnabled' => false,
             'assetPackage' => null,
+            'originalRoute' => null,
+            'originalRouteParams' => [],
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,

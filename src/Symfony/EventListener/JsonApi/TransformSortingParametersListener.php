@@ -31,6 +31,10 @@ final class TransformSortingParametersListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+        if (($operation = $request->attributes->get('_api_operation')) && 'api_platform.symfony.main_controller' === $operation->getController()) {
+            return;
+        }
+
         $orderParameter = $request->query->all()['sort'] ?? null;
 
         if (

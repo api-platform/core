@@ -40,6 +40,7 @@ api_platform:
         jsonproblem:                   ['application/problem+json']
         jsonld:                        ['application/ld+json']
         jsonapi:                       ['application/vnd.api+json']
+        html:                          ['text/html']
     graphql:
         enabled: true
         nesting_separator: __
@@ -66,6 +67,7 @@ api_platform:
         extra_properties:
             standard_put: true
             rfc_7807_compliant_errors: true
+            legacy_api_platform_controller: true
         normalization_context: 
             skip_null_values: false
         pagination_client_enabled:            true
@@ -292,42 +294,42 @@ services:
     app.graphql.query_resolver.dummy_custom_item:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryItemResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.query_resolver.dummy_custom_collection:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryCollectionResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.query_resolver.dummy_custom_collection_no_read_and_serialize:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeCollectionResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.dummy_custom:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumMutationResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_not_persisted:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNotPersistedMutationResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_no_write_custom_result:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNoWriteCustomResultMutationResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.upload_media_object:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMediaObjectResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.upload_multiple_media_object:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMultipleMediaObjectResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.date_time_type:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType'
@@ -353,17 +355,17 @@ services:
     app.graphql.query_resolver.dummy_custom_not_retrieved_item:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.query_resolver.dummy_custom_item_no_read_and_serialize:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeItemResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_only_persist:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumOnlyPersistMutationResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.messenger_handler.messenger_with_inputs:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Entity\MessengerWithInputHandler'

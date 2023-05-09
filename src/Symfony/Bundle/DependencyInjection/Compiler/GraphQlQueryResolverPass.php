@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  *
+ * @deprecated prefer GraphQlResolverPass
+ *
  * @author Lukas Lücke <lukas@luecke.me>
  */
 final class GraphQlQueryResolverPass implements CompilerPassInterface

@@ -14,10 +14,17 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd\Action;
 
 use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\JsonLd\Context;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Generates JSON-LD contexts.
@@ -31,16 +38,49 @@ final class ContextAction
         'Error' => true,
     ];
 
-    public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
-    {
+    public function __construct(
+        private readonly ContextBuilderInterface $contextBuilder,
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ?ProviderInterface $provider = null,
+        private readonly ?ProcessorInterface $processor = null,
+        private readonly ?SerializerInterface $serializer = null
+    ) {
     }
 
     /**
      * Generates a context according to the type requested.
      *
      * @throws NotFoundHttpException
+     *
+     * @return array{'@context': array<string, mixed>}|Response
      */
-    public function __invoke(string $shortName): array
+    public function __invoke(string $shortName, Request $request = null): array|Response
+    {
+        if (null !== $request && $this->provider && $this->processor && $this->serializer) {
+            $operation = new Get(
+                outputFormats: ['jsonld' => ['application/ld+json']],
+                class: Context::class,
+                read: false,
+                serialize: false
+            );
+            $context = ['request' => $request];
+            $this->provider->provide($operation, [], $context);
+
+            return $this->processor->process($this->serializer->serialize($this->getContext($shortName), 'json'), $operation, [], $context);
+        }
+
+        if (!$context = $this->getContext($shortName)) {
+            throw new NotFoundHttpException();
+        }
+
+        return $context;
+    }
+
+    /**
+     * @return array{'@context': array<string, mixed>}|null
+     */
+    private function getContext(string $shortName): ?array
     {
         if ('Entrypoint' === $shortName) {
             return ['@context' => $this->contextBuilder->getEntrypointContext()];
@@ -65,6 +105,6 @@ final class ContextAction
             }
         }
 
-        throw new NotFoundHttpException();
+        return null;
     }
 }

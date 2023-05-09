@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Serializer;
 
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -68,7 +70,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         $attributes = $this->replaceIdKeys($fields['edges']['node'] ?? $fields['collection'] ?? $fields, $resourceClass, $context);
 
-        if ($resolverContext['is_mutation'] || $resolverContext['is_subscription']) {
+        if ($operation instanceof Subscription || $operation instanceof Mutation) {
             $wrapFieldName = lcfirst($operation->getShortName());
 
             return $attributes[$wrapFieldName] ?? [];

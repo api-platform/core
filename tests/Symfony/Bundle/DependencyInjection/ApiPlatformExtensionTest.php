@@ -631,8 +631,7 @@ class ApiPlatformExtensionTest extends TestCase
         $services = [
             // graphql.xml
             'api_platform.graphql.executor',
-            'api_platform.graphql.query_resolver_locator',
-            'api_platform.graphql.mutation_resolver_locator',
+            'api_platform.graphql.resolver_locator',
             'api_platform.graphql.iterable_type',
             'api_platform.graphql.upload_type',
             'api_platform.graphql.type_locator',
@@ -685,8 +684,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContainerHas($services, $aliases);
 
         // graphql.xml
-        $this->assertServiceHasTags('api_platform.graphql.query_resolver_locator', ['container.service_locator']);
-        $this->assertServiceHasTags('api_platform.graphql.mutation_resolver_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.resolver_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.graphql.iterable_type', ['api_platform.graphql.type']);
         $this->assertServiceHasTags('api_platform.graphql.upload_type', ['api_platform.graphql.type']);
         $this->assertServiceHasTags('api_platform.graphql.type_locator', ['container.service_locator']);
@@ -1157,9 +1155,9 @@ class ApiPlatformExtensionTest extends TestCase
             FilterInterface::class => 'api_platform.filter',
             ValidationGroupsGeneratorInterface::class => 'api_platform.validation_groups_generator',
             PropertySchemaRestrictionMetadataInterface::class => 'api_platform.metadata.property_schema_restriction',
-            QueryItemResolverInterface::class => 'api_platform.graphql.query_resolver',
-            QueryCollectionResolverInterface::class => 'api_platform.graphql.query_resolver',
-            MutationResolverInterface::class => 'api_platform.graphql.mutation_resolver',
+            QueryItemResolverInterface::class => 'api_platform.graphql.resolver',
+            QueryCollectionResolverInterface::class => 'api_platform.graphql.resolver',
+            MutationResolverInterface::class => 'api_platform.graphql.resolver',
             GraphQlTypeInterface::class => 'api_platform.graphql.type',
             ErrorHandlerInterface::class => 'api_platform.graphql.error_handler',
             QueryItemExtensionInterface::class => 'api_platform.doctrine.orm.query_extension.item',

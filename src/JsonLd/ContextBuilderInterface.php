@@ -24,6 +24,7 @@ use ApiPlatform\Exception\ResourceClassNotFoundException;
 interface ContextBuilderInterface
 {
     public const HYDRA_NS = 'http://www.w3.org/ns/hydra/core#';
+    public const JSONLD_NS = 'http://www.w3.org/ns/json-ld#';
     public const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
     public const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
     public const XML_NS = 'http://www.w3.org/2001/XMLSchema#';

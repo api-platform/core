@@ -139,7 +139,7 @@ Feature: Value object as ApiResource
     }
     """
     Then the response status code should be 400
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {

@@ -36,6 +36,10 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
+        if (!$data instanceof InputDto) {
+            throw new \RuntimeException('Data is not an InputDto');
+        }
+
         /** @var EntityManager */
         $manager = $this->registry->getManagerForClass($operation->getClass());
         $entity = new ($operation->getClass())();

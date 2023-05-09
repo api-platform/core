@@ -24,6 +24,7 @@
             <directory>src</directory>
         </include>
         <exclude>
+            <directory>src/Symfony/Maker/Resources/skeleton</directory>
             <directory>features</directory>
             <directory>tests</directory>
             <directory>vendor</directory>

@@ -25,10 +25,10 @@ use ApiPlatform\Metadata\Operation;
 interface ProcessorInterface
 {
     /**
-     * Processes the state.
+     * Handle the state.
      *
-     * @param array<string, mixed> $uriVariables
-     * @param array<string, mixed> $context
+     * @param array<string, mixed>                                                                                                                                   $uriVariables
+     * @param array<string, mixed>&array{request?: \Symfony\Component\HttpFoundation\Request, previous_data?: mixed, resource_class?: string, original_data?: mixed} $context
      *
      * @return T
      */

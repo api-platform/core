@@ -221,6 +221,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'keep_legacy_inflector' => true,
+            'event_listeners_backward_compatibility_layer' => true,
         ], $config);
     }
 

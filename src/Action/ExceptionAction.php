@@ -29,6 +29,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated
  */
 final class ExceptionAction
 {
