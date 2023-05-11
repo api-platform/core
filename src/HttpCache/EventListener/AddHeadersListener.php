@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\EventListener;
+namespace ApiPlatform\HttpCache\EventListener;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  * Configures cache HTTP headers for the current response.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated use \Symfony\EventListener\AddHeadersListener.php instead
  */
 final class AddHeadersListener
 {
