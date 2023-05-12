@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Action\ExceptionAction;
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Metadata\ApiResource;
@@ -93,7 +92,7 @@ final class ErrorListener extends SymfonyErrorListener
             $resourceClass = Error::class;
         }
 
-        $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($errorResource, $operation);
+        $identifiers = $this->identifiersExtractor?->getIdentifiersFromItem($errorResource, $operation) ?? [];
 
         $dup->attributes->set('_api_error', true);
         $dup->attributes->set('_api_resource_class', $resourceClass);
