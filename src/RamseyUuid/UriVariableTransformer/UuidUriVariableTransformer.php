@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\RamseyUuid\UriVariableTransformer;
 
-use ApiPlatform\Api\UriVariableTransformerInterface;
-use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use Ramsey\Uuid\Exception\InvalidUuidStringException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;

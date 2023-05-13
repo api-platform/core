@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\RamseyUuid\UriVariableTransformer;
 
-use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\RamseyUuid\UriVariableTransformer\UuidUriVariableTransformer;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
