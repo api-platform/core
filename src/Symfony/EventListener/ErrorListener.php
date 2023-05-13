@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -81,12 +82,16 @@ final class ErrorListener extends SymfonyErrorListener
             if (!$operation) {
                 $operation = $resourceCollection->getOperation();
             }
-
             $errorResource = $exception;
         } elseif ($this->resourceMetadataCollectionFactory) {
             // Create a generic, rfc7807 compatible error according to the wanted format
             /** @var HttpOperation $operation */
             $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format['key'] ?? null));
+            $operation = $operation->withStatus($this->getStatusCode($apiOperation, $request, $operation, $exception));
+            $errorResource = Error::createFromException($exception, $operation->getStatus());
+            $resourceClass = Error::class;
+        } else {
+            $operation = new Get(name: '_api_errors_problem', class: Error::class, outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]);
             $operation = $operation->withStatus($this->getStatusCode($apiOperation, $request, $operation, $exception));
             $errorResource = Error::createFromException($exception, $operation->getStatus());
             $resourceClass = Error::class;
@@ -148,7 +153,6 @@ final class ErrorListener extends SymfonyErrorListener
         foreach ($exceptionToStatus as $class => $status) {
             if (is_a($exception::class, $class, true)) {
                 return $status;
-                break;
             }
         }
 

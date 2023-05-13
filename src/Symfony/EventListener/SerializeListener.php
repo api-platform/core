@@ -99,13 +99,16 @@ final class SerializeListener
 
         if ($request->get('_api_error', false)) {
             $context['skip_deprecated_exception_normalizers'] = true;
-            $groups = $context['groups'] ?? [];
-            if (!\is_array($groups)) {
-                $groups = [$groups];
-            }
 
-            $groups[] = 'trace';
-            $context['groups'] = $groups;
+            if ($this->debug) {
+                $groups = $context['groups'] ?? [];
+                if (!\is_array($groups)) {
+                    $groups = [$groups];
+                }
+
+                $groups[] = 'trace';
+                $context['groups'] = $groups;
+            }
         }
 
         if ($included = $request->attributes->get('_api_included')) {
