@@ -1,0 +1,2 @@
+resources:
+    'ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ThisDoesNotExist': ~

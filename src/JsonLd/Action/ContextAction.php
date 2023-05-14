@@ -13,13 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Action;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -34,22 +31,8 @@ final class ContextAction
         'Error' => true,
     ];
 
-    private $contextBuilder;
-    private $resourceNameCollectionFactory;
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|null
-     */
-    private $resourceMetadataFactory;
-
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory)
+    public function __construct(private readonly ContextBuilderInterface $contextBuilder, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
-        $this->contextBuilder = $contextBuilder;
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
     }
 
     /**
@@ -68,18 +51,15 @@ final class ContextAction
         }
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            /** @var ResourceMetadata|ResourceMetadataCollection */
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
 
-            if ($resourceMetadata instanceof ResourceMetadataCollection) {
-                try {
-                    $resourceMetadata = $resourceMetadata->getOperation();
-                } catch (OperationNotFoundException $e) {
-                    continue;
-                }
+            try {
+                $resourceMetadataCollection = $resourceMetadataCollection->getOperation();
+            } catch (OperationNotFoundException) {
+                continue;
             }
 
-            if ($shortName === $resourceMetadata->getShortName()) {
+            if ($shortName === $resourceMetadataCollection->getShortName()) {
                 return ['@context' => $this->contextBuilder->getResourceContext($resourceClass)];
             }
         }
@@ -87,5 +67,3 @@ final class ContextAction
         throw new NotFoundHttpException();
     }
 }
-
-class_alias(ContextAction::class, \ApiPlatform\Core\JsonLd\Action\ContextAction::class);

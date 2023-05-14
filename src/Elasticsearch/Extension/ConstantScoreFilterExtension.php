@@ -39,7 +39,7 @@ final class ConstantScoreFilterExtension extends AbstractFilterExtension
      */
     protected function alterRequestBody(array $requestBody, array $clauseBody): array
     {
-        $requestBody['query'] = $requestBody['query'] ?? [];
+        $requestBody['query'] ??= [];
         $requestBody['query'] += [
             'constant_score' => [
                 'filter' => $clauseBody,
@@ -49,5 +49,3 @@ final class ConstantScoreFilterExtension extends AbstractFilterExtension
         return $requestBody;
     }
 }
-
-class_alias(ConstantScoreFilterExtension::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\ConstantScoreFilterExtension::class);

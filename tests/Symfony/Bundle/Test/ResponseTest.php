@@ -68,8 +68,8 @@ class ResponseTest extends TestCase
         $httpFoundationResponse = new HttpFoundationResponse('{"foo": "bar"}', 200, ['content-type' => 'application/ld+json']);
 
         $response = new Response($httpFoundationResponse, $browserKitResponse, []);
-        $this->assertSame(['foo' => 'bar'], $response->toArray());
-        $this->assertSame(['foo' => 'bar'], $response->toArray()); // Trigger the cache
+        $this->assertEquals(['foo' => 'bar'], $response->toArray());
+        $this->assertEquals(['foo' => 'bar'], $response->toArray()); // Trigger the cache
     }
 
     public function testToArrayTransportException(): void

@@ -19,7 +19,7 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait SearchFilterTestTrait
 {
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = $this->buildSearchFilter($this->managerRegistry, [
             'id' => null,
@@ -94,14 +94,14 @@ trait SearchFilterTestTrait
             ],
             'dummyDate' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
             'dummyDate[]' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => true,
@@ -150,14 +150,14 @@ trait SearchFilterTestTrait
             ],
             'relatedDummies.dummyDate' => [
                 'property' => 'relatedDummies.dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
             'relatedDummies.dummyDate[]' => [
                 'property' => 'relatedDummies.dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => true,
@@ -294,6 +294,18 @@ trait SearchFilterTestTrait
                     'name' => [
                         'CaSE',
                         'inSENSitive',
+                    ],
+                ],
+            ],
+            'partial (multiple almost same values; case insensitive)' => [
+                [
+                    'id' => null,
+                    'name' => 'ipartial',
+                ],
+                [
+                    'name' => [
+                        'blue car',
+                        'Blue Car',
                     ],
                 ],
             ],

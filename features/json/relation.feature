@@ -151,7 +151,6 @@ Feature: JSON relations support
     }
     """
 
-  # TODO: to remove in 3.0
   Scenario: Create a related dummy with a relation using plain identifiers
     When I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/related_dummies" with body:
@@ -185,7 +184,6 @@ Feature: JSON relations support
     }
     """
 
-  # TODO: to remove in 3.0
   Scenario: Passing a (valid) plain identifier on a relation
     When I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/dummies" with body:

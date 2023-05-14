@@ -17,10 +17,13 @@ use ApiPlatform\Doctrine\Odm\PropertyInfo\DoctrineExtractor;
 use ApiPlatform\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineDummy;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineEmbeddable;
+use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineEnum;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineFooType;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineRelation;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineWithEmbedded;
+use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\EnumInt;
+use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\EnumString;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -128,6 +131,13 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($expectedTypes, $actualTypes);
     }
 
+    public function testExtractEnum(): void
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt'));
+        $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom'));
+    }
+
     public function typesProvider(): array
     {
         return [
@@ -140,8 +150,8 @@ class DoctrineExtractorTest extends TestCase
             ['binUuid', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['binUuidRfc4122', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['timestamp', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
-            ['dateImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
+            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class)]],
+            ['dateImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)]],
             ['float', [new Type(Type::BUILTIN_TYPE_FLOAT)]],
             ['bool', [new Type(Type::BUILTIN_TYPE_BOOL)]],
             ['int', [new Type(Type::BUILTIN_TYPE_INT)]],
@@ -191,7 +201,7 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
     }
 
-    public function testGeneratedValueNotWritable()
+    public function testGeneratedValueNotWritable(): void
     {
         $extractor = $this->createExtractor();
         $this->assertFalse($extractor->isWritable(DoctrineGeneratedValue::class, 'id'));
@@ -212,7 +222,7 @@ class DoctrineExtractorTest extends TestCase
 
     private function createExtractor(): DoctrineExtractor
     {
-        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR], true);
+        $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR], true);
         $documentManager = DocumentManager::create(null, $config);
 
         if (!MongoDbType::hasType('custom_foo')) {

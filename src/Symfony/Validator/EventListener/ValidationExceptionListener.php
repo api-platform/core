@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Validator\EventListener;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -27,15 +28,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class ValidationExceptionListener
 {
-    private $serializer;
-    private $errorFormats;
-    private $exceptionToStatus;
-
-    public function __construct(SerializerInterface $serializer, array $errorFormats, array $exceptionToStatus = [])
+    public function __construct(private readonly SerializerInterface $serializer, private readonly array $errorFormats, private readonly array $exceptionToStatus = [])
     {
-        $this->serializer = $serializer;
-        $this->errorFormats = $errorFormats;
-        $this->exceptionToStatus = $exceptionToStatus;
     }
 
     /**
@@ -43,11 +37,11 @@ final class ValidationExceptionListener
      */
     public function onKernelException(ExceptionEvent $event): void
     {
-        $exception = method_exists($event, 'getThrowable') ? $event->getThrowable() : $event->getException(); // @phpstan-ignore-line
+        $exception = $event->getThrowable();
         if (!$exception instanceof ConstraintViolationListAwareExceptionInterface && !$exception instanceof FilterValidationException) {
             return;
         }
-        $exceptionClass = \get_class($exception);
+        $exceptionClass = $exception::class;
         $statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
 
         foreach ($this->exceptionToStatus as $class => $status) {
@@ -60,16 +54,19 @@ final class ValidationExceptionListener
 
         $format = ErrorFormatGuesser::guessErrorFormat($event->getRequest(), $this->errorFormats);
 
+        $context = [];
+        if ($exception instanceof ValidationException && ($errorTitle = $exception->getErrorTitle())) {
+            $context['title'] = $errorTitle;
+        }
+
         $event->setResponse(new Response(
-                $this->serializer->serialize($exception instanceof ConstraintViolationListAwareExceptionInterface ? $exception->getConstraintViolationList() : $exception, $format['key']),
-                $statusCode,
-                [
-                    'Content-Type' => sprintf('%s; charset=utf-8', $format['value'][0]),
-                    'X-Content-Type-Options' => 'nosniff',
-                    'X-Frame-Options' => 'deny',
-                ]
+            $this->serializer->serialize($exception instanceof ConstraintViolationListAwareExceptionInterface ? $exception->getConstraintViolationList() : $exception, $format['key'], $context),
+            $statusCode,
+            [
+                'Content-Type' => sprintf('%s; charset=utf-8', $format['value'][0]),
+                'X-Content-Type-Options' => 'nosniff',
+                'X-Frame-Options' => 'deny',
+            ]
         ));
     }
 }
-
-class_alias(ValidationExceptionListener::class, \ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener::class);

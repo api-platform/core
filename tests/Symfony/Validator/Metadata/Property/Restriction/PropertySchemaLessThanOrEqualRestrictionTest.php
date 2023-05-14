@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanOrEqualRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
@@ -30,7 +30,7 @@ final class PropertySchemaLessThanOrEqualRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaLessThanOrEqualRestriction;
+    private PropertySchemaLessThanOrEqualRestriction $propertySchemaLessThanOrEqualRestriction;
 
     protected function setUp(): void
     {
@@ -56,6 +56,6 @@ final class PropertySchemaLessThanOrEqualRestrictionTest extends TestCase
 
     public function testCreate(): void
     {
-        self::assertSame(['maximum' => 10], $this->propertySchemaLessThanOrEqualRestriction->create(new LessThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));
+        self::assertEquals(['maximum' => 10], $this->propertySchemaLessThanOrEqualRestriction->create(new LessThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));
     }
 }

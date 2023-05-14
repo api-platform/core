@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\HttpCache;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\HttpCache\VarnishXKeyPurger;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
-use LogicException;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -31,7 +31,7 @@ class VarnishXKeyPurgerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testPurge()
+    public function testPurge(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo']])->willReturn(new Response())->shouldBeCalled();
@@ -63,7 +63,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $purger->purge(['/foo' => '/foo', '/bar' => '/bar']);
     }
 
-    public function testEmptyTags()
+    public function testEmptyTags(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request()->shouldNotBeCalled();
@@ -74,7 +74,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $purger->purge([]);
     }
 
-    public function testHeaderTooLong()
+    public function testHeaderTooLong(): void
     {
         $this->expectExceptionMessage('IRI "/foobar-long-foobar-toolong-foofoo-barbar" is too long to fit current max header length (currently set to "20"). You can increase it using the "api_platform.http_cache.invalidation.max_header_length" parameter.');
 
@@ -87,7 +87,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $purger->purge(['/foobar-long-foobar-toolong-foofoo-barbar']);
     }
 
-    public function testCustomGlue()
+    public function testCustomGlue(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo,/bar,/baz']])->willReturn(new Response())->shouldBeCalled();
@@ -101,20 +101,20 @@ class VarnishXKeyPurgerTest extends TestCase
     /**
      * @dataProvider provideChunkHeaderCases
      */
-    public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $keysToSend)
+    public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $keysToSend): void
     {
-        /** @var HttpClientInterface */
+        /** @var HttpClientInterface $client */
         $client = new class() implements ClientInterface {
-            public $sentKeys = [];
+            public array $sentKeys = [];
 
             public function send(RequestInterface $request, array $options = []): ResponseInterface
             {
-                throw new LogicException('Not implemented');
+                throw new \LogicException('Not implemented');
             }
 
             public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface
             {
-                throw new LogicException('Not implemented');
+                throw new \LogicException('Not implemented');
             }
 
             public function request($method, $uri, array $options = []): ResponseInterface
@@ -126,12 +126,12 @@ class VarnishXKeyPurgerTest extends TestCase
 
             public function requestAsync($method, $uri, array $options = []): PromiseInterface
             {
-                throw new LogicException('Not implemented');
+                throw new \LogicException('Not implemented');
             }
 
-            public function getConfig($option = null)
+            public function getConfig($option = null): void
             {
-                throw new LogicException('Not implemented');
+                throw new \LogicException('Not implemented');
             }
         };
 
@@ -141,7 +141,7 @@ class VarnishXKeyPurgerTest extends TestCase
         self::assertSame($keysToSend, $client->sentKeys); // @phpstan-ignore-line
     }
 
-    public function provideChunkHeaderCases()
+    public function provideChunkHeaderCases(): \Generator
     {
         yield 'no iri' => [
             50,
@@ -205,5 +205,16 @@ class VarnishXKeyPurgerTest extends TestCase
                 implode(' ', array_fill(0, 1402, '/foo')),
             ],
         ];
+    }
+
+    public function testConstructor(): void
+    {
+        $clientProphecy = $this->prophesize(ClientInterface::class);
+        $clientProphecy->request('PURGE', '', ['headers' => ['xkey' => '/foo']])->willReturn(new Response())->shouldBeCalled();
+        $purger = new VarnishXKeyPurger(new RewindableGenerator(static function () use ($clientProphecy) {
+            yield $clientProphecy->reveal();
+        }, 1));
+
+        $purger->purge(['/foo']);
     }
 }

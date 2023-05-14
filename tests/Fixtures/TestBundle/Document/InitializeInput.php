@@ -13,28 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InitializeInputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\InitializeInputProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ApiResource(input=InitializeInputDto::class)
- * @ODM\Document
- */
+#[ApiResource(input: InitializeInputDto::class, processor: InitializeInputProcessor::class)]
+#[ODM\Document]
 class InitializeInput
 {
-    /**
-     * @ODM\Id(strategy="NONE", type="int")
-     */
+    #[ODM\Id(strategy: 'NONE', type: 'int')]
     public $id;
-
-    /**
-     * @ODM\Field
-     */
+    #[ODM\Field]
     public $manager;
-
-    /**
-     * @ODM\Field
-     */
+    #[ODM\Field]
     public $name;
 }

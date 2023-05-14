@@ -13,69 +13,84 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource;
 
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Operation;
 
 /**
- * @experimental
  * @extends \ArrayObject<int, ApiResource>
  */
 final class ResourceMetadataCollection extends \ArrayObject
 {
-    private $operationCache = [];
-    private $resourceClass;
+    private const GRAPHQL_PREFIX = 'g_';
+    private const HTTP_PREFIX = 'h_';
+    private const FORCE_COLLECTION = 'co_';
+    private const HTTP_OPERATION = 'ht_';
 
-    public function __construct(string $resourceClass, array $input = [])
+    private array $operationCache = [];
+
+    public function __construct(private readonly string $resourceClass, array $input = [])
     {
-        $this->resourceClass = $resourceClass;
         parent::__construct($input);
     }
 
     public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
     {
-        if (isset($this->operationCache[$operationName ?? ''])) {
-            return $this->operationCache[$operationName ?? ''];
+        $operationName ??= '';
+        $cachePrefix = ($forceCollection ? self::FORCE_COLLECTION : '') . ($httpOperation ? self::HTTP_OPERATION : '');
+        $httpCacheKey = self::HTTP_PREFIX . $cachePrefix . $operationName;
+        if (isset($this->operationCache[$httpCacheKey])) {
+            return $this->operationCache[$httpCacheKey];
         }
 
-        if (isset($this->operationCache['graphql_'.($operationName ?? '')])) {
-            return $this->operationCache['graphql_'.($operationName ?? '')];
+        $gqlCacheKey = self::GRAPHQL_PREFIX . $cachePrefix . $operationName;
+        if (isset($this->operationCache[$gqlCacheKey])) {
+            return $this->operationCache[$gqlCacheKey];
         }
 
         $it = $this->getIterator();
         $metadata = null;
-        $operationName = $operationName ?? '';
 
         while ($it->valid()) {
-            /** @var ApiResource */
+            /** @var ApiResource $metadata */
             $metadata = $it->current();
 
             foreach ($metadata->getOperations() ?? [] as $name => $operation) {
                 $isCollection = $operation instanceof CollectionOperationInterface;
-                if ('' === $operationName && \in_array($operation->getMethod() ?? HttpOperation::METHOD_GET, [HttpOperation::METHOD_GET, HttpOperation::METHOD_OPTIONS, HttpOperation::METHOD_HEAD], true) && ($forceCollection ? $isCollection : !$isCollection)) {
-                    return $this->operationCache[$operationName] = $operation;
+                $method = $operation->getMethod() ?? 'GET';
+                $isGetOperation = 'GET' === $method || 'OPTIONS' === $method || 'HEAD' === $method;
+                if ('' === $operationName && $isGetOperation && ($forceCollection ? $isCollection : !$isCollection)) {
+                    return $this->operationCache[$httpCacheKey] = $operation;
                 }
 
                 if ($name === $operationName) {
-                    return $this->operationCache[$operationName] = $operation;
+                    return $this->operationCache[$httpCacheKey] = $operation;
+                }
+
+                if ($operation->getUriTemplate() === $operationName) {
+                    return $this->operationCache[$httpCacheKey] = $operation;
                 }
             }
 
             foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
                 $isCollection = $operation instanceof CollectionOperationInterface;
                 if ('' === $operationName && ($forceCollection ? $isCollection : !$isCollection) && false === $httpOperation) {
-                    return $this->operationCache['graphql_'.$operationName] = $operation;
+                    return $this->operationCache[$gqlCacheKey] = $operation;
                 }
 
                 if ($name === $operationName) {
-                    return $this->operationCache['graphql_'.$operationName] = $operation;
+                    return $this->operationCache[$httpCacheKey] = $operation;
                 }
             }
 
             $it->next();
         }
+
+        // Idea:
+        // if ($metadata) {
+        //     return (new class extends HttpOperation {})->withResource($metadata);
+        // }
 
         $this->handleNotFound($operationName, $metadata);
     }
@@ -86,11 +101,9 @@ final class ResourceMetadataCollection extends \ArrayObject
     private function handleNotFound(string $operationName, ?ApiResource $metadata): void
     {
         // Hide the FQDN in the exception message if possible
-        $shortName = $metadata ? $metadata->getShortName() : $this->resourceClass;
-        if (!$metadata) {
-            if (false !== $pos = strrpos($shortName, '\\')) {
-                $shortName = substr($shortName, $pos + 1);
-            }
+        $shortName = $metadata?->getShortName() ? $metadata->getShortName() : $this->resourceClass;
+        if (!$metadata && false !== $pos = strrpos($shortName, '\\')) {
+            $shortName = substr($shortName, $pos + 1);
         }
 
         throw new OperationNotFoundException(sprintf('Operation "%s" not found for resource "%s".', $operationName, $shortName));

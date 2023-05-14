@@ -23,26 +23,19 @@ class ArrayPaginatorTest extends TestCase
 {
     /**
      * @dataProvider initializeProvider
-     *
-     * @param mixed $firstResult
-     * @param mixed $maxResults
-     * @param mixed $currentItems
-     * @param mixed $totalItems
-     * @param mixed $currentPage
-     * @param mixed $lastPage
      */
-    public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage)
+    public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage): void
     {
         $paginator = new ArrayPaginator($results, $firstResult, $maxResults);
 
-        $this->assertEquals($totalItems, $paginator->getTotalItems());
-        $this->assertEquals($currentPage, $paginator->getCurrentPage());
-        $this->assertEquals($lastPage, $paginator->getLastPage());
-        $this->assertEquals($maxResults, $paginator->getItemsPerPage());
-        $this->assertEquals($currentItems, $paginator->count());
+        $this->assertSame((float) $totalItems, $paginator->getTotalItems());
+        $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
+        $this->assertSame((float) $lastPage, $paginator->getLastPage());
+        $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
+        $this->assertCount($currentItems, $paginator);
     }
 
-    public function initializeProvider()
+    public function initializeProvider(): array
     {
         return [
             'First of three pages of 3 items each' => [[0, 1, 2, 3, 4, 5, 6], 0, 3, 3, 7, 1, 3],

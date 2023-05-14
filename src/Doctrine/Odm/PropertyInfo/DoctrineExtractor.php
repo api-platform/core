@@ -27,18 +27,13 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Extracts data using Doctrine MongoDB ODM metadata.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
-    private $objectManager;
-
-    public function __construct(ObjectManager $objectManager)
+    public function __construct(private readonly ObjectManager $objectManager)
     {
-        $this->objectManager = $objectManager;
     }
 
     /**
@@ -97,21 +92,30 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         if ($metadata->hasField($property)) {
             $typeOfField = $metadata->getTypeOfField($property);
             $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+            $enumType = null;
+            if (null !== $enumClass = $metadata instanceof MongoDbClassMetadata ? $metadata->getFieldMapping($property)['enumType'] ?? null : null) {
+                $enumType = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
+            }
 
             switch ($typeOfField) {
                 case MongoDbType::DATE:
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, \DateTime::class)];
                 case MongoDbType::DATE_IMMUTABLE:
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, \DateTimeImmutable::class)];
                 case MongoDbType::HASH:
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
                 case MongoDbType::COLLECTION:
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT))];
-                default:
-                    $builtinType = $this->getPhpType($typeOfField);
-
-                    return $builtinType ? [new Type($builtinType, $nullable)] : null;
+                case MongoDbType::INT:
+                case MongoDbType::STRING:
+                    if ($enumType) {
+                        return [$enumType];
+                    }
             }
+
+            $builtinType = $this->getPhpType($typeOfField);
+
+            return $builtinType ? [new Type($builtinType, $nullable)] : null;
         }
 
         return null;
@@ -132,7 +136,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
     {
         if (
             null === ($metadata = $this->getMetadata($class))
-            || $metadata instanceof MongoDbClassMetadata && MongoDbClassMetadata::GENERATOR_TYPE_NONE === $metadata->generatorType
+            || ($metadata instanceof MongoDbClassMetadata && MongoDbClassMetadata::GENERATOR_TYPE_NONE === $metadata->generatorType)
             || !\in_array($property, $metadata->getIdentifierFieldNames(), true)
         ) {
             return null;
@@ -145,7 +149,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
     {
         try {
             return $this->objectManager->getClassMetadata($class);
-        } catch (MappingException $exception) {
+        } catch (MappingException) {
             return null;
         }
     }
@@ -155,33 +159,12 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
      */
     private function getPhpType(string $doctrineType): ?string
     {
-        switch ($doctrineType) {
-            case MongoDbType::INTEGER:
-            case MongoDbType::INT:
-            case MongoDbType::INTID:
-            case MongoDbType::KEY:
-                return Type::BUILTIN_TYPE_INT;
-            case MongoDbType::FLOAT:
-                return Type::BUILTIN_TYPE_FLOAT;
-            case MongoDbType::STRING:
-            case MongoDbType::ID:
-            case MongoDbType::OBJECTID:
-            case MongoDbType::TIMESTAMP:
-            case MongoDbType::BINDATA:
-            case MongoDbType::BINDATABYTEARRAY:
-            case MongoDbType::BINDATACUSTOM:
-            case MongoDbType::BINDATAFUNC:
-            case MongoDbType::BINDATAMD5:
-            case MongoDbType::BINDATAUUID:
-            case MongoDbType::BINDATAUUIDRFC4122:
-                return Type::BUILTIN_TYPE_STRING;
-            case MongoDbType::BOOLEAN:
-            case MongoDbType::BOOL:
-                return Type::BUILTIN_TYPE_BOOL;
-        }
-
-        return null;
+        return match ($doctrineType) {
+            MongoDbType::INTEGER, MongoDbType::INT, MongoDbType::INTID, MongoDbType::KEY => Type::BUILTIN_TYPE_INT,
+            MongoDbType::FLOAT => Type::BUILTIN_TYPE_FLOAT,
+            MongoDbType::STRING, MongoDbType::ID, MongoDbType::OBJECTID, MongoDbType::TIMESTAMP, MongoDbType::BINDATA, MongoDbType::BINDATABYTEARRAY, MongoDbType::BINDATACUSTOM, MongoDbType::BINDATAFUNC, MongoDbType::BINDATAMD5, MongoDbType::BINDATAUUID, MongoDbType::BINDATAUUIDRFC4122 => Type::BUILTIN_TYPE_STRING,
+            MongoDbType::BOOLEAN, MongoDbType::BOOL => Type::BUILTIN_TYPE_BOOL,
+            default => null,
+        };
     }
 }
-
-class_alias(DoctrineExtractor::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo\DoctrineExtractor::class);

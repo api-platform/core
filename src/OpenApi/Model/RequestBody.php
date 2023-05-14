@@ -17,15 +17,8 @@ final class RequestBody
 {
     use ExtensionTrait;
 
-    private $description;
-    private $content;
-    private $required;
-
-    public function __construct(string $description = '', \ArrayObject $content = null, bool $required = false)
+    public function __construct(private string $description = '', private ?\ArrayObject $content = null, private bool $required = false)
     {
-        $this->description = $description;
-        $this->content = $content;
-        $this->required = $required;
     }
 
     public function getDescription(): string
@@ -67,5 +60,3 @@ final class RequestBody
         return $clone;
     }
 }
-
-class_alias(RequestBody::class, \ApiPlatform\Core\OpenApi\Model\RequestBody::class);

@@ -153,4 +153,4 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     """
     Then the response status code should be 200
     And the JSON node "success" should be equal to "YES"
-    And the JSON node "@type" should be equal to "RPC"
+    And the JSON node "@type" should be equal to "RPCOutput"

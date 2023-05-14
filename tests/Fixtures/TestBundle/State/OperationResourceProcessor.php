@@ -15,8 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,11 +26,8 @@ final class OperationResourceProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
 
-    private $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry)
     {
-        $this->managerRegistry = $managerRegistry;
     }
 
     private function persist($data, array $context = [])
@@ -49,7 +46,7 @@ final class OperationResourceProcessor implements ProcessorInterface
         return $data;
     }
 
-    private function remove($data, array $context = [])
+    private function remove($data): void
     {
         if (!$manager = $this->getManager($data)) {
             return;
@@ -59,10 +56,12 @@ final class OperationResourceProcessor implements ProcessorInterface
         $manager->flush();
     }
 
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if ($operation instanceof DeleteOperationInterface) {
-            return $this->remove($data);
+            $this->remove($data);
+
+            return $data;
         }
 
         return $this->persist($data);
@@ -70,8 +69,6 @@ final class OperationResourceProcessor implements ProcessorInterface
 
     /**
      * Gets the Doctrine object manager associated with given data.
-     *
-     * @param mixed $data
      */
     private function getManager($data): ?DoctrineObjectManager
     {
@@ -80,8 +77,6 @@ final class OperationResourceProcessor implements ProcessorInterface
 
     /**
      * Checks if doctrine does not manage data automatically.
-     *
-     * @param mixed $data
      */
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {

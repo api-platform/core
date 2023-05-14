@@ -17,36 +17,8 @@ final class Parameter
 {
     use ExtensionTrait;
 
-    private $name;
-    private $in;
-    private $description;
-    private $required;
-    private $deprecated;
-    private $allowEmptyValue;
-    private $schema;
-    private $explode;
-    private $allowReserved;
-    private $style;
-    private $example;
-    private $examples;
-    private $content;
-
-    public function __construct(string $name, string $in, string $description = '', bool $required = false, bool $deprecated = false, bool $allowEmptyValue = false, array $schema = [], string $style = null, bool $explode = false, bool $allowReserved = false, $example = null, \ArrayObject $examples = null, \ArrayObject $content = null)
+    public function __construct(private string $name, private string $in, private string $description = '', private bool $required = false, private bool $deprecated = false, private bool $allowEmptyValue = false, private array $schema = [], private ?string $style = null, private bool $explode = false, private bool $allowReserved = false, private $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
     {
-        $this->name = $name;
-        $this->in = $in;
-        $this->description = $description;
-        $this->required = $required;
-        $this->deprecated = $deprecated;
-        $this->allowEmptyValue = $allowEmptyValue;
-        $this->schema = $schema;
-        $this->explode = $explode;
-        $this->allowReserved = $allowReserved;
-        $this->example = $example;
-        $this->examples = $examples;
-        $this->content = $content;
-        $this->style = $style;
-
         if (null === $style) {
             if ('query' === $in || 'cookie' === $in) {
                 $this->style = 'form';
@@ -56,14 +28,12 @@ final class Parameter
         }
     }
 
-    // TODO: string not ?string
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    // TODO: string not ?string
-    public function getIn(): ?string
+    public function getIn(): string
     {
         return $this->in;
     }
@@ -242,5 +212,3 @@ final class Parameter
         return $clone;
     }
 }
-
-class_alias(Parameter::class, \ApiPlatform\Core\OpenApi\Model\Parameter::class);

@@ -24,12 +24,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
  */
 class DummyCustomQueryItemResolver implements QueryItemResolverInterface
 {
-    /**
-     * @param DummyCustomQuery|DummyCustomQueryDocument|null $item
-     *
-     * @return DummyCustomQuery|DummyCustomQueryDocument
-     */
-    public function __invoke($item, array $context)
+    public function __invoke(?object $item, array $context): DummyCustomQuery|DummyCustomQueryDocument
     {
         $item->message = 'Success!';
         $item->customArgs = $context['args'];

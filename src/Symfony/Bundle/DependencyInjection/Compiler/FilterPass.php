@@ -32,7 +32,7 @@ final class FilterPass implements CompilerPassInterface
      *
      * @throws RuntimeException
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $filters = [];
         foreach ($container->findTaggedServiceIds('api_platform.filter', true) as $serviceId => $tags) {
@@ -46,8 +46,5 @@ final class FilterPass implements CompilerPassInterface
         }
 
         $container->getDefinition('api_platform.filter_locator')->addArgument($filters);
-        $container->getDefinition('api_platform.filter_collection_factory')->addArgument(array_keys($filters));
     }
 }
-
-class_alias(FilterPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass::class);

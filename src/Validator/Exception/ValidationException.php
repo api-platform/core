@@ -22,6 +22,13 @@ use ApiPlatform\Exception\RuntimeException;
  */
 class ValidationException extends RuntimeException
 {
-}
+    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null, protected readonly ?string $errorTitle = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 
-class_alias(ValidationException::class, \ApiPlatform\Core\Validator\Exception\ValidationException::class);
+    public function getErrorTitle(): ?string
+    {
+        return $this->errorTitle;
+    }
+}

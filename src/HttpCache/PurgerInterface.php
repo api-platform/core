@@ -17,8 +17,6 @@ namespace ApiPlatform\HttpCache;
  * Purges resources from the cache.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 interface PurgerInterface
 {
@@ -27,7 +25,7 @@ interface PurgerInterface
      *
      * @param string[] $iris
      */
-    public function purge(array $iris);
+    public function purge(array $iris): void;
 
     /**
      * Get the response header containing purged tags.

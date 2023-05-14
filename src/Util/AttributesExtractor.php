@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Util;
 
-use ApiPlatform\Core\Api\OperationType;
-
 /**
  * Extracts data used by the library form given attributes.
  *
@@ -35,22 +33,6 @@ final class AttributesExtractor
     public static function extractAttributes(array $attributes): array
     {
         $result = ['resource_class' => $attributes['_api_resource_class'] ?? null, 'has_composite_identifier' => $attributes['_api_has_composite_identifier'] ?? false];
-        if ($subresourceContext = $attributes['_api_subresource_context'] ?? null) {
-            $result['subresource_context'] = $subresourceContext;
-        }
-
-        // Normalizing identifiers tuples
-        // TODO: 3.0 remove
-        $identifiers = [];
-        foreach (($attributes['_api_identifiers'] ?? ['id']) as $parameterName => $identifiedBy) {
-            if (\is_string($identifiedBy)) {
-                $identifiers[$identifiedBy] = [$result['resource_class'], $identifiedBy];
-            } else {
-                $identifiers[$parameterName] = $identifiedBy;
-            }
-        }
-
-        $result['identifiers'] = $identifiers;
 
         if (null === $result['resource_class']) {
             return [];
@@ -63,18 +45,6 @@ final class AttributesExtractor
         }
         if (isset($attributes['_api_operation'])) {
             $result['operation'] = $attributes['_api_operation'];
-        }
-
-        // TODO: remove in 3.0
-        if (!isset($result['operation']) || ($result['operation']->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || ($result['operation']->getExtraProperties()['is_legacy_subresource'] ?? false)) {
-            foreach (OperationType::TYPES as $operationType) {
-                $attribute = "_api_{$operationType}_operation_name";
-                if (isset($attributes[$attribute])) {
-                    $result["{$operationType}_operation_name"] = $attributes[$attribute];
-                    $hasRequestAttributeKey = true;
-                    break;
-                }
-            }
         }
 
         if ($previousObject = $attributes['previous_data'] ?? null) {
@@ -94,5 +64,3 @@ final class AttributesExtractor
         return $result;
     }
 }
-
-class_alias(AttributesExtractor::class, \ApiPlatform\Core\Util\AttributesExtractor::class);

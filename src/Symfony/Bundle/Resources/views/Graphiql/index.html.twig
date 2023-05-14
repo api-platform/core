@@ -1,23 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
+    {% block head_metas %}
+        <meta charset="UTF-8">
+    {% endblock %}
 
-    <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphiql/graphiql.css', assetPackage) }}">
-    <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphiql-style.css', assetPackage) }}">
+    {% block title %}
+        <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
+    {% endblock %}
 
-    {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
-    <script id="graphiql-data" type="application/json">{{ graphiql_data|json_encode(65)|raw }}</script>
+    {% block head_stylesheets %}
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphiql/graphiql.css', assetPackage) }}">
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphiql-style.css', assetPackage) }}">
+    {% endblock %}
+
+    {% block head_javascript %}
+        {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
+        <script id="graphiql-data" type="application/json">{{ graphiql_data|json_encode(65)|raw }}</script>
+    {% endblock %}
 </head>
 
 <body>
 <div id="graphiql">Loading...</div>
 
-<script src="{{ asset('bundles/apiplatform/react/react.production.min.js', assetPackage) }}"></script>
-<script src="{{ asset('bundles/apiplatform/react/react-dom.production.min.js', assetPackage) }}"></script>
-<script src="{{ asset('bundles/apiplatform/graphiql/graphiql.min.js', assetPackage) }}"></script>
-<script src="{{ asset('bundles/apiplatform/init-graphiql.js', assetPackage) }}"></script>
+{% block body_javascript %}
+    <script src="{{ asset('bundles/apiplatform/react/react.production.min.js', assetPackage) }}"></script>
+    <script src="{{ asset('bundles/apiplatform/react/react-dom.production.min.js', assetPackage) }}"></script>
+    <script src="{{ asset('bundles/apiplatform/graphiql/graphiql.min.js', assetPackage) }}"></script>
+    <script src="{{ asset('bundles/apiplatform/init-graphiql.js', assetPackage) }}"></script>
+{% endblock %}
 
 </body>
 </html>

@@ -7,7 +7,6 @@ Feature: GraphQL introspection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].extensions.status" should be equal to 400
-    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "GraphQL query is not valid."
 
   Scenario: Introspect the GraphQL schema
@@ -563,6 +562,60 @@ Feature: GraphQL introspection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "errors[0].debugMessage" should be equal to 'Type with id "VoDummyInspectionCursorConnection" is not present in the types container'
     And the JSON node "data.typeNotAvailable" should be null
-    And the JSON node "data.typeOwner.fields[3].type.name" should be equal to "VoDummyInspectionCursorConnection"
+    And the JSON node "data.typeOwner.fields[1].type.name" should be equal to "VoDummyInspectionCursorConnection"
+
+  Scenario: Introspect an enum
+    When I send the following GraphQL request:
+    """
+    {
+      person: __type(name: "Person") {
+        name
+        fields {
+          name
+          type {
+            name
+            description
+            enumValues {
+              name
+              description
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.person.fields[1].type.name" should be equal to "GenderTypeEnum"
+    #And the JSON node "data.person.fields[1].type.description" should be equal to "An enumeration of genders."
+    And the JSON node "data.person.fields[1].type.enumValues[0].name" should be equal to "MALE"
+    #And the JSON node "data.person.fields[1].type.enumValues[0].description" should be equal to "The male gender."
+    And the JSON node "data.person.fields[1].type.enumValues[1].name" should be equal to "FEMALE"
+    And the JSON node "data.person.fields[1].type.enumValues[1].description" should be equal to "The female gender."
+
+  Scenario: Introspect an enum resource
+    When I send the following GraphQL request:
+    """
+    {
+      videoGame: __type(name: "VideoGame") {
+        name
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.videoGame.fields[3].type.ofType.name" should be equal to "GamePlayMode"

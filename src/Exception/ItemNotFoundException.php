@@ -21,5 +21,3 @@ namespace ApiPlatform\Exception;
 class ItemNotFoundException extends InvalidArgumentException
 {
 }
-
-class_alias(ItemNotFoundException::class, \ApiPlatform\Core\Exception\ItemNotFoundException::class);

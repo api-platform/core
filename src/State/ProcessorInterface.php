@@ -19,16 +19,11 @@ use ApiPlatform\Metadata\Operation;
  * Process data: send an email, persist to storage, add to queue etc.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @experimental
  */
 interface ProcessorInterface
 {
     /**
      * Handle the state.
-     *
-     * @param mixed $data
-     *
-     * @return mixed
      */
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = []);
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []);
 }

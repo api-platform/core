@@ -38,9 +38,18 @@ Alternatively, you can also work with the test application we provide:
     cd tests/Fixtures/app
     ./console assets:install --symlink
     symfony serve
+
+    # if you prefer keeping the server in your terminal:
+    symfony server:start --dir tests/Fixtures/app
     
     # or if you prefer using the PHP built-in web server
     php -S localhost:8000 -t public/
+
+You also have access to a `console`:
+
+```
+APP_DEBUG=1 tests/Fixtures/app/console debug:config
+```
 
 ### Matching Coding Standards
 
@@ -55,6 +64,8 @@ Be sure to add only **your modified files**. If any other file is fixed by cs to
 ### Backward Compatibility Promise
 
 API Platform is following the [Symfony Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
+
+As users need to use named arguments when using our attributes, they don't follow the backward compatibility rules applied to the constructor.
 
 When you are making a change, make sure no BC break is added.
 

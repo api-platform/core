@@ -18,12 +18,12 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class IntegerUriVariableTransformer implements UriVariableTransformerInterface
 {
-    public function transform($value, array $types, array $context = [])
+    public function transform(mixed $value, array $types, array $context = []): int
     {
         return (int) $value;
     }
 
-    public function supportsTransformation($value, array $types, array $context = []): bool
+    public function supportsTransformation(mixed $value, array $types, array $context = []): bool
     {
         return Type::BUILTIN_TYPE_INT === $types[0] && \is_string($value);
     }

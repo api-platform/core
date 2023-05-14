@@ -24,23 +24,17 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 final class PropertyFilter implements FilterInterface
 {
-    private $overrideDefaultProperties;
-    private $parameterName;
-    private $whitelist;
-    private $nameConverter;
+    private ?array $whitelist;
 
-    public function __construct(string $parameterName = 'properties', bool $overrideDefaultProperties = false, array $whitelist = null, NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly string $parameterName = 'properties', private readonly bool $overrideDefaultProperties = false, array $whitelist = null, private readonly ?NameConverterInterface $nameConverter = null)
     {
-        $this->overrideDefaultProperties = $overrideDefaultProperties;
-        $this->parameterName = $parameterName;
         $this->whitelist = null === $whitelist ? null : $this->formatWhitelist($whitelist);
-        $this->nameConverter = $nameConverter;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(Request $request, bool $normalization, array $attributes, array &$context)
+    public function apply(Request $request, bool $normalization, array $attributes, array &$context): void
     {
         if (null !== $propertyAttribute = $request->attributes->get('_api_filter_property')) {
             $properties = $propertyAttribute;
@@ -82,6 +76,7 @@ final class PropertyFilter implements FilterInterface
                 'type' => 'string',
                 'is_collection' => true,
                 'required' => false,
+                'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
                 'swagger' => [
                     'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
                     'name' => "$this->parameterName[]",
@@ -129,7 +124,7 @@ final class PropertyFilter implements FilterInterface
 
     private function getProperties(array $properties, array $whitelist = null): array
     {
-        $whitelist = $whitelist ?? $this->whitelist;
+        $whitelist ??= $this->whitelist;
         $result = [];
 
         foreach ($properties as $key => $value) {
@@ -163,10 +158,8 @@ final class PropertyFilter implements FilterInterface
         return $result;
     }
 
-    private function denormalizePropertyName($property)
+    private function denormalizePropertyName($property): string
     {
         return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
     }
 }
-
-class_alias(PropertyFilter::class, \ApiPlatform\Core\Serializer\Filter\PropertyFilter::class);

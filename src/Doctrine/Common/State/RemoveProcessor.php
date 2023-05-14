@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Common\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
 
@@ -23,14 +23,11 @@ final class RemoveProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
 
-    private $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry)
     {
-        $this->managerRegistry = $managerRegistry;
     }
 
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
         if (!$manager = $this->getManager($data)) {
             return;
@@ -42,8 +39,6 @@ final class RemoveProcessor implements ProcessorInterface
 
     /**
      * Gets the Doctrine object manager associated with given data.
-     *
-     * @param mixed $data
      */
     private function getManager($data): ?DoctrineObjectManager
     {

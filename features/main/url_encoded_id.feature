@@ -19,8 +19,8 @@ Feature: Allowing resource identifiers with characters that should be URL encode
     }
     """
     Examples:
-      | url                              |
-      | /url_encoded_ids/%encode:id      |
-      | /url_encoded_ids/%25encode%3Aid  |
-      | /url_encoded_ids/%25encode:id    |
-      | /url_encoded_ids/%encode%3Aid    |
+      | url                             |
+      | /url_encoded_ids/%encode:id     |
+      | /url_encoded_ids/%25encode%3Aid |
+      | /url_encoded_ids/%25encode:id   |
+      | /url_encoded_ids/%encode%3Aid   |

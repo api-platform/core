@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Hal\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -28,7 +28,7 @@ class ObjectNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testDoesNotSupportDenormalization()
+    public function testDoesNotSupportDenormalization(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('jsonhal is a read-only format.');
@@ -45,7 +45,7 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize(['foo'], 'Foo');
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $std = new \stdClass();
         $dummy = new Dummy();

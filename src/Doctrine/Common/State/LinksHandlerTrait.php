@@ -20,9 +20,12 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 trait LinksHandlerTrait
 {
+    private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+
     /**
      * @return Link[]
      */
@@ -34,15 +37,25 @@ trait LinksHandlerTrait
             return $links;
         }
 
-        $newLinks = [];
+        $newLink = null;
+        $linkProperty = $context['linkProperty'] ?? null;
 
         foreach ($links as $link) {
-            if ($linkClass === $link->getFromClass()) {
-                $newLinks[] = $link;
+            if ($linkClass === $link->getFromClass() && $linkProperty === $link->getFromProperty()) {
+                $newLink = $link;
+                break;
             }
         }
 
-        // Using graphql, it's possible that we won't find a graphql operation of the same type (eg it is disabled).
+        if ($newLink) {
+            return [$newLink];
+        }
+
+        if (!$this->resourceMetadataCollectionFactory) {
+            return [];
+        }
+
+        // Using GraphQL, it's possible that we won't find a GraphQL Operation of the same type (e.g. it is disabled).
         try {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($linkClass);
             $linkedOperation = $resourceMetadataCollection->getOperation($operation->getName());
@@ -51,30 +64,31 @@ trait LinksHandlerTrait
                 throw $e;
             }
 
-            // Instead we'll look for the first Query available
+            // Instead, we'll look for the first Query available.
             foreach ($resourceMetadataCollection as $resourceMetadata) {
-                foreach ($resourceMetadata->getGraphQlOperations() as $operation) {
-                    if ($operation instanceof Query) {
-                        $linkedOperation = $operation;
+                foreach ($resourceMetadata->getGraphQlOperations() as $op) {
+                    if ($op instanceof Query) {
+                        $linkedOperation = $op;
                     }
                 }
             }
         }
 
         foreach ($this->getOperationLinks($linkedOperation ?? null) as $link) {
-            if ($resourceClass === $link->getToClass()) {
-                $newLinks[] = $link;
+            if ($resourceClass === $link->getToClass() && $linkProperty === $link->getFromProperty()) {
+                $newLink = $link;
+                break;
             }
         }
 
-        if (!$newLinks) {
+        if (!$newLink) {
             throw new RuntimeException(sprintf('The class "%s" cannot be retrieved from "%s".', $resourceClass, $linkClass));
         }
 
-        return $newLinks;
+        return [$newLink];
     }
 
-    private function getIdentifierValue(array &$identifiers, string $name = null)
+    private function getIdentifierValue(array &$identifiers, string $name = null): mixed
     {
         if (isset($identifiers[$name])) {
             $value = $identifiers[$name];

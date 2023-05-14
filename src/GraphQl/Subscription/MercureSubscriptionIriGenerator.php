@@ -23,16 +23,8 @@ use Symfony\Component\Routing\RequestContext;
  */
 final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGeneratorInterface
 {
-    private $requestContext;
-    private $registry;
-
-    /**
-     * @param HubRegistry|string $registry
-     */
-    public function __construct(RequestContext $requestContext, $registry)
+    public function __construct(private readonly RequestContext $requestContext, private readonly HubRegistry $registry)
     {
-        $this->requestContext = $requestContext;
-        $this->registry = $registry;
     }
 
     public function generateTopicIri(string $subscriptionId): string
@@ -49,10 +41,6 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
 
     public function generateMercureUrl(string $subscriptionId, ?string $hub = null): string
     {
-        if (!$this->registry instanceof HubRegistry) {
-            return sprintf('%s?topic=%s', $this->registry, $this->generateTopicIri($subscriptionId));
-        }
-
         return sprintf('%s?topic=%s', $this->registry->getHub($hub)->getUrl(), $this->generateTopicIri($subscriptionId));
     }
 }

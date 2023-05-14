@@ -16,7 +16,7 @@ namespace ApiPlatform\GraphQl\Resolver;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
@@ -28,14 +28,11 @@ final class ResourceFieldResolver
 {
     use ClassInfoTrait;
 
-    private $iriConverter;
-
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(private readonly IriConverterInterface $iriConverter)
     {
-        $this->iriConverter = $iriConverter;
     }
 
-    public function __invoke(?array $source, array $args, $context, ResolveInfo $info)
+    public function __invoke(?array $source, array $args, $context, ResolveInfo $info): mixed
     {
         $property = null;
         if ('id' === $info->fieldName && !isset($source['_id']) && isset($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {

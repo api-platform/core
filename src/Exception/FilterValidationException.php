@@ -18,14 +18,10 @@ namespace ApiPlatform\Exception;
  *
  * @author Julien DENIAU <julien.deniau@gmail.com>
  */
-final class FilterValidationException extends \Exception implements ExceptionInterface
+final class FilterValidationException extends \Exception implements ExceptionInterface, \Stringable
 {
-    private $constraintViolationList;
-
-    public function __construct(array $constraintViolationList, string $message = '', int $code = 0, \Exception $previous = null)
+    public function __construct(private readonly array $constraintViolationList, string $message = '', int $code = 0, \Exception $previous = null)
     {
-        $this->constraintViolationList = $constraintViolationList;
-
         parent::__construct($message ?: $this->__toString(), $code, $previous);
     }
 
@@ -34,5 +30,3 @@ final class FilterValidationException extends \Exception implements ExceptionInt
         return implode("\n", $this->constraintViolationList);
     }
 }
-
-class_alias(FilterValidationException::class, \ApiPlatform\Core\Exception\FilterValidationException::class);

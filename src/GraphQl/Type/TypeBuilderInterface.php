@@ -25,6 +25,8 @@ use Symfony\Component\PropertyInfo\Type;
  * Interface implemented to build a GraphQL type.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated Since API Platform 3.1. Use @see TypeBuilderEnumInterface instead.
  */
 interface TypeBuilderInterface
 {
@@ -42,8 +44,10 @@ interface TypeBuilderInterface
 
     /**
      * Gets the type of a paginated collection of the given resource type.
+     *
+     * @deprecated Since API Platform 3.1. Use @see TypeBuilderEnumInterface::getPaginatedCollectionType() method instead.
      */
-    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, string $operationName): GraphQLType;
+    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, Operation $operation): GraphQLType;
 
     /**
      * Returns true if a type is a collection.

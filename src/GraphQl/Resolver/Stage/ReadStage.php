@@ -19,9 +19,9 @@ use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Util\ArrayTrait;
-use ApiPlatform\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -36,30 +36,21 @@ final class ReadStage implements ReadStageInterface
     use ClassInfoTrait;
     use IdentifierTrait;
 
-    private $iriConverter;
-    private $provider;
-    private $serializerContextBuilder;
-    private $nestingSeparator;
-
-    public function __construct(IriConverterInterface $iriConverter, ProviderInterface $provider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
+    public function __construct(private readonly IriConverterInterface $iriConverter, private readonly ProviderInterface $provider, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private readonly string $nestingSeparator)
     {
-        $this->iriConverter = $iriConverter;
-        $this->provider = $provider;
-        $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->nestingSeparator = $nestingSeparator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context)
+    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context): object|array|null
     {
         if (!($operation->canRead() ?? true)) {
             return $context['is_collection'] ? [] : null;
         }
 
         $args = $context['args'];
-        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation->getName(), $context, true);
+        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation, $context, true);
 
         if (!$context['is_collection']) {
             $identifier = $this->getIdentifierFromContext($context);
@@ -92,15 +83,13 @@ final class ReadStage implements ReadStageInterface
         if (isset($source[$info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
             $uriVariables = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
             $normalizationContext['linkClass'] = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
+            $normalizationContext['linkProperty'] = $info->fieldName;
         }
 
         return $this->provider->provide($operation, $uriVariables, $normalizationContext);
     }
 
-    /**
-     * @return object|null
-     */
-    private function getItem(?string $identifier, array $normalizationContext)
+    private function getItem(?string $identifier, array $normalizationContext): ?object
     {
         if (null === $identifier) {
             return null;
@@ -108,7 +97,7 @@ final class ReadStage implements ReadStageInterface
 
         try {
             $item = $this->iriConverter->getResourceFromIri($identifier, $normalizationContext);
-        } catch (ItemNotFoundException $e) {
+        } catch (ItemNotFoundException) {
             return null;
         }
 
@@ -127,17 +116,6 @@ final class ReadStage implements ReadStageInterface
 
                 // If the value contains arrays, we need to merge them for the filters to understand this syntax, proper to GraphQL to preserve the order of the arguments.
                 if ($this->isSequentialArrayOfArrays($value)) {
-                    if (\count($value[0]) > 1) {
-                        $deprecationMessage = "The filter syntax \"$name: {";
-                        $filterArgsOld = [];
-                        $filterArgsNew = [];
-                        foreach ($value[0] as $filterArgName => $filterArgValue) {
-                            $filterArgsOld[] = "$filterArgName: \"$filterArgValue\"";
-                            $filterArgsNew[] = sprintf('{%s: "%s"}', $filterArgName, $filterArgValue);
-                        }
-                        $deprecationMessage .= sprintf('%s}" is deprecated since API Platform 2.6, use the following syntax instead: "%s: [%s]".', implode(', ', $filterArgsOld), $name, implode(', ', $filterArgsNew));
-                        @trigger_error($deprecationMessage, \E_USER_DEPRECATED);
-                    }
                     $value = array_merge(...$value);
                 }
                 $filters[$name] = $this->getNormalizedFilters($value);

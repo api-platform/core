@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
+namespace ApiPlatform\Tests\Doctrine\Orm;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Tests\Fixtures\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class PaginatorTest extends TestCase
 {
@@ -26,23 +26,17 @@ class PaginatorTest extends TestCase
 
     /**
      * @dataProvider initializeProvider
-     *
-     * @param mixed $firstResult
-     * @param mixed $maxResults
-     * @param mixed $totalItems
-     * @param mixed $currentPage
-     * @param mixed $lastPage
      */
-    public function testInitialize($firstResult, $maxResults, $totalItems, $currentPage, $lastPage)
+    public function testInitialize(int $firstResult, int $maxResults, int $totalItems, int $currentPage, int $lastPage): void
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
-        $this->assertEquals($currentPage, $paginator->getCurrentPage());
-        $this->assertEquals($lastPage, $paginator->getLastPage());
-        $this->assertEquals($maxResults, $paginator->getItemsPerPage());
+        $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
+        $this->assertSame((float) $lastPage, $paginator->getLastPage());
+        $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
     }
 
-    public function testInitializeWithQueryFirstResultNotApplied()
+    public function testInitializeWithQueryFirstResultNotApplied(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Doctrine\\ORM\\Query::setFirstResult()" or/and "Doctrine\\ORM\\Query::setMaxResults()" was/were not applied to the query.');
@@ -50,7 +44,7 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMalformedQuery();
     }
 
-    public function testInitializeWithQueryMaxResultsNotApplied()
+    public function testInitializeWithQueryMaxResultsNotApplied(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Doctrine\\ORM\\Query::setFirstResult()" or/and "Doctrine\\ORM\\Query::setMaxResults()" was/were not applied to the query.');
@@ -58,14 +52,14 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMalformedQuery(true);
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $paginator = $this->getPaginator();
 
         $this->assertSame($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
     }
 
-    private function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42)
+    private function getPaginator(int $firstResult = 1, int $maxResults = 15, int $totalItems = 42): Paginator
     {
         $query = $this->prophesize(Query::class);
         $query->getFirstResult()->willReturn($firstResult)->shouldBeCalled();
@@ -76,14 +70,12 @@ class PaginatorTest extends TestCase
         $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
         $doctrinePaginator->count()->willReturn($totalItems);
 
-        $doctrinePaginator->getIterator()->will(function () {
-            return new \ArrayIterator();
-        });
+        $doctrinePaginator->getIterator()->will(fn (): \ArrayIterator => new \ArrayIterator());
 
         return new Paginator($doctrinePaginator->reveal());
     }
 
-    private function getPaginatorWithMalformedQuery($maxResults = false)
+    private function getPaginatorWithMalformedQuery(bool $maxResults = false): void
     {
         $query = $this->prophesize(Query::class);
         $query->getFirstResult()->willReturn($maxResults ? 42 : null)->shouldBeCalled();
@@ -98,7 +90,7 @@ class PaginatorTest extends TestCase
         new Paginator($doctrinePaginator->reveal());
     }
 
-    public function initializeProvider()
+    public function initializeProvider(): array
     {
         return [
             'First of three pages of 15 items each' => [0, 15, 42, 1, 3],

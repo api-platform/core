@@ -15,7 +15,6 @@ namespace ApiPlatform\Doctrine\Odm\State;
 
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -23,7 +22,6 @@ use ApiPlatform\State\ProviderInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectRepository;
 
 /**
  * Collection state provider using the Doctrine ODM.
@@ -32,27 +30,20 @@ final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerTrait;
 
-    private $resourceMetadataCollectionFactory;
-    private $managerRegistry;
-    private $collectionExtensions;
-
     /**
      * @param AggregationCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, iterable $collectionExtensions = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $collectionExtensions = [])
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->managerRegistry = $managerRegistry;
-        $this->collectionExtensions = $collectionExtensions;
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
     {
         $resourceClass = $operation->getClass();
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
-        /** @var ObjectRepository $repository */
         $repository = $manager->getRepository($resourceClass);
         if (!$repository instanceof DocumentRepository) {
             throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
@@ -63,20 +54,14 @@ final class CollectionProvider implements ProviderInterface
         $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operation);
 
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operation->getName(), $context);
+            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operation, $context);
 
-            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-                return $extension->getResult($aggregationBuilder, $resourceClass, $operation->getName(), $context);
+            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation, $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $operation, $context);
             }
         }
 
-        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        try {
-            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operation->getName());
-            $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
-        } catch (OperationNotFoundException $e) {
-            $attribute = $resourceMetadata->getOperation(null, true)->getExtraProperties()['doctrine_mongodb'] ?? [];
-        }
+        $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
         $executeOptions = $attribute['execute_options'] ?? [];
 
         return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions);

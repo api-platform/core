@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -21,30 +22,14 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  * Configures cache HTTP headers for the current response.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental
  */
 final class AddHeadersListener
 {
-    private $etag;
-    private $maxAge;
-    private $sharedMaxAge;
-    private $vary;
-    private $public;
-    private $resourceMetadataFactory;
-    private $staleWhileRevalidate;
-    private $staleIfError;
+    use OperationRequestInitiatorTrait;
 
-    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, int $staleWhileRevalidate = null, int $staleIfError = null)
+    public function __construct(private readonly bool $etag = false, private readonly ?int $maxAge = null, private readonly ?int $sharedMaxAge = null, private readonly ?array $vary = null, private readonly ?bool $public = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?int $staleWhileRevalidate = null, private readonly ?int $staleIfError = null)
     {
-        $this->etag = $etag;
-        $this->maxAge = $maxAge;
-        $this->sharedMaxAge = $sharedMaxAge;
-        $this->vary = $vary;
-        $this->public = $public;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->staleWhileRevalidate = $staleWhileRevalidate;
-        $this->staleIfError = $staleIfError;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function onKernelResponse(ResponseEvent $event): void
@@ -65,14 +50,8 @@ final class AddHeadersListener
             return;
         }
 
-        $resourceCacheHeaders = [];
-
-        if ($this->resourceMetadataFactory) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-            $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
-        } else {
-            $resourceCacheHeaders = $attributes['cache_headers'] ?? [];
-        }
+        $operation = $this->initializeOperation($request);
+        $resourceCacheHeaders = $attributes['cache_headers'] ?? $operation?->getCacheHeaders() ?? [];
 
         if ($this->etag && !$response->getEtag()) {
             $response->setEtag(md5((string) $response->getContent()));
@@ -107,5 +86,3 @@ final class AddHeadersListener
         }
     }
 }
-
-class_alias(AddHeadersListener::class, \ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener::class);

@@ -1,4 +1,3 @@
-# todo remove @v3 tag in 3.0
 Feature: Create-Retrieve-Update-Delete
   In order to use an hypermedia API
   As a client software developer
@@ -572,7 +571,6 @@ Feature: Create-Retrieve-Update-Delete
     And the response should be empty
 
   @php8
-  @v3
   @createSchema
   Scenario: Create a resource ProcessorEntity
     When I add "Content-Type" header equal to "application/ld+json"
@@ -599,7 +597,6 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   @php8
-  @v3
   Scenario: Create a resource ProviderEntity
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/provider_entities" with body:
@@ -625,7 +622,6 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   @php8
-  @v3
   Scenario: Get a collection of Provider Entities
     When I send a "GET" request to "/provider_entities"
     Then the response status code should be 200
@@ -650,7 +646,6 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   @php8
-  @v3
   Scenario: Get a resource ProviderEntity
     When I send a "GET" request to "/provider_entities/1"
     Then the response status code should be 200
@@ -667,7 +662,6 @@ Feature: Create-Retrieve-Update-Delete
       }
     """
 
-  @v3
   Scenario: Get a resource in v3 configured in YAML
     Given there is a Program
     When I send a "GET" request to "/programs/1"
@@ -687,7 +681,6 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
-  @v3
   Scenario: Get a collection resource in v3 configured in YAML
     Given there are 3 Programs
     When I send a "GET" request to "/users/1/programs"
@@ -730,7 +723,6 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
-  @v3
   Scenario: Get a resource in v3 configured in XML
     Given there is a Comment
     When I send a "GET" request to "/comments/1"
@@ -750,7 +742,6 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
-  @v3
   Scenario: Get a collection resource in v3 configured in XML
     Given there are 3 Comments
     When I send a "GET" request to "/users/1/comments"

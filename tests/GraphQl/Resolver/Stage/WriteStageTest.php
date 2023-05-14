@@ -11,9 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\WriteStage;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
@@ -21,6 +20,8 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\State\ProcessorInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -29,10 +30,9 @@ class WriteStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var WriteStage */
-    private $writeStage;
-    private $processorProphecy;
-    private $serializerContextBuilderProphecy;
+    private WriteStage $writeStage;
+    private ObjectProphecy $processorProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}
@@ -51,7 +51,6 @@ class WriteStageTest extends TestCase
     public function testNoData(): void
     {
         $resourceClass = 'myResource';
-        $operationName = 'item_query';
         /** @var Operation $operation */
         $operation = (new Query())->withName('item_query');
 
@@ -62,7 +61,6 @@ class WriteStageTest extends TestCase
 
     public function testApplyDisabled(): void
     {
-        $operationName = 'item_query';
         $resourceClass = 'myResource';
         /** @var Operation $operation */
         $operation = (new Query())->withName('item_query')->withWrite(false);
@@ -82,7 +80,7 @@ class WriteStageTest extends TestCase
         $operation = (new Mutation())->withName($operationName);
 
         $denormalizationContext = ['denormalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->willReturn($denormalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, false)->willReturn($denormalizationContext);
 
         $data = new \stdClass();
         $processedData = new \stdClass();

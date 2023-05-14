@@ -18,21 +18,18 @@ final class ContentStatus implements \JsonSerializable
     public const DRAFT = 'draft';
     public const PUBLISHED = 'published';
 
-    private $value;
+    private readonly string $value;
 
     public function __construct(string $value)
     {
         if (!self::isValid($value)) {
-            throw new \UnexpectedValueException("Value '$value' is not part of the enum ".__CLASS__);
+            throw new \UnexpectedValueException("Value '$value' is not part of the enum ".self::class);
         }
 
         $this->value = $value;
     }
 
-    /**
-     * @return string|bool
-     */
-    public function getKey()
+    public function getKey(): string|bool
     {
         return static::search($this->value);
     }
@@ -42,9 +39,6 @@ final class ContentStatus implements \JsonSerializable
         return $this->value;
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function toArray(): array
     {
         return [
@@ -58,21 +52,15 @@ final class ContentStatus implements \JsonSerializable
         return \in_array($value, self::toArray(), true);
     }
 
-    /**
-     * @return string|bool
-     */
-    public static function search(string $value)
+    public static function search(string $value): string|bool
     {
         return array_search($value, self::toArray(), true);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'key' => $this->getKey(),

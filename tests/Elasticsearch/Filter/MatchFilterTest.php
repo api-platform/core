@@ -15,30 +15,26 @@ namespace ApiPlatform\Tests\Elasticsearch\Filter;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Filter\ConstantScoreFilterInterface;
 use ApiPlatform\Elasticsearch\Filter\MatchFilter;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-/**
- * @group legacy
- */
 class MatchFilterTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(
             ConstantScoreFilterInterface::class,
@@ -46,7 +42,6 @@ class MatchFilterTest extends TestCase
                 $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
                 $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-                $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
                 $this->prophesize(IriConverterInterface::class)->reveal(),
                 $this->prophesize(PropertyAccessorInterface::class)->reveal(),
                 $this->prophesize(NameConverterInterface::class)->reveal()
@@ -54,7 +49,7 @@ class MatchFilterTest extends TestCase
         );
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['id', 'name', 'bar']))->shouldBeCalled();
@@ -62,9 +57,6 @@ class MatchFilterTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]))->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
-
-        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $foo = new Foo();
         $foo->setName('Xavier');
@@ -84,19 +76,18 @@ class MatchFilterTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            $identifierExtractorProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
             $nameConverterProphecy->reveal()
         );
 
-        self::assertSame(
+        self::assertEquals(
             ['bool' => ['must' => [['match' => ['id' => 1]], ['bool' => ['should' => [['match' => ['name' => 'Caroline']], ['match' => ['name' => 'Xavier']]]]]]]],
             $matchFilter->apply([], Foo::class, null, ['filters' => ['id' => '/foos/1', 'name' => ['Caroline', 'Xavier']]])
         );
     }
 
-    public function testApplyWithNestedProperty()
+    public function testApplyWithNestedProperty(): void
     {
         $fooType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
         $barType = new Type(Type::BUILTIN_TYPE_STRING);
@@ -108,9 +99,6 @@ class MatchFilterTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
-
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $nameConverterProphecy->normalize('foo.bar', Foo::class, null, Argument::type('array'))->willReturn('foo.bar')->shouldBeCalled();
         $nameConverterProphecy->normalize('foo', Foo::class, null, Argument::type('array'))->willReturn('foo')->shouldBeCalled();
@@ -119,20 +107,19 @@ class MatchFilterTest extends TestCase
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $identifierExtractorProphecy->reveal(),
             $this->prophesize(IriConverterInterface::class)->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             $nameConverterProphecy->reveal(),
             ['foo.bar' => null]
         );
 
-        self::assertSame(
+        self::assertEquals(
             ['bool' => ['must' => [['nested' => ['path' => 'foo', 'query' => ['match' => ['foo.bar' => 'Krupicka']]]]]]],
             $matchFilter->apply([], Foo::class, null, ['filters' => ['foo.bar' => 'Krupicka']])
         );
     }
 
-    public function testApplyWithInvalidFilters()
+    public function testApplyWithInvalidFilters(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['id', 'bar']))->shouldBeCalled();
@@ -141,9 +128,6 @@ class MatchFilterTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]))->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new ApiProperty())->shouldBeCalled();
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
-
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getResourceFromIri('/invalid_iri_foos/1', ['fetch_data' => false])->willThrow(new InvalidArgumentException())->shouldBeCalled();
 
@@ -151,19 +135,18 @@ class MatchFilterTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            $identifierExtractorProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             $this->prophesize(NameConverterInterface::class)->reveal()
         );
 
-        self::assertSame(
+        self::assertEquals(
             [],
             $matchFilter->apply([], Foo::class, null, ['filters' => ['id' => '/invalid_iri_foos/1', 'bar' => 'Chaverot']])
         );
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['id', 'name', 'bar', 'date', 'weird']))->shouldBeCalled();
@@ -182,53 +165,60 @@ class MatchFilterTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
             $this->prophesize(IriConverterInterface::class)->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             $this->prophesize(NameConverterInterface::class)->reveal()
         );
 
-        self::assertSame(
+        self::assertEquals(
             [
                 'id' => [
                     'property' => 'id',
                     'type' => 'int',
                     'required' => false,
+                    'is_collection' => false,
                 ],
                 'id[]' => [
                     'property' => 'id',
                     'type' => 'int',
                     'required' => false,
+                    'is_collection' => true,
                 ],
                 'name' => [
                     'property' => 'name',
                     'type' => 'string',
                     'required' => false,
+                    'is_collection' => false,
                 ],
                 'name[]' => [
                     'property' => 'name',
                     'type' => 'string',
                     'required' => false,
+                    'is_collection' => true,
                 ],
                 'date' => [
                     'property' => 'date',
                     'type' => \DateTimeInterface::class,
                     'required' => false,
+                    'is_collection' => false,
                 ],
                 'date[]' => [
                     'property' => 'date',
                     'type' => \DateTimeInterface::class,
                     'required' => false,
+                    'is_collection' => true,
                 ],
                 'weird' => [
                     'property' => 'weird',
                     'type' => 'string',
                     'required' => false,
+                    'is_collection' => false,
                 ],
                 'weird[]' => [
                     'property' => 'weird',
                     'type' => 'string',
                     'required' => false,
+                    'is_collection' => true,
                 ],
             ],
             $matchFilter->getDescription(Foo::class)

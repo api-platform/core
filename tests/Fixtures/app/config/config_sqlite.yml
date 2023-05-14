@@ -1,5 +1,7 @@
 imports:
-    - { resource: config_test.yml }
+    - { resource: config_common.yml }
+    - { resource: config_doctrine.yml }
+    - { resource: config_behat_orm.yml }
 
 parameters:
     env(DATABASE_URL): sqlite:///%kernel.project_dir%/var/data.db
@@ -10,3 +12,4 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
         types:
             uuid: Ramsey\Uuid\Doctrine\UuidType
+            symfony_uuid: Symfony\Bridge\Doctrine\Types\UuidType

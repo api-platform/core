@@ -13,25 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator;
 
-class Uuid implements \JsonSerializable
+class Uuid implements \JsonSerializable, \Stringable
 {
-    private $id;
+    private string $id = 'foo';
 
     public function __construct()
     {
-        $this->id = 'foo';
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }
 
-    /**
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange] // TODO: remove this and add the typehint in API Platform 3
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->id;
     }

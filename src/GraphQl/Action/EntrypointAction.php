@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Action;
 
-use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface as SchemaBuilderLegacyInterface;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\ExecutorInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
-use GraphQL\Error\Debug;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
@@ -34,45 +32,22 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class EntrypointAction
 {
-    /** @var SchemaBuilderLegacyInterface|SchemaBuilderInterface */
-    private $schemaBuilder;
-    private $executor;
-    private $graphiQlAction;
-    private $graphQlPlaygroundAction;
-    private $normalizer;
-    private $errorHandler;
-    private $debug;
-    private $graphiqlEnabled;
-    private $graphQlPlaygroundEnabled;
-    private $defaultIde;
+    private int $debug;
 
-    public function __construct($schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, ErrorHandlerInterface $errorHandler, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
+    public function __construct(private readonly SchemaBuilderInterface $schemaBuilder, private readonly ExecutorInterface $executor, private readonly ?GraphiQlAction $graphiQlAction, private readonly ?GraphQlPlaygroundAction $graphQlPlaygroundAction, private readonly NormalizerInterface $normalizer, private readonly ErrorHandlerInterface $errorHandler, bool $debug = false, private readonly bool $graphiqlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false, private readonly ?string $defaultIde = null)
     {
-        $this->schemaBuilder = $schemaBuilder;
-        $this->executor = $executor;
-        $this->graphiQlAction = $graphiQlAction;
-        $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
-        $this->normalizer = $normalizer;
-        $this->errorHandler = $errorHandler;
-        if (class_exists(Debug::class)) {
-            $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
-        } else {
-            $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
-        }
-        $this->graphiqlEnabled = $graphiqlEnabled;
-        $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
-        $this->defaultIde = $defaultIde;
+        $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
     }
 
     public function __invoke(Request $request): Response
     {
         try {
             if ($request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
-                if ('graphiql' === $this->defaultIde && $this->graphiqlEnabled) {
+                if ('graphiql' === $this->defaultIde && $this->graphiqlEnabled && $this->graphiQlAction) {
                     return ($this->graphiQlAction)($request);
                 }
 
-                if ('graphql-playground' === $this->defaultIde && $this->graphQlPlaygroundEnabled) {
+                if ('graphql-playground' === $this->defaultIde && $this->graphQlPlaygroundEnabled && $this->graphQlPlaygroundAction) {
                     return ($this->graphQlPlaygroundAction)($request);
                 }
             }
@@ -85,11 +60,11 @@ final class EntrypointAction
             $executionResult = $this->executor
                 ->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operationName)
                 ->setErrorsHandler($this->errorHandler)
-                ->setErrorFormatter([$this->normalizer, 'normalize']);
+                ->setErrorFormatter($this->normalizer->normalize(...));
         } catch (\Exception $exception) {
             $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, [], null, $exception)]))
                 ->setErrorsHandler($this->errorHandler)
-                ->setErrorFormatter([$this->normalizer, 'normalize']);
+                ->setErrorFormatter($this->normalizer->normalize(...));
         }
 
         return new JsonResponse($executionResult->toArray($this->debug));
@@ -111,15 +86,16 @@ final class EntrypointAction
             return [$query, $operationName, $variables];
         }
 
-        if ('json' === $request->getContentType()) {
+        $contentType = method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType();
+        if ('json' === $contentType) {
             return $this->parseData($query, $operationName, $variables, $request->getContent());
         }
 
-        if ('graphql' === $request->getContentType()) {
+        if ('graphql' === $contentType) {
             $query = $request->getContent();
         }
 
-        if (\in_array($request->getContentType(), ['multipart', 'form'], true)) {
+        if (\in_array($contentType, ['multipart', 'form'], true)) {
             return $this->parseMultipartRequest($query, $operationName, $variables, $request->request->all(), $request->files->all());
         }
 
@@ -131,7 +107,7 @@ final class EntrypointAction
      */
     private function parseData(?string $query, ?string $operationName, array $variables, string $jsonContent): array
     {
-        if (!\is_array($data = json_decode($jsonContent, true))) {
+        if (!\is_array($data = json_decode($jsonContent, true, 512, \JSON_ERROR_NONE))) {
             throw new BadRequestHttpException('GraphQL data is not valid JSON.');
         }
 
@@ -162,7 +138,7 @@ final class EntrypointAction
         [$query, $operationName, $variables] = $this->parseData($query, $operationName, $variables, $operations);
 
         /** @var string $map */
-        if (!\is_array($decodedMap = json_decode($map, true))) {
+        if (!\is_array($decodedMap = json_decode($map, true, 512, \JSON_ERROR_NONE))) {
             throw new BadRequestHttpException('GraphQL multipart request map is not valid JSON.');
         }
 
@@ -181,8 +157,8 @@ final class EntrypointAction
                 throw new BadRequestHttpException('GraphQL multipart request file has not been sent correctly.');
             }
 
-            foreach ($map[$key] as $mapValue) {
-                $path = explode('.', $mapValue);
+            foreach ($value as $mapValue) {
+                $path = explode('.', (string) $mapValue);
 
                 if ('variables' !== $path[0]) {
                     throw new BadRequestHttpException('GraphQL multipart request path in map is invalid.');
@@ -190,9 +166,7 @@ final class EntrypointAction
 
                 unset($path[0]);
 
-                $mapPathExistsInVariables = array_reduce($path, static function (array $inVariables, string $pathElement) {
-                    return \array_key_exists($pathElement, $inVariables) ? $inVariables[$pathElement] : false;
-                }, $variables);
+                $mapPathExistsInVariables = array_reduce($path, static fn (array $inVariables, string $pathElement) => \array_key_exists($pathElement, $inVariables) ? $inVariables[$pathElement] : false, $variables);
 
                 if (false === $mapPathExistsInVariables) {
                     throw new BadRequestHttpException('GraphQL multipart request path in map does not match the variables.');
@@ -214,12 +188,10 @@ final class EntrypointAction
      */
     private function decodeVariables(string $variables): array
     {
-        if (!\is_array($decoded = json_decode($variables, true))) {
+        if (!\is_array($decoded = json_decode($variables, true, 512, \JSON_ERROR_NONE))) {
             throw new BadRequestHttpException('GraphQL variables are not valid JSON.');
         }
 
         return $decoded;
     }
 }
-
-class_alias(EntrypointAction::class, \ApiPlatform\Core\GraphQl\Action\EntrypointAction::class);

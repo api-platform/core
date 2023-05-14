@@ -13,38 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Composite Primitive Item.
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource]
+#[ORM\Entity]
 class CompositePrimitiveItem
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="string")
-     */
-    private $name;
+    #[ORM\Column(type: 'text')]
+    private string $description;
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     */
-    private $year;
-
-    /**
-     * @ORM\Column(type="text")
-     */
-    private $description;
-
-    public function __construct(string $name, int $year)
+    public function __construct(#[ORM\Id] #[ORM\Column(type: 'string')] private string $name, #[ORM\Id] #[ORM\Column(type: 'integer')] private int $year)
     {
-        $this->name = $name;
-        $this->year = $year;
     }
 
     /**
@@ -66,7 +49,7 @@ class CompositePrimitiveItem
     /**
      * Sets description.
      */
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }

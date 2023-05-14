@@ -31,5 +31,3 @@ trait ContextTrait
         ]);
     }
 }
-
-class_alias(ContextTrait::class, \ApiPlatform\Core\Serializer\ContextTrait::class);

@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -28,7 +28,7 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaRegexRestriction;
+    private PropertySchemaRegexRestriction $propertySchemaRegexRestriction;
 
     protected function setUp(): void
     {

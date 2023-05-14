@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDBClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -32,8 +33,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 /**
  * Filter the collection by given properties.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -43,16 +42,16 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     public const DOCTRINE_INTEGER_TYPE = [MongoDbType::INTEGER, MongoDbType::INT];
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, IdentifiersExtractorInterface $identifiersExtractor, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, ?IdentifiersExtractorInterface $identifiersExtractor, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->iriConverter = $iriConverter;
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->identifiersExtractor = $identifiersExtractor;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    protected function getIriConverter()
+    protected function getIriConverter(): IriConverterInterface
     {
         return $this->iriConverter;
     }
@@ -65,12 +64,12 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
+            null === $value
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
@@ -91,7 +90,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
         // prefixing the strategy with i makes it case insensitive
-        if (0 === strpos($strategy, 'i')) {
+        if (str_starts_with($strategy, 'i')) {
             $strategy = substr($strategy, 1);
             $caseSensitive = false;
         }
@@ -101,7 +100,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         if ($metadata->hasField($field) && !$metadata->hasAssociation($field)) {
             if ('id' === $field) {
-                $values = array_map([$this, 'getIdFromValue'], $values);
+                $values = array_map($this->getIdFromValue(...), $values);
             }
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
@@ -122,14 +121,11 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             return;
         }
 
-        $values = array_map([$this, 'getIdFromValue'], $values);
-        $doctrineTypeField = $this->getDoctrineFieldType($property, $resourceClass);
+        $values = array_map($this->getIdFromValue(...), $values);
 
-        if (null !== $this->identifiersExtractor) {
-            $associationResourceClass = $metadata->getAssociationTargetClass($field);
-            $associationFieldIdentifier = $this->identifiersExtractor->getIdentifiersFromResourceClass($associationResourceClass)[0];
-            $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
-        }
+        $associationResourceClass = $metadata->getAssociationTargetClass($field);
+        $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];
+        $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
 
         if (!$this->hasValidValues($values, $doctrineTypeField)) {
             $this->logger->notice('Invalid filter ignored', [
@@ -144,10 +140,8 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     /**
      * Add equality match stage according to the strategy.
-     *
-     * @param mixed $values
      */
-    private function addEqualityMatchStrategy(string $strategy, Builder $aggregationBuilder, string $field, string $matchField, $values, bool $caseSensitive, ClassMetadata $metadata): void
+    private function addEqualityMatchStrategy(string $strategy, Builder $aggregationBuilder, string $field, string $matchField, array $values, bool $caseSensitive, ClassMetadata $metadata): void
     {
         $inValues = [];
         foreach ($values as $inValue) {
@@ -163,13 +157,9 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     /**
      * Get equality match value according to the strategy.
      *
-     * @param mixed $value
-     *
      * @throws InvalidArgumentException If strategy does not exist
-     *
-     * @return Regex|string
      */
-    private function getEqualityMatchStrategyValue(string $strategy, string $field, $value, bool $caseSensitive, ClassMetadata $metadata)
+    private function getEqualityMatchStrategyValue(string $strategy, string $field, mixed $value, bool $caseSensitive, ClassMetadata $metadata): mixed
     {
         $type = $metadata->getTypeOfField($field);
 
@@ -182,21 +172,14 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         $quotedValue = preg_quote($value);
 
-        switch ($strategy) {
-            case null:
-            case self::STRATEGY_EXACT:
-                return $caseSensitive ? $value : new Regex("^$quotedValue$", 'i');
-            case self::STRATEGY_PARTIAL:
-                return new Regex($quotedValue, $caseSensitive ? '' : 'i');
-            case self::STRATEGY_START:
-                return new Regex("^$quotedValue", $caseSensitive ? '' : 'i');
-            case self::STRATEGY_END:
-                return new Regex("$quotedValue$", $caseSensitive ? '' : 'i');
-            case self::STRATEGY_WORD_START:
-                return new Regex("(^$quotedValue.*|.*\s$quotedValue.*)", $caseSensitive ? '' : 'i');
-            default:
-                throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
-        }
+        return match ($strategy) {
+            self::STRATEGY_EXACT => $caseSensitive ? $value : new Regex("^$quotedValue$", 'i'),
+            self::STRATEGY_PARTIAL => new Regex($quotedValue, $caseSensitive ? '' : 'i'),
+            self::STRATEGY_START => new Regex("^$quotedValue", $caseSensitive ? '' : 'i'),
+            self::STRATEGY_END => new Regex("$quotedValue$", $caseSensitive ? '' : 'i'),
+            self::STRATEGY_WORD_START => new Regex("(^$quotedValue.*|.*\s$quotedValue.*)", $caseSensitive ? '' : 'i'),
+            default => throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy)),
+        };
     }
 
     /**
@@ -204,20 +187,12 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      */
     protected function getType(string $doctrineType): string
     {
-        switch ($doctrineType) {
-            case MongoDbType::INT:
-            case MongoDbType::INTEGER:
-                return 'int';
-            case MongoDbType::BOOL:
-            case MongoDbType::BOOLEAN:
-                return 'bool';
-            case MongoDbType::DATE:
-            case MongoDbType::DATE_IMMUTABLE:
-                return \DateTimeInterface::class;
-            case MongoDbType::FLOAT:
-                return 'float';
-        }
-
-        return 'string';
+        return match ($doctrineType) {
+            MongoDbType::INT, MongoDbType::INTEGER => 'int',
+            MongoDbType::BOOL, MongoDbType::BOOLEAN => 'bool',
+            MongoDbType::DATE, MongoDbType::DATE_IMMUTABLE => \DateTimeInterface::class,
+            MongoDbType::FLOAT => 'float',
+            default => 'string',
+        };
     }
 }

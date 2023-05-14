@@ -14,12 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -28,7 +26,8 @@ use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -36,14 +35,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ReadStageTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    /** @var ReadStage */
-    private $readStage;
-    private $iriConverterProphecy;
-    private $providerProphecy;
-    private $serializerContextBuilderProphecy;
+    private ReadStage $readStage;
+    private ObjectProphecy $iriConverterProphecy;
+    private ObjectProphecy $providerProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}
@@ -64,10 +61,8 @@ class ReadStageTest extends TestCase
 
     /**
      * @dataProvider contextProvider
-     *
-     * @param object|iterable|null $expectedResult
      */
-    public function testApplyDisabled(array $context, $expectedResult): void
+    public function testApplyDisabled(array $context, object|array|null $expectedResult): void
     {
         $resourceClass = 'myResource';
         /** @var Operation $operation */
@@ -88,11 +83,8 @@ class ReadStageTest extends TestCase
 
     /**
      * @dataProvider itemProvider
-     *
-     * @param object|null $item
-     * @param object|null $expectedResult
      */
-    public function testApplyItem(?string $identifier, $item, bool $throwNotFound, $expectedResult): void
+    public function testApplyItem(?string $identifier, ?object $item, bool $throwNotFound, ?object $expectedResult): void
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
@@ -105,8 +97,10 @@ class ReadStageTest extends TestCase
             'info' => $info,
         ];
 
+        /** @var Operation $operation */
+        $operation = (new Query())->withName($operationName);
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         if ($throwNotFound) {
             $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
@@ -114,8 +108,6 @@ class ReadStageTest extends TestCase
             $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willReturn($item);
         }
 
-        /** @var Operation $operation */
-        $operation = (new Query())->withName($operationName);
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
@@ -134,11 +126,8 @@ class ReadStageTest extends TestCase
 
     /**
      * @dataProvider itemMutationOrSubscriptionProvider
-     *
-     * @param object|null $item
-     * @param object|null $expectedResult
      */
-    public function testApplyMutationOrSubscription(bool $isMutation, bool $isSubscription, string $resourceClass, ?string $identifier, $item, bool $throwNotFound, $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
+    public function testApplyMutationOrSubscription(bool $isMutation, bool $isSubscription, string $resourceClass, ?string $identifier, ?object $item, bool $throwNotFound, ?object $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $operationName = 'create';
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -150,8 +139,10 @@ class ReadStageTest extends TestCase
             'info' => $info,
         ];
 
+        /** @var Operation $operation */
+        $operation = (new Mutation())->withName($operationName)->withShortName('shortName');
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         if ($throwNotFound) {
             $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
@@ -164,8 +155,6 @@ class ReadStageTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        /** @var Operation $operation */
-        $operation = (new Mutation())->withName($operationName)->withShortName('shortName');
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
@@ -177,11 +166,11 @@ class ReadStageTest extends TestCase
 
         return [
             'no identifier' => [true, false, 'myResource', null, $item, false, null],
-            'identifier' => [true, false, 'stdClass', 'identifier', $item, false, $item],
+            'identifier' => [true, false, \stdClass::class, 'identifier', $item, false, $item],
             'identifier bad item' => [true, false, 'myResource', 'identifier', $item, false, $item, \UnexpectedValueException::class, 'Item "identifier" did not match expected type "shortName".'],
             'identifier not found' => [true, false, 'myResource', 'identifier_not_found', $item, true, null, NotFoundHttpException::class, 'Item "identifier_not_found" not found.'],
             'no identifier (subscription)' => [false, true, 'myResource', null, $item, false, null],
-            'identifier (subscription)' => [false, true, 'stdClass', 'identifier', $item, false, $item],
+            'identifier (subscription)' => [false, true, \stdClass::class, 'identifier', $item, false, $item],
         ];
     }
 
@@ -193,7 +182,7 @@ class ReadStageTest extends TestCase
         $operationName = 'collection_query';
         $resourceClass = 'myResource';
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $fieldName = 'subresource';
+        $fieldName = 'resource';
         $info->fieldName = $fieldName;
         $context = [
             'is_collection' => true,
@@ -204,15 +193,13 @@ class ReadStageTest extends TestCase
             'source' => $source,
         ];
 
-        $collectionOperation = (new GetCollection())->withFilters($expectedFilters);
-
         /** @var Operation $operation */
         $operation = (new QueryCollection())->withName($operationName);
         $normalizationContext = ['normalization' => true, 'operation' => $operation];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->providerProphecy->provide($operation, [], $normalizationContext + ['filters' => $expectedFilters])->willReturn([]);
-        $this->providerProphecy->provide($operation, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'linkClass' => 'myResource'])->willReturn(['subresource']);
+        $this->providerProphecy->provide($operation, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'linkClass' => 'myResource', 'linkProperty' => 'resource'])->willReturn(['resource']);
 
         $result = ($this->readStage)($resourceClass, $rootClass, $operation, $context);
 
@@ -224,7 +211,7 @@ class ReadStageTest extends TestCase
         $operationName = 'collection_query';
         $resourceClass = 'myResource';
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $fieldName = 'subresource';
+        $fieldName = 'resource';
         $info->fieldName = $fieldName;
         $context = [
             'is_collection' => true,
@@ -239,21 +226,18 @@ class ReadStageTest extends TestCase
             'info' => $info,
             'source' => null,
         ];
-        $collectionOperation = (new GetCollection());
+
         /** @var Operation $operation */
         $operation = (new QueryCollection())->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         ($this->readStage)($resourceClass, $resourceClass, $operation, $context);
 
-        $this->providerProphecy->provide($operation, [], Argument::that(function ($args) {
-            // Prophecy does not check the order of items in associative arrays. Checking if some.field comes first manually
-            return
-            array_search('some.field', array_keys($args['filters']['order']), true) <
-            array_search('localField', array_keys($args['filters']['order']), true);
-        }))->shouldHaveBeenCalled();
+        $this->providerProphecy->provide($operation, [], Argument::that(fn ($args): bool => // Prophecy does not check the order of items in associative arrays. Checking if some.field comes first manually
+array_search('some.field', array_keys($args['filters']['order']), true) <
+        array_search('localField', array_keys($args['filters']['order']), true)))->shouldHaveBeenCalled();
     }
 
     public function collectionProvider(): array
@@ -274,47 +258,13 @@ class ReadStageTest extends TestCase
                 ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']],
                 [],
             ],
-            'with subresource' => [
+            'with resource' => [
                 [],
                 'myResource',
-                ['subresource' => [], ItemNormalizer::ITEM_IDENTIFIERS_KEY => ['id' => 3], ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => 'myResource'],
+                ['resource' => [], ItemNormalizer::ITEM_IDENTIFIERS_KEY => ['id' => 3], ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => 'myResource'],
                 [],
-                ['subresource'],
+                ['resource'],
             ],
         ];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testApplyCollectionWithDeprecatedFilterSyntax(): void
-    {
-        $operationName = 'collection_query';
-        $resourceClass = 'myResource';
-        $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $fieldName = 'subresource';
-        $info->fieldName = $fieldName;
-        $context = [
-            'is_collection' => true,
-            'is_mutation' => false,
-            'is_subscription' => false,
-            'args' => ['filter' => [['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']]],
-            'info' => $info,
-            'source' => null,
-        ];
-        $filters = ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']];
-        /** @var Operation $operation */
-        $operation = (new QueryCollection())->withName($operationName)->withClass($resourceClass)->withFilters($filters);
-
-        $normalizationContext = ['normalization' => true, 'operation' => $operation];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
-
-        $this->providerProphecy->provide($operation, [], $normalizationContext + ['filters' => $filters])->willReturn([]);
-
-        $this->expectDeprecation('The filter syntax "filter: {filterArg1: "filterValue1", filterArg2: "filterValue2"}" is deprecated since API Platform 2.6, use the following syntax instead: "filter: [{filterArg1: "filterValue1"}, {filterArg2: "filterValue2"}]".');
-
-        $result = ($this->readStage)($resourceClass, 'myResource', $operation, $context);
-
-        $this->assertSame([], $result);
     }
 }

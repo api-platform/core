@@ -3,8 +3,8 @@ Feature: JSON-LD using iri_only parameter
   As a Vulcain user and as a developer
   I should be able to only get an IRI list when I ask a resource.
 
-  Scenario: Retrieve Dummy's resource context with iri_only
-    When I send a "GET" request to "/contexts/IriOnlyDummy"
+  Scenario Outline: Retrieve Dummy's resource context with iri_only
+    When I send a "GET" request to "<uri>"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -20,6 +20,14 @@ Feature: JSON-LD using iri_only parameter
           }
       }
       """
+    Examples:
+      | uri                           |
+      | /contexts/IriOnlyDummy        |
+      | /contexts/IriOnlyDummy.jsonld |
+
+  Scenario: Retrieve Dummy's resource context with invalid format returns an error
+    When I send a "GET" request to "/contexts/IriOnlyDummy.json"
+    Then the response status code should be 404
 
   @createSchema
   Scenario: Retrieve Dummies with iri_only and jsonld_embed_context

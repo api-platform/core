@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\EventListener\ExceptionListener;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -33,42 +31,44 @@ class ExceptionListenerTest extends TestCase
     /**
      * @dataProvider getRequest
      */
-    public function testOnKernelException(Request $request)
+    public function testOnKernelException(Request $request): void
     {
         $kernel = $this->prophesize(HttpKernelInterface::class);
-        $kernel->handle(Argument::type(Request::class), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response())->shouldBeCalled();
 
-        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
-        $event = new ExceptionEvent($kernel->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
+        $event = new ExceptionEvent($kernel->reveal(), $request, HttpKernelInterface::MAIN_REQUEST, new \Exception());
+
+        $errorListener = $this->prophesize(ErrorListener::class);
+        $errorListener->onKernelException($event)->shouldBeCalled();
+        $listener = new ExceptionListener($errorListener->reveal());
         $listener->onKernelException($event);
-
-        $this->assertInstanceOf(Response::class, $event->getResponse());
     }
 
-    public function getRequest()
+    public function getRequest(): array
     {
         return [
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get'])],
+            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get'])],
             [new Request([], [], ['_api_respond' => true])],
         ];
     }
 
-    public function testDoNothingWhenNotAnApiCall()
+    public function testDoNothingWhenNotAnApiCall(): void
     {
-        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
-        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
+        $errorListener = $this->prophesize(ErrorListener::class);
+        $listener = new ExceptionListener($errorListener->reveal());
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MAIN_REQUEST, new \Exception());
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());
     }
 
-    public function testDoNothingWhenHtmlRequested()
+    public function testDoNothingWhenHtmlRequested(): void
     {
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('html');
 
-        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
-        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
+        $errorListener = $this->prophesize(ErrorListener::class);
+        $listener = new ExceptionListener($errorListener->reveal());
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MAIN_REQUEST, new \Exception());
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());

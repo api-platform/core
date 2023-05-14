@@ -22,37 +22,8 @@ use ApiPlatform\Metadata\Resource\ResourceNameCollection;
  */
 final class Documentation implements DocumentationInterface
 {
-    private $resourceNameCollection;
-    private $title;
-    private $description;
-    private $version;
-    private $mimeTypes = [];
-
-    public function __construct(ResourceNameCollection $resourceNameCollection, string $title = '', string $description = '', string $version = '', array $formats = null)
+    public function __construct(private readonly ResourceNameCollection $resourceNameCollection, private readonly string $title = '', private readonly string $description = '', private readonly string $version = '')
     {
-        $this->resourceNameCollection = $resourceNameCollection;
-        $this->title = $title;
-        $this->description = $description;
-        $this->version = $version;
-
-        if (null === $formats) {
-            return;
-        }
-
-        @trigger_error(sprintf('Passing a 5th parameter to the constructor of "%s" is deprecated since API Platform 2.5', __CLASS__), \E_USER_DEPRECATED);
-
-        foreach ($formats as $mimeTypes) {
-            foreach ($mimeTypes as $mimeType) {
-                $this->mimeTypes[] = $mimeType;
-            }
-        }
-    }
-
-    public function getMimeTypes(): array
-    {
-        @trigger_error(sprintf('The method "%s" is deprecated since API Platform 2.5, use the "formats" attribute instead', __METHOD__), \E_USER_DEPRECATED);
-
-        return $this->mimeTypes;
     }
 
     public function getVersion(): string
@@ -75,5 +46,3 @@ final class Documentation implements DocumentationInterface
         return $this->resourceNameCollection;
     }
 }
-
-class_alias(Documentation::class, \ApiPlatform\Core\Documentation\Documentation::class);

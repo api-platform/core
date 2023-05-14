@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Extension;
 
+use ApiPlatform\Metadata\Operation;
+
 /**
  * Interface of Elasticsearch request body search extensions for collection queries.
  *
@@ -24,5 +26,5 @@ namespace ApiPlatform\Elasticsearch\Extension;
  */
 interface RequestBodySearchCollectionExtensionInterface
 {
-    public function applyToCollection(array $requestBody, string $resourceClass, ?string $operationName = null, array $context = []): array;
+    public function applyToCollection(array $requestBody, string $resourceClass, ?Operation $operation = null, array $context = []): array;
 }

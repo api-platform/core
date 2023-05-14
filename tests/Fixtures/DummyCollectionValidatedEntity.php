@@ -19,32 +19,31 @@ class DummyCollectionValidatedEntity
 {
     /**
      * @var array
-     *
-     * @Assert\Collection(
-     *     allowExtraFields=true,
-     *     fields={
-     *         "name"=@Assert\Required({
-     *             @Assert\NotBlank
-     *         }),
-     *         "email"={
-     *             @Assert\NotNull,
-     *             @Assert\Length(min=2, max=255),
-     *             @Assert\Email(mode=Assert\Email::VALIDATION_MODE_LOOSE)
-     *         },
-     *         "phone"=@Assert\Optional({
-     *             @Assert\Type(type="string"),
-     *             @Assert\Regex(pattern="/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/")
-     *         }),
-     *         "age"=@Assert\Optional({
-     *             @Assert\Type(type="int")
-     *         }),
-     *         "social"=@Assert\Collection(
-     *             fields={
-     *                 "githubUsername"=@Assert\NotNull
-     *             }
-     *         )
-     *     }
-     * )
      */
+    #[Assert\Collection(
+        allowExtraFields: true,
+        fields: [
+            'name' => new Assert\Required([
+                new Assert\NotBlank(),
+            ]),
+            'email' => [
+                new Assert\NotNull(),
+                new Assert\Length(min: 2, max: 255),
+                new Assert\Email(mode: Assert\Email::VALIDATION_MODE_HTML5),
+            ],
+            'phone' => new Assert\Optional([
+                new Assert\Type(type: 'string'),
+                new Assert\Regex(pattern: "/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/"),
+            ]),
+            'age' => new Assert\Optional([
+                new Assert\Type(type: 'int'),
+            ]),
+            'social' => new Assert\Collection(
+                fields: [
+                    'githubUsername' => new Assert\NotNull(),
+                ]
+            ),
+        ]
+    )]
     public $dummyData;
 }

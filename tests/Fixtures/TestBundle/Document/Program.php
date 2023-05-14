@@ -17,29 +17,17 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @ODM\Document
  */
+#[ODM\Document]
 class Program
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     public $name;
-
-    /**
-     * @ODM\Field(type="date")
-     */
+    #[ODM\Field(type: 'date')]
     public $date;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=User::class, storeAs="id")
-     */
+    #[ODM\ReferenceOne(targetDocument: User::class, storeAs: 'id')]
     public $author;
 
     public function getId()

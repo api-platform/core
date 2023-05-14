@@ -14,47 +14,42 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Serializer;
 
 use ApiPlatform\Api\FilterInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Serializer\SerializerFilterContextBuilder;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
- * @group legacy
  */
 class SerializerFilterContextBuilderTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreateFromRequestWithCollectionOperation()
+    public function testCreateFromRequestWithCollectionOperation(): void
     {
         $request = new Request();
 
         $attributes = [
             'resource_class' => DummyGroup::class,
-            'collection_operation_name' => 'get',
+            'operation_name' => 'get',
         ];
 
-        $resourceMetadata = new ResourceMetadata(
-            null,
-            null,
-            null,
-            null,
-            ['get' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]]
-        );
+        $resourceMetadata = $this->getMetadataWithFilter(DummyGroup::class, ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']);
 
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $decoratedProphecy->createFromRequest($request, true, $attributes)->willReturn([])->shouldBeCalled();
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyGroup::class)->willReturn($resourceMetadata)->shouldBeCalled();
 
         $dummyGroupGroupFilterProphecy = $this->prophesize(SerializerFilterInterface::class);
@@ -73,27 +68,20 @@ class SerializerFilterContextBuilderTest extends TestCase
         $serializerContextBuilderFilter->createFromRequest($request, true, $attributes);
     }
 
-    public function testCreateFromRequestWithItemOperation()
+    public function testCreateFromRequestWithItemOperation(): void
     {
         $request = new Request();
 
         $attributes = [
             'resource_class' => DummyGroup::class,
-            'item_operation_name' => 'put',
+            'operation_name' => 'get',
         ];
 
-        $resourceMetadata = new ResourceMetadata(
-            null,
-            null,
-            null,
-            ['put' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]],
-            null
-        );
-
+        $resourceMetadata = $this->getMetadataWithFilter(DummyGroup::class, ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']);
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $decoratedProphecy->createFromRequest($request, true, $attributes)->willReturn([])->shouldBeCalled();
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyGroup::class)->willReturn($resourceMetadata)->shouldBeCalled();
 
         $dummyGroupGroupFilterProphecy = $this->prophesize(SerializerFilterInterface::class);
@@ -112,27 +100,21 @@ class SerializerFilterContextBuilderTest extends TestCase
         $serializerContextBuilderFilter->createFromRequest($request, true, $attributes);
     }
 
-    public function testCreateFromRequestWithoutFilters()
+    public function testCreateFromRequestWithoutFilters(): void
     {
         $request = new Request();
 
         $attributes = [
             'resource_class' => DummyGroup::class,
-            'collection_operation_name' => 'get',
+            'operation_name' => 'get',
         ];
 
-        $resourceMetadata = new ResourceMetadata(
-            null,
-            null,
-            null,
-            null,
-            ['get' => []]
-        );
+        $resourceMetadata = $this->getMetadataWithFilter(DummyGroup::class, null);
 
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $decoratedProphecy->createFromRequest($request, false, $attributes)->willReturn([])->shouldBeCalled();
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyGroup::class)->willReturn($resourceMetadata)->shouldBeCalled();
 
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
@@ -141,37 +123,28 @@ class SerializerFilterContextBuilderTest extends TestCase
         $serializerContextBuilderFilter->createFromRequest($request, false, $attributes);
     }
 
-    public function testCreateFromRequestWithoutAttributes()
+    public function testCreateFromRequestWithoutAttributes(): void
     {
         $request = new Request([], [], [
             '_api_resource_class' => DummyGroup::class,
-            '_api_collection_operation_name' => 'get',
+            '_api_operation_name' => 'get',
         ]);
 
         $attributes = [
             'resource_class' => DummyGroup::class,
-            'collection_operation_name' => 'get',
-            'identifiers' => [
-                'id' => [DummyGroup::class, 'id'],
-            ],
+            'operation_name' => 'get',
             'has_composite_identifier' => false,
             'receive' => true,
             'respond' => true,
             'persist' => true,
         ];
 
-        $resourceMetadata = new ResourceMetadata(
-            null,
-            null,
-            null,
-            null,
-            ['get' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]]
-        );
+        $resourceMetadata = $this->getMetadataWithFilter(DummyGroup::class, ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']);
 
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $decoratedProphecy->createFromRequest($request, true, $attributes)->willReturn([])->shouldBeCalled();
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyGroup::class)->willReturn($resourceMetadata)->shouldBeCalled();
 
         $dummyGroupGroupFilterProphecy = $this->prophesize(SerializerFilterInterface::class);
@@ -190,18 +163,27 @@ class SerializerFilterContextBuilderTest extends TestCase
         $serializerContextBuilderFilter->createFromRequest($request, true);
     }
 
-    public function testCreateFromRequestThrowsExceptionWithoutAttributesAndRequestAttributes()
+    public function testCreateFromRequestThrowsExceptionWithoutAttributesAndRequestAttributes(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Request attributes are not valid.');
 
         $request = new Request();
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
         $serializerContextBuilderFilter = new SerializerFilterContextBuilder($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal(), $decoratedProphecy->reveal());
         $serializerContextBuilderFilter->createFromRequest($request, true);
+    }
+
+    private function getMetadataWithFilter(string $class, ?array $filters = null): ResourceMetadataCollection
+    {
+        return new ResourceMetadataCollection($class, [
+            new ApiResource(operations: [
+                'get' => new Get(name: 'get', filters: $filters),
+            ]),
+        ]);
     }
 }

@@ -16,6 +16,8 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -38,16 +40,13 @@ final class ReadListener
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
-    public const OPERATION_ATTRIBUTE_KEY = 'read';
-
-    private $serializerContextBuilder;
-    private $provider;
-
-    public function __construct(ProviderInterface $provider, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, SerializerContextBuilderInterface $serializerContextBuilder = null, UriVariablesConverterInterface $uriVariablesConverter = null)
-    {
-        $this->provider = $provider;
+    public function __construct(
+        private readonly ProviderInterface $provider,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
+        UriVariablesConverterInterface $uriVariablesConverter = null,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->serializerContextBuilder = $serializerContextBuilder;
         $this->uriVariablesConverter = $uriVariablesConverter;
     }
 
@@ -65,7 +64,7 @@ final class ReadListener
             return;
         }
 
-        if (!$operation || !($operation->canRead() ?? true) || !$attributes['receive'] || (!$operation->getUriVariables() && !$request->isMethodSafe()) || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || ($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
+        if (!$attributes['receive'] || !$operation || !($operation->canRead() ?? true) || (!$operation->getUriVariables() && !$request->isMethodSafe())) {
             return;
         }
 
@@ -91,13 +90,20 @@ final class ReadListener
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $parameters, $resourceClass);
             $data = $this->provider->provide($operation, $uriVariables, $context);
-        } catch (InvalidIdentifierException $e) {
+        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
-        } catch (InvalidUriVariableException $e) {
-            throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+        } catch (RuntimeException $e) {
+            $data = null;
         }
 
-        if (null === $data) {
+        if (
+            null === $data
+            && 'POST' !== $operation->getMethod()
+            && (
+                'PUT' !== $operation->getMethod() ||
+                ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
+            )
+        ) {
             throw new NotFoundHttpException('Not Found');
         }
 

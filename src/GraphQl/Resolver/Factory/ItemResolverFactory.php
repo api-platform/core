@@ -20,7 +20,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
@@ -37,19 +37,8 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     use ClassInfoTrait;
     use CloneTrait;
 
-    private $readStage;
-    private $securityStage;
-    private $securityPostDenormalizeStage;
-    private $serializeStage;
-    private $queryResolverLocator;
-
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator)
+    public function __construct(private readonly ReadStageInterface $readStage, private readonly SecurityStageInterface $securityStage, private readonly SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, private readonly SerializeStageInterface $serializeStage, private readonly ContainerInterface $queryResolverLocator)
     {
-        $this->readStage = $readStage;
-        $this->securityStage = $securityStage;
-        $this->securityPostDenormalizeStage = $securityPostDenormalizeStage;
-        $this->serializeStage = $serializeStage;
-        $this->queryResolverLocator = $queryResolverLocator;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
@@ -71,6 +60,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 throw new \LogicException('Item from read stage should be a nullable object.');
             }
 
+            $resourceClass = $operation->getOutput()['class'] ?? $resourceClass;
             // The item retrieved can be of another type when using an identifier (see Relay Nodes at query.feature:23)
             $resourceClass = $this->getResourceClass($item, $resourceClass);
             $queryResolverId = $operation->getResolver();
@@ -98,11 +88,9 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     }
 
     /**
-     * @param object|null $item
-     *
      * @throws \UnexpectedValueException
      */
-    private function getResourceClass($item, ?string $resourceClass, string $errorMessage = 'Resolver only handles items of class %s but retrieved item is of class %s.'): string
+    private function getResourceClass(?object $item, ?string $resourceClass, string $errorMessage = 'Resolver only handles items of class %s but retrieved item is of class %s.'): string
     {
         if (null === $item) {
             if (null === $resourceClass) {

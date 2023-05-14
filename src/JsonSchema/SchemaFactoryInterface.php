@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
+use ApiPlatform\Metadata\Operation;
+
 /**
  * Factory for creating the JSON Schema document corresponding to a PHP class.
- *
- * @experimental
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -25,5 +25,5 @@ interface SchemaFactoryInterface
     /**
      * Builds the JSON Schema document corresponding to the given PHP class.
      */
-    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema;
+    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema;
 }

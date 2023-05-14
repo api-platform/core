@@ -21,7 +21,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 class AttributeResourceProvider implements ProviderInterface
 {
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): AttributeResources|AttributeResource
     {
         if (isset($uriVariables['identifier'])) {
             $resource = new AttributeResource($uriVariables['identifier'], 'Foo');

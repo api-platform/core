@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Type;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\GraphQl\Type\FieldsBuilderInterface;
+use ApiPlatform\GraphQl\Type\FieldsBuilderEnumInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilder;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\GraphQl\Type\TypesFactoryInterface;
@@ -29,9 +28,11 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\StringType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -41,23 +42,12 @@ class SchemaBuilderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ObjectProphecy */
-    private $resourceNameCollectionFactoryProphecy;
-
-    /** @var ObjectProphecy */
-    private $resourceMetadataCollectionFactoryProphecy;
-
-    /** @var ObjectProphecy */
-    private $typesFactoryProphecy;
-
-    /** @var ObjectProphecy */
-    private $typesContainerProphecy;
-
-    /** @var ObjectProphecy */
-    private $fieldsBuilderProphecy;
-
-    /** @var SchemaBuilder */
-    private $schemaBuilder;
+    private ObjectProphecy $resourceNameCollectionFactoryProphecy;
+    private ObjectProphecy $resourceMetadataCollectionFactoryProphecy;
+    private ObjectProphecy $typesFactoryProphecy;
+    private ObjectProphecy $typesContainerProphecy;
+    private ObjectProphecy $fieldsBuilderProphecy;
+    private SchemaBuilder $schemaBuilder;
 
     /**
      * {@inheritdoc}
@@ -68,7 +58,7 @@ class SchemaBuilderTest extends TestCase
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->typesFactoryProphecy = $this->prophesize(TypesFactoryInterface::class);
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
-        $this->fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $this->fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $this->schemaBuilder = new SchemaBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->typesFactoryProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->fieldsBuilderProphecy->reveal());
     }
 
@@ -77,43 +67,37 @@ class SchemaBuilderTest extends TestCase
      */
     public function testGetSchema(string $resourceClass, ResourceMetadataCollection $resourceMetadata, ObjectType $expectedQueryType, ?ObjectType $expectedMutationType, ?ObjectType $expectedSubscriptionType): void
     {
-        $type = $this->prophesize(GraphQLType::class)->reveal();
-        $type->name = 'MyType';
+        $type = new StringType(['name' => 'MyType']);
         $this->typesFactoryProphecy->getTypes()->shouldBeCalled()->willReturn(['typeId' => $type]);
         $this->typesContainerProphecy->set('typeId', $type)->shouldBeCalled();
         $this->typesContainerProphecy->get('MyType')->willReturn($type);
-        $typeFoo = $this->prophesize(GraphQLType::class)->reveal();
-        $typeFoo->name = 'Foo';
+        $typeFoo = new StringType(['name' => 'Foo']);
         $this->typesContainerProphecy->get('Foo')->willReturn(GraphQLType::listOf($typeFoo));
         $this->fieldsBuilderProphecy->getNodeQueryFields()->shouldBeCalled()->willReturn(['node_fields']);
-        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'item_query' === $arg->getName();
-        }), [])->willReturn(['query' => ['query_fields']]);
-        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'collection_query' === $arg->getName();
-        }), [])->willReturn(['query' => ['query_fields']]);
-        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'custom_item_query' === $arg->getName();
-        }), [])->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
-        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'custom_collection_query' === $arg->getName();
-        }), [])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
-        $this->fieldsBuilderProphecy->getMutationFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'mutation' === $arg->getName();
-        }))->willReturn(['mutation' => ['mutation_fields']]);
-        $this->fieldsBuilderProphecy->getSubscriptionFields($resourceClass, Argument::that(static function (Operation $arg): bool {
-            return 'update' === $arg->getName();
-        }))->willReturn(['subscription' => ['subscription_fields']]);
+        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'item_query' === $arg->getName()), [])->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'collection_query' === $arg->getName()), [])->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'custom_item_query' === $arg->getName()), [])->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
+        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'custom_collection_query' === $arg->getName()), [])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
+        $this->fieldsBuilderProphecy->getMutationFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'mutation' === $arg->getName()))->willReturn(['mutation' => ['mutation_fields']]);
+        $this->fieldsBuilderProphecy->getSubscriptionFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'update' === $arg->getName()))->willReturn(['subscription' => ['subscription_fields']]);
 
         $this->resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([$resourceClass]));
         $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+
+        $this->typesContainerProphecy->set('Query', $expectedQueryType)->shouldBeCalled();
+        if ($expectedMutationType) {
+            $this->typesContainerProphecy->set('Mutation', $expectedMutationType)->shouldBeCalled();
+        }
+        if ($expectedSubscriptionType) {
+            $this->typesContainerProphecy->set('Subscription', $expectedSubscriptionType)->shouldBeCalled();
+        }
 
         $schema = $this->schemaBuilder->getSchema();
         $this->assertEquals($expectedQueryType, $schema->getQueryType());
         $this->assertEquals($expectedMutationType, $schema->getMutationType());
         $this->assertEquals($expectedSubscriptionType, $schema->getSubscriptionType());
-        $this->assertEquals($type, $schema->getType('MyType'));
-        $this->assertEquals($typeFoo, $schema->getType('Foo'));
+        $this->assertSame($type, $schema->getType('MyType'));
+        $this->assertSame($typeFoo, $schema->getType('Foo'));
     }
 
     public function schemaProvider(): array

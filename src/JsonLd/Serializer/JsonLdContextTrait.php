@@ -47,7 +47,7 @@ trait JsonLdContextTrait
         return $data;
     }
 
-    private function createJsonLdContext(AnonymousContextBuilderInterface $contextBuilder, $object, array &$context, array $data = []): array
+    private function createJsonLdContext(AnonymousContextBuilderInterface $contextBuilder, $object, array &$context): array
     {
         // We're in a collection, don't add the @context part
         if (isset($context['jsonld_has_context'])) {
@@ -59,5 +59,3 @@ trait JsonLdContextTrait
         return $contextBuilder->getAnonymousResourceContext($object, ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null]);
     }
 }
-
-class_alias(JsonLdContextTrait::class, \ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait::class);

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -29,12 +29,12 @@ class MetadataAwareNameConverterPassTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(CompilerPassInterface::class, new MetadataAwareNameConverterPass());
     }
 
-    public function testProcessFirstArgumentConfigured()
+    public function testProcessFirstArgumentConfigured(): void
     {
         $pass = new MetadataAwareNameConverterPass();
 
@@ -52,7 +52,7 @@ class MetadataAwareNameConverterPassTest extends TestCase
         $pass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessWithNameConverter()
+    public function testProcessWithNameConverter(): void
     {
         $pass = new MetadataAwareNameConverterPass();
 
@@ -73,7 +73,7 @@ class MetadataAwareNameConverterPassTest extends TestCase
         $pass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessWithoutMetadataAwareDefinition()
+    public function testProcessWithoutMetadataAwareDefinition(): void
     {
         $pass = new MetadataAwareNameConverterPass();
 
@@ -84,7 +84,7 @@ class MetadataAwareNameConverterPassTest extends TestCase
         $pass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessOnlyOneArg()
+    public function testProcessOnlyOneArg(): void
     {
         $pass = new MetadataAwareNameConverterPass();
 

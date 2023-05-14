@@ -17,8 +17,7 @@ namespace ApiPlatform\Elasticsearch\Metadata\Document;
  * Document metadata.
  *
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html
- *
- * @experimental
+ * @deprecated
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
@@ -26,13 +25,8 @@ final class DocumentMetadata
 {
     public const DEFAULT_TYPE = '_doc';
 
-    private $index;
-    private $type;
-
-    public function __construct(?string $index = null, string $type = self::DEFAULT_TYPE)
+    public function __construct(private ?string $index = null, private string $type = self::DEFAULT_TYPE)
     {
-        $this->index = $index;
-        $this->type = $type;
     }
 
     /**
@@ -73,5 +67,3 @@ final class DocumentMetadata
         return $this->type;
     }
 }
-
-class_alias(DocumentMetadata::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata::class);

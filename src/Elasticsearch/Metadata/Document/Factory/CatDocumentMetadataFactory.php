@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Metadata\Document\Factory;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Util\Inflector;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
@@ -27,28 +24,14 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
  * Creates document's metadata using indices from the cat APIs.
  *
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html
- *
- * @experimental
+ * @deprecated
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    private $client;
-    /**
-     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
-     */
-    private $resourceMetadataFactory;
-    private $decorated;
-
-    /**
-     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
-     */
-    public function __construct(Client $client, $resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct(private readonly Client $client, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ?DocumentMetadataFactoryInterface $decorated = null)
     {
-        $this->client = $client;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -61,7 +44,7 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
         if ($this->decorated) {
             try {
                 $documentMetadata = $this->decorated->create($resourceClass);
-            } catch (IndexNotFoundException $e) {
+            } catch (IndexNotFoundException) {
             }
         }
 
@@ -69,13 +52,8 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
             return $documentMetadata;
         }
 
-        /** @var ResourceMetadata|ResourceMetadataCollection */
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if ($resourceMetadata instanceof ResourceMetadata) {
-            $resourceShortName = $resourceMetadata->getShortName();
-        } else {
-            $resourceShortName = $resourceMetadata->getOperation()->getShortName();
-        }
+        $resourceShortName = $resourceMetadata->getOperation()->getShortName();
 
         if (null === $resourceShortName) {
             return $this->handleNotFound($documentMetadata, $resourceClass);
@@ -85,7 +63,7 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
 
         try {
             $this->client->cat()->indices(['index' => $index]);
-        } catch (Missing404Exception $e) {
+        } catch (Missing404Exception) {
             return $this->handleNotFound($documentMetadata, $resourceClass);
         }
 
@@ -104,5 +82,3 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
         throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
     }
 }
-
-class_alias(CatDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory::class);

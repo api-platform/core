@@ -16,12 +16,11 @@ namespace ApiPlatform\Hydra\Serializer;
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -34,37 +33,23 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
     use FilterLocatorTrait;
-    private $collectionNormalizer;
-    private $resourceMetadataFactory;
-    private $resourceClassResolver;
 
     /**
-     * @param ContainerInterface|FilterCollection                                 $filterLocator           The new filter locator or the deprecated filter collection
-     * @param mixed                                                               $resourceMetadataFactory
-     * @param ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver
+     * @param ContainerInterface $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(NormalizerInterface $collectionNormalizer, $resourceMetadataFactory, $resourceClassResolver, $filterLocator)
+    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
     {
         $this->setFilterLocator($filterLocator);
-        $this->collectionNormalizer = $collectionNormalizer;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->resourceClassResolver = $resourceClassResolver;
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return $this->collectionNormalizer->supportsNormalization($data, $format);
+        return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
@@ -72,32 +57,24 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (!\is_array($data)) {
-            throw new UnexpectedValueException('Expected data to be an array');
+        if (($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && $object instanceof \ArrayObject && !\count($object)) {
+            return $object;
         }
+
+        $data = $this->collectionNormalizer->normalize($object, $format, $context);
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $data;
         }
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
-        $resourceFilters = null;
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $operationName = $context['collection_operation_name'] ?? null;
-            if (null === $operationName) {
-                $resourceFilters = $resourceMetadata->getAttribute('filters', []);
-            } else {
-                $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
-            }
-        } elseif ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
-            $resourceFilters = $operation->getFilters();
+
+        if (!\is_array($data)) {
+            throw new UnexpectedValueException('Expected data to be an array');
         }
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
+        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
+        $resourceFilters = $operation->getFilters();
         if (!$resourceFilters) {
             return $data;
         }
@@ -111,6 +88,11 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                 $currentFilters[] = $filter;
             }
         }
+
+        if (($options = $operation?->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+            $resourceClass = $options->getEntityClass();
+        }
+
         if ($currentFilters) {
             $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters);
         }
@@ -121,7 +103,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * {@inheritdoc}
      */
-    public function setNormalizer(NormalizerInterface $normalizer)
+    public function setNormalizer(NormalizerInterface $normalizer): void
     {
         if ($this->collectionNormalizer instanceof NormalizerAwareInterface) {
             $this->collectionNormalizer->setNormalizer($normalizer);
@@ -147,5 +129,3 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         return ['@type' => 'hydra:IriTemplate', 'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), 'hydra:variableRepresentation' => 'BasicRepresentation', 'hydra:mapping' => $mapping];
     }
 }
-
-class_alias(CollectionFiltersNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer::class);

@@ -13,34 +13,32 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Item.
- *
- * @ApiResource
- * @ODM\Document
  */
-class CompositeItem
+#[ApiResource]
+#[ODM\Document]
+class CompositeItem implements \Stringable
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[Groups(['default'])]
+    #[ODM\Field(type: 'string', nullable: true)]
+    private ?string $field1 = null;
+    #[Groups(['default'])]
+    #[ODM\ReferenceMany(targetDocument: CompositeRelation::class, mappedBy: 'compositeItem')]
+    private Collection|iterable $compositeValues;
 
-    /**
-     * @ODM\Field(type="string", nullable=true)
-     * @Groups({"default"})
-     */
-    private $field1;
-
-    /**
-     * @ODM\ReferenceMany(targetDocument=CompositeRelation::class, mappedBy="compositeItem")
-     * @Groups({"default"})
-     */
-    private $compositeValues;
+    public function __construct()
+    {
+        $this->compositeValues = new ArrayCollection();
+    }
 
     /**
      * Gets id.
@@ -60,10 +58,8 @@ class CompositeItem
 
     /**
      * Sets field1.
-     *
-     * @param string|null $field1 the value to set
      */
-    public function setField1($field1 = null)
+    public function setField1(?string $field1 = null): void
     {
         $this->field1 = $field1;
     }
@@ -71,12 +67,12 @@ class CompositeItem
     /**
      * Gets compositeValues.
      */
-    public function getCompositeValues(): ?CompositeRelation
+    public function getCompositeValues(): Collection|iterable
     {
         return $this->compositeValues;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->id;
     }

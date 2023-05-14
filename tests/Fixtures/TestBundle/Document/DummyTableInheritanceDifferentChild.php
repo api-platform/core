@@ -13,23 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- * @ApiResource
- */
+#[ApiResource]
+#[ODM\Document]
 class DummyTableInheritanceDifferentChild extends DummyTableInheritance
 {
     /**
      * @var string The dummy email
-     *
-     * @ODM\Field
-     *
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
+    #[ODM\Field]
     private $email;
 
     public function getEmail()
@@ -37,7 +33,7 @@ class DummyTableInheritanceDifferentChild extends DummyTableInheritance
         return $this->email;
     }
 
-    public function setEmail($email)
+    public function setEmail($email): void
     {
         $this->email = $email;
     }

@@ -15,11 +15,12 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Entity;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MessengerInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MessengerWithInput;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-class MessengerWithInputHandler implements MessageHandlerInterface
+#[AsMessageHandler]
+class MessengerWithInputHandler
 {
-    public function __invoke(MessengerInput $data)
+    public function __invoke(MessengerInput $data): MessengerWithInput
     {
         $object = new MessengerWithInput();
         $object->name = 'test';

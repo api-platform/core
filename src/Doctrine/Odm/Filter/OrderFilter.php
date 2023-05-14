@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -29,8 +30,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * For each property passed, if the resource does not have such property or if the
  * direction value is different from "asc" or "desc" (case insensitive), the property
  * is ignored.
- *
- * @experimental
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
@@ -63,27 +62,27 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    public function apply(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
             return;
         }
 
         if (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName])) {
-            parent::apply($aggregationBuilder, $resourceClass, $operationName, $context);
+            parent::apply($aggregationBuilder, $resourceClass, $operation, $context);
 
             return;
         }
 
         foreach ($context['filters'][$this->orderParameterName] as $property => $value) {
-            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operation, $context);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $direction, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    protected function filterProperty(string $property, $direction, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
             return;
@@ -105,5 +104,3 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
         );
     }
 }
-
-class_alias(OrderFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter::class);

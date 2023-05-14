@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -26,44 +27,33 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * Abstract class for easing the implementation of a filter.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 abstract class AbstractFilter implements FilterInterface
 {
     use MongoDbOdmPropertyHelperTrait;
     use PropertyHelperTrait;
+    protected LoggerInterface $logger;
 
-    protected $managerRegistry;
-    protected $logger;
-    protected $properties;
-    protected $nameConverter;
-
-    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
+    public function __construct(protected ManagerRegistry $managerRegistry, LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
     {
-        $this->managerRegistry = $managerRegistry;
         $this->logger = $logger ?? new NullLogger();
-        $this->properties = $properties;
-        $this->nameConverter = $nameConverter;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    public function apply(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         foreach ($context['filters'] as $property => $value) {
-            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operation, $context);
         }
     }
 
     /**
      * Passes a property through the filter.
-     *
-     * @param mixed $value
      */
-    abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = []);
+    abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void;
 
     protected function getManagerRegistry(): ManagerRegistry
     {
@@ -93,23 +83,21 @@ abstract class AbstractFilter implements FilterInterface
         return \array_key_exists($property, $this->properties);
     }
 
-    protected function denormalizePropertyName($property)
+    protected function denormalizePropertyName(string|int $property): string
     {
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;
         }
 
-        return implode('.', array_map([$this->nameConverter, 'denormalize'], explode('.', (string) $property)));
+        return implode('.', array_map($this->nameConverter->denormalize(...), explode('.', (string) $property)));
     }
 
-    protected function normalizePropertyName($property)
+    protected function normalizePropertyName(string $property): string
     {
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;
         }
 
-        return implode('.', array_map([$this->nameConverter, 'normalize'], explode('.', (string) $property)));
+        return implode('.', array_map($this->nameConverter->normalize(...), explode('.', $property)));
     }
 }
-
-class_alias(AbstractFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\AbstractFilter::class);

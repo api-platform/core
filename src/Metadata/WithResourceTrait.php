@@ -15,25 +15,15 @@ namespace ApiPlatform\Metadata;
 
 trait WithResourceTrait
 {
-    public function withResource(ApiResource $resource): self
-    {
-        return $this->copyFrom($resource);
-    }
-
-    /**
-     * @param ApiResource|Operation $resource
-     *
-     * @return ApiResource|Operation
-     */
-    protected function copyFrom($resource)
+    protected function copyFrom(Metadata $resource): static
     {
         $self = clone $this;
         foreach (get_class_methods($resource) as $method) {
             if (
-                method_exists($self, $method) &&
-                preg_match('/^(?:get|is|can)(.*)/', $method, $matches) &&
-                null === $self->{$method}() &&
-                null !== $val = $resource->{$method}()
+                method_exists($self, $method)
+                && preg_match('/^(?:get|is|can)(.*)/', (string) $method, $matches)
+                && null === $self->{$method}()
+                && null !== $val = $resource->{$method}()
             ) {
                 $self = $self->{"with{$matches[1]}"}($val);
             }

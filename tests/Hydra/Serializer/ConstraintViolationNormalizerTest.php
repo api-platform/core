@@ -14,10 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Hydra\Serializer;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Hydra\Serializer\ConstraintViolationListNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -30,7 +31,7 @@ class ConstraintViolationNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
@@ -44,19 +45,14 @@ class ConstraintViolationNormalizerTest extends TestCase
     }
 
     /**
-     * @dataProvider payloadFieldsProvider
+     * @dataProvider nameConverterAndPayloadFieldsProvider
      */
-    public function testNormalize(?array $fields, array $result)
+    public function testNormalize(?object $nameConverter, ?array $fields, array $expected): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList'])->willReturn('/context/foo')->shouldBeCalled();
-        $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(function ($args) {
-            return '_'.$args[0];
-        });
 
-        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), $fields, $nameConverterProphecy->reveal());
+        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), $fields, $nameConverter);
 
         // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
         $constraint = new NotNull();
@@ -66,7 +62,31 @@ class ConstraintViolationNormalizerTest extends TestCase
             new ConstraintViolation('1', '2', [], '3', '4', '5'),
         ]);
 
-        $expected = [
+        $this->assertSame($expected, $normalizer->normalize($list));
+    }
+
+    public function nameConverterAndPayloadFieldsProvider(): iterable
+    {
+        $basicExpectation = [
+            '@context' => '/context/foo',
+            '@type' => 'ConstraintViolationList',
+            'hydra:title' => 'An error occurred',
+            'hydra:description' => "d: a\n4: 1",
+            'violations' => [
+                [
+                    'propertyPath' => 'd',
+                    'message' => 'a',
+                    'code' => 'f24bdbad0becef97a6887238aa58221c',
+                ],
+                [
+                    'propertyPath' => '4',
+                    'message' => '1',
+                    'code' => null,
+                ],
+            ],
+        ];
+
+        $nameConverterBasedExpectation = [
             '@context' => '/context/foo',
             '@type' => 'ConstraintViolationList',
             'hydra:title' => 'An error occurred',
@@ -84,17 +104,35 @@ class ConstraintViolationNormalizerTest extends TestCase
                 ],
             ],
         ];
-        if ([] !== $result) {
-            $expected['violations'][0]['payload'] = $result;
-        }
 
-        $this->assertEquals($expected, $normalizer->normalize($list));
-    }
+        $advancedNameConverterProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
+        $advancedNameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(fn ($args): string => '_'.$args[0]);
+        $advancedNameConverter = $advancedNameConverterProphecy->reveal();
 
-    public function payloadFieldsProvider(): iterable
-    {
-        yield [['severity', 'anotherField1'], ['severity' => 'warning']];
-        yield [null, ['severity' => 'warning', 'anotherField2' => 'aValue']];
-        yield [[], []];
+        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
+        $nameConverterProphecy->normalize(Argument::type('string'))->will(fn ($args): string => '_'.$args[0]);
+        $nameConverter = $nameConverterProphecy->reveal();
+
+        $nullNameConverter = null;
+
+        $expected = $nameConverterBasedExpectation;
+        $expected['violations'][0]['payload'] = ['severity' => 'warning'];
+        yield [$advancedNameConverter, ['severity', 'anotherField1'], $expected];
+        yield [$nameConverter, ['severity', 'anotherField1'], $expected];
+        $expected = $basicExpectation;
+        $expected['violations'][0]['payload'] = ['severity' => 'warning'];
+        yield [$nullNameConverter, ['severity', 'anotherField1'], $expected];
+
+        $expected = $nameConverterBasedExpectation;
+        $expected['violations'][0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
+        yield [$advancedNameConverter, null, $expected];
+        yield [$nameConverter, null, $expected];
+        $expected = $basicExpectation;
+        $expected['violations'][0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
+        yield [$nullNameConverter, null, $expected];
+
+        yield [$advancedNameConverter, [], $nameConverterBasedExpectation];
+        yield [$nameConverter, [], $nameConverterBasedExpectation];
+        yield [$nullNameConverter, [], $basicExpectation];
     }
 }

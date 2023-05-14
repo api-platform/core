@@ -28,5 +28,3 @@ final class ErrorHandler implements ErrorHandlerInterface
         return array_map($formatter, $errors);
     }
 }
-
-class_alias(ErrorHandler::class, \ApiPlatform\Core\GraphQl\Error\ErrorHandler::class);

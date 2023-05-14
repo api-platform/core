@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\Filter;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -29,22 +30,18 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class OrderFilter extends AbstractFilter implements SortFilterInterface
 {
-    private $orderParameterName;
-
     /**
      * {@inheritdoc}
      */
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, string $orderParameterName = 'order', ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, private readonly string $orderParameterName = 'order', ?array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
-
-        $this->orderParameterName = $orderParameterName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(array $clauseBody, string $resourceClass, ?string $operationName = null, array $context = []): array
+    public function apply(array $clauseBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
     {
         if (!\is_array($properties = $context['filters'][$this->orderParameterName] ?? [])) {
             return $clauseBody;

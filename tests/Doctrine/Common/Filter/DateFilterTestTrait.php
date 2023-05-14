@@ -19,29 +19,29 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait DateFilterTestTrait
 {
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = $this->buildFilter();
 
         $this->assertEquals([
             'dummyDate[before]' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
             ],
             'dummyDate[strictly_before]' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
             ],
             'dummyDate[after]' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
             ],
             'dummyDate[strictly_after]' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
             ],
         ], $filter->getDescription($this->resourceClass));

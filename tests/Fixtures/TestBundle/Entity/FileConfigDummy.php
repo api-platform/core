@@ -17,42 +17,35 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * File Config Dummy.
- *
- * @ORM\Entity
  */
+#[ORM\Entity]
 class FileConfigDummy
 {
-    public const HYDRA_TITLE = 'File config Dummy';
-
+    final public const HYDRA_TITLE = 'File config Dummy';
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $name;
-
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $foo;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -62,7 +55,7 @@ class FileConfigDummy
         return $this->name;
     }
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }

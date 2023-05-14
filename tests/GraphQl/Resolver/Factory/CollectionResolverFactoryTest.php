@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\CollectionResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
@@ -22,10 +21,9 @@ use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -35,13 +33,12 @@ class CollectionResolverFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $collectionResolverFactory;
-    private $readStageProphecy;
-    private $securityStageProphecy;
-    private $securityPostDenormalizeStageProphecy;
-    private $serializeStageProphecy;
-    private $queryResolverLocatorProphecy;
-    private $requestStackProphecy;
+    private CollectionResolverFactory $collectionResolverFactory;
+    private ObjectProphecy $readStageProphecy;
+    private ObjectProphecy $securityStageProphecy;
+    private ObjectProphecy $securityPostDenormalizeStageProphecy;
+    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $queryResolverLocatorProphecy;
 
     /**
      * {@inheritdoc}
@@ -53,7 +50,6 @@ class CollectionResolverFactoryTest extends TestCase
         $this->securityPostDenormalizeStageProphecy = $this->prophesize(SecurityPostDenormalizeStageInterface::class);
         $this->serializeStageProphecy = $this->prophesize(SerializeStageInterface::class);
         $this->queryResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->requestStackProphecy = $this->prophesize(RequestStack::class);
 
         $this->collectionResolverFactory = new CollectionResolverFactory(
             $this->readStageProphecy->reveal(),
@@ -61,13 +57,12 @@ class CollectionResolverFactoryTest extends TestCase
             $this->securityPostDenormalizeStageProphecy->reveal(),
             $this->serializeStageProphecy->reveal(),
             $this->queryResolverLocatorProphecy->reveal(),
-            $this->requestStackProphecy->reveal()
         );
     }
 
     public function testResolve(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -76,13 +71,6 @@ class CollectionResolverFactoryTest extends TestCase
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $info->fieldName = 'testField';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
-
-        $request = new Request();
-        $attributesParameterBagProphecy = $this->prophesize(ParameterBag::class);
-        $attributesParameterBagProphecy->get('_graphql_collections_args', [])->willReturn(['collection_args']);
-        $attributesParameterBagProphecy->set('_graphql_collections_args', [$resourceClass => $args, 'collection_args'])->shouldBeCalled();
-        $request->attributes = $attributesParameterBagProphecy->reveal();
-        $this->requestStackProphecy->getCurrentRequest()->willReturn($request);
 
         $readStageCollection = [new \stdClass()];
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
@@ -107,7 +95,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveFieldNotInSource(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -138,7 +126,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveNullSource(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -146,13 +134,6 @@ class CollectionResolverFactoryTest extends TestCase
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
-
-        $request = new Request();
-        $attributesParameterBagProphecy = $this->prophesize(ParameterBag::class);
-        $attributesParameterBagProphecy->get('_graphql_collections_args', [])->willReturn(['collection_args']);
-        $attributesParameterBagProphecy->set('_graphql_collections_args', [$resourceClass => $args, 'collection_args'])->shouldBeCalled();
-        $request->attributes = $attributesParameterBagProphecy->reveal();
-        $this->requestStackProphecy->getCurrentRequest()->willReturn($request);
 
         $readStageCollection = [new \stdClass()];
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
@@ -190,7 +171,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveNullRootClass(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = null;
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -203,7 +184,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveBadReadStageCollection(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withName($operationName);
@@ -223,7 +204,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testResolveCustom(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
         $operation = (new QueryCollection())->withResolver('query_resolver_id')->withName($operationName);
@@ -237,9 +218,7 @@ class CollectionResolverFactoryTest extends TestCase
 
         $customCollection = [new \stdClass()];
         $customCollection[0]->field = 'foo';
-        $this->queryResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(function () use ($customCollection) {
-            return $customCollection;
-        });
+        $this->queryResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(fn (): array => $customCollection);
 
         $this->securityStageProphecy->__invoke($resourceClass, $operation, $resolverContext + [
             'extra_variables' => [

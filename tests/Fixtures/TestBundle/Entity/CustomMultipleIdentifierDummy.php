@@ -13,46 +13,41 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom Identifier Dummy.
- *
- * @ApiResource(compositeIdentifier=false)
- * @ORM\Entity
  */
+#[ApiResource(uriVariables: ['firstId' => new Link(compositeIdentifier: false, fromClass: self::class, identifiers: ['firstId']), 'secondId' => new Link(compositeIdentifier: false, fromClass: self::class, identifiers: ['secondId'])])]
+#[ORM\Entity]
 class CustomMultipleIdentifierDummy
 {
     /**
      * @var int The custom identifier
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
      */
-    private $firstId;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    private int $firstId;
     /**
      * @var int The custom identifier
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
      */
-    private $secondId;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    private int $secondId;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(length=30)
      */
-    private $name;
+    #[ORM\Column(length: 30)]
+    private string $name;
 
     public function getFirstId(): int
     {
         return $this->firstId;
     }
 
-    public function setFirstId(int $firstId)
+    public function setFirstId(int $firstId): void
     {
         $this->firstId = $firstId;
     }
@@ -62,7 +57,7 @@ class CustomMultipleIdentifierDummy
         return $this->secondId;
     }
 
-    public function setSecondId(int $secondId)
+    public function setSecondId(int $secondId): void
     {
         $this->secondId = $secondId;
     }
@@ -72,7 +67,7 @@ class CustomMultipleIdentifierDummy
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }

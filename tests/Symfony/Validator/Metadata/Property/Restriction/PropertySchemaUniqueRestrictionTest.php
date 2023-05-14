@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaUniqueRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\Unique;
@@ -28,7 +28,7 @@ final class PropertySchemaUniqueRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaUniqueRestriction;
+    private PropertySchemaUniqueRestriction $propertySchemaUniqueRestriction;
 
     protected function setUp(): void
     {
@@ -52,6 +52,6 @@ final class PropertySchemaUniqueRestrictionTest extends TestCase
 
     public function testCreate(): void
     {
-        self::assertSame(['uniqueItems' => true], $this->propertySchemaUniqueRestriction->create(new Unique(), new ApiProperty()));
+        self::assertEquals(['uniqueItems' => true], $this->propertySchemaUniqueRestriction->create(new Unique(), new ApiProperty()));
     }
 }

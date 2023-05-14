@@ -28,10 +28,10 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use ExistsFilterTestTrait;
 
-    protected $filterClass = ExistsFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = ExistsFilter::class;
+    protected string $resourceClass = Dummy::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -116,12 +116,8 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        $existsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
-            return new ExistsFilter($managerRegistry, null, $properties, 'exists');
-        };
-        $customExistsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
-            return new ExistsFilter($managerRegistry, null, $properties, 'customExists');
-        };
+        $existsFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'exists');
+        $customExistsFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'customExists');
 
         return array_merge_recursive(
             $this->provideApplyTestArguments(),
@@ -428,38 +424,6 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 ],
             ]
         );
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The ExistsFilter syntax "description[exists]=true/false" is deprecated since 2.5. Use the syntax "exists[description]=true/false" instead.
-     */
-    public function testLegacyExistsAfterSyntax()
-    {
-        $args = [
-            [
-                'description' => null,
-            ],
-            [
-                'description' => [
-                    'exists' => 'true',
-                ],
-            ],
-            [
-                [
-                    '$match' => [
-                        'description' => [
-                            '$ne' => null,
-                        ],
-                    ],
-                ],
-            ],
-            function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
-                return new ExistsFilter($managerRegistry, null, $properties, 'exists');
-            },
-        ];
-
-        $this->testApply(...$args);
     }
 
     protected function buildFilter(?array $properties = null)

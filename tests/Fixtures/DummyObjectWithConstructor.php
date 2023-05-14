@@ -18,12 +18,22 @@ namespace ApiPlatform\Tests\Fixtures;
  */
 class DummyObjectWithConstructor
 {
-    private $foo; // @phpstan-ignore-line
-    private $bar; // @phpstan-ignore-line
-
-    public function __construct(string $foo, \stdClass $bar)
+    public function __construct(private readonly string $foo, private \stdClass $bar)
     {
-        $this->foo = $foo;
+    }
+
+    public function getFoo(): string
+    {
+        return $this->foo;
+    }
+
+    public function getBar(): \stdClass
+    {
+        return $this->bar;
+    }
+
+    public function setBar(\stdClass $bar): void
+    {
         $this->bar = $bar;
     }
 }

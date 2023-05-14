@@ -26,9 +26,7 @@ interface IdentifiersExtractorInterface
     /**
      * Finds identifiers from an Item (object).
      *
-     * @param object $item
-     *
      * @throws RuntimeException
      */
-    public function getIdentifiersFromItem($item, ?Operation $operation = null, array $context = []): array;
+    public function getIdentifiersFromItem(object $item, ?Operation $operation = null, array $context = []): array;
 }

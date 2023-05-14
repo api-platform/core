@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Type;
+namespace ApiPlatform\Tests\GraphQl\Type;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Type\TypeNotFoundException;
 use ApiPlatform\GraphQl\Type\TypesContainer;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -26,10 +26,7 @@ class TypesContainerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @var TypesContainer
-     */
-    private $typesContainer;
+    private TypesContainer $typesContainer;
 
     /**
      * {@inheritdoc}
@@ -68,7 +65,7 @@ class TypesContainerTest extends TestCase
         $type = $this->prophesize(GraphQLType::class)->reveal();
 
         $this->typesContainer->set('test', $type);
-        $this->assertSame(['test' => $type], $this->typesContainer->all());
+        $this->assertEquals(['test' => $type], $this->typesContainer->all());
     }
 
     public function testHas(): void

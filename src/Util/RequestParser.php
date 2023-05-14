@@ -30,17 +30,6 @@ final class RequestParser
     }
 
     /**
-     * Gets a fixed request.
-     */
-    public static function parseAndDuplicateRequest(Request $request): Request
-    {
-        $query = self::parseRequestParams(self::getQueryString($request) ?? '');
-        $body = self::parseRequestParams($request->getContent());
-
-        return $request->duplicate($query, $body);
-    }
-
-    /**
      * Parses request parameters from the specified source.
      *
      * @author Rok Kralj
@@ -55,9 +44,7 @@ final class RequestParser
 
         $source = preg_replace_callback(
             '/(^|(?<=&))[^=[&]+/',
-            static function ($key) {
-                return bin2hex(urldecode($key[0]));
-            },
+            static fn ($key): string => bin2hex(urldecode($key[0])),
             $source
         );
 
@@ -82,7 +69,7 @@ final class RequestParser
 
         $parts = [];
 
-        foreach (explode('&', $qs) as $param) {
+        foreach (explode('&', (string) $qs) as $param) {
             if ('' === $param || '=' === $param[0]) {
                 // Ignore useless delimiters, e.g. "x=y&".
                 // Also ignore pairs with empty key, even if there was a value, e.g. "=value", as such nameless values cannot be retrieved anyway.
@@ -103,5 +90,3 @@ final class RequestParser
         return implode('&', $parts);
     }
 }
-
-class_alias(RequestParser::class, \ApiPlatform\Core\Util\RequestParser::class);

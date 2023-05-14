@@ -25,16 +25,10 @@ use Psr\Cache\CacheItemPoolInterface;
 final class CachedResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     public const CACHE_KEY_PREFIX = 'resource_metadata_collection_';
+    private array $localCache = [];
 
-    private $decorated;
-    /** @var CacheItemPoolInterface */
-    private $cacheItemPool;
-    private $localCache = [];
-
-    public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private readonly CacheItemPoolInterface $cacheItemPool, private readonly ResourceMetadataCollectionFactoryInterface $decorated)
     {
-        $this->cacheItemPool = $cacheItemPool;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -49,7 +43,7 @@ final class CachedResourceMetadataCollectionFactory implements ResourceMetadataC
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-        } catch (CacheException $e) {
+        } catch (CacheException) {
             $resourceMetadataCollection = $this->decorated->create($resourceClass);
             $this->localCache[$cacheKey] = (array) $resourceMetadataCollection;
 

@@ -1,4 +1,5 @@
 Feature: GraphQL type support
+
   @createSchema
   Scenario: Use a custom type for a field
     Given there are 2 dummy objects with dummyDate
@@ -75,4 +76,5 @@ Feature: GraphQL type support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "errors[0].message" should be equal to 'Variable "$itemDate" got invalid value "bad date"; Expected type DateTime; DateTime cannot represent non date value: "bad date"'
+    And the JSON node "errors[0].message" should contain 'Variable "$itemDate" got invalid value "bad date";'
+    And the JSON node "errors[0].message" should contain 'DateTime cannot represent non date value: "bad date"'

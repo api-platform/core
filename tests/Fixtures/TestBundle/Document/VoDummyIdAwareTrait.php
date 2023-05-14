@@ -19,9 +19,8 @@ trait VoDummyIdAwareTrait
 {
     /**
      * @var int
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     protected $id;
 
     public function getId()

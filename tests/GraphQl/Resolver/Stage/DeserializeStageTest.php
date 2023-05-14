@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -29,10 +30,9 @@ class DeserializeStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var DeserializeStage */
-    private $deserializeStage;
-    private $denormalizerProphecy;
-    private $serializerContextBuilderProphecy;
+    private DeserializeStage $deserializeStage;
+    private ObjectProphecy $denormalizerProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}
@@ -50,10 +50,8 @@ class DeserializeStageTest extends TestCase
 
     /**
      * @dataProvider objectToPopulateProvider
-     *
-     * @param object|null $objectToPopulate
      */
-    public function testApplyDisabled($objectToPopulate): void
+    public function testApplyDisabled(?object $objectToPopulate): void
     {
         $resourceClass = 'myResource';
         /** @var Operation $operation */
@@ -65,10 +63,8 @@ class DeserializeStageTest extends TestCase
 
     /**
      * @dataProvider objectToPopulateProvider
-     *
-     * @param object|null $objectToPopulate
      */
-    public function testApply($objectToPopulate, array $denormalizationContext): void
+    public function testApply(?object $objectToPopulate, array $denormalizationContext): void
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
@@ -76,7 +72,7 @@ class DeserializeStageTest extends TestCase
         $operation = (new Query())->withName($operationName)->withClass($resourceClass);
         $context = ['args' => ['input' => 'myInput']];
 
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->shouldBeCalled()->willReturn($denormalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, false)->shouldBeCalled()->willReturn($denormalizationContext);
 
         $denormalizedData = new \stdClass();
         $this->denormalizerProphecy->denormalize($context['args']['input'], $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext)->shouldBeCalled()->willReturn($denormalizedData);

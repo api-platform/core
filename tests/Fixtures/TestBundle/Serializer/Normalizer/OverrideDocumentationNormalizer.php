@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -21,20 +22,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class OverrideDocumentationNormalizer implements NormalizerInterface
 {
-    private $documentationNormalizer;
-
-    public function __construct(NormalizerInterface $documentationNormalizer)
+    public function __construct(private readonly NormalizerInterface $documentationNormalizer)
     {
-        $this->documentationNormalizer = $documentationNormalizer;
     }
 
     /**
-     * @param mixed      $object
      * @param mixed|null $format
      *
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
-     *
-     * @return mixed
+     * @throws ExceptionInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
@@ -54,7 +49,6 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
 
     /**
      * @param mixed|null $format
-     * @param mixed      $data
      */
     public function supportsNormalization($data, $format = null): bool
     {

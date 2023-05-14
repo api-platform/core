@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\NumericFilterTrait;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
@@ -24,8 +25,6 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  *
  * For each property passed, if the resource does not have such property or if
  * the value is not numeric, the property is ignored.
- *
- * @experimental
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
@@ -47,12 +46,12 @@ final class NumericFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isNumericField($property, $resourceClass)
+            !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
+            || !$this->isNumericField($property, $resourceClass)
         ) {
             return;
         }
@@ -91,5 +90,3 @@ final class NumericFilter extends AbstractFilter
         return 'int';
     }
 }
-
-class_alias(NumericFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\NumericFilter::class);

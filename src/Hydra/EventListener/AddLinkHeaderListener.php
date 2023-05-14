@@ -16,9 +16,9 @@ namespace ApiPlatform\Hydra\EventListener;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Util\CorsTrait;
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\Link;
 
 /**
  * Adds the HTTP Link header pointing to the Hydra documentation.
@@ -29,11 +29,8 @@ final class AddLinkHeaderListener
 {
     use CorsTrait;
 
-    private $urlGenerator;
-
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly UrlGeneratorInterface $urlGenerator)
     {
-        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -58,5 +55,3 @@ final class AddLinkHeaderListener
         $request->attributes->set('_links', $linkProvider->withLink($link));
     }
 }
-
-class_alias(AddLinkHeaderListener::class, \ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener::class);

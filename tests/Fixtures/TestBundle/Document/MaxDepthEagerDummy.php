@@ -13,39 +13,30 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
-/** *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"default"}, "enable_max_depth"=true},
- *     "denormalization_context"={"groups"={"default"}, "enable_max_depth"=true}
- * })
- * @ODM\Document
+/**
+ * *
+ *
  *
  * @author Brian Fox <brian@brianfox.fr>
  */
+#[ApiResource(normalizationContext: ['groups' => ['default'], 'enable_max_depth' => true], denormalizationContext: ['groups' => ['default'], 'enable_max_depth' => true])]
+#[ODM\Document]
 class MaxDepthEagerDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"default"})
-     */
+    #[Groups(['default'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
-    /**
-     * @ODM\Field(name="name", type="string")
-     * @Groups({"default"})
-     */
+    #[Groups(['default'])]
+    #[ODM\Field(name: 'name', type: 'string')]
     public $name;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=MaxDepthEagerDummy::class, cascade={"persist"})
-     * @Groups({"default"})
-     * @MaxDepth(1)
-     */
+    #[Groups(['default'])]
+    #[MaxDepth(1)]
+    #[ODM\ReferenceOne(targetDocument: self::class, cascade: ['persist'])]
     public $child;
 
     public function getId()

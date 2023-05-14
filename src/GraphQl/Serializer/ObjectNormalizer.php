@@ -15,8 +15,7 @@ namespace ApiPlatform\GraphQl\Serializer;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -33,24 +32,14 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
     public const ITEM_RESOURCE_CLASS_KEY = '#itemResourceClass';
     public const ITEM_IDENTIFIERS_KEY = '#itemIdentifiers';
 
-    private $decorated;
-    private $iriConverter;
-    private $identifiersExtractor;
-
-    public function __construct(NormalizerInterface $decorated, $iriConverter, IdentifiersExtractorInterface $identifiersExtractor)
+    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter, private readonly IdentifiersExtractorInterface $identifiersExtractor)
     {
-        $this->decorated = $decorated;
-        $this->iriConverter = $iriConverter;
-        if ($iriConverter instanceof LegacyIriConverterInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
-        }
-        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $this->decorated->supportsNormalization($data, $format, $context);
     }
@@ -67,10 +56,8 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
      * {@inheritdoc}
      *
      * @throws UnexpectedValueException
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];

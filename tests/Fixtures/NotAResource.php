@@ -22,20 +22,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class NotAResource
 {
-    /**
-     * @Groups("contain_non_resource")
-     */
-    private $foo;
-
-    /**
-     * @Groups("contain_non_resource")
-     */
-    private $bar;
-
-    public function __construct($foo, $bar)
-    {
-        $this->foo = $foo;
-        $this->bar = $bar;
+    public function __construct(
+        /**
+         * @Groups("contain_non_resource")
+         */
+        private $foo,
+        /**
+         * @Groups("contain_non_resource")
+         */
+        private $bar
+    ) {
     }
 
     public function getFoo()

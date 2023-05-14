@@ -22,22 +22,18 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class ProductProvider implements ProviderInterface
 {
-    private $managerRegistry;
-    private $orm;
-
-    public function __construct(ManagerRegistry $managerRegistry, bool $orm = true)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly bool $orm = true)
     {
-        $this->managerRegistry = $managerRegistry;
-        $this->orm = $orm;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): Product|ProductDocument|null
     {
         if ($operation instanceof CollectionOperationInterface) {
-            dd('todo');
+            // todo Handle collection of products
+            return null;
         }
 
         return $this->managerRegistry->getRepository($this->orm ? Product::class : ProductDocument::class)->findOneBy([

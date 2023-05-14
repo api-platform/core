@@ -17,6 +17,10 @@ namespace ApiPlatform\State\Pagination;
  * Partial Paginator Interface.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ *
+ * @template T of object
+ *
+ * @extends \Traversable<T>
  */
 interface PartialPaginatorInterface extends \Traversable, \Countable
 {

@@ -32,7 +32,7 @@ final class MetadataAwareNameConverterPass implements CompilerPassInterface
      *
      * @throws RuntimeException
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('serializer.name_converter.metadata_aware')) {
             return;
@@ -53,5 +53,3 @@ final class MetadataAwareNameConverterPass implements CompilerPassInterface
         $container->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware');
     }
 }
-
-class_alias(MetadataAwareNameConverterPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass::class);

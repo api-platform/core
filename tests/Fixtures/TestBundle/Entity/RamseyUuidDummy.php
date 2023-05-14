@@ -13,31 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-/**
- * @ORM\Entity
- * @ApiResource
- */
+#[ApiResource]
+#[ORM\Entity]
 class RamseyUuidDummy
 {
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
     /**
-     * @var \Ramsey\Uuid\UuidInterface
-     *
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
+     * The dummy id.
      */
-    private $id;
-
-    /**
-     * @var \Ramsey\Uuid\UuidInterface|null
-     *
-     * @ORM\Column(type="uuid", nullable=true)
-     */
-    private $other;
+    private UuidInterface $id;
+    #[ORM\Column(type: 'uuid', nullable: true)]
+    private ?UuidInterface $other = null;
 
     public function __construct(?UuidInterface $id = null)
     {

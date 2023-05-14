@@ -18,20 +18,18 @@ use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-final class PayloadArgumentResolver implements ArgumentValueResolverInterface
+final class PayloadArgumentResolver implements CompatibleValueResolverInterface
 {
     use OperationRequestInitiatorTrait;
-    private $serializationContextBuilder;
 
     public function __construct(
         ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
-        SerializerContextBuilderInterface $serializationContextBuilder
+        private readonly SerializerContextBuilderInterface $serializationContextBuilder
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->serializationContextBuilder = $serializationContextBuilder;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
@@ -59,22 +57,26 @@ final class PayloadArgumentResolver implements ArgumentValueResolverInterface
         return $inputClass === $class || is_subclass_of($inputClass, $class);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): \Generator
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if (interface_exists(ValueResolverInterface::class)) {
+            if (!$this->supports($request, $argument)) {
+                return [];
+            }
+        }
+
         yield $request->attributes->get('data');
     }
 
     private function getExpectedInputClass(Request $request): ?string
     {
         $operation = $this->initializeOperation($request);
-        if (Request::METHOD_DELETE === $request->getMethod() || $request->isMethodSafe() || !($operation->canDeserialize() ?? true)) {
+        if (Request::METHOD_DELETE === $request->getMethod() || $request->isMethodSafe() || !($operation?->canDeserialize() ?? true)) {
             return null;
         }
 
         $context = $this->serializationContextBuilder->createFromRequest($request, false, RequestAttributesExtractor::extractAttributes($request));
 
-        return $context['input'] ?? $context['resource_class'];
+        return $context['input']['class'] ?? $context['resource_class'] ?? null;
     }
 }
-
-class_alias(PayloadArgumentResolver::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver::class);

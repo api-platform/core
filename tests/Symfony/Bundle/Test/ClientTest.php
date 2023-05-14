@@ -16,15 +16,11 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Test;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Response;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
-use PHPUnit\Runner\Version;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
-/**
- * @group legacy
- */
 class ClientTest extends ApiTestCase
 {
     protected function setUp(): void
@@ -33,13 +29,13 @@ class ClientTest extends ApiTestCase
         /**
          * @var EntityManagerInterface
          */
-        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager();
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        /** @var ClassMetadata[] $classes */
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);
 
-        $schemaTool->dropSchema($classes);
-        $schemaTool->createSchema($classes);
+        @$schemaTool->dropSchema($classes);
+        @$schemaTool->createSchema($classes);
     }
 
     public function testRequest(): void
@@ -98,8 +94,6 @@ class ClientTest extends ApiTestCase
 
     /**
      * @dataProvider authBasicProvider
-     *
-     * @param mixed $basic
      */
     public function testAuthBasic($basic): void
     {
@@ -118,10 +112,6 @@ class ClientTest extends ApiTestCase
 
     public function testComplexScenario(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         self::createClient()->request('GET', '/secured_dummies', ['auth_basic' => ['dunglas', 'kevin']]);
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
@@ -167,10 +157,6 @@ JSON
 
     public function testLoginUser(): void
     {
-        if (!method_exists(KernelBrowser::class, 'loginUser')) {
-            $this->markTestSkipped('symfony/framework-bundle 5.1 is required to test this function');
-        }
-
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
 

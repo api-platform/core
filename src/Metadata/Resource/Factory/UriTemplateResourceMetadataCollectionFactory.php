@@ -17,27 +17,22 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\Operations;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Operation\PathSegmentNameGeneratorInterface;
 use Symfony\Component\Routing\Route;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @experimental
  */
 final class UriTemplateResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $linkFactory;
-    private $pathSegmentNameGenerator;
-    private $decorated;
+    use OperationDefaultsTrait;
 
-    public function __construct(LinkFactoryInterface $linkFactory, PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, ResourceMetadataCollectionFactoryInterface $decorated = null)
+    private $triggerLegacyFormatOnce = [];
+
+    public function __construct(private readonly LinkFactoryInterface $linkFactory, private readonly PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
-        $this->linkFactory = $linkFactory;
-        $this->pathSegmentNameGenerator = $pathSegmentNameGenerator;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -62,7 +57,10 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 /** @var HttpOperation */
                 $operation = $this->configureUriVariables($operation);
 
-                if ($operation->getUriTemplate()) {
+                if (
+                    $operation->getUriTemplate()
+                    && !($operation->getExtraProperties()['generated_operation'] ?? false)
+                ) {
                     $operation = $operation->withExtraProperties($operation->getExtraProperties() + ['user_defined_uri_template' => true]);
                     if (!$operation->getName()) {
                         $operation = $operation->withName($key);
@@ -82,12 +80,12 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 }
 
                 $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
-                $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : '');
+
                 if (!$operation->getName()) {
-                    $operation = $operation->withName($operationName);
+                    $operation = $operation->withName($this->getDefaultOperationName($operation, $resourceClass));
                 }
 
-                $operations->add($operationName, $operation);
+                $operations->add($operation->getName(), $operation);
             }
 
             $resource = $resource->withOperations($operations->sort());
@@ -99,45 +97,58 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
     private function generateUriTemplate(HttpOperation $operation): string
     {
-        $uriTemplate = sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
+        $uriTemplate = $operation->getUriTemplate() ?? sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
         $uriVariables = $operation->getUriVariables() ?? [];
+        $legacyFormat = null;
+
+        if (str_ends_with($uriTemplate, '{._format}') || ($legacyFormat = str_ends_with($uriTemplate, '.{_format}'))) {
+            $uriTemplate = substr($uriTemplate, 0, -10);
+        }
+
+        if ($legacyFormat && ($this->triggerLegacyFormatOnce[$operation->getClass()] ?? true)) {
+            $this->triggerLegacyFormatOnce[$operation->getClass()] = false;
+            trigger_deprecation('api-platform/core', '3.0', sprintf('The special Symfony parameter ".{_format}" in your URI Template is deprecated, use an RFC6570 variable "{._format}" on the class "%s" instead. We will only use the RFC6570 compatible variable in 4.0.', $operation->getClass()));
+        }
 
         if ($parameters = array_keys($uriVariables)) {
-            if (($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && 1 < \count($uriVariables[$parameters[0]]->getIdentifiers() ?? [])) {
-                $parameters[0] = 'id';
-            }
-
             foreach ($parameters as $parameterName) {
-                $uriTemplate .= sprintf('/{%s}', $parameterName);
+                $part = sprintf('/{%s}', $parameterName);
+                if (false === strpos($uriTemplate, $part)) {
+                    $uriTemplate .= sprintf('/{%s}', $parameterName);
+                }
             }
         }
 
-        return sprintf('%s.{_format}', $uriTemplate);
+        return sprintf('%s%s', $uriTemplate, $legacyFormat ? '.{_format}' : '{._format}');
     }
 
-    /**
-     * @param ApiResource|HttpOperation $operation
-     *
-     * @return ApiResource|HttpOperation
-     */
-    private function configureUriVariables($operation)
+    private function configureUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation
     {
         // We will generate the collection route, don't initialize variables here
         if ($operation instanceof HttpOperation && (
-            [] === $operation->getUriVariables() ||
-            ($operation instanceof CollectionOperationInterface && null === $operation->getUriTemplate())
+            [] === $operation->getUriVariables()
+            || (
+                $operation instanceof CollectionOperationInterface
+                && null === $operation->getUriTemplate()
+            )
         )) {
-            return $operation;
+            if (null === $operation->getUriVariables()) {
+                return $operation;
+            }
+
+            return $this->normalizeUriVariables($operation);
         }
 
+        $hasUserConfiguredUriVariables = !($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false);
         if (!$operation->getUriVariables()) {
+            $hasUserConfiguredUriVariables = false;
             $operation = $operation->withUriVariables($this->transformLinksToUriVariables($this->linkFactory->createLinksFromIdentifiers($operation)));
         }
 
         $operation = $this->normalizeUriVariables($operation);
 
         if (!($uriTemplate = $operation->getUriTemplate())) {
-            if ($operation instanceof Post) {
+            if ($operation instanceof HttpOperation && 'POST' === $operation->getMethod()) {
                 return $operation->withUriVariables([]);
             }
 
@@ -149,36 +160,63 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         }
         $operation = $operation->withUriVariables($uriVariables);
 
-        $route = (new Route($uriTemplate))->compile();
-        $variables = array_filter($route->getPathVariables(), function ($v) {
-            return '_format' !== $v;
-        });
+        if (str_ends_with($uriTemplate, '{._format}') || str_ends_with($uriTemplate, '.{_format}')) {
+            $uriTemplate = substr($uriTemplate, 0, -10);
+        }
 
-        if (\count($variables) !== \count($uriVariables)) {
-            $newUriVariables = [];
-            foreach ($variables as $variable) {
-                if (isset($uriVariables[$variable])) {
-                    $newUriVariables[$variable] = $uriVariables[$variable];
-                    continue;
+        // TODO: move this to the Symfony bridge
+        if (class_exists(Route::class)) {
+            $route = (new Route($uriTemplate))->compile();
+            $variables = $route->getPathVariables();
+
+            if (\count($variables) !== \count($uriVariables)) {
+                if ($hasUserConfiguredUriVariables) {
+                    return $operation;
                 }
 
-                $newUriVariables[$variable] = (new Link())->withFromClass($operation->getClass())->withIdentifiers(['id'])->withParameterName($variable);
+                $newUriVariables = [];
+                foreach ($variables as $variable) {
+                    if (isset($uriVariables[$variable])) {
+                        $newUriVariables[$variable] = $uriVariables[$variable];
+                        continue;
+                    }
+
+                    $newUriVariables[$variable] = (new Link())
+                        ->withFromClass($operation->getClass())
+                        ->withIdentifiers([property_exists($operation->getClass(), $variable) ? $variable : 'id'])
+                        ->withParameterName($variable);
+                }
+
+                return $operation->withUriVariables($newUriVariables);
             }
 
-            return $operation->withUriVariables($newUriVariables);
+            // When an operation is generated we need to find properties matching it's uri variables
+            if (!($operation->getExtraProperties()['generated_operation'] ?? false) || !$this->linkFactory instanceof PropertyLinkFactoryInterface) {
+                return $operation;
+            }
+
+            $diff = array_diff($variables, array_keys($uriVariables));
+            if (0 === \count($diff)) {
+                return $operation;
+            }
+
+            // We generated this operation but there're some missing identifiers
+            $uriVariables = 'POST' === $operation->getMethod() || $operation instanceof CollectionOperationInterface ? [] : $operation->getUriVariables();
+
+            foreach ($diff as $key) {
+                $uriVariables[$key] = $this->linkFactory->createLinkFromProperty($operation, $key);
+            }
+
+            return $operation->withUriVariables($uriVariables);
         }
 
         return $operation;
     }
 
-    /**
-     * @param ApiResource|HttpOperation $operation
-     *
-     * @return ApiResource|HttpOperation
-     */
-    private function normalizeUriVariables($operation)
+    private function normalizeUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation
     {
         $uriVariables = (array) ($operation->getUriVariables() ?? []);
+
         $normalizedUriVariables = [];
         $resourceClass = $operation->getClass();
 

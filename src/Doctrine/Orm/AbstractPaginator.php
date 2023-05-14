@@ -20,10 +20,10 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 
 abstract class AbstractPaginator implements \IteratorAggregate, PartialPaginatorInterface
 {
-    protected $paginator;
-    protected $iterator;
-    protected $firstResult;
-    protected $maxResults;
+    protected DoctrinePaginator $paginator;
+    protected array|\Traversable $iterator;
+    protected ?int $firstResult;
+    protected ?int $maxResults;
 
     /**
      * @throws InvalidArgumentException
@@ -32,7 +32,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PartialPaginator
     {
         $query = $paginator->getQuery();
 
-        if (null === ($firstResult = $query->getFirstResult()) || null === $maxResults = $query->getMaxResults()) {
+        if (null === ($firstResult = $query->getFirstResult()) || null === $maxResults = $query->getMaxResults()) { // @phpstan-ignore-line
             throw new InvalidArgumentException(sprintf('"%1$s::setFirstResult()" or/and "%1$s::setMaxResults()" was/were not applied to the query.', Query::class));
         }
 
@@ -77,5 +77,3 @@ abstract class AbstractPaginator implements \IteratorAggregate, PartialPaginator
         return iterator_count($this->getIterator());
     }
 }
-
-class_alias(AbstractPaginator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\AbstractPaginator::class);

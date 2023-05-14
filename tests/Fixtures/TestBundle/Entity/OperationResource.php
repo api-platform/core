@@ -23,37 +23,20 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 #[ApiResource(normalizationContext: ['skip_null_values' => true], processor: OperationResourceProcessor::class)]
 #[Get]
 #[Patch(inputFormats: ['json' => ['application/merge-patch+json']])]
 #[Post]
-#[Put]
+#[Put(extraProperties: ['standard_put' => false])]
 #[Delete]
 class OperationResource
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    #[ApiProperty(identifier: true)]
-    private $identifier;
-
-    /**
-     * @var string
-     */
-    public $name;
-
-    public function __construct(int $identifier, string $name)
+    public function __construct(#[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column(type: 'integer')] #[ApiProperty(identifier: true)] private int $identifier, public $name)
     {
-        $this->identifier = $identifier;
-        $this->name = $name;
     }
 
-    public function getIdentifier()
+    public function getIdentifier(): int
     {
         return $this->identifier;
     }

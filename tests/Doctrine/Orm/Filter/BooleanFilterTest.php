@@ -25,7 +25,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
 {
     use BooleanFilterTestTrait;
 
-    protected $filterClass = BooleanFilter::class;
+    protected string $filterClass = BooleanFilter::class;
 
     public function provideApplyTestData(): array
     {

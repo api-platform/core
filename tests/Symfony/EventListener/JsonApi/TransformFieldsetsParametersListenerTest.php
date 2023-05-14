@@ -13,33 +13,36 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\EventListener\JsonApi;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\EventListener\JsonApi\TransformFieldsetsParametersListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-/**
- * @group legacy
- */
 class TransformFieldsetsParametersListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $listener;
+    private TransformFieldsetsParametersListener $listener;
 
     protected function setUp(): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy'));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            new ApiResource(operations: [
+                'get' => new Get(shortName: 'dummy'),
+            ]),
+        ]));
 
         $this->listener = new TransformFieldsetsParametersListener($resourceMetadataFactoryProphecy->reveal());
     }
 
-    public function testOnKernelRequestWithInvalidFormat()
+    public function testOnKernelRequestWithInvalidFormat(): void
     {
         $expectedRequest = new Request();
         $expectedRequest->setRequestFormat('badformat');
@@ -54,7 +57,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidFilter()
+    public function testOnKernelRequestWithInvalidFilter(): void
     {
         $eventProphecy = $this->prophesize(RequestEvent::class);
 
@@ -76,7 +79,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $request = new Request(
             ['fields' => ['dummy' => 'id,name,dummyFloat', 'relatedDummy' => 'id,name'], 'include' => 'relatedDummy,foo'],
@@ -104,7 +107,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithIncludeWithoutFields()
+    public function testOnKernelRequestWithIncludeWithoutFields(): void
     {
         $request = new Request(
             ['include' => 'relatedDummy,foo'],
@@ -131,7 +134,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithWrongParametersTypesDoesnTAffectRequestAttributes()
+    public function testOnKernelRequestWithWrongParametersTypesDoesnTAffectRequestAttributes(): void
     {
         $request = new Request(
             ['fields' => 'foo', 'include' => ['relatedDummy,foo']],

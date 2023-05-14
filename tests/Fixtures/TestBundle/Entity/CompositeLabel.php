@@ -13,30 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Label.
- *
- * @ApiResource
- * @ORM\Entity
  */
-class CompositeLabel
+#[ApiResource]
+#[ORM\Entity]
+class CompositeLabel implements \Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Groups({"default"})
-     */
-    private $value;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Groups(['default'])]
+    private ?string $value = null;
 
     /**
      * Gets id.
@@ -59,7 +53,7 @@ class CompositeLabel
      *
      * @param string|null $value the value to set
      */
-    public function setValue(?string $value = null)
+    public function setValue(?string $value = null): void
     {
         $this->value = $value;
     }

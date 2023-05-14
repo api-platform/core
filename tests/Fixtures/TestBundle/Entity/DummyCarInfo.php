@@ -17,15 +17,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @author Sergey Balasov <sbalasov@gmail.com>
- *
- * @ORM\Embeddable
  */
+#[ORM\Embeddable]
 class DummyCarInfo
 {
     /**
      * @var string
-     *
-     * @ORM\Column(nullable=true)
      */
+    #[ORM\Column(nullable: true)]
     public $name;
 }

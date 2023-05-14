@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Action;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Action\EntrypointAction;
 use ApiPlatform\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\GraphQl\Action\GraphQlPlaygroundAction;
@@ -23,10 +22,12 @@ use ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer;
 use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\DebugFlag;
+use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -110,7 +111,7 @@ class EntrypointActionTest extends TestCase
 
         $mockedEntrypoint = $this->getEntrypointAction($variables);
 
-        $this->assertEquals($expectedResponse->getContent(), $mockedEntrypoint($request)->getContent());
+        $this->assertSame($expectedResponse->getContent(), $mockedEntrypoint($request)->getContent());
     }
 
     public function multipartRequestProvider(): array
@@ -152,49 +153,49 @@ class EntrypointActionTest extends TestCase
                 '{"file": ["variables.file"]}',
                 ['file' => $file],
                 ['file' => $file],
-                new Response('{"errors":[{"message":"GraphQL multipart request does not respect the specification.","extensions":{"category":"user","status":400}}]}'),
+                new Response(\defined(Error::class.'::CATEGORY_GRAPHQL') ? '{"errors":[{"message":"GraphQL multipart request does not respect the specification.","extensions":{"category":"user","status":400}}]}' : '{"errors":[{"message":"GraphQL multipart request does not respect the specification.","extensions":{"status":400}}]}'),
             ],
             'upload without providing map' => [
                 '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 null,
                 ['file' => $file],
                 ['file' => null],
-                new Response('{"errors":[{"message":"GraphQL multipart request does not respect the specification.","extensions":{"category":"user","status":400}}]}'),
+                new Response(\defined(Error::class.'::CATEGORY_GRAPHQL') ? '{"errors":[{"message":"GraphQL multipart request does not respect the specification.","extensions":{"category":"user","status":400}}]}' : '{"errors":[{"message":"GraphQL multipart request does not respect the specification.","extensions":{"status":400}}]}'),
             ],
             'upload with invalid json' => [
                 '{invalid}',
                 '{"file": ["file"]}',
                 ['file' => $file],
                 ['file' => null],
-                new Response('{"errors":[{"message":"GraphQL data is not valid JSON.","extensions":{"category":"user","status":400}}]}'),
+                new Response(\defined(Error::class.'::CATEGORY_GRAPHQL') ? '{"errors":[{"message":"GraphQL data is not valid JSON.","extensions":{"category":"user","status":400}}]}' : '{"errors":[{"message":"GraphQL data is not valid JSON.","extensions":{"status":400}}]}'),
             ],
             'upload with invalid map JSON' => [
                 '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 '{invalid}',
                 ['file' => $file],
                 ['file' => null],
-                new Response('{"errors":[{"message":"GraphQL multipart request map is not valid JSON.","extensions":{"category":"user","status":400}}]}'),
+                new Response(\defined(Error::class.'::CATEGORY_GRAPHQL') ? '{"errors":[{"message":"GraphQL multipart request map is not valid JSON.","extensions":{"category":"user","status":400}}]}' : '{"errors":[{"message":"GraphQL multipart request map is not valid JSON.","extensions":{"status":400}}]}'),
             ],
             'upload with no file' => [
                 '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 '{"file": ["file"]}',
                 [],
                 ['file' => null],
-                new Response('{"errors":[{"message":"GraphQL multipart request file has not been sent correctly.","extensions":{"category":"user","status":400}}]}'),
+                new Response(\defined(Error::class.'::CATEGORY_GRAPHQL') ? '{"errors":[{"message":"GraphQL multipart request file has not been sent correctly.","extensions":{"category":"user","status":400}}]}' : '{"errors":[{"message":"GraphQL multipart request file has not been sent correctly.","extensions":{"status":400}}]}'),
             ],
             'upload with wrong map' => [
                 '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 '{"file": ["file"]}',
                 ['file' => $file],
                 ['file' => null],
-                new Response('{"errors":[{"message":"GraphQL multipart request path in map is invalid.","extensions":{"category":"user","status":400}}]}'),
+                new Response(\defined(Error::class.'::CATEGORY_GRAPHQL') ? '{"errors":[{"message":"GraphQL multipart request path in map is invalid.","extensions":{"category":"user","status":400}}]}' : '{"errors":[{"message":"GraphQL multipart request path in map is invalid.","extensions":{"status":400}}]}'),
             ],
             'upload when variable path does not exist' => [
                 '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 '{"file": ["variables.wrong"]}',
                 ['file' => $file],
                 ['file' => null],
-                new Response('{"errors":[{"message":"GraphQL multipart request path in map does not match the variables.","extensions":{"category":"user","status":400}}]}'),
+                new Response(\defined(Error::class.'::CATEGORY_GRAPHQL') ? '{"errors":[{"message":"GraphQL multipart request path in map does not match the variables.","extensions":{"category":"user","status":400}}]}' : '{"errors":[{"message":"GraphQL multipart request path in map does not match the variables.","extensions":{"status":400}}]}'),
             ],
         ];
     }
@@ -206,8 +207,13 @@ class EntrypointActionTest extends TestCase
         $request->headers->set('Content-Type', 'application/xml');
         $mockedEntrypoint = $this->getEntrypointAction();
 
-        $this->assertEquals(200, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        $this->assertSame(200, $mockedEntrypoint($request)->getStatusCode());
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_GRAPHQL')) {
+            $this->assertSame('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        } else {
+            $this->assertSame('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"status":400}}]}', $mockedEntrypoint($request)->getContent());
+        }
     }
 
     public function testBadMethodAction(): void
@@ -216,8 +222,13 @@ class EntrypointActionTest extends TestCase
         $request->setMethod('PUT');
         $mockedEntrypoint = $this->getEntrypointAction();
 
-        $this->assertEquals(200, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        $this->assertSame(200, $mockedEntrypoint($request)->getStatusCode());
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_GRAPHQL')) {
+            $this->assertSame('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        } else {
+            $this->assertSame('{"errors":[{"message":"GraphQL query is not valid.","extensions":{"status":400}}]}', $mockedEntrypoint($request)->getContent());
+        }
     }
 
     public function testBadVariablesAction(): void
@@ -226,8 +237,13 @@ class EntrypointActionTest extends TestCase
         $request->setRequestFormat('json');
         $mockedEntrypoint = $this->getEntrypointAction();
 
-        $this->assertEquals(200, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        $this->assertSame(200, $mockedEntrypoint($request)->getStatusCode());
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_GRAPHQL')) {
+            $this->assertSame('{"errors":[{"message":"GraphQL variables are not valid JSON.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        } else {
+            $this->assertSame('{"errors":[{"message":"GraphQL variables are not valid JSON.","extensions":{"status":400}}]}', $mockedEntrypoint($request)->getContent());
+        }
     }
 
     private function getEntrypointAction(array $variables = ['graphqlVariable']): EntrypointAction
@@ -244,7 +260,7 @@ class EntrypointActionTest extends TestCase
 
         $executionResultProphecy = $this->prophesize(ExecutionResult::class);
         $executionResultProphecy->toArray(DebugFlag::NONE)->willReturn(['GraphQL']);
-        $executionResultProphecy->setErrorFormatter([$normalizer, 'normalize'])->willReturn($executionResultProphecy);
+        $executionResultProphecy->setErrorFormatter(Argument::type('callable'))->willReturn($executionResultProphecy);
         $executionResultProphecy->setErrorsHandler($errorHandler)->willReturn($executionResultProphecy);
         $executorProphecy = $this->prophesize(ExecutorInterface::class);
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, $variables, 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());

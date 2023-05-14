@@ -63,7 +63,7 @@ Feature: Documentation support
     And "plainPassword" property is writable for Hydra class "User"
     And "plainPassword" property is not required for Hydra class "User"
     And the value of the node "@type" of the property "name" of the Hydra class "Dummy" is "hydra:SupportedProperty"
-    And the value of the node "hydra:property.@id" of the property "name" of the Hydra class "Dummy" is "http://schema.org/name"
+    And the value of the node "hydra:property.@id" of the property "name" of the Hydra class "Dummy" is "https://schema.org/name"
     And the value of the node "hydra:property.@type" of the property "name" of the Hydra class "Dummy" is "rdf:Property"
     And the value of the node "hydra:property.rdfs:label" of the property "name" of the Hydra class "Dummy" is "name"
     And the value of the node "hydra:property.domain" of the property "name" of the Hydra class "Dummy" is "#Dummy"

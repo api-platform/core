@@ -22,7 +22,6 @@ use ApiPlatform\State\ProviderInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectRepository;
 
 /**
  * Item state provider using the Doctrine ODM.
@@ -34,21 +33,15 @@ final class ItemProvider implements ProviderInterface
 {
     use LinksHandlerTrait;
 
-    private $resourceMetadataCollectionFactory;
-    private $managerRegistry;
-    private $itemExtensions;
-
     /**
      * @param AggregationItemExtensionInterface[] $itemExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, iterable $itemExtensions = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $itemExtensions = [])
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->managerRegistry = $managerRegistry;
-        $this->itemExtensions = $itemExtensions;
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         $resourceClass = $operation->getClass();
         /** @var DocumentManager $manager */
@@ -59,7 +52,6 @@ final class ItemProvider implements ProviderInterface
             return $manager->getReference($resourceClass, reset($uriVariables));
         }
 
-        /** @var ObjectRepository $repository */
         $repository = $manager->getRepository($resourceClass);
         if (!$repository instanceof DocumentRepository) {
             throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
@@ -70,10 +62,10 @@ final class ItemProvider implements ProviderInterface
         $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operation);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($aggregationBuilder, $resourceClass, $uriVariables, $operation->getName(), $context);
+            $extension->applyToItem($aggregationBuilder, $resourceClass, $uriVariables, $operation, $context);
 
-            if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-                return $extension->getResult($aggregationBuilder, $resourceClass, $operation->getName(), $context);
+            if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operation, $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $operation, $context);
             }
         }
 

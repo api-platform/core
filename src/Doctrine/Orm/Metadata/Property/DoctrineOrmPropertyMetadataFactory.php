@@ -25,13 +25,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    private $decorated;
-    private $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry, PropertyMetadataFactoryInterface $decorated)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly PropertyMetadataFactoryInterface $decorated)
     {
-        $this->managerRegistry = $managerRegistry;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -70,10 +65,6 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
 
                 break;
             }
-        }
-
-        if (null === $propertyMetadata->isIdentifier()) {
-            $propertyMetadata = $propertyMetadata->withIdentifier(false);
         }
 
         if ($doctrineClassMetadata instanceof ClassMetadataInfo && \in_array($property, $doctrineClassMetadata->getFieldNames(), true)) {

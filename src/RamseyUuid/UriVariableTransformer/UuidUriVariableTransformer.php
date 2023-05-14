@@ -20,7 +20,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * Transforms an UUID string to an instance of Ramsey\Uuid.
+ * Transforms a UUID string to an instance of Ramsey\Uuid.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
@@ -29,7 +29,7 @@ final class UuidUriVariableTransformer implements UriVariableTransformerInterfac
     /**
      * {@inheritdoc}
      */
-    public function transform($value, array $types, array $context = [])
+    public function transform(mixed $value, array $types, array $context = []): UuidInterface
     {
         try {
             return Uuid::fromString($value);
@@ -41,7 +41,7 @@ final class UuidUriVariableTransformer implements UriVariableTransformerInterfac
     /**
      * {@inheritdoc}
      */
-    public function supportsTransformation($value, array $types, array $context = []): bool
+    public function supportsTransformation(mixed $value, array $types, array $context = []): bool
     {
         return \is_string($value) && is_a($types[0], UuidInterface::class, true);
     }

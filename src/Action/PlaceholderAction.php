@@ -30,5 +30,3 @@ final class PlaceholderAction
         return $data;
     }
 }
-
-class_alias(PlaceholderAction::class, \ApiPlatform\Core\Action\PlaceholderAction::class);

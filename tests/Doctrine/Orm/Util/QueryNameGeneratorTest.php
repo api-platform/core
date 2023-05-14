@@ -21,15 +21,15 @@ use PHPUnit\Framework\TestCase;
  */
 class QueryNameGeneratorTest extends TestCase
 {
-    public function testGenerateJoinAlias()
+    public function testGenerateJoinAlias(): void
     {
         $queryNameGenerator = new QueryNameGenerator();
-        $this->assertEquals('related_a1', $queryNameGenerator->generateJoinAlias('related'));
+        $this->assertSame('related_a1', $queryNameGenerator->generateJoinAlias('related'));
     }
 
-    public function testGenerateParameterName()
+    public function testGenerateParameterName(): void
     {
         $queryNameGenerator = new QueryNameGenerator();
-        $this->assertEquals('name_p1', $queryNameGenerator->generateParameterName('name'));
+        $this->assertSame('name_p1', $queryNameGenerator->generateParameterName('name'));
     }
 }

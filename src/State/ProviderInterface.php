@@ -19,14 +19,15 @@ use ApiPlatform\Metadata\Operation;
  * Retrieves data from a persistence layer.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @experimental
+ *
+ * @template T of object
  */
 interface ProviderInterface
 {
     /**
      * Provides data.
      *
-     * @return object|array|null
+     * @return T|Pagination\PartialPaginatorInterface<T>|iterable<T>|null
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []);
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null;
 }

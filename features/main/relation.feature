@@ -252,10 +252,10 @@ Feature: Relations support
         "related": "/related_dummies/1"
       }
       """
-      Then the response status code should be 201
-      And the response should be in JSON
-      And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-      And the JSON should be equal to:
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
       """
       {
         "@context": "/contexts/RelationEmbedder",
@@ -502,7 +502,7 @@ Feature: Relations support
           "pattern": "^An error occurred$"
         },
         "hydra:description": {
-          "pattern": "^Expected IRI or document for resource \"ApiPlatform\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\RelatedDummy\", \"integer\" given.$"
+          "pattern": "^The type of the \"ApiPlatform\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\RelatedDummy\" resource must be \"array\" \\(nested document\\) or \"string\" \\(IRI\\), \"integer\" given.$"
         }
       },
       "required": [
@@ -547,4 +547,3 @@ Feature: Relations support
       "hydra:totalItems": 1
     }
     """
-

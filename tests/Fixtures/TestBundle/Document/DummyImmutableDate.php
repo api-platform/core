@@ -13,32 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Dummy Date Immutable.
- *
- * @ApiResource(attributes={
- *     "filters"={"my_dummy_immutable_date.mongodb.date"}
- * })
- *
- * @ODM\Document
  */
+#[ApiResource(filters: ['my_dummy_immutable_date.mongodb.date'])]
+#[ODM\Document]
 class DummyImmutableDate
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var \DateTimeImmutable The dummy date
-     *
-     * @ODM\Field(type="date_immutable")
      */
+    #[ODM\Field(type: 'date_immutable')]
     public $dummyDate;
 
     /**
@@ -46,7 +39,7 @@ class DummyImmutableDate
      *
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class LengthTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $filter = new Length();
 
@@ -30,7 +30,7 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testEmptyQueryParameter()
+    public function testEmptyQueryParameter(): void
     {
         $filter = new Length();
 
@@ -39,7 +39,10 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testNonMatchingParameter()
+    /**
+     * @group legacy
+     */
+    public function testNonMatchingParameter(): void
     {
         $filter = new Length();
 
@@ -61,7 +64,32 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testNonMatchingParameterWithOnlyOneDefinition()
+    public function testNonMatchingParameterOpenApi(): void
+    {
+        $filter = new Length();
+
+        $filterDefinition = [
+            'openapi' => [
+                'minLength' => 3,
+                'maxLength' => 5,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" length must be greater than or equal to 3'],
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'ab'])
+        );
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" length must be lower than or equal to 5'],
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcdef'])
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNonMatchingParameterWithOnlyOneDefinition(): void
     {
         $filter = new Length();
 
@@ -88,7 +116,37 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testMatchingParameter()
+    public function testNonMatchingParameterWithOnlyOneDefinitionOpenApi(): void
+    {
+        $filter = new Length();
+
+        $filterDefinition = [
+            'openapi' => [
+                'minLength' => 3,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" length must be greater than or equal to 3'],
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'ab'])
+        );
+
+        $filterDefinition = [
+            'openapi' => [
+                'maxLength' => 5,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" length must be lower than or equal to 5'],
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcdef'])
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testMatchingParameter(): void
     {
         $filter = new Length();
 
@@ -112,7 +170,34 @@ class LengthTest extends TestCase
         );
     }
 
-    public function testMatchingParameterWithOneDefinition()
+    public function testMatchingParameterOpenApi(): void
+    {
+        $filter = new Length();
+
+        $filterDefinition = [
+            'openapi' => [
+                'minLength' => 3,
+                'maxLength' => 5,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abc'])
+        );
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcd'])
+        );
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcde'])
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testMatchingParameterWithOneDefinition(): void
     {
         $filter = new Length();
 
@@ -128,6 +213,31 @@ class LengthTest extends TestCase
 
         $filterDefinition = [
             'swagger' => [
+                'maxLength' => 5,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcde'])
+        );
+    }
+
+    public function testMatchingParameterWithOneDefinitionOpenApi(): void
+    {
+        $filter = new Length();
+
+        $filterDefinition = [
+            'openapi' => [
+                'minLength' => 3,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abc'])
+        );
+
+        $filterDefinition = [
+            'openapi' => [
                 'maxLength' => 5,
             ],
         ];

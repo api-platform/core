@@ -31,5 +31,3 @@ trait CorsTrait
         return $request->isMethod('OPTIONS') && $request->headers->has('Access-Control-Request-Method');
     }
 }
-
-class_alias(CorsTrait::class, \ApiPlatform\Core\Util\CorsTrait::class);

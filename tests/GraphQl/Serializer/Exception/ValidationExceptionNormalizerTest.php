@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Serializer\Exception;
+namespace ApiPlatform\Tests\GraphQl\Serializer\Exception;
 
 use ApiPlatform\GraphQl\Serializer\Exception\ValidationExceptionNormalizer;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
@@ -25,15 +25,13 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ValidationExceptionNormalizerTest extends TestCase
 {
-    private $validationExceptionNormalizer;
+    private ValidationExceptionNormalizer $validationExceptionNormalizer;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->validationExceptionNormalizer = new ValidationExceptionNormalizer();
     }
 
@@ -49,9 +47,12 @@ class ValidationExceptionNormalizerTest extends TestCase
         $normalizedError = $this->validationExceptionNormalizer->normalize($error);
         $this->assertSame($exceptionMessage, $normalizedError['message']);
         $this->assertSame(422, $normalizedError['extensions']['status']);
-        $this->assertSame('user', $normalizedError['extensions']['category']);
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_INTERNAL')) {
+            $this->assertSame('user', $normalizedError['extensions']['category']);
+        }
         $this->assertArrayHasKey('violations', $normalizedError['extensions']);
-        $this->assertSame([
+        $this->assertEquals([
             [
                 'path' => 'field 1',
                 'message' => 'message 1',

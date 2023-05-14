@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class MultipleOfTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $filter = new MultipleOf();
 
@@ -30,7 +30,7 @@ class MultipleOfTest extends TestCase
         );
     }
 
-    public function testEmptyQueryParameter()
+    public function testEmptyQueryParameter(): void
     {
         $request = ['some_filter' => ''];
         $filter = new MultipleOf();
@@ -40,7 +40,10 @@ class MultipleOfTest extends TestCase
         );
     }
 
-    public function testNonMatchingParameter()
+    /**
+     * @group legacy
+     */
+    public function testNonMatchingParameter(): void
     {
         $request = ['some_filter' => '8'];
         $filter = new MultipleOf();
@@ -57,13 +60,49 @@ class MultipleOfTest extends TestCase
         );
     }
 
-    public function testMatchingParameter()
+    public function testNonMatchingParameterOpenApi(): void
+    {
+        $request = ['some_filter' => '8'];
+        $filter = new MultipleOf();
+
+        $filterDefinition = [
+            'openapi' => [
+                'multipleOf' => 3,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must multiple of 3'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testMatchingParameter(): void
     {
         $request = ['some_filter' => '8'];
         $filter = new MultipleOf();
 
         $filterDefinition = [
             'swagger' => [
+                'multipleOf' => 4,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+    }
+
+    public function testMatchingParameterOpenApi(): void
+    {
+        $request = ['some_filter' => '8'];
+        $filter = new MultipleOf();
+
+        $filterDefinition = [
+            'openapi' => [
                 'multipleOf' => 4,
             ],
         ];

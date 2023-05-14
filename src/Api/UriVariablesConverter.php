@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -28,21 +27,10 @@ use Symfony\Component\PropertyInfo\Type;
 final class UriVariablesConverter implements UriVariablesConverterInterface
 {
     /**
-     * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
-     */
-    private $propertyMetadataFactory;
-    private $uriVariableTransformers;
-    private $resourceMetadataCollectionFactory;
-
-    /**
      * @param iterable<UriVariableTransformerInterface> $uriVariableTransformers
-     * @param mixed                                     $propertyMetadataFactory
      */
-    public function __construct($propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, iterable $uriVariableTransformers)
+    public function __construct(private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly iterable $uriVariableTransformers)
     {
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->uriVariableTransformers = $uriVariableTransformers;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**
@@ -51,7 +39,7 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
     public function convert(array $uriVariables, string $class, array $context = []): array
     {
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($class)->getOperation();
-        $context = $context + ['operation' => $operation];
+        $context += ['operation' => $operation];
         $uriVariablesDefinitions = $operation->getUriVariables() ?? [];
 
         foreach ($uriVariables as $parameterName => $value) {

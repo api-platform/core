@@ -20,11 +20,8 @@ use ApiPlatform\Api\FilterInterface;
  */
 class DummyFilter implements FilterInterface
 {
-    private $description;
-
-    public function __construct(array $description)
+    public function __construct(private readonly array $description)
     {
-        $this->description = $description;
     }
 
     /**

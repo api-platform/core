@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class BoundsTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $filter = new Bounds();
 
@@ -30,7 +30,7 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testEmptyQueryParameter()
+    public function testEmptyQueryParameter(): void
     {
         $filter = new Bounds();
 
@@ -39,7 +39,10 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testNonMatchingMinimum()
+    /**
+     * @group legacy
+     */
+    public function testNonMatchingMinimum(): void
     {
         $request = ['some_filter' => '9'];
         $filter = new Bounds();
@@ -80,7 +83,51 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testMatchingMinimum()
+    public function testNonMatchingMinimumOpenApi(): void
+    {
+        $request = ['some_filter' => '9'];
+        $filter = new Bounds();
+
+        $filterDefinition = [
+            'openapi' => [
+                'minimum' => 10,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be greater than or equal to 10'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+
+        $filterDefinition = [
+            'openapi' => [
+                'minimum' => 10,
+                'exclusiveMinimum' => false,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be greater than or equal to 10'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+
+        $filterDefinition = [
+            'openapi' => [
+                'minimum' => 9,
+                'exclusiveMinimum' => true,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be greater than 9'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testMatchingMinimum(): void
     {
         $request = ['some_filter' => '10'];
         $filter = new Bounds();
@@ -107,7 +154,37 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testNonMatchingMaximum()
+    public function testMatchingMinimumOpenApi(): void
+    {
+        $request = ['some_filter' => '10'];
+        $filter = new Bounds();
+
+        $filterDefinition = [
+            'openapi' => [
+                'minimum' => 10,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+
+        $filterDefinition = [
+            'openapi' => [
+                'minimum' => 9,
+                'exclusiveMinimum' => false,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNonMatchingMaximum(): void
     {
         $request = ['some_filter' => '11'];
         $filter = new Bounds();
@@ -148,7 +225,51 @@ class BoundsTest extends TestCase
         );
     }
 
-    public function testMatchingMaximum()
+    public function testNonMatchingMaximumOpenApi(): void
+    {
+        $request = ['some_filter' => '11'];
+        $filter = new Bounds();
+
+        $filterDefinition = [
+            'openapi' => [
+                'maximum' => 10,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be less than or equal to 10'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+
+        $filterDefinition = [
+            'openapi' => [
+                'maximum' => 10,
+                'exclusiveMaximum' => false,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be less than or equal to 10'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+
+        $filterDefinition = [
+            'openapi' => [
+                'maximum' => 9,
+                'exclusiveMaximum' => true,
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be less than 9'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testMatchingMaximum(): void
     {
         $request = ['some_filter' => '10'];
         $filter = new Bounds();
@@ -165,6 +286,33 @@ class BoundsTest extends TestCase
 
         $filterDefinition = [
             'swagger' => [
+                'maximum' => 10,
+                'exclusiveMaximum' => false,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+    }
+
+    public function testMatchingMaximumOpenApi(): void
+    {
+        $request = ['some_filter' => '10'];
+        $filter = new Bounds();
+
+        $filterDefinition = [
+            'openapi' => [
+                'maximum' => 10,
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
+
+        $filterDefinition = [
+            'openapi' => [
                 'maximum' => 10,
                 'exclusiveMaximum' => false,
             ],

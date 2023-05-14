@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Hal\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Util\IriHelper;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -30,7 +29,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
     public const FORMAT = 'jsonhal';
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, $resourceMetadataFactory)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
     {
         parent::__construct($resourceClassResolver, $pageParameterName, $resourceMetadataFactory);
     }
@@ -38,19 +37,13 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getPaginationData($object, array $context = []): array
+    protected function getPaginationData(iterable $object, array $context = []): array
     {
         [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems] = $this->getPaginationConfig($object, $context);
         $parsed = IriHelper::parseIri($context['uri'] ?? '/', $this->pageParameterName);
 
-        /** @var ResourceMetadata|ResourceMetadataCollection */
-        $metadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? '');
-        if ($metadata instanceof ResourceMetadataCollection) {
-            $operation = $metadata->getOperation($context['operation_name'] ?? null);
-            $urlGenerationStrategy = $operation->getUrlGenerationStrategy();
-        } else {
-            $urlGenerationStrategy = $metadata->getAttribute('url_generation_strategy');
-        }
+        $operation = $context['operation'] ?? $this->getOperation($context);
+        $urlGenerationStrategy = $operation->getUrlGenerationStrategy();
 
         $data = [
             '_links' => [
@@ -89,7 +82,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
      *
      * @throws UnexpectedValueException
      */
-    protected function getItemsData($object, string $format = null, array $context = []): array
+    protected function getItemsData(iterable $object, string $format = null, array $context = []): array
     {
         $data = [];
 
@@ -99,11 +92,9 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
                 throw new UnexpectedValueException('Expected item to be an array');
             }
             $data['_embedded']['item'][] = $item;
-            $data['_links']['item'][] = $item['_links']['self'];
+            $data['_links']['item'][] = $item['_links']['self'] ?? null;
         }
 
         return $data;
     }
 }
-
-class_alias(CollectionNormalizer::class, \ApiPlatform\Core\Hal\Serializer\CollectionNormalizer::class);

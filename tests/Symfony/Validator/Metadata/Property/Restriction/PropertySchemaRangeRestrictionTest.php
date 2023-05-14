@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRangeRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Length;
@@ -29,7 +29,7 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaRangeRestriction;
+    private PropertySchemaRangeRestriction $propertySchemaRangeRestriction;
 
     protected function setUp(): void
     {

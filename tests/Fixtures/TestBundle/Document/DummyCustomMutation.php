@@ -13,79 +13,69 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Dummy with a custom GraphQL mutation resolver.
  *
- * @ODM\Document
- * @ApiResource(graphql={
- *     "sum"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
- *         "normalization_context"={"groups"={"result"}},
- *         "denormalization_context"={"groups"={"sum"}}
- *     },
- *     "sumNotPersisted"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom_not_persisted",
- *         "normalization_context"={"groups"={"result"}},
- *         "denormalization_context"={"groups"={"sum"}}
- *     },
- *     "sumNoWriteCustomResult"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom_no_write_custom_result",
- *         "normalization_context"={"groups"={"result"}},
- *         "denormalization_context"={"groups"={"sum"}},
- *         "write"=false
- *     },
- *     "sumOnlyPersist"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom_only_persist_document",
- *         "normalization_context"={"groups"={"result"}},
- *         "denormalization_context"={"groups"={"sum"}},
- *         "read"=false,
- *         "deserialize"=false,
- *         "validate"=false,
- *         "serialize"=false
- *     },
- *     "testCustomArguments"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
- *         "args"={"operandC"={"type"="Int!"}}
- *     }
- * })
- *
  * @author Raoul Clais <raoul.clais@gmail.com>
  */
+#[ODM\Document]
+#[ApiResource(graphQlOperations: [
+    new Mutation(
+        name: 'sum',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom',
+        extraArgs: ['id' => ['type' => 'ID!']],
+        normalizationContext: ['groups' => ['result']],
+        denormalizationContext: ['groups' => ['sum']]
+    ),
+    new Mutation(
+        name: 'sumNotPersisted',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom_not_persisted',
+        extraArgs: ['id' => ['type' => 'ID!']],
+        normalizationContext: ['groups' => ['result']],
+        denormalizationContext: ['groups' => ['sum']]
+    ),
+    new Mutation(name: 'sumNoWriteCustomResult',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom_no_write_custom_result',
+        extraArgs: ['id' => ['type' => 'ID!']],
+        normalizationContext: ['groups' => ['result']],
+        denormalizationContext: ['groups' => ['sum']],
+        write: false
+    ),
+    new Mutation(name: 'sumOnlyPersist',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom_only_persist_document',
+        extraArgs: ['id' => ['type' => 'ID!']],
+        normalizationContext: ['groups' => ['result']],
+        denormalizationContext: ['groups' => ['sum']],
+        read: false,
+        deserialize: false,
+        validate: false,
+        serialize: false
+    ),
+    new Mutation(name: 'testCustomArguments',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom',
+        args: ['operandC' => ['type' => 'Int!']]
+    ),
+])]
 class DummyCustomMutation
 {
-    /**
-     * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
 
-    /**
-     * @var int|null
-     *
-     * @ODM\Field(type="int")
-     */
-    private $operandA;
+    #[ODM\Field(type: 'int')]
+    private ?int $operandA = null;
 
-    /**
-     * @var int|null
-     *
-     * @Groups({"sum"})
-     * @ODM\Field(type="int", nullable=true)
-     */
-    private $operandB;
+    #[Groups(['sum'])]
+    #[ODM\Field(type: 'int', nullable: true)]
+    private ?int $operandB = null;
 
-    /**
-     * @var int|null
-     *
-     * @Groups({"result"})
-     * @ODM\Field(type="int", nullable=true)
-     */
-    private $result;
+    #[Groups(['result'])]
+    #[ODM\Field(type: 'int', nullable: true)]
+    private ?int $result = null;
 
     public function getId(): ?int
     {

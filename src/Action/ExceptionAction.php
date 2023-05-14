@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Action;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
-use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Renders a normalized exception for a given {@see FlattenException} or {@see LegacyFlattenException}.
+ * Renders a normalized exception for a given {@see FlattenException}.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -34,39 +34,19 @@ final class ExceptionAction
 {
     use OperationRequestInitiatorTrait;
 
-    private $serializer;
-    private $errorFormats;
-    private $exceptionToStatus;
     /**
-     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|null
+     * @param array $errorFormats      A list of enabled error formats
+     * @param array $exceptionToStatus A list of exceptions mapped to their HTTP status code
      */
-    private $resourceMetadataFactory;
-
-    /**
-     * @param array      $errorFormats            A list of enabled error formats
-     * @param array      $exceptionToStatus       A list of exceptions mapped to their HTTP status code
-     * @param mixed|null $resourceMetadataFactory
-     */
-    public function __construct(SerializerInterface $serializer, array $errorFormats, array $exceptionToStatus = [], $resourceMetadataFactory = null)
+    public function __construct(private readonly SerializerInterface $serializer, private readonly array $errorFormats, private readonly array $exceptionToStatus = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
-        $this->serializer = $serializer;
-        $this->errorFormats = $errorFormats;
-        $this->exceptionToStatus = $exceptionToStatus;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if (null !== $resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        } else {
-            $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
-        }
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**
      * Converts an exception to a JSON response.
-     *
-     * @param FlattenException|LegacyFlattenException $exception
      */
-    public function __invoke($exception, Request $request): Response
+    public function __invoke(FlattenException $exception, Request $request): Response
     {
         $operation = $this->initializeOperation($request);
         $exceptionClass = $exception->getClass();
@@ -98,23 +78,20 @@ final class ExceptionAction
     {
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        if ([] === $attributes || null === $this->resourceMetadataFactory) {
+        if ([] === $attributes) {
             return [];
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-        $operationExceptionToStatus = $resourceMetadata->getOperationAttribute($attributes, 'exception_to_status', [], false);
-        $resourceExceptionToStatus = $resourceMetadata->getAttribute('exception_to_status', []);
+        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($attributes['resource_class']);
+        /** @var HttpOperation $operation */
+        $operation = $resourceMetadataCollection->getOperation($attributes['operation_name'] ?? null);
+        $exceptionToStatus = [$operation->getExceptionToStatus() ?: []];
 
-        if (!\is_array($operationExceptionToStatus) || !\is_array($resourceExceptionToStatus)) {
-            throw new \LogicException('"exception_to_status" attribute should be an array.');
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            /* @var ApiResource $resourceMetadata */
+            $exceptionToStatus[] = $resourceMetadata->getExceptionToStatus() ?: [];
         }
 
-        return array_merge(
-            $resourceExceptionToStatus,
-            $operationExceptionToStatus
-        );
+        return array_merge(...$exceptionToStatus);
     }
 }
-
-class_alias(ExceptionAction::class, \ApiPlatform\Core\Action\ExceptionAction::class);

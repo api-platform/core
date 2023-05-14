@@ -14,16 +14,16 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\Filter;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Filter\OrderFilter;
 use ApiPlatform\Elasticsearch\Filter\SortFilterInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -31,7 +31,7 @@ class OrderFilterTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(
             SortFilterInterface::class,
@@ -44,7 +44,7 @@ class OrderFilterTest extends TestCase
         );
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
@@ -61,13 +61,13 @@ class OrderFilterTest extends TestCase
             ['name' => 'asc']
         );
 
-        self::assertSame(
+        self::assertEquals(
             [['name' => ['order' => 'asc']]],
             $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['name' => null]]])
         );
     }
 
-    public function testApplyWithNestedProperty()
+    public function testApplyWithNestedProperty(): void
     {
         $fooType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
         $barType = new Type(Type::BUILTIN_TYPE_STRING);
@@ -92,13 +92,13 @@ class OrderFilterTest extends TestCase
             ['foo.bar' => null]
         );
 
-        self::assertSame(
+        self::assertEquals(
             [['foo.bar' => ['order' => 'asc', 'nested' => ['path' => 'foo']]]],
             $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['foo.bar' => 'asc']]])
         );
     }
 
-    public function testApplyWithInvalidOrderFilter()
+    public function testApplyWithInvalidOrderFilter(): void
     {
         $orderFilter = new OrderFilter(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
@@ -108,10 +108,10 @@ class OrderFilterTest extends TestCase
             'order'
         );
 
-        self::assertSame([], $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => 'error']]));
+        self::assertEquals([], $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => 'error']]));
     }
 
-    public function testApplyWithInvalidTypeAndInvalidDirection()
+    public function testApplyWithInvalidTypeAndInvalidDirection(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
@@ -128,13 +128,13 @@ class OrderFilterTest extends TestCase
             'order'
         );
 
-        self::assertSame(
+        self::assertEquals(
             [],
             $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['name' => 'error', 'bar' => 'asc']]])
         );
     }
 
-    public function testDescription()
+    public function testDescription(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
@@ -149,6 +149,6 @@ class OrderFilterTest extends TestCase
             ['name' => 'asc', 'bar' => null]
         );
 
-        self::assertSame(['order[name]' => ['property' => 'name', 'type' => 'string', 'required' => false]], $orderFilter->getDescription(Foo::class));
+        self::assertEquals(['order[name]' => ['property' => 'name', 'type' => 'string', 'required' => false]], $orderFilter->getDescription(Foo::class));
     }
 }

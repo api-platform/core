@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Metadata\Resource;
 
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
-use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -27,20 +26,8 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $managerRegistry;
-
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface
-     */
-    private $decorated;
-
-    public function __construct(ManagerRegistry $managerRegistry, ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly ResourceMetadataCollectionFactoryInterface $decorated)
     {
-        $this->decorated = $decorated;
-        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -50,10 +37,12 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
+        /** @var ApiResource $resourceMetadata */
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();
 
             if ($operations) {
+                /** @var Operation $operation */
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     if (!$this->managerRegistry->getManagerForClass($operation->getClass()) instanceof DocumentManager) {
                         continue;
@@ -85,7 +74,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
         return $resourceMetadataCollection;
     }
 
-    private function addDefaults($operation): Operation
+    private function addDefaults(Operation $operation): Operation
     {
         if (null === $operation->getProvider()) {
             $operation = $operation->withProvider($this->getProvider($operation));
@@ -110,9 +99,9 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
     private function getProcessor(Operation $operation): string
     {
         if ($operation instanceof DeleteOperationInterface) {
-            return RemoveProcessor::class;
+            return 'api_platform.doctrine_mongodb.odm.state.remove_processor';
         }
 
-        return PersistProcessor::class;
+        return 'api_platform.doctrine_mongodb.odm.state.persist_processor';
     }
 }

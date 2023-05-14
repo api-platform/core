@@ -13,32 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 
 /**
  * Resource linked to an external API.
  *
- * @ApiResource
- *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
+#[ApiResource]
 class SerializableResource
 {
-    /**
-     * @var int
-     *
-     * @ApiProperty(identifier=true)
-     */
-    public $id;
+    #[ApiProperty(identifier: true)]
+    public int $id;
 
-    /**
-     * @var string
-     */
-    public $foo;
+    public string $foo;
 
-    /**
-     * @var string
-     */
-    public $bar;
+    public string $bar;
 }

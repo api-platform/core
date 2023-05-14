@@ -21,37 +21,48 @@ use PHPUnit\Framework\TestCase;
  */
 class JsonEncoderTest extends TestCase
 {
-    /**
-     * @var JsonEncoder
-     */
-    private $encoder;
+    private JsonEncoder $encoder;
 
     protected function setUp(): void
     {
         $this->encoder = new JsonEncoder('json');
     }
 
-    public function testSupportEncoding()
+    public function testSupportEncoding(): void
     {
         $this->assertTrue($this->encoder->supportsEncoding('json'));
         $this->assertFalse($this->encoder->supportsEncoding('csv'));
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals('{"foo":"bar"}', $this->encoder->encode($data, 'json'));
+        $this->assertSame('{"foo":"bar"}', $this->encoder->encode($data, 'json'));
     }
 
-    public function testSupportDecoding()
+    public function testSupportDecoding(): void
     {
         $this->assertTrue($this->encoder->supportsDecoding('json'));
         $this->assertFalse($this->encoder->supportsDecoding('csv'));
     }
 
-    public function testDecode()
+    public function testDecode(): void
     {
         $this->assertEquals(['foo' => 'bar'], $this->encoder->decode('{"foo":"bar"}', 'json'));
+    }
+
+    public function testUTF8EncodedString(): void
+    {
+        $data = ['foo' => 'Über'];
+
+        $this->assertEquals('{"foo":"Über"}', $this->encoder->encode($data, 'json'));
+    }
+
+    public function testUTF8MalformedHandlingEncoding(): void
+    {
+        $data = ['foo' => pack('H*', 'B11111')];
+
+        $this->assertEquals('{"foo":"\u0011\u0011"}', $this->encoder->encode($data, 'json'));
     }
 }

@@ -11,9 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\ItemResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
@@ -23,6 +22,8 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -33,12 +34,12 @@ class ItemResolverFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $itemResolverFactory;
-    private $readStageProphecy;
-    private $securityStageProphecy;
-    private $securityPostDenormalizeStageProphecy;
-    private $serializeStageProphecy;
-    private $queryResolverLocatorProphecy;
+    private ItemResolverFactory $itemResolverFactory;
+    private ObjectProphecy $readStageProphecy;
+    private ObjectProphecy $securityStageProphecy;
+    private ObjectProphecy $securityPostDenormalizeStageProphecy;
+    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $queryResolverLocatorProphecy;
 
     /**
      * {@inheritdoc}
@@ -62,10 +63,8 @@ class ItemResolverFactoryTest extends TestCase
 
     /**
      * @dataProvider itemResourceProvider
-     *
-     * @param object|null $readStageItem
      */
-    public function testResolve(?string $resourceClass, string $determinedResourceClass, $readStageItem): void
+    public function testResolve(?string $resourceClass, string $determinedResourceClass, ?object $readStageItem): void
     {
         $rootClass = 'rootClass';
         $operationName = 'item_query';
@@ -73,6 +72,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
@@ -98,9 +98,9 @@ class ItemResolverFactoryTest extends TestCase
     public function itemResourceProvider(): array
     {
         return [
-            'nominal' => ['stdClass', 'stdClass', new \stdClass()],
-            'null item' => ['stdClass', 'stdClass', null],
-            'null resource class' => [null, 'stdClass', new \stdClass()],
+            'nominal' => [\stdClass::class, \stdClass::class, new \stdClass()],
+            'null item' => [\stdClass::class, \stdClass::class, null],
+            'null resource class' => [null, \stdClass::class, new \stdClass()],
         ];
     }
 
@@ -110,7 +110,7 @@ class ItemResolverFactoryTest extends TestCase
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $info->fieldName = 'nested';
 
-        $this->assertSame(['already_serialized'], ($this->itemResolverFactory)('resourceClass')($source, [], null, $info));
+        $this->assertEquals(['already_serialized'], ($this->itemResolverFactory)('resourceClass')($source, [], null, $info));
     }
 
     public function testResolveNestedNullValue(): void
@@ -124,13 +124,14 @@ class ItemResolverFactoryTest extends TestCase
 
     public function testResolveBadReadStageItem(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'item_query';
         $operation = (new Query())->withName($operationName);
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = [];
@@ -151,6 +152,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = null;
@@ -171,6 +173,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
@@ -184,13 +187,14 @@ class ItemResolverFactoryTest extends TestCase
 
     public function testResolveCustom(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'custom_query';
         $operation = (new Query())->withResolver('query_resolver_id')->withName($operationName);
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
@@ -198,9 +202,7 @@ class ItemResolverFactoryTest extends TestCase
 
         $customItem = new \stdClass();
         $customItem->field = 'foo';
-        $this->queryResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(function () use ($customItem) {
-            return $customItem;
-        });
+        $this->queryResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(fn (): \stdClass => $customItem);
 
         $this->securityStageProphecy->__invoke($resourceClass, $operation, $resolverContext + [
             'extra_variables' => [
@@ -222,22 +224,21 @@ class ItemResolverFactoryTest extends TestCase
 
     public function testResolveCustomBadItem(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'custom_query';
         $operation = (new Query())->withResolver('query_resolver_id')->withName($operationName);
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
         $customItem = new Dummy();
-        $this->queryResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(function () use ($customItem) {
-            return $customItem;
-        });
+        $this->queryResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(fn (): Dummy => $customItem);
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Custom query resolver "query_resolver_id" has to return an item of class stdClass but returned an item of class Dummy.');

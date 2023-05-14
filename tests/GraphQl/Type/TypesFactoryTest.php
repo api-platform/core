@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Type;
+namespace ApiPlatform\Tests\GraphQl\Type;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\GraphQl\Type\TypesFactory;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -26,7 +26,7 @@ class TypesFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testGetTypes()
+    public function testGetTypes(): void
     {
         $typeProphecy = $this->prophesize(TypeInterface::class);
         $typeProphecy->getName()->willReturn('Foo');

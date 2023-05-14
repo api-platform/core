@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Type\Definition;
+namespace ApiPlatform\Tests\GraphQl\Type\Definition;
 
 use ApiPlatform\GraphQl\Type\Definition\IterableType;
 use GraphQL\Error\Error;
@@ -31,14 +31,14 @@ use PHPUnit\Framework\TestCase;
  */
 class IterableTypeTest extends TestCase
 {
-    public function testGetName()
+    public function testGetName(): void
     {
         $iterableType = new IterableType();
 
-        $this->assertEquals('Iterable', $iterableType->getName());
+        $this->assertSame('Iterable', $iterableType->getName());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $iterableType = new IterableType();
 
@@ -50,7 +50,7 @@ class IterableTypeTest extends TestCase
         $this->assertEquals(['foo'], $iterableType->serialize(['foo']));
     }
 
-    public function testParseValue()
+    public function testParseValue(): void
     {
         $iterableType = new IterableType();
 
@@ -62,12 +62,12 @@ class IterableTypeTest extends TestCase
         $this->assertEquals(['foo'], $iterableType->parseValue(['foo']));
     }
 
-    public function testParseLiteral()
+    public function testParseLiteral(): void
     {
         $iterableType = new IterableType();
 
         $this->expectException(\Exception::class);
-        $iterableType->parseLiteral(new IntValueNode(['value' => 1]));
+        $iterableType->parseLiteral(new IntValueNode(['value' => '1']));
 
         $listValueNode = new ListValueNode(['values' => []]);
         $this->assertEquals([], $iterableType->parseLiteral($listValueNode));

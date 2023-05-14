@@ -30,16 +30,11 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     public const FORMAT = 'elasticsearch';
 
-    private $decorated;
-
-    public function __construct(NormalizerInterface $decorated)
+    public function __construct(private readonly NormalizerInterface $decorated)
     {
-        $this->decorated = $decorated;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws LogicException
      */
     public function hasCacheableSupportsMethod(): bool
@@ -55,10 +50,8 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
      * {@inheritdoc}
      *
      * @throws LogicException
-     *
-     * @return mixed
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         if (!$this->decorated instanceof DenormalizerInterface) {
             throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
@@ -72,19 +65,19 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @throws LogicException
      */
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         if (!$this->decorated instanceof DenormalizerInterface) {
             throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
         }
 
-        return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsDenormalization($data, $type, $format);
+        return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsDenormalization($data, $type, $format, $context); // @phpstan-ignore-line symfony bc-layer
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         return $this->decorated->normalize($object, $format, $context);
     }
@@ -92,7 +85,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsNormalization($data, $format);
     }
@@ -102,7 +95,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @throws LogicException
      */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         if (!$this->decorated instanceof SerializerAwareInterface) {
             throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));
@@ -111,5 +104,3 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
         $this->decorated->setSerializer($serializer);
     }
 }
-
-class_alias(ItemNormalizer::class, \ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer::class);

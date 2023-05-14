@@ -15,13 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
 class CustomInputDto
 {
-    /**
-     * @var string
-     */
-    public $foo;
-
-    /**
-     * @var int
-     */
-    public $bar;
+    public string $foo;
+    public int $bar;
 }

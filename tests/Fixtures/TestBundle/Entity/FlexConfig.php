@@ -17,16 +17,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * This entity is configure in tests/Fixtures/app/config/api_platform/flex.yaml.
- *
- * @ORM\Entity
  */
+#[ORM\Entity]
 class FlexConfig
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     public function getId()

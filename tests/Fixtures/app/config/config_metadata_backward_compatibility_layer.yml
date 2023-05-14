@@ -1,6 +1,0 @@
-services:
-    app.graphql.type_converter:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type\TypeConverterLegacy'
-        decorates: 'api_platform.graphql.type_converter'
-        arguments: ['@app.graphql.type_converter.inner']
-        public: false

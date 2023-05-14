@@ -20,10 +20,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class NotFoundAction
 {
-    public function __invoke()
+    public function __invoke(): void
     {
         throw new NotFoundHttpException();
     }
 }
-
-class_alias(NotFoundAction::class, \ApiPlatform\Core\Action\NotFoundAction::class);

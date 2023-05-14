@@ -13,16 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\State;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ProviderEntity;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -31,6 +27,8 @@ use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @group mongodb
@@ -39,21 +37,19 @@ class CollectionProviderTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $managerRegistryProphecy;
-    private $resourceMetadataFactoryProphecy;
+    private ObjectProphecy $managerRegistryProphecy;
+    private ObjectProphecy $resourceMetadataFactoryProphecy;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
     }
 
-    public function testGetCollection()
+    public function testGetCollection(): void
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
@@ -69,17 +65,17 @@ class CollectionProviderTest extends TestCase
         $managerProphecy->getRepository(ProviderEntity::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
 
         $this->managerRegistryProphecy->getManagerForClass(ProviderEntity::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
+
         $operation = (new GetCollection())->withName('foo')->withClass(ProviderEntity::class);
-        $this->resourceMetadataFactoryProphecy->create(ProviderEntity::class)->willReturn(new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => $operation]))]));
 
         $extensionProphecy = $this->prophesize(AggregationCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($aggregationBuilder, ProviderEntity::class, 'foo', [])->shouldBeCalled();
+        $extensionProphecy->applyToCollection($aggregationBuilder, ProviderEntity::class, $operation, [])->shouldBeCalled();
 
         $dataProvider = new CollectionProvider($this->resourceMetadataFactoryProphecy->reveal(), $this->managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertEquals($iterator, $dataProvider->provide($operation, []));
+        $this->assertSame($iterator, $dataProvider->provide($operation, []));
     }
 
-    public function testGetCollectionWithExecuteOptions()
+    public function testGetCollectionWithExecuteOptions(): void
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
@@ -97,19 +93,15 @@ class CollectionProviderTest extends TestCase
         $this->managerRegistryProphecy->getManagerForClass(ProviderEntity::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
         $operation = (new GetCollection())->withExtraProperties(['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]])->withName('foo')->withClass(ProviderEntity::class);
-        $this->resourceMetadataFactoryProphecy->create(ProviderEntity::class)
-                                              ->willReturn(new ResourceMetadataCollection(ProviderEntity::class, [
-                                                  (new ApiResource())->withOperations(new Operations(['foo' => $operation])),
-                                              ]));
 
         $extensionProphecy = $this->prophesize(AggregationCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($aggregationBuilder, ProviderEntity::class, 'foo', [])->shouldBeCalled();
+        $extensionProphecy->applyToCollection($aggregationBuilder, ProviderEntity::class, $operation, [])->shouldBeCalled();
 
         $dataProvider = new CollectionProvider($this->resourceMetadataFactoryProphecy->reveal(), $this->managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertEquals($iterator, $dataProvider->provide($operation, []));
+        $this->assertSame($iterator, $dataProvider->provide($operation, []));
     }
 
-    public function testAggregationResultExtension()
+    public function testAggregationResultExtension(): void
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
@@ -121,18 +113,19 @@ class CollectionProviderTest extends TestCase
         $managerProphecy->getRepository(ProviderEntity::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
 
         $this->managerRegistryProphecy->getManagerForClass(ProviderEntity::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
+
         $operation = (new GetCollection())->withName('foo')->withClass(ProviderEntity::class);
 
         $extensionProphecy = $this->prophesize(AggregationResultCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($aggregationBuilder, ProviderEntity::class, 'foo', [])->shouldBeCalled();
-        $extensionProphecy->supportsResult(ProviderEntity::class, 'foo', [])->willReturn(true)->shouldBeCalled();
-        $extensionProphecy->getResult($aggregationBuilder, ProviderEntity::class, 'foo', [])->willReturn([])->shouldBeCalled();
+        $extensionProphecy->applyToCollection($aggregationBuilder, ProviderEntity::class, $operation, [])->shouldBeCalled();
+        $extensionProphecy->supportsResult(ProviderEntity::class, $operation, [])->willReturn(true)->shouldBeCalled();
+        $extensionProphecy->getResult($aggregationBuilder, ProviderEntity::class, $operation, [])->willReturn([])->shouldBeCalled();
 
         $dataProvider = new CollectionProvider($this->resourceMetadataFactoryProphecy->reveal(), $this->managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
         $this->assertEquals([], $dataProvider->provide($operation, []));
     }
 
-    public function testCannotCreateAggregationBuilder()
+    public function testCannotCreateAggregationBuilder(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The repository for "ApiPlatform\Tests\Fixtures\TestBundle\Document\ProviderEntity" must be an instance of "Doctrine\ODM\MongoDB\Repository\DocumentRepository".');
@@ -149,7 +142,7 @@ class CollectionProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->provide($operation, []));
     }
 
-    public function testOperationNotFound()
+    public function testOperationNotFound(): void
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
@@ -166,12 +159,12 @@ class CollectionProviderTest extends TestCase
 
         $this->managerRegistryProphecy->getManagerForClass(ProviderEntity::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
-        $this->resourceMetadataFactoryProphecy->create(ProviderEntity::class)->willReturn(new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => new GetCollection()]))]));
+        $operation = new GetCollection(name: 'bar', class: ProviderEntity::class);
 
         $extensionProphecy = $this->prophesize(AggregationCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($aggregationBuilder, ProviderEntity::class, 'bar', [])->shouldBeCalled();
+        $extensionProphecy->applyToCollection($aggregationBuilder, ProviderEntity::class, $operation, [])->shouldBeCalled();
 
         $dataProvider = new CollectionProvider($this->resourceMetadataFactoryProphecy->reveal(), $this->managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertEquals($iterator, $dataProvider->provide((new GetCollection())->withName('bar')->withClass(ProviderEntity::class), []));
+        $this->assertSame($iterator, $dataProvider->provide($operation, []));
     }
 }

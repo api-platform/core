@@ -27,24 +27,21 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeConverter implements TypeConverterInterface
 {
-    private $defaultTypeConverter;
-
-    public function __construct(TypeConverterInterface $defaultTypeConverter)
+    public function __construct(private readonly TypeConverterInterface $defaultTypeConverter)
     {
-        $this->defaultTypeConverter = $defaultTypeConverter;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth)
+    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
     {
         if ('dummyDate' === $property
             && \in_array($rootResource, [Dummy::class, DummyDocument::class], true)
             && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
             && is_a($type->getClassName(), \DateTimeInterface::class, true)
         ) {
-            return 'DateTime';
+            return \DateTime::class;
         }
 
         return $this->defaultTypeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);

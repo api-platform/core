@@ -18,19 +18,14 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\ReferenceOne;
 
 /**
- * @Document
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
+#[Document]
 class DoctrineRelation
 {
-    /**
-     * @Id
-     */
+    #[Id]
     public $id;
 
-    /**
-     * @ReferenceOne(targetDocument=DoctrineDummy::class, inversedBy="indexedFoo")
-     */
+    #[ReferenceOne(targetDocument: DoctrineDummy::class, inversedBy: 'indexedFoo')]
     protected $foo;
 }

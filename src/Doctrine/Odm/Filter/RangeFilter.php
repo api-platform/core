@@ -15,12 +15,11 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\RangeFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Filters the collection by range.
- *
- * @experimental
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -32,12 +31,12 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            !\is_array($values) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass)
+            !\is_array($values)
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }
@@ -67,7 +66,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
     /**
      * Adds the match stage according to the operator.
      */
-    protected function addMatch(Builder $aggregationBuilder, string $field, string $matchField, string $operator, string $value)
+    protected function addMatch(Builder $aggregationBuilder, string $field, string $matchField, string $operator, string $value): void
     {
         switch ($operator) {
             case self::PARAMETER_BETWEEN:
@@ -135,5 +134,3 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
         }
     }
 }
-
-class_alias(RangeFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter::class);

@@ -13,14 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
-class NonResourceClass
+class NonResourceClass implements \Stringable
 {
-    /**
-     * @var string
-     */
-    public $foo;
+    public ?string $foo = null;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->foo;
     }

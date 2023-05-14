@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class NonUniqueIdentifierExceptionTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $nonUniqueIdentifierException = new NonUniqueIdentifierException();
 

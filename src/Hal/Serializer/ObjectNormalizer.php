@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Hal\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -28,23 +27,14 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
 {
     public const FORMAT = 'jsonhal';
 
-    private $decorated;
-    private $iriConverter;
-
-    public function __construct(NormalizerInterface $decorated, $iriConverter)
+    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter)
     {
-        $this->decorated = $decorated;
-        $this->iriConverter = $iriConverter;
-
-        if ($iriConverter instanceof LegacyIriConverterInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $this->decorated->supportsNormalization($data, $format, $context);
     }
@@ -59,10 +49,8 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];
@@ -81,7 +69,7 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
         $metadata = [
             '_links' => [
                 'self' => [
-                    'href' => $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($originalResource) : $this->iriConverter->getIriFromResource($originalResource),
+                    'href' => $this->iriConverter->getIriFromResource($originalResource),
                 ],
             ],
         ];
@@ -92,7 +80,7 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
         return self::FORMAT === $format;
@@ -102,13 +90,9 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
      * {@inheritdoc}
      *
      * @throws LogicException
-     *
-     * @return mixed
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         throw new LogicException(sprintf('%s is a read-only format.', self::FORMAT));
     }
 }
-
-class_alias(ObjectNormalizer::class, \ApiPlatform\Core\Hal\Serializer\ObjectNormalizer::class);

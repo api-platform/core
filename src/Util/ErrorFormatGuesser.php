@@ -53,5 +53,3 @@ final class ErrorFormatGuesser
         return $defaultFormat;
     }
 }
-
-class_alias(ErrorFormatGuesser::class, \ApiPlatform\Core\Util\ErrorFormatGuesser::class);

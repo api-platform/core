@@ -13,58 +13,48 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Dummy Product.
+ *
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products{._format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, operations: [new GetCollection()])]
+#[ORM\Entity]
 class DummyProduct
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var Collection<int, DummyAggregateOffer>
-     *
-     * @ApiSubresource
-     * @ORM\OneToMany(targetEntity="DummyAggregateOffer", mappedBy="product", cascade={"persist"})
      */
-    private $offers;
-
+    #[ORM\OneToMany(targetEntity: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
+    private Collection|iterable $offers;
     /**
      * @var string The tour name
-     *
-     * @ORM\Column
      */
-    private $name;
-
+    #[ORM\Column]
+    private string $name;
     /**
-     * @var Collection<int, DummyProduct>
-     *
-     * @ApiSubresource
-     * @ORM\OneToMany(targetEntity="DummyProduct", mappedBy="parent")
+     * @var Collection<int,DummyProduct>
      */
-    private $relatedProducts;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="DummyProduct", inversedBy="relatedProducts")
-     */
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    private Collection|iterable $relatedProducts;
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'relatedProducts')]
     private $parent;
 
     public function __construct()
@@ -73,23 +63,23 @@ class DummyProduct
         $this->relatedProducts = new ArrayCollection();
     }
 
-    public function getOffers(): Collection
+    public function getOffers(): Collection|iterable
     {
         return $this->offers;
     }
 
-    public function setOffers($offers)
+    public function setOffers(Collection|iterable $offers): void
     {
         $this->offers = $offers;
     }
 
-    public function addOffer(DummyAggregateOffer $offer)
+    public function addOffer(DummyAggregateOffer $offer): void
     {
         $this->offers->add($offer);
         $offer->setProduct($this);
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -99,22 +89,22 @@ class DummyProduct
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    public function getRelatedProducts(): Collection
+    public function getRelatedProducts(): Collection|iterable
     {
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(iterable $relatedProducts)
+    public function setRelatedProducts(Collection|iterable $relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }
 
-    public function addRelatedProduct(self $relatedProduct)
+    public function addRelatedProduct(self $relatedProduct): void
     {
         $this->relatedProducts->add($relatedProduct);
         $relatedProduct->setParent($this);
@@ -125,7 +115,7 @@ class DummyProduct
         return $this->parent;
     }
 
-    public function setParent(self $product)
+    public function setParent(self $product): void
     {
         $this->parent = $product;
     }

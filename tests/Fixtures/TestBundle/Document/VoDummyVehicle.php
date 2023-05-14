@@ -18,61 +18,39 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\MappedSuperclass
- */
+#[ODM\MappedSuperclass]
 abstract class VoDummyVehicle
 {
     use VoDummyIdAwareTrait;
-
     /**
-     * @var string
-     *
-     * @ODM\Field
-     * @Groups({"car_read", "car_write"})
+     * @var Collection<VoDummyDriver>
      */
-    private $make;
-
-    /**
-     * @var VoDummyInsuranceCompany
-     *
-     * @ODM\ReferenceOne(targetDocument=VoDummyInsuranceCompany::class, cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
-     */
-    private $insuranceCompany;
-
-    /**
-     * @var VoDummyDriver[]|Collection
-     *
-     * @ODM\ReferenceMany(targetDocument=VoDummyDriver::class, cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
-     */
-    private $drivers;
+    #[Groups(['car_read', 'car_write'])]
+    #[ODM\ReferenceMany(targetDocument: VoDummyDriver::class, cascade: ['persist'])]
+    private Collection|iterable $drivers;
 
     public function __construct(
-        string $make,
-        VoDummyInsuranceCompany $insuranceCompany,
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $make,
+        #[Groups(['car_read', 'car_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyInsuranceCompany::class, cascade: ['persist'])] private VoDummyInsuranceCompany $insuranceCompany,
         array $drivers
     ) {
-        $this->make = $make;
-        $this->insuranceCompany = $insuranceCompany;
         $this->drivers = new ArrayCollection($drivers);
     }
 
-    public function getMake()
+    public function getMake(): string
     {
         return $this->make;
     }
 
-    public function getInsuranceCompany()
+    public function getInsuranceCompany(): VoDummyInsuranceCompany
     {
         return $this->insuranceCompany;
     }
 
     /**
-     * @return VoDummyDriver[]|Collection
+     * @return Collection<VoDummyDriver>
      */
-    public function getDrivers()
+    public function getDrivers(): Collection|iterable
     {
         return $this->drivers;
     }

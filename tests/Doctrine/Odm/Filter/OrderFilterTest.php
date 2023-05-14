@@ -30,10 +30,10 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use OrderFilterTestTrait;
 
-    protected $filterClass = OrderFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = OrderFilter::class;
+    protected string $resourceClass = Dummy::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -235,12 +235,8 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        $orderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter {
-            return new OrderFilter($managerRegistry, 'order', null, $properties);
-        };
-        $customOrderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter {
-            return new OrderFilter($managerRegistry, 'customOrder', null, $properties);
-        };
+        $orderFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'order', null, $properties);
+        $customOrderFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'customOrder', null, $properties);
 
         return array_merge_recursive(
             $this->provideApplyTestArguments(),

@@ -25,10 +25,8 @@ trait SerializerAwareProviderTrait
 {
     /**
      * @internal
-     *
-     * @var ContainerInterface
      */
-    private $serializerLocator;
+    private ContainerInterface $serializerLocator;
 
     public function setSerializerLocator(ContainerInterface $serializerLocator): void
     {

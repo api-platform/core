@@ -13,39 +13,30 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Relation.
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource]
+#[ORM\Entity]
 class CompositeRelation
 {
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Groups({"default"})
-     */
-    private $value;
-
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="CompositeItem", inversedBy="compositeValues")
-     * @ORM\JoinColumn(name="composite_item_id", referencedColumnName="id", nullable=false)
-     * @Groups({"default"})
-     */
-    private $compositeItem;
-
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="CompositeLabel")
-     * @ORM\JoinColumn(name="composite_label_id", referencedColumnName="id", nullable=false)
-     * @Groups({"default"})
-     */
-    private $compositeLabel;
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Groups(['default'])]
+    private ?string $value = null;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: CompositeItem::class, inversedBy: 'compositeValues')]
+    #[ORM\JoinColumn(name: 'composite_item_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups(['default'])]
+    private CompositeItem $compositeItem;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: CompositeLabel::class)]
+    #[ORM\JoinColumn(name: 'composite_label_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups(['default'])]
+    private CompositeLabel $compositeLabel;
 
     /**
      * Gets value.
@@ -60,7 +51,7 @@ class CompositeRelation
      *
      * @param string|null $value the value to set
      */
-    public function setValue($value = null)
+    public function setValue($value = null): void
     {
         $this->value = $value;
     }
@@ -78,7 +69,7 @@ class CompositeRelation
      *
      * @param CompositeItem $compositeItem the value to set
      */
-    public function setCompositeItem(CompositeItem $compositeItem)
+    public function setCompositeItem(CompositeItem $compositeItem): void
     {
         $this->compositeItem = $compositeItem;
     }
@@ -96,7 +87,7 @@ class CompositeRelation
      *
      * @param CompositeLabel $compositeLabel the value to set
      */
-    public function setCompositeLabel(CompositeLabel $compositeLabel)
+    public function setCompositeLabel(CompositeLabel $compositeLabel): void
     {
         $this->compositeLabel = $compositeLabel;
     }

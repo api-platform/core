@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Common\State;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\State\ProcessorInterface;
@@ -21,17 +20,18 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class RemoveProcessorTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(ProcessorInterface::class, new RemoveProcessor($this->prophesize(ManagerRegistry::class)->reveal()));
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $dummy = new Dummy();
 
@@ -45,7 +45,7 @@ class RemoveProcessorTest extends TestCase
         (new RemoveProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Delete(), []);
     }
 
-    public function testRemoveWithNullManager()
+    public function testRemoveWithNullManager(): void
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();

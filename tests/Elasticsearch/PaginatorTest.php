@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\DataProvider;
+namespace ApiPlatform\Tests\Elasticsearch\DataProvider;
 
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -82,42 +82,39 @@ class PaginatorTest extends TestCase
     private const OFFSET = 4;
     private const LIMIT = 4;
 
-    /**
-     * @var PaginatorInterface
-     */
-    private $paginator;
+    private PaginatorInterface $paginator;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(PaginatorInterface::class, $this->paginator);
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         self::assertCount(4, $this->paginator);
     }
 
-    public function testGetLastPage()
+    public function testGetLastPage(): void
     {
         self::assertSame(2., $this->paginator->getLastPage());
     }
 
-    public function testGetLastPageWithZeroAsLimit()
+    public function testGetLastPageWithZeroAsLimit(): void
     {
         self::assertSame(1., $this->getPaginator(0, 0)->getLastPage());
     }
 
-    public function testGetLastPageWithNegativeLimit()
+    public function testGetLastPageWithNegativeLimit(): void
     {
         self::assertSame(1., $this->getPaginator(-1, 0)->getLastPage());
     }
 
-    public function testGetTotalItems()
+    public function testGetTotalItems(): void
     {
         self::assertSame(8., $this->paginator->getTotalItems());
     }
 
-    public function testGetTotalItemsForElasticSearch7()
+    public function testGetTotalItemsForElasticSearch7(): void
     {
         // the total in elastichsearch >= 7 is object and not integer.
         $documents = self::DOCUMENTS;
@@ -131,36 +128,34 @@ class PaginatorTest extends TestCase
         self::assertSame(8., $paginator->getTotalItems());
     }
 
-    public function testGetCurrentPage()
+    public function testGetCurrentPage(): void
     {
         self::assertSame(2., $this->paginator->getCurrentPage());
     }
 
-    public function testGetCurrentPageWithZeroAsLimit()
+    public function testGetCurrentPageWithZeroAsLimit(): void
     {
         self::assertSame(1., $this->getPaginator(0, 0)->getCurrentPage());
     }
 
-    public function testGetCurrentPageWithNegativeLimit()
+    public function testGetCurrentPageWithNegativeLimit(): void
     {
         self::assertSame(1., $this->getPaginator(-1, 0)->getCurrentPage());
     }
 
-    public function testGetItemsPerPage()
+    public function testGetItemsPerPage(): void
     {
         self::assertSame(4., $this->paginator->getItemsPerPage());
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         // set local cache
         iterator_to_array($this->paginator);
 
         self::assertEquals(
             array_map(
-                function (array $document): Foo {
-                    return $this->denormalizeFoo($document['_source']);
-                },
+                fn (array $document): Foo => $this->denormalizeFoo($document['_source']),
                 self::DOCUMENTS['hits']['hits']
             ),
             iterator_to_array($this->paginator)
@@ -172,7 +167,7 @@ class PaginatorTest extends TestCase
         $this->paginator = $this->getPaginator();
     }
 
-    private function getPaginator(int $limit = self::OFFSET, int $offset = self::OFFSET, array $documents = self::DOCUMENTS)
+    private function getPaginator(int $limit = self::OFFSET, int $offset = self::OFFSET, array $documents = self::DOCUMENTS): Paginator
     {
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
 

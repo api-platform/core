@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Util;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -24,6 +23,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class QueryBuilderHelperTest extends TestCase
 {
@@ -32,7 +32,7 @@ class QueryBuilderHelperTest extends TestCase
     /**
      * @dataProvider provideAddJoinOnce
      */
-    public function testAddJoinOnce(?string $originAliasForJoinOnce, string $expectedAlias)
+    public function testAddJoinOnce(?string $originAliasForJoinOnce, string $expectedAlias): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
         $queryBuilder->from('foo', 'f');
@@ -60,7 +60,7 @@ class QueryBuilderHelperTest extends TestCase
     /**
      * @dataProvider provideAddJoinOnce
      */
-    public function testAddJoinOnceWithSpecifiedNewAlias()
+    public function testAddJoinOnceWithSpecifiedNewAlias(): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
         $queryBuilder->from('foo', 'f');
@@ -108,7 +108,7 @@ class QueryBuilderHelperTest extends TestCase
 
         $actual = QueryBuilderHelper::getEntityClassByAlias('a_1', $queryBuilder, $managerRegistryProphecy->reveal());
 
-        $this->assertEquals(RelatedDummy::class, $actual);
+        $this->assertSame(RelatedDummy::class, $actual);
     }
 
     public function testGetEntityClassByAliasWithJoinByClass(): void
@@ -127,20 +127,18 @@ class QueryBuilderHelperTest extends TestCase
 
         $actual = QueryBuilderHelper::getEntityClassByAlias('a_1', $queryBuilder, $managerRegistryProphecy->reveal());
 
-        $this->assertEquals(RelatedDummy::class, $actual);
+        $this->assertSame(RelatedDummy::class, $actual);
     }
 
-    public function provideAddJoinOnce(): array
+    public function provideAddJoinOnce(): \Iterator
     {
-        return [
-            [
-                null,
-                'b',
-            ],
-            [
-                'f2',
-                'b2',
-            ],
+        yield [
+            null,
+            'b',
+        ];
+        yield [
+            'f2',
+            'b2',
         ];
     }
 }

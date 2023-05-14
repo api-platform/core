@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Metadata\Property;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -24,6 +23,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -32,7 +32,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreateNoManager()
+    public function testCreateNoManager(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -43,10 +43,10 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrineOrmPropertyMetadataFactory = new DoctrineOrmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
 
-        $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
+        $this->assertSame($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
-    public function testCreateIsIdentifier()
+    public function testCreateIsIdentifier(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withIdentifier(true);
@@ -64,10 +64,10 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrineOrmPropertyMetadataFactory = new DoctrineOrmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
 
-        $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
+        $this->assertSame($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
-    public function testCreateIsWritable()
+    public function testCreateIsWritable(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withWritable(false);
@@ -89,11 +89,11 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), false);
     }
 
-    public function testCreateWithDefaultOption()
+    public function testCreateWithDefaultOption(): void
     {
         $propertyMetadata = new ApiProperty();
 
@@ -116,10 +116,10 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(DummyPropertyWithDefaultValue::class, 'dummyDefaultOption');
 
-        $this->assertEquals($doctrinePropertyMetadata->getDefault(), 'default value');
+        $this->assertSame($doctrinePropertyMetadata->getDefault(), 'default value');
     }
 
-    public function testCreateClassMetadataInfo()
+    public function testCreateClassMetadataInfo(): void
     {
         $propertyMetadata = new ApiProperty();
 
@@ -141,11 +141,11 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), true);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), true);
     }
 
-    public function testCreateClassMetadata()
+    public function testCreateClassMetadata(): void
     {
         $propertyMetadata = new ApiProperty();
 
@@ -165,7 +165,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), false);
     }
 }

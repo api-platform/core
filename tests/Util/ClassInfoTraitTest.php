@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Util;
 
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Util\ClassInfoTrait;
 use PHPUnit\Framework\TestCase;
 
 class ClassInfoTraitTest extends TestCase
@@ -28,24 +28,24 @@ class ClassInfoTraitTest extends TestCase
         };
     }
 
-    public function testDoctrineRealClassName()
+    public function testDoctrineRealClassName(): void
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 
-        $this->assertEquals(Dummy::class, $classInfo->getRealClassName('Proxies\__CG__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy'));
+        $this->assertSame(Dummy::class, $classInfo->getRealClassName('Proxies\__CG__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy'));
     }
 
-    public function testProxyManagerRealClassName()
+    public function testProxyManagerRealClassName(): void
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 
-        $this->assertEquals(Dummy::class, $classInfo->getRealClassName('MongoDBODMProxies\__PM__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy\Generated'));
+        $this->assertSame(Dummy::class, $classInfo->getRealClassName('MongoDBODMProxies\__PM__\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy\Generated'));
     }
 
-    public function testUnmarkedRealClassName()
+    public function testUnmarkedRealClassName(): void
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 
-        $this->assertEquals(Dummy::class, $classInfo->getRealClassName(Dummy::class));
+        $this->assertSame(Dummy::class, $classInfo->getRealClassName(Dummy::class));
     }
 }

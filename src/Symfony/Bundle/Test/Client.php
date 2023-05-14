@@ -28,8 +28,6 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 /**
  * Convenient test client that makes requests to a Kernel object.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Client implements HttpClientInterface
@@ -52,23 +50,17 @@ final class Client implements HttpClientInterface
         'extra' => [],
     ];
 
-    private $kernelBrowser;
+    private array $defaultOptions = self::API_OPTIONS_DEFAULTS;
 
-    private $defaultOptions = self::API_OPTIONS_DEFAULTS;
-
-    /**
-     * @var Response
-     */
-    private $response;
+    private ?Response $response = null;
 
     /**
      * @param array $defaultOptions Default options for the requests
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(KernelBrowser $kernelBrowser, array $defaultOptions = [])
+    public function __construct(private readonly KernelBrowser $kernelBrowser, array $defaultOptions = [])
     {
-        $this->kernelBrowser = $kernelBrowser;
         $kernelBrowser->followRedirects(false);
         if ($defaultOptions) {
             $this->setDefaultOptions($defaultOptions);
@@ -104,7 +96,7 @@ final class Client implements HttpClientInterface
         }
 
         if ($basic) {
-            $credentials = \is_array($basic) ? $basic : explode(':', $basic, 2);
+            $credentials = \is_array($basic) ? $basic : explode(':', (string) $basic, 2);
             $server['PHP_AUTH_USER'] = $credentials[0];
             $server['PHP_AUTH_PW'] = $credentials[1] ?? '';
         }
@@ -129,7 +121,7 @@ final class Client implements HttpClientInterface
     /**
      * {@inheritdoc}
      */
-    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         throw new \LogicException('Not implemented yet');
     }
@@ -187,7 +179,7 @@ final class Client implements HttpClientInterface
      *
      * @return Profile|false A Profile instance
      */
-    public function getProfile()
+    public function getProfile(): Profile|false
     {
         return $this->kernelBrowser->getProfile();
     }
@@ -237,7 +229,7 @@ final class Client implements HttpClientInterface
         /** @var string $key */
         foreach ($options['normalized_headers'] as $key => $values) {
             foreach ($values as $value) {
-                [, $value] = explode(': ', $value, 2);
+                [, $value] = explode(': ', (string) $value, 2);
                 $headers[$key][] = $value;
             }
         }
@@ -247,14 +239,8 @@ final class Client implements HttpClientInterface
 
     public function loginUser(UserInterface $user, string $firewallContext = 'main'): self
     {
-        if (!method_exists($this->kernelBrowser, 'loginUser')) {
-            throw new \LogicException(sprintf('"%s" requires symfony/framework-bundle 5.1+ to be installed.', __METHOD__));
-        }
-
         $this->kernelBrowser->loginUser($user, $firewallContext);
 
         return $this;
     }
 }
-
-class_alias(Client::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client::class);

@@ -19,7 +19,7 @@ use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\Util\SortTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Cache\CacheItemPoolInterface;
@@ -36,19 +36,8 @@ final class SubscriptionManager implements SubscriptionManagerInterface
     use ResourceClassInfoTrait;
     use SortTrait;
 
-    private $subscriptionsCache;
-    private $subscriptionIdentifierGenerator;
-    private $serializeStage;
-    private $iriConverter;
-    private $resourceMetadataCollectionFactory;
-
-    public function __construct(CacheItemPoolInterface $subscriptionsCache, SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, SerializeStageInterface $serializeStage, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly SerializeStageInterface $serializeStage, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
-        $this->subscriptionsCache = $subscriptionsCache;
-        $this->subscriptionIdentifierGenerator = $subscriptionIdentifierGenerator;
-        $this->serializeStage = $serializeStage;
-        $this->iriConverter = $iriConverter;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function retrieveSubscriptionId(array $context, ?array $result): ?string
@@ -81,10 +70,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         return $subscriptionId;
     }
 
-    /**
-     * @param object $object
-     */
-    public function getPushPayloads($object): array
+    public function getPushPayloads(object $object): array
     {
         $iri = $this->iriConverter->getIriFromResource($object);
         $subscriptions = $this->getSubscriptionsFromIri($iri);

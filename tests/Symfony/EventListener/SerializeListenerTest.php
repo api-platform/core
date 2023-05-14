@@ -13,15 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Serializer\ResourceList;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\EventListener\SerializeListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -30,13 +32,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class SerializeListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testDoNotSerializeWhenControllerResultIsResponse()
+    public function testDoNotSerializeWhenControllerResultIsResponse(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize(Argument::cetera())->shouldNotBeCalled();
@@ -57,7 +58,7 @@ class SerializeListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
-    public function testDoNotSerializeWhenRespondFlagIsFalse()
+    public function testDoNotSerializeWhenRespondFlagIsFalse(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize(Argument::cetera())->shouldNotBeCalled();
@@ -66,7 +67,7 @@ class SerializeListenerTest extends TestCase
 
         $dummy = new Dummy();
 
-        $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post', '_api_respond' => false]);
+        $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_operation_name' => 'post', '_api_respond' => false]);
         $request->setMethod('POST');
 
         $event = new ViewEvent(
@@ -82,24 +83,22 @@ class SerializeListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
-    public function testDoNotSerializeWhenDisabledInOperationAttribute()
+    public function testDoNotSerializeWhenDisabledInOperationAttribute(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize(Argument::cetera())->shouldNotBeCalled();
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
-        $resourceMetadata = new ResourceMetadata('Dummy', null, null, [], [
-            'post' => [
-                'serialize' => false,
-            ],
-        ]);
-
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            new ApiResource(operations: [
+                'post' => new Post(serialize: false),
+            ]),
+        ]));
 
         $dummy = new Dummy();
-        $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
+        $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_operation_name' => 'post']);
         $request->setMethod('POST');
 
         $event = new ViewEvent(
@@ -115,9 +114,9 @@ class SerializeListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
-    public function testSerializeCollectionOperation()
+    public function testSerializeCollectionOperation(): void
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'get'];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
         $serializerProphecy
@@ -125,12 +124,10 @@ class SerializeListenerTest extends TestCase
                 Argument::any(),
                 'xml',
                 Argument::allOf(
-                    Argument::that(function (array $context) {
-                        return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
-                    }),
+                    Argument::that(fn (array $context) => $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList),
                     Argument::withEntry('request_uri', ''),
                     Argument::withEntry('resource_class', 'Foo'),
-                    Argument::withEntry('collection_operation_name', 'get')
+                    Argument::withEntry('operation_name', 'get')
                 )
             )
             ->willReturn('bar')
@@ -139,7 +136,7 @@ class SerializeListenerTest extends TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
         $request->setRequestFormat('xml');
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -154,15 +151,15 @@ class SerializeListenerTest extends TestCase
         $this->assertSame('bar', $event->getControllerResult());
     }
 
-    public function testSerializeCollectionOperationWithOutputClassDisabled()
+    public function testSerializeCollectionOperationWithOutputClassDisabled(): void
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'post', 'output' => ['class' => null]];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'operation_name' => 'post', 'output' => ['class' => null]];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_output_class' => false]);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_output_class' => false]);
         $request->setRequestFormat('xml');
 
         $event = new ViewEvent(
@@ -178,21 +175,19 @@ class SerializeListenerTest extends TestCase
         $this->assertNull($event->getControllerResult());
     }
 
-    public function testSerializeItemOperation()
+    public function testSerializeItemOperation(): void
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'item_operation_name' => 'get'];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy
             ->serialize(
                 Argument::any(),
                 'xml',
                 Argument::allOf(
-                    Argument::that(function (array $context) {
-                        return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
-                    }),
+                    Argument::that(fn (array $context) => $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList),
                     Argument::withEntry('request_uri', ''),
                     Argument::withEntry('resource_class', 'Foo'),
-                    Argument::withEntry('item_operation_name', 'get')
+                    Argument::withEntry('operation_name', 'get')
                 )
             )
             ->willReturn('bar')
@@ -201,7 +196,7 @@ class SerializeListenerTest extends TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
         $request->setRequestFormat('xml');
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -216,7 +211,7 @@ class SerializeListenerTest extends TestCase
         $this->assertSame('bar', $event->getControllerResult());
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(EncoderInterface::class);

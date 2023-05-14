@@ -23,17 +23,14 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class DummyDtoNoOutputProcessor implements ProcessorInterface
 {
-    private $registry;
-
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(private readonly ManagerRegistry $registry)
     {
-        $this->registry = $registry;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function process($data, Operation $operation = null, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation = null, array $uriVariables = [], array $context = [])
     {
         $isOrm = true;
         $em = $this->registry->getManagerForClass(DummyDtoNoOutput::class);

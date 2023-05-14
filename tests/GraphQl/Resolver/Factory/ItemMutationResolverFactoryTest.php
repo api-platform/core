@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
@@ -28,6 +27,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -37,16 +38,16 @@ class ItemMutationResolverFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $itemMutationResolverFactory;
-    private $readStageProphecy;
-    private $securityStageProphecy;
-    private $securityPostDenormalizeStageProphecy;
-    private $serializeStageProphecy;
-    private $deserializeStageProphecy;
-    private $writeStageProphecy;
-    private $validateStageProphecy;
-    private $mutationResolverLocatorProphecy;
-    private $securityPostValidationStageProphecy;
+    private ItemMutationResolverFactory $itemMutationResolverFactory;
+    private ObjectProphecy $readStageProphecy;
+    private ObjectProphecy $securityStageProphecy;
+    private ObjectProphecy $securityPostDenormalizeStageProphecy;
+    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $deserializeStageProphecy;
+    private ObjectProphecy $writeStageProphecy;
+    private ObjectProphecy $validateStageProphecy;
+    private ObjectProphecy $mutationResolverLocatorProphecy;
+    private ObjectProphecy $securityPostValidationStageProphecy;
 
     /**
      * {@inheritdoc}
@@ -78,7 +79,7 @@ class ItemMutationResolverFactoryTest extends TestCase
 
     public function testResolve(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'create';
         $operation = (new Mutation())->withName($operationName);
@@ -123,8 +124,7 @@ class ItemMutationResolverFactoryTest extends TestCase
     {
         $resourceClass = null;
         $rootClass = 'rootClass';
-        $operationName = 'create';
-        $operation = (new Mutation())->withName($operationName);
+        $operation = (new Mutation())->withName('create');
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -132,11 +132,10 @@ class ItemMutationResolverFactoryTest extends TestCase
         $this->assertNull(($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
-    public function testResolveNullOperationName(): void
+    public function testResolveNullOperation(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
-        $operationName = null;
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -146,7 +145,7 @@ class ItemMutationResolverFactoryTest extends TestCase
 
     public function testResolveBadReadStageItem(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'create';
         $operation = (new Mutation())->withName($operationName);
@@ -166,7 +165,7 @@ class ItemMutationResolverFactoryTest extends TestCase
 
     public function testResolveNullDeserializeStageItem(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'create';
         $operation = (new Mutation())->withName($operationName);
@@ -206,7 +205,7 @@ class ItemMutationResolverFactoryTest extends TestCase
 
     public function testResolveDelete(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'delete';
         $operation = (new Mutation())->withName($operationName);
@@ -247,7 +246,7 @@ class ItemMutationResolverFactoryTest extends TestCase
 
     public function testResolveCustom(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'create';
         $operation = (new Mutation())->withResolver('query_resolver_id')->withName($operationName);
@@ -266,9 +265,7 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $customItem = new \stdClass();
         $customItem->field = 'foo';
-        $this->mutationResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(function () use ($customItem) {
-            return $customItem;
-        });
+        $this->mutationResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(fn (): \stdClass => $customItem);
 
         $this->securityStageProphecy->__invoke($resourceClass, $operation, $resolverContext + [
             'extra_variables' => [
@@ -296,7 +293,7 @@ class ItemMutationResolverFactoryTest extends TestCase
 
     public function testResolveCustomBadItem(): void
     {
-        $resourceClass = 'stdClass';
+        $resourceClass = \stdClass::class;
         $rootClass = 'rootClass';
         $operationName = 'create';
         $operation = (new Mutation())->withResolver('query_resolver_id')->withName($operationName)->withShortName('shortName');
@@ -314,9 +311,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
         $customItem = new Dummy();
-        $this->mutationResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(function () use ($customItem) {
-            return $customItem;
-        });
+        $this->mutationResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(fn (): Dummy => $customItem);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Custom mutation resolver "query_resolver_id" has to return an item of class shortName but returned an item of class Dummy.');

@@ -22,10 +22,5 @@ use ApiPlatform\Metadata\GraphQl\Operation;
  */
 interface WriteStageInterface
 {
-    /**
-     * @param object|null $data
-     *
-     * @return object|null
-     */
-    public function __invoke($data, string $resourceClass, Operation $operation, array $context);
+    public function __invoke(?object $data, string $resourceClass, Operation $operation, array $context): ?object;
 }

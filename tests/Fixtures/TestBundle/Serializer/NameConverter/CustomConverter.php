@@ -21,12 +21,12 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  */
 class CustomConverter extends CamelCaseToSnakeCaseNameConverter
 {
-    public function normalize($propertyName): string
+    public function normalize(string $propertyName): string
     {
         return 'nameConverted' === $propertyName ? parent::normalize($propertyName) : $propertyName;
     }
 
-    public function denormalize($propertyName): string
+    public function denormalize(string $propertyName): string
     {
         return 'name_converted' === $propertyName ? parent::denormalize($propertyName) : $propertyName;
     }

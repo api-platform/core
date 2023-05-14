@@ -28,32 +28,23 @@ use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidator
  */
 class Validator implements ValidatorInterface
 {
-    private $validator;
-    private $container;
-
-    public function __construct(SymfonyValidatorInterface $validator, ContainerInterface $container = null)
+    public function __construct(private readonly SymfonyValidatorInterface $validator, private readonly ?ContainerInterface $container = null)
     {
-        $this->validator = $validator;
-        $this->container = $container;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validate($data, array $context = [])
+    public function validate(object $data, array $context = []): void
     {
         if (null !== $validationGroups = $context['groups'] ?? null) {
             if (
-                $this->container &&
-                \is_string($validationGroups) &&
-                $this->container->has($validationGroups) &&
-                ($service = $this->container->get($validationGroups)) &&
-                \is_callable($service)
+                $this->container
+                && \is_string($validationGroups)
+                && $this->container->has($validationGroups)
+                && ($service = $this->container->get($validationGroups))
+                && \is_callable($service)
             ) {
-                if (!$service instanceof ValidationGroupsGeneratorInterface) {
-                    @trigger_error(sprintf('Using a public validation groups generator service not implementing "%s" is deprecated since 2.6 and will be removed in 3.0.', ValidationGroupsGeneratorInterface::class), \E_USER_DEPRECATED);
-                }
-
                 $validationGroups = $service($data);
             } elseif (\is_callable($validationGroups)) {
                 $validationGroups = $validationGroups($data);
@@ -70,5 +61,3 @@ class Validator implements ValidatorInterface
         }
     }
 }
-
-class_alias(Validator::class, \ApiPlatform\Core\Bridge\Symfony\Validator\Validator::class);

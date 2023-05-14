@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Serializer\Exception;
+namespace ApiPlatform\Tests\GraphQl\Serializer\Exception;
 
 use ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer;
 use GraphQL\Error\Error;
@@ -22,15 +22,13 @@ use PHPUnit\Framework\TestCase;
  */
 class ErrorNormalizerTest extends TestCase
 {
-    private $errorNormalizer;
+    private ErrorNormalizer $errorNormalizer;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->errorNormalizer = new ErrorNormalizer();
     }
 
@@ -41,7 +39,10 @@ class ErrorNormalizerTest extends TestCase
 
         $normalizedError = $this->errorNormalizer->normalize($error);
         $this->assertSame($errorMessage, $normalizedError['message']);
-        $this->assertSame(Error::CATEGORY_GRAPHQL, $normalizedError['extensions']['category']);
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_GRAPHQL')) {
+            $this->assertSame(Error::CATEGORY_GRAPHQL, $normalizedError['extensions']['category']);
+        }
     }
 
     public function testSupportsNormalization(): void

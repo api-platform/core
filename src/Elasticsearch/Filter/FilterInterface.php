@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\Filter;
 
 use ApiPlatform\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Metadata\Operation;
 
 /**
  * Elasticsearch filter interface.
@@ -24,5 +25,5 @@ use ApiPlatform\Api\FilterInterface as BaseFilterInterface;
  */
 interface FilterInterface extends BaseFilterInterface
 {
-    public function apply(array $clauseBody, string $resourceClass, ?string $operationName = null, array $context = []): array;
+    public function apply(array $clauseBody, string $resourceClass, ?Operation $operation = null, array $context = []): array;
 }

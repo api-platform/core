@@ -14,19 +14,17 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\GraphQl;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\State\OptionsInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class QueryCollection extends Query implements CollectionOperationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         ?string $resolver = null,
         ?array $args = null,
+        ?array $extraArgs = null,
         ?array $links = null,
 
-        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -39,11 +37,11 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        ?bool $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
+        ?bool $collectDenormalizationErrors = null,
         ?string $security = null,
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
@@ -70,9 +68,61 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         ?string $name = null,
         $provider = null,
         $processor = null,
-        array $extraProperties = []
+        protected ?OptionsInterface $stateOptions = null,
+        array $extraProperties = [],
+
+        ?bool $nested = null,
     ) {
-        parent::__construct(...\func_get_args());
-        $this->name = $name ?: 'collection_query';
+        parent::__construct(
+            resolver: $resolver,
+            args: $args,
+            extraArgs: $extraArgs,
+            links: $links,
+            shortName: $shortName,
+            class: $class,
+            paginationEnabled: $paginationEnabled,
+            paginationType: $paginationType,
+            paginationItemsPerPage: $paginationItemsPerPage,
+            paginationMaximumItemsPerPage: $paginationMaximumItemsPerPage,
+            paginationPartial: $paginationPartial,
+            paginationClientEnabled: $paginationClientEnabled,
+            paginationClientItemsPerPage: $paginationClientItemsPerPage,
+            paginationClientPartial: $paginationClientPartial,
+            paginationFetchJoinCollection: $paginationFetchJoinCollection,
+            paginationUseOutputWalkers: $paginationUseOutputWalkers,
+            order: $order,
+            description: $description,
+            normalizationContext: $normalizationContext,
+            denormalizationContext: $denormalizationContext,
+            collectDenormalizationErrors: $collectDenormalizationErrors,
+            security: $security,
+            securityMessage: $securityMessage,
+            securityPostDenormalize: $securityPostDenormalize,
+            securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
+            securityPostValidation: $securityPostValidation,
+            securityPostValidationMessage: $securityPostValidationMessage,
+            deprecationReason: $deprecationReason,
+            filters: $filters,
+            validationContext: $validationContext,
+            input: $input,
+            output: $output,
+            mercure: $mercure,
+            messenger: $messenger,
+            elasticsearch: $elasticsearch,
+            urlGenerationStrategy: $urlGenerationStrategy,
+            read: $read,
+            deserialize: $deserialize,
+            validate: $validate,
+            write: $write,
+            serialize: $serialize,
+            fetchPartial: $fetchPartial,
+            forceEager: $forceEager,
+            priority: $priority,
+            name: $name ?: 'collection_query',
+            provider: $provider,
+            processor: $processor,
+            extraProperties: $extraProperties,
+            nested: $nested,
+        );
     }
 }

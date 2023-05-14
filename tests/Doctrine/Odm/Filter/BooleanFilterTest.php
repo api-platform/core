@@ -20,7 +20,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 
 /**
  * @group mongodb
- * @group legacy
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -28,8 +27,8 @@ class BooleanFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use BooleanFilterTestTrait;
 
-    protected $filterClass = BooleanFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = BooleanFilter::class;
+    protected string $resourceClass = Dummy::class;
 
     public function provideApplyTestData(): array
     {

@@ -13,19 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ApiResource
- */
+#[ApiResource]
+#[ORM\Entity]
 class ExternalUser extends AbstractUser
 {
-    /**
-     * @ORM\Column
-     */
-    private $externalId;
+    #[ORM\Column]
+    private ?string $externalId = null;
 
     public function getExternalId(): ?string
     {

@@ -21,14 +21,11 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class RelatedQuestionsProvider implements ProviderInterface
 {
-    private $registry;
-
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(private readonly ManagerRegistry $registry)
     {
-        $this->registry = $registry;
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
     {
         $manager = $this->registry->getManagerForClass($operation->getClass());
         $repository = $manager->getRepository($operation->getClass());

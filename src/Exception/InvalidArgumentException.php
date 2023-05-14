@@ -21,5 +21,3 @@ namespace ApiPlatform\Exception;
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }
-
-class_alias(InvalidArgumentException::class, \ApiPlatform\Core\Exception\InvalidArgumentException::class);

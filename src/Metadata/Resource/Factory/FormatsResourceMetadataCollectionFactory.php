@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -30,19 +29,11 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  *       * operation input/output formats
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @experimental
  */
 final class FormatsResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $decorated;
-    private $formats;
-    private $patchFormats;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated, array $formats, array $patchFormats)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly array $formats, private readonly array $patchFormats)
     {
-        $this->decorated = $decorated;
-        $this->formats = $formats;
-        $this->patchFormats = $patchFormats;
     }
 
     /**
@@ -77,7 +68,7 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
                 $operation = $operation->withFormats($this->normalizeFormats($operation->getFormats()));
             }
 
-            if (($isPatch = HttpOperation::METHOD_PATCH === $operation->getMethod()) && !$operation->getFormats() && !$operation->getInputFormats()) {
+            if (($isPatch = 'PATCH' === $operation->getMethod()) && !$operation->getFormats() && !$operation->getInputFormats()) {
                 $operation = $operation->withInputFormats($this->patchFormats);
             }
 
@@ -116,11 +107,9 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
     }
 
     /**
-     * @param array|string $currentFormats
-     *
      * @throws InvalidArgumentException
      */
-    private function normalizeFormats($currentFormats): array
+    private function normalizeFormats(array|string $currentFormats): array
     {
         $currentFormats = (array) $currentFormats;
 

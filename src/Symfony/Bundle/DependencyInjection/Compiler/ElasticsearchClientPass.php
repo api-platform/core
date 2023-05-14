@@ -28,7 +28,7 @@ final class ElasticsearchClientPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->getParameter('api_platform.elasticsearch.enabled')) {
             return;
@@ -48,12 +48,12 @@ final class ElasticsearchClientPass implements CompilerPassInterface
         $clientDefinition = $container->getDefinition('api_platform.elasticsearch.client');
 
         if (!$clientConfiguration) {
+            // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
             $clientDefinition->setFactory([ClientBuilder::class, 'build']);
         } else {
+            // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
             $clientDefinition->setFactory([ClientBuilder::class, 'fromConfig']);
             $clientDefinition->setArguments([$clientConfiguration]);
         }
     }
 }
-
-class_alias(ElasticsearchClientPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass::class);

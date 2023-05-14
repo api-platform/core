@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common\Filter;
 
+use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -30,12 +30,9 @@ trait SearchFilterTrait
 {
     use PropertyHelperTrait;
 
-    /**
-     * @var LegacyIriConverterInterface|IriConverterInterface
-     */
-    protected $iriConverter;
-    protected $propertyAccessor;
-    protected $identifiersExtractor;
+    protected IriConverterInterface $iriConverter;
+    protected PropertyAccessorInterface $propertyAccessor;
+    protected ?IdentifiersExtractorInterface $identifiersExtractor = null;
 
     /**
      * {@inheritdoc}
@@ -79,7 +76,7 @@ trait SearchFilterTrait
                         'type' => $typeOfField,
                         'required' => false,
                         'strategy' => $strategy,
-                        'is_collection' => '[]' === substr((string) $filterParameterName, -2),
+                        'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
                     ];
                 }
             } elseif ($metadata->hasAssociation($field)) {
@@ -94,7 +91,7 @@ trait SearchFilterTrait
                         'type' => 'string',
                         'required' => false,
                         'strategy' => self::STRATEGY_EXACT,
-                        'is_collection' => '[]' === substr((string) $filterParameterName, -2),
+                        'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
                     ];
                 }
             }
@@ -112,26 +109,23 @@ trait SearchFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    /**
-     * @return IriConverterInterface|LegacyIriConverterInterface
-     */
-    abstract protected function getIriConverter();
+    abstract protected function getIriConverter(): IriConverterInterface;
 
     abstract protected function getPropertyAccessor(): PropertyAccessorInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName(string $property): string;
 
     /**
      * Gets the ID from an IRI or a raw ID.
      */
-    protected function getIdFromValue(string $value)
+    protected function getIdFromValue(string $value): mixed
     {
         try {
             $iriConverter = $this->getIriConverter();
-            $item = $iriConverter instanceof LegacyIriConverterInterface ? $iriConverter->getItemFromIri($value, ['fetch_data' => false]) : $iriConverter->getResourceFromIri($value, ['fetch_data' => false]); // @phpstan-ignore-line bc-compatibility inside a trait
+            $item = $iriConverter->getResourceFromIri($value, ['fetch_data' => false]);
 
             return $this->getPropertyAccessor()->getValue($item, 'id');
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             // Do nothing, return the raw value
         }
 
@@ -162,12 +156,10 @@ trait SearchFilterTrait
 
     /**
      * When the field should be an integer, check that the given value is a valid one.
-     *
-     * @param mixed|null $type
      */
-    protected function hasValidValues(array $values, $type = null): bool
+    protected function hasValidValues(array $values, ?string $type = null): bool
     {
-        foreach ($values as $key => $value) {
+        foreach ($values as $value) {
             if (null !== $value && \in_array($type, (array) self::DOCTRINE_INTEGER_TYPE, true) && false === filter_var($value, \FILTER_VALIDATE_INT)) {
                 return false;
             }
@@ -176,5 +168,3 @@ trait SearchFilterTrait
         return true;
     }
 }
-
-class_alias(SearchFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class);

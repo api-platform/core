@@ -16,19 +16,18 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
 /**
  * Filters the collection by date intervals.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class DateFilter extends AbstractFilter implements DateFilterInterface
+final class DateFilter extends AbstractFilter implements DateFilterInterface
 {
     use DateFilterTrait;
 
@@ -40,14 +39,14 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (
-            !\is_array($values) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isDateField($property, $resourceClass)
+            !\is_array($values)
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
+            || !$this->isDateField($property, $resourceClass)
         ) {
             return;
         }
@@ -107,8 +106,6 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
 
     /**
      * Adds the match stage according to the chosen null management.
-     *
-     * @param mixed $value
      */
     private function addMatch(Builder $aggregationBuilder, string $field, string $operator, $value, string $nullManagement = null): void
     {
@@ -120,7 +117,7 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
 
         try {
             $value = new \DateTime($value);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Silently ignore this filter if it can not be transformed to a \DateTime
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
@@ -136,9 +133,9 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
             self::PARAMETER_STRICTLY_AFTER => '$gt',
         ];
 
-        if ((self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true)) ||
-            (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true)) ||
-            (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
+        if ((self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
+            || (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true))
+            || (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
         ) {
             $aggregationBuilder->match()->addOr(
                 $aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value),
@@ -151,5 +148,3 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
         $aggregationBuilder->match()->addAnd($aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value));
     }
 }
-
-class_alias(DateFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter::class);

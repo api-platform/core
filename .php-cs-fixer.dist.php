@@ -16,6 +16,7 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude([
         'src/Core/Bridge/Symfony/Maker/Resources/skeleton',
         'tests/Fixtures/app/var',
+        'tests/Fixtures/Symfony/Maker',
     ])
     ->notPath('src/Symfony/Bundle/DependencyInjection/Configuration.php')
     ->notPath('src/Annotation/ApiFilter.php') // temporary
@@ -23,6 +24,9 @@ $finder = PhpCsFixer\Finder::create()
     ->notPath('src/Annotation/ApiResource.php') // temporary
     ->notPath('src/Annotation/ApiSubresource.php') // temporary
     ->notPath('tests/Fixtures/TestBundle/Entity/DummyPhp8.php') // temporary
+    ->notPath('tests/Fixtures/TestBundle/Enum/EnumWithDescriptions.php') // PHPDoc on enum cases
+    ->notPath('tests/Fixtures/TestBundle/Enum/GamePlayMode.php') // PHPDoc on enum cases
+    ->notPath('tests/Fixtures/TestBundle/Enum/GenderTypeEnum.php') // PHPDoc on enum cases
     ->append([
         'tests/Fixtures/app/console',
     ]);
@@ -74,10 +78,9 @@ return (new PhpCsFixer\Config())
             ],
         ],
         'no_superfluous_elseif' => true,
-        // To re-enable in API Platform 3: https://github.com/symfony/symfony/issues/43021
-        //'no_superfluous_phpdoc_tags' => [
-        //    'allow_mixed' => false,
-        //],
+        'no_superfluous_phpdoc_tags' => [
+            'allow_mixed' => false,
+        ],
         'no_unset_cast' => true,
         'no_unset_on_property' => true,
         'no_useless_else' => true,
@@ -113,6 +116,5 @@ return (new PhpCsFixer\Config())
                 'property',
             ],
         ],
-        'void_return' => false, // BC breaks; to be done in API Platform 3.0
     ])
     ->setFinder($finder);

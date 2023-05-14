@@ -15,12 +15,8 @@ namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -34,44 +30,18 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     public const FORMAT = 'jsonapi';
 
-    private $decorated;
-    /**
-     * @var IriConverterInterface|LegacyIriConverterInterface
-     */
-    private $iriConverter;
-    private $resourceClassResolver;
-    /**
-     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
-     */
-    private $resourceMetadataFactory;
-
-    public function __construct(NormalizerInterface $decorated, $iriConverter, ResourceClassResolverInterface $resourceClassResolver, $resourceMetadataFactory)
+    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
     {
-        $this->decorated = $decorated;
-        $this->iriConverter = $iriConverter;
-        $this->resourceClassResolver = $resourceClassResolver;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if ($iriConverter instanceof LegacyIriConverterInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
-        }
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $this->decorated->supportsNormalization($data, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->decorated instanceof CacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod();
@@ -79,10 +49,8 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];
@@ -97,12 +65,12 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         if (isset($originalResource)) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($originalResource);
             $resourceData = [
-                'id' => $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($originalResource) : $this->iriConverter->getIriFromResource($originalResource),
-                'type' => $this->getResourceShortName($resourceClass),
+                'id' => $this->iriConverter->getIriFromResource($originalResource),
+                'type' => $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getShortName(),
             ];
         } else {
             $resourceData = [
-                'id' => \function_exists('spl_object_id') ? spl_object_id($object) : spl_object_hash($object),
+                'id' => $this->iriConverter->getIriFromResource($object),
                 'type' => (new \ReflectionClass($this->getObjectClass($object)))->getShortName(),
             ];
         }
@@ -113,19 +81,4 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
         return ['data' => $resourceData];
     }
-
-    // TODO: 3.0 remove
-    private function getResourceShortName(string $resourceClass): string
-    {
-        /** @var ResourceMetadata|ResourceMetadataCollection */
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        if ($resourceMetadata instanceof ResourceMetadata) {
-            return $resourceMetadata->getShortName();
-        }
-
-        return $resourceMetadata->getOperation()->getShortName();
-    }
 }
-
-class_alias(ObjectNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\ObjectNormalizer::class);

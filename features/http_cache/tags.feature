@@ -121,7 +121,7 @@ Feature: Cache invalidation through HTTP Cache tags
     Then the response status code should be 200
     And the header "Cache-Tags" should be equal to "/relation3s/1,/relation2s/1,/relation2s/2,/relation3s"
 
-  Scenario: Update a collection member only
+  Scenario: Update a collection member only (legacy non-standard PUT)
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation3s/1" with body:
     """

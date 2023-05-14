@@ -47,7 +47,7 @@ Feature: Operation support
     """
     {
       "@context": "/contexts/EmbeddedDummy",
-      "@id": "/embedded_dummies/1",
+      "@id": "/embedded_dummies_groups/1",
       "@type": "EmbeddedDummy",
       "name": "Dummy #1",
       "embeddedDummy": {
@@ -76,10 +76,22 @@ Feature: Operation support
     """
     {
         "@context": "/contexts/Book",
-        "@id": "/books/1",
+        "@id": "/books/by_isbn/9780451524935",
         "@type": "Book",
         "name": "1984",
         "isbn": "9780451524935",
         "id": 1
+    }
+    """
+
+  Scenario: Call a non API Platform route
+    When I send a "GET" request to "/common/custom/object"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+        "id": 1,
+        "text": "Lorem ipsum dolor sit amet"
     }
     """

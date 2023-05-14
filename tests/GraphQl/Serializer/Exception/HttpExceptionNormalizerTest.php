@@ -25,15 +25,13 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  */
 class HttpExceptionNormalizerTest extends TestCase
 {
-    private $httpExceptionNormalizer;
+    private HttpExceptionNormalizer $httpExceptionNormalizer;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->httpExceptionNormalizer = new HttpExceptionNormalizer();
     }
 
@@ -47,7 +45,10 @@ class HttpExceptionNormalizerTest extends TestCase
         $normalizedError = $this->httpExceptionNormalizer->normalize($error);
         $this->assertSame($expectedExceptionMessage, $normalizedError['message']);
         $this->assertSame($expectedStatus, $normalizedError['extensions']['status']);
-        $this->assertSame($expectedCategory, $normalizedError['extensions']['category']);
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_INTERNAL')) {
+            $this->assertSame($expectedCategory, $normalizedError['extensions']['category']);
+        }
     }
 
     public function exceptionProvider(): array
@@ -56,7 +57,7 @@ class HttpExceptionNormalizerTest extends TestCase
 
         return [
             'client error' => [new BadRequestHttpException($exceptionMessage), $exceptionMessage, 400, 'user'],
-            'server error' => [new ServiceUnavailableHttpException(null, $exceptionMessage), $exceptionMessage, 503, Error::CATEGORY_INTERNAL],
+            'server error' => [new ServiceUnavailableHttpException(null, $exceptionMessage), $exceptionMessage, 503, 'internal'],
         ];
     }
 

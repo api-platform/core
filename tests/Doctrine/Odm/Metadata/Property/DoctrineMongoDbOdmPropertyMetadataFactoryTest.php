@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\Metadata\Property;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -22,6 +21,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @group mongodb
@@ -32,7 +32,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreateNoManager()
+    public function testCreateNoManager(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -43,10 +43,10 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
         $doctrineMongoDbOdmPropertyMetadataFactory = new DoctrineMongoDbOdmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
 
-        $this->assertEquals($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
+        $this->assertSame($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
-    public function testCreateIsIdentifier()
+    public function testCreateIsIdentifier(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withIdentifier(true);
@@ -64,10 +64,10 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
         $doctrineMongoDbOdmPropertyMetadataFactory = new DoctrineMongoDbOdmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
 
-        $this->assertEquals($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
+        $this->assertSame($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
-    public function testCreateIsWritable()
+    public function testCreateIsWritable(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withWritable(false);
@@ -88,11 +88,11 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), false);
     }
 
-    public function testCreateClassMetadata()
+    public function testCreateClassMetadata(): void
     {
         $propertyMetadata = new ApiProperty();
 
@@ -112,7 +112,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
         $doctrinePropertyMetadata = $doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id');
 
-        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
-        $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+        $this->assertSame($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertSame($doctrinePropertyMetadata->isWritable(), false);
     }
 }

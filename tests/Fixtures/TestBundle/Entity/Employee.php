@@ -18,10 +18,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
 #[Post]
 #[ApiResource(
@@ -36,31 +34,31 @@ use Doctrine\ORM\Mapping as ORM;
     uriTemplate: '/companies/{companyId}/employees',
     uriVariables: [
         'companyId' => ['from_class' => Company::class, 'to_property' => 'company'],
-    ]
+    ],
+    normalizationContext: ['groups' => ['company_employees_read']]
 )]
 #[GetCollection]
+#[ORM\Entity]
 class Employee
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     public $id;
 
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
+    #[Groups(['company_employees_read'])]
     public string $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
-     */
-    public ?Company $company;
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[Groups(['company_employees_read'])]
+    public ?Company $company = null;
 
     public function getId()
     {

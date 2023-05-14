@@ -13,55 +13,56 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * FooDummy.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @ApiResource(
- *     attributes={
- *         "order"={"dummy.name"}
- *     },
- *     graphql={
- *         "collection_query"={"pagination_type"="page"}
- *     }
- * )
- * @ORM\Entity
  */
+#[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page')], order: ['dummy.name'])]
+#[ORM\Entity]
 class FooDummy
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string The foo name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $name;
-
     /**
      * @var Dummy|null The foo dummy
-     *
-     * @ORM\ManyToOne(targetEntity="Dummy", cascade={"persist"})
      */
-    private $dummy;
+    #[ORM\ManyToOne(targetEntity: Dummy::class, cascade: ['persist'])]
+    private ?Dummy $dummy = null;
 
-    public function getId()
+    /**
+     * @var Collection<SoMany>
+     */
+    #[ORM\OneToMany(targetEntity: SoMany::class, mappedBy: 'fooDummy', cascade: ['persist'])]
+    public Collection $soManies;
+
+    public function __construct()
+    {
+        $this->soManies = new ArrayCollection();
+    }
+
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -71,12 +72,12 @@ class FooDummy
         return $this->name;
     }
 
-    public function getDummy()
+    public function getDummy(): ?Dummy
     {
         return $this->dummy;
     }
 
-    public function setDummy(Dummy $dummy)
+    public function setDummy(Dummy $dummy): void
     {
         $this->dummy = $dummy;
     }

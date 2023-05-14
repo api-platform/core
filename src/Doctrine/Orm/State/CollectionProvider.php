@@ -21,7 +21,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -34,28 +33,25 @@ final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerTrait;
 
-    private $resourceMetadataCollectionFactory;
-    private $managerRegistry;
-    private $collectionExtensions;
-
     /**
      * @param QueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, iterable $collectionExtensions = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $collectionExtensions = [])
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->managerRegistry = $managerRegistry;
-        $this->collectionExtensions = $collectionExtensions;
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
     {
-        $resourceClass = $operation->getClass();
-        /** @var EntityManagerInterface $manager */
-        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
+        $entityClass = $operation->getClass();
+        if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+            $entityClass = $options->getEntityClass();
+        }
 
-        /** @var EntityRepository */
-        $repository = $manager->getRepository($resourceClass);
+        /** @var EntityManagerInterface $manager */
+        $manager = $this->managerRegistry->getManagerForClass($entityClass);
+
+        $repository = $manager->getRepository($entityClass);
         if (!method_exists($repository, 'createQueryBuilder')) {
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
         }
@@ -63,13 +59,13 @@ final class CollectionProvider implements ProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
-        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operation);
+        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $entityClass, $operation);
 
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operation->getName(), $context);
+            $extension->applyToCollection($queryBuilder, $queryNameGenerator, $entityClass, $operation, $context);
 
-            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-                return $extension->getResult($queryBuilder, $resourceClass, $operation->getName(), $context);
+            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($entityClass, $operation, $context)) {
+                return $extension->getResult($queryBuilder, $entityClass, $operation, $context);
             }
         }
 

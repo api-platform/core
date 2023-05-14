@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
@@ -30,6 +29,8 @@ use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -39,8 +40,8 @@ class SerializeStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $normalizerProphecy;
-    private $serializerContextBuilderProphecy;
+    private ObjectProphecy $normalizerProphecy;
+    private ObjectProphecy $serializerContextBuilderProphecy;
 
     /**
      * {@inheritdoc}
@@ -54,14 +55,13 @@ class SerializeStageTest extends TestCase
     /**
      * @dataProvider applyDisabledProvider
      */
-    public function testApplyDisabled(array $context, bool $paginationEnabled, ?array $expectedResult): void
+    public function testApplyDisabled(Operation $operation, bool $paginationEnabled, ?array $expectedResult): void
     {
-        $operationName = 'item_query';
         $resourceClass = 'myResource';
         /** @var Operation $operation */
-        $operation = (new Query())->withSerialize(false);
+        $operation = $operation->withSerialize(false);
 
-        $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operation, $context);
+        $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operation, []);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -69,20 +69,18 @@ class SerializeStageTest extends TestCase
     public function applyDisabledProvider(): array
     {
         return [
-            'item' => [['is_collection' => false, 'is_mutation' => false, 'is_subscription' => false], false, null],
-            'collection with pagination' => [['is_collection' => true, 'is_mutation' => false, 'is_subscription' => false], true, ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]]],
-            'collection without pagination' => [['is_collection' => true, 'is_mutation' => false, 'is_subscription' => false], false, []],
-            'mutation' => [['is_collection' => false, 'is_mutation' => true, 'is_subscription' => false], false, ['clientMutationId' => null]],
-            'subscription' => [['is_collection' => false, 'is_mutation' => false, 'is_subscription' => true], false, ['clientSubscriptionId' => null]],
+            'item' => [new Query(), false, null],
+            'collection with pagination' => [new QueryCollection(), true, ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]]],
+            'collection without pagination' => [new QueryCollection(), false, []],
+            'mutation' => [new Mutation(), false, ['clientMutationId' => null]],
+            'subscription' => [new Subscription(), false, ['clientSubscriptionId' => null]],
         ];
     }
 
     /**
      * @dataProvider applyProvider
-     *
-     * @param object|iterable|null $itemOrCollection
      */
-    public function testApply($itemOrCollection, string $operationName, array $context, bool $paginationEnabled, ?array $expectedResult): void
+    public function testApply(object|array $itemOrCollection, string $operationName, array $context, bool $paginationEnabled, ?array $expectedResult): void
     {
         $resourceClass = 'myResource';
         $operation = $context['is_mutation'] ? new Mutation() : new Query();
@@ -98,9 +96,9 @@ class SerializeStageTest extends TestCase
         $operation = $operation->withShortName('shortName')->withName($operationName)->withClass($resourceClass);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
+        $this->normalizerProphecy->normalize(Argument::type(\stdClass::class), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
         $result = ($this->createSerializeStage($paginationEnabled))($itemOrCollection, $resourceClass, $operation, $context);
 
@@ -142,9 +140,9 @@ class SerializeStageTest extends TestCase
         $operation = (new QueryCollection())->withShortName('shortName')->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
+        $this->normalizerProphecy->normalize(Argument::type(\stdClass::class), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
         if ($expectedExceptionClass) {
             $this->expectException($expectedExceptionClass);
@@ -187,9 +185,9 @@ class SerializeStageTest extends TestCase
         $operation = (new Query())->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(new \stdClass());
+        $this->normalizerProphecy->normalize(Argument::type(\stdClass::class), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(new \stdClass());
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected serialized data to be a nullable array.');
@@ -201,7 +199,7 @@ class SerializeStageTest extends TestCase
     {
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadataCollection(''));
-        $pagination = new Pagination($resourceMetadataCollectionFactoryProphecy->reveal(), [], ['enabled' => $paginationEnabled]);
+        $pagination = new Pagination([], ['enabled' => $paginationEnabled]);
 
         return new SerializeStage(
             $this->normalizerProphecy->reveal(),

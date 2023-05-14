@@ -13,25 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonLd\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class ObjectNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -50,7 +49,7 @@ class ObjectNormalizerTest extends TestCase
         ]);
 
         $normalizer = new ObjectNormalizer(
-            $serializerProphecy->reveal(), // @phpstan-ignore-line
+            $serializerProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );
@@ -64,7 +63,7 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }
 
-    public function testNormalizeEmptyArray()
+    public function testNormalizeEmptyArray(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -79,7 +78,7 @@ class ObjectNormalizerTest extends TestCase
         $contextBuilderProphecy->getAnonymousResourceContext($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $normalizer = new ObjectNormalizer(
-            $serializerProphecy->reveal(),  // @phpstan-ignore-line
+            $serializerProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );
@@ -87,23 +86,23 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals([], $normalizer->normalize($dummy));
     }
 
-    public function testNormalizeWithOutput()
+    public function testNormalizeWithOutput(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1234');
+        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummy/1234');
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $serializerProphecy->normalize($dummy, null, Argument::type('array'))->willReturn(['name' => 'hello']);
 
         $contextBuilderProphecy = $this->prophesize(AnonymousContextBuilderInterface::class);
-        $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['iri' => '/dummy/1234', 'api_resource' => $dummy])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy', '@context' => []]);
+        $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['api_resource' => $dummy, 'iri' => '/dummy/1234'])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy', '@context' => []]);
 
         $normalizer = new ObjectNormalizer(
-            $serializerProphecy->reveal(), // @phpstan-ignore-line
+            $serializerProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );
@@ -117,23 +116,23 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['api_resource' => $dummy]));
     }
 
-    public function testNormalizeWithContext()
+    public function testNormalizeWithContext(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1234');
+        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummy/1234');
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $serializerProphecy->normalize($dummy, null, Argument::type('array'))->willReturn(['name' => 'hello']);
 
         $contextBuilderProphecy = $this->prophesize(AnonymousContextBuilderInterface::class);
-        $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['iri' => '/dummy/1234', 'api_resource' => $dummy, 'has_context' => true])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy']);
+        $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['api_resource' => $dummy, 'has_context' => true, 'iri' => '/dummy/1234'])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy']);
 
         $normalizer = new ObjectNormalizer(
-            $serializerProphecy->reveal(), // @phpstan-ignore-line
+            $serializerProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );

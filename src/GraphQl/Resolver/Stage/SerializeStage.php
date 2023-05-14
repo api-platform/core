@@ -16,7 +16,10 @@ namespace ApiPlatform\GraphQl\Resolver\Stage;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -31,33 +34,22 @@ final class SerializeStage implements SerializeStageInterface
 {
     use IdentifierTrait;
 
-    private $normalizer;
-    private $serializerContextBuilder;
-    private $pagination;
-
-    public function __construct(NormalizerInterface $normalizer, SerializerContextBuilderInterface $serializerContextBuilder, Pagination $pagination)
+    public function __construct(private readonly NormalizerInterface $normalizer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private readonly Pagination $pagination)
     {
-        $this->normalizer = $normalizer;
-        $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->pagination = $pagination;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __invoke($itemOrCollection, string $resourceClass, Operation $operation, array $context): ?array
+    public function __invoke(object|array|null $itemOrCollection, string $resourceClass, Operation $operation, array $context): ?array
     {
-        // TODO: replace by $operation->isCollection and $operation instanceof CollectionOperationInterface
-        $isCollection = $context['is_collection'];
-        $isMutation = $context['is_mutation'];
-        $isSubscription = $context['is_subscription'];
+        $isCollection = $operation instanceof CollectionOperationInterface;
+        $isMutation = $operation instanceof Mutation;
+        $isSubscription = $operation instanceof Subscription;
         $shortName = $operation->getShortName();
         $operationName = $operation->getName();
 
         if (!($operation->canSerialize() ?? true)) {
             if ($isCollection) {
-                if ($this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
-                    return 'cursor' === $this->pagination->getGraphQlPaginationType($resourceClass, $operationName) ?
+                if ($this->pagination->isGraphQlEnabled($operation, $context)) {
+                    return 'cursor' === $this->pagination->getGraphQlPaginationType($operation) ?
                         $this->getDefaultCursorBasedPaginatedData() :
                         $this->getDefaultPageBasedPaginatedData();
                 }
@@ -76,7 +68,7 @@ final class SerializeStage implements SerializeStageInterface
             return null;
         }
 
-        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, true);
+        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation, $context, true);
 
         $data = null;
         if (!$isCollection) {
@@ -88,13 +80,13 @@ final class SerializeStage implements SerializeStageInterface
         }
 
         if ($isCollection && is_iterable($itemOrCollection)) {
-            if (!$this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
+            if (!$this->pagination->isGraphQlEnabled($operation, $context)) {
                 $data = [];
                 foreach ($itemOrCollection as $index => $object) {
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);
                 }
             } else {
-                $data = 'cursor' === $this->pagination->getGraphQlPaginationType($resourceClass, $operationName) ?
+                $data = 'cursor' === $this->pagination->getGraphQlPaginationType($operation) ?
                     $this->serializeCursorBasedPaginatedCollection($itemOrCollection, $normalizationContext, $context) :
                     $this->serializePageBasedPaginatedCollection($itemOrCollection, $normalizationContext);
             }

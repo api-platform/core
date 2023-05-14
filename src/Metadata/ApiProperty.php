@@ -20,156 +20,60 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT)]
 final class ApiProperty
 {
     /**
-     * @var string
-     */
-    private $description;
-
-    /**
-     * @var bool
-     */
-    private $readable;
-
-    /**
-     * @var bool
-     */
-    private $writable;
-
-    /**
-     * @var bool
-     */
-    private $readableLink;
-
-    /**
-     * @var bool
-     */
-    private $writableLink;
-
-    /**
-     * @var bool
-     */
-    private $required;
-
-    /**
-     * @var bool
-     */
-    private $identifier;
-
-    /**
-     * @var string|int|float|bool|array|null
-     */
-    private $default;
-
-    /**
-     * @var string|int|float|bool|array|null
-     */
-    private $example;
-
-    private $deprecationReason;
-    private $fetchable;
-    private $fetchEager;
-    private $jsonldContext;
-    private $openapiContext;
-    private $push;
-    private $security;
-    private $securityPostDenormalize;
-
-    /**
-     * @var string[]
-     */
-    private $types;
-
-    /**
-     * The related php types.
-     *
-     * @var Type[]
-     */
-    private $builtinTypes;
-
-    private $schema;
-    private $initializable;
-    private $iri;
-
-    /**
-     * @var array
-     */
-    private $extraProperties;
-
-    /**
-     * @param bool|null        $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null        $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null        $required                https://api-platform.com/docs/admin/validation/#client-side-validation
-     * @param bool|null        $identifier              https://api-platform.com/docs/core/identifiers/
-     * @param string|null      $default
-     * @param string|null      $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param string|null      $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param bool|null        $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
-     * @param array|null       $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
-     * @param array|null       $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param bool|null        $push                    https://api-platform.com/docs/core/push-relations/
-     * @param string|null      $security                https://api-platform.com/docs/core/security
-     * @param string|null      $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param array|null       $types                   the RDF types of this property
-     * @param bool|string|null $iri                     the IRI representing the property, can be `false` to remove the generated "@id"
+     * @param bool|null   $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null   $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null   $required                https://api-platform.com/docs/admin/validation/#client-side-validation
+     * @param bool|null   $identifier              https://api-platform.com/docs/core/identifiers/
+     * @param string|null $default
+     * @param mixed       $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param string|null $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param bool|null   $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
+     * @param array|null  $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
+     * @param array|null  $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param bool|null   $push                    https://api-platform.com/docs/core/push-relations/
+     * @param string|null $security                https://api-platform.com/docs/core/security
+     * @param string|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param string[]    $types                   the RDF types of this property
+     * @param string[]    $iris
+     * @param Type[]      $builtinTypes
      */
     public function __construct(
-        ?string $description = null,
-        ?bool $readable = null,
-        ?bool $writable = null,
-        ?bool $readableLink = null,
-        ?bool $writableLink = null,
-        ?bool $required = null,
-        ?bool $identifier = null,
-
-                $default = null,
-                $example = null,
-
-        ?string $deprecationReason = null,
-        ?bool $fetchable = null,
-        ?bool $fetchEager = null,
-        ?array $jsonldContext = null,
-        ?array $openapiContext = null,
-        ?bool $push = null,
-        ?string $security = null,
-        ?string $securityPostDenormalize = null,
-
-        ?array $types = null,
-        ?array $builtinTypes = null,
-        ?array $schema = null,
-        ?bool $initializable = null,
-
-        $iri = null,
-
-        // attributes
-        array $extraProperties = []
+        private ?string $description = null,
+        private ?bool $readable = null,
+        private ?bool $writable = null,
+        private ?bool $readableLink = null,
+        private ?bool $writableLink = null,
+        private ?bool $required = null,
+        private ?bool $identifier = null,
+        private $default = null,
+        private mixed $example = null,
+        private ?string $deprecationReason = null,
+        private ?bool $fetchable = null,
+        private ?bool $fetchEager = null,
+        private ?array $jsonldContext = null,
+        private ?array $openapiContext = null,
+        private ?array $jsonSchemaContext = null,
+        private ?bool $push = null,
+        private ?string $security = null,
+        private ?string $securityPostDenormalize = null,
+        private array|string|null $types = null,
+        /**
+         * The related php types.
+         */
+        private ?array $builtinTypes = null,
+        private ?array $schema = null,
+        private ?bool $initializable = null,
+        private $iris = null,
+        private ?bool $genId = null,
+        private array $extraProperties = []
     ) {
-        $this->description = $description;
-        $this->readable = $readable;
-        $this->writable = $writable;
-        $this->readableLink = $readableLink;
-        $this->writableLink = $writableLink;
-        $this->required = $required;
-        $this->identifier = $identifier;
-        $this->default = $default;
-        $this->example = $example;
-        $this->deprecationReason = $deprecationReason;
-        $this->fetchable = $fetchable;
-        $this->fetchEager = $fetchEager;
-        $this->jsonldContext = $jsonldContext;
-        $this->openapiContext = $openapiContext;
-        $this->push = $push;
-        $this->security = $security;
-        $this->openapiContext = $openapiContext;
-        $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->types = $types;
-        $this->builtinTypes = $builtinTypes;
-        $this->schema = $schema;
-        $this->initializable = $initializable;
-        $this->iri = $iri;
-        $this->extraProperties = $extraProperties;
+        if (\is_string($types)) {
+            $this->types = (array) $types;
+        }
     }
 
     public function getDescription(): ?string
@@ -276,12 +180,12 @@ final class ApiProperty
         return $self;
     }
 
-    public function getExample()
+    public function getExample(): mixed
     {
         return $this->example;
     }
 
-    public function withExample($example): self
+    public function withExample(mixed $example): self
     {
         $self = clone $this;
         $self->example = $example;
@@ -354,6 +258,19 @@ final class ApiProperty
         return $self;
     }
 
+    public function getJsonSchemaContext(): ?array
+    {
+        return $this->jsonSchemaContext;
+    }
+
+    public function withJsonSchemaContext($jsonSchemaContext): self
+    {
+        $self = clone $this;
+        $self->jsonSchemaContext = $jsonSchemaContext;
+
+        return $self;
+    }
+
     public function getPush(): ?bool
     {
         return $this->push;
@@ -401,7 +318,7 @@ final class ApiProperty
     /**
      * @param string[]|string $types
      */
-    public function withTypes($types = []): self
+    public function withTypes(array|string $types = []): self
     {
         $self = clone $this;
         $self->types = (array) $types;
@@ -470,20 +387,36 @@ final class ApiProperty
     /**
      * Gets IRI of this property.
      */
-    public function getIri()
+    public function getIris()
     {
-        return $this->iri;
+        return $this->iris;
     }
 
     /**
      * Returns a new instance with the given IRI.
      *
-     * @param mixed $iri
+     * @param string|string[] $iris
      */
-    public function withIri($iri): self
+    public function withIris(string|array $iris): self
     {
         $metadata = clone $this;
-        $metadata->iri = $iri;
+        $metadata->iris = (array) $iris;
+
+        return $metadata;
+    }
+
+    /**
+     * Whether to generate a skolem iri on anonymous resources.
+     */
+    public function getGenId()
+    {
+        return $this->genId;
+    }
+
+    public function withGenId(bool $genId): self
+    {
+        $metadata = clone $this;
+        $metadata->genId = $genId;
 
         return $metadata;
     }

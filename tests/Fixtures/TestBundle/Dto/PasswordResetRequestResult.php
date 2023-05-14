@@ -17,14 +17,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 final class PasswordResetRequestResult
 {
-    /**
-     * @Groups({"user_password_reset_request"})
-     */
-    private $emailSentAt;
-
-    public function __construct(\DateTimeInterface $emailSentAt)
+    public function __construct(#[Groups(['user_password_reset_request'])] private readonly \DateTimeInterface $emailSentAt)
     {
-        $this->emailSentAt = $emailSentAt;
     }
 
     public function getEmailSentAt(): \DateTimeInterface

@@ -1,0 +1,80 @@
+<?php
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Behat;
+
+use Behat\Behat\Context\Context;
+use Behat\Behat\Context\Environment\InitializedContextEnvironment;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behatch\Context\RestContext;
+use Behatch\Json\Json;
+use JsonSchema\Validator;
+use PHPUnit\Framework\ExpectationFailedException;
+
+final class JsonHalContext implements Context
+{
+    private ?RestContext $restContext = null;
+    private readonly Validator $validator;
+    private readonly string $schemaFile;
+
+    public function __construct(string $schemaFile)
+    {
+        if (!is_file($schemaFile)) {
+            throw new \InvalidArgumentException('The JSON HAL schema doesn\'t exist.');
+        }
+
+        $this->validator = new Validator();
+        $this->schemaFile = $schemaFile;
+    }
+
+    /**
+     * Gives access to the Behatch context.
+     *
+     * @BeforeScenario
+     */
+    public function gatherContexts(BeforeScenarioScope $scope): void
+    {
+        /**
+         * @var InitializedContextEnvironment $environment
+         */
+        $environment = $scope->getEnvironment();
+        /**
+         * @var RestContext $restContext
+         */
+        $restContext = $environment->getContext(RestContext::class);
+        $this->restContext = $restContext;
+    }
+
+    /**
+     * @Then the JSON should be valid according to the JSON HAL schema
+     */
+    public function theJsonShouldBeValidAccordingToTheJsonHALSchema(): void
+    {
+        $json = $this->getJson()->getContent();
+        $this->validator->validate($json, (object) ['$ref' => "file://{$this->schemaFile}"]);
+
+        if (!$this->validator->isValid()) {
+            throw new ExpectationFailedException('The JSON is not valid according to the HAL+JSON schema.');
+        }
+    }
+
+    private function getJson(): Json
+    {
+        return new Json($this->getContent());
+    }
+
+    private function getContent(): string
+    {
+        return $this->restContext->getMink()->getSession()->getDriver()->getContent();
+    }
+}

@@ -84,7 +84,7 @@ Feature: HAL support
     }
     """
 
-  Scenario: Update a resource
+  Scenario: Update a resource (legacy PUT as standard_put: false)
     When I add "Accept" header equal to "application/hal+json"
     And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/dummies/1" with body:
@@ -126,6 +126,50 @@ Feature: HAL support
       "foo": null
     }
     """
+
+  Scenario: Update a resource
+    When I add "Accept" header equal to "application/hal+json"
+    When I add "Content-Type" header equal to "application/merge-patch+json"
+    And I send a "PATCH" request to "/dummies/1" with body:
+    """
+    {"name": "A nice dummy"}
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
+    And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "_links": {
+        "self": {
+          "href": "/dummies/1"
+        },
+        "relatedDummy": {
+          "href": "/related_dummies/1"
+        },
+        "relatedDummies": [
+          {
+            "href": "/related_dummies/1"
+          }
+        ]
+      },
+      "description": null,
+      "dummy": null,
+      "dummyBoolean": null,
+      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyFloat": null,
+      "dummyPrice": null,
+      "jsonData": [],
+      "arrayData": [],
+      "name_converted": null,
+      "id": 1,
+      "name": "A nice dummy",
+      "alias": null,
+      "foo": null
+    }
+    """
+
 
   Scenario: Embed a relation in a parent object
     When I add "Content-Type" header equal to "application/json"

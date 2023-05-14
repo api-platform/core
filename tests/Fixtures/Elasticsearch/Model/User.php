@@ -13,58 +13,37 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\Elasticsearch\Model;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Elasticsearch\Filter\TermFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *     normalizationContext={
- *         "groups"={"user:read"}
- *     }
- * )
- * @ApiFilter(TermFilter::class, properties={"id", "gender", "age", "firstName", "tweets.id", "tweets.date"})
- */
+#[ApiResource(normalizationContext: ['groups' => ['user:read']])]
+#[ApiFilter(TermFilter::class, properties: ['id', 'gender', 'age', 'firstName', 'tweets.id', 'tweets.date'])]
 class User
 {
-    /**
-     * @ApiProperty(identifier=true)
-     *
-     * @Groups({"user:read", "tweet:read"})
-     */
-    private $id;
+    #[ApiProperty(identifier: true)]
+    #[Groups(['tweet:read', 'user:read'])]
+    private ?string $id = null;
 
-    /**
-     * @Groups({"user:read", "tweet:read"})
-     */
-    private $gender;
+    #[Groups(['tweet:read', 'user:read'])]
+    private ?string $gender = null;
 
-    /**
-     * @Groups({"user:read", "tweet:read"})
-     */
-    private $age;
+    #[Groups(['tweet:read', 'user:read'])]
+    private ?int $age = null;
 
-    /**
-     * @Groups({"user:read", "tweet:read"})
-     */
-    private $firstName;
+    #[Groups(['tweet:read', 'user:read'])]
+    private ?string $firstName = null;
 
-    /**
-     * @Groups({"user:read", "tweet:read"})
-     */
-    private $lastName;
+    #[Groups(['tweet:read', 'user:read'])]
+    private ?string $lastName = null;
 
-    /**
-     * @Groups({"user:read"})
-     */
-    private $registeredAt;
+    #[Groups(['user:read'])]
+    private ?\DateTimeInterface $registeredAt = null;
 
-    /**
-     * @Groups({"user:read"})
-     */
-    private $tweets = [];
+    #[Groups(['user:read'])]
+    private array $tweets = [];
 
     public function getId(): ?string
     {
@@ -91,7 +70,7 @@ class User
         return $this->age;
     }
 
-    public function setAge(int $age)
+    public function setAge(int $age): void
     {
         $this->age = $age;
     }

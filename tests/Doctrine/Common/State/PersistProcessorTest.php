@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Common\State;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\ProcessorInterface;
@@ -23,6 +22,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prediction\CallPrediction;
 use Prophecy\Prediction\NoCallsPrediction;
 
@@ -30,12 +30,12 @@ class PersistProcessorTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(ProcessorInterface::class, new PersistProcessor($this->prophesize(ManagerRegistry::class)->reveal()));
     }
 
-    public function testPersist()
+    public function testPersist(): void
     {
         $dummy = new Dummy();
 
@@ -52,7 +52,7 @@ class PersistProcessorTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function testPersistIfEntityAlreadyManaged()
+    public function testPersistIfEntityAlreadyManaged(): void
     {
         $dummy = new Dummy();
 
@@ -70,7 +70,7 @@ class PersistProcessorTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function testPersistWithNullManager()
+    public function testPersistWithNullManager(): void
     {
         $dummy = new Dummy();
 
@@ -81,7 +81,7 @@ class PersistProcessorTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function getTrackingPolicyParameters()
+    public function getTrackingPolicyParameters(): array
     {
         return [
             'deferred explicit ORM' => [ClassMetadataInfo::class, true, true],
@@ -93,12 +93,8 @@ class PersistProcessorTest extends TestCase
 
     /**
      * @dataProvider getTrackingPolicyParameters
-     *
-     * @param mixed $metadataClass
-     * @param mixed $deferredExplicit
-     * @param mixed $persisted
      */
-    public function testTrackingPolicy($metadataClass, $deferredExplicit, $persisted)
+    public function testTrackingPolicy(string $metadataClass, bool $deferredExplicit, bool $persisted): void
     {
         $dummy = new Dummy();
 

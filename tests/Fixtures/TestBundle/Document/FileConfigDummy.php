@@ -17,40 +17,33 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * File Config Dummy.
- *
- * @ODM\Document
  */
+#[ODM\Document]
 class FileConfigDummy
 {
-    public const HYDRA_TITLE = 'File config Dummy';
-
+    final public const HYDRA_TITLE = 'File config Dummy';
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private $name;
-
     /**
      * @var string
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private $foo;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -60,7 +53,7 @@ class FileConfigDummy
         return $this->name;
     }
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }

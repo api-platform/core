@@ -17,14 +17,11 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\EmbeddedDocument;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Field;
 
 /**
- * @EmbeddedDocument
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
+#[EmbeddedDocument]
 class DoctrineEmbeddable
 {
-    /**
-     * @Field(type="string")
-     */
+    #[Field(type: 'string')]
     protected $field;
 }

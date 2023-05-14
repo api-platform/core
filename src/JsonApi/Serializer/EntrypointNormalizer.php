@@ -16,14 +16,10 @@ namespace ApiPlatform\JsonApi\Serializer;
 use ApiPlatform\Api\Entrypoint;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -37,65 +33,30 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 {
     public const FORMAT = 'jsonapi';
 
-    private $resourceMetadataFactory;
-    private $iriConverter;
-    private $urlGenerator;
-
-    public function __construct($resourceMetadataFactory, $iriConverter, UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly IriConverterInterface $iriConverter, private readonly UrlGeneratorInterface $urlGenerator)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->iriConverter = $iriConverter;
-        $this->urlGenerator = $urlGenerator;
-
-        if ($iriConverter instanceof LegacyIriConverterInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
-        }
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $entrypoint = ['links' => ['self' => $this->urlGenerator->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)]];
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
-            /** @var ResourceMetadata|ResourceMetadataCollection */
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if ($resourceMetadata instanceof ResourceMetadata) {
-                if (!$resourceMetadata->getCollectionOperations()) {
-                    continue;
-                }
-
-                try {
-                    $entrypoint['links'][lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_URL);
-                } catch (InvalidArgumentException $ex) {
-                    // Ignore resources without GET operations
-                }
-            }
-
             foreach ($resourceMetadata as $resource) {
-                foreach ($resource->getOperations() as $operationName => $operation) {
+                foreach ($resource->getOperations() as $operation) {
                     if (!$operation instanceof CollectionOperationInterface || ($operation instanceof HttpOperation && $operation->getUriVariables())) {
                         continue;
                     }
 
                     try {
-                        if ($this->iriConverter instanceof LegacyIriConverterInterface) {
-                            $iri = $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_URL);
-                        } else {
-                            $iri = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_URL, $operation);
-                        }
-
+                        $iri = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_URL, $operation); // @phpstan-ignore-line phpstan issue as type is CollectionOperationInterface & Operation
                         $entrypoint['links'][lcfirst($resource->getShortName())] = $iri;
-                    } catch (InvalidArgumentException $ex) {
+                    } catch (InvalidArgumentException) {
                         // Ignore resources without GET operations
                     }
                 }
@@ -108,18 +69,13 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
     }
 }
-
-class_alias(EntrypointNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer::class);

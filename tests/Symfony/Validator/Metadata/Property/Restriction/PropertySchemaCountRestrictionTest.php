@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCountRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Positive;
@@ -28,7 +28,7 @@ final class PropertySchemaCountRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaCountRestriction;
+    private PropertySchemaCountRestriction $propertySchemaCountRestriction;
 
     protected function setUp(): void
     {

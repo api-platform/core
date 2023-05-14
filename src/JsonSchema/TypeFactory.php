@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Uid\Ulid;
@@ -23,18 +23,13 @@ use Symfony\Component\Uid\Uuid;
 /**
  * {@inheritdoc}
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class TypeFactory implements TypeFactoryInterface
 {
     use ResourceClassInfoTrait;
 
-    /**
-     * @var SchemaFactoryInterface|null
-     */
-    private $schemaFactory;
+    private ?SchemaFactoryInterface $schemaFactory = null;
 
     public function __construct(ResourceClassResolverInterface $resourceClassResolver = null)
     {
@@ -52,8 +47,8 @@ final class TypeFactory implements TypeFactoryInterface
     public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
     {
         if ($type->isCollection()) {
-            $keyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
-            $subType = (method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
+            $keyType = $type->getCollectionKeyTypes()[0] ?? null;
+            $subType = ($type->getCollectionValueTypes()[0] ?? null) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
 
             if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
                 return $this->addNullabilityToTypeDefinition([
@@ -73,24 +68,19 @@ final class TypeFactory implements TypeFactoryInterface
 
     private function makeBasicType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
     {
-        switch ($type->getBuiltinType()) {
-            case Type::BUILTIN_TYPE_INT:
-                return ['type' => 'integer'];
-            case Type::BUILTIN_TYPE_FLOAT:
-                return ['type' => 'number'];
-            case Type::BUILTIN_TYPE_BOOL:
-                return ['type' => 'boolean'];
-            case Type::BUILTIN_TYPE_OBJECT:
-                return $this->getClassType($type->getClassName(), $format, $readableLink, $serializerContext, $schema);
-            default:
-                return ['type' => 'string'];
-        }
+        return match ($type->getBuiltinType()) {
+            Type::BUILTIN_TYPE_INT => ['type' => 'integer'],
+            Type::BUILTIN_TYPE_FLOAT => ['type' => 'number'],
+            Type::BUILTIN_TYPE_BOOL => ['type' => 'boolean'],
+            Type::BUILTIN_TYPE_OBJECT => $this->getClassType($type->getClassName(), $type->isNullable(), $format, $readableLink, $serializerContext, $schema),
+            default => ['type' => 'string'],
+        };
     }
 
     /**
      * Gets the JSON Schema document which specifies the data type corresponding to the given PHP class, and recursively adds needed new schema to the current schema if provided.
      */
-    private function getClassType(?string $className, string $format, ?bool $readableLink, ?array $serializerContext, ?Schema $schema): array
+    private function getClassType(?string $className, bool $nullable, string $format, ?bool $readableLink, ?array $serializerContext, ?Schema $schema): array
     {
         if (null === $className) {
             return ['type' => 'string'];
@@ -126,6 +116,20 @@ final class TypeFactory implements TypeFactoryInterface
                 'format' => 'binary',
             ];
         }
+        if (!$this->isResourceClass($className) && is_a($className, \BackedEnum::class, true)) {
+            $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
+
+            $type = \is_string($enumCases[0] ?? '') ? 'string' : 'integer';
+
+            if ($nullable) {
+                $enumCases[] = null;
+            }
+
+            return [
+                'type' => $type,
+                'enum' => $enumCases,
+            ];
+        }
 
         // Skip if $schema is null (filters only support basic types)
         if (null === $schema) {
@@ -148,7 +152,8 @@ final class TypeFactory implements TypeFactoryInterface
             throw new \LogicException('The schema factory must be injected by calling the "setSchemaFactory" method.');
         }
 
-        $subSchema = $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, null, $subSchema, $serializerContext, false);
+        $serializerContext += [SchemaFactory::FORCE_SUBSCHEMA => true];
+        $subSchema = $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext, false);
 
         return ['$ref' => $subSchema['$ref']];
     }
@@ -182,18 +187,13 @@ final class TypeFactory implements TypeFactoryInterface
         }
 
         if ($schema && Schema::VERSION_JSON_SCHEMA === $schema->getVersion()) {
-            return array_merge(
-                $jsonSchema,
-                [
-                    'type' => \is_array($jsonSchema['type'])
-                        ? array_merge($jsonSchema['type'], ['null'])
-                        : [$jsonSchema['type'], 'null'],
-                ]
-            );
+            return [...$jsonSchema, ...[
+                'type' => \is_array($jsonSchema['type'])
+                    ? array_merge($jsonSchema['type'], ['null'])
+                    : [$jsonSchema['type'], 'null'],
+            ]];
         }
 
-        return array_merge($jsonSchema, ['nullable' => true]);
+        return [...$jsonSchema, ...['nullable' => true]];
     }
 }
-
-class_alias(TypeFactory::class, \ApiPlatform\Core\JsonSchema\TypeFactory::class);

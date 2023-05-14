@@ -17,14 +17,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 final class PasswordResetRequest
 {
-    /**
-     * @Groups({"user_password_reset_request"})
-     */
-    private $email;
-
-    public function __construct(string $email = '')
+    public function __construct(#[Groups(['user_password_reset_request'])] private readonly string $email = '')
     {
-        $this->email = $email;
     }
 
     public function getEmail(): string

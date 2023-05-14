@@ -9,7 +9,6 @@
 
         <service id="api_platform.metadata.property.name_collection_factory" alias="api_platform.metadata.property.name_collection_factory.property_info" />
         <service id="ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface" alias="api_platform.metadata.property.name_collection_factory" />
-        <service id="ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface" alias="api_platform.metadata.property.name_collection_factory" />
 
         <service id="api_platform.metadata.property.name_collection_factory.property_info" class="ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyNameCollectionFactory" public="false">
             <argument type="service" id="api_platform.property_info" />

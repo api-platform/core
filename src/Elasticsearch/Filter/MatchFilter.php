@@ -18,8 +18,6 @@ namespace ApiPlatform\Elasticsearch\Filter;
  *
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class MatchFilter extends AbstractSearchFilter

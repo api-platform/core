@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Serializer;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Serializer\ItemNormalizer;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -29,7 +30,7 @@ final class ItemNormalizerTest extends TestCase
     use ProphecyTrait;
 
     private $normalizerProphecy;
-    private $itemNormalizer;
+    private ItemNormalizer $itemNormalizer;
 
     protected function setUp(): void
     {
@@ -63,13 +64,13 @@ final class ItemNormalizerTest extends TestCase
     {
         $this->normalizerProphecy->denormalize('foo', 'string', 'json', ['groups' => 'foo'])->willReturn('foo')->shouldBeCalledOnce();
 
-        self::assertSame('foo', $this->itemNormalizer->denormalize('foo', 'string', 'json', ['groups' => 'foo']));
+        self::assertEquals('foo', $this->itemNormalizer->denormalize('foo', 'string', 'json', ['groups' => 'foo']));
     }
 
     public function testSupportsDenormalization(): void
     {
-        $this->normalizerProphecy->supportsDenormalization('foo', 'string', 'json')->willReturn(true)->shouldBeCalledOnce();
-        $this->normalizerProphecy->supportsDenormalization('foo', 'string', DocumentNormalizer::FORMAT)->shouldNotBeCalled();
+        $this->normalizerProphecy->supportsDenormalization('foo', 'string', 'json', Argument::type('array'))->willReturn(true)->shouldBeCalledOnce();
+        $this->normalizerProphecy->supportsDenormalization('foo', 'string', DocumentNormalizer::FORMAT, Argument::type('array'))->shouldNotBeCalled();
 
         self::assertTrue($this->itemNormalizer->supportsDenormalization('foo', 'string', 'json'));
         self::assertFalse($this->itemNormalizer->supportsDenormalization('foo', 'string', DocumentNormalizer::FORMAT));
@@ -79,7 +80,7 @@ final class ItemNormalizerTest extends TestCase
     {
         $this->normalizerProphecy->normalize($object = (object) ['foo'], 'json', ['groups' => 'foo'])->willReturn(['foo'])->shouldBeCalledOnce();
 
-        self::assertSame(['foo'], $this->itemNormalizer->normalize($object, 'json', ['groups' => 'foo']));
+        self::assertEquals(['foo'], $this->itemNormalizer->normalize($object, 'json', ['groups' => 'foo']));
     }
 
     public function testSupportsNormalization(): void

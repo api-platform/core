@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Hostname;
@@ -30,7 +30,7 @@ final class PropertySchemaFormatTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaFormatRestriction;
+    private PropertySchemaFormat $propertySchemaFormatRestriction;
 
     protected function setUp(): void
     {

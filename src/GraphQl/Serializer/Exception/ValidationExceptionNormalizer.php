@@ -28,24 +28,21 @@ use Symfony\Component\Validator\ConstraintViolation;
  */
 final class ValidationExceptionNormalizer implements NormalizerInterface
 {
-    private $exceptionToStatus;
-
-    public function __construct(array $exceptionToStatus = [])
+    public function __construct(private readonly array $exceptionToStatus = [])
     {
-        $this->exceptionToStatus = $exceptionToStatus;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         /** @var ValidationException */
         $validationException = $object->getPrevious();
         $error = FormattedError::createFromException($object);
         $error['message'] = $validationException->getMessage();
 
-        $exceptionClass = \get_class($validationException);
+        $exceptionClass = $validationException::class;
         $statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
 
         foreach ($this->exceptionToStatus as $class => $status) {
@@ -56,7 +53,10 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
             }
         }
         $error['extensions']['status'] = $statusCode;
-        $error['extensions']['category'] = 'user';
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_INTERNAL')) {
+            $error['extensions']['category'] = 'user';
+        }
         $error['extensions']['violations'] = [];
 
         /** @var ConstraintViolation $violation */
@@ -73,7 +73,7 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof Error && $data->getPrevious() instanceof ValidationException;
     }

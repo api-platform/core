@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Subscription;
+namespace ApiPlatform\Tests\GraphQl\Subscription;
 
 use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGenerator;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SubscriptionIdentifierGeneratorTest extends TestCase
 {
-    private $subscriptionIdentifierGenerator;
+    private SubscriptionIdentifierGenerator $subscriptionIdentifierGenerator;
 
     /**
      * {@inheritdoc}

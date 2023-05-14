@@ -22,10 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 trait OperationRequestInitiatorTrait
 {
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface|null
-     */
-    private $resourceMetadataCollectionFactory;
+    private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null;
 
     /**
      * TODO: Kernel terminate remove the _api_operation attribute?
@@ -36,17 +33,14 @@ trait OperationRequestInitiatorTrait
             return $request->attributes->get('_api_operation');
         }
 
-        // TODO: 3.0 $resourceMetadataCollectionFactory is mandatory
-        if (null === $request->attributes->get('_api_resource_class') || null === $this->resourceMetadataCollectionFactory) {
+        if (null === $this->resourceMetadataCollectionFactory || null === $request->attributes->get('_api_resource_class')) {
             return null;
         }
 
-        // TODO: 3.0 remove collection/item
-        $operationName = $request->attributes->get('_api_operation_name') ?? $request->attributes->get('_api_collection_operation_name') ?? $request->attributes->get('_api_item_operation_name') ?? $request->attributes->get('_api_subresource_operation_name');
+        $operationName = $request->attributes->get('_api_operation_name');
         /** @var HttpOperation $operation */
         $operation = $this->resourceMetadataCollectionFactory->create($request->attributes->get('_api_resource_class'))->getOperation($operationName);
         $request->attributes->set('_api_operation', $operation);
-        $request->attributes->set('_api_operation_name', $operationName);
 
         return $operation;
     }
