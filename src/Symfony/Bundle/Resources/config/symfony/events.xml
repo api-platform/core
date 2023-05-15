@@ -50,6 +50,7 @@
             <argument type="service" id="api_platform.serializer.context_builder" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument>%api_platform.error_formats%</argument>
+            <argument>%kernel.debug%</argument>
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="16" />
         </service>
