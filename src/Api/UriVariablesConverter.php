@@ -63,6 +63,7 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
                 }
             }
         }
+
         return $uriVariables;
     }
 

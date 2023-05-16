@@ -133,7 +133,7 @@ Feature: Retrieve data with Composite identifiers
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
-  Scenario: Get identifiers with different type
+  Scenario: Get identifiers with different types
     Given there are Composite identifier objects
     When I send a "GET" request to "/composite_key_with_different_types/id=82133;verificationKey=7d75af772e637e45c36d041696e1128d"
     Then the response status code should be 200
