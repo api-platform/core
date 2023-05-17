@@ -174,8 +174,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             $queryBuilder
                 ->andWhere($queryBuilder->expr()->in($wrapCase($aliasedField), $valueParameter))
                 ->setParameter($valueParameter, array_map(static function ($value) use ($caseSensitive, $queryBuilder, $doctrineTypeField) {
-
-                    if ($doctrineTypeField !== null) {
+                    if (null !== $doctrineTypeField) {
                         $type = Type::getType($doctrineTypeField);
 
                         if ($type instanceof Type) {
