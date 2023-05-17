@@ -21,6 +21,7 @@ use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -102,7 +103,9 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                 $values = array_map($this->getIdFromValue(...), $values);
             }
 
-            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+            $doctrineTypeField = $this->getDoctrineFieldType($property, $resourceClass);
+
+            if (!$this->hasValidValues($values, $doctrineTypeField)) {
                 $this->logger->notice('Invalid filter ignored', [
                     'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
                 ]);
@@ -110,7 +113,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                 return;
             }
 
-            $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive);
+            $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive, $doctrineTypeField);
 
             return;
         }
@@ -141,7 +144,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             $associationField = $associationFieldIdentifier;
         }
 
-        $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive);
+        $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive, $doctrineTypeField);
     }
 
     /**
@@ -149,7 +152,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $values, bool $caseSensitive): void
+    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $values, bool $caseSensitive, ?string $doctrineTypeField): void
     {
         if (!\is_array($values)) {
             $values = [$values];
@@ -163,14 +166,25 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             if (1 === \count($values)) {
                 $queryBuilder
                     ->andWhere($queryBuilder->expr()->eq($wrapCase($aliasedField), $wrapCase($valueParameter)))
-                    ->setParameter($valueParameter, $values[0]);
+                    ->setParameter($valueParameter, $values[0], $doctrineTypeField);
 
                 return;
             }
 
             $queryBuilder
                 ->andWhere($queryBuilder->expr()->in($wrapCase($aliasedField), $valueParameter))
-                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strtolower', $values));
+                ->setParameter($valueParameter, array_map(static function ($value) use ($caseSensitive, $queryBuilder, $doctrineTypeField) {
+
+                    if ($doctrineTypeField !== null) {
+                        $type = Type::getType($doctrineTypeField);
+
+                        if ($type instanceof Type) {
+                            $value = $type->convertToDatabaseValue($value, $queryBuilder->getEntityManager()->getConnection()->getDatabasePlatform());
+                        }
+                    }
+
+                    return $caseSensitive ? $value : strtolower($value);
+                }, $values));
 
             return;
         }
@@ -210,7 +224,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         $queryBuilder->andWhere($queryBuilder->expr()->orX(...$ors));
         foreach ($parameters as $parameter) {
-            $queryBuilder->setParameter($parameter[1], $parameter[0]);
+            $queryBuilder->setParameter($parameter[1], $parameter[0], $doctrineTypeField);
         }
     }
 
