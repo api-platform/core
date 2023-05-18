@@ -21,12 +21,15 @@ use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
+use Doctrine\DBAL\Types\DateType;
+use Doctrine\DBAL\Types\PhpDateTimeMappingType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\Types\AbstractUidType;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -158,6 +161,24 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             $values = [$values];
         }
 
+        $databasePlatform = $queryBuilder->getEntityManager()->getConnection()->getDatabasePlatform();
+
+        $values = array_map(static function ($value) use ($databasePlatform, $doctrineTypeField) {
+            if (null !== $doctrineTypeField) {
+                $type = Type::getType($doctrineTypeField);
+
+                if ($type instanceof PhpDateTimeMappingType || $type instanceof DateType) {
+                    $value = !str_contains($doctrineTypeField, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
+                }
+
+                if ($type instanceof AbstractUidType) {
+                    $value = $type->convertToDatabaseValue($value, $databasePlatform);
+                }
+            }
+
+            return $value;
+        }, $values);
+
         $wrapCase = $this->createWrapCase($caseSensitive);
         $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
         $aliasedField = sprintf('%s.%s', $alias, $field);
@@ -173,17 +194,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
             $queryBuilder
                 ->andWhere($queryBuilder->expr()->in($wrapCase($aliasedField), $valueParameter))
-                ->setParameter($valueParameter, array_map(static function ($value) use ($caseSensitive, $queryBuilder, $doctrineTypeField) {
-                    if (null !== $doctrineTypeField) {
-                        $type = Type::getType($doctrineTypeField);
-
-                        if ($type instanceof Type) {
-                            $value = $type->convertToDatabaseValue($value, $queryBuilder->getEntityManager()->getConnection()->getDatabasePlatform());
-                        }
-                    }
-
-                    return $caseSensitive ? $value : strtolower($value);
-                }, $values));
+                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strolower', $values));
 
             return;
         }
