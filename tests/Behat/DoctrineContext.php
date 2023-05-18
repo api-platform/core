@@ -193,7 +193,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Uuid as SymfonyUuid;
-use Symfony\Component\Uid\UuidV7;
 
 /**
  * Defines application features from the specific context.
@@ -1666,7 +1665,7 @@ final class DoctrineContext implements Context
      */
     public function thereIsASymfonyDummyIdentifiedResourceDoctrineGenerator(string $uuid): void
     {
-        $dummy = new SymfonyUuidDoctrineGeneratorDummy(UuidV7::fromString($uuid));
+        $dummy = new SymfonyUuidDoctrineGeneratorDummy(SymfonyUuid::fromString($uuid));
 
         $this->manager->persist($dummy);
         $this->manager->flush();
