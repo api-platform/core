@@ -194,7 +194,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
             $queryBuilder
                 ->andWhere($queryBuilder->expr()->in($wrapCase($aliasedField), $valueParameter))
-                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strolower', $values));
+                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strtolower', $values));
 
             return;
         }
