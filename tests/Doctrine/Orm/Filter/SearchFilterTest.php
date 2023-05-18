@@ -22,10 +22,12 @@ use ApiPlatform\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDoctrineGeneratorDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
@@ -501,6 +503,18 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     Dummy::class,
                 ],
             ]
+        );
+    }
+
+    public function testSymfonyUuidGenerator(): void
+    {
+        $this->testApply(
+            ['id' => 'exact'],
+            ['id' => '0187fd4e-3384-7b67-83a6-1ad7e12b3c0c'],
+            sprintf('SELECT %s FROM %s %1$s WHERE %1$s.id = :id_p1', $this->alias, SymfonyUuidDoctrineGeneratorDummy::class),
+            ['id_p1' => (new UuidType())->convertToDatabaseValue('0187fd4e-3384-7b67-83a6-1ad7e12b3c0c', $this->managerRegistry->getConnection()->getDatabasePLatform())],
+            $this->buildSearchFilter(...),
+            SymfonyUuidDoctrineGeneratorDummy::class
         );
     }
 

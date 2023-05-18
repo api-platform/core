@@ -203,3 +203,52 @@ Feature: Using uuid identifier on resource
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @!mongodb
+  @createSchema
+  Scenario: Retrieve a resource identified by Symfony\Component\Uid\Uuid with doctrine generator
+    Given there is a Symfony dummy identified resource with doctrine generator uuid "0187fd4e-3391-7960-867d-c06119377efc"
+    Given there is a Symfony dummy identified resource with doctrine generator uuid "0187fd4e-3384-7b67-83a6-1ad7e12b3c0c"
+    When I send a "GET" request to "/symfony_uuid_doctrine_generator_dummies?id=0187fd4e-3384-7b67-83a6-1ad7e12b3c0c"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/SymfonyUuidDoctrineGeneratorDummy",
+      "@id": "/symfony_uuid_doctrine_generator_dummies",
+      "@type": "hydra:Collection",
+      "hydra:totalItems": 1,
+      "hydra:member": [
+        {
+          "@id": "/symfony_uuid_doctrine_generator_dummies/0187fd4e-3384-7b67-83a6-1ad7e12b3c0c",
+          "@type": "SymfonyUuidDoctrineGeneratorDummy",
+          "id": "0187fd4e-3384-7b67-83a6-1ad7e12b3c0c"
+        }
+      ],
+      "hydra:view": {
+        "@id": "/symfony_uuid_doctrine_generator_dummies?id=0187fd4e-3384-7b67-83a6-1ad7e12b3c0c",
+        "@type": "hydra:PartialCollectionView"
+      },
+      "hydra:search": {
+        "@type": "hydra:IriTemplate",
+        "hydra:template": "/symfony_uuid_doctrine_generator_dummies{?id,id[]}",
+        "hydra:variableRepresentation": "BasicRepresentation",
+        "hydra:mapping": [
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "id",
+            "property": "id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "id[]",
+            "property": "id",
+            "required": false
+          }
+        ]
+      }
+    }
+    """

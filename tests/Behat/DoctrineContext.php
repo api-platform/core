@@ -170,6 +170,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SeparatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoMany;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDoctrineGeneratorDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
@@ -192,6 +193,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Uuid as SymfonyUuid;
+use Symfony\Component\Uid\UuidV7;
 
 /**
  * Defines application features from the specific context.
@@ -1654,6 +1656,17 @@ final class DoctrineContext implements Context
     public function thereIsASymfonyDummyIdentifiedResource(string $uuid): void
     {
         $dummy = new SymfonyUuidDummy(SymfonyUuid::fromString($uuid));
+
+        $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a Symfony dummy identified resource with doctrine generator uuid :uuid
+     */
+    public function thereIsASymfonyDummyIdentifiedResourceDoctrineGenerator(string $uuid): void
+    {
+        $dummy = new SymfonyUuidDoctrineGeneratorDummy(UuidV7::fromString($uuid));
 
         $this->manager->persist($dummy);
         $this->manager->flush();
