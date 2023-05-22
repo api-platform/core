@@ -15,6 +15,9 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 
+/**
+ * @internal
+ */
 final class ClassNameResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
     /**
