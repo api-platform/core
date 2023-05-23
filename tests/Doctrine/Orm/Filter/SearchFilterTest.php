@@ -504,7 +504,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         );
     }
 
-    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null): SearchFilter
+    protected function buildSearchFilter(ManagerRegistry $managerRegistry, array $properties = null): SearchFilter
     {
         $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

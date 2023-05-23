@@ -113,7 +113,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         if ($parameters = array_keys($uriVariables)) {
             foreach ($parameters as $parameterName) {
                 $part = sprintf('/{%s}', $parameterName);
-                if (false === strpos($uriTemplate, $part)) {
+                if (!str_contains($uriTemplate, $part)) {
                     $uriTemplate .= sprintf('/{%s}', $parameterName);
                 }
             }

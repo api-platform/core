@@ -42,7 +42,7 @@ final class ReadListener
 
     public function __construct(
         private readonly ProviderInterface $provider,
-        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
         UriVariablesConverterInterface $uriVariablesConverter = null,
     ) {
@@ -100,8 +100,8 @@ final class ReadListener
             null === $data
             && 'POST' !== $operation->getMethod()
             && (
-                'PUT' !== $operation->getMethod() ||
-                ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
+                'PUT' !== $operation->getMethod()
+                || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
             )
         ) {
             throw new NotFoundHttpException('Not Found');

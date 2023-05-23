@@ -273,7 +273,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         return $request;
     }
 
-    private function createArgumentMetadata(?string $type = null, bool $isVariadic = false): ArgumentMetadata
+    private function createArgumentMetadata(string $type = null, bool $isVariadic = false): ArgumentMetadata
     {
         return new ArgumentMetadata('foo', $type, $isVariadic, false, null);
     }

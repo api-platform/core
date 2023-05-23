@@ -35,16 +35,16 @@ final class ResourceMetadataCollection extends \ArrayObject
         parent::__construct($input);
     }
 
-    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
+    public function getOperation(string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
     {
         $operationName ??= '';
-        $cachePrefix = ($forceCollection ? self::FORCE_COLLECTION : '') . ($httpOperation ? self::HTTP_OPERATION : '');
-        $httpCacheKey = self::HTTP_PREFIX . $cachePrefix . $operationName;
+        $cachePrefix = ($forceCollection ? self::FORCE_COLLECTION : '').($httpOperation ? self::HTTP_OPERATION : '');
+        $httpCacheKey = self::HTTP_PREFIX.$cachePrefix.$operationName;
         if (isset($this->operationCache[$httpCacheKey])) {
             return $this->operationCache[$httpCacheKey];
         }
 
-        $gqlCacheKey = self::GRAPHQL_PREFIX . $cachePrefix . $operationName;
+        $gqlCacheKey = self::GRAPHQL_PREFIX.$cachePrefix.$operationName;
         if (isset($this->operationCache[$gqlCacheKey])) {
             return $this->operationCache[$gqlCacheKey];
         }

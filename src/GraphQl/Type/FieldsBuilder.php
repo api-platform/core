@@ -162,7 +162,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
     /**
      * {@inheritdoc}
      */
-    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, ?array $ioMetadata = null): array
+    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, array $ioMetadata = null): array
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
@@ -441,7 +441,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
         return $this->convertFilterArgsToTypes($args);
     }
 
-    private function mergeFilterArgs(array $args, array $parsed, ?Operation $operation = null, string $original = ''): array
+    private function mergeFilterArgs(array $args, array $parsed, Operation $operation = null, string $original = ''): array
     {
         foreach ($parsed as $key => $value) {
             // Never override keys that cannot be merged
