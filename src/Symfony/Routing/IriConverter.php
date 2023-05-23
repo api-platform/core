@@ -52,7 +52,7 @@ final class IriConverter implements IriConverterInterface
     private $localOperationCache = [];
     private $localIdentifiersExtractorOperationCache = [];
 
-    public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
+    public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->uriVariablesConverter = $uriVariablesConverter;
@@ -61,7 +61,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
+    public function getResourceFromIri(string $iri, array $context = [], Operation $operation = null): object
     {
         try {
             $parameters = $this->router->match($iri);
@@ -168,7 +168,7 @@ final class IriConverter implements IriConverterInterface
         return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
     }
 
-    private function generateSymfonyRoute(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = [], ?Operation $identifiersExtractorOperation = null): string
+    private function generateSymfonyRoute(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = [], Operation $identifiersExtractorOperation = null): string
     {
         $identifiers = $context['uri_variables'] ?? [];
 

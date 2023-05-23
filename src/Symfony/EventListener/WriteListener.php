@@ -43,8 +43,8 @@ final class WriteListener
         private readonly ProcessorInterface $processor,
         private readonly IriConverterInterface $iriConverter,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
-        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
-        ?UriVariablesConverterInterface $uriVariablesConverter = null,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        UriVariablesConverterInterface $uriVariablesConverter = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;

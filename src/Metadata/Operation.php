@@ -119,7 +119,7 @@ abstract class Operation
         return $this->shortName;
     }
 
-    public function withShortName(?string $shortName = null): self
+    public function withShortName(string $shortName = null): self
     {
         $self = clone $this;
         $self->shortName = $shortName;
@@ -132,7 +132,7 @@ abstract class Operation
         return $this->class;
     }
 
-    public function withClass(?string $class = null): self
+    public function withClass(string $class = null): self
     {
         $self = clone $this;
         $self->class = $class;
@@ -145,7 +145,7 @@ abstract class Operation
         return $this->paginationEnabled;
     }
 
-    public function withPaginationEnabled(?bool $paginationEnabled = null): self
+    public function withPaginationEnabled(bool $paginationEnabled = null): self
     {
         $self = clone $this;
         $self->paginationEnabled = $paginationEnabled;
@@ -158,7 +158,7 @@ abstract class Operation
         return $this->paginationType;
     }
 
-    public function withPaginationType(?string $paginationType = null): self
+    public function withPaginationType(string $paginationType = null): self
     {
         $self = clone $this;
         $self->paginationType = $paginationType;
@@ -171,7 +171,7 @@ abstract class Operation
         return $this->paginationItemsPerPage;
     }
 
-    public function withPaginationItemsPerPage(?int $paginationItemsPerPage = null): self
+    public function withPaginationItemsPerPage(int $paginationItemsPerPage = null): self
     {
         $self = clone $this;
         $self->paginationItemsPerPage = $paginationItemsPerPage;
@@ -184,7 +184,7 @@ abstract class Operation
         return $this->paginationMaximumItemsPerPage;
     }
 
-    public function withPaginationMaximumItemsPerPage(?int $paginationMaximumItemsPerPage = null): self
+    public function withPaginationMaximumItemsPerPage(int $paginationMaximumItemsPerPage = null): self
     {
         $self = clone $this;
         $self->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
@@ -197,7 +197,7 @@ abstract class Operation
         return $this->paginationPartial;
     }
 
-    public function withPaginationPartial(?bool $paginationPartial = null): self
+    public function withPaginationPartial(bool $paginationPartial = null): self
     {
         $self = clone $this;
         $self->paginationPartial = $paginationPartial;
@@ -210,7 +210,7 @@ abstract class Operation
         return $this->paginationClientEnabled;
     }
 
-    public function withPaginationClientEnabled(?bool $paginationClientEnabled = null): self
+    public function withPaginationClientEnabled(bool $paginationClientEnabled = null): self
     {
         $self = clone $this;
         $self->paginationClientEnabled = $paginationClientEnabled;
@@ -223,7 +223,7 @@ abstract class Operation
         return $this->paginationClientItemsPerPage;
     }
 
-    public function withPaginationClientItemsPerPage(?bool $paginationClientItemsPerPage = null): self
+    public function withPaginationClientItemsPerPage(bool $paginationClientItemsPerPage = null): self
     {
         $self = clone $this;
         $self->paginationClientItemsPerPage = $paginationClientItemsPerPage;
@@ -236,7 +236,7 @@ abstract class Operation
         return $this->paginationClientPartial;
     }
 
-    public function withPaginationClientPartial(?bool $paginationClientPartial = null): self
+    public function withPaginationClientPartial(bool $paginationClientPartial = null): self
     {
         $self = clone $this;
         $self->paginationClientPartial = $paginationClientPartial;
@@ -249,7 +249,7 @@ abstract class Operation
         return $this->paginationFetchJoinCollection;
     }
 
-    public function withPaginationFetchJoinCollection(?bool $paginationFetchJoinCollection = null): self
+    public function withPaginationFetchJoinCollection(bool $paginationFetchJoinCollection = null): self
     {
         $self = clone $this;
         $self->paginationFetchJoinCollection = $paginationFetchJoinCollection;
@@ -262,7 +262,7 @@ abstract class Operation
         return $this->paginationUseOutputWalkers;
     }
 
-    public function withPaginationUseOutputWalkers(?bool $paginationUseOutputWalkers = null): self
+    public function withPaginationUseOutputWalkers(bool $paginationUseOutputWalkers = null): self
     {
         $self = clone $this;
         $self->paginationUseOutputWalkers = $paginationUseOutputWalkers;
@@ -288,7 +288,7 @@ abstract class Operation
         return $this->description;
     }
 
-    public function withDescription(?string $description = null): self
+    public function withDescription(string $description = null): self
     {
         $self = clone $this;
         $self->description = $description;
@@ -340,7 +340,7 @@ abstract class Operation
         return $this->security;
     }
 
-    public function withSecurity(?string $security = null): self
+    public function withSecurity(string $security = null): self
     {
         $self = clone $this;
         $self->security = $security;
@@ -353,7 +353,7 @@ abstract class Operation
         return $this->securityMessage;
     }
 
-    public function withSecurityMessage(?string $securityMessage = null): self
+    public function withSecurityMessage(string $securityMessage = null): self
     {
         $self = clone $this;
         $self->securityMessage = $securityMessage;
@@ -366,7 +366,7 @@ abstract class Operation
         return $this->securityPostDenormalize;
     }
 
-    public function withSecurityPostDenormalize(?string $securityPostDenormalize = null): self
+    public function withSecurityPostDenormalize(string $securityPostDenormalize = null): self
     {
         $self = clone $this;
         $self->securityPostDenormalize = $securityPostDenormalize;
@@ -379,7 +379,7 @@ abstract class Operation
         return $this->securityPostDenormalizeMessage;
     }
 
-    public function withSecurityPostDenormalizeMessage(?string $securityPostDenormalizeMessage = null): self
+    public function withSecurityPostDenormalizeMessage(string $securityPostDenormalizeMessage = null): self
     {
         $self = clone $this;
         $self->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
@@ -392,7 +392,7 @@ abstract class Operation
         return $this->securityPostValidation;
     }
 
-    public function withSecurityPostValidation(?string $securityPostValidation = null): self
+    public function withSecurityPostValidation(string $securityPostValidation = null): self
     {
         $self = clone $this;
         $self->securityPostValidation = $securityPostValidation;
@@ -405,7 +405,7 @@ abstract class Operation
         return $this->securityPostValidationMessage;
     }
 
-    public function withSecurityPostValidationMessage(?string $securityPostValidationMessage = null): self
+    public function withSecurityPostValidationMessage(string $securityPostValidationMessage = null): self
     {
         $self = clone $this;
         $self->securityPostValidationMessage = $securityPostValidationMessage;
@@ -418,7 +418,7 @@ abstract class Operation
         return $this->deprecationReason;
     }
 
-    public function withDeprecationReason(?string $deprecationReason = null): self
+    public function withDeprecationReason(string $deprecationReason = null): self
     {
         $self = clone $this;
         $self->deprecationReason = $deprecationReason;
@@ -509,7 +509,7 @@ abstract class Operation
         return $this->elasticsearch;
     }
 
-    public function withElasticsearch(?bool $elasticsearch = null): self
+    public function withElasticsearch(bool $elasticsearch = null): self
     {
         $self = clone $this;
         $self->elasticsearch = $elasticsearch;
@@ -522,7 +522,7 @@ abstract class Operation
         return $this->urlGenerationStrategy;
     }
 
-    public function withUrlGenerationStrategy(?int $urlGenerationStrategy = null): self
+    public function withUrlGenerationStrategy(int $urlGenerationStrategy = null): self
     {
         $self = clone $this;
         $self->urlGenerationStrategy = $urlGenerationStrategy;
@@ -600,7 +600,7 @@ abstract class Operation
         return $this->fetchPartial;
     }
 
-    public function withFetchPartial(?bool $fetchPartial = null): self
+    public function withFetchPartial(bool $fetchPartial = null): self
     {
         $self = clone $this;
         $self->fetchPartial = $fetchPartial;
@@ -613,7 +613,7 @@ abstract class Operation
         return $this->forceEager;
     }
 
-    public function withForceEager(?bool $forceEager = null): self
+    public function withForceEager(bool $forceEager = null): self
     {
         $self = clone $this;
         $self->forceEager = $forceEager;

@@ -25,7 +25,7 @@ trait UriVariablesResolverTrait
     /**
      * Resolves an operation's UriVariables to their identifiers values.
      */
-    private function getOperationUriVariables(?HttpOperation $operation = null, array $parameters = [], ?string $resourceClass = null): array
+    private function getOperationUriVariables(HttpOperation $operation = null, array $parameters = [], string $resourceClass = null): array
     {
         $identifiers = [];
 

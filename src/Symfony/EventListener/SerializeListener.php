@@ -40,7 +40,7 @@ final class SerializeListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'serialize';
 
-    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
