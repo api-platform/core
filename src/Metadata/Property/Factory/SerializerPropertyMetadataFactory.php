@@ -157,7 +157,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * - From metadata of the given operation ("operation_name" key).
      * - From metadata of the current resource.
      *
-     * @return (string[]|null|string)[]
+     * @return (string[]|string|null)[]
      */
     private function getEffectiveSerializerGroups(array $options): array
     {

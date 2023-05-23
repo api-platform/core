@@ -945,7 +945,7 @@ class ApiResource
         return $this->securityPostValidation;
     }
 
-    public function withSecurityPostValidation(?string $securityPostValidation = null): self
+    public function withSecurityPostValidation(string $securityPostValidation = null): self
     {
         $self = clone $this;
         $self->securityPostValidation = $securityPostValidation;
@@ -958,7 +958,7 @@ class ApiResource
         return $this->securityPostValidationMessage;
     }
 
-    public function withSecurityPostValidationMessage(?string $securityPostValidationMessage = null): self
+    public function withSecurityPostValidationMessage(string $securityPostValidationMessage = null): self
     {
         $self = clone $this;
         $self->securityPostValidationMessage = $securityPostValidationMessage;

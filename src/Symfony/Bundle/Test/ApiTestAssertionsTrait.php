@@ -98,14 +98,14 @@ trait ApiTestAssertionsTrait
         static::assertThat($array, $constraint, $message);
     }
 
-    public static function assertMatchesJsonSchema(object|array|string $jsonSchema, ?int $checkMode = null, string $message = ''): void
+    public static function assertMatchesJsonSchema(object|array|string $jsonSchema, int $checkMode = null, string $message = ''): void
     {
         $constraint = new MatchesJsonSchema($jsonSchema, $checkMode);
 
         static::assertThat(self::getHttpResponse()->toArray(false), $constraint, $message);
     }
 
-    public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld', ?array $serializationContext = null): void
+    public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, string $operationName = null, string $format = 'jsonld', array $serializationContext = null): void
     {
         $schemaFactory = self::getSchemaFactory();
 
@@ -120,7 +120,7 @@ trait ApiTestAssertionsTrait
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
-    public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld', ?array $serializationContext = null): void
+    public static function assertMatchesResourceItemJsonSchema(string $resourceClass, string $operationName = null, string $format = 'jsonld', array $serializationContext = null): void
     {
         $schemaFactory = self::getSchemaFactory();
 

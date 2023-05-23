@@ -173,7 +173,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributes(object $object, ?string $format = null, array $context = []): array
+    protected function getAttributes(object $object, string $format = null, array $context = []): array
     {
         return $this->getComponents($object, $format, $context)['attributes'];
     }
