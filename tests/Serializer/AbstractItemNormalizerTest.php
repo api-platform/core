@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5584\DtoWithNullValue;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
@@ -1346,6 +1347,48 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertInstanceOf(NonCloneableDummy::class, $actual);
         $this->assertSame($dummy, $actual);
         $propertyAccessorProphecy->setValue($actual, 'name', 'bar')->shouldHaveBeenCalled();
+    }
+
+    public function testDenormalizeObjectWithNullDisabledTypeEnforcement(): void
+    {
+        $data = [
+            'dummy' => null,
+        ];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DtoWithNullValue::class, [])->willReturn(new PropertyNameCollection(['dummy']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(DtoWithNullValue::class, 'dummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, nullable: true)])->withDescription('')->withReadable(true)->withWritable(true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, DtoWithNullValue::class)->willReturn(DtoWithNullValue::class);
+        $resourceClassResolverProphecy->isResourceClass(DtoWithNullValue::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            [],
+            null,
+            null,
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $context = [AbstractItemNormalizer::DISABLE_TYPE_ENFORCEMENT => true];
+        $actual = $normalizer->denormalize($data, DtoWithNullValue::class, null, $context);
+
+        $this->assertInstanceOf(DtoWithNullValue::class, $actual);
+        $this->assertEquals(new DtoWithNullValue(), $actual);
     }
 }
 
