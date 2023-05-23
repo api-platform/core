@@ -253,7 +253,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             }
 
             // It's an embedded property, select relevant subfields
-            foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) { // @phpstan-ignore-line
+            foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
                 $isFetchable = $propertyMetadata->isFetchable();
                 $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
                 $propertyName = "$property.$embeddedProperty";
