@@ -33,6 +33,7 @@ trait UriVariablesResolverTrait
             return $identifiers;
         }
 
+        $uriVariablesMap = [];
         foreach ($operation->getUriVariables() ?? [] as $parameterName => $uriVariableDefinition) {
             if (!isset($parameters[$parameterName])) {
                 if (!isset($parameters['id'])) {
@@ -51,16 +52,18 @@ trait UriVariablesResolverTrait
 
                 foreach ($currentIdentifiers as $key => $value) {
                     $identifiers[$key] = $value;
+                    $uriVariableMap[$key] = $uriVariableDefinition;
                 }
 
                 continue;
             }
 
             $identifiers[$parameterName] = $parameters[$parameterName];
+            $uriVariableMap[$parameterName] = $uriVariableDefinition;
         }
 
         if ($this->uriVariablesConverter) {
-            $context = ['operation' => $operation];
+            $context = ['operation' => $operation, 'uri_variables_map' => $uriVariablesMap];
             $identifiers = $this->uriVariablesConverter->convert($identifiers, $operation->getClass() ?? $resourceClass, $context);
         }
 
