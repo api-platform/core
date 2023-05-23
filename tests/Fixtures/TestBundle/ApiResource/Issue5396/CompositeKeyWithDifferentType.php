@@ -28,6 +28,10 @@ class CompositeKeyWithDifferentType
 
     public static function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
+        if (!\is_string($uriVariables['verificationKey'])) {
+            throw new \RuntimeException('verificationKey should be a string.');
+        }
+
         return $context;
     }
 }
