@@ -44,9 +44,7 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
 
         foreach ($uriVariables as $parameterName => $value) {
             $uriVariableDefinition = $uriVariablesDefinitions[$parameterName] ?? $uriVariablesDefinitions['id'] ?? new Link();
-
-            $identifierTypes = $this->getIdentifierTypes($uriVariableDefinition->getFromClass() ?? $class, $uriVariableDefinition->getIdentifiers() ?? [$parameterName]);
-            if (!($types = $identifierTypes[$parameterName] ?? false)) {
+            if ([] === $types = $this->getIdentifierTypes($uriVariableDefinition->getFromClass() ?? $class, $uriVariableDefinition->getIdentifiers() ?? [$parameterName])) {
                 continue;
             }
 
@@ -73,7 +71,7 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
         foreach ($properties as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
             foreach ($propertyMetadata->getBuiltinTypes() as $type) {
-                $types[$property][] = Type::BUILTIN_TYPE_OBJECT === ($builtinType = $type->getBuiltinType()) ? $type->getClassName() : $builtinType;
+                $types[] = Type::BUILTIN_TYPE_OBJECT === ($builtinType = $type->getBuiltinType()) ? $type->getClassName() : $builtinType;
             }
         }
 
