@@ -1,4 +1,4 @@
-@php8
+@!mongodb
 @v3
 Feature: Exposing a collection of objects should use the specified operation to generate the IRI
 

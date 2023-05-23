@@ -103,8 +103,17 @@ Feature: Resource attributes
 
   Scenario: Uri variables with Post operation
     When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/post_with_uri_variables/{id}" with body:
+    And I send a "POST" request to "/post_with_uri_variables_and_no_provider/{id}" with body:
     """
     {}
     """
     Then the response status code should be 201
+
+  Scenario: Throw validation exception in a provider
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/post_with_uri_variables/{id}" with body:
+    """
+    {}
+    """
+    Then the response status code should be 422
+
