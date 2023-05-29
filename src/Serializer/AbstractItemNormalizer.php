@@ -495,6 +495,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $collectionKeyType = $type->getCollectionKeyTypes()[0] ?? null;
         $collectionKeyBuiltinType = $collectionKeyType?->getBuiltinType();
+        $childContext = $this->createChildContext(['resource_class' => $className] + $context, $attribute, $format);
+        unset($childContext['uri_variables']);
+        if ($this->resourceMetadataCollectionFactory) {
+            $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($className)->getOperation();
+        }
 
         $values = [];
         foreach ($value as $index => $obj) {
@@ -502,7 +507,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyBuiltinType, \gettype($index)), $index, [$collectionKeyBuiltinType], ($context['deserialization_path'] ?? false) ? sprintf('key(%s)', $context['deserialization_path']) : null, true);
             }
 
-            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $this->createChildContext($context, $attribute, $format));
+            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $childContext);
         }
 
         return $values;
@@ -753,7 +758,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $value;
         }
 
-        if (null === $value && ($type->isNullable() || ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false))) {
+        if (null === $value && $type->isNullable() || ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false)) {
             return $value;
         }
 
@@ -773,7 +778,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             && $this->resourceClassResolver->isResourceClass($className)
         ) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
-            $context['resource_class'] = $resourceClass;
 
             return $this->denormalizeCollection($attribute, $propertyMetadata, $type, $resourceClass, $value, $format, $context);
         }
@@ -785,6 +789,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
+            unset($childContext['uri_variables']);
             if ($this->resourceMetadataCollectionFactory) {
                 $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
             }
@@ -857,7 +862,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        if ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false) {
+        if ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false) { // @phpstan-ignore-line
             return $value;
         }
 
