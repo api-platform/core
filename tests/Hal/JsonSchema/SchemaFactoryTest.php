@@ -119,6 +119,7 @@ class SchemaFactoryTest extends TestCase
         // @noRector
         $this->assertTrue(isset($resultSchema['properties']));
         $this->assertArrayHasKey('_embedded', $resultSchema['properties']);
+        $this->assertArrayHasKey('item', $resultSchema['properties']['_embedded']);
         $this->assertArrayHasKey('totalItems', $resultSchema['properties']);
         $this->assertArrayHasKey('itemsPerPage', $resultSchema['properties']);
         $this->assertArrayHasKey('_links', $resultSchema['properties']);

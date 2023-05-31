@@ -76,7 +76,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $schema['properties'] = [
                 '_embedded' => [
                     'type' => 'array',
-                    'items' => $items,
+                    'item' => $items,
                 ],
                 'totalItems' => [
                     'type' => 'integer',
