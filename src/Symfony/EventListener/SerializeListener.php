@@ -45,7 +45,7 @@ final class SerializeListener
     public function __construct(
         private readonly SerializerInterface $serializer,
         private readonly SerializerContextBuilderInterface $serializerContextBuilder,
-        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
         private readonly array $errorFormats = [],
         private readonly bool $debug = false,
     ) {

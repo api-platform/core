@@ -44,7 +44,7 @@ final class ErrorListener extends SymfonyErrorListener
         LoggerInterface $logger = null,
         bool $debug = false,
         array $exceptionsMapping = [],
-        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         private readonly array $errorFormats = [],
         private readonly array $exceptionToStatus = [],
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
