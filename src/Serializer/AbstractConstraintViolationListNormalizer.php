@@ -53,12 +53,15 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     {
         return match($format) {
             static::FORMAT => [
-                ConstraintViolationListInterface::class => $this->hasCacheableSupportsMethod(),
+                ConstraintViolationListInterface::class => true,
             ],
             default => [];
         }
     }
 
+    /**
+    * @deprecated since Symfony 6.3, use "getSupportedTypes(?string $format)" instead
+    */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
