@@ -56,7 +56,13 @@ final class ValidationException extends BaseValidationException implements Const
             $ids[] = $violation->getCode();
         }
 
-        return 1 < \count($ids) ? CompositeIdentifierParser::stringify(identifiers: $ids) : $ids[0];
+        $id = 1 < \count($ids) ? CompositeIdentifierParser::stringify(identifiers: $ids) : ($ids[0] ?? null);
+
+        if (!$id) {
+            return spl_object_hash($this);
+        }
+
+        return $id;
     }
 
     public function __toString(): string
