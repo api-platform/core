@@ -46,11 +46,17 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
         return static::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
     
+    /**
+     * @return array<class-string<ConstraintViolationListInterface::class>, bool>|list<mixed>
+     */
     public function getSupportedTypes(?string $format)
     {
-        return [
-            ConstraintViolationListInterface::class => $this->hasCacheableSupportsMethod(),
-        ];
+        return match($format) {
+            static::FORMAT => [
+                ConstraintViolationListInterface::class => $this->hasCacheableSupportsMethod(),
+            ],
+            default => [];
+        }
     }
 
     public function hasCacheableSupportsMethod(): bool
