@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
     operations: [
         new Get(name: '_api_errors_hydra', outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]),
         new Get(name: '_api_errors_problem', outputFormats: ['json' => ['application/problem+json']], normalizationContext: ['groups' => ['jsonproblem'], 'skip_null_values' => true]),
-        new Get(name: '_api_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true], provider: 'api_platform.state_provider.json_api.default_error'),
+        new Get(name: '_api_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true], provider: 'api_platform.json_api.state_provider.default_error'),
     ]
 )]
 class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface

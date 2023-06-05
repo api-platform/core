@@ -58,11 +58,6 @@
             <tag name="api_platform.state_provider" key="api_platform.state_provider.default_error" />
         </service>
 
-        <service id="api_platform.state_provider.json_api.default_error" class="ApiPlatform\State\JsonApi\DefaultErrorProvider" >
-            <tag name="api_platform.state_provider" key="ApiPlatform\State\JsonApi\DefaultErrorProvider" />
-            <tag name="api_platform.state_provider" key="api_platform.state_provider.json_api.default_error" />
-        </service>
-
         <service id="ApiPlatform\State\ObjectProvider" alias="api_platform.state_provider.object" />
     </services>
 </container>
