@@ -65,6 +65,7 @@
             <tag name="serializer.normalizer" priority="-780" />
         </service>
 
+        <!-- deprecated -->
         <service id="api_platform.jsonapi.normalizer.error" class="ApiPlatform\JsonApi\Serializer\ErrorNormalizer" public="false">
             <argument>%kernel.debug%</argument>
 
@@ -90,6 +91,11 @@
 
         <service id="api_platform.jsonapi.listener.request.transform_filtering_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformFilteringParametersListener">
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
+        </service>
+
+        <service id="api_platform.json_api.state_provider.default_error" class="ApiPlatform\JsonApi\State\DefaultErrorProvider" >
+            <tag name="api_platform.state_provider" key="ApiPlatform\JsonApi\State\DefaultErrorProvider" />
+            <tag name="api_platform.state_provider" key="api_platform.json_api.state_provider.default_error" />
         </service>
     </services>
 

@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -102,6 +103,10 @@ final class RespondListener
             if ((Response::HTTP_CREATED === $status || (300 <= $status && $status < 400)) && 'POST' === $method) {
                 $headers['Location'] = $request->attributes->get('_api_write_item_iri');
             }
+        }
+
+        if (($exception = $request->attributes->get('data')) instanceof HttpExceptionInterface) {
+            $headers = array_merge($headers, $exception->getHeaders());
         }
 
         $event->setResponse(new Response(

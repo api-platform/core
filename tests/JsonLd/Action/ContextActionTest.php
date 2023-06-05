@@ -55,7 +55,7 @@ class ContextActionTest extends TestCase
         $contextBuilderProphecy->getBaseContext()->willReturn(['/contexts']);
         $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
 
-        $this->assertEquals(['@context' => ['/contexts']], $contextAction('Error'));
+        $this->assertEquals(['@context' => ['/contexts']], $contextAction('ConstraintViolationList'));
     }
 
     public function testContextActionWithResourceClass(): void

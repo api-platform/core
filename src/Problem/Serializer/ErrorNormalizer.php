@@ -45,6 +45,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
+        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated in favor of using an Error resource.', __CLASS__));
         $data = [
             'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE],
             'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],
@@ -63,11 +64,15 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
+        if ($context['skip_deprecated_exception_normalizers'] ?? false) {
+            return false;
+        }
+
         return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 
     public function hasCacheableSupportsMethod(): bool
     {
-        return true;
+        return false;
     }
 }

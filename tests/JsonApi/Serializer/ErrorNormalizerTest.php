@@ -35,11 +35,12 @@ class ErrorNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new FlattenException(), ErrorNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new FlattenException(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     /**
      * @dataProvider errorProvider
+     *
+     * @group legacy
      *
      * @param int    $status          http status code of the Exception
      * @param string $originalMessage original message of the Exception
@@ -62,6 +63,9 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
+    /**
+     * @group legacy
+     */
     public function testNormalizeAnExceptionWithCustomErrorCode(): void
     {
         $status = Response::HTTP_BAD_REQUEST;
@@ -80,6 +84,9 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
+    /**
+     * @group legacy
+     */
     public function testNormalizeAFlattenExceptionWithCustomErrorCode(): void
     {
         $status = Response::HTTP_BAD_REQUEST;

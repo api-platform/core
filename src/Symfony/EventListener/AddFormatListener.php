@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\FormatMatcher;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Negotiation\Negotiator;
@@ -31,7 +32,7 @@ final class AddFormatListener
 {
     use OperationRequestInitiatorTrait;
 
-    public function __construct(private readonly Negotiator $negotiator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [])
+    public function __construct(private readonly Negotiator $negotiator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [], private readonly array $errorFormats = [])
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
@@ -47,8 +48,7 @@ final class AddFormatListener
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
 
-        if (!(
-            $request->attributes->has('_api_resource_class')
+        if (!($request->attributes->has('_api_resource_class')
             || $request->attributes->getBoolean('_api_respond', false)
             || $request->attributes->getBoolean('_graphql', false)
         )) {
@@ -64,7 +64,12 @@ final class AddFormatListener
             $flattenedMimeTypes = $this->flattenMimeTypes($formats);
             $mimeTypes = array_keys($flattenedMimeTypes);
         } elseif (!isset($formats[$routeFormat])) {
-            throw new NotFoundHttpException(sprintf('Format "%s" is not supported', $routeFormat));
+            if (!$request->attributes->get('data') instanceof \Exception) {
+                throw new NotFoundHttpException(sprintf('Format "%s" is not supported', $routeFormat));
+            }
+            $this->setRequestErrorFormat($operation, $request);
+
+            return;
         } else {
             $mimeTypes = Request::getMimeTypes($routeFormat);
             $flattenedMimeTypes = $this->flattenMimeTypes([$routeFormat => $mimeTypes]);
@@ -75,7 +80,13 @@ final class AddFormatListener
         $accept = $request->headers->get('Accept');
         if (null !== $accept) {
             if (null === $mediaType = $this->negotiator->getBest($accept, $mimeTypes)) {
-                throw $this->getNotAcceptableHttpException($accept, $flattenedMimeTypes);
+                if (!$request->attributes->get('data') instanceof \Exception) {
+                    throw $this->getNotAcceptableHttpException($accept, $flattenedMimeTypes);
+                }
+
+                $this->setRequestErrorFormat($operation, $request);
+
+                return;
             }
 
             $formatMatcher = new FormatMatcher($formats);
@@ -90,6 +101,12 @@ final class AddFormatListener
             $mimeType = $request->getMimeType($requestFormat);
 
             if (isset($flattenedMimeTypes[$mimeType])) {
+                return;
+            }
+
+            if ($request->attributes->get('data') instanceof \Exception) {
+                $this->setRequestErrorFormat($operation, $request);
+
                 return;
             }
 
@@ -141,5 +158,26 @@ final class AddFormatListener
             $accept,
             implode('", "', array_keys($mimeTypes))
         ));
+    }
+
+    public function setRequestErrorFormat(?HttpOperation $operation, Request $request): void
+    {
+        $errorResourceFormats = array_merge($operation?->getOutputFormats() ?? [], $operation?->getFormats() ?? [], $this->errorFormats);
+
+        $flattened = $this->flattenMimeTypes($errorResourceFormats);
+        if ($flattened[$accept = $request->headers->get('Accept')] ?? false) {
+            $request->setRequestFormat($flattened[$accept]);
+
+            return;
+        }
+
+        if (isset($errorResourceFormats['jsonproblem'])) {
+            $request->setRequestFormat('jsonproblem');
+            $request->setFormat('jsonproblem', $errorResourceFormats['jsonproblem']);
+
+            return;
+        }
+
+        $request->setRequestFormat(array_key_first($errorResourceFormats));
     }
 }

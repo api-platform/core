@@ -18,8 +18,10 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ResourceList;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Util\ErrorFormatGuesser;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -40,8 +42,13 @@ final class SerializeListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'serialize';
 
-    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
-    {
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+        private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
+        private readonly array $errorFormats = [],
+        private readonly bool $debug = false,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
 
@@ -79,6 +86,29 @@ final class SerializeListener
             $event->setControllerResult(null);
 
             return;
+        }
+
+        if ($controllerResult instanceof ValidationException) {
+            $format = ErrorFormatGuesser::guessErrorFormat($request, $this->errorFormats);
+            $previousOperation = $request->attributes->get('_api_previous_operation');
+            if (!($previousOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
+                $context['groups'] = ['legacy_'.$format['key']];
+                $context['force_iri_generation'] = false;
+            }
+        }
+
+        if ($request->get('_api_error', false)) {
+            $context['skip_deprecated_exception_normalizers'] = true;
+
+            if ($this->debug) {
+                $groups = $context['groups'] ?? [];
+                if (!\is_array($groups)) {
+                    $groups = [$groups];
+                }
+
+                $groups[] = 'trace';
+                $context['groups'] = $groups;
+            }
         }
 
         if ($included = $request->attributes->get('_api_included')) {
