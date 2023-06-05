@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\State\JsonApi;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 
 /**
