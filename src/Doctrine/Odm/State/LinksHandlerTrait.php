@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Types\Type;
 
 trait LinksHandlerTrait
 {
@@ -89,13 +90,23 @@ trait LinksHandlerTrait
             $aggregation = $manager->createAggregationBuilder($aggregationClass);
         }
 
+        $associationAsObject = false;
+
         if ($lookupProperty && $classMetadata->hasAssociation($lookupProperty)) {
+            $referenceMapping = $classMetadata->getFieldMapping($lookupProperty);
+            $associationAsObject = ClassMetadata::REFERENCE_STORE_AS_ID === $referenceMapping['storeAs'] ?? false;
+
             $aggregation->lookup($lookupProperty)->alias($lookupPropertyAlias);
         }
 
         if ($toProperty) {
             foreach ($identifierProperties as $identifierProperty) {
-                $aggregation->match()->field(sprintf('%s.%s', $lookupPropertyAlias, 'id' === $identifierProperty ? '_id' : $identifierProperty))->equals($this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null));
+                $aggregation->match()->field(sprintf('%s.%s', $lookupPropertyAlias, 'id' === $identifierProperty ? '_id' : $identifierProperty))->equals(
+                    $this->getFieldType(
+                        $associationAsObject ? Type::OBJECTID : $classMetadata->getTypeOfField($toProperty),
+                        $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null)
+                    )
+                );
             }
         } else {
             foreach ($identifierProperties as $identifierProperty) {
@@ -120,5 +131,17 @@ trait LinksHandlerTrait
         $previousAggregationBuilder->match()->field('_id')->in($in);
 
         return $previousAggregationBuilder;
+    }
+
+    private function getFieldType($type, $value){
+
+        if (!Type::hasType($type)) {
+            return $value;
+        }
+        if (Type::STRING !== $type) {
+            return Type::getType($type)->convertToDatabaseValue($value);
+        }
+
+        return $value;
     }
 }
