@@ -90,12 +90,7 @@ trait LinksHandlerTrait
             $aggregation = $manager->createAggregationBuilder($aggregationClass);
         }
 
-        $associationAsObject = false;
-
         if ($lookupProperty && $classMetadata->hasAssociation($lookupProperty)) {
-            $referenceMapping = $classMetadata->getFieldMapping($lookupProperty);
-            $associationAsObject = ClassMetadata::REFERENCE_STORE_AS_ID === $referenceMapping['storeAs'];
-
             $aggregation->lookup($lookupProperty)->alias($lookupPropertyAlias);
         }
 
@@ -103,14 +98,19 @@ trait LinksHandlerTrait
             foreach ($identifierProperties as $identifierProperty) {
                 $aggregation->match()->field(sprintf('%s.%s', $lookupPropertyAlias, 'id' === $identifierProperty ? '_id' : $identifierProperty))->equals(
                     $this->getFieldType(
-                        $associationAsObject ? Type::OBJECTID : $classMetadata->getTypeOfField($toProperty),
+                        $this->getAssociatedFieldType($classMetadata, $identifierProperty),
                         $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null)
                     )
                 );
             }
         } else {
             foreach ($identifierProperties as $identifierProperty) {
-                $aggregation->match()->field($identifierProperty)->equals($this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null));
+                $aggregation->match()->field($identifierProperty)->equals(
+                    $this->getFieldType(
+                        $this->getAssociatedFieldType($classMetadata, $identifierProperty),
+                        $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null)
+                    )
+                );
             }
         }
 
@@ -131,6 +131,18 @@ trait LinksHandlerTrait
         $previousAggregationBuilder->match()->field('_id')->in($in);
 
         return $previousAggregationBuilder;
+    }
+
+    private function getAssociatedFieldType($classMetadata, $identifierProperty){
+        if(!$classMetadata->hasAssociation($identifierProperty)){
+            return $classMetadata->getTypeOfField($identifierProperty);
+        }
+
+        $referenceMapping = $classMetadata->getFieldMapping($identifierProperty);
+
+        $associationAsObject = ClassMetadata::REFERENCE_STORE_AS_ID === $referenceMapping['storeAs'];
+
+        return $associationAsObject ? Type::OBJECTID : $classMetadata->getTypeOfField($identifierProperty);
     }
 
     private function getFieldType($type, $value)
