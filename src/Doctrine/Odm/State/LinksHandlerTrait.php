@@ -133,13 +133,13 @@ trait LinksHandlerTrait
         return $previousAggregationBuilder;
     }
 
-    private function getAssociatedFieldType($classMetadata, $identifierProperty){
-        if(!$classMetadata->hasAssociation($identifierProperty)){
+    private function getAssociatedFieldType(ClassMetadata $classMetadata, string $identifierProperty): string
+    {
+        if (!$classMetadata->hasAssociation($identifierProperty)) {
             return $classMetadata->getTypeOfField($identifierProperty);
         }
 
         $referenceMapping = $classMetadata->getFieldMapping($identifierProperty);
-
         $associationAsObject = ClassMetadata::REFERENCE_STORE_AS_ID === $referenceMapping['storeAs'];
 
         return $associationAsObject ? Type::OBJECTID : $classMetadata->getTypeOfField($identifierProperty);
