@@ -135,7 +135,7 @@ trait LinksHandlerTrait
 
     private function getAssociatedFieldType(ClassMetadata $classMetadata, string $identifierProperty): string
     {
-        if (!$classMetadata->hasAssociation($identifierProperty)) {
+        if ($classMetadata->hasAssociation($identifierProperty) === null || $classMetadata->hasAssociation($identifierProperty) === false) {
             return $classMetadata->getTypeOfField($identifierProperty);
         }
 
