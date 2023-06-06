@@ -90,11 +90,11 @@ trait LinksHandlerTrait
             $aggregation = $manager->createAggregationBuilder($aggregationClass);
         }
 
-        $associationAsObject = null;
+        $associationAsObject = false;
 
         if ($lookupProperty && $classMetadata->hasAssociation($lookupProperty)) {
             $referenceMapping = $classMetadata->getFieldMapping($lookupProperty);
-            $associationAsObject = ClassMetadata::REFERENCE_STORE_AS_ID === $referenceMapping['storeAs'] ?? null;
+            $associationAsObject = ClassMetadata::REFERENCE_STORE_AS_ID === $referenceMapping['storeAs'];
 
             $aggregation->lookup($lookupProperty)->alias($lookupPropertyAlias);
         }
@@ -135,7 +135,6 @@ trait LinksHandlerTrait
 
     private function getFieldType($type, $value)
     {
-
         if (!Type::hasType($type)) {
             return $value;
         }
