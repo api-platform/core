@@ -45,7 +45,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     {
         return static::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
-    
+
     /**
      * @return array<class-string<ConstraintViolationListInterface::class>, bool>|list<mixed>
      */
@@ -64,6 +64,8 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return true;
     }
 

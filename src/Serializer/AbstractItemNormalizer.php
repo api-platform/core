@@ -18,6 +18,9 @@ use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
+use ApiPlatform\Hal\Serializer\ItemNormalizer as HalItemNormalizer;
+use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
+use ApiPlatform\JsonLd\Serializer\ItemNormalizer as JsonLdItemNormalizer;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -89,10 +92,23 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     * @deprecated since Symfony 6.3, use "getSupportedTypes(?string $format)" instead
      */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return true;
+    }
+
+    public function getSupportedTypes(?string $format)
+    {
+        return [
+            HalItemNormalizer::class => true,
+            JsonApiItemNormalizer::class => true,
+            JsonLdItemNormalizer::class => true,
+            ItemNormalizer::class => true,
+        ];
     }
 
     /**

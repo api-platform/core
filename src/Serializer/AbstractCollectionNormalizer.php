@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Hal\Serializer\CollectionNormalizer as HalCollectionNormalizer;
+use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
+use ApiPlatform\JsonApi\Serializer\CollectionNormalizer as JsonApiCollectionNormalizer;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
@@ -54,9 +57,26 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         return static::FORMAT === $format && is_iterable($data);
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes(?string $format)" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return true;
+    }
+
+    public function getSupportedTypes(?string $format)
+    {
+        return match($format) {
+            static::FORMAT => [
+                HalCollectionNormalizer::class => true,
+                HydraCollectionNormalizer::class => true,
+                JsonApiCollectionNormalizer::class => true,
+            ],
+            default => [],
+        };
     }
 
     /**
