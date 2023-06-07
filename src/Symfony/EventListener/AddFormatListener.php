@@ -73,7 +73,7 @@ final class AddFormatListener
         // First, try to guess the format from the Accept header
         /** @var string|null $accept */
         $accept = $request->headers->get('Accept');
-        if (null !== $accept) {
+        if (!empty($accept)) {
             if (null === $mediaType = $this->negotiator->getBest($accept, $mimeTypes)) {
                 throw $this->getNotAcceptableHttpException($accept, $flattenedMimeTypes);
             }
