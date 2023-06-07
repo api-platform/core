@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\FormatMatcher;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use Exception;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -73,8 +74,15 @@ final class AddFormatListener
         // First, try to guess the format from the Accept header
         /** @var string|null $accept */
         $accept = $request->headers->get('Accept');
-        if (!empty($accept)) {
-            if (null === $mediaType = $this->negotiator->getBest($accept, $mimeTypes)) {
+
+        if (null !== $accept) {
+            try {
+                $mediaType = $this->negotiator->getBest($accept, $mimeTypes);
+            } catch (Exception) {
+                throw $this->getNotAcceptableHttpException($accept, $flattenedMimeTypes);
+            }
+
+            if (null === $mediaType) {
                 throw $this->getNotAcceptableHttpException($accept, $flattenedMimeTypes);
             }
 
