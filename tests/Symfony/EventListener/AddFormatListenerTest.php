@@ -138,6 +138,8 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('json', $request->getRequestFormat());
     }
 
+
+
     public function testSupportedAcceptHeaderSymfonyBuiltInFormat(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
@@ -262,6 +264,31 @@ class AddFormatListenerTest extends TestCase
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
+    }
+
+    public function testZeroAcceptHeader(): void
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
+        $request->headers->set('Accept', '0');
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $eventProphecy->getRequest()->willReturn($request);
+        $event = $eventProphecy->reveal();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
+            new ApiResource(operations: [
+                'get' => new Get(outputFormats: [
+                    'binary' => ['application/octet-stream'],
+                    'json' => ['application/json'],
+                ]),
+            ]),
+        ]));
+
+        $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('binary', $request->getRequestFormat());
     }
 
     public function testAcceptHeaderTakePrecedenceOverRequestFormat(): void
