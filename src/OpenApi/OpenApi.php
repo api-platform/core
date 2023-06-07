@@ -13,19 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi;
 
-use ApiPlatform\Documentation\DocumentationInterface;
 use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\ExtensionTrait;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Paths;
 
-final class OpenApi implements DocumentationInterface
+final class OpenApi
 {
     use ExtensionTrait;
 
-    // We're actually supporting 3.1 but swagger ui has a version constraint
-    // public const VERSION = '3.1.0';
-    public const VERSION = '3.0.0';
+    public const VERSION = '3.1.0';
 
     private string $openapi = self::VERSION;
 

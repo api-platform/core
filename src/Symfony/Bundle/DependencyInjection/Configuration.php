@@ -19,6 +19,8 @@ use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\EntityManagerInterface;
@@ -84,7 +86,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()
-                ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
+                ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.metadata.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
                 ->arrayNode('validator')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -280,6 +282,10 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('api_keys')
                             ->useAttributeAsKey('key')
+                            ->validate()
+                                ->ifTrue(static fn($v): bool => (bool) array_filter(array_keys($v), fn($item) => !preg_match('/^[a-zA-Z0-9._-]+$/', $item)))
+                                ->thenInvalid('The api keys "key" is not valid according to the pattern enforced by OpenAPI 3.1 ^[a-zA-Z0-9._-]+$.')
+                            ->end()
                             ->prototype('array')
                                 ->children()
                                     ->scalarNode('name')
@@ -558,10 +564,9 @@ final class Configuration implements ConfigurationInterface
                 return $normalizedDefaults;
             });
 
-        $reflection = new \ReflectionClass(ApiResource::class);
-        foreach ($reflection->getConstructor()->getParameters() as $parameter) {
-            $defaultsNode->children()->variableNode($nameConverter->normalize($parameter->getName()));
-        }
+        $this->defineDefault($defaultsNode, new \ReflectionClass(ApiResource::class), $nameConverter);
+        $this->defineDefault($defaultsNode, new \ReflectionClass(Put::class), $nameConverter);
+        $this->defineDefault($defaultsNode, new \ReflectionClass(Post::class), $nameConverter);
     }
 
     private function addMakerSection(ArrayNodeDefinition $rootNode): void
@@ -572,5 +577,12 @@ final class Configuration implements ConfigurationInterface
                     ->{class_exists(MakerBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
             ->end();
+    }
+
+    private function defineDefault(ArrayNodeDefinition $defaultsNode, \ReflectionClass $reflectionClass, CamelCaseToSnakeCaseNameConverter $nameConverter)
+    {
+        foreach ($reflectionClass->getConstructor()->getParameters() as $parameter) {
+            $defaultsNode->children()->variableNode($nameConverter->normalize($parameter->getName()));
+        }
     }
 }

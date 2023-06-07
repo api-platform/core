@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -84,7 +84,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
 
             $parameterName = $link->getParameterName();
-            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass(), $link->getIdentifiers()[0], $parameterName, $link->getToProperty());
+            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $link->getIdentifiers()[0], $parameterName, $link->getToProperty());
         }
 
         return $identifiers;
@@ -93,7 +93,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     /**
      * Gets the value of the given class property.
      */
-    private function getIdentifierValue(object $item, string $class, string $property, string $parameterName, ?string $toProperty = null): float|bool|int|string
+    private function getIdentifierValue(object $item, string $class, string $property, string $parameterName, string $toProperty = null): float|bool|int|string
     {
         if ($item instanceof $class) {
             try {

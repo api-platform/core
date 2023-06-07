@@ -27,10 +27,10 @@ class HttpOperation extends Operation
     public const METHOD_OPTIONS = 'OPTIONS';
 
     /**
-     * @param string[]|null                              $types         the RDF types of this property
-     * @param array<string, string|string[]>|string|null $formats       {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
-     * @param array<string, string|string[]>|string|null $inputFormats  {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
-     * @param array<string, string|string[]>|string|null $outputFormats {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
+     * @param string[]|null                                  $types         the RDF types of this property
+     * @param array<int|string, string|string[]>|string|null $formats       {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
+     * @param array<int|string, string|string[]>|string|null $inputFormats  {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
+     * @param array<int|string, string|string[]>|string|null $outputFormats {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
      * @param array<string,array{
      *     0: string,
      *     1: string
@@ -76,7 +76,7 @@ class HttpOperation extends Operation
      * @param string|callable|null   $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
      */
     public function __construct(
-        protected string $method = self::METHOD_GET,
+        protected string $method = 'GET',
         protected ?string $uriTemplate = null,
         protected ?array $types = null,
         protected $formats = null,
@@ -104,50 +104,50 @@ class HttpOperation extends Operation
         protected ?array $exceptionToStatus = null,
         protected ?bool $queryParameterValidationEnabled = null,
 
-        ?string $shortName = null,
-        ?string $class = null,
-        ?bool $paginationEnabled = null,
-        ?string $paginationType = null,
-        ?int $paginationItemsPerPage = null,
-        ?int $paginationMaximumItemsPerPage = null,
-        ?bool $paginationPartial = null,
-        ?bool $paginationClientEnabled = null,
-        ?bool $paginationClientItemsPerPage = null,
-        ?bool $paginationClientPartial = null,
-        ?bool $paginationFetchJoinCollection = null,
-        ?bool $paginationUseOutputWalkers = null,
-        ?array $order = null,
-        ?string $description = null,
-        ?array $normalizationContext = null,
-        ?array $denormalizationContext = null,
-        ?bool $collectDenormalizationErrors = null,
-        ?string $security = null,
-        ?string $securityMessage = null,
-        ?string $securityPostDenormalize = null,
-        ?string $securityPostDenormalizeMessage = null,
-        ?string $securityPostValidation = null,
-        ?string $securityPostValidationMessage = null,
-        ?string $deprecationReason = null,
-        ?array $filters = null,
-        ?array $validationContext = null,
+        string $shortName = null,
+        string $class = null,
+        bool $paginationEnabled = null,
+        string $paginationType = null,
+        int $paginationItemsPerPage = null,
+        int $paginationMaximumItemsPerPage = null,
+        bool $paginationPartial = null,
+        bool $paginationClientEnabled = null,
+        bool $paginationClientItemsPerPage = null,
+        bool $paginationClientPartial = null,
+        bool $paginationFetchJoinCollection = null,
+        bool $paginationUseOutputWalkers = null,
+        array $order = null,
+        string $description = null,
+        array $normalizationContext = null,
+        array $denormalizationContext = null,
+        bool $collectDenormalizationErrors = null,
+        string $security = null,
+        string $securityMessage = null,
+        string $securityPostDenormalize = null,
+        string $securityPostDenormalizeMessage = null,
+        string $securityPostValidation = null,
+        string $securityPostValidationMessage = null,
+        string $deprecationReason = null,
+        array $filters = null,
+        array $validationContext = null,
         $input = null,
         $output = null,
         $mercure = null,
         $messenger = null,
-        ?bool $elasticsearch = null,
-        ?int $urlGenerationStrategy = null,
-        ?bool $read = null,
-        ?bool $deserialize = null,
-        ?bool $validate = null,
-        ?bool $write = null,
-        ?bool $serialize = null,
-        ?bool $fetchPartial = null,
-        ?bool $forceEager = null,
-        ?int $priority = null,
-        ?string $name = null,
+        bool $elasticsearch = null,
+        int $urlGenerationStrategy = null,
+        bool $read = null,
+        bool $deserialize = null,
+        bool $validate = null,
+        bool $write = null,
+        bool $serialize = null,
+        bool $fetchPartial = null,
+        bool $forceEager = null,
+        int $priority = null,
+        string $name = null,
         $provider = null,
         $processor = null,
-        ?OptionsInterface $stateOptions = null,
+        OptionsInterface $stateOptions = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -217,7 +217,7 @@ class HttpOperation extends Operation
         return $this->uriTemplate;
     }
 
-    public function withUriTemplate(?string $uriTemplate = null)
+    public function withUriTemplate(string $uriTemplate = null)
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;

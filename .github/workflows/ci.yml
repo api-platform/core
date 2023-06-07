@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COVERAGE: '0'
@@ -186,6 +190,36 @@ jobs:
           php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
+  phpunit-components:
+    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.1'
+          - '8.2'
+        component:
+          - JsonSchema
+          - OpenApi
+          - Metadata
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: latest
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          ini-values: memory_limit=-1
+      - name: Run ${{ matrix.component }} tests
+        working-directory: src/${{ matrix.component }}
+        run: |
+            composer update
+            vendor/bin/simple-phpunit
+
   behat:
     name: Behat (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -339,7 +373,7 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: |
-          vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv --tags='~php8'
+          vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv
 
   mysql:
     name: Behat (PHP ${{ matrix.php }}) (MySQL)
@@ -388,7 +422,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags '~@!mysql&&~@php8'
+        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags '~@!mysql'
 
   mongodb:
     name: PHPUnit + Behat (PHP ${{ matrix.php }}) (MongoDB)
@@ -447,9 +481,9 @@ jobs:
         run: |
           mkdir -p build/logs/behat
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction --tags='~@php8'
+            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction
           else
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction --tags='~@php8'
+            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction
           fi
       - name: Merge code coverage reports
         run: |

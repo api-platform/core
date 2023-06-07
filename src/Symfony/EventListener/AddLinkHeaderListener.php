@@ -31,7 +31,7 @@ final class AddLinkHeaderListener
     use CorsTrait;
     use OperationRequestInitiatorTrait;
 
-    public function __construct(private readonly Discovery $discovery, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+    public function __construct(private readonly Discovery $discovery, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
@@ -45,8 +45,8 @@ final class AddLinkHeaderListener
         $operation = $this->initializeOperation($request);
 
         if (
-            null === $request->attributes->get('_api_resource_class') ||
-            !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            null === $request->attributes->get('_api_resource_class')
+            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
         ) {
             return;
         }

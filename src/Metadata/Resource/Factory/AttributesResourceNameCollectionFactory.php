@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Util\ReflectionClassRecursiveIterator;
+use ApiPlatform\Metadata\Util\ReflectionClassRecursiveIterator;
 
 /**
  * Creates a resource name collection from {@see ApiResource} annotations.

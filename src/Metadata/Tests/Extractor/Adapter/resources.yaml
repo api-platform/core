@@ -1,0 +1,320 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment:
+        - null
+        -
+            uriTemplate: '/users/{userId}/comments'
+            shortName: Comment
+            description: 'A list of Comments from User'
+            types:
+                - someirischema
+                - anotheririschema
+            operations:
+                -
+                    name: custom_operation_name
+                    method: GET
+                    uriTemplate: '/users/{userId}/comments{._format}'
+                    shortName: Comment
+                    description: 'A list of Comments'
+                    types:
+                        - Comment
+                    formats:
+                        json: null
+                        jsonld: null
+                        xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                    inputFormats:
+                        jsonld: application/merge-patch+json+ld
+                    outputFormats:
+                        jsonld: application/merge-patch+json+ld
+                    uriVariables:
+                        userId:
+                            fromClass: ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment
+                            fromProperty: author
+                            compositeIdentifier: true
+                    routePrefix: /foo/api
+                    defaults:
+                        _bar: _foo
+                    requirements:
+                        userId: \d+
+                    options:
+                        bar: baz
+                    stateless: false
+                    sunset: '2021-12-01'
+                    acceptPatch: text/example;charset=utf-8
+                    status: 204
+                    host: api-platform.com
+                    schemes:
+                        - https
+                    condition: "request.headers.has('Accept')"
+                    controller: App\Controller\CustomController
+                    class: ApiPlatform\Metadata\GetCollection
+                    urlGenerationStrategy: 0
+                    deprecationReason: "I don't know"
+                    cacheHeaders:
+                        max_age: 60
+                        shared_max_age: 120
+                        vary:
+                            - Authorization
+                            - Accept-Language
+                            - Accept
+                    normalizationContext:
+                        groups: 'comment:read_collection'
+                    denormalizationContext:
+                        groups:
+                            - 'comment:write'
+                    hydraContext:
+                        foo:
+                            bar: baz
+                    openapiContext:
+                        bar: baz
+                    openapi:
+                        extensionProperties:
+                            bar: baz
+                    validationContext:
+                        foo: bar
+                    filters:
+                        - comment.another_custom_filter
+                    elasticsearch: false
+                    mercure:
+                        private: true
+                    messenger: input
+                    input: App\Dto\CreateCommentInput
+                    output: App\Dto\CommentCollectionOutut
+                    order:
+                        - userId
+                    fetchPartial: false
+                    forceEager: false
+                    paginationClientEnabled: false
+                    paginationClientItemsPerPage: false
+                    paginationClientPartial: false
+                    paginationViaCursor:
+                        userId: DESC
+                    paginationEnabled: false
+                    paginationFetchJoinCollection: false
+                    paginationUseOutputWalkers: false
+                    paginationItemsPerPage: 54
+                    paginationMaximumItemsPerPage: 200
+                    paginationPartial: false
+                    paginationType: page
+                    security: "is_granted('IS_AUTHENTICATED_ANONYMOUSLY')"
+                    securityMessage: "Sorry, you can't access this collection."
+                    securityPostDenormalize: "is_granted('ROLE_CUSTOM_ADMIN')"
+                    securityPostDenormalizeMessage: 'Sorry, you must an admin to access this collection.'
+                    exceptionToStatus:
+                        Symfony\Component\Serializer\Exception\ExceptionInterface: 404
+                    queryParameterValidationEnabled: false
+                    read: true
+                    deserialize: false
+                    validate: false
+                    write: false
+                    serialize: true
+                    priority: 200
+                    extraProperties:
+                        custom_property: 'Lorem ipsum dolor sit amet'
+                        another_custom_property:
+                            'Lorem ipsum': 'Dolor sit amet'
+                        foo: bar
+                -
+                    uriTemplate: '/users/{userId}/comments/{commentId}{._format}'
+                    class: ApiPlatform\Metadata\Get
+                    uriVariables:
+                        userId:
+                            fromClass: ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment
+                            fromProperty: author
+                            compositeIdentifier: true
+                        commentId:
+                            - ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment
+                            - id
+            formats:
+                json: null
+                jsonld: null
+                xls: application/vnd.ms-excel
+            inputFormats:
+                json: application/merge-patch+json
+            outputFormats:
+                json: application/merge-patch+json
+            uriVariables:
+                userId:
+                    fromClass: ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment
+                    fromProperty: author
+                    compositeIdentifier: true
+            routePrefix: /api
+            defaults:
+                prout: pouet
+            requirements:
+                id: \d+
+            options:
+                foo: bar
+            stateless: true
+            sunset: '2021-01-01'
+            acceptPatch: application/merge-patch+json
+            status: 200
+            host: example.com
+            schemes:
+                - http
+                - https
+            condition: "request.headers.get('User-Agent') matches \\{/firefox/i'"
+            controller: App\Controller\CommentController
+            class: null
+            urlGenerationStrategy: 1
+            deprecationReason: 'This resource is deprecated'
+            cacheHeaders:
+                max_age: 60
+                shared_max_age: 120
+                vary:
+                    - Authorization
+                    - Accept-Language
+            normalizationContext:
+                groups: 'comment:read'
+            denormalizationContext:
+                groups:
+                    - 'comment:write'
+                    - 'comment:custom'
+            collectDenormalizationErrors: true
+            hydraContext:
+                foo:
+                    bar: baz
+            openapiContext:
+                bar: baz
+            openapi:
+                extensionProperties:
+                    bar: baz
+            validationContext:
+                foo: bar
+            filters:
+                - comment.custom_filter
+            elasticsearch: true
+            mercure: true
+            messenger: true
+            input: App\Dto\CommentInput
+            output: App\Dto\CommentOutut
+            order:
+                - foo
+                - bar
+            fetchPartial: true
+            forceEager: true
+            paginationClientEnabled: true
+            paginationClientItemsPerPage: true
+            paginationClientPartial: true
+            paginationViaCursor:
+                id: DESC
+            paginationEnabled: true
+            paginationFetchJoinCollection: true
+            paginationUseOutputWalkers: true
+            paginationItemsPerPage: 42
+            paginationMaximumItemsPerPage: 200
+            paginationPartial: true
+            paginationType: page
+            security: "is_granted('ROLE_USER')"
+            securityMessage: "Sorry, you can't access this resource."
+            securityPostDenormalize: "is_granted('ROLE_ADMIN')"
+            securityPostDenormalizeMessage: 'Sorry, you must an admin to access this resource.'
+            securityPostValidation: "is_granted('ROLE_OWNER')"
+            securityPostValidationMessage: 'Sorry, you must the owner of this resource to access it.'
+            compositeIdentifier: null
+            exceptionToStatus:
+                Symfony\Component\Serializer\Exception\ExceptionInterface: 400
+            queryParameterValidationEnabled: true
+            graphQlOperations:
+                -
+                    args:
+                        foo:
+                            type: custom
+                            bar: baz
+                    shortName: Comment
+                    description: 'Creates a Comment.'
+                    class: ApiPlatform\Metadata\GraphQl\Mutation
+                    name: create
+                    urlGenerationStrategy: 0
+                    deprecationReason: "I don't know"
+                    normalizationContext:
+                        groups: 'comment:read_collection'
+                    denormalizationContext:
+                        groups:
+                            - 'comment:write'
+                    validationContext:
+                        foo: bar
+                    filters:
+                        - comment.another_custom_filter
+                    elasticsearch: false
+                    mercure:
+                        private: true
+                    messenger: input
+                    input: App\Dto\CreateCommentInput
+                    output: App\Dto\CommentCollectionOutut
+                    order:
+                        - userId
+                    fetchPartial: false
+                    forceEager: false
+                    paginationClientEnabled: false
+                    paginationClientItemsPerPage: false
+                    paginationClientPartial: false
+                    paginationEnabled: false
+                    paginationFetchJoinCollection: false
+                    paginationUseOutputWalkers: false
+                    paginationItemsPerPage: 54
+                    paginationMaximumItemsPerPage: 200
+                    paginationPartial: false
+                    paginationType: page
+                    security: "is_granted('IS_AUTHENTICATED_ANONYMOUSLY')"
+                    securityMessage: "Sorry, you can't access this collection."
+                    securityPostDenormalize: "is_granted('ROLE_CUSTOM_ADMIN')"
+                    securityPostDenormalizeMessage: 'Sorry, you must an admin to access this collection.'
+                    read: true
+                    deserialize: false
+                    validate: false
+                    write: false
+                    serialize: true
+                    priority: 200
+                    extraProperties:
+                        custom_property: 'Lorem ipsum dolor sit amet'
+                        another_custom_property:
+                            'Lorem ipsum': 'Dolor sit amet'
+                        foo: bar
+                        route_prefix: /v1
+                    stateOptions:
+                        elasticsearchOptions:
+                            index: foo_index
+                            type: foo_type
+                -
+                    class: ApiPlatform\Metadata\GraphQl\Query
+                    extraProperties:
+                        route_prefix: /v1
+                        custom_property: 'Lorem ipsum dolor sit amet'
+                        another_custom_property:
+                            'Lorem ipsum': 'Dolor sit amet'
+                    stateOptions:
+                        elasticsearchOptions:
+                            index: foo_index
+                            type: foo_type
+                -
+                    class: ApiPlatform\Metadata\GraphQl\QueryCollection
+                    extraProperties:
+                        route_prefix: /v1
+                        custom_property: 'Lorem ipsum dolor sit amet'
+                        another_custom_property:
+                            'Lorem ipsum': 'Dolor sit amet'
+                    stateOptions:
+                        elasticsearchOptions:
+                            index: foo_index
+                            type: foo_type
+                -
+                    class: ApiPlatform\Metadata\GraphQl\Subscription
+                    extraProperties:
+                        route_prefix: /v1
+                        custom_property: 'Lorem ipsum dolor sit amet'
+                        another_custom_property:
+                            'Lorem ipsum': 'Dolor sit amet'
+                    stateOptions:
+                        elasticsearchOptions:
+                            index: foo_index
+                            type: foo_type
+            provider: null
+            processor: null
+            stateOptions:
+                elasticsearchOptions:
+                    index: foo_index
+                    type: foo_type
+            extraProperties:
+                custom_property: 'Lorem ipsum dolor sit amet'
+                another_custom_property:
+                    'Lorem ipsum': 'Dolor sit amet'

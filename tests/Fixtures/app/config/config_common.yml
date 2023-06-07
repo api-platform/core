@@ -64,6 +64,7 @@ api_platform:
     defaults:
         extra_properties:
             standard_put: true
+            rfc_7807_compliant_errors: true
         normalization_context: 
             skip_null_values: false
         pagination_client_enabled:            true
@@ -75,6 +76,7 @@ api_platform:
             shared_max_age:                   3600
             vary:                             ['Accept', 'Cookie']
             public:                           true
+
     doctrine_mongodb_odm: false
     mapping:
         paths:

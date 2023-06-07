@@ -18,9 +18,9 @@ use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
-use ApiPlatform\Util\ClassInfoTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,8 +43,8 @@ final class WriteListener
         private readonly ProcessorInterface $processor,
         private readonly IriConverterInterface $iriConverter,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
-        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
-        ?UriVariablesConverterInterface $uriVariablesConverter = null,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        UriVariablesConverterInterface $uriVariablesConverter = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;

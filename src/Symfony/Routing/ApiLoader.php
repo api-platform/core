@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Routing;
 
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\Config\FileLocator;
@@ -97,7 +96,7 @@ final class ApiLoader extends Loader
                         $operation->getOptions() ?? [],
                         $operation->getHost() ?? '',
                         $operation->getSchemes() ?? [],
-                        [$operation->getMethod() ?? HttpOperation::METHOD_GET],
+                        [$operation->getMethod() ?? 'GET'],
                         $operation->getCondition() ?? ''
                     );
 

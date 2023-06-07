@@ -157,7 +157,7 @@ trait SearchFilterTrait
     /**
      * When the field should be an integer, check that the given value is a valid one.
      */
-    protected function hasValidValues(array $values, ?string $type = null): bool
+    protected function hasValidValues(array $values, string $type = null): bool
     {
         foreach ($values as $value) {
             if (null !== $value && \in_array($type, (array) self::DOCTRINE_INTEGER_TYPE, true) && false === filter_var($value, \FILTER_VALIDATE_INT)) {

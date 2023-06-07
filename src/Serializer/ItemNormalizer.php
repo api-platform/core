@@ -17,6 +17,7 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -76,10 +77,34 @@ class ItemNormalizer extends AbstractItemNormalizer
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException) {
             $operation = $this->resourceMetadataCollectionFactory->create($context['resource_class'])->getOperation();
-            // todo: we could guess uri variables with the operation and the data instead of hardcoding id
-            $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => $data['id']]]);
+            $uriVariables = $this->getContextUriVariables($data, $operation, $context);
+            $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
 
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => true]);
         }
+    }
+
+    private function getContextUriVariables(array $data, $operation, array $context): array
+    {
+        if (!isset($context['uri_variables'])) {
+            return ['id' => $data['id']];
+        }
+
+        $uriVariables = $context['uri_variables'];
+
+        /** @var Link $uriVariable */
+        foreach ($operation->getUriVariables() as $uriVariable) {
+            if (isset($uriVariables[$uriVariable->getParameterName()])) {
+                continue;
+            }
+
+            foreach ($uriVariable->getIdentifiers() as $identifier) {
+                if (isset($data[$identifier])) {
+                    $uriVariables[$uriVariable->getParameterName()] = $data[$identifier];
+                }
+            }
+        }
+
+        return $uriVariables;
     }
 }

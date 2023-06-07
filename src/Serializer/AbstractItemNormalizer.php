@@ -23,8 +23,9 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Util\CloneTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -41,7 +42,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Base item normalizer.
@@ -51,6 +51,7 @@ use Symfony\Component\Serializer\Serializer;
 abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 {
     use ClassInfoTrait;
+    use CloneTrait;
     use ContextTrait;
     use InputOutputMetadataTrait;
 
@@ -214,21 +215,34 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" resource must be "array" (nested document) or "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null);
         }
 
-        $previousObject = isset($objectToPopulate) ? clone $objectToPopulate : null;
-
+        $previousObject = $this->clone($objectToPopulate);
         $object = parent::denormalize($data, $class, $format, $context);
 
         if (!$this->resourceClassResolver->isResourceClass($class)) {
             return $object;
         }
 
+        // Bypass the post-denormalize attribute revert logic if the object could not be
+        // cloned since we cannot possibly revert any changes made to it.
+        if (null !== $objectToPopulate && null === $previousObject) {
+            return $object;
+        }
+
+        $options = $this->getFactoryOptions($context);
+        $propertyNames = iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $options));
+
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
         foreach (array_keys($data) as $attribute) {
+            $attribute = $this->nameConverter ? $this->nameConverter->denormalize((string) $attribute) : $attribute;
+            if (!\in_array($attribute, $propertyNames, true)) {
+                continue;
+            }
+
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
                 if (null !== $previousObject) {
                     $this->setValue($object, $attribute, $this->propertyAccessor->getValue($previousObject, $attribute));
                 } else {
-                    $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $this->getFactoryOptions($context));
+                    $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
                     $this->setValue($object, $attribute, $propertyMetadata->getDefault());
                 }
             }
@@ -370,10 +384,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
 
             if (
-                $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
-                (
-                    isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
-                    isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
+                $this->isAllowedAttribute($classOrObject, $propertyName, null, $context)
+                && (
+                    isset($context['api_normalize']) && $propertyMetadata->isReadable()
+                    || isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
                 )
             ) {
                 $allowedAttributes[] = $propertyName;
@@ -590,11 +604,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
 
         if (
-            $type &&
-            $type->isCollection() &&
-            ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) &&
-            ($className = $collectionValueType->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $type
+            && $type->isCollection()
+            && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null)
+            && ($className = $collectionValueType->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             if (!is_iterable($attributeValue)) {
                 throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
@@ -608,9 +622,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $type &&
-            ($className = $type->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $type
+            && ($className = $type->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             if (!\is_object($attributeValue) && null !== $attributeValue) {
                 throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
@@ -632,11 +646,19 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         unset($context['resource_class']);
+        unset($context['force_resource_class']);
 
         if ($type && $type->getClassName()) {
             $childContext = $this->createChildContext($context, $attribute, $format);
             unset($childContext['iri'], $childContext['uri_variables']);
             $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
+
+            return $this->serializer->normalize($attributeValue, $format, $childContext);
+        }
+
+        if ($type && 'array' === $type->getBuiltinType()) {
+            $childContext = $this->createChildContext($context, $attribute, $format);
+            unset($childContext['iri'], $childContext['uri_variables']);
 
             return $this->serializer->normalize($attributeValue, $format, $childContext);
         }
@@ -683,7 +705,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
-            $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $context);
+            $relatedContext = $context;
+            unset($relatedContext['force_resource_class']);
+            $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $relatedContext);
             if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
                 throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
             }
@@ -729,7 +753,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $value;
         }
 
-        if (null === $value && $type->isNullable()) {
+        if (null === $value && ($type->isNullable() || ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false))) {
             return $value;
         }
 
@@ -743,10 +767,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $type->isCollection() &&
-            null !== $collectionValueType &&
-            null !== ($className = $collectionValueType->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $type->isCollection()
+            && null !== $collectionValueType
+            && null !== ($className = $collectionValueType->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $context['resource_class'] = $resourceClass;
@@ -755,8 +779,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            null !== ($className = $type->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            null !== ($className = $type->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
@@ -769,9 +793,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $type->isCollection() &&
-            null !== $collectionValueType &&
-            null !== ($className = $collectionValueType->getClassName())
+            $type->isCollection()
+            && null !== $collectionValueType
+            && null !== ($className = $collectionValueType->getClassName())
         ) {
             if (!$this->serializer instanceof DenormalizerInterface) {
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));

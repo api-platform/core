@@ -17,6 +17,7 @@ use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Documentation\DocumentationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\OpenApi\OpenApi;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -30,7 +31,10 @@ final class DocumentationAction
     {
     }
 
-    public function __invoke(Request $request = null): DocumentationInterface
+    /**
+     * @return DocumentationInterface|OpenApi
+     */
+    public function __invoke(Request $request = null)
     {
         if (null !== $request) {
             $context = ['base_url' => $request->getBaseUrl()];

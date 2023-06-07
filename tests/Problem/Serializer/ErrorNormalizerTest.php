@@ -34,9 +34,11 @@ class ErrorNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new FlattenException(), ErrorNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new FlattenException(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
+    /**
+     * @group legacy
+     */
     public function testNormalize(): void
     {
         $normalizer = new ErrorNormalizer();
@@ -62,6 +64,8 @@ class ErrorNormalizerTest extends TestCase
     /**
      * @dataProvider providerStatusCode
      *
+     * @group legacy
+     *
      * @param int    $status          http status code of the Exception
      * @param string $originalMessage original message of the Exception
      * @param bool   $debug           simulates kernel debug variable
@@ -84,6 +88,9 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, null, ['statusCode' => $status]));
     }
 
+    /**
+     * @group legacy
+     */
     public function providerStatusCode(): \Iterator
     {
         yield [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', false];
@@ -95,6 +102,9 @@ class ErrorNormalizerTest extends TestCase
         yield [509, Response::$statusTexts[Response::HTTP_INTERNAL_SERVER_ERROR], true];
     }
 
+    /**
+     * @group legacy
+     */
     public function testErrorServerNormalizeContextStatus(): void
     {
         $normalizer = new ErrorNormalizer(false);

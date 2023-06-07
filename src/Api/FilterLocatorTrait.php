@@ -21,6 +21,8 @@ use Psr\Container\ContainerInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  *
+ * @deprecated
+ *
  * @internal
  */
 trait FilterLocatorTrait

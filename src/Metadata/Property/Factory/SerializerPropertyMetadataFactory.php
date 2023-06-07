@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 
@@ -116,8 +116,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         if (
-            $type->isCollection() &&
-            $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
+            $type->isCollection()
+            && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
         ) {
             $relatedClass = $collectionValueType->getClassName();
         } else {
@@ -157,7 +157,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * - From metadata of the given operation ("operation_name" key).
      * - From metadata of the current resource.
      *
-     * @return (string[]|null|string)[]
+     * @return (string[]|string|null)[]
      */
     private function getEffectiveSerializerGroups(array $options): array
     {

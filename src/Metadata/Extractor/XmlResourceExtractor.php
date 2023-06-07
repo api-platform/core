@@ -13,14 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Elasticsearch\State\Options;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Tests\Fixtures\StateOptions;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\Config\Util\XmlUtils;
 
 /**
@@ -438,7 +439,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         return $data;
     }
 
-    private function buildStateOptions(\SimpleXMLElement $resource): ?Options
+    private function buildStateOptions(\SimpleXMLElement $resource): ?OptionsInterface
     {
         $stateOptions = $resource->stateOptions ?? null;
         if (!$stateOptions) {
@@ -446,7 +447,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
         $elasticsearchOptions = $stateOptions->elasticsearchOptions ?? null;
         if ($elasticsearchOptions) {
-            return new Options(
+            return new StateOptions(
                 isset($elasticsearchOptions['index']) ? (string) $elasticsearchOptions['index'] : null,
                 isset($elasticsearchOptions['type']) ? (string) $elasticsearchOptions['type'] : null,
             );

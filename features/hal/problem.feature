@@ -16,9 +16,10 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
     And the JSON should be equal to:
     """
     {
-      "type": "https://tools.ietf.org/html/rfc2616#section-10",
+      "type": "/validation_errors/c1051bb4-d103-4f74-8988-acbcafc7fdc3",
       "title": "An error occurred",
       "detail": "name: This value should not be blank.",
+      "status": "422",
       "violations": [
         {
           "propertyPath": "name",
@@ -44,7 +45,7 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
-    And the JSON node "type" should be equal to "https://tools.ietf.org/html/rfc2616#section-10"
+    And the JSON node "type" should be equal to "/errors/400"
     And the JSON node "title" should be equal to "An error occurred"
     And the JSON node "detail" should be equal to 'Nested documents for attribute "relatedDummy" are not allowed. Use IRIs instead.'
     And the JSON node "trace" should exist

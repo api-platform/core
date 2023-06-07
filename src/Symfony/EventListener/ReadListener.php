@@ -16,10 +16,10 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\CloneTrait;
@@ -42,7 +42,7 @@ final class ReadListener
 
     public function __construct(
         private readonly ProviderInterface $provider,
-        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
         UriVariablesConverterInterface $uriVariablesConverter = null,
     ) {
@@ -89,16 +89,24 @@ final class ReadListener
         $resourceClass = $operation->getClass() ?? $attributes['resource_class'];
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $parameters, $resourceClass);
-            $data = $this->provider->provide($operation, $uriVariables, $context);
+            if ($request->attributes->get('_api_error', false)) {
+                $exception = $request->attributes->get('data');
+                $data = $operation->getProvider() ? $this->provider->provide($operation, $uriVariables, $context + ['previous_data' => $exception]) : $exception;
+            } else {
+                $data = $this->provider->provide($operation, $uriVariables, $context);
+            }
         } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+        } catch (ProviderNotFoundException $e) {
+            $data = null;
         }
 
         if (
-            null === $data &&
-            (
-                HttpOperation::METHOD_PUT !== $operation->getMethod() ||
-                ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
+            null === $data
+            && 'POST' !== $operation->getMethod()
+            && (
+                'PUT' !== $operation->getMethod()
+                || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
             )
         ) {
             throw new NotFoundHttpException('Not Found');

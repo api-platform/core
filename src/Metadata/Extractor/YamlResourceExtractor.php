@@ -13,13 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Elasticsearch\State\Options;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Tests\Fixtures\StateOptions;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -234,6 +236,28 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             unset($resource['openapi'][$key]);
         }
 
+        if (\array_key_exists('parameters', $resource['openapi']) && \is_array($openapiParameters = $resource['openapi']['parameters'] ?? [])) {
+            $parameters = [];
+            foreach ($openapiParameters as $parameter) {
+                $parameters[] = new Parameter(
+                    name: $parameter['name'],
+                    in: $parameter['in'],
+                    description: $parameter['description'] ?? '',
+                    required: $parameter['required'] ?? false,
+                    deprecated: $parameter['deprecated'] ?? false,
+                    allowEmptyValue: $parameter['allowEmptyValue'] ?? false,
+                    schema: $parameter['schema'] ?? [],
+                    style: $parameter['style'] ?? null,
+                    explode: $parameter['explode'] ?? false,
+                    allowReserved: $parameter['allowReserved '] ?? false,
+                    example: $parameter['example'] ?? null,
+                    examples: isset($parameter['examples']) ? new \ArrayObject($parameter['examples']) : null,
+                    content: isset($parameter['content']) ? new \ArrayObject($parameter['content']) : null
+                );
+            }
+            $resource['openapi']['parameters'] = $parameters;
+        }
+
         return new OpenApiOperation(...$resource['openapi']);
     }
 
@@ -368,7 +392,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         return $data ?: null;
     }
 
-    private function buildStateOptions(array $resource): ?Options
+    private function buildStateOptions(array $resource): ?OptionsInterface
     {
         $stateOptions = $resource['stateOptions'] ?? [];
         if (!\is_array($stateOptions)) {
@@ -382,7 +406,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         $configuration = reset($stateOptions);
         switch (key($stateOptions)) {
             case 'elasticsearchOptions':
-                return new Options($configuration['index'] ?? null, $configuration['type'] ?? null);
+                return new StateOptions($configuration['index'] ?? null, $configuration['type'] ?? null);
         }
 
         return null;

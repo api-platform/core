@@ -36,6 +36,9 @@ class ValidationExceptionListenerTest extends TestCase
 {
     use ProphecyTrait;
 
+    /**
+     * @group legacy
+     */
     public function testNotValidationException(): void
     {
         if (!class_exists(Countries::class)) {
@@ -51,6 +54,9 @@ class ValidationExceptionListenerTest extends TestCase
         $this->assertNull($event->getResponse());
     }
 
+    /**
+     * @group legacy
+     */
     public function testValidationException(): void
     {
         $exceptionJson = '{"foo": "bar"}';
@@ -72,6 +78,9 @@ class ValidationExceptionListenerTest extends TestCase
         $this->assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testOnKernelValidationExceptionWithCustomStatus(): void
     {
         $serializedConstraintViolationList = '{"foo": "bar"}';
@@ -114,6 +123,9 @@ class ValidationExceptionListenerTest extends TestCase
         self::assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testValidationFilterException(): void
     {
         $exceptionJson = '{"message": "my message"}';
@@ -135,6 +147,9 @@ class ValidationExceptionListenerTest extends TestCase
         $this->assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testValidationExceptionWithHydraTitle(): void
     {
         $exceptionJson = '{"foo": "bar"}';

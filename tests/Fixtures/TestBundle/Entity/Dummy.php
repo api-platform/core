@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ApiResource(filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], extraProperties: ['standard_put' => false])]
+#[ApiResource(filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], extraProperties: ['standard_put' => false, 'rfc_7807_compliant_errors' => false])]
 #[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()])]
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()])]
 #[ORM\Entity]

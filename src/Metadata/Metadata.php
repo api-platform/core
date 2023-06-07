@@ -98,7 +98,7 @@ abstract class Metadata
         return $this->description;
     }
 
-    public function withDescription(?string $description = null): static
+    public function withDescription(string $description = null): static
     {
         $self = clone $this;
         $self->description = $description;
@@ -500,7 +500,7 @@ abstract class Metadata
         return $this->securityPostValidation;
     }
 
-    public function withSecurityPostValidation(?string $securityPostValidation = null): static
+    public function withSecurityPostValidation(string $securityPostValidation = null): static
     {
         $self = clone $this;
         $self->securityPostValidation = $securityPostValidation;
@@ -513,7 +513,7 @@ abstract class Metadata
         return $this->securityPostValidationMessage;
     }
 
-    public function withSecurityPostValidationMessage(?string $securityPostValidationMessage = null): static
+    public function withSecurityPostValidationMessage(string $securityPostValidationMessage = null): static
     {
         $self = clone $this;
         $self->securityPostValidationMessage = $securityPostValidationMessage;

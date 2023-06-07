@@ -1,0 +1,72 @@
+{
+    "name": "api-platform/openapi",
+    "description": "Models to build and serialize an OpenAPI specification.",
+    "type": "library",
+    "keywords": ["REST", "GraphQL", "API", "JSON-LD", "Hydra", "JSONAPI", "OpenAPI", "HAL", "Swagger"],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        },
+        {
+            "name": "API Platform Community",
+            "homepage": "https://api-platform.com/community/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "api-platform/json-schema": "*@dev || ^3.1",
+        "api-platform/metadata": "*@dev || ^3.1",
+        "api-platform/state": "*@dev || ^3.1",
+        "symfony/console": "^6.1",
+        "symfony/property-access": "^6.1",
+        "symfony/serializer": "^6.1"
+    },
+    "require-dev": {
+        "phpspec/prophecy-phpunit": "^2.0",
+        "symfony/phpunit-bridge": "^6.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\OpenApi\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "3.2.x-dev"
+        },
+        "symfony": {
+            "require": "^6.1"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Metadata"
+        },
+        {
+            "type": "path",
+            "url": "../JsonSchema"
+        },
+        {
+            "type": "path",
+            "url": "../State"
+        }
+    ]
+}

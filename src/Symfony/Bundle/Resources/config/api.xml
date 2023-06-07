@@ -66,9 +66,17 @@
             <argument type="service" id="api_platform.serializer.mapping.class_metadata_factory.inner" />
         </service>
 
+        <service id="api_platform.serializer.mapping.cache_class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory" decorates="api_platform.serializer.mapping.class_metadata_factory" decoration-priority="-2" public="false">
+            <argument type="service" id="api_platform.serializer.mapping.cache_class_metadata_factory.inner" />
+            <argument type="service" id="serializer.mapping.cache.symfony" />
+        </service>
+
         <!-- Resources Operations path resolver -->
         <service id="api_platform.path_segment_name_generator.underscore" class="ApiPlatform\Operation\UnderscorePathSegmentNameGenerator" public="false" />
         <service id="api_platform.path_segment_name_generator.dash" class="ApiPlatform\Operation\DashPathSegmentNameGenerator" public="false" />
+
+        <service id="api_platform.metadata.path_segment_name_generator.underscore" class="ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator" public="false" />
+        <service id="api_platform.metadata.path_segment_name_generator.dash" class="ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator" public="false" />
 
         <!-- Action -->
 
@@ -170,9 +178,14 @@
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener">
-            <argument key="$controller">api_platform.action.exception</argument>
+            <argument key="$controller">api_platform.action.placeholder</argument>
             <argument key="$logger" type="service" id="logger" on-invalid="null" />
             <argument key="$debug">%kernel.debug%</argument>
+            <argument key="$resourceMetadataCollectionFactory" type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument key="$errorFormats">%api_platform.error_formats%</argument>
+            <argument key="$exceptionToStatus">%api_platform.exception_to_status%</argument>
+            <argument key="$identifiersExtractor" type="service" id="api_platform.api.identifiers_extractor"/>
+            <argument key="$resourceClassResolver" type="service" id="api_platform.resource_class_resolver"/>
         </service>
     </services>
 </container>

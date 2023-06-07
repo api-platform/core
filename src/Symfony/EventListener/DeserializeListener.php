@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\FormatMatcher;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
@@ -45,7 +44,7 @@ final class DeserializeListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'deserialize';
 
-    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
+    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
         if (null === $this->translator) {
@@ -86,11 +85,11 @@ final class DeserializeListener
         $format = $this->getFormat($request, $operation?->getInputFormats() ?? []);
         $data = $request->attributes->get('data');
         if (
-            null !== $data &&
-            (
-                HttpOperation::METHOD_POST === $method ||
-                HttpOperation::METHOD_PATCH === $method ||
-                (HttpOperation::METHOD_PUT === $method && !($operation->getExtraProperties()['standard_put'] ?? false))
+            null !== $data
+            && (
+                'POST' === $method
+                || 'PATCH' === $method
+                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? false))
             )
         ) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;

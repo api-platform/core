@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Extractor\PropertyExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -45,8 +45,8 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         if (
-            !property_exists($resourceClass, $property) && !interface_exists($resourceClass) ||
-            null === ($propertyMetadata = $this->extractor->getProperties()[$resourceClass][$property] ?? null)
+            !property_exists($resourceClass, $property) && !interface_exists($resourceClass)
+            || null === ($propertyMetadata = $this->extractor->getProperties()[$resourceClass][$property] ?? null)
         ) {
             return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
         }

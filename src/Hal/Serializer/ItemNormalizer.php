@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Hal\Serializer;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
-use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
@@ -245,9 +245,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
     {
         if (
-            !($context[self::ENABLE_MAX_DEPTH] ?? false) ||
-            !isset($attributesMetadata[$attribute]) ||
-            null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
+            !($context[self::ENABLE_MAX_DEPTH] ?? false)
+            || !isset($attributesMetadata[$attribute])
+            || null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
         ) {
             return false;
         }

@@ -13,16 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\OpenApi\Factory\OpenApiFactory;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -36,6 +37,10 @@ final class SchemaFactory implements SchemaFactoryInterface
 {
     use ResourceClassInfoTrait;
     private array $distinctFormats = [];
+
+    // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
+    public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
+    public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
     public function __construct(private readonly TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
@@ -56,7 +61,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
+    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, Operation $operation = null, Schema $schema = null, array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = $schema ? clone $schema : new Schema();
 
@@ -221,7 +226,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = $propertySchema;
     }
 
-    private function buildDefinitionName(string $className, string $format = 'json', ?string $inputOrOutputClass = null, Operation $operation = null, ?array $serializerContext = null): string
+    private function buildDefinitionName(string $className, string $format = 'json', string $inputOrOutputClass = null, Operation $operation = null, array $serializerContext = null): string
     {
         if ($operation) {
             $prefix = $operation->getShortName();
@@ -242,7 +247,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $prefix .= '.'.$format;
         }
 
-        $definitionName = $serializerContext[OpenApiFactory::OPENAPI_DEFINITION_NAME] ?? null;
+        $definitionName = $serializerContext[self::OPENAPI_DEFINITION_NAME] ?? null;
         if ($definitionName) {
             $name = sprintf('%s-%s', $prefix, $definitionName);
         } else {
@@ -258,7 +263,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         return preg_replace('/[^a-zA-Z0-9.\-_]/', '.', $name);
     }
 
-    private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?array $serializerContext = null): ?array
+    private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, Operation $operation = null, array $serializerContext = null): ?array
     {
         if (!$this->isResourceClass($className)) {
             return [
@@ -269,55 +274,63 @@ final class SchemaFactory implements SchemaFactoryInterface
             ];
         }
 
-        // The best here is to use an Operation when calling `buildSchema`, we try to do a smart guess otherwise
-        if (!$operation || !$operation->getClass()) {
+        if (null === $operation) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($className);
+            try {
+                $operation = $resourceMetadataCollection->getOperation();
+            } catch (OperationNotFoundException $e) {
+                $operation = new HttpOperation();
+            }
 
-            if ($operation && $operation->getName()) {
-                $operation = $resourceMetadataCollection->getOperation($operation->getName());
-            } else {
-                // Guess the operation and use the first one that matches criterias
-                foreach ($resourceMetadataCollection as $resourceMetadata) {
-                    foreach ($resourceMetadata->getOperations() ?? [] as $op) {
-                        if ($operation instanceof CollectionOperationInterface && $op instanceof CollectionOperationInterface) {
-                            $operation = $op;
-                            break 2;
-                        }
+            $operation = $this->findOperationForType($resourceMetadataCollection, $type, $operation);
+        } else {
+            // The best here is to use an Operation when calling `buildSchema`, we try to do a smart guess otherwise
+            if (!$operation->getClass()) {
+                $resourceMetadataCollection = $this->resourceMetadataFactory->create($className);
 
-                        if (Schema::TYPE_INPUT === $type && \in_array($op->getMethod(), ['POST', 'PATCH', 'PUT'], true)) {
-                            $operation = $op;
-                            break 2;
-                        }
-
-                        if (!$operation) {
-                            $operation = new HttpOperation();
-                        }
-                    }
+                if ($operation->getName()) {
+                    $operation = $resourceMetadataCollection->getOperation($operation->getName());
+                } else {
+                    $operation = $this->findOperationForType($resourceMetadataCollection, $type, $operation);
                 }
             }
         }
 
         $inputOrOutput = ['class' => $className];
+        $inputOrOutput = Schema::TYPE_OUTPUT === $type ? ($operation->getOutput() ?? $inputOrOutput) : ($operation->getInput() ?? $inputOrOutput);
+        $outputClass = ($serializerContext[self::FORCE_SUBSCHEMA] ?? false) ? ($inputOrOutput['class'] ?? $inputOrOutput->class ?? $operation->getClass()) : ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null);
 
-        if ($operation) {
-            $inputOrOutput = Schema::TYPE_OUTPUT === $type ? ($operation->getOutput() ?? $inputOrOutput) : ($operation->getInput() ?? $inputOrOutput);
-        }
-
-        if (null === ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null)) {
+        if (null === $outputClass) {
             // input or output disabled
             return null;
-        }
-
-        if (!$operation) {
-            return [$operation, $serializerContext ?? [], [], $inputOrOutput['class'] ?? $inputOrOutput->class];
         }
 
         return [
             $operation,
             $serializerContext ?? $this->getSerializerContext($operation, $type),
             $this->getValidationGroups($operation),
-            $inputOrOutput['class'] ?? $inputOrOutput->class,
+            $outputClass,
         ];
+    }
+
+    private function findOperationForType(ResourceMetadataCollection $resourceMetadataCollection, string $type, Operation $operation): Operation
+    {
+        // Find the operation and use the first one that matches criterias
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            foreach ($resourceMetadata->getOperations() ?? [] as $op) {
+                if ($operation instanceof CollectionOperationInterface && $op instanceof CollectionOperationInterface) {
+                    $operation = $op;
+                    break 2;
+                }
+
+                if (Schema::TYPE_INPUT === $type && \in_array($op->getMethod(), ['POST', 'PATCH', 'PUT'], true)) {
+                    $operation = $op;
+                    break 2;
+                }
+            }
+        }
+
+        return $operation;
     }
 
     private function getSerializerContext(Operation $operation, string $type = Schema::TYPE_OUTPUT): array
@@ -335,7 +348,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     /**
      * Gets the options for the property name collection / property metadata factories.
      */
-    private function getFactoryOptions(array $serializerContext, array $validationGroups, ?HttpOperation $operation = null): array
+    private function getFactoryOptions(array $serializerContext, array $validationGroups, HttpOperation $operation = null): array
     {
         $options = [
             /* @see https://github.com/symfony/symfony/blob/v5.1.0/src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php */

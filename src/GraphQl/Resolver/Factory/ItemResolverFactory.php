@@ -20,7 +20,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
@@ -41,7 +41,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     {
     }
 
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
+    public function __invoke(string $resourceClass = null, string $rootClass = null, Operation $operation = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
             // Data already fetched and normalized (field or nested resource)

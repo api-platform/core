@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Symfony\Routing\SkolemIriConverter;
 
 /**
  * Adds a {@see NotExposed} operation with {@see NotFoundAction} on a resource which only has a GetCollection.
@@ -29,10 +28,12 @@ use ApiPlatform\Symfony\Routing\SkolemIriConverter;
  */
 final class NotExposedOperationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    public static $skolemUriTemplate = '/.well-known/genid/{id}';
+
     private $linkFactory;
     private $decorated;
 
-    public function __construct(LinkFactoryInterface $linkFactory, ?ResourceMetadataCollectionFactoryInterface $decorated = null)
+    public function __construct(LinkFactoryInterface $linkFactory, ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
         $this->linkFactory = $linkFactory;
         $this->decorated = $decorated;
@@ -59,7 +60,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
 
             foreach ($operations as $operation) {
                 // An item operation has been found, nothing to do anymore in this factory
-                if ((HttpOperation::METHOD_GET === $operation->getMethod() && !$operation instanceof CollectionOperationInterface) || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false)) {
+                if (('GET' === $operation->getMethod() && !$operation instanceof CollectionOperationInterface) || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false)) {
                     return $resourceMetadataCollection;
                 }
             }
@@ -71,7 +72,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
         $operation = (new NotExposed())->withClass($resource->getClass())->withShortName($resource->getShortName()); // @phpstan-ignore-line $resource is defined if count > 0
 
         if (!$this->linkFactory->createLinksFromIdentifiers($operation)) {
-            $operation = $operation->withUriTemplate(SkolemIriConverter::$skolemUriTemplate);
+            $operation = $operation->withUriTemplate(self::$skolemUriTemplate);
         }
 
         $operations->add(sprintf('_api_%s_get', $operation->getShortName()), $operation)->sort(); // @phpstan-ignore-line $operation exists

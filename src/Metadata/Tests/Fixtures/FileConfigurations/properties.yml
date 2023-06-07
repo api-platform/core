@@ -1,0 +1,11 @@
+properties:
+    'ApiPlatform\Metadata\Tests\Fixtures\ApiResource\FileConfigDummy':
+        'foo':
+            description: 'The dummy foo'
+            readable: true
+            writable: true
+            readableLink: false
+            writableLink: false
+            required: true
+        'name':
+            description: 'The dummy name'

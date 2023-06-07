@@ -42,13 +42,13 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(array $requestBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
+    public function applyToCollection(array $requestBody, string $resourceClass, Operation $operation = null, array $context = []): array
     {
         $orders = [];
 
         if (
-            $operation &&
-            null !== ($defaultOrder = $operation->getOrder())
+            $operation
+            && null !== ($defaultOrder = $operation->getOrder())
             && \is_array($defaultOrder)
         ) {
             foreach ($defaultOrder as $property => $direction) {
