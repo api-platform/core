@@ -44,6 +44,10 @@ final class SwaggerUiAction
     {
         $openApi = $this->openApiFactory->__invoke(['base_url' => $request->getBaseUrl() ?: '/']);
 
+        foreach ($request->attributes->get('_api_exception_swagger_data') ?? [] as $key => $value) {
+            $request->attributes->set($key, $value);
+        }
+
         $swaggerContext = [
             'formats' => $this->formats,
             'title' => $openApi->getInfo()->getTitle(),

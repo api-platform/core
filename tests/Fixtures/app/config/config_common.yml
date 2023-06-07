@@ -64,6 +64,7 @@ api_platform:
     defaults:
         extra_properties:
             standard_put: true
+            rfc_7807_compliant_errors: true
         normalization_context: 
             skip_null_values: false
         pagination_client_enabled:            true

@@ -53,6 +53,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.formats.inner" />
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.patch_formats%</argument>
+            <argument>%api_platform.error_formats%</argument>
         </service>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.filters" class="ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="200" public="false">

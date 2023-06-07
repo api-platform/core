@@ -46,6 +46,7 @@ final class ContextAction
             return ['@context' => $this->contextBuilder->getEntrypointContext()];
         }
 
+        // TODO: remove this, exceptions are resources since 3.2
         if (isset(self::RESERVED_SHORT_NAMES[$shortName])) {
             return ['@context' => $this->contextBuilder->getBaseContext()];
         }
