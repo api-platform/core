@@ -19,6 +19,7 @@ use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Uid\AbstractUid;
 
 /**
  * Trait for filtering the collection by given properties.
@@ -124,7 +125,9 @@ trait SearchFilterTrait
             $iriConverter = $this->getIriConverter();
             $item = $iriConverter->getResourceFromIri($value, ['fetch_data' => false]);
 
-            return $this->getPropertyAccessor()->getValue($item, 'id');
+            $id = $this->getPropertyAccessor()->getValue($item, 'id');
+
+            return ($id instanceof AbstractUid) ? $id->toBinary() : $id;
         } catch (InvalidArgumentException) {
             // Do nothing, return the raw value
         }
