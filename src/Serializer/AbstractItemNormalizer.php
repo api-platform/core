@@ -176,7 +176,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if ($inputClass = $this->getInputClass($context)) {
             if (!$this->serializer instanceof DenormalizerInterface) {
-                throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');
+                throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
 
             unset($context['input'], $context['operation'], $context['operation_name']);
