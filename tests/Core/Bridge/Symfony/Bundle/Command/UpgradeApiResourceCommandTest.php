@@ -69,6 +69,13 @@ class UpgradeApiResourceCommandTest extends TestCase
         foreach ($expectedStrings as $expectedString) {
             $this->assertStringContainsString($expectedString, $display);
         }
+
+        $this->assertStringNotContainsString('-declare(strict_types=1);', $display);
+        $this->assertStringNotContainsString('+declare (strict_types=1);', $display);
+        $this->assertStringNotContainsString('-@ORM\Column(type="integer")', $display);
+        $this->assertStringNotContainsString('+@ORM\Column (type="integer")', $display);
+        $this->assertStringNotContainsString('-private function nothingToDo(): void', $display);
+        $this->assertStringNotContainsString('+private function nothingToDo() : void', $display);
     }
 
     public function debugResourceProvider(): array

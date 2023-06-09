@@ -66,4 +66,8 @@ class DummyToUpgradeWithOnlyAnnotation
      * @ApiFilter(ExistsFilter::class)
      */
     private $dummyToUpgradeProduct;
+
+    private function nothingToDo(): void // @phpstan-ignore-line
+    {
+    }
 }

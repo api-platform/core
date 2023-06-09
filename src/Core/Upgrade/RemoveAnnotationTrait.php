@@ -13,22 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Upgrade;
 
-use phpDocumentor\Reflection\DocBlock\Serializer;
-use phpDocumentor\Reflection\DocBlockFactory;
 use PhpParser\Comment\Doc;
 
 trait RemoveAnnotationTrait
 {
     private function removeAnnotationByTag(Doc $comment, string $tagName): Doc
     {
-        $factory = DocBlockFactory::createInstance();
-        $docBlock = $factory->create($comment->getText());
-        foreach ($docBlock->getTagsByName($tagName) as $tag) {
-            $docBlock->removeTag($tag);
-        }
+        // https://regex101.com/r/GBIPnj/1
+        $text = preg_filter("/^[[:blank:]]*[\/*]+[[:blank:]]*@{$tagName}[[:blank:]]*(\(.*?\))?[\s*\/]*?$/ms", '', $comment->getText());
 
-        $serializer = new Serializer(0, '', true, null, null, \PHP_EOL);
-
-        return new Doc($serializer->getDocComment($docBlock));
+        return null === $text ? $comment : new Doc($text);
     }
 }
