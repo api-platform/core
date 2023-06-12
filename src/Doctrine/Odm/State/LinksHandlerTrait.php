@@ -135,7 +135,10 @@ trait LinksHandlerTrait
 
     private function getFieldType($type, $value)
     {
-        if (!Type::hasType($type) || !$type) {
+        if (null === $type) {
+            return $value;
+        }
+        if (!Type::hasType($type)) {
             return $value;
         }
         if (Type::STRING !== $type) {
