@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Api\FilterInterface;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
@@ -347,6 +348,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.route_loader.legacy',
             'api_platform.operation_path_resolver.router',
             'api_platform.iri_converter.legacy',
+            'api_platform.symfony.iri_converter',
             'api_platform.listener.request.add_format',
             'api_platform.listener.request.deserialize',
             'api_platform.listener.view.serialize',
@@ -386,6 +388,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.name_collection_factory',
             'api_platform.route_loader',
             'api_platform.iri_converter',
+            'ApiPlatform\Api\IriConverterInterface',
             'api_platform.identifiers_extractor',
             'api_platform.pagination',
             'api_platform.cache.metadata.property',
@@ -437,11 +440,13 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.write.legacy',
             'api_platform.listener.request.read.legacy',
             'api_platform.iri_converter',
+            'api_platform.iri_converter.legacy',
         ];
 
         $aliases = [
             // v3/api.xml
             'ApiPlatform\Api\IriConverterInterface',
+            'ApiPlatform\Core\Api\IriConverterInterface',
             'api_platform.identifiers_extractor',
             'ApiPlatform\Api\IdentifiersExtractorInterface',
 
@@ -1817,6 +1822,30 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.listener.request.read.legacy', ['kernel.event_listener']);
 
         $this->assertNotContainerHasService('api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory');
+    }
+
+    /**
+     * @dataProvider provideIriConverterAliases
+     */
+    public function testIriConverterIsCompatibleWithAliasedInterface(bool $metadataBCLayer, string $interface): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['metadata_backward_compatibility_layer'] = $metadataBCLayer;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasAlias($interface);
+
+        $definition = $this->container->findDefinition($interface);
+        $this->assertTrue(is_a($definition->getClass(), $interface, true), "Failed asserting that alias '{$interface}' resolves to a service implementing this interface.");
+    }
+
+    public function provideIriConverterAliases(): \Generator
+    {
+        yield 'BC layer on, new interface' => [true, IriConverterInterface::class];
+        yield 'BC layer on, legacy interface' => [true, \ApiPlatform\Core\Api\IriConverterInterface::class];
+
+        yield 'BC layer off, new interface' => [false, IriConverterInterface::class];
+        yield 'BC layer off, legacy interface' => [false, \ApiPlatform\Core\Api\IriConverterInterface::class];
     }
 
     public function testRectorConfiguration(): void

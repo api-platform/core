@@ -31,7 +31,6 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Symfony\Routing\IriConverter as NewIriConverter;
 use ApiPlatform\Util\AttributesExtractor;
 use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -43,6 +42,8 @@ use Symfony\Component\Routing\RouterInterface;
  * {@inheritdoc}
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated Since Api Platform 2.7, use ApiPlatform\Symfony\Routing\IriConverter instead.
  */
 final class IriConverter implements IriConverterInterface
 {
@@ -63,8 +64,6 @@ final class IriConverter implements IriConverterInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->identifiersExtractor = $identifiersExtractor ?: new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, $propertyAccessor ?? PropertyAccess::createPropertyAccessor());
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        trigger_deprecation('api-platform/core', '2.7', sprintf('The service "%s" is deprecated, use %s instead.', self::class, NewIriConverter::class));
     }
 
     /**

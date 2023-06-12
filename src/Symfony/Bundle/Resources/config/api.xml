@@ -159,6 +159,7 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
+        <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter.legacy" />
 
         <service id="api_platform.symfony.iri_converter.skolem" class="ApiPlatform\Symfony\Routing\SkolemIriConverter" public="false">
             <argument type="service" id="api_platform.router" />
