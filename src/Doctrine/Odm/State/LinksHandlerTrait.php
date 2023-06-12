@@ -98,7 +98,7 @@ trait LinksHandlerTrait
             foreach ($identifierProperties as $identifierProperty) {
                 $aggregation->match()->field(sprintf('%s.%s', $lookupPropertyAlias, 'id' === $identifierProperty ? '_id' : $identifierProperty))->equals(
                     $this->getFieldType(
-                        $this->getAssociatedFieldType($classMetadata, $identifierProperty),
+                        $classMetadata->getTypeOfField($identifierProperty),
                         $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null)
                     )
                 );
@@ -107,7 +107,7 @@ trait LinksHandlerTrait
             foreach ($identifierProperties as $identifierProperty) {
                 $aggregation->match()->field($identifierProperty)->equals(
                     $this->getFieldType(
-                        $this->getAssociatedFieldType($classMetadata, $identifierProperty),
+                        $classMetadata->getTypeOfField($identifierProperty),
                         $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null)
                     )
                 );
@@ -131,18 +131,6 @@ trait LinksHandlerTrait
         $previousAggregationBuilder->match()->field('_id')->in($in);
 
         return $previousAggregationBuilder;
-    }
-
-    private function getAssociatedFieldType(ClassMetadata $classMetadata, string $identifierProperty): string
-    {
-        if (null == $classMetadata->hasAssociation($identifierProperty) || !$classMetadata->hasAssociation($identifierProperty)) {
-            return $classMetadata->getTypeOfField($identifierProperty);
-        }
-
-        $referenceMapping = $classMetadata->getFieldMapping($identifierProperty);
-        $associationAsObject = ClassMetadata::REFERENCE_STORE_AS_ID === $referenceMapping['storeAs'];
-
-        return $associationAsObject ? Type::OBJECTID : $classMetadata->getTypeOfField($identifierProperty);
     }
 
     private function getFieldType($type, $value)
