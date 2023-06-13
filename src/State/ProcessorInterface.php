@@ -25,7 +25,7 @@ use ApiPlatform\Metadata\Operation;
 interface ProcessorInterface
 {
     /**
-     * Handle the state.
+     * Processes the state.
      *
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
