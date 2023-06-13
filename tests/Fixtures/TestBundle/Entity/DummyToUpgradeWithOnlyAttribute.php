@@ -49,4 +49,8 @@ class DummyToUpgradeWithOnlyAttribute
     #[ApiSubresource]
     #[ApiProperty(iri: 'DummyToUpgradeWithOnlyAttribute.dummyToUpgradeProduct')]
     private $dummyToUpgradeProduct;
+
+    private function nothingToDo(): void // @phpstan-ignore-line
+    {
+    }
 }

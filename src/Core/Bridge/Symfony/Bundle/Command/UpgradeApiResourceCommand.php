@@ -26,8 +26,9 @@ use ApiPlatform\Core\Upgrade\UpgradeApiSubresourceVisitor;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Doctrine\Common\Annotations\AnnotationReader;
-use PhpParser\Lexer\Emulative;
+use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\Parser\Php7;
 use PhpParser\PrettyPrinter\Standard;
 use SebastianBergmann\Diff\Differ;
@@ -106,7 +107,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
                 continue;
             }
 
-            $lexer = new Emulative([
+            $lexer = new Lexer([
                 'usedAttributes' => [
                     'comments',
                     'startLine',
@@ -141,7 +142,10 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
             $oldStmts = $parser->parse($oldCode);
             $oldTokens = $lexer->getTokens();
 
-            $newStmts = $traverser->traverse($oldStmts);
+            $cloningTraverser = new NodeTraverser();
+            $cloningTraverser->addVisitor(new CloningVisitor()); // Required to preserve formatting
+
+            $newStmts = $traverser->traverse($cloningTraverser->traverse($oldStmts));
             $newCode = $prettyPrinter->printFormatPreserving($newStmts, $oldStmts, $oldTokens);
 
             if (!$input->getOption('force') && $input->getOption('dry-run')) {
@@ -216,7 +220,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
     private function printDiff(string $oldCode, string $newCode, OutputInterface $output): void
     {
         $consoleFormatter = new ColorConsoleDiffFormatter();
-        $differ = class_exists(UnifiedDiffOutputBuilder::class) ? new Differ(new UnifiedDiffOutputBuilder()) :  new Differ();
+        $differ = class_exists(UnifiedDiffOutputBuilder::class) ? new Differ(new UnifiedDiffOutputBuilder()) : new Differ();
         $diff = $differ->diff($oldCode, $newCode);
         $output->write($consoleFormatter->format($diff));
     }
