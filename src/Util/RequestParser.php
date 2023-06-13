@@ -79,6 +79,11 @@ final class RequestParser
 
             $keyValuePair = explode('=', $param, 2);
 
+            // Encode "+" sign so it's not decoded to a space afterward.
+            if (isset($keyValuePair[1])) {
+                $keyValuePair[1] = str_replace('+', '%2B', $keyValuePair[1]);
+            }
+
             // GET parameters, that are submitted from a HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
             // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str. This is why we use urldecode and then normalize to
             // RFC 3986 with rawurlencode.
