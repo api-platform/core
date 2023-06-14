@@ -23,7 +23,6 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 final class ApiGatewayNormalizerTest extends TestCase
 {
@@ -35,19 +34,14 @@ final class ApiGatewayNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $normalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
         $normalizerProphecy->supportsNormalization(OpenApiNormalizer::FORMAT, OpenApi::class)->willReturn(true);
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $normalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
-            $normalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
-        }
+        $normalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
 
         $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 
         $this->assertTrue($normalizer->supportsNormalization(OpenApiNormalizer::FORMAT, OpenApi::class));
-
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-        }
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalize(): void

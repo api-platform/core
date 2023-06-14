@@ -157,12 +157,16 @@ final class Configuration implements ConfigurationInterface
         $this->addExceptionToStatusSection($rootNode);
 
         $this->addFormatSection($rootNode, 'formats', [
-            'jsonld' => ['mime_types' => ['application/ld+json']],
-            'json' => ['mime_types' => ['application/json']], // Swagger support
-            'html' => ['mime_types' => ['text/html']], // Swagger UI support
         ]);
         $this->addFormatSection($rootNode, 'patch_formats', [
             'json' => ['mime_types' => ['application/merge-patch+json']],
+        ]);
+        $this->addFormatSection($rootNode, 'docs_formats', [
+            'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
+            'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']],
+            'json' => ['mime_types' => ['application/json']], // this is only for legacy reasons, use jsonopenapi instead
+            'jsonld' => ['mime_types' => ['application/ld+json']],
+            'html' => ['mime_types' => ['text/html']],
         ]);
         $this->addFormatSection($rootNode, 'error_formats', [
             'jsonproblem' => ['mime_types' => ['application/problem+json']],

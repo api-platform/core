@@ -110,6 +110,8 @@
             <argument type="service" id="api_platform.openapi.factory" on-invalid="null" />
             <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
             <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
+            <argument type="service" id="api_platform.negotiator" on-invalid="null" />
+            <argument>%api_platform.docs_formats%</argument>
         </service>
 
         <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
