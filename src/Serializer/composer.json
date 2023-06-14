@@ -30,10 +30,11 @@
         "symfony/validator": "^6.3"
     },
     "require-dev": {
+        "api-platform/symfony": "*@dev || ^3.1",
         "phpspec/prophecy-phpunit": "^2.0",
-        "symfony/phpunit-bridge": "^6.1",
         "symfony/mercure-bundle": "*",
-        "api-platform/symfony": "*@dev || ^3.1"
+        "symfony/phpunit-bridge": "^6.1",
+        "symfony/yaml": "^6.3"
     },
     "autoload": {
         "psr-4": {

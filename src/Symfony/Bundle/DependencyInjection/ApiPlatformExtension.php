@@ -105,9 +105,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        if (!$config['formats']) {
+            trigger_deprecation('api-platform/core', '3.2', 'Setting the "formats" section will be mandatory in API Platform 4.');
+            $config['formats'] = [
+                'jsonld' => ['mime_types' => ['application/ld+json']],
+                // Note that in API Platform 4 this will be removed as it was used for documentation only and are is now present in the docsFormats
+                'json' => ['mime_types' => ['application/json']], // Swagger support
+            ];
+        }
+
         $formats = $this->getFormats($config['formats']);
         $patchFormats = $this->getFormats($config['patch_formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
+        $docsFormats = $this->getFormats($config['docs_formats']);
 
         if (!isset($errorFormats['html']) && $config['enable_swagger'] && $config['enable_swagger_ui']) {
             $errorFormats['html'] = ['text/html'];
@@ -122,7 +132,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $patchFormats['jsonapi'] = ['application/vnd.api+json'];
         }
 
-        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats);
+        if (isset($docsFormats['json']) && !isset($docsFormats['jsonopenapi'])) {
+            trigger_deprecation('api-platform/core', '3.2', 'The "json" format is too broad, use ["jsonopenapi" => ["application/vnd.openapi+json"]] instead.');
+            $docsFormats['jsonopenapi'] = ['application/vnd.openapi+json'];
+        }
+
+        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats, $docsFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
         $this->registerOpenApiConfiguration($container, $config, $loader);
@@ -159,7 +174,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerInflectorConfiguration($config);
     }
 
-    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
+    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats): void
     {
         $loader->load('symfony/events.xml');
         $loader->load('symfony/controller.xml');
@@ -191,6 +206,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.patch_formats', $patchFormats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
+        $container->setParameter('api_platform.docs_formats', $docsFormats);
         $container->setParameter('api_platform.eager_loading.enabled', $this->isConfigEnabled($container, $config['eager_loading']));
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.fetch_partial', $config['eager_loading']['fetch_partial']);
@@ -286,7 +302,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
-                $config['resource_class_directories'], $container->getParameter('api_platform.resource_class_directories')
+                $config['resource_class_directories'],
+                $container->getParameter('api_platform.resource_class_directories')
             ));
         }
 

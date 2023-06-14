@@ -26,6 +26,8 @@ use Symfony\Component\Serializer\Serializer;
 final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     public const FORMAT = 'json';
+    public const JSON_FORMAT = 'jsonopenapi';
+    public const YAML_FORMAT = 'yamlopenapi';
     private const EXTENSION_PROPERTIES_KEY = 'extensionProperties';
 
     public function __construct(private readonly NormalizerInterface $decorated)
@@ -72,12 +74,12 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && $data instanceof OpenApi;
+        return (self::FORMAT === $format || self::JSON_FORMAT === $format || self::YAML_FORMAT === $format) && $data instanceof OpenApi;
     }
 
     public function getSupportedTypes($format): array
     {
-        return self::FORMAT === $format ? [OpenApi::class => true] : [];
+        return (self::FORMAT === $format || self::JSON_FORMAT === $format || self::YAML_FORMAT === $format) ? [OpenApi::class => true] : [];
     }
 
     public function hasCacheableSupportsMethod(): bool

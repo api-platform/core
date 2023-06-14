@@ -82,9 +82,12 @@ class ConfigurationTest extends TestCase
             'description' => 'description',
             'version' => '1.0.0',
             'show_webby' => true,
-            'formats' => [
-                'jsonld' => ['mime_types' => ['application/ld+json']],
+            'formats' => [],
+            'docs_formats' => [
+                'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
+                'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']],
                 'json' => ['mime_types' => ['application/json']],
+                'jsonld' => ['mime_types' => ['application/ld+json']],
                 'html' => ['mime_types' => ['text/html']],
             ],
             'patch_formats' => [
