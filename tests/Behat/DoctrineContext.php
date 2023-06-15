@@ -128,8 +128,10 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPassenger;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProperty;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummySubEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiResourceChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyWithSubEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EntityClassWithDateTime;
@@ -2136,6 +2138,20 @@ final class DoctrineContext implements Context
         $entity = new EntityClassWithDateTime();
         $entity->setStart(new \DateTime());
         $this->manager->persist($entity);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a dummy entity with a sub entity with id :strId and name :name
+     */
+    public function thereIsADummyWithSubEntity(string $strId, string $name): void
+    {
+        $subEntity = new DummySubEntity($strId, $name);
+        $mainEntity = new DummyWithSubEntity();
+        $mainEntity->setSubEntity($subEntity);
+        $mainEntity->setName('main');
+        $this->manager->persist($subEntity);
+        $this->manager->persist($mainEntity);
         $this->manager->flush();
     }
 
