@@ -771,7 +771,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $type->isCollection()
                 && null !== $collectionValueType
                 && null !== ($className = $collectionValueType->getClassName())
-                &&$this->resourceClassResolver->isResourceClass($className)
+                && $this->resourceClassResolver->isResourceClass($className)
             ) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
                 $context['resource_class'] = $resourceClass;
@@ -781,7 +781,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             if (
                 null !== ($className = $type->getClassName())
-                &&$this->resourceClassResolver->isResourceClass($className)
+                && $this->resourceClassResolver->isResourceClass($className)
             ) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
                 $childContext = $this->createChildContext($context, $attribute, $format);
@@ -796,8 +796,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if (
                 $type->isCollection()
                 && null !== $collectionValueType
-                &&null !== ($className = $collectionValueType->getClassName()) &&
-                \is_array($value)
+                && null !== ($className = $collectionValueType->getClassName())
+                && \is_array($value)
             ) {
                 if (!$this->serializer instanceof DenormalizerInterface) {
                     throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
