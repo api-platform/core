@@ -21,6 +21,8 @@ use ApiPlatform\Metadata\Operation;
 /**
  * This IRI converter calls the legacy IriConverter on legacy resources.
  *
+ * It also replaces the new iri converter when BC flag is ON to allow using the new interface without new metadata system.
+ *
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @internal
@@ -30,7 +32,7 @@ final class LegacyIriConverter implements IriConverterInterface
     private $legacyIriConverter;
     private $iriConverter;
 
-    public function __construct(LegacyIriConverterInterface $legacyIriConverter, IriConverterInterface $iriConverter)
+    public function __construct(LegacyIriConverterInterface $legacyIriConverter, IriConverterInterface $iriConverter = null)
     {
         $this->legacyIriConverter = $legacyIriConverter;
         $this->iriConverter = $iriConverter;
@@ -41,6 +43,10 @@ final class LegacyIriConverter implements IriConverterInterface
      */
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null)
     {
+        if (null === $this->iriConverter) {
+            return $this->legacyIriConverter->getItemFromIri($iri, $context);
+        }
+
         if (!$operation && !($operation = $context['operation'] ?? null)) {
             return $this->iriConverter->getResourceFromIri($iri, $context);
         }
@@ -57,6 +63,10 @@ final class LegacyIriConverter implements IriConverterInterface
      */
     public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
+        if (null === $this->iriConverter) {
+            return \is_string($item) ? $this->legacyIriConverter->getIriFromResourceClass($item, $referenceType) : $this->legacyIriConverter->getIriFromItem($item, $referenceType);
+        }
+
         return $this->iriConverter->getIriFromResource($item, $referenceType, $operation, $context);
     }
 }

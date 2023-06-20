@@ -18,6 +18,7 @@ use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DeprecateLegacyIriConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
@@ -52,6 +53,7 @@ class ApiPlatformBundleTest extends TestCase
         $containerProphecy->addCompilerPass(Argument::type(MetadataAwareNameConverterPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(TestClientPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(AuthenticatorManagerPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(DeprecateLegacyIriConverterPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
 
         $bundle = new ApiPlatformBundle();
         $bundle->build($containerProphecy->reveal());

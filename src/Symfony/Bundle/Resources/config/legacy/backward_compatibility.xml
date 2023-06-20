@@ -13,9 +13,8 @@
         <service id="api_platform.cache.metadata.property" alias="api_platform.cache.metadata.property.legacy"/>
         <service id="api_platform.cache.metadata.resource" alias="api_platform.cache.metadata.resource.legacy"/>
         <service id="api_platform.openapi.factory" alias="api_platform.openapi.factory.legacy" />
-        <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.iri_converter" />
+        <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
-        
         <service id="ApiPlatform\Core\Serializer\SerializerContextBuilderInterface" alias="ApiPlatform\Serializer\SerializerContextBuilderInterface" />
         <service id="ApiPlatform\Core\Api\ResourceClassResolverInterface" alias="ApiPlatform\Api\ResourceClassResolverInterface" />
         <service id="ApiPlatform\Core\Api\UrlGeneratorInterface" alias="ApiPlatform\Api\UrlGeneratorInterface" />

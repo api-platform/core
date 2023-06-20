@@ -45,7 +45,9 @@
             <argument type="service" id="api_platform.subresource_operation_factory" />
         </service>
 
-        <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter.legacy" />
+        <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Core\Api\LegacyIriConverter" public="false">
+            <argument type="service" id="api_platform.iri_converter.legacy"/>
+        </service>
 
         <service id="api_platform.listener.request.add_format" class="ApiPlatform\Symfony\EventListener\AddFormatListener">
             <argument type="service" id="api_platform.negotiator" />

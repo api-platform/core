@@ -22,6 +22,8 @@ use ApiPlatform\Exception\RuntimeException;
  * Converts item and resources to IRI and vice versa.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated Since Api Platform 2.7, use ApiPlatform\Api\IriConverterInterface instead.
  */
 interface IriConverterInterface
 {
