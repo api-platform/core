@@ -31,7 +31,8 @@
     "doctrine/inflector": "^2.0",
     "psr/cache": "^3.0",
     "psr/log": "^1.0 || ^2.0 || ^3.0",
-    "symfony/property-info": "^6.1"
+    "symfony/property-info": "^6.1",
+    "symfony/string": "^6.1"
   },
   "require-dev": {
     "phpstan/phpdoc-parser": "^1.16",
