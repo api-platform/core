@@ -54,6 +54,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\String\UnicodeString;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -141,6 +142,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
         }
+
+        $this->triggerDeprecations();
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
@@ -785,5 +788,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerArgumentResolverConfiguration(XmlFileLoader $loader): void
     {
         $loader->load('argument_resolver.xml');
+    }
+
+    private function triggerDeprecations(): void
+    {
+        if (!class_exists(UnicodeString::class)) {
+            trigger_deprecation('api-platform/core', '3.2', 'Using doctrine/inflector is deprecated since API Platform 3.2 and will be removed in API Platform 4. Use symfony/string instead. Run "composer require symfony/string".');
+        }
     }
 }
