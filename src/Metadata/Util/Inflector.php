@@ -49,7 +49,8 @@ final class Inflector
     public static function pluralize(string $word): string
     {
         if (class_exists(EnglishInflector::class)) {
-            return (new EnglishInflector())->pluralize($word)[0];
+            $pluralize = (new EnglishInflector())->pluralize($word);
+            return end($pluralize);
         }
 
         return self::getInstance()->pluralize($word);
