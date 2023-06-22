@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.7.13
+
+### Bug fixes
+
+* [20371ccad](https://github.com/api-platform/core/commit/20371ccadf3eeaea14c23ed693635d5d2b7cc060) fix: IriConverterInterface injection and deprecation (#5630)
+* [c5f709d17](https://github.com/api-platform/core/commit/c5f709d17f9352bd6c12e272fc3660c346afd900) fix: api:upgrade-resource output formatting (#5624)
+
 ## v2.7.12
 
 ### Bug fixes
