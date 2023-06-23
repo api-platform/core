@@ -31,14 +31,13 @@ use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Util\Inflector as MetadataInflector;
+use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
-use ApiPlatform\Util\Inflector;
 use Doctrine\Persistence\ManagerRegistry;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -797,11 +796,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if ($config['keep_legacy_inflector']) {
             Inflector::keepLegacyInflector(true);
-            MetadataInflector::keepLegacyInflector(true);
             trigger_deprecation('api-platform/core', '3.2', 'Using doctrine/inflector is deprecated since API Platform 3.2 and will be removed in API Platform 4. Use symfony/string instead. Run "composer require symfony/string" and set "keep_legacy_inflector" to false in config.');
         } else {
             Inflector::keepLegacyInflector(false);
-            MetadataInflector::keepLegacyInflector(false);
         }
     }
 }
