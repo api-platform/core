@@ -189,12 +189,10 @@ final class SchemaFactory implements SchemaFactoryInterface
                 continue;
             }
 
-            $subSchema = $this->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext, false);
-            if (isset($subSchema['$ref'])) {
-                $propertySchema['anyOf'] = [['$ref' => $subSchema['$ref']], ['type' => 'null']];
-                // prevent "type" and "anyOf" conflict
-                unset($propertySchema['type']);
-            }
+            $subSchema = $this->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+            $propertySchema['anyOf'] = [['$ref' => $subSchema['$ref']], ['type' => 'null']];
+            // prevent "type" and "anyOf" conflict
+            unset($propertySchema['type']);
             break;
         }
 
