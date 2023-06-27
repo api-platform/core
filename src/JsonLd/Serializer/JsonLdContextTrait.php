@@ -44,6 +44,18 @@ trait JsonLdContextTrait
 
         $data['@context'] = $contextBuilder->getResourceContextUri($resourceClass);
 
+        $data['@context'] = [
+            $data['@context'],
+            [
+                'id' => [
+                    '@type' => '@id'
+                ],
+                'type' => [
+                    '@type' => '@type'
+                ]
+            ]
+        ];
+
         return $data;
     }
 
