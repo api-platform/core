@@ -219,10 +219,10 @@ class ApiResource extends Metadata
         return $self;
     }
 
-   public function getTypes(): ?array
-   {
-       return $this->types;
-   }
+    public function getTypes(): ?array
+    {
+        return $this->types;
+    }
 
     /**
      * @param string[]|string $types
