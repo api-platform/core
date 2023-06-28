@@ -82,7 +82,9 @@ trait FieldDatatypeTrait
             && null !== ($className = $type->getClassName())
             && $this->resourceClassResolver->isResourceClass($className)
         ) {
-            return $currentProperty;
+            $nestedPath = $this->getNestedFieldPath($className, implode('.', $properties));
+
+            return null === $nestedPath ? $currentProperty : "$currentProperty.$nestedPath";
         }
 
         return null;
