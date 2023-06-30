@@ -105,6 +105,7 @@ abstract class Operation extends Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        protected ?bool $removeJsonLdIdType = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(

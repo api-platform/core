@@ -39,22 +39,24 @@ trait JsonLdContextTrait
         if (isset($context['jsonld_embed_context'])) {
             $data['@context'] = $contextBuilder->getResourceContext($resourceClass);
 
+            if ($context['operation']->getRemoveJsonLdIdType()) {
+                $data['@context'] = [
+                    $data['@context'],
+                    [
+                        'id' => [
+                            '@type' => '@id'
+                        ],
+                        'type' => [
+                            '@type' => '@type'
+                        ]
+                    ]
+                ];
+            }
+
             return $data;
         }
 
         $data['@context'] = $contextBuilder->getResourceContextUri($resourceClass);
-
-        $data['@context'] = [
-            $data['@context'],
-            [
-                'id' => [
-                    '@type' => '@id'
-                ],
-                'type' => [
-                    '@type' => '@type'
-                ]
-            ]
-        ];
 
         return $data;
     }

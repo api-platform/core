@@ -63,6 +63,7 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        protected ?bool $removeJsonLdIdType = null,
         protected array $extraProperties = []
     ) {
     }
@@ -556,6 +557,19 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->stateOptions = $stateOptions;
+
+        return $self;
+    }
+
+    public function getRemoveJsonLdIdType(): ?bool
+    {
+        return $this->removeJsonLdIdType;
+    }
+
+    public function withRemoveJsonLdIdType(bool $removeJsonLdIdType): static
+    {
+        $self = clone $this;
+        $self->removeJsonLdIdType = $removeJsonLdIdType;
 
         return $self;
     }

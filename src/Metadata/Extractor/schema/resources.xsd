@@ -470,5 +470,6 @@
         <xsd:attribute type="xsd:string" name="host"/>
         <xsd:attribute type="xsd:string" name="condition"/>
         <xsd:attribute type="xsd:string" name="controller"/>
+        <xsd:attribute type="xsd:boolean" name="removeJsonLdIdType"/>
     </xsd:attributeGroup>
 </xsd:schema>

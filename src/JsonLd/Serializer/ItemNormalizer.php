@@ -99,8 +99,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         if (true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
+            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
             $context['iri'] = $iri;
-            $metadata['@id'] = $iri;
+
+            if($operation->getRemoveJsonLdIdType()) {
+                $metadata['id'] = $iri;
+            } else {
+                $metadata['@id'] = $iri;
+            }
         }
 
         $context['api_normalize'] = true;
@@ -117,7 +123,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
             if (null === $types) {
                 $types = [$operation->getShortName()];
             }
-            $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
+
+            if($operation->getRemoveJsonLdIdType()) {
+                $metadata['type'] = 1 === \count($types) ? $types[0] : $types;
+            } else {
+                $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
+            }
         }
 
         return $metadata + $data;
