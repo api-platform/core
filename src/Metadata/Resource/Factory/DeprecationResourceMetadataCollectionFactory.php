@@ -17,6 +17,12 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
+/**
+ * Triggers resource deprecations
+ * 
+ * @final
+ * @internal
+ */
 class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     // Hashmap to avoid triggering too many deprecations
