@@ -63,7 +63,7 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'securityPostValidationMessage',
         'queryParameterValidationEnabled',
         'stateOptions',
-        'removeJsonLdIdType',
+        'aliasIdType',
         'collectDenormalizationErrors',
     ];
 

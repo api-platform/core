@@ -174,6 +174,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'type' => 'foo_type',
                 ],
             ],
+            'aliasIdType' => false,
             'graphQlOperations' => [
                 [
                     'args' => [
@@ -498,6 +499,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'openapi',
         'paginationViaCursor',
         'stateOptions',
+        'aliasIdType'
     ];
 
     /**

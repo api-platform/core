@@ -100,6 +100,7 @@ class XmlExtractorTest extends TestCase
                     'read' => null,
                     'write' => null,
                     'stateOptions' => null,
+                    'aliasIdType' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments{._format}',
@@ -271,6 +272,7 @@ class XmlExtractorTest extends TestCase
                             'provider' => null,
                             'itemUriTemplate' => null,
                             'stateOptions' => null,
+                            'aliasIdType' => null,
                         ],
                         [
                             'name' => null,
@@ -368,6 +370,7 @@ class XmlExtractorTest extends TestCase
                             'priority' => null,
                             'processor' => null,
                             'provider' => null,
+                            'aliasIdType' => null,
                             'stateOptions' => null,
                         ],
                     ],
@@ -377,6 +380,7 @@ class XmlExtractorTest extends TestCase
                     'provider' => null,
                     'read' => null,
                     'write' => null,
+                    'aliasIdType' => null,
                     'stateOptions' => null,
                 ],
             ],
