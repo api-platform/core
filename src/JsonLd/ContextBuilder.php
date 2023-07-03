@@ -145,7 +145,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $context = $this->getBaseContext($referenceType);
         $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
 
-        if($operation->getRemoveJsonLdIdType()) {
+        if($operation->getAliasIdType()) {
             $context['id'] = [
                 '@type' => '@id',
             ];

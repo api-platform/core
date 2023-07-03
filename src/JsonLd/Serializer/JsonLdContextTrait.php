@@ -39,7 +39,7 @@ trait JsonLdContextTrait
         if (isset($context['jsonld_embed_context'])) {
             $data['@context'] = $contextBuilder->getResourceContext($resourceClass);
 
-            if ($context['operation']->getRemoveJsonLdIdType()) {
+            if ($context['operation']->getAliasIdType()) {
                 $data['@context'] = [
                     $data['@context'],
                     [

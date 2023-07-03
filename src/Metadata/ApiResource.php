@@ -142,7 +142,7 @@ class ApiResource extends Metadata
         $provider = null,
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
-        protected ?bool $removeJsonLdIdType = null,
+        protected ?bool $aliasIdType = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(
@@ -183,7 +183,7 @@ class ApiResource extends Metadata
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
-            removeJsonLdIdType: $removeJsonLdIdType,
+            aliasIdType: $aliasIdType,
             extraProperties: $extraProperties
         );
 

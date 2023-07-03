@@ -98,15 +98,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['item_uri_template'] = $itemUriTemplate;
         }
 
+        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+        $isAliasType = $operation->getAliasIdType();
         if (true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
-            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
             $context['iri'] = $iri;
-
-            if($operation->getRemoveJsonLdIdType()) {
-                $metadata['id'] = $iri;
-            } else {
-                $metadata['@id'] = $iri;
-            }
+            $metadata[$isAliasType ? 'id' : '@id'] = $iri;
         }
 
         $context['api_normalize'] = true;
@@ -117,18 +113,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         if (!isset($metadata['@type']) && $isResourceClass) {
-            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
-
             $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
             if (null === $types) {
                 $types = [$operation->getShortName()];
             }
 
-            if($operation->getRemoveJsonLdIdType()) {
-                $metadata['type'] = 1 === \count($types) ? $types[0] : $types;
-            } else {
-                $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
-            }
+            $metadata[$isAliasType ? 'type' : '@type'] = 1 === \count($types) ? $types[0] : $types;
         }
 
         return $metadata + $data;
