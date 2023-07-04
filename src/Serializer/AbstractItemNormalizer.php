@@ -16,6 +16,7 @@ namespace ApiPlatform\Serializer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
@@ -623,6 +624,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $childContext = $this->createChildContext($context, $attribute, $format);
             unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation']);
 
+            $this->addCacheTagsForRelation($propertyMetadata, $context);
+
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
 
@@ -642,6 +645,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
             }
             unset($childContext['iri'], $childContext['uri_variables']);
+
+            $this->addCacheTagsForRelation($propertyMetadata, $context);
 
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -722,16 +727,28 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $iri = $this->iriConverter->getIriFromResource($relatedObject);
 
-        if (isset($context['resources'])) {
-            $context['resources'][$iri] = $iri;
-        }
-
         $push = $propertyMetadata->getPush() ?? false;
         if (isset($context['resources_to_push']) && $push) {
             $context['resources_to_push'][$iri] = $iri;
         }
 
         return $iri;
+    }
+
+    private function addCacheTagsForRelation(ApiProperty $propertyMetadata, array $context): void
+    {
+        // Add cache tag for related collection
+        if (isset($context['resources'])) {
+            if (isset($propertyMetadata->getExtraProperties()['cacheDependencies'])) {
+                foreach ($propertyMetadata->getExtraProperties()['cacheDependencies'] as $dependency) {
+                    $cacheTag = $context['iri'].PurgeHttpCacheListener::IRI_RELATION_DELIMITER.$dependency;
+                    $context['resources'][$cacheTag] = $cacheTag;
+                }
+            } else {
+                $cacheTag = $context['iri'].PurgeHttpCacheListener::IRI_RELATION_DELIMITER.$context['api_attribute'];
+                $context['resources'][$cacheTag] = $cacheTag;
+            }
+        }
     }
 
     private function createAttributeValue(string $attribute, mixed $value, string $format = null, array &$context = []): mixed

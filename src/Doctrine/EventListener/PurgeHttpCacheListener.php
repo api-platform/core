@@ -41,6 +41,8 @@ final class PurgeHttpCacheListener
     private readonly PropertyAccessorInterface $propertyAccessor;
     private array $tags = [];
 
+    public const IRI_RELATION_DELIMITER = '#';
+
     public function __construct(private readonly PurgerInterface $purger, private readonly IriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
@@ -52,7 +54,7 @@ final class PurgeHttpCacheListener
     public function preUpdate(PreUpdateEventArgs $eventArgs): void
     {
         $object = $eventArgs->getObject();
-        $this->gatherResourceAndItemTags($object, true);
+        $this->addTagForItem($object);
 
         $changeSet = $eventArgs->getEntityChangeSet();
         $objectManager = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
@@ -62,9 +64,14 @@ final class PurgeHttpCacheListener
             if (!isset($associationMappings[$key])) {
                 continue;
             }
+            $mappings = $associationMappings[$key];
+            $relatedProperty = $mappings['isOwningSide'] ? $mappings['inversedBy'] : $mappings['mappedBy'];
+            if (!$relatedProperty) {
+                continue;
+            }
 
-            $this->addTagsFor($value[0]);
-            $this->addTagsFor($value[1]);
+            $this->addTagsFor($value[0], $relatedProperty);
+            $this->addTagsFor($value[1], $relatedProperty);
         }
     }
 
@@ -77,17 +84,13 @@ final class PurgeHttpCacheListener
         $uow = $em->getUnitOfWork();
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            $this->gatherResourceAndItemTags($entity, false);
-            $this->gatherRelationTags($em, $entity);
-        }
-
-        foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            $this->gatherResourceAndItemTags($entity, true);
+            $this->gatherResourceTags($entity);
             $this->gatherRelationTags($em, $entity);
         }
 
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
-            $this->gatherResourceAndItemTags($entity, true);
+            $this->addTagForItem($entity);
+            $this->gatherResourceTags($entity);
             $this->gatherRelationTags($em, $entity);
         }
     }
@@ -106,16 +109,12 @@ final class PurgeHttpCacheListener
         $this->tags = [];
     }
 
-    private function gatherResourceAndItemTags(object $entity, bool $purgeItem): void
+    private function gatherResourceTags(object $entity): void
     {
         try {
             $resourceClass = $this->resourceClassResolver->getResourceClass($entity);
             $iri = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, new GetCollection());
             $this->tags[$iri] = $iri;
-
-            if ($purgeItem) {
-                $this->addTagForItem($entity);
-            }
         } catch (OperationNotFoundException|InvalidArgumentException) {
         }
     }
@@ -123,21 +122,35 @@ final class PurgeHttpCacheListener
     private function gatherRelationTags(EntityManagerInterface $em, object $entity): void
     {
         $associationMappings = $em->getClassMetadata(ClassUtils::getClass($entity))->getAssociationMappings();
-        foreach (array_keys($associationMappings) as $property) {
-            if ($this->propertyAccessor->isReadable($entity, $property)) {
-                $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
+        foreach ($associationMappings as $property => $mappings) {
+            $relatedProperty = $mappings['isOwningSide'] ? $mappings['inversedBy'] : $mappings['mappedBy'];
+            if (!$relatedProperty) {
+                continue;
             }
+
+            if (!$this->propertyAccessor->isReadable($entity, $property)) {
+                continue;
+            }
+            $relatedObject = $this->propertyAccessor->getValue($entity, $property);
+            if ($relatedObject === $entity) {
+                continue;
+            }
+
+            $this->addTagsFor(
+                $relatedObject,
+                $relatedProperty
+            );
         }
     }
 
-    private function addTagsFor(mixed $value): void
+    private function addTagsFor(mixed $value, string $property = null): void
     {
         if (!$value || \is_scalar($value)) {
             return;
         }
 
         if (!is_iterable($value)) {
-            $this->addTagForItem($value);
+            $this->addTagForItem($value, $property);
 
             return;
         }
@@ -147,11 +160,11 @@ final class PurgeHttpCacheListener
         }
 
         foreach ($value as $v) {
-            $this->addTagForItem($v);
+            $this->addTagForItem($v, $property);
         }
     }
 
-    private function addTagForItem(mixed $value): void
+    private function addTagForItem(mixed $value, string $property = null): void
     {
         if (!$this->resourceClassResolver->isResourceClass($this->getObjectClass($value))) {
             return;
@@ -159,6 +172,9 @@ final class PurgeHttpCacheListener
 
         try {
             $iri = $this->iriConverter->getIriFromResource($value);
+            if ($property) {
+                $iri .= self::IRI_RELATION_DELIMITER.$property;
+            }
             $this->tags[$iri] = $iri;
         } catch (RuntimeException|InvalidArgumentException) {
         }
