@@ -295,6 +295,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $constructorParameters = $constructor->getParameters();
 
             $params = [];
+            $missingConstructorParameters = [];
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
@@ -329,12 +330,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
                     if (!isset($context['not_normalizable_value_exceptions'])) {
-                        throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name), 0, null, [$constructorParameter->name]);
+                        $missingConstructorParameters[] = $constructorParameter->getName();
                     }
 
                     $exception = NotNormalizableValueException::createForUnexpectedDataType(sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name), $data, ['unknown'], $context['deserialization_path'] ?? null, true);
                     $context['not_normalizable_value_exceptions'][] = $exception;
                 }
+            }
+
+            if (\count($missingConstructorParameters) > 0) {
+                throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$%s".', $class, implode('", "$', $missingConstructorParameters)), 0, null, $missingConstructorParameters, $class);
             }
 
             if (\count($context['not_normalizable_value_exceptions'] ?? []) > 0) {
