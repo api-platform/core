@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\HttpCache\EventListener;
+namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;
@@ -34,8 +34,6 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  * @see https://docs.varnish-software.com/varnish-cache-plus/vmods/ykey/
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- *  @deprecated use \Symfony\EventListener\AddTagsListener.php instead
  */
 final class AddTagsListener
 {
