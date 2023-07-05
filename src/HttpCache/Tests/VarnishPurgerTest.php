@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\HttpCache;
+namespace ApiPlatform\HttpCache\Tests;
 
 use ApiPlatform\HttpCache\VarnishPurger;
 use GuzzleHttp\ClientInterface;
@@ -186,5 +186,13 @@ class VarnishPurgerTest extends TestCase
         }, 1));
 
         $purger->purge(['/foo']);
+    }
+
+    public function testGetResponseHeader(): void
+    {
+        $clientProphecy = $this->prophesize(HttpClientInterface::class);
+
+        $purger = new VarnishPurger([$clientProphecy->reveal()]);
+        self::assertSame(['Cache-Tags' => '/foo'], $purger->getResponseHeaders(['/foo']));
     }
 }

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\HttpCache;
+namespace ApiPlatform\HttpCache\Tests;
 
 use ApiPlatform\HttpCache\VarnishXKeyPurger;
 use GuzzleHttp\ClientInterface;
