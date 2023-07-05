@@ -193,6 +193,7 @@ jobs:
           - OpenApi
           - Metadata
           - Elasticsearch
+          - HttpCache
           - RamseyUuid
       fail-fast: false
     steps:
