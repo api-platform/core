@@ -86,7 +86,7 @@ api_platform:
 
 parameters:
     container.autowiring.strict_mode: true
-    container.dumper.inline_class_loader: true
+    .container.dumper.inline_class_loader: true
 
 services:
     test.client:

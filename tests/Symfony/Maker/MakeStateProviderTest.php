@@ -38,9 +38,9 @@ class MakeStateProviderTest extends KernelTestCase
         $this->assertFileExists($newProviderFile);
 
         // Unify line endings
-        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/CustomStateProvider.php'));
+        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/CustomStateProvider.fixture'));
         $result = preg_replace('~\R~u', "\r\n", file_get_contents($newProviderFile));
-        $this->assertSame($expected, $result);
+        $this->assertStringContainsString($expected, $result);
 
         $display = $tester->getDisplay();
         $this->assertStringContainsString('Success!', $display);

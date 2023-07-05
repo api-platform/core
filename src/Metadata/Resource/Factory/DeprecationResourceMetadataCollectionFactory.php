@@ -18,9 +18,10 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
- * Triggers resource deprecations
- * 
+ * Triggers resource deprecations.
+ *
  * @final
+ *
  * @internal
  */
 class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
