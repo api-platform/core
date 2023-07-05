@@ -6,6 +6,7 @@ Feature: Update an embed collection with PUT
     Given I add "Content-Type" header equal to "application/ld+json"
 
   @createSchema
+  @!mongodb
   Scenario: Update embed collection
     And I send a "POST" request to "/issue5584_employees" with body:
     """

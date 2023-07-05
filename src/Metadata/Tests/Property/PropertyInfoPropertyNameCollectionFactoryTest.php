@@ -88,7 +88,7 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
             ])
         );
 
-        self::assertObjectHasAttribute('ignored', new DummyIgnoreProperty());
+        $this->assertTrue((new \ReflectionObject(new DummyIgnoreProperty()))->hasProperty('ignored'));
 
         $collection = $factory->create(DummyIgnoreProperty::class, ['serializer_groups' => ['dummy']]);
 
