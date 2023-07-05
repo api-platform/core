@@ -17,6 +17,7 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAliasIdType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -143,5 +144,38 @@ class ObjectNormalizerTest extends TestCase
             'name' => 'hello',
         ];
         $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['api_resource' => $dummy, 'jsonld_has_context' => true]));
+    }
+
+    public function testNormalizeAliasIdType(): void
+    {
+        $dummy = new DummyAliasIdType();
+        $dummy->setName('hello');
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize($dummy, null, Argument::type('array'))->willReturn(['name' => 'hello']);
+
+        $contextBuilderProphecy = $this->prophesize(AnonymousContextBuilderInterface::class);
+        $contextBuilderProphecy->getAnonymousResourceContext($dummy, Argument::type('array'))->shouldBeCalled()->willReturn([
+            '@context' => [],
+            'type' => 'Dummy',
+            'id' => '_:1234',
+        ]);
+
+        $normalizer = new ObjectNormalizer(
+            $serializerProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $contextBuilderProphecy->reveal()
+        );
+
+        $expected = [
+            '@context' => [],
+            'id' => '_:1234',
+            'type' => 'Dummy',
+            'name' => 'hello',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummy));
     }
 }
