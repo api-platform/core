@@ -35,7 +35,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- *  * @deprecated use \Symfony\EventListener\AddTagsListener.php instead
+ *  @deprecated use \Symfony\EventListener\AddTagsListener.php instead
  */
 final class AddTagsListener
 {
