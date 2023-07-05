@@ -31,6 +31,7 @@ use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
@@ -141,6 +142,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
         }
+
+        $this->registerInflectorConfiguration($config);
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
@@ -160,6 +163,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
+        $container->setParameter('api_platform.keep_legacy_inflector', $config['keep_legacy_inflector']);
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);
@@ -785,5 +789,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerArgumentResolverConfiguration(XmlFileLoader $loader): void
     {
         $loader->load('argument_resolver.xml');
+    }
+
+    private function registerInflectorConfiguration(array $config): void
+    {
+        if ($config['keep_legacy_inflector']) {
+            Inflector::keepLegacyInflector(true);
+            trigger_deprecation('api-platform/core', '3.2', 'Using doctrine/inflector is deprecated since API Platform 3.2 and will be removed in API Platform 4. Use symfony/string instead. Run "composer require symfony/string" and set "keep_legacy_inflector" to false in config.');
+        } else {
+            Inflector::keepLegacyInflector(false);
+        }
     }
 }
