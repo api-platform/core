@@ -17,7 +17,7 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAliasIdType;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\DummyAliasIdTypeDto;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -148,7 +148,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testNormalizeAliasIdType(): void
     {
-        $dummy = new DummyAliasIdType();
+        $dummy = new DummyAliasIdTypeDto();
         $dummy->setName('hello');
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

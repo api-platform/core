@@ -11,11 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -24,22 +23,17 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Romain Herault <romain@rherault.dev>
  */
 #[ApiResource(aliasIdType: true)]
-#[ORM\Entity]
-class DummyAliasIdType
+class DummyAliasIdTypeDto
 {
     /**
      * @var int|null The id
      */
-    #[ORM\Column(type: 'integer', nullable: true)]
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string The dummy name
      */
     #[ApiProperty(iris: ['https://schema.org/name'])]
-    #[ORM\Column]
     #[Assert\NotBlank]
     private string $name;
 
