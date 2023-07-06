@@ -105,6 +105,7 @@ final class NotExposed extends HttpOperation
         $processor = null,
         array $extraProperties = [],
         OptionsInterface $stateOptions = null,
+        bool $contextInLink = null,
     ) {
         parent::__construct(
             method: $method,
@@ -179,6 +180,7 @@ final class NotExposed extends HttpOperation
             processor: $processor,
             stateOptions: $stateOptions,
             extraProperties: $extraProperties,
+            contextInLink: $contextInLink,
         );
     }
 }

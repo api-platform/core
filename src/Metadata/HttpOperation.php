@@ -149,6 +149,7 @@ class HttpOperation extends Operation
         $processor = null,
         OptionsInterface $stateOptions = null,
         array $extraProperties = [],
+        bool $contextInLink = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -195,7 +196,8 @@ class HttpOperation extends Operation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            contextInLink: $contextInLink,
         );
     }
 

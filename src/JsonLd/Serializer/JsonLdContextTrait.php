@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Serializer;
 
+use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 
@@ -27,6 +28,8 @@ trait JsonLdContextTrait
 {
     /**
      * Updates the given JSON-LD document to add its @context key.
+     *
+     * @throws ResourceClassNotFoundException
      */
     private function addJsonLdContext(ContextBuilderInterface $contextBuilder, string $resourceClass, array &$context, array $data = []): array
     {
@@ -37,12 +40,16 @@ trait JsonLdContextTrait
         $context['jsonld_has_context'] = true;
 
         if (isset($context['jsonld_embed_context'])) {
-            $data['@context'] = $contextBuilder->getResourceContext($resourceClass);
+            if (!isset($context['operation']) || true !== $context['operation']->getContextInLink()) {
+                $data['@context'] = $contextBuilder->getResourceContext($resourceClass);
+            }
 
             return $data;
         }
 
-        $data['@context'] = $contextBuilder->getResourceContextUri($resourceClass);
+        if (!isset($context['operation']) || true !== $context['operation']->getContextInLink()) {
+            $data['@context'] = $contextBuilder->getResourceContextUri($resourceClass);
+        }
 
         return $data;
     }

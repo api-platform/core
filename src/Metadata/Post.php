@@ -92,7 +92,8 @@ final class Post extends HttpOperation
         $processor = null,
         OptionsInterface $stateOptions = null,
         array $extraProperties = [],
-        private ?string $itemUriTemplate = null
+        private ?string $itemUriTemplate = null,
+        bool $contextInLink = null,
     ) {
         parent::__construct(
             method: 'POST',
@@ -166,7 +167,8 @@ final class Post extends HttpOperation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            contextInLink: $contextInLink,
         );
     }
 

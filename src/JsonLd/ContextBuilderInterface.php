@@ -29,6 +29,7 @@ interface ContextBuilderInterface
     public const XML_NS = 'http://www.w3.org/2001/XMLSchema#';
     public const OWL_NS = 'http://www.w3.org/2002/07/owl#';
     public const SCHEMA_ORG_NS = 'https://schema.org/';
+    public const JSONLD_NS = 'http://www.w3.org/ns/json-ld#';
 
     /**
      * Gets the base context.

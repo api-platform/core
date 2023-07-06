@@ -15,6 +15,7 @@ namespace ApiPlatform\Hydra\EventListener;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Util\CorsTrait;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\WebLink\GenericLinkProvider;
@@ -47,11 +48,26 @@ final class AddLinkHeaderListener
         $apiDocUrl = $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL);
         $link = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);
 
+        /** @var ?GetCollection $apiOperation */
+        $apiOperation = $request->attributes->get('_api_operation');
+        $contextLink = new Link(ContextBuilder::JSONLD_NS.'context', '/contexts/'.$apiOperation?->getShortName());
+
+        $contextInLink = $apiOperation?->getContextInLink();
+
         if (null === $linkProvider = $request->attributes->get('_links')) {
-            $request->attributes->set('_links', new GenericLinkProvider([$link]));
+            if (true === $contextInLink) {
+                $request->attributes->set('_links', new GenericLinkProvider([$link, $contextLink]));
+            } else {
+                $request->attributes->set('_links', new GenericLinkProvider([$link]));
+            }
 
             return;
         }
-        $request->attributes->set('_links', $linkProvider->withLink($link));
+
+        if (true === $contextInLink) {
+            $request->attributes->set('_links', $linkProvider->withLink($link)->withLink($contextLink));
+        } else {
+            $request->attributes->set('_links', $linkProvider->withLink($link));
+        }
     }
 }

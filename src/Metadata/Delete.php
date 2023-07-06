@@ -92,6 +92,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         $processor = null,
         OptionsInterface $stateOptions = null,
         array $extraProperties = [],
+        bool $contextInLink = null,
     ) {
         parent::__construct(
             method: 'DELETE',
@@ -137,6 +138,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             description: $description,
             normalizationContext: $normalizationContext,
             denormalizationContext: $denormalizationContext,
+            collectDenormalizationErrors: $collectDenormalizationErrors,
             security: $security,
             securityMessage: $securityMessage,
             securityPostDenormalize: $securityPostDenormalize,
@@ -163,9 +165,9 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             name: $name,
             provider: $provider,
             processor: $processor,
-            extraProperties: $extraProperties,
-            collectDenormalizationErrors: $collectDenormalizationErrors,
             stateOptions: $stateOptions,
+            extraProperties: $extraProperties,
+            contextInLink: $contextInLink,
         );
     }
 }

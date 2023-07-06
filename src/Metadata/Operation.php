@@ -106,6 +106,7 @@ abstract class Operation extends Metadata
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
         protected array $extraProperties = [],
+        public ?bool $contextInLink = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -146,6 +147,7 @@ abstract class Operation extends Metadata
             processor: $processor,
             stateOptions: $stateOptions,
             extraProperties: $extraProperties,
+            contextInLink: $contextInLink,
         );
     }
 

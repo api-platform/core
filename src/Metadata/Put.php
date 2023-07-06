@@ -93,6 +93,7 @@ final class Put extends HttpOperation
         OptionsInterface $stateOptions = null,
         array $extraProperties = [],
         private ?bool $allowCreate = null,
+        bool $contextInLink = null,
     ) {
         parent::__construct(
             method: 'PUT',
@@ -166,7 +167,8 @@ final class Put extends HttpOperation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            contextInLink: $contextInLink,
         );
     }
 

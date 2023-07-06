@@ -69,7 +69,8 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
-        protected array $extraProperties = []
+        protected array $extraProperties = [],
+        protected ?bool $contextInLink = null,
     ) {
     }
 
@@ -575,6 +576,19 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;
+
+        return $self;
+    }
+
+    public function getContextInLink(): ?bool
+    {
+        return $this->contextInLink;
+    }
+
+    public function withContextInLink(bool $contextInLink): static
+    {
+        $self = clone $this;
+        $self->contextInLink = $contextInLink;
 
         return $self;
     }

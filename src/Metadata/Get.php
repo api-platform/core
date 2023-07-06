@@ -92,6 +92,7 @@ final class Get extends HttpOperation
         $processor = null,
         OptionsInterface $stateOptions = null,
         array $extraProperties = [],
+        bool $contextInLink = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -165,6 +166,7 @@ final class Get extends HttpOperation
             processor: $processor,
             stateOptions: $stateOptions,
             extraProperties: $extraProperties,
+            contextInLink: $contextInLink,
         );
     }
 }

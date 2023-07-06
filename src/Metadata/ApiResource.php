@@ -143,6 +143,7 @@ class ApiResource extends Metadata
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
         protected array $extraProperties = [],
+        protected ?bool $contextInLink = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -182,7 +183,8 @@ class ApiResource extends Metadata
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            contextInLink: $contextInLink,
         );
 
         $this->operations = null === $operations ? null : new Operations($operations);

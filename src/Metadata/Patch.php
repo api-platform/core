@@ -92,6 +92,7 @@ final class Patch extends HttpOperation
         $processor = null,
         OptionsInterface $stateOptions = null,
         array $extraProperties = [],
+        bool $contextInLink = null,
     ) {
         parent::__construct(
             method: 'PATCH',
@@ -165,7 +166,8 @@ final class Patch extends HttpOperation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            contextInLink: $contextInLink,
         );
     }
 }
