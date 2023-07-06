@@ -204,7 +204,7 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $schemaFactory = new SchemaFactory($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $schemaFactory = new SchemaFactory(null, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
 
         $typeFactory = new TypeFactory();
         $typeFactory->setSchemaFactory($schemaFactory);

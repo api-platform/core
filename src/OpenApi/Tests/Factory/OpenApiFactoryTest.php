@@ -411,7 +411,7 @@ class OpenApiFactoryTest extends TestCase
 
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $schemaFactory = new SchemaFactory($resourceCollectionMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $schemaFactory = new SchemaFactory(null, $resourceCollectionMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
 
         $typeFactory = new TypeFactory();
         $typeFactory->setSchemaFactory($schemaFactory);

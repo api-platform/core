@@ -74,7 +74,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
 
-        $schemaFactory = new SchemaFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $schemaFactory = new SchemaFactory(null, $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
         $resultSchema = $schemaFactory->buildSchema(NotAResource::class);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
@@ -142,7 +142,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResourceWithUnionIntersectTypes::class)->willReturn(false);
 
-        $schemaFactory = new SchemaFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $schemaFactory = new SchemaFactory(null, $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
         $resultSchema = $schemaFactory->buildSchema(NotAResourceWithUnionIntersectTypes::class);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
@@ -217,7 +217,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(GenderTypeEnum::class)->willReturn(true);
 
-        $schemaFactory = new SchemaFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $schemaFactory = new SchemaFactory(null, $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
         $resultSchema = $schemaFactory->buildSchema(OverriddenOperationDummy::class, 'json', Schema::TYPE_OUTPUT, null, null, ['groups' => $serializerGroup, AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
@@ -267,7 +267,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
 
-        $schemaFactory = new SchemaFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $schemaFactory = new SchemaFactory(null, $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
         $resultSchema = $schemaFactory->buildSchema(NotAResource::class);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();

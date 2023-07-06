@@ -51,6 +51,7 @@ class SchemaFactoryTest extends TestCase
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $baseSchemaFactory = new BaseSchemaFactory(
+            null,
             $resourceMetadataFactoryCollection->reveal(),
             $propertyNameCollectionFactory->reveal(),
             $propertyMetadataFactory->reveal()
