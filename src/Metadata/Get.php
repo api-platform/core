@@ -43,7 +43,7 @@ final class Get extends HttpOperation
         array $paginationViaCursor = null,
         array $hydraContext = null,
         array $openapiContext = null,
-        bool|OpenApiOperation|null $openapi = null,
+        bool|OpenApiOperation $openapi = null,
         array $exceptionToStatus = null,
         bool $queryParameterValidationEnabled = null,
 
