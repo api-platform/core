@@ -213,17 +213,23 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                     'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null,
                 ];
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $context);
+                $propertyTypes = $propertyMetadata->getBuiltinTypes();
 
                 if (
-                    null === ($propertyType = $propertyMetadata->getBuiltinTypes()[0] ?? null)
+                    !$propertyTypes
                     || (!$input && false === $propertyMetadata->isReadable())
                     || ($input && $operation instanceof Mutation && false === $propertyMetadata->isWritable())
                 ) {
                     continue;
                 }
 
-                if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
-                    $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
+                // guess union/intersect types: check each type until finding a valid one
+                foreach ($propertyTypes as $propertyType) {
+                    if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
+                        $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
+                        // stop at the first valid type
+                        break;
+                    }
                 }
             }
         }

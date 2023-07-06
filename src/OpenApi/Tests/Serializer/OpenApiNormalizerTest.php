@@ -150,6 +150,7 @@ class OpenApiNormalizerTest extends TestCase
                 ->withReadable(true)
                 ->withWritable(false)
                 ->withIdentifier(true)
+                ->withSchema(['type' => 'integer', 'description' => 'This is an id.', 'readOnly' => true])
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
@@ -161,7 +162,7 @@ class OpenApiNormalizerTest extends TestCase
                 ->withWritableLink(true)
                 ->withRequired(false)
                 ->withIdentifier(false)
-                ->withSchema(['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$'])
+                ->withSchema(['type' => 'string', 'description' => 'This is a name.', 'minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$'])
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
@@ -173,6 +174,7 @@ class OpenApiNormalizerTest extends TestCase
                 ->withWritableLink(true)
                 ->withRequired(false)
                 ->withIdentifier(false)
+                ->withSchema(['type' => 'string', 'readOnly' => true, 'description' => 'This is an initializable but not writable property.'])
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
@@ -184,6 +186,7 @@ class OpenApiNormalizerTest extends TestCase
                 ->withWritableLink(true)
                 ->withRequired(false)
                 ->withIdentifier(false)
+                ->withSchema(['type' => 'string', 'format' => 'date-time', 'description' => 'This is a \DateTimeInterface object.'])
         );
 
         $propertyMetadataFactoryProphecy->create('Zorro', 'id', Argument::any())->shouldBeCalled()->willReturn(
@@ -193,6 +196,7 @@ class OpenApiNormalizerTest extends TestCase
                 ->withReadable(true)
                 ->withWritable(false)
                 ->withIdentifier(true)
+                ->withSchema(['type' => 'integer', 'description' => 'This is an id.', 'readOnly' => true])
         );
 
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
@@ -200,8 +204,9 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
+        $schemaFactory = new SchemaFactory(null, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+
         $typeFactory = new TypeFactory();
-        $schemaFactory = new SchemaFactory($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $typeFactory->setSchemaFactory($schemaFactory);
 
         $factory = new OpenApiFactory(

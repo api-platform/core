@@ -58,12 +58,17 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups);
+        $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-        if (!$this->isResourceClass($resourceClass) && ($builtinType = $propertyMetadata->getBuiltinTypes()[0] ?? null) && $builtinType->isCollection()) {
-            return $propertyMetadata->withReadableLink(true)->withWritableLink(true);
+        if (!$this->isResourceClass($resourceClass) && $types) {
+            foreach ($types as $builtinType) {
+                if ($builtinType->isCollection()) {
+                    return $propertyMetadata->withReadableLink(true)->withWritableLink(true);
+                }
+            }
         }
 
-        return $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups);
+        return $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups, $types);
     }
 
     /**
@@ -101,48 +106,45 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
-    private function transformLinkStatus(ApiProperty $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null): ApiProperty
+    private function transformLinkStatus(ApiProperty $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null, array $types = null): ApiProperty
     {
         // No need to check link status if property is not readable and not writable
         if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
             return $propertyMetadata;
         }
 
-        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        foreach ($types as $type) {
+            if (
+                $type->isCollection()
+                && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
+            ) {
+                $relatedClass = $collectionValueType->getClassName();
+            } else {
+                $relatedClass = $type->getClassName();
+            }
 
-        if (null === $type) {
+            // if property is not a resource relation, don't set link status (as it would have no meaning)
+            if (null === $relatedClass || !$this->isResourceClass($relatedClass)) {
+                continue;
+            }
+
+            // find the resource class
+            // this prevents serializer groups on non-resource child class from incorrectly influencing the decision
+            if (null !== $this->resourceClassResolver) {
+                $relatedClass = $this->resourceClassResolver->getResourceClass(null, $relatedClass);
+            }
+
+            $relatedGroups = $this->getClassSerializerGroups($relatedClass);
+
+            if (null === $propertyMetadata->isReadableLink()) {
+                $propertyMetadata = $propertyMetadata->withReadableLink(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups)));
+            }
+
+            if (null === $propertyMetadata->isWritableLink()) {
+                $propertyMetadata = $propertyMetadata->withWritableLink(null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups)));
+            }
+
             return $propertyMetadata;
-        }
-
-        if (
-            $type->isCollection()
-            && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
-        ) {
-            $relatedClass = $collectionValueType->getClassName();
-        } else {
-            $relatedClass = $type->getClassName();
-        }
-
-        // if property is not a resource relation, don't set link status (as it would have no meaning)
-        if (null === $relatedClass || !$this->isResourceClass($relatedClass)) {
-            return $propertyMetadata;
-        }
-
-        // find the resource class
-        // this prevents serializer groups on non-resource child class from incorrectly influencing the decision
-        if (null !== $this->resourceClassResolver) {
-            $relatedClass = $this->resourceClassResolver->getResourceClass(null, $relatedClass);
-        }
-
-        $relatedGroups = $this->getClassSerializerGroups($relatedClass);
-
-        if (null === $propertyMetadata->isReadableLink()) {
-            $propertyMetadata = $propertyMetadata->withReadableLink(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups)));
-        }
-
-        if (null === $propertyMetadata->isWritableLink()) {
-            $propertyMetadata = $propertyMetadata->withWritableLink(null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups)));
         }
 
         return $propertyMetadata;

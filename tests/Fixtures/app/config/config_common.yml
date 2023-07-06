@@ -429,3 +429,14 @@ services:
         tags:
             -  { name: 'serializer.normalizer' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\AuthorItemProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\BookCollectionProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\LibraryItemProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }

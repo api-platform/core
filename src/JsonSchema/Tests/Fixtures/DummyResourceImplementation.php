@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures;
+namespace ApiPlatform\JsonSchema\Tests\Fixtures;
 
 class DummyResourceImplementation implements DummyResourceInterface
 {

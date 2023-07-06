@@ -86,19 +86,19 @@ Feature: Documentation support
     {
       "default": "male",
       "example": "male",
-      "type": "string",
+      "type": ["string", "null"],
       "enum": [
           "male",
           "female",
           null
-      ],
-      "nullable": true
+      ]
     }
     """
     And the "playMode" property exists for the OpenAPI class "VideoGame"
     And the "playMode" property for the OpenAPI class "VideoGame" should be equal to:
     """
     {
+      "owl:maxCardinality": 1,
       "type": "string",
       "format": "iri-reference"
     }
@@ -238,8 +238,7 @@ Feature: Documentation support
                                         "type": "string"
                                     },
                                     "property": {
-                                        "type": "string",
-                                        "nullable": true
+                                        "type": ["string", "null"]
                                     },
                                     "required": {
                                         "type": "boolean"
@@ -310,12 +309,15 @@ Feature: Documentation support
     And the "resourceRelated" property for the OpenAPI class "Resource" should be equal to:
     """
     {
-      "readOnly":true,
-      "anyOf":[
+      "owl:maxCardinality": 1,
+      "readOnly": true,
+      "anyOf": [
         {
-          "$ref":"#/components/schemas/ResourceRelated"
+          "$ref": "#/components/schemas/ResourceRelated"
+        },
+        {
+          "type": "null"
         }
-      ],
-      "nullable":true
+      ]
     }
     """
