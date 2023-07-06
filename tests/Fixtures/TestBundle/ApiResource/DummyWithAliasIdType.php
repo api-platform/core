@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -23,13 +23,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Romain Herault <romain@rherault.dev>
  */
 #[ApiResource(aliasIdType: true)]
-class DummyAliasIdTypeDto
+class DummyWithAliasIdType
 {
-    /**
-     * @var int|null The id
-     */
-    private $id;
-
     /**
      * @var string The dummy name
      */
@@ -39,16 +34,6 @@ class DummyAliasIdTypeDto
 
     public static function staticMethod(): void
     {
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($id): void
-    {
-        $this->id = $id;
     }
 
     public function setName(string $name): void

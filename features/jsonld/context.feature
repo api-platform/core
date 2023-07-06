@@ -86,3 +86,22 @@ Feature: JSON-LD contexts generation
           }
       }
       """
+
+  Scenario: Retrieve Dummy context with aliasIdType
+    When I send a "GET" request to "/contexts/DummyWithAliasIdType"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be a superset of:
+    """
+    {
+        "@context": {
+            "@vocab": "http://example.com/docs.jsonld#",
+            "hydra": "http://www.w3.org/ns/hydra/core#",
+            "id": {"@type": "@id"},
+            "type": {"@type": "@type"},
+            "name": "https://schema.org/name"
+        }
+    }
+    """
+
