@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.1.12
+
+### Bug fixes
+
+* [1bcca0930](https://github.com/api-platform/core/commit/1bcca093074a85da071a8b16c250e084a7c3b68a) fix(symfony): provider can throw validation exception (#5586)
+* [57bfefbfa](https://github.com/api-platform/core/commit/57bfefbfa42dd893b6ec3cb66c0402597927efc6) [547078cf7](https://github.com/api-platform/core/commit/547078cf7ce89d6dbfcccf4fa6dbe7031b04b94c) fix(metadata): convert composite uri variables w/ proper type
+* [a0f12b667](https://github.com/api-platform/core/commit/a0f12b667a076c6647d7d8281c7a6e3a6bd68692) fix(serializer): disable_type_enforcement with null values (#5593)
+
+Also updates: graphiql, opensans
+
 ## v3.1.11
 
 ### Bug fixes

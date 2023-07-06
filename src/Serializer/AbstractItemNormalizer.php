@@ -176,7 +176,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if ($inputClass = $this->getInputClass($context)) {
             if (!$this->serializer instanceof DenormalizerInterface) {
-                throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');
+                throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
 
             unset($context['input'], $context['operation'], $context['operation_name']);
@@ -495,6 +495,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $collectionKeyType = $type->getCollectionKeyTypes()[0] ?? null;
         $collectionKeyBuiltinType = $collectionKeyType?->getBuiltinType();
+        $childContext = $this->createChildContext(['resource_class' => $className] + $context, $attribute, $format);
+        unset($childContext['uri_variables']);
+        if ($this->resourceMetadataCollectionFactory) {
+            $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($className)->getOperation();
+        }
 
         $values = [];
         foreach ($value as $index => $obj) {
@@ -502,7 +507,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyBuiltinType, \gettype($index)), $index, [$collectionKeyBuiltinType], ($context['deserialization_path'] ?? false) ? sprintf('key(%s)', $context['deserialization_path']) : null, true);
             }
 
-            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $this->createChildContext($context, $attribute, $format));
+            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $childContext);
         }
 
         return $values;

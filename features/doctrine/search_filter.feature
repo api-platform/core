@@ -1024,3 +1024,12 @@ Feature: Search filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON node "hydra:totalItems" should be equal to 1
+
+  @!mongodb
+  @createSchema
+  Scenario: Search on nested sub-entity that doesn't use "id" as its ORM identifier
+    Given there is a dummy entity with a sub entity with id "stringId" and name "someName"
+    When I send a "GET" request to "/dummy_with_subresource?subEntity=/dummy_subresource/stringId"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "hydra:totalItems" should be equal to 1
