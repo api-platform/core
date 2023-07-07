@@ -12,7 +12,7 @@ env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COVERAGE: '0'
   SYMFONY_DEPRECATIONS_HELPER: max[self]=0
-# a line for test
+
 jobs:
   commitlint:
     if: github.event_name == 'pull_request'
