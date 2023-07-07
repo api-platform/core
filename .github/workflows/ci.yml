@@ -12,7 +12,7 @@ env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COVERAGE: '0'
   SYMFONY_DEPRECATIONS_HELPER: max[self]=0
-
+# a line for test
 jobs:
   commitlint:
     if: github.event_name == 'pull_request'
@@ -27,7 +27,7 @@ jobs:
         run: | 
             commit=$(gh api \
               /repos/${{ github.repository }}/pulls/${{github.event.number}}/commits \
-              | jq -r '.[0].commit.message' \
+              | jq -r '.[-1].commit.message' \
               | head -n 1)
             # we can't use npx see https://github.com/conventional-changelog/commitlint/issues/613
             echo '{}' > package.json
