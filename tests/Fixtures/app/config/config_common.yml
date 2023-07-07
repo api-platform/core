@@ -61,6 +61,7 @@ api_platform:
     http_cache:
         invalidation:
             enabled: true
+    keep_legacy_inflector: false
     defaults:
         extra_properties:
             standard_put: true
