@@ -217,6 +217,7 @@ class ConfigurationTest extends TestCase
             'maker' => [
                 'enabled' => true,
             ],
+            'keep_legacy_inflector' => true,
         ], $config);
     }
 

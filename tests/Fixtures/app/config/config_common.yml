@@ -61,6 +61,7 @@ api_platform:
     http_cache:
         invalidation:
             enabled: true
+    keep_legacy_inflector: false
     defaults:
         extra_properties:
             standard_put: true
@@ -87,7 +88,7 @@ api_platform:
 
 parameters:
     container.autowiring.strict_mode: true
-    container.dumper.inline_class_loader: true
+    .container.dumper.inline_class_loader: true
 
 services:
     test.client:

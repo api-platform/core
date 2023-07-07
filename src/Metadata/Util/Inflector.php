@@ -56,6 +56,7 @@ final class Inflector
     {
         if (!self::$keepLegacyInflector) {
             $pluralize = (new EnglishInflector())->pluralize($word);
+
             return end($pluralize);
         }
 
