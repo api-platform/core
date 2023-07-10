@@ -26,9 +26,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 #[ApiResource(
     exceptionToStatus: [NotFoundHttpException::class => 400],
     operations: [
-        new Get(exceptionToStatus: [NotFoundException::class => 404]),
-        new Put(),
-        new GetCollection(),
+        new Get(uriTemplate: '/dummy_exception_to_statuses/{id}', exceptionToStatus: [NotFoundException::class => 404]),
+        new Put(uriTemplate: '/dummy_exception_to_statuses/{id}'),
+        new GetCollection(uriTemplate: '/dummy_exception_to_statuses'),
     ]
 )]
 #[ApiFilter(RequiredFilter::class)]
