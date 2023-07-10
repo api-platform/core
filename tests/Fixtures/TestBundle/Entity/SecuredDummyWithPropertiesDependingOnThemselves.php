@@ -27,9 +27,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ApiResource(
     operations: [
-        new Get(),
-        new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi']),
-        new Post(security: 'is_granted("ROLE_ADMIN")'),
+        new Get(uriTemplate: '/secured_dummy_with_properties_depending_on_themselves/{id}'),
+        new Patch(uriTemplate: '/secured_dummy_with_properties_depending_on_themselves/{id}', inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi']),
+        new Post(uriTemplate: '/secured_dummy_with_properties_depending_on_themselves', security: 'is_granted("ROLE_ADMIN")'),
     ]
 )]
 #[ORM\Entity]
