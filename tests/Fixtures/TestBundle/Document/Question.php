@@ -24,7 +24,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 #[ODM\Document]
 class Question
 {
-    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    #[ODM\Id(type: 'object_id')]
     private ?int $id = null;
     #[ODM\Field(nullable: true)]
     private string $content;

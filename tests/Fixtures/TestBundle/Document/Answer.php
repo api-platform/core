@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 class Answer
 {
     #[Serializer\Groups(['foobar'])]
-    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    #[ODM\Id(type: 'object_id')]
     private ?int $id = null;
     #[Serializer\Groups(['foobar'])]
     #[ODM\Field(nullable: false)]
