@@ -23,18 +23,18 @@ use Symfony\Component\String\UnicodeString;
  */
 final class Inflector
 {
-    private static bool $keepLegacyInflector;
+    private static bool $keepLegacyInflector = true;
     private static ?LegacyInflector $instance = null;
 
     private static function getInstance(): LegacyInflector
     {
-        return self::$instance
-            ?? self::$instance = InflectorFactory::create()->build();
+        return static::$instance
+            ?? static::$instance = InflectorFactory::create()->build();
     }
 
     public static function keepLegacyInflector(bool $keepLegacyInflector): void
     {
-        self::$keepLegacyInflector = $keepLegacyInflector;
+        static::$keepLegacyInflector = $keepLegacyInflector;
     }
 
     /**
@@ -42,11 +42,11 @@ final class Inflector
      */
     public static function tableize(string $word): string
     {
-        if (!self::$keepLegacyInflector) {
+        if (!static::$keepLegacyInflector) {
             return (new UnicodeString($word))->snake()->toString();
         }
 
-        return self::getInstance()->tableize($word);
+        return static::getInstance()->tableize($word);
     }
 
     /**
@@ -54,7 +54,7 @@ final class Inflector
      */
     public static function pluralize(string $word): string
     {
-        if (!self::$keepLegacyInflector) {
+        if (!static::$keepLegacyInflector) {
             $pluralize = (new EnglishInflector())->pluralize($word);
 
             return end($pluralize);
