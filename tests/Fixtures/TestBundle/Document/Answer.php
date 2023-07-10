@@ -36,7 +36,7 @@ class Answer
 {
     #[Serializer\Groups(['foobar'])]
     #[ODM\Id(type: 'object_id')]
-    private ?int $id = null;
+    private $id = null;
     #[Serializer\Groups(['foobar'])]
     #[ODM\Field(nullable: false)]
     private ?string $content = null;

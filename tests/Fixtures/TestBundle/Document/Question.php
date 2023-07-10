@@ -25,7 +25,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class Question
 {
     #[ODM\Id(type: 'object_id')]
-    private ?int $id = null;
+    private $id = null;
     #[ODM\Field(nullable: true)]
     private string $content;
     #[ODM\ReferenceOne(targetDocument: Answer::class, inversedBy: 'question', storeAs: 'id')]
