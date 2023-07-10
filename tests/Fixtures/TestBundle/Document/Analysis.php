@@ -18,23 +18,28 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Analysis.
  */
-#[ApiResource(uriTemplate: '/studies/{studyId}/analyses',
+#[ApiResource(
+    uriTemplate: '/studies/{studyId}/analyses',
     operations: [
         new GetCollection(),
+        new Post(),
         new Put(),
         new Patch(),
         new Delete(),
     ],
     uriVariables: [
         'studyId' => new Link(toProperty: 'study', fromClass: Study::class, identifiers: ['id']),
-    ]
+    ],
+    normalizationContext: ['groups' => ['analysis:read']],
+    denormalizationContext: ['groups' => ['analysis:write']],
 )]
 #[ODM\Document]
 class Analysis
