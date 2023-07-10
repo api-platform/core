@@ -24,6 +24,12 @@ abstract class Metadata
      * @param string|null $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param string|null $security                https://api-platform.com/docs/core/security
      * @param string|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param mixed|null  $mercure
+     * @param mixed|null  $messenger
+     * @param mixed|null  $input
+     * @param mixed|null  $output
+     * @param mixed|null  $provider
+     * @param mixed|null  $processor
      */
     public function __construct(
         protected ?string $shortName = null,

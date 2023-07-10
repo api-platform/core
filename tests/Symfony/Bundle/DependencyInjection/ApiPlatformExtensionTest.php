@@ -155,6 +155,7 @@ class ApiPlatformExtensionTest extends TestCase
         'graphql' => [
             'graphql_playground' => ['enabled' => false],
         ],
+        'keep_legacy_inflector' => false,
     ]];
 
     private ContainerBuilder $container;

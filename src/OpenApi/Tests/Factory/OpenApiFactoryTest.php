@@ -254,34 +254,116 @@ class OpenApiFactoryTest extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withDescription('This is an id.')->withReadable(true)->withWritable(false)->withIdentifier(true)
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withDescription('This is an id.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withIdentifier(true)
+                ->withSchema(['type' => 'integer', 'readOnly' => true, 'description' => 'This is an id.'])
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withSchema(['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$'])
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is a name.')
+                ->withReadable(true)
+                ->withWritable(true)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withRequired(false)
+                ->withIdentifier(false)
+                ->withSchema(['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$', 'description' => 'This is a name.', 'type' => 'string'])
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an initializable but not writable property.')->withReadable(true)->withWritable(false)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withInitializable(true)
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an initializable but not writable property.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withRequired(false)
+                ->withIdentifier(false)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an initializable but not writable property.'])
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])->withDescription('This is a \DateTimeInterface object.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])
+                ->withDescription('This is a \DateTimeInterface object.')
+                ->withReadable(true)
+                ->withWritable(true)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withRequired(false)
+                ->withIdentifier(false)
+                ->withSchema(['type' => ['string', 'null'], 'description' => 'This is a \DateTimeInterface object.', 'format' => 'date-time'])
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'enum', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an enum.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one'])
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an enum.')
+                ->withReadable(true)
+                ->withWritable(true)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withRequired(false)
+                ->withIdentifier(false)
+                ->withSchema(['type' => 'string', 'description' => 'This is an enum.'])
+                ->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one'])
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withDescription('This is an id.')->withReadable(true)->withWritable(false)->withIdentifier(true)
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withDescription('This is an id.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withIdentifier(true)
+                ->withSchema(['type' => 'integer', 'description' => 'This is an id.', 'readOnly' => true])
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withSchema(['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$'])
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is a name.')
+                ->withReadable(true)
+                ->withWritable(true)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withRequired(false)
+                ->withIdentifier(false)
+                ->withSchema(['type' => 'string', 'description' => 'This is a name.', 'minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$'])
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an initializable but not writable property.')->withReadable(true)->withWritable(false)->withReadableLink(true)->withWritableLink(true)->withInitializable(true)
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an initializable but not writable property.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an initializable but not writable property.'])
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])->withDescription('This is a \DateTimeInterface object.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])
+                ->withDescription('This is a \DateTimeInterface object.')
+                ->withReadable(true)
+                ->withWritable(true)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withSchema(['type' => ['string', 'null'], 'format' => 'date-time', 'description' => 'This is a \DateTimeInterface object.'])
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'enum', Argument::any())->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an enum.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one'])
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an enum.')
+                ->withReadable(true)
+                ->withWritable(true)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an enum.'])
+                ->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one'])
         );
 
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
@@ -329,8 +411,9 @@ class OpenApiFactoryTest extends TestCase
 
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
+        $schemaFactory = new SchemaFactory(null, $resourceCollectionMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+
         $typeFactory = new TypeFactory();
-        $schemaFactory = new SchemaFactory($typeFactory, $resourceCollectionMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $typeFactory->setSchemaFactory($schemaFactory);
 
         $factory = new OpenApiFactory(
@@ -379,10 +462,9 @@ class OpenApiFactoryTest extends TestCase
                     'description' => 'This is an initializable but not writable property.',
                 ]),
                 'dummy_date' => new \ArrayObject([
-                    'type' => 'string',
+                    'type' => ['string', 'null'],
                     'description' => 'This is a \DateTimeInterface object.',
                     'format' => 'date-time',
-                    'nullable' => true,
                 ]),
                 'enum' => new \ArrayObject([
                     'type' => 'string',

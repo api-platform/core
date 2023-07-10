@@ -280,32 +280,40 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 ->propertyMetadataFactory
                 ->create($context['resource_class'], $attribute, $options);
 
-            // TODO: 3.0 support multiple types, default value of types will be [] instead of null
-            $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
-            $isOne = $isMany = false;
+            $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-            if (null !== $type) {
+            // prevent declaring $attribute as attribute if it's already declared as relationship
+            $isRelationship = false;
+
+            foreach ($types as $type) {
+                $isOne = $isMany = false;
+
                 if ($type->isCollection()) {
                     $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
                     $isMany = $collectionValueType && ($className = $collectionValueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
                 } else {
                     $isOne = ($className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
                 }
+
+                if (!isset($className) || !$isOne && !$isMany) {
+                    // don't declare it as an attribute too quick: maybe the next type is a valid resource
+                    continue;
+                }
+
+                $relation = [
+                    'name' => $attribute,
+                    'type' => $this->getResourceShortName($className),
+                    'cardinality' => $isOne ? 'one' : 'many',
+                ];
+
+                $components['relationships'][] = $relation;
+                $isRelationship = true;
             }
 
-            if (!isset($className) || !$isOne && !$isMany) {
+            // if all types are not relationships, declare it as an attribute
+            if (!$isRelationship) {
                 $components['attributes'][] = $attribute;
-
-                continue;
             }
-
-            $relation = [
-                'name' => $attribute,
-                'type' => $this->getResourceShortName($className),
-                'cardinality' => $isOne ? 'one' : 'many',
-            ];
-
-            $components['relationships'][] = $relation;
         }
 
         if (false !== $context['cache_key']) {

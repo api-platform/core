@@ -59,30 +59,27 @@ trait FieldDatatypeTrait
             return null;
         }
 
-        // TODO: 3.0 allow multiple types
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-        if (null === $type) {
-            return null;
-        }
+        foreach ($types as $type) {
+            if (
+                Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
+                && null !== ($nextResourceClass = $type->getClassName())
+                && $this->resourceClassResolver->isResourceClass($nextResourceClass)
+            ) {
+                $nestedPath = $this->getNestedFieldPath($nextResourceClass, implode('.', $properties));
 
-        if (
-            Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
-            && null !== ($nextResourceClass = $type->getClassName())
-            && $this->resourceClassResolver->isResourceClass($nextResourceClass)
-        ) {
-            $nestedPath = $this->getNestedFieldPath($nextResourceClass, implode('.', $properties));
+                return null === $nestedPath ? $nestedPath : "$currentProperty.$nestedPath";
+            }
 
-            return null === $nestedPath ? $nestedPath : "$currentProperty.$nestedPath";
-        }
-
-        if (
-            null !== ($type = $type->getCollectionValueTypes()[0] ?? null)
-            && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
-            && null !== ($className = $type->getClassName())
-            && $this->resourceClassResolver->isResourceClass($className)
-        ) {
-            return $currentProperty;
+            if (
+                null !== ($type = $type->getCollectionValueTypes()[0] ?? null)
+                && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
+                && null !== ($className = $type->getClassName())
+                && $this->resourceClassResolver->isResourceClass($className)
+            ) {
+                return $currentProperty;
+            }
         }
 
         return null;

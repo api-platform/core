@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class DocumentNormalizer extends ObjectNormalizer
+final class DocumentNormalizer extends ObjectNormalizer // @phpstan-ignore-line
 {
     public const FORMAT = 'elasticsearch';
 

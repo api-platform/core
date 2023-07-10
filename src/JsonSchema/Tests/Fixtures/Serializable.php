@@ -11,9 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures;
+namespace ApiPlatform\JsonSchema\Tests\Fixtures;
 
-interface DummyResourceInterface
+interface Serializable
 {
-    public function getSomething(): string;
+    public function __serialize(): array;
+
+    public function __unserialize(array $data);
 }
