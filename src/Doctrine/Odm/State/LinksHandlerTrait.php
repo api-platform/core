@@ -105,12 +105,7 @@ trait LinksHandlerTrait
             }
         } else {
             foreach ($identifierProperties as $identifierProperty) {
-                $aggregation->match()->field($identifierProperty)->equals(
-                    $this->getFieldType(
-                        $classMetadata->getTypeOfField($identifierProperty),
-                        $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null)
-                    )
-                );
+                $aggregation->match()->field($identifierProperty)->equals($this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null));
             }
         }
 
