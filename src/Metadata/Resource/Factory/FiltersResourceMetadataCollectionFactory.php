@@ -51,6 +51,11 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
 
         foreach ($resourceMetadataCollection as $i => $resource) {
             foreach ($operations = $resource->getOperations() ?? [] as $operationName => $operation) {
+                if (null !== $operation->getFilters()) {
+                    // filters are already applied on this operation
+                    continue;
+                }
+
                 $operations->add($operationName, $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [], $filters))));
             }
 
