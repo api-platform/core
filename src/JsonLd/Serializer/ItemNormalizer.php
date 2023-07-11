@@ -110,6 +110,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $context['api_normalize'] = true;
 
+        /* @see https://github.com/api-platform/core/pull/5663 */
+        unset($context['item_uri_template']);
+
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {
             return $data;

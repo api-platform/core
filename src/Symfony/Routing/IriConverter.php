@@ -50,7 +50,6 @@ final class IriConverter implements IriConverterInterface
     use UriVariablesResolverTrait;
 
     private $localOperationCache = [];
-    private $localIdentifiersExtractorOperationCache = [];
 
     public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
@@ -108,7 +107,7 @@ final class IriConverter implements IriConverterInterface
 
         $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_c' : '_i');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
-            return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
+            return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context);
         }
 
         if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
@@ -129,10 +128,11 @@ final class IriConverter implements IriConverterInterface
             unset($context['uri_variables']);
         }
 
-        $identifiersExtractorOperation = $operation;
         if ($this->operationMetadataFactory && isset($context['item_uri_template'])) {
-            $identifiersExtractorOperation = null;
             $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
+            if (!$operation) {
+                throw new InvalidArgumentException(sprintf('Unable to find operation "%s"', $context['item_uri_template']));
+            }
         }
 
         // In symfony the operation name is the route name, try to find one if none provided
@@ -143,7 +143,6 @@ final class IriConverter implements IriConverterInterface
             $forceCollection = $operation instanceof CollectionOperationInterface;
             try {
                 $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
-                $identifiersExtractorOperation = $operation;
             } catch (OperationNotFoundException) {
             }
         }
@@ -153,9 +152,8 @@ final class IriConverter implements IriConverterInterface
         }
 
         $this->localOperationCache[$localOperationCacheKey] = $operation;
-        $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] = $identifiersExtractorOperation;
 
-        return $this->generateSymfonyRoute($resource, $referenceType, $operation, $context, $identifiersExtractorOperation);
+        return $this->generateSymfonyRoute($resource, $referenceType, $operation, $context);
     }
 
     private function generateSkolemIri(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = [], string $resourceClass = null): string
@@ -168,17 +166,22 @@ final class IriConverter implements IriConverterInterface
         return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
     }
 
-    private function generateSymfonyRoute(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = [], Operation $identifiersExtractorOperation = null): string
+    private function generateSymfonyRoute(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): string
     {
         $identifiers = $context['uri_variables'] ?? [];
 
         if (\is_object($resource)) {
             try {
-                $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, $identifiersExtractorOperation, $context);
+                $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, $operation, $context);
             } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers) {
-                    throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+                    // Try with the first operation found
+                    try {
+                        $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, null, $context);
+                    } catch (InvalidArgumentException|RuntimeException $e) {
+                        throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+                    }
                 }
             }
         }
