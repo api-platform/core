@@ -17,6 +17,8 @@ namespace ApiPlatform\Core\DataTransformer;
  * Transforms a DTO or an Anonymous class to a Resource object.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
+ * @deprecated since version 2.7, to be removed in 3.0. Instead, you can still document the output or the input DTO.
  */
 interface DataTransformerInterface
 {
