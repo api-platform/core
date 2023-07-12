@@ -17,10 +17,12 @@ use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ItemNormalizer as BaseItemNormalizer;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use Psr\Log\LoggerInterface;
@@ -37,6 +39,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ItemNormalizer extends BaseItemNormalizer
 {
+    use CacheKeyTrait;
     use ClassInfoTrait;
 
     public const FORMAT = 'graphql';
@@ -76,7 +79,12 @@ final class ItemNormalizer extends BaseItemNormalizer
             return parent::normalize($object, $format, $context);
         }
 
-        unset($context['operation_name'], $context['operation']);
+        if (!isset($context['cache_key']) && $context['operation'] instanceof Mutation) {
+            $context['cache_key'] = $this->getCacheKey($format, $context);
+        }
+
+        unset($context['operation_name'], $context['operation']); // Remove operation and operation_name only when cache key has been created
+
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {
             throw new UnexpectedValueException('Expected data to be an array.');
