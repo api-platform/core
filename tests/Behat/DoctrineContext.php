@@ -77,6 +77,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDoc
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Product as ProductDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Program as ProgramDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\PropertyCollectionIriOnly as PropertyCollectionIriOnlyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\PropertyCollectionIriOnlyRelation as PropertyCollectionIriOnlyRelationDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\PropertyUriTemplateOneToOneRelation as PropertyUriTemplateOneToOneRelationDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy as RelatedOwnedDummyDocument;
@@ -165,6 +168,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Product;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PropertyCollectionIriOnly;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PropertyCollectionIriOnlyRelation;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PropertyUriTemplateOneToOneRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -1952,6 +1958,27 @@ final class DoctrineContext implements Context
             $this->manager->persist($iriOnlyDummy);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are propertyCollectionIriOnly with relations
+     */
+    public function thereAreResourcesWithPropertyUriTemplates(): void
+    {
+        $propertyCollectionIriOnlyRelation = $this->isOrm() ? new PropertyCollectionIriOnlyRelation() : new PropertyCollectionIriOnlyRelationDocument();
+        $propertyCollectionIriOnlyRelation->name = 'asb';
+
+        $propertyToOneRelation = $this->isOrm() ? new PropertyUriTemplateOneToOneRelation() : new PropertyUriTemplateOneToOneRelationDocument();
+        $propertyToOneRelation->name = 'xarguš';
+
+        $propertyCollectionIriOnly = $this->isOrm() ? new PropertyCollectionIriOnly() : new PropertyCollectionIriOnlyDocument();
+        $propertyCollectionIriOnly->addPropertyCollectionIriOnlyRelation($propertyCollectionIriOnlyRelation);
+        $propertyCollectionIriOnly->setToOneRelation($propertyToOneRelation);
+
+        $this->manager->persist($propertyCollectionIriOnly);
+        $this->manager->persist($propertyCollectionIriOnlyRelation);
+        $this->manager->persist($propertyToOneRelation);
         $this->manager->flush();
     }
 
