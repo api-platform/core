@@ -64,6 +64,7 @@ class ApiLoaderTest extends TestCase
                 'api_dummies_my_path_op_collection' => (new GetCollection())->withUriTemplate('some/custom/path'),
                 // Custom path
                 'api_dummies_my_stateless_op_collection' => (new GetCollection())->withUriTemplate('/dummies.{_format}')->withStateless(true),
+                'api_dummies_my_controller_method_item' => (new Get())->withUriTemplate('/foo')->withController('Foo\\Bar\\MyController::method'),
             ])),
         ]);
 
@@ -180,6 +181,21 @@ class ApiLoaderTest extends TestCase
             ),
             $routeCollection->get('api_dummies_my_stateless_op_collection')
         );
+
+        $this->assertEquals(
+            $this->getRoute(
+                '/foo',
+                'Foo\\Bar\\MyController::method',
+                null,
+                RelatedDummyEntity::class,
+                [],
+                'api_dummies_my_controller_method_item',
+                [],
+                ['GET'],
+                []
+            ),
+            $routeCollection->get('api_dummies_my_controller_method_item')
+        );
     }
 
     public function testApiLoaderWithPrefix(): void
@@ -254,6 +270,7 @@ class ApiLoaderTest extends TestCase
             'api_platform.action.get_item',
             'api_platform.action.put_item',
             'api_platform.action.delete_item',
+            'Foo\\Bar\\MyController',
         ];
         $containerProphecy = $this->prophesize(ContainerInterface::class);
 
