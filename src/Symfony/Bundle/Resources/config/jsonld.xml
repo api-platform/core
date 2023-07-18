@@ -13,6 +13,7 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.symfony.iri_converter.skolem" />
             <argument type="service" id="api_platform.name_converter"/>
+            <argument>%api_platform.enable_docs%</argument>
         </service>
 
         <!-- Serializer -->
