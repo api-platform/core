@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ODM\Document]
 class Study
 {
-    #[ODM\Id]
+    #[ODM\Id(type: 'object_id', strategy: 'NONE')]
     #[Groups(['study:read', 'study:write'])]
     private $id;
 
@@ -69,6 +69,14 @@ class Study
     public function getId(): ?string
     {
         return $this->id;
+    }
+
+    /**
+     * Set id.
+     */
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
     }
 
     /**

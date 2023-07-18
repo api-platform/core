@@ -44,7 +44,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ODM\Document]
 class Analysis
 {
-    #[ODM\Id]
+    #[ODM\Id(type: 'object_id', strategy: 'NONE')]
     #[Groups(['analysis:read', 'analysis:write'])]
     private $id;
 
@@ -52,7 +52,7 @@ class Analysis
     #[Groups(['analysis:read', 'analysis:write'])]
     private ?string $content = null;
 
-    #[ODM\ReferenceOne(storeAs: 'id', targetDocument: Study::class, inversedBy: 'analyses')]
+    #[ODM\ReferenceOne(storeAs: 'id', targetDocument: Study::class)]
     #[Groups(['analysis:read', 'analysis:write'])]
     private ?Study $study = null;
 
@@ -62,6 +62,14 @@ class Analysis
     public function getId(): ?string
     {
         return $this->id;
+    }
+
+    /**
+     * Set id.
+     */
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
     }
 
     /**

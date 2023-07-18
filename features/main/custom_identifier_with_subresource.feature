@@ -93,3 +93,69 @@ Feature: Using custom parent identifier for resources
       ]
     }
     """
+
+  Scenario: Create a new study and analysis, and query analyses
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/studies" with body:
+    """
+    {
+      "id": "64b703fc1d65f957cce5eb33",
+      "content": "study for the app"
+    }
+    """
+    Then the response status code should be 201
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Study",
+      "@id": "/studies/64b703fc1d65f957cce5eb33",
+      "@type": "Study",
+      "id": "64b703fc1d65f957cce5eb33",
+      "content": "study for the app"
+    }
+    """
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/studies/64b703fc1d65f957cce5eb33/analyses" with body:
+    """
+    {
+      "id": "64b70696f2d88fe04a86f905",
+      "content": "a",
+      "study": "/studies/64b703fc1d65f957cce5eb33"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Analysis",
+      "@id": "/analyses/64b70696f2d88fe04a86f905",
+      "@type": "Analysis",
+      "id": "64b70696f2d88fe04a86f905",
+      "content": "a",
+      "study": "/studies/64b703fc1d65f957cce5eb33"
+    }
+    """
+    When I send a "GET" request to "/studies/64b703fc1d65f957cce5eb33/analyses"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Analysis",
+      "@id": "/studies/64b703fc1d65f957cce5eb33/analyses",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/analyses/64b70696f2d88fe04a86f905",
+          "@type": "Analysis",
+          "id": "64b70696f2d88fe04a86f905",
+          "content": "a",
+          "study": "/studies/64b703fc1d65f957cce5eb33"
+        }
+      ],
+      "hydra:totalItems": 1
+    }
+    """
