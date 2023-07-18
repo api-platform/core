@@ -45,10 +45,10 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_URL): array
     {
         $context = [
-            'hydra' => self::HYDRA_NS
+            'hydra' => self::HYDRA_NS,
         ];
 
-        if($this->enableDocs) {
+        if ($this->enableDocs) {
             $context['@vocab'] = $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#';
         }
 
