@@ -257,6 +257,20 @@ class ApiLoaderTest extends TestCase
         );
     }
 
+    public function testApiLoaderWithUndefinedControllerService(): void
+    {
+        $this->expectExceptionObject(new \RuntimeException('Operation "api_dummies_my_undefined_controller_method_item" is defining an unknown service as controller "Foo\\Bar\\MyUndefinedController". Make sure it is properly registered in the dependency injection container.'));
+
+        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+                'api_dummies_my_undefined_controller_method_item' => (new Get())->withUriTemplate('/foo')->withController('Foo\\Bar\\MyUndefinedController::method'),
+            ])),
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null);
+        $routeCollection->get('api_dummies_my_undefined_controller_method_item');
+    }
+
     private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection): ApiLoader
     {
         $routingConfig = __DIR__.'/../../../src/Symfony/Bundle/Resources/config/routing';
@@ -277,6 +291,7 @@ class ApiLoaderTest extends TestCase
         foreach ($possibleArguments as $possibleArgument) {
             $containerProphecy->has($possibleArgument)->willReturn(true);
         }
+        $containerProphecy->has('Foo\\Bar\\MyUndefinedController')->willReturn(false);
 
         $containerProphecy->has(Argument::type('string'))->willReturn(false);
 
