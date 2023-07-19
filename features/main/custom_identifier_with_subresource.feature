@@ -93,7 +93,7 @@ Feature: Using custom parent identifier for resources
       ]
     }
     """
-
+  @mongodb
   Scenario: Create a new study and analysis, and query analyses
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
