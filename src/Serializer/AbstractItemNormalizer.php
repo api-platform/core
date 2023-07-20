@@ -338,7 +338,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 }
             }
 
-            if (\count($missingConstructorArguments) > 0) {
+            if ($missingConstructorArguments) {
                 throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$%s".', $class, implode('", "$', $missingConstructorArguments)), 0, null, $missingConstructorArguments, $class);
             }
 
