@@ -64,6 +64,7 @@ class ApiLoaderTest extends TestCase
                 'api_dummies_my_path_op_collection' => (new GetCollection())->withUriTemplate('some/custom/path'),
                 // Custom path
                 'api_dummies_my_stateless_op_collection' => (new GetCollection())->withUriTemplate('/dummies.{_format}')->withStateless(true),
+                'api_dummies_my_controller_method_item' => (new Get())->withUriTemplate('/foo')->withController('Foo\\Bar\\MyController::method'),
             ])),
         ]);
 
@@ -180,6 +181,21 @@ class ApiLoaderTest extends TestCase
             ),
             $routeCollection->get('api_dummies_my_stateless_op_collection')
         );
+
+        $this->assertEquals(
+            $this->getRoute(
+                '/foo',
+                'Foo\\Bar\\MyController::method',
+                null,
+                RelatedDummyEntity::class,
+                [],
+                'api_dummies_my_controller_method_item',
+                [],
+                ['GET'],
+                []
+            ),
+            $routeCollection->get('api_dummies_my_controller_method_item')
+        );
     }
 
     public function testApiLoaderWithPrefix(): void
@@ -241,6 +257,20 @@ class ApiLoaderTest extends TestCase
         );
     }
 
+    public function testApiLoaderWithUndefinedControllerService(): void
+    {
+        $this->expectExceptionObject(new \RuntimeException('Operation "api_dummies_my_undefined_controller_method_item" is defining an unknown service as controller "Foo\\Bar\\MyUndefinedController". Make sure it is properly registered in the dependency injection container.'));
+
+        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+                'api_dummies_my_undefined_controller_method_item' => (new Get())->withUriTemplate('/foo')->withController('Foo\\Bar\\MyUndefinedController::method'),
+            ])),
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null);
+        $routeCollection->get('api_dummies_my_undefined_controller_method_item');
+    }
+
     private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection): ApiLoader
     {
         $routingConfig = __DIR__.'/../../../src/Symfony/Bundle/Resources/config/routing';
@@ -254,12 +284,14 @@ class ApiLoaderTest extends TestCase
             'api_platform.action.get_item',
             'api_platform.action.put_item',
             'api_platform.action.delete_item',
+            'Foo\\Bar\\MyController',
         ];
         $containerProphecy = $this->prophesize(ContainerInterface::class);
 
         foreach ($possibleArguments as $possibleArgument) {
             $containerProphecy->has($possibleArgument)->willReturn(true);
         }
+        $containerProphecy->has('Foo\\Bar\\MyUndefinedController')->willReturn(false);
 
         $containerProphecy->has(Argument::type('string'))->willReturn(false);
 
