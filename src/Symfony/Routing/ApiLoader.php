@@ -80,8 +80,11 @@ final class ApiLoader extends Loader
                         $path = str_replace('{._format}', '.{_format}', $path);
                     }
 
-                    if (($controller = $operation->getController()) && !$this->container->has($controller)) {
-                        throw new RuntimeException(sprintf('There is no builtin action for the "%s" operation. You need to define the controller yourself.', $operationName));
+                    if ($controller = $operation->getController()) {
+                        $controllerId = explode('::', $controller)[0];
+                        if (!$this->container->has($controllerId)) {
+                            throw new RuntimeException(sprintf('Operation "%s" is defining an unknown service as controller "%s". Make sure it is properly registered in the dependency injection container.', $operationName, $controllerId));
+                        }
                     }
 
                     $route = new Route(
