@@ -65,7 +65,7 @@ final class LegacyIriConverter implements IriConverterInterface
     public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
         if (null === $this->iriConverter) {
-            if (array_key_exists('uri_variables', $context) && $identifiers = $context['uri_variables']) {
+            if ($identifiers = ($context['uri_variables'] ?? null)) {
                 try {
                     return $this->legacyIriConverter->getItemIriFromResourceClass($item, $identifiers, $referenceType);
                 }
