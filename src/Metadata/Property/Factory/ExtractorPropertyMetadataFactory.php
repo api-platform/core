@@ -99,6 +99,23 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             'readableLink' => 'is',
             'required' => 'is',
             'identifier' => 'is',
+            'default' => 'get',
+            'example' => 'get',
+            'deprecationReason' => 'get',
+            'fetchable' => 'is',
+            'fetchEager' => 'get',
+            'jsonldContext' => 'get',
+            'openapiContext' => 'get',
+            'jsonSchemaContext' => 'get',
+            'push' => 'get',
+            'security' => 'get',
+            'securityPostDenormalize' => 'get',
+            'types' => 'get',
+            'builtinTypes' => 'get',
+            'schema' => 'get',
+            'initializable' => 'is',
+            'genId' => 'get',
+            'extraProperties' => 'get',
         ];
 
         foreach ($metadataAccessors as $metadataKey => $accessorPrefix) {
