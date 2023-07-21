@@ -318,7 +318,7 @@ resources:
                 elasticsearchOptions:
                     index: foo_index
                     type: foo_type
-            aliasIdType: false
+            jsonLdAliases: false
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
                 another_custom_property:

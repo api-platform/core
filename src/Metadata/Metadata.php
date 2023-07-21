@@ -69,7 +69,7 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
-        protected ?bool $aliasIdType = null,
+        protected ?bool $jsonLdAliases = null,
         protected array $extraProperties = []
     ) {
     }
@@ -567,15 +567,15 @@ abstract class Metadata
         return $self;
     }
 
-    public function getAliasIdType(): ?bool
+    public function getJsonLdAliases(): ?bool
     {
-        return $this->aliasIdType;
+        return $this->jsonLdAliases;
     }
 
-    public function withAliasIdType(bool $aliasIdType): static
+    public function withJsonLdAliases(bool $jsonLdAliases): static
     {
         $self = clone $this;
-        $self->aliasIdType = $aliasIdType;
+        $self->jsonLdAliases = $jsonLdAliases;
 
         return $self;
     }

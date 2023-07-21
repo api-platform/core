@@ -99,10 +99,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
-        $isAliasType = $operation->getAliasIdType();
+        $jsonLdAliases = $operation->getJsonLdAliases();
         if (true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
             $context['iri'] = $iri;
-            $metadata[$isAliasType ? 'id' : '@id'] = $iri;
+            $metadata[$jsonLdAliases ? 'id' : '@id'] = $iri;
         }
 
         $context['api_normalize'] = true;
@@ -118,7 +118,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 $types = [$operation->getShortName()];
             }
 
-            $metadata[$isAliasType ? 'type' : '@type'] = 1 === \count($types) ? $types[0] : $types;
+            $metadata[$jsonLdAliases ? 'type' : '@type'] = 1 === \count($types) ? $types[0] : $types;
         }
 
         return $metadata + $data;

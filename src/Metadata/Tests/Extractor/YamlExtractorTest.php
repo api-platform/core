@@ -100,7 +100,7 @@ class YamlExtractorTest extends TestCase
                     'read' => null,
                     'write' => null,
                     'stateOptions' => null,
-                    'aliasIdType' => null,
+                    'jsonLdAliases' => null,
                 ],
             ],
             Program::class => [
@@ -171,7 +171,7 @@ class YamlExtractorTest extends TestCase
                     'read' => null,
                     'write' => null,
                     'stateOptions' => null,
-                    'aliasIdType' => null,
+                    'jsonLdAliases' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/programs{._format}',
@@ -313,7 +313,7 @@ class YamlExtractorTest extends TestCase
                             'provider' => null,
                             'itemUriTemplate' => null,
                             'stateOptions' => null,
-                            'aliasIdType' => null,
+                            'jsonLdAliases' => null,
                         ],
                         [
                             'name' => null,
@@ -393,7 +393,7 @@ class YamlExtractorTest extends TestCase
                             'processor' => null,
                             'provider' => null,
                             'stateOptions' => null,
-                            'aliasIdType' => null,
+                            'jsonLdAliases' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -402,7 +402,7 @@ class YamlExtractorTest extends TestCase
                     'read' => null,
                     'write' => null,
                     'stateOptions' => null,
-                    'aliasIdType' => null,
+                    'jsonLdAliases' => null,
                 ],
             ],
             SingleFileConfigDummy::class => [
@@ -473,7 +473,7 @@ class YamlExtractorTest extends TestCase
                     'read' => null,
                     'write' => null,
                     'stateOptions' => null,
-                    'aliasIdType' => null,
+                    'jsonLdAliases' => null,
                 ],
             ],
         ], $extractor->getResources());

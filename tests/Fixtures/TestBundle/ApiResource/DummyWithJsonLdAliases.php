@@ -22,8 +22,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Romain Herault <romain@rherault.dev>
  */
-#[ApiResource(aliasIdType: true)]
-class DummyWithAliasIdType
+#[ApiResource(jsonLdAliases: true)]
+class DummyWithJsonLdAliases
 {
     /**
      * @var string The dummy name

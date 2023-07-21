@@ -160,7 +160,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'validationContext' => $this->buildArrayValue($resource, 'validationContext'),
             'filters' => $this->buildArrayValue($resource, 'filters'),
             'order' => $this->buildArrayValue($resource, 'order'),
-            'aliasIdType' => $this->phpize($resource, 'aliasIdType', 'bool'),
+            'jsonLdAliases' => $this->phpize($resource, 'jsonLdAliases', 'bool'),
             'extraProperties' => $this->buildArrayValue($resource, 'extraProperties'),
             'mercure' => $this->buildMercure($resource),
             'messenger' => $this->buildMessenger($resource),

@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\JsonLd\Serializer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyWithAliasIdType;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyWithJsonLdAliases;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -146,9 +146,9 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['api_resource' => $dummy, 'jsonld_has_context' => true]));
     }
 
-    public function testNormalizeAliasIdType(): void
+    public function testNormalizeJsonLdAliases(): void
     {
-        $dummy = new DummyWithAliasIdType();
+        $dummy = new DummyWithJsonLdAliases();
         $dummy->setName('hello');
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

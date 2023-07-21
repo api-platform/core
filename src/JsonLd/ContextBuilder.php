@@ -112,7 +112,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $outputClass = $this->getObjectClass($object);
         $operation = $context['operation'] ?? new Get(shortName: (new \ReflectionClass($outputClass))->getShortName());
         $shortName = $operation->getShortName();
-        $isAliasIdType = $operation->getAliasIdType();
+        $jsonLdAliases = $operation->getJsonLdAliases();
 
         $jsonLdContext = [
             '@context' => $this->getResourceContextWithShortname(
@@ -124,9 +124,9 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         ];
 
         if (isset($context['iri'])) {
-            $jsonLdContext[$isAliasIdType ? 'id' : '@id'] = $context['iri'];
+            $jsonLdContext[$jsonLdAliases ? 'id' : '@id'] = $context['iri'];
         } elseif (true === ($context['gen_id'] ?? true) && $this->iriConverter) {
-            $jsonLdContext[$isAliasIdType ? 'id' : '@id'] = $this->iriConverter->getIriFromResource($object);
+            $jsonLdContext[$jsonLdAliases ? 'id' : '@id'] = $this->iriConverter->getIriFromResource($object);
         }
 
         if ($context['has_context'] ?? false) {
@@ -135,7 +135,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
 
         // here the object can be different from the resource given by the $context['api_resource'] value
         if (isset($context['api_resource'])) {
-            $jsonLdContext[$isAliasIdType ? 'type' : '@type'] = $this->resourceMetadataFactory->create($this->getObjectClass($context['api_resource']))[0]->getShortName();
+            $jsonLdContext[$jsonLdAliases ? 'type' : '@type'] = $this->resourceMetadataFactory->create($this->getObjectClass($context['api_resource']))[0]->getShortName();
         }
 
         return $jsonLdContext;
@@ -146,12 +146,12 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $context = $this->getBaseContext($referenceType);
         $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
 
-        if($operation && $operation->getAliasIdType()) {
+        if ($operation && $operation->getJsonLdAliases()) {
             $context['id'] = [
                 '@type' => '@id',
             ];
             $context['type'] = [
-                '@type' => '@type'
+                '@type' => '@type',
             ];
         }
 

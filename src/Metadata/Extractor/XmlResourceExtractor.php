@@ -135,7 +135,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'validationContext' => isset($resource->validationContext->values) ? $this->buildValues($resource->validationContext->values) : null,
             'filters' => $this->buildArrayValue($resource, 'filter'),
             'order' => isset($resource->order->values) ? $this->buildValues($resource->order->values) : null,
-            'aliasIdType' => $this->phpize($resource, 'aliasIdType', 'bool'),
+            'jsonLdAliases' => $this->phpize($resource, 'jsonLdAliases', 'bool'),
             'extraProperties' => $this->buildExtraProperties($resource, 'extraProperties'),
             'read' => $this->phpize($resource, 'read', 'bool'),
             'write' => $this->phpize($resource, 'write', 'bool'),
