@@ -120,11 +120,23 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
         return $this->documentationNormalizer->supportsNormalization($data, $format);
     }
 
+    public function getSupportedTypes($format): array
+    {
+        // @deprecated remove condition when support for symfony versions under 6.3 is dropped
+        if (!method_exists($this->documentationNormalizer, 'getSupportedTypes')) {
+            return ['*' => $this->documentationNormalizer instanceof CacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod()];
+        }
+
+        return $this->documentationNormalizer->getSupportedTypes($format);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return $this->documentationNormalizer instanceof CacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod();
     }
 

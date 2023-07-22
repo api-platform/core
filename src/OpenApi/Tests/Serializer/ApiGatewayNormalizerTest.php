@@ -28,6 +28,9 @@ final class ApiGatewayNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
+    /**
+     * @group legacy
+     */
     public function testSupportsNormalization(): void
     {
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);

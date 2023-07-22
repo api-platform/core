@@ -45,6 +45,9 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize(['foo'], 'Foo');
     }
 
+    /**
+     * @group legacy
+     */
     public function testSupportsNormalization(): void
     {
         $std = new \stdClass();

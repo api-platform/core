@@ -41,4 +41,9 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
     {
         return 'json' === $format && SerializableResource::class === $type && \is_array($data);
     }
+
+    public function getSupportedTypes($format): array
+    {
+        return 'json' === $format ? ['*' => true] : [];
+    }
 }

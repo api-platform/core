@@ -40,6 +40,9 @@ class EntrypointNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
+    /**
+     * @group legacy
+     */
     public function testSupportNormalization(): void
     {
         $collection = new ResourceNameCollection();

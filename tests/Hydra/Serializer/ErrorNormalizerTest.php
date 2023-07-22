@@ -27,6 +27,9 @@ class ErrorNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
+    /**
+     * @group legacy
+     */
     public function testSupportsNormalization(): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);

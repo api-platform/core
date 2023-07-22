@@ -51,6 +51,9 @@ class AbstractItemNormalizerTest extends TestCase
     use ExpectDeprecationTrait;
     use ProphecyTrait;
 
+    /**
+     * @group legacy
+     */
     public function testSupportNormalizationAndSupportDenormalization(): void
     {
         $std = new \stdClass();

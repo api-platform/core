@@ -56,7 +56,26 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return true;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        /*
+         * At this point, support anything that is_iterable(), i.e. array|Traversable
+         * for non-objects, symfony uses 'native-'.\gettype($data) :
+         * https://github.com/tucksaun/symfony/blob/400685a68b00b0932f8ef41096578872b643099c/src/Symfony/Component/Serializer/Serializer.php#L254
+         */
+        if (static::FORMAT === $format) {
+            return [
+                'native-array' => true,
+                '\Traversable' => true,
+            ];
+        }
+
+        return [];
     }
 
     /**

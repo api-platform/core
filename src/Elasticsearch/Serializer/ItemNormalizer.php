@@ -90,6 +90,19 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
         return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsNormalization($data, $format);
     }
 
+    public function getSupportedTypes($format): array
+    {
+        // @deprecated remove condition when support for symfony versions under 6.3 is dropped
+        if (!method_exists($this->decorated, 'getSupportedTypes')) {
+            return [
+                DocumentNormalizer::FORMAT => null,
+                '*' => $this->decorated instanceof CacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod(),
+            ];
+        }
+
+        return DocumentNormalizer::FORMAT !== $format ? $this->decorated->getSupportedTypes($format) : [];
+    }
+
     /**
      * {@inheritdoc}
      *

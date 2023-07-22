@@ -158,6 +158,9 @@ class PartialCollectionViewNormalizerTest extends TestCase
         return $normalizer->normalize($paginatorProphecy->reveal(), null, ['resource_class' => SoMany::class, 'operation_name' => 'get']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testSupportsNormalization(): void
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);

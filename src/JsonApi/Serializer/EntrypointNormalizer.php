@@ -74,8 +74,15 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
         return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 
+    public function getSupportedTypes($format): array
+    {
+        return self::FORMAT === $format ? [Entrypoint::class => true] : [];
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return true;
     }
 }

@@ -65,6 +65,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
+    public function getSupportedTypes($format): array
+    {
+        return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
+    }
+
     /**
      * {@inheritdoc}
      */

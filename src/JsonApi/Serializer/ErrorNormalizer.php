@@ -67,8 +67,22 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 
+    public function getSupportedTypes($format): array
+    {
+        if (self::FORMAT === $format) {
+            return [
+                \Exception::class => true,
+                FlattenException::class => true,
+            ];
+        }
+
+        return [];
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return true;
     }
 }
