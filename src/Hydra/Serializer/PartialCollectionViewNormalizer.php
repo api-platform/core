@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Adds a view key to the result of a paginated Hydra collection.
@@ -121,7 +122,14 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
     public function hasCacheableSupportsMethod(): bool
     {
-        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
 
         return $this->collectionNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
     }

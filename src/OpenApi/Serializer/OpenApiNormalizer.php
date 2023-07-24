@@ -18,6 +18,7 @@ use ApiPlatform\OpenApi\OpenApi;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Generates an OpenAPI v3 specification.
@@ -81,7 +82,14 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
 
     public function hasCacheableSupportsMethod(): bool
     {
-        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
 
         return true;
     }

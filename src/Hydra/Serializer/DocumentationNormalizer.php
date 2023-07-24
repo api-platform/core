@@ -31,6 +31,7 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Creates a machine readable Hydra API documentation.
@@ -551,7 +552,14 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     public function hasCacheableSupportsMethod(): bool
     {
-        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
 
         return true;
     }
