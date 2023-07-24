@@ -165,8 +165,6 @@ class PartialCollectionViewNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null, Argument::type('array'))->willReturn(true)->shouldBeCalled();
-
         if (method_exists(Serializer::class, 'getSupportedTypes')) {
             $decoratedNormalizerProphecy->getSupportedTypes('jsonld')->willReturn(['*' => true]);
             $decoratedNormalizerProphecy->getSupportedTypes(Argument::any())->willReturn([]);
@@ -174,6 +172,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
             $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
             $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
         }
+        $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null, Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 

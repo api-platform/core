@@ -47,13 +47,13 @@ class CollectionFiltersNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedProphecy->supportsNormalization('foo', 'abc', Argument::type('array'))->willReturn(true)->shouldBeCalled();
         if (method_exists(Serializer::class, 'getSupportedTypes')) {
             $decoratedProphecy->getSupportedTypes(Argument::any())->willReturn(['*' => true]);
         } else {
             $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
             $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
         }
+        $decoratedProphecy->supportsNormalization('foo', 'abc', Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $normalizer = new CollectionFiltersNormalizer(
             $decoratedProphecy->reveal(),
@@ -62,8 +62,9 @@ class CollectionFiltersNormalizerTest extends TestCase
             $this->prophesize(ContainerInterface::class)->reveal()
         );
 
+        $this->assertTrue($normalizer->supportsNormalization('foo', 'abc'));
+
         if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->supportsNormalization('foo', 'abc'));
             $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
         } else {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());
