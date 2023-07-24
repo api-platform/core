@@ -53,6 +53,9 @@ class EntrypointNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization($entrypoint, 'json'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), EntrypointNormalizer::FORMAT));
 
+        $this->assertEmpty($normalizer->getSupportedTypes('json'));
+        $this->assertSame([Entrypoint::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());
         }

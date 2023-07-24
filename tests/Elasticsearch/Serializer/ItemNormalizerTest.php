@@ -111,6 +111,10 @@ final class ItemNormalizerTest extends TestCase
      */
     public function testHasCacheableSupportsMethodWithDecoratedNormalizerNotAnInstanceOfCacheableSupportsMethodInterface(): void
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->markTestSkipped('Symfony Serializer >= 6.3');
+        }
+
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', CacheableSupportsMethodInterface::class));
 
@@ -139,5 +143,13 @@ final class ItemNormalizerTest extends TestCase
         $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));
 
         (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->setSerializer($this->prophesize(SerializerInterface::class)->reveal());
+    }
+
+    public function testGetSupportedTypes(): void
+    {
+        $this->normalizerProphecy->getSupportedTypes(Argument::any())->willReturn(['*' => true]);
+
+        $this->assertEmpty($this->itemNormalizer->getSupportedTypes('json'));
+        $this->assertSame(['*' => true], $this->itemNormalizer->getSupportedTypes($this->itemNormalizer::FORMAT));
     }
 }

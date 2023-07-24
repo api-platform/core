@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Serializer;
+namespace ApiPlatform\OpenApi\Serializer;
 
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -42,6 +42,5 @@ if (method_exists(Serializer::class, 'getSupportedTypes')) {
      */
     interface CacheableSupportsMethodInterface extends BaseCacheableSupportsMethodInterface
     {
-        public function getSupportedTypes(?string $format): array;
     }
 }

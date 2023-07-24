@@ -56,6 +56,11 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
         $this->assertFalse($normalizer->supportsNormalization([], 'xml', ['resource_class' => 'Foo']));
         $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml', ['resource_class' => 'Foo']));
+        $this->assertEmpty($normalizer->getSupportedTypes('xml'));
+        $this->assertSame([
+            'native-array' => true,
+            '\Traversable' => true,
+        ], $normalizer->getSupportedTypes($normalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());

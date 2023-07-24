@@ -364,6 +364,8 @@ class DocumentationNormalizerTest extends TestCase
         $this->assertEquals($expected, $documentationNormalizer->normalize($documentation));
         $this->assertTrue($documentationNormalizer->supportsNormalization($documentation, 'jsonld'));
         $this->assertFalse($documentationNormalizer->supportsNormalization($documentation, 'hal'));
+        $this->assertEmpty($documentationNormalizer->getSupportedTypes('json'));
+        $this->assertSame([Documentation::class => true], $documentationNormalizer->getSupportedTypes($documentationNormalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($documentationNormalizer->hasCacheableSupportsMethod());

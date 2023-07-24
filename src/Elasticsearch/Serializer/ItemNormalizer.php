@@ -15,6 +15,7 @@ namespace ApiPlatform\Elasticsearch\Serializer;
 
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -39,8 +40,10 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        if (!$this->decorated instanceof CacheableSupportsMethodInterface) {
-            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', CacheableSupportsMethodInterface::class));
+        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
+        if (!$this->decorated instanceof BaseCacheableSupportsMethodInterface) {
+            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', BaseCacheableSupportsMethodInterface::class));
         }
 
         return $this->decorated->hasCacheableSupportsMethod();
@@ -96,11 +99,11 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
         if (!method_exists($this->decorated, 'getSupportedTypes')) {
             return [
                 DocumentNormalizer::FORMAT => null,
-                '*' => $this->decorated instanceof CacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod(),
+                '*' => $this->decorated instanceof BaseCacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod(),
             ];
         }
 
-        return DocumentNormalizer::FORMAT !== $format ? $this->decorated->getSupportedTypes($format) : [];
+        return DocumentNormalizer::FORMAT === $format ? $this->decorated->getSupportedTypes($format) : [];
     }
 
     /**

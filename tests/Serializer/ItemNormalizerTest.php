@@ -78,6 +78,8 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
+        $this->assertSame(['*' => true], $normalizer->getSupportedTypes('any'));
+
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());
         }

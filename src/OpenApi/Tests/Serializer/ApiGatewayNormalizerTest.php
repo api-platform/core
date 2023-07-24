@@ -35,9 +35,9 @@ final class ApiGatewayNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
         $normalizerProphecy->supportsNormalization(OpenApiNormalizer::FORMAT, OpenApi::class)->willReturn(true);
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $normalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
             $normalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
         }
 

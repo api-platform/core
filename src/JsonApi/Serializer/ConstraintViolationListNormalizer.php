@@ -61,7 +61,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
 
     public function getSupportedTypes($format): array
     {
-        return (self::FORMAT === $format) ? [ConstraintViolationListInterface::class => true] : [];
+        return self::FORMAT === $format ? [ConstraintViolationListInterface::class => true] : [];
     }
 
     public function hasCacheableSupportsMethod(): bool

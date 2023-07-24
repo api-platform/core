@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use ApiPlatform\Tests\Fixtures\Foo;
 use ApiPlatform\Tests\Fixtures\NotAResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -31,6 +30,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
@@ -47,9 +47,10 @@ class CollectionFiltersNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
         $decoratedProphecy->supportsNormalization('foo', 'abc', Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $decoratedProphecy->getSupportedTypes(Argument::any())->willReturn(['*' => true]);
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
             $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
         }
 
@@ -61,6 +62,8 @@ class CollectionFiltersNormalizerTest extends TestCase
         );
 
         $this->assertTrue($normalizer->supportsNormalization('foo', 'abc'));
+        $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
+
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());
         }
