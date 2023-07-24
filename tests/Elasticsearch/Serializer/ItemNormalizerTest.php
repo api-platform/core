@@ -144,6 +144,10 @@ final class ItemNormalizerTest extends TestCase
 
     public function testGetSupportedTypes(): void
     {
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->markTestSkipped('Symfony Serializer < 6.3');
+        }
+
         $this->normalizerProphecy->getSupportedTypes(Argument::any())->willReturn(['*' => true]);
 
         $this->assertEmpty($this->itemNormalizer->getSupportedTypes('json'));

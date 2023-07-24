@@ -44,7 +44,10 @@ final class ApiGatewayNormalizerTest extends TestCase
         $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 
         $this->assertTrue($normalizer->supportsNormalization(OpenApiNormalizer::FORMAT, OpenApi::class));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     public function testNormalize(): void

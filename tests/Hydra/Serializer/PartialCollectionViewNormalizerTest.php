@@ -166,10 +166,11 @@ class PartialCollectionViewNormalizerTest extends TestCase
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null, Argument::type('array'))->willReturn(true)->shouldBeCalled();
-        $decoratedNormalizerProphecy->getSupportedTypes('jsonld')->willReturn(['*' => true]);
-        $decoratedNormalizerProphecy->getSupportedTypes(Argument::any())->willReturn([]);
 
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            $decoratedNormalizerProphecy->getSupportedTypes('jsonld')->willReturn(['*' => true]);
+            $decoratedNormalizerProphecy->getSupportedTypes(Argument::any())->willReturn([]);
+        } else {
             $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
             $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
         }
@@ -178,10 +179,11 @@ class PartialCollectionViewNormalizerTest extends TestCase
 
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $this->assertTrue($normalizer->supportsNormalization(new \stdClass()));
-        $this->assertEmpty($normalizer->getSupportedTypes('json'));
-        $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
 
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertEmpty($normalizer->getSupportedTypes('json'));
+            $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
+        } else {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());
         }
     }
