@@ -21,7 +21,6 @@ use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
-use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MakerBundle\MakerBundle;
@@ -80,10 +79,6 @@ class AppKernel extends Kernel
             $bundles[] = new DoctrineMongoDBBundle();
         }
 
-        if (class_exists(NelmioApiDocBundle::class)) {
-            $bundles[] = new NelmioApiDocBundle();
-        }
-
         $bundles[] = new TestBundle();
 
         return $bundles;
@@ -97,10 +92,6 @@ class AppKernel extends Kernel
     protected function configureRoutes($routes): void
     {
         $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
-
-        if (class_exists(NelmioApiDocBundle::class)) {
-            $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
-        }
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
@@ -214,23 +205,6 @@ class AppKernel extends Kernel
             $twigConfig['exception_controller'] = null;
         }
         $c->prependExtensionConfig('twig', $twigConfig);
-
-        if (class_exists(NelmioApiDocBundle::class)) {
-            $c->prependExtensionConfig('nelmio_api_doc', [
-                'sandbox' => [
-                    'accept_type' => 'application/json',
-                    'body_format' => [
-                        'formats' => ['json'],
-                        'default_format' => 'json',
-                    ],
-                    'request_format' => [
-                        'formats' => ['json' => 'application/json'],
-                    ],
-                ],
-            ]);
-            $c->prependExtensionConfig('api_platform', ['enable_nelmio_api_doc' => true]);
-        }
-
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
