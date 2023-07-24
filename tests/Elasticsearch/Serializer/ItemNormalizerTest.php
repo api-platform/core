@@ -15,13 +15,14 @@ namespace ApiPlatform\Tests\Elasticsearch\Serializer;
 
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Serializer\ItemNormalizer;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -50,11 +51,17 @@ final class ItemNormalizerTest extends TestCase
         self::assertInstanceOf(NormalizerInterface::class, $this->itemNormalizer);
         self::assertInstanceOf(DenormalizerInterface::class, $this->itemNormalizer);
         self::assertInstanceOf(SerializerAwareInterface::class, $this->itemNormalizer);
-        self::assertInstanceOf(CacheableSupportsMethodInterface::class, $this->itemNormalizer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testHasCacheableSupportsMethod(): void
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->markTestSkipped('Symfony Serializer >= 6.3');
+        }
+
         $this->normalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalledOnce();
 
         self::assertTrue($this->itemNormalizer->hasCacheableSupportsMethod());
@@ -99,6 +106,9 @@ final class ItemNormalizerTest extends TestCase
         $this->itemNormalizer->setSerializer($serializer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testHasCacheableSupportsMethodWithDecoratedNormalizerNotAnInstanceOfCacheableSupportsMethodInterface(): void
     {
         $this->expectException(LogicException::class);

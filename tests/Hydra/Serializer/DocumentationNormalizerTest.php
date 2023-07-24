@@ -35,6 +35,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -363,7 +364,10 @@ class DocumentationNormalizerTest extends TestCase
         $this->assertEquals($expected, $documentationNormalizer->normalize($documentation));
         $this->assertTrue($documentationNormalizer->supportsNormalization($documentation, 'jsonld'));
         $this->assertFalse($documentationNormalizer->supportsNormalization($documentation, 'hal'));
-        $this->assertTrue($documentationNormalizer->hasCacheableSupportsMethod());
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($documentationNormalizer->hasCacheableSupportsMethod());
+        }
     }
 
     public function testNormalizeInputOutputClass(): void

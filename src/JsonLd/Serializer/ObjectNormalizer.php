@@ -16,7 +16,7 @@ namespace ApiPlatform\JsonLd\Serializer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**

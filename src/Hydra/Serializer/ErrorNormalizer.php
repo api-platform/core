@@ -15,8 +15,8 @@ namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**

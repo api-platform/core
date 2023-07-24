@@ -18,11 +18,12 @@ use ApiPlatform\OpenApi\Model\Paths;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 final class ApiGatewayNormalizerTest extends TestCase
 {
@@ -36,7 +37,9 @@ final class ApiGatewayNormalizerTest extends TestCase
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
         $normalizerProphecy->supportsNormalization(OpenApiNormalizer::FORMAT, OpenApi::class)->willReturn(true);
-        $normalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $normalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
+        }
 
         $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Problem\Serializer;
 
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
