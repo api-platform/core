@@ -621,7 +621,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
-            unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation']);
+            unset(
+                $childContext['iri'],
+                $childContext['uri_variables'],
+                $childContext['resource_class'],
+                $childContext['force_resource_class'],
+                $childContext['operation'],
+            );
 
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -650,8 +656,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
         }
 
-        unset($context['resource_class']);
-        unset($context['force_resource_class']);
+        unset(
+            $context['resource_class'],
+            $context['force_resource_class'],
+        );
 
         if ($type && $type->getClassName()) {
             $childContext = $this->createChildContext($context, $attribute, $format);
