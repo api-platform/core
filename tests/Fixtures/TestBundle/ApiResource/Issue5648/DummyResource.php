@@ -23,8 +23,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: '/dummy_ressource_with_custom_filter', itemUriTemplate: '/dummy_ressource_with_custom_filter/{id}'),
-        new Get(uriTemplate: '/dummy_ressource_with_custom_filter/{id}', uriVariables: ['id']),
+        new GetCollection(uriTemplate: '/dummy_resource_with_custom_filter', itemUriTemplate: '/dummy_resource_with_custom_filter/{id}'),
+        new Get(uriTemplate: '/dummy_resource_with_custom_filter/{id}', uriVariables: ['id']),
     ],
     stateOptions: new Options(entityClass: Dummy::class)
 )]
