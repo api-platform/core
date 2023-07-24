@@ -50,8 +50,20 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
+    public function getSupportedTypes($format): array
+    {
+        // @deprecated remove condition when support for symfony versions under 6.3 is dropped
+        if (!method_exists($this->collectionNormalizer, 'getSupportedTypes')) {
+            return ['*' => $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod()];
+        }
+
+        return $this->collectionNormalizer->getSupportedTypes($format);
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
     }
 

@@ -23,6 +23,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ErrorNormalizerTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testSupportNormalization(): void
     {
         $normalizer = new ErrorNormalizer();

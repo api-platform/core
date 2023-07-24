@@ -50,4 +50,11 @@ final class HttpExceptionNormalizer implements NormalizerInterface
     {
         return $data instanceof Error && $data->getPrevious() instanceof HttpExceptionInterface;
     }
+
+    public function getSupportedTypes($format): array
+    {
+        return [
+            Error::class => false,
+        ];
+    }
 }
