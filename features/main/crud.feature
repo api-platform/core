@@ -771,3 +771,29 @@ Feature: Create-Retrieve-Update-Delete
       "hydra:totalItems": 3
     }
     """
+
+  @!mongodb
+  @createSchema
+  Scenario: Replace an existing resource that doesn't expose its internal identifier
+    Given there is an HiddenIdentifierDummy object
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "PUT" request to "/hidden_identifier_dummies/prettyid" with body:
+    """
+    {
+      "foo": "A nice dummy"
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/hidden_identifier_dummies/prettyid"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/HiddenIdentifierDummy",
+      "@id": "/hidden_identifier_dummies/prettyid",
+      "@type": "HiddenIdentifierDummy",
+      "visibleId":"prettyid",
+      "foo": "A nice dummy"
+    }
+    """

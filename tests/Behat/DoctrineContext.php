@@ -139,6 +139,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Greeting;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\HiddenIdentifierDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
@@ -2144,6 +2145,19 @@ final class DoctrineContext implements Context
         $entity = new EntityClassWithDateTime();
         $entity->setStart(new \DateTime());
         $this->manager->persist($entity);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is an HiddenIdentifierDummy object
+     */
+    public function thereIsAnHiddenIdentifierDummy(): void
+    {
+        $dummy = new HiddenIdentifierDummy();
+        $dummy->id = 1;
+        $dummy->visibleId = 'prettyid';
+        $dummy->foo = 'fooValue';
+        $this->manager->persist($dummy);
         $this->manager->flush();
     }
 

@@ -53,6 +53,14 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             return ['id' => $this->propertyAccessor->getValue($item, 'id')];
         }
 
+        if ($operation && ($ormIds = $operation->getExtraProperties()['ormIds'] ?? null) && \array_key_exists('orm', $context)) {
+            return array_reduce($ormIds, function ($carry, $id) use ($item) {
+                $carry[$id] = $this->propertyAccessor->getValue($item, $id);
+
+                return $carry;
+            });
+        }
+
         if ($operation && $operation->getClass()) {
             return $this->getIdentifiersFromOperation($item, $operation, $context);
         }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common\State;
 
+use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -27,7 +28,8 @@ final class PersistProcessor implements ProcessorInterface
     use ClassInfoTrait;
     use LinksHandlerTrait;
 
-    public function __construct(private readonly ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry,
+                                private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null)
     {
     }
 
@@ -55,7 +57,12 @@ final class PersistProcessor implements ProcessorInterface
             // TODO: the call to getReference is most likely to fail with complex identifiers
             $newData = $data;
             if (isset($context['previous_data'])) {
-                $newData = 1 === \count($uriVariables) ? $manager->getReference($class, current($uriVariables)) : clone $context['previous_data'];
+                if ($ormId = $operation->getExtraProperties()['ormIds'] ?? null) {
+                    $id = $this->identifiersExtractor->getIdentifiersFromItem($context['previous_data'], $operation, ['orm' => true]);
+                } else {
+                    $id = current($uriVariables);
+                }
+                $newData = 1 === \count($uriVariables) ? $manager->getReference($class, $id) : clone $context['previous_data'];
             }
 
             $identifiers = array_reverse($uriVariables);
@@ -79,7 +86,8 @@ final class PersistProcessor implements ProcessorInterface
             } else {
                 foreach ($reflectionProperties as $propertyName => $reflectionProperty) {
                     // Don't override the property if it's part of the subresource system
-                    if (isset($uriVariables[$propertyName])) {
+                    if (isset($uriVariables[$propertyName]) ||
+                        \in_array($propertyName, $operation->getExtraProperties()['ormIds'] ?? [], true)) {
                         continue;
                     }
 
