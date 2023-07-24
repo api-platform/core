@@ -15,11 +15,11 @@ namespace ApiPlatform\Tests\Elasticsearch\Serializer;
 
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Serializer\ItemNormalizer;
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -35,15 +35,16 @@ final class ItemNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->itemNormalizer = new ItemNormalizer(
-            (
-                $this->normalizerProphecy = $this
-                    ->prophesize(NormalizerInterface::class)
-                    ->willImplement(DenormalizerInterface::class)
-                    ->willImplement(SerializerAwareInterface::class)
-                    ->willImplement(CacheableSupportsMethodInterface::class)
-            )->reveal()
-        );
+        $this->normalizerProphecy = $this
+            ->prophesize(NormalizerInterface::class)
+            ->willImplement(DenormalizerInterface::class)
+            ->willImplement(SerializerAwareInterface::class);
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->normalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
+        }
+
+        $this->itemNormalizer = new ItemNormalizer($this->normalizerProphecy->reveal());
     }
 
     public function testConstruct(): void
@@ -111,10 +112,6 @@ final class ItemNormalizerTest extends TestCase
      */
     public function testHasCacheableSupportsMethodWithDecoratedNormalizerNotAnInstanceOfCacheableSupportsMethodInterface(): void
     {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->markTestSkipped('Symfony Serializer >= 6.3');
-        }
-
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', CacheableSupportsMethodInterface::class));
 

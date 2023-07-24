@@ -17,11 +17,11 @@ use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Paths;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
-use ApiPlatform\OpenApi\Serializer\CacheableSupportsMethodInterface;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
