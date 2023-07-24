@@ -649,6 +649,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
+            unset(
+                $context['resource_class'],
+                $context['force_resource_class'],
+            );
+
             if ($type->getClassName()) {
                 $childContext = $this->createChildContext($context, $attribute, $format);
                 unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['force_resource_class']);
