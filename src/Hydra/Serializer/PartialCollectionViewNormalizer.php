@@ -15,15 +15,17 @@ namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\Util\IriHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Adds a view key to the result of a paginated Hydra collection.
@@ -111,7 +113,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         // @deprecated remove condition when support for symfony versions under 6.3 is dropped
         if (!method_exists($this->collectionNormalizer, 'getSupportedTypes')) {
             return [
-                '*' => $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod(),
+                '*' => $this->collectionNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod(),
             ];
         }
 
@@ -120,9 +122,16 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
     public function hasCacheableSupportsMethod(): bool
     {
-        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
 
-        return $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
+        return $this->collectionNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
     }
 
     /**

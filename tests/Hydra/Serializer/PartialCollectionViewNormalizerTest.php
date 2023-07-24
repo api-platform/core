@@ -28,6 +28,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -164,14 +165,26 @@ class PartialCollectionViewNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            $decoratedNormalizerProphecy->getSupportedTypes('jsonld')->willReturn(['*' => true]);
+            $decoratedNormalizerProphecy->getSupportedTypes(Argument::any())->willReturn([]);
+        } else {
+            $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
+            $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
+        }
         $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null, Argument::type('array'))->willReturn(true)->shouldBeCalled();
-        $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
+
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $this->assertTrue($normalizer->supportsNormalization(new \stdClass()));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertEmpty($normalizer->getSupportedTypes('json'));
+            $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
+        } else {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     public function testSetNormalizer(): void

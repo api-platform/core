@@ -17,8 +17,10 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Decorates the output with JSON API metadata when appropriate, but otherwise
@@ -47,7 +49,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         // @deprecated remove condition when support for symfony versions under 6.3 is dropped
         if (!method_exists($this->decorated, 'getSupportedTypes')) {
             return [
-                '*' => $this->decorated instanceof CacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod(),
+                '*' => $this->decorated instanceof BaseCacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod(),
             ];
         }
 
@@ -56,9 +58,16 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     public function hasCacheableSupportsMethod(): bool
     {
-        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
 
-        return $this->decorated instanceof CacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod();
+        return $this->decorated instanceof BaseCacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod();
     }
 
     /**

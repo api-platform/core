@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -43,7 +44,15 @@ class ErrorNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new FlattenException(), ErrorNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new FlattenException(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertEmpty($normalizer->getSupportedTypes('json'));
+        $this->assertSame([
+            \Exception::class => true,
+            FlattenException::class => true,
+        ], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     /**

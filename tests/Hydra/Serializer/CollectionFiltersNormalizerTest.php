@@ -32,6 +32,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -46,9 +47,13 @@ class CollectionFiltersNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            $decoratedProphecy->getSupportedTypes(Argument::any())->willReturn(['*' => true]);
+        } else {
+            $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
+            $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
+        }
         $decoratedProphecy->supportsNormalization('foo', 'abc', Argument::type('array'))->willReturn(true)->shouldBeCalled();
-        $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
 
         $normalizer = new CollectionFiltersNormalizer(
             $decoratedProphecy->reveal(),
@@ -58,7 +63,12 @@ class CollectionFiltersNormalizerTest extends TestCase
         );
 
         $this->assertTrue($normalizer->supportsNormalization('foo', 'abc'));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
+        } else {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     public function testNormalizeNonResourceCollection(): void

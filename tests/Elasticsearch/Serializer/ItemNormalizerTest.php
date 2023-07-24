@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -34,15 +35,16 @@ final class ItemNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->itemNormalizer = new ItemNormalizer(
-            (
-                $this->normalizerProphecy = $this
-                    ->prophesize(NormalizerInterface::class)
-                    ->willImplement(DenormalizerInterface::class)
-                    ->willImplement(SerializerAwareInterface::class)
-                    ->willImplement(CacheableSupportsMethodInterface::class)
-            )->reveal()
-        );
+        $this->normalizerProphecy = $this
+            ->prophesize(NormalizerInterface::class)
+            ->willImplement(DenormalizerInterface::class)
+            ->willImplement(SerializerAwareInterface::class);
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->normalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
+        }
+
+        $this->itemNormalizer = new ItemNormalizer($this->normalizerProphecy->reveal());
     }
 
     public function testConstruct(): void
@@ -50,11 +52,17 @@ final class ItemNormalizerTest extends TestCase
         self::assertInstanceOf(NormalizerInterface::class, $this->itemNormalizer);
         self::assertInstanceOf(DenormalizerInterface::class, $this->itemNormalizer);
         self::assertInstanceOf(SerializerAwareInterface::class, $this->itemNormalizer);
-        self::assertInstanceOf(CacheableSupportsMethodInterface::class, $this->itemNormalizer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testHasCacheableSupportsMethod(): void
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->markTestSkipped('Symfony Serializer >= 6.3');
+        }
+
         $this->normalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalledOnce();
 
         self::assertTrue($this->itemNormalizer->hasCacheableSupportsMethod());
@@ -99,6 +107,9 @@ final class ItemNormalizerTest extends TestCase
         $this->itemNormalizer->setSerializer($serializer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testHasCacheableSupportsMethodWithDecoratedNormalizerNotAnInstanceOfCacheableSupportsMethodInterface(): void
     {
         $this->expectException(LogicException::class);
@@ -129,5 +140,17 @@ final class ItemNormalizerTest extends TestCase
         $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));
 
         (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->setSerializer($this->prophesize(SerializerInterface::class)->reveal());
+    }
+
+    public function testGetSupportedTypes(): void
+    {
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->markTestSkipped('Symfony Serializer < 6.3');
+        }
+
+        $this->normalizerProphecy->getSupportedTypes(Argument::any())->willReturn(['*' => true]);
+
+        $this->assertEmpty($this->itemNormalizer->getSupportedTypes('json'));
+        $this->assertSame(['*' => true], $this->itemNormalizer->getSupportedTypes($this->itemNormalizer::FORMAT));
     }
 }

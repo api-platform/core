@@ -15,9 +15,10 @@ namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Converts {@see \Exception} or {@see FlattenException} to a Hydra error representation.
@@ -79,7 +80,14 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
 
     public function hasCacheableSupportsMethod(): bool
     {
-        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
 
         return true;
     }

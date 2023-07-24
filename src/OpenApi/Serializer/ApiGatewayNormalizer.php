@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\OpenApi\Serializer;
 
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Removes features unsupported by Amazon API Gateway.
@@ -124,7 +125,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
     {
         // @deprecated remove condition when support for symfony versions under 6.3 is dropped
         if (!method_exists($this->documentationNormalizer, 'getSupportedTypes')) {
-            return ['*' => $this->documentationNormalizer instanceof CacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod()];
+            return ['*' => $this->documentationNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod()];
         }
 
         return $this->documentationNormalizer->getSupportedTypes($format);
@@ -135,9 +136,16 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        trigger_deprecation('api-platform/core', '3.1', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
 
-        return $this->documentationNormalizer instanceof CacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod();
+        return $this->documentationNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod();
     }
 
     private function isLocalRef(string $ref): bool
