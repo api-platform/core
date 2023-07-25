@@ -62,7 +62,7 @@
         "symfony/config": "^6.1",
         "symfony/console": "^6.1",
         "symfony/css-selector": "^6.1",
-        "symfony/dependency-injection": "^6.1",
+        "symfony/dependency-injection": "^6.1.12",
         "symfony/doctrine-bridge": "^6.1",
         "symfony/dom-crawler": "^6.1",
         "symfony/error-handler": "^6.1",
