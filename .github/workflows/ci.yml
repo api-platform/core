@@ -708,7 +708,7 @@ jobs:
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[self]=0
+          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&ignoreFile=./tests/.ignored-deprecations
 
   windows-behat:
     name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
@@ -792,7 +792,7 @@ jobs:
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[self]=0
+          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&ignoreFile=./tests/.ignored-deprecations
 
   behat-symfony-lowest:
     name: Behat (PHP ${{ matrix.php }}) (Symfony lowest)
