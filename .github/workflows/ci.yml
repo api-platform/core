@@ -707,6 +707,8 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
   windows-behat:
     name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
