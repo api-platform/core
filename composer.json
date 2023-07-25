@@ -52,7 +52,7 @@
         "phpstan/phpstan-phpunit": "^1.0",
         "phpstan/phpstan-symfony": "^1.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
-        "ramsey/uuid": "^3.7 || ^4.0",
+        "ramsey/uuid": "^3.9.7 || ^4.0",
         "ramsey/uuid-doctrine": "^1.4 || ^2.0",
         "soyuka/contexts": "v3.3.9",
         "soyuka/stubs-mongodb": "^1.0",
