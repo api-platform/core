@@ -34,7 +34,7 @@ class Person
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', enumType: GenderTypeEnum::class, nullable: true)]
+    #[ORM\Column(type: 'string', nullable: true, enumType: GenderTypeEnum::class)]
     #[Groups(['people.pets'])]
     public ?GenderTypeEnum $genderType = GenderTypeEnum::MALE;
 

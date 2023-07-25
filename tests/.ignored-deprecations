@@ -1,0 +1,4 @@
+# https://github.com/doctrine/dbal/issues/5784
+%Subscribing to onSchemaCreateTable events is deprecated\.%
+# https://github.com/doctrine/orm/pull/10855
+%Column::setCustomSchemaOptions\(\) is deprecated\. Use setPlatformOptions\(\) instead\.%

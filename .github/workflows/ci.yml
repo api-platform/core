@@ -10,7 +10,6 @@ concurrency:
 
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
 jobs:
   commitlint:
@@ -552,8 +551,6 @@ jobs:
         php:
           - '8.2'
       fail-fast: false
-    env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -592,9 +589,6 @@ jobs:
         php:
           - '8.2'
       fail-fast: false
-    # env:
-      # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
-      #SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -765,9 +759,6 @@ jobs:
         php:
           - '8.2'
       fail-fast: false
-      # env:
-      # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
-      #SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
