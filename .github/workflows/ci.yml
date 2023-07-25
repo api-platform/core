@@ -48,7 +48,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           ini-values: memory_limit=-1
           tools: pecl, composer, php-cs-fixer
           coverage: none
@@ -75,7 +75,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -134,7 +134,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -202,7 +202,7 @@ jobs:
         with:
           php-version: latest
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
       - name: Run ${{ matrix.component }} tests
         working-directory: src/${{ matrix.component }}
@@ -233,7 +233,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -336,7 +336,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -386,7 +386,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -562,7 +562,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -603,7 +603,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -645,7 +645,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages
@@ -692,7 +692,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -734,7 +734,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -776,7 +776,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -816,7 +816,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages
