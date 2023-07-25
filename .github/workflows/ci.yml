@@ -789,6 +789,8 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
   behat-symfony-lowest:
     name: Behat (PHP ${{ matrix.php }}) (Symfony lowest)
