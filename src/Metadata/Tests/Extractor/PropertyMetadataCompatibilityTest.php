@@ -93,7 +93,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         $this->assertEquals($this->buildApiProperty(), $property);
     }
 
-    public function getExtractors(): array
+    public static function getExtractors(): array
     {
         return [
             [XmlPropertyExtractor::class, new XmlPropertyAdapter()],

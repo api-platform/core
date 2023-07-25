@@ -124,7 +124,7 @@ class ExceptionActionTest extends TestCase
         $this->assertTrue($response->headers->contains('X-Frame-Options', 'deny'));
     }
 
-    public function provideOperationExceptionToStatusCases(): \Generator
+    public static function provideOperationExceptionToStatusCases(): \Generator
     {
         yield 'no mapping' => [
             [],

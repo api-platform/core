@@ -114,13 +114,13 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
         $existsFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'exists');
         $customExistsFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'customExists');
 
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'valid values' => [
                     [

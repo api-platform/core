@@ -110,7 +110,7 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
-    public function errorProvider(): array
+    public static function errorProvider(): array
     {
         return [
             [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', false],

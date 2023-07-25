@@ -73,7 +73,7 @@ class ReadStageTest extends TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function contextProvider(): array
+    public static function contextProvider(): array
     {
         return [
             'item context' => [['is_collection' => false], null],
@@ -113,7 +113,7 @@ class ReadStageTest extends TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function itemProvider(): array
+    public static function itemProvider(): array
     {
         $item = new \stdClass();
 
@@ -160,7 +160,7 @@ class ReadStageTest extends TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function itemMutationOrSubscriptionProvider(): array
+    public static function itemMutationOrSubscriptionProvider(): array
     {
         $item = new \stdClass();
 
@@ -240,7 +240,7 @@ array_search('some.field', array_keys($args['filters']['order']), true) <
         array_search('localField', array_keys($args['filters']['order']), true)))->shouldHaveBeenCalled();
     }
 
-    public function collectionProvider(): array
+    public static function collectionProvider(): array
     {
         return [
             'no root class' => [[], null, null, [], []],

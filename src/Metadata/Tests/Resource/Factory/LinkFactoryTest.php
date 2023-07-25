@@ -58,7 +58,7 @@ final class LinkFactoryTest extends TestCase
         );
     }
 
-    public function provideCreateLinksFromIdentifiersCases(): \Generator
+    public static function provideCreateLinksFromIdentifiersCases(): \Generator
     {
         yield 'no identifiers no id' => [
             ['slug'],
@@ -111,7 +111,7 @@ final class LinkFactoryTest extends TestCase
         );
     }
 
-    public function provideCreateLinksFromAttributesCases(): \Generator
+    public static function provideCreateLinksFromAttributesCases(): \Generator
     {
         yield 'no builtin types' => [
             [],

@@ -76,7 +76,7 @@ class TypeConverterTest extends TestCase
         $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
-    public function convertTypeProvider(): array
+    public static function convertTypeProvider(): array
     {
         return [
             [new Type(Type::BUILTIN_TYPE_BOOL), false, 0, GraphQLType::boolean()],
@@ -187,7 +187,7 @@ class TypeConverterTest extends TestCase
         $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
-    public function convertTypeResourceProvider(): array
+    public static function convertTypeResourceProvider(): array
     {
         return [
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
@@ -206,7 +206,7 @@ class TypeConverterTest extends TestCase
         $this->assertEquals($expectedGraphqlType, $this->typeConverter->resolveType($type));
     }
 
-    public function resolveTypeProvider(): array
+    public static function resolveTypeProvider(): array
     {
         return [
             ['String', GraphQLType::string()],
@@ -234,7 +234,7 @@ class TypeConverterTest extends TestCase
         $this->typeConverter->resolveType($type);
     }
 
-    public function resolveTypeInvalidProvider(): array
+    public static function resolveTypeInvalidProvider(): array
     {
         return [
             ['float?', '"float?" is not a valid GraphQL type.'],

@@ -201,7 +201,7 @@ class PaginatorTest extends TestCase
         return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
     }
 
-    public function initializeProvider(): array
+    public static function initializeProvider(): array
     {
         return [
             'First of three pages of 15 items each' => [0, 15, 42, 1, 3],

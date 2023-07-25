@@ -718,6 +718,8 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testCanDenormalizeInputClassWithDifferentFieldsThanResourceClass(): void
     {
+        $this->markTestSkipped('TODO: check why this test has been commented');
+
         // $data = [
         //     'dummyName' => 'Dummy Name',
         // ];

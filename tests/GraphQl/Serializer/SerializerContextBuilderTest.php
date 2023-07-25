@@ -85,7 +85,7 @@ class SerializerContextBuilderTest extends TestCase
     /**
      * @dataProvider createNormalizationContextProvider
      */
-    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, AdvancedNameConverterInterface $advancedNameConverter = null, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
+    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, callable $advancedNameConverter = null, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
     {
         $resolverContext = [
             'is_mutation' => $isMutation,
@@ -108,7 +108,7 @@ class SerializerContextBuilderTest extends TestCase
 
         $serializerContextBuilder = $this->serializerContextBuilder;
         if ($advancedNameConverter) {
-            $serializerContextBuilder = $this->buildSerializerContextBuilder($advancedNameConverter);
+            $serializerContextBuilder = $this->buildSerializerContextBuilder($advancedNameConverter($this));
         }
 
         $context = $serializerContextBuilder->create($resourceClass, $operation, $resolverContext, true);
@@ -117,127 +117,129 @@ class SerializerContextBuilderTest extends TestCase
         $this->assertEquals($expectedContext, $context);
     }
 
-    public function createNormalizationContextProvider(): array
+    public static function createNormalizationContextProvider(): iterable
     {
-        $advancedNameConverter = $this->prophesize(AdvancedNameConverterInterface::class);
-        $advancedNameConverter->denormalize('field', 'myResource', null, Argument::type('array'))->willReturn('denormalizedField');
+        $advancedNameConverterFactory = function (self $that): AdvancedNameConverterInterface {
+            $advancedNameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
+            $advancedNameConverterProphecy->denormalize('field', 'myResource', null, Argument::type('array'))->willReturn('denormalizedField');
 
-        return [
-            'nominal' => [
-                $resourceClass = 'myResource',
-                $operationName = 'item_query',
-                ['_id' => 3, 'field' => 'foo'],
-                false,
-                false,
-                false,
-                [
-                    'groups' => ['normalization_group'],
-                    'resource_class' => $resourceClass,
-                    'operation_name' => $operationName,
-                    'graphql_operation_name' => $operationName,
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
-                    'attributes' => [
-                        'id' => 3,
-                        'field' => 'foo',
-                    ],
+            return $advancedNameConverterProphecy->reveal();
+        };
+
+        yield 'nominal' => [
+            $resourceClass = 'myResource',
+            $operationName = 'item_query',
+            ['_id' => 3, 'field' => 'foo'],
+            false,
+            false,
+            false,
+            [
+                'groups' => ['normalization_group'],
+                'resource_class' => $resourceClass,
+                'operation_name' => $operationName,
+                'graphql_operation_name' => $operationName,
+                'input' => ['class' => 'inputClass'],
+                'output' => ['class' => 'outputClass'],
+                'attributes' => [
+                    'id' => 3,
+                    'field' => 'foo',
                 ],
             ],
-            'nominal with advanced name converter' => [
-                $resourceClass = 'myResource',
-                $operationName = 'item_query',
-                ['_id' => 3, 'field' => 'foo'],
-                false,
-                false,
-                false,
-                [
-                    'groups' => ['normalization_group'],
-                    'resource_class' => $resourceClass,
-                    'operation_name' => $operationName,
-                    'graphql_operation_name' => $operationName,
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
-                    'attributes' => [
-                        'id' => 3,
-                        'denormalizedField' => 'foo',
-                    ],
-                ],
-                $advancedNameConverter->reveal(),
-            ],
-            'nominal collection' => [
-                $resourceClass = 'myResource',
-                $operationName = 'collection_query',
-                ['edges' => ['node' => ['nodeField' => 'baz']]],
-                false,
-                false,
-                false,
-                [
-                    'groups' => ['normalization_group'],
-                    'resource_class' => $resourceClass,
-                    'operation_name' => $operationName,
-                    'graphql_operation_name' => $operationName,
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
-                    'attributes' => [
-                        'nodeField' => 'baz',
-                    ],
+        ];
+        yield 'nominal with advanced name converter' => [
+            $resourceClass = 'myResource',
+            $operationName = 'item_query',
+            ['_id' => 3, 'field' => 'foo'],
+            false,
+            false,
+            false,
+            [
+                'groups' => ['normalization_group'],
+                'resource_class' => $resourceClass,
+                'operation_name' => $operationName,
+                'graphql_operation_name' => $operationName,
+                'input' => ['class' => 'inputClass'],
+                'output' => ['class' => 'outputClass'],
+                'attributes' => [
+                    'id' => 3,
+                    'denormalizedField' => 'foo',
                 ],
             ],
-            'no resource class' => [
-                $resourceClass = null,
-                $operationName = 'item_query',
-                ['related' => ['_id' => 9]],
-                false,
-                false,
-                false,
-                [
-                    'resource_class' => $resourceClass,
-                    'operation_name' => $operationName,
-                    'graphql_operation_name' => $operationName,
-                    'attributes' => [
-                        'related' => ['id' => 9],
-                    ],
+            $advancedNameConverterFactory,
+        ];
+        yield 'nominal collection' => [
+            $resourceClass = 'myResource',
+            $operationName = 'collection_query',
+            ['edges' => ['node' => ['nodeField' => 'baz']]],
+            false,
+            false,
+            false,
+            [
+                'groups' => ['normalization_group'],
+                'resource_class' => $resourceClass,
+                'operation_name' => $operationName,
+                'graphql_operation_name' => $operationName,
+                'input' => ['class' => 'inputClass'],
+                'output' => ['class' => 'outputClass'],
+                'attributes' => [
+                    'nodeField' => 'baz',
                 ],
             ],
-            'mutation' => [
-                $resourceClass = 'myResource',
-                $operationName = 'create',
-                ['shortName' => ['_id' => 7, 'related' => ['field' => 'bar']]],
-                true,
-                false,
-                false,
-                [
-                    'groups' => ['normalization_group'],
-                    'resource_class' => $resourceClass,
-                    'operation_name' => $operationName,
-                    'graphql_operation_name' => $operationName,
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
-                    'attributes' => [
-                        'id' => 7,
-                        'related' => ['field' => 'bar'],
-                    ],
+        ];
+        yield 'no resource class' => [
+            $resourceClass = null,
+            $operationName = 'item_query',
+            ['related' => ['_id' => 9]],
+            false,
+            false,
+            false,
+            [
+                'resource_class' => $resourceClass,
+                'operation_name' => $operationName,
+                'graphql_operation_name' => $operationName,
+                'attributes' => [
+                    'related' => ['id' => 9],
                 ],
             ],
-            'subscription (using fields in context)' => [
-                $resourceClass = 'myResource',
-                $operationName = 'update',
-                ['shortName' => ['_id' => 7, 'related' => ['field' => 'bar']]],
-                false,
-                true,
-                true,
-                [
-                    'groups' => ['normalization_group'],
-                    'resource_class' => $resourceClass,
-                    'operation_name' => $operationName,
-                    'graphql_operation_name' => $operationName,
-                    'no_resolver_data' => true,
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
-                    'attributes' => [
-                        'id' => 7,
-                        'related' => ['field' => 'bar'],
-                    ],
+        ];
+        yield 'mutation' => [
+            $resourceClass = 'myResource',
+            $operationName = 'create',
+            ['shortName' => ['_id' => 7, 'related' => ['field' => 'bar']]],
+            true,
+            false,
+            false,
+            [
+                'groups' => ['normalization_group'],
+                'resource_class' => $resourceClass,
+                'operation_name' => $operationName,
+                'graphql_operation_name' => $operationName,
+                'input' => ['class' => 'inputClass'],
+                'output' => ['class' => 'outputClass'],
+                'attributes' => [
+                    'id' => 7,
+                    'related' => ['field' => 'bar'],
+                ],
+            ],
+        ];
+        yield 'subscription (using fields in context)' => [
+            $resourceClass = 'myResource',
+            $operationName = 'update',
+            ['shortName' => ['_id' => 7, 'related' => ['field' => 'bar']]],
+            false,
+            true,
+            true,
+            [
+                'groups' => ['normalization_group'],
+                'resource_class' => $resourceClass,
+                'operation_name' => $operationName,
+                'graphql_operation_name' => $operationName,
+                'no_resolver_data' => true,
+                'input' => ['class' => 'inputClass'],
+                'output' => ['class' => 'outputClass'],
+                'attributes' => [
+                    'id' => 7,
+                    'related' => ['field' => 'bar'],
                 ],
             ],
         ];
@@ -256,7 +258,7 @@ class SerializerContextBuilderTest extends TestCase
         $this->assertEquals($expectedContext, $context);
     }
 
-    public function createDenormalizationContextProvider(): array
+    public static function createDenormalizationContextProvider(): array
     {
         return [
             'nominal' => [

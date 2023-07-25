@@ -620,7 +620,8 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit
+        # The PHPUnit Bridge doesn't support PHPUnit 10 yet: https://github.com/symfony/symfony/issues/49069
+        run: vendor/bin/phpunit -c phpunit10.xml.dist
 
   behat-symfony-next:
     name: Behat (PHP ${{ matrix.php }}) (Symfony dev)

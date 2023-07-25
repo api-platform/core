@@ -69,7 +69,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
         }
         $resourceClass = $resourceClass ?: $this->resourceClass;
         $aggregationBuilder = $repository->createAggregationBuilder();
-        $filterCallable = $filterFactory($this->managerRegistry, $properties);
+        $filterCallable = $filterFactory($this->managerRegistry, $properties, $this);
         $context = ['filters' => $filterParameters];
         $filterCallable->apply($aggregationBuilder, $resourceClass, null, $context);
         $pipeline = [];
@@ -86,5 +86,5 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
         return new $this->filterClass($this->managerRegistry, null, $properties);
     }
 
-    abstract public function provideApplyTestData(): array;
+    abstract public static function provideApplyTestData(): array;
 }

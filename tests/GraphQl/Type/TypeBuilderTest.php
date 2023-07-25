@@ -143,7 +143,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame($shortName, $resourceObjectType->name);
     }
 
-    public function resourceObjectTypeQuerySerializationGroupsProvider(): array
+    public static function resourceObjectTypeQuerySerializationGroupsProvider(): array
     {
         return [
             'same serialization groups for item_query and collection_query' => [
@@ -601,7 +601,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame($expectedIsCollection, $this->typeBuilder->isCollection($type));
     }
 
-    public function typesProvider(): array
+    public static function typesProvider(): array
     {
         return [
             [new Type(Type::BUILTIN_TYPE_BOOL), false],

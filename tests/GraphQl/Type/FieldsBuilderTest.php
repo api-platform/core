@@ -135,7 +135,7 @@ class FieldsBuilderTest extends TestCase
         $this->assertEquals($expectedQueryFields, $queryFields);
     }
 
-    public function itemQueryFieldsProvider(): array
+    public static function itemQueryFieldsProvider(): array
     {
         return [
             'no resource field configuration' => ['resourceClass', (new Query())->withClass('resourceClass')->withName('action'), [], null, null, []],
@@ -229,7 +229,7 @@ class FieldsBuilderTest extends TestCase
         $this->assertEquals($expectedQueryFields, $queryFields);
     }
 
-    public function collectionQueryFieldsProvider(): array
+    public static function collectionQueryFieldsProvider(): array
     {
         return [
             'no resource field configuration' => ['resourceClass', (new QueryCollection())->withClass('resourceClass')->withName('action'), [], null, null, []],
@@ -367,7 +367,7 @@ class FieldsBuilderTest extends TestCase
         $this->assertSame($expectedMutationFields, $mutationFields);
     }
 
-    public function mutationFieldsProvider(): array
+    public static function mutationFieldsProvider(): array
     {
         return [
             'nominal case with deprecation reason' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withDeprecationReason('not useful'), $graphqlType = new ObjectType(['name' => 'mutation', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $mutationResolver = function (): void {
@@ -430,7 +430,7 @@ class FieldsBuilderTest extends TestCase
         $this->assertSame($expectedSubscriptionFields, $subscriptionFields);
     }
 
-    public function subscriptionFieldsProvider(): array
+    public static function subscriptionFieldsProvider(): array
     {
         return [
             'mercure not enabled' => ['resourceClass', (new Subscription())->withClass('resourceClass')->withName('action')->withShortName('ShortName'), new ObjectType(['name' => 'subscription', 'fields' => []]), new ObjectType(['name' => 'input', 'fields' => []]), null, [],
@@ -481,7 +481,7 @@ class FieldsBuilderTest extends TestCase
     /**
      * @dataProvider resourceObjectTypeFieldsProvider
      */
-    public function testGetResourceObjectTypeFields(string $resourceClass, Operation $operation, array $properties, bool $input, int $depth, ?array $ioMetadata, array $expectedResourceObjectTypeFields, AdvancedNameConverterInterface $advancedNameConverter = null): void
+    public function testGetResourceObjectTypeFields(string $resourceClass, Operation $operation, array $properties, bool $input, int $depth, ?array $ioMetadata, array $expectedResourceObjectTypeFields, callable $advancedNameConverterFactory = null): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
         $this->resourceClassResolverProphecy->isResourceClass('nestedResourceClass')->willReturn(true);
@@ -513,316 +513,318 @@ class FieldsBuilderTest extends TestCase
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
 
         $fieldsBuilder = $this->fieldsBuilder;
-        if ($advancedNameConverter) {
-            $fieldsBuilder = $this->buildFieldsBuilder($advancedNameConverter);
+        if ($advancedNameConverterFactory) {
+            $fieldsBuilder = $this->buildFieldsBuilder($advancedNameConverterFactory($this));
         }
         $resourceObjectTypeFields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $operation, $input, $depth, $ioMetadata);
 
         $this->assertEquals($expectedResourceObjectTypeFields, $resourceObjectTypeFields);
     }
 
-    public function resourceObjectTypeFieldsProvider(): array
+    public static function resourceObjectTypeFieldsProvider(): iterable
     {
-        $advancedNameConverter = $this->prophesize(AdvancedNameConverterInterface::class);
-        $advancedNameConverter->normalize('field', 'resourceClass')->willReturn('normalizedField');
+        $advancedNameConverterFactory = function (self $that): AdvancedNameConverterInterface {
+            $advancedNameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
+            $advancedNameConverterProphecy->normalize('field', 'resourceClass')->willReturn('normalizedField');
 
-        return [
-            'query' => ['resourceClass', (new Query())->withClass('resourceClass'),
-                [
-                    'property' => new ApiProperty(),
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(false),
-                    'propertyNotReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(false),
-                    'nameConverted' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(false),
+            return $advancedNameConverterProphecy->reveal();
+        };
+
+        yield 'query' => ['resourceClass', (new Query())->withClass('resourceClass'),
+            [
+                'property' => new ApiProperty(),
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(false),
+                'propertyNotReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(false),
+                'nameConverted' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(false),
+            ],
+            false, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
                 ],
-                false, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'propertyBool' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                    'name_converted' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
+                'propertyBool' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
+                ],
+                'name_converted' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
                 ],
             ],
-            'query with advanced name converter' => ['resourceClass', (new Query())->withClass('resourceClass'),
-                [
-                    'field' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(false),
-                ],
-                false, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'normalizedField' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                ],
-                $advancedNameConverter->reveal(),
+        ];
+        yield 'query with advanced name converter' => ['resourceClass', (new Query())->withClass('resourceClass'),
+            [
+                'field' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(false),
             ],
-            'query input' => ['resourceClass', (new Query())->withClass('resourceClass'),
-                [
-                    'property' => new ApiProperty(),
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(false),
+            false, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
                 ],
-                true, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'propertyBool' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
+                'normalizedField' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
                 ],
             ],
-            'query with simple non-null string array property' => ['resourceClass', (new Query())->withClass('resourceClass'),
-                [
-                    'property' => (new ApiProperty())->withBuiltinTypes([
-                        new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)),
-                    ])->withReadable(true)->withWritable(false),
+            $advancedNameConverterFactory,
+        ];
+        yield 'query input' => ['resourceClass', (new Query())->withClass('resourceClass'),
+            [
+                'property' => new ApiProperty(),
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(false),
+            ],
+            true, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
                 ],
-                false, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'property' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
+                'propertyBool' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
                 ],
             ],
-            'query with nested resources' => ['resourceClass', (new Query())->withClass('resourceClass'),
-                [
-                    'propertyNestedResource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'nestedResourceClass')])->withReadable(true)->withWritable(true),
+        ];
+        yield 'query with simple non-null string array property' => ['resourceClass', (new Query())->withClass('resourceClass'),
+            [
+                'property' => (new ApiProperty())->withBuiltinTypes([
+                    new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)),
+                ])->withReadable(true)->withWritable(false),
+            ],
+            false, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
                 ],
-                false, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'propertyNestedResource' => [
-                        'type' => GraphQLType::nonNull(new ObjectType(['name' => 'objectType', 'fields' => []])),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => static function (): void {
-                        },
-                        'deprecationReason' => null,
-                    ],
+                'property' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
                 ],
             ],
-            'mutation non input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
-                [
-                    'property' => new ApiProperty(),
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                    'propertyReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(true),
-                    'propertyObject' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'objectClass')])->withReadable(true)->withWritable(true),
+        ];
+        yield 'query with nested resources' => ['resourceClass', (new Query())->withClass('resourceClass'),
+            [
+                'propertyNestedResource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'nestedResourceClass')])->withReadable(true)->withWritable(true),
+            ],
+            false, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
                 ],
-                false, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'propertyReadable' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                    'propertyObject' => [
-                        'type' => GraphQLType::nonNull(new ObjectType(['name' => 'objectType', 'fields' => []])),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => static function (): void {
-                        },
-                        'deprecationReason' => null,
-                    ],
+                'propertyNestedResource' => [
+                    'type' => GraphQLType::nonNull(new ObjectType(['name' => 'objectType', 'fields' => []])),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => static function (): void {
+                    },
+                    'deprecationReason' => null,
                 ],
             ],
-            'mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
-                [
-                    'property' => new ApiProperty(),
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
-                    'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                    'id' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(false)->withWritable(true),
+        ];
+        yield 'mutation non input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
+            [
+                'property' => new ApiProperty(),
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'propertyReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(true),
+                'propertyObject' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'objectClass')])->withReadable(true)->withWritable(true),
+            ],
+            false, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
                 ],
-                true, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'propertyBool' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => 'propertyBool description',
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => 'not useful',
-                    ],
-                    'propertySubresource' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                    '_id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                    'clientMutationId' => GraphQLType::string(),
+                'propertyReadable' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
+                ],
+                'propertyObject' => [
+                    'type' => GraphQLType::nonNull(new ObjectType(['name' => 'objectType', 'fields' => []])),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => static function (): void {
+                    },
+                    'deprecationReason' => null,
                 ],
             ],
-            'mutation nested input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
-                [
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+        ];
+        yield 'mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
+            [
+                'property' => new ApiProperty(),
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
+                'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'id' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(false)->withWritable(true),
+            ],
+            true, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
                 ],
-                true, 1, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::id(),
-                    ],
-                    'propertyBool' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                    'clientMutationId' => GraphQLType::string(),
+                'propertyBool' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => 'propertyBool description',
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => 'not useful',
+                ],
+                'propertySubresource' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
+                ],
+                '_id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
+                ],
+                'clientMutationId' => GraphQLType::string(),
+            ],
+        ];
+        yield 'mutation nested input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
+            [
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+            ],
+            true, 1, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::id(),
+                ],
+                'propertyBool' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
+                ],
+                'clientMutationId' => GraphQLType::string(),
+            ],
+        ];
+        yield 'delete mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('delete'),
+            [
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+            ],
+            true, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
+                ],
+                'clientMutationId' => GraphQLType::string(),
+            ],
+        ];
+        yield 'create mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('create'),
+            [
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+            ],
+            true, 0, null,
+            [
+                'propertyBool' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
+                ],
+                'clientMutationId' => GraphQLType::string(),
+            ],
+        ];
+        yield 'update mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('update'),
+            [
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+            ],
+            true, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
+                ],
+                'propertyBool' => [
+                    'type' => GraphQLType::string(),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
+                ],
+                'clientMutationId' => GraphQLType::string(),
+            ],
+        ];
+        yield 'subscription non input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
+            [
+                'property' => new ApiProperty(),
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'propertyReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(true),
+            ],
+            false, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
+                ],
+                'propertyReadable' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => null,
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
                 ],
             ],
-            'delete mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('delete'),
-                [
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                ],
-                true, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'clientMutationId' => GraphQLType::string(),
-                ],
+        ];
+        yield 'subscription input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
+            [
+                'property' => new ApiProperty(),
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
+                'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'id' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(false)->withWritable(true),
             ],
-            'create mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('create'),
-                [
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+            true, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
                 ],
-                true, 0, null,
-                [
-                    'propertyBool' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                    'clientMutationId' => GraphQLType::string(),
-                ],
+                'clientSubscriptionId' => GraphQLType::string(),
             ],
-            'update mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('update'),
-                [
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                ],
-                true, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'propertyBool' => [
-                        'type' => GraphQLType::string(),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                    'clientMutationId' => GraphQLType::string(),
-                ],
+        ];
+        yield 'null io metadata non input' => ['resourceClass', (new Query())->withClass('resourceClass'),
+            [
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
             ],
-            'subscription non input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
-                [
-                    'property' => new ApiProperty(),
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                    'propertyReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(true),
-                ],
-                false, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'propertyReadable' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                ],
+            false, 0, ['class' => null], [],
+        ];
+        yield 'null io metadata input' => ['resourceClass', (new Query())->withClass('resourceClass'),
+            [
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
             ],
-            'subscription input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
-                [
-                    'property' => new ApiProperty(),
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
-                    'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                    'id' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(false)->withWritable(true),
-                ],
-                true, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
-                    'clientSubscriptionId' => GraphQLType::string(),
-                ],
+            true, 0, ['class' => null],
+            [
+                'clientMutationId' => GraphQLType::string(),
             ],
-            'null io metadata non input' => ['resourceClass', (new Query())->withClass('resourceClass'),
-                [
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                ],
-                false, 0, ['class' => null], [],
+        ];
+        yield 'invalid types' => ['resourceClass', (new Query())->withClass('resourceClass'),
+            [
+                'propertyInvalidType' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_NULL)])->withReadable(true)->withWritable(false),
+                'propertyNotRegisteredType' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_CALLABLE)])->withReadable(true)->withWritable(false),
             ],
-            'null io metadata input' => ['resourceClass', (new Query())->withClass('resourceClass'),
-                [
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                ],
-                true, 0, ['class' => null],
-                [
-                    'clientMutationId' => GraphQLType::string(),
-                ],
-            ],
-            'invalid types' => ['resourceClass', (new Query())->withClass('resourceClass'),
-                [
-                    'propertyInvalidType' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_NULL)])->withReadable(true)->withWritable(false),
-                    'propertyNotRegisteredType' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_CALLABLE)])->withReadable(true)->withWritable(false),
-                ],
-                false, 0, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::id()),
-                    ],
+            false, 0, null,
+            [
+                'id' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::id()),
                 ],
             ],
         ];
@@ -865,7 +867,7 @@ class FieldsBuilderTest extends TestCase
         $this->assertSame($expectedResolvedArgs, $args);
     }
 
-    public function resolveResourceArgsProvider(): array
+    public static function resolveResourceArgsProvider(): array
     {
         return [
             [[], []],

@@ -41,7 +41,7 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_OPENAPI)));
     }
 
-    public function typeProvider(): iterable
+    public static function typeProvider(): iterable
     {
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
         yield [['nullable' => true, 'type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT, true)];
@@ -169,7 +169,7 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_JSON_SCHEMA)));
     }
 
-    public function jsonSchemaTypeProvider(): iterable
+    public static function jsonSchemaTypeProvider(): iterable
     {
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
         yield [['type' => ['integer', 'null']], new Type(Type::BUILTIN_TYPE_INT, true)];
@@ -290,7 +290,7 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_SWAGGER)));
     }
 
-    public function openAPIV2TypeProvider(): iterable
+    public static function openAPIV2TypeProvider(): iterable
     {
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT, true)];
@@ -423,7 +423,7 @@ class TypeFactoryTest extends TestCase
         );
     }
 
-    public function classTypeWithNullabilityDataProvider(): iterable
+    public static function classTypeWithNullabilityDataProvider(): iterable
     {
         $schemaFactory = $this->createSchemaFactoryMock($schema = new Schema());
 

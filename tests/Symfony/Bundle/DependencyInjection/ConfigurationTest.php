@@ -220,7 +220,7 @@ class ConfigurationTest extends TestCase
         ], $config);
     }
 
-    public function invalidHttpStatusCodeProvider(): array
+    public static function invalidHttpStatusCodeProvider(): array
     {
         return [
             [0],
@@ -247,7 +247,7 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
-    public function invalidHttpStatusCodeValueProvider(): array
+    public static function invalidHttpStatusCodeValueProvider(): array
     {
         return [
             [true],

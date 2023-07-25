@@ -148,7 +148,23 @@ final class ItemNormalizerTest extends TestCase
             $this->markTestSkipped('Symfony Serializer < 6.3');
         }
 
-        $this->normalizerProphecy->getSupportedTypes(Argument::any())->willReturn(['*' => true]);
+        // TODO: use prophecy when getSupportedTypes() will be added to the interface
+        $this->itemNormalizer = new ItemNormalizer(new class() implements NormalizerInterface {
+            public function normalize(mixed $object, string $format = null, array $context = [])
+            {
+                return null;
+            }
+
+            public function supportsNormalization(mixed $data, string $format = null): bool
+            {
+                return true;
+            }
+
+            public function getSupportedTypes(?string $format): array
+            {
+                return ['*' => true];
+            }
+        });
 
         $this->assertEmpty($this->itemNormalizer->getSupportedTypes('json'));
         $this->assertSame(['*' => true], $this->itemNormalizer->getSupportedTypes($this->itemNormalizer::FORMAT));

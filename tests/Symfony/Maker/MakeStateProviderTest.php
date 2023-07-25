@@ -56,7 +56,7 @@ class MakeStateProviderTest extends KernelTestCase
         $this->assertStringContainsString('Next: Open your new state provider class and start customizing it.', $display);
     }
 
-    public function stateProviderDataProvider(): \Generator
+    public static function stateProviderDataProvider(): \Generator
     {
         yield 'Generate state provider' => [
             'isInteractive' => true,

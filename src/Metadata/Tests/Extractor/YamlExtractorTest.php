@@ -536,7 +536,7 @@ class YamlExtractorTest extends TestCase
         (new YamlResourceExtractor([$path]))->getResources();
     }
 
-    public function getInvalidPaths(): array
+    public static function getInvalidPaths(): array
     {
         return [
             [__DIR__.'/yaml/invalid/invalid_resources.yaml', '"resources" setting is expected to be null or an array, string given in "'.__DIR__.'/yaml/invalid/invalid_resources.yaml".'],

@@ -91,7 +91,7 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
         self::assertEquals($expectedResult, $elasticsearchResult);
     }
 
-    public function elasticsearchProvider(): array
+    public static function elasticsearchProvider(): array
     {
         return [
             'elasticsearch: false' => [false, 0, false],

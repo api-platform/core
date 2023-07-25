@@ -31,10 +31,10 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
     protected string $filterClass = DateFilter::class;
     protected string $resourceClass = Dummy::class;
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'after (all properties enabled)' => [
                     [

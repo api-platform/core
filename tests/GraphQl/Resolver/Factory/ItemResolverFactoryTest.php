@@ -95,7 +95,7 @@ class ItemResolverFactoryTest extends TestCase
         $this->assertSame($serializeStageData, ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
-    public function itemResourceProvider(): array
+    public static function itemResourceProvider(): array
     {
         return [
             'nominal' => [\stdClass::class, \stdClass::class, new \stdClass()],

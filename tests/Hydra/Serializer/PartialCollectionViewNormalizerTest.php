@@ -165,10 +165,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            $decoratedNormalizerProphecy->getSupportedTypes('jsonld')->willReturn(['*' => true]);
-            $decoratedNormalizerProphecy->getSupportedTypes(Argument::any())->willReturn([]);
-        } else {
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
             $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
         }
@@ -179,10 +176,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $this->assertTrue($normalizer->supportsNormalization(new \stdClass()));
 
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertEmpty($normalizer->getSupportedTypes('json'));
-            $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
-        } else {
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());
         }
     }
@@ -198,5 +192,32 @@ class PartialCollectionViewNormalizerTest extends TestCase
 
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $normalizer->setNormalizer($injectedNormalizer);
+    }
+
+    public function testGetSupportedTypes(): void
+    {
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->markTestSkipped('Symfony Serializer < 6.3');
+        }
+
+        // TODO: use prophecy when getSupportedTypes() will be added to the interface
+        $normalizer = new PartialCollectionViewNormalizer(new class() implements NormalizerInterface {
+            public function normalize(mixed $object, string $format = null, array $context = [])
+            {
+                return null;
+            }
+
+            public function supportsNormalization(mixed $data, string $format = null): bool
+            {
+                return true;
+            }
+
+            public function getSupportedTypes(?string $format): array
+            {
+                return ['*' => true];
+            }
+        });
+
+        $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
     }
 }

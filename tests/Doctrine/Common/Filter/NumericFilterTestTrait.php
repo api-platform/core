@@ -87,7 +87,7 @@ trait NumericFilterTestTrait
         ], $filter->getDescription($this->resourceClass));
     }
 
-    private function provideApplyTestArguments(): array
+    private static function provideApplyTestArguments(): array
     {
         return [
             'numeric string (positive integer)' => [

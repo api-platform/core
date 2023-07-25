@@ -57,12 +57,12 @@ class ConstraintViolationNormalizerTest extends TestCase
     /**
      * @dataProvider nameConverterAndPayloadFieldsProvider
      */
-    public function testNormalize(?object $nameConverter, ?array $fields, array $expected): void
+    public function testNormalize(callable $nameConverterFactory, ?array $fields, array $expected): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList'])->willReturn('/context/foo')->shouldBeCalled();
 
-        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), $fields, $nameConverter);
+        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), $fields, $nameConverterFactory($this));
 
         // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
         $constraint = new NotNull();
@@ -75,7 +75,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($list));
     }
 
-    public function nameConverterAndPayloadFieldsProvider(): iterable
+    public static function nameConverterAndPayloadFieldsProvider(): iterable
     {
         $basicExpectation = [
             '@context' => '/context/foo',
@@ -115,34 +115,40 @@ class ConstraintViolationNormalizerTest extends TestCase
             ],
         ];
 
-        $advancedNameConverterProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
-        $advancedNameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(fn ($args): string => '_'.$args[0]);
-        $advancedNameConverter = $advancedNameConverterProphecy->reveal();
+        $advancedNameConverterFactory = function (self $that) {
+            $advancedNameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
+            $advancedNameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(fn ($args): string => '_'.$args[0]);
 
-        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize(Argument::type('string'))->will(fn ($args): string => '_'.$args[0]);
-        $nameConverter = $nameConverterProphecy->reveal();
+            return $advancedNameConverterProphecy->reveal();
+        };
 
-        $nullNameConverter = null;
+        $nameConverterFactory = function (self $that) {
+            $nameConverterProphecy = $that->prophesize(NameConverterInterface::class);
+            $nameConverterProphecy->normalize(Argument::type('string'))->will(fn ($args): string => '_'.$args[0]);
+
+            return $nameConverterProphecy->reveal();
+        };
+
+        $nullNameConverterFactory = fn () => null;
 
         $expected = $nameConverterBasedExpectation;
         $expected['violations'][0]['payload'] = ['severity' => 'warning'];
-        yield [$advancedNameConverter, ['severity', 'anotherField1'], $expected];
-        yield [$nameConverter, ['severity', 'anotherField1'], $expected];
+        yield [$advancedNameConverterFactory, ['severity', 'anotherField1'], $expected];
+        yield [$nameConverterFactory, ['severity', 'anotherField1'], $expected];
         $expected = $basicExpectation;
         $expected['violations'][0]['payload'] = ['severity' => 'warning'];
-        yield [$nullNameConverter, ['severity', 'anotherField1'], $expected];
+        yield [$nullNameConverterFactory, ['severity', 'anotherField1'], $expected];
 
         $expected = $nameConverterBasedExpectation;
         $expected['violations'][0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
-        yield [$advancedNameConverter, null, $expected];
-        yield [$nameConverter, null, $expected];
+        yield [$advancedNameConverterFactory, null, $expected];
+        yield [$nameConverterFactory, null, $expected];
         $expected = $basicExpectation;
         $expected['violations'][0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
-        yield [$nullNameConverter, null, $expected];
+        yield [$nullNameConverterFactory, null, $expected];
 
-        yield [$advancedNameConverter, [], $nameConverterBasedExpectation];
-        yield [$nameConverter, [], $nameConverterBasedExpectation];
-        yield [$nullNameConverter, [], $basicExpectation];
+        yield [$advancedNameConverterFactory, [], $nameConverterBasedExpectation];
+        yield [$nameConverterFactory, [], $nameConverterBasedExpectation];
+        yield [$nullNameConverterFactory, [], $basicExpectation];
     }
 }

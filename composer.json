@@ -12,6 +12,12 @@
             "homepage": "https://dunglas.fr"
         }
     ],
+    "repositories": [
+        {
+            "type": "github",
+            "url": "https://github.com/dunglas/prophecy-phpunit"
+        }
+    ],
     "require": {
         "php": ">=8.1",
         "doctrine/inflector": "^1.0 || ^2.0",
@@ -44,7 +50,7 @@
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "jangregor/phpstan-prophecy": "^1.0",
         "justinrainbow/json-schema": "^5.2.1",
-        "phpspec/prophecy-phpunit": "^2.0",
+        "phpspec/prophecy-phpunit": "^2.0 | dev-feat/static as 2.99.99",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpdoc-parser": "^1.13",
         "phpstan/phpstan": "^1.1",
