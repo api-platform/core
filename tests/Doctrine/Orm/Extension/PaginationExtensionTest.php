@@ -395,7 +395,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertSame($expected, $doctrinePaginator->getFetchJoinCollection());
     }
 
-    public function fetchJoinCollectionProvider(): array
+    public static function fetchJoinCollectionProvider(): array
     {
         return [
             'collection disabled' => [false, ['operation_name' => 'get'], false],
@@ -445,7 +445,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertSame($expected, $doctrinePaginator->getUseOutputWalkers());
     }
 
-    public function fetchUseOutputWalkersProvider(): array
+    public static function fetchUseOutputWalkersProvider(): array
     {
         return [
             'collection disabled' => [false, ['operation_name' => 'get'], false],

@@ -104,7 +104,7 @@ class ClientTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function authBasicProvider(): iterable
+    public static function authBasicProvider(): iterable
     {
         yield ['dunglas:kevin'];
         yield [['dunglas', 'kevin']];

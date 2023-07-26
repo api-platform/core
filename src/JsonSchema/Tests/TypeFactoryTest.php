@@ -41,7 +41,7 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_OPENAPI)));
     }
 
-    public function typeProvider(): iterable
+    public static function typeProvider(): iterable
     {
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
         yield [['nullable' => true, 'type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT, true)];
@@ -169,7 +169,7 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_JSON_SCHEMA)));
     }
 
-    public function jsonSchemaTypeProvider(): iterable
+    public static function jsonSchemaTypeProvider(): iterable
     {
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
         yield [['type' => ['integer', 'null']], new Type(Type::BUILTIN_TYPE_INT, true)];
@@ -290,7 +290,7 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_SWAGGER)));
     }
 
-    public function openAPIV2TypeProvider(): iterable
+    public static function openAPIV2TypeProvider(): iterable
     {
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT, true)];
@@ -412,10 +412,10 @@ class TypeFactoryTest extends TestCase
     }
 
     /** @dataProvider classTypeWithNullabilityDataProvider */
-    public function testGetClassTypeWithNullability(array $expected, SchemaFactoryInterface $schemaFactory, Schema $schema): void
+    public function testGetClassTypeWithNullability(array $expected, callable $schemaFactoryFactory, Schema $schema): void
     {
         $typeFactory = new TypeFactory();
-        $typeFactory->setSchemaFactory($schemaFactory);
+        $typeFactory->setSchemaFactory($schemaFactoryFactory($this));
 
         self::assertEquals(
             $expected,
@@ -423,9 +423,10 @@ class TypeFactoryTest extends TestCase
         );
     }
 
-    public function classTypeWithNullabilityDataProvider(): iterable
+    public static function classTypeWithNullabilityDataProvider(): iterable
     {
-        $schemaFactory = $this->createSchemaFactoryMock($schema = new Schema());
+        $schema = new Schema();
+        $schemaFactoryFactory = fn (self $that): SchemaFactoryInterface => $that->createSchemaFactoryMock($schema);
 
         yield 'JSON-Schema version' => [
             [
@@ -434,11 +435,12 @@ class TypeFactoryTest extends TestCase
                     ['type' => 'null'],
                 ],
             ],
-            $schemaFactory,
+            $schemaFactoryFactory,
             $schema,
         ];
 
-        $schemaFactory = $this->createSchemaFactoryMock($schema = new Schema(Schema::VERSION_OPENAPI));
+        $schema = new Schema(Schema::VERSION_OPENAPI);
+        $schemaFactoryFactory = fn (self $that): SchemaFactoryInterface => $that->createSchemaFactoryMock($schema);
 
         yield 'OpenAPI < 3.1 version' => [
             [
@@ -447,7 +449,7 @@ class TypeFactoryTest extends TestCase
                 ],
                 'nullable' => true,
             ],
-            $schemaFactory,
+            $schemaFactoryFactory,
             $schema,
         ];
     }

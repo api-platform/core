@@ -841,7 +841,7 @@ class EagerLoadingExtensionTest extends TestCase
         $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']), $context);
     }
 
-    public function provideExistingJoinCases(): iterable
+    public static function provideExistingJoinCases(): iterable
     {
         yield [Join::LEFT_JOIN];
         yield [Join::INNER_JOIN];

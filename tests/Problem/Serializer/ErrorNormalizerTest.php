@@ -96,7 +96,7 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, null, ['statusCode' => $status]));
     }
 
-    public function providerStatusCode(): \Iterator
+    public static function providerStatusCode(): \Iterator
     {
         yield [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', false];
         yield [Response::HTTP_GATEWAY_TIMEOUT, 'Sensitive server error displayed', false];

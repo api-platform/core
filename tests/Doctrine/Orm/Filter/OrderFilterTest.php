@@ -294,13 +294,13 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription(EmbeddedDummy::class));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
-        $orderFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'order', null, $properties);
-        $customOrderFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'customOrder', null, $properties);
+        $orderFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'order', null, $properties);
+        $customOrderFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'customOrder', null, $properties);
 
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'valid values' => [
                     sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name DESC', Dummy::class),

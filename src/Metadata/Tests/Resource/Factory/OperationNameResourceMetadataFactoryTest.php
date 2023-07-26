@@ -42,7 +42,7 @@ class OperationNameResourceMetadataFactoryTest extends TestCase
         $this->assertEquals($operation->withName($expectedOperationName), $result->getOperation($expectedOperationName));
     }
 
-    public function operationProvider(): array
+    public static function operationProvider(): array
     {
         return [
             [new Get(), '_api_a_get'],

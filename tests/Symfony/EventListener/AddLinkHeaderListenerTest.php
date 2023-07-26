@@ -72,7 +72,7 @@ class AddLinkHeaderListenerTest extends TestCase
         $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
     }
 
-    public function addProvider(): array
+    public static function addProvider(): array
     {
         return [
             ['<https://managed.mercure.rocks/.well-known/mercure>; rel="mercure"', new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get'])],
@@ -105,7 +105,7 @@ class AddLinkHeaderListenerTest extends TestCase
         $this->assertNull($request->attributes->get('_links'));
     }
 
-    public function doNotAddProvider(): array
+    public static function doNotAddProvider(): array
     {
         return [
             [new Request()],

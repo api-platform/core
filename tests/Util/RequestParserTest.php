@@ -30,7 +30,7 @@ class RequestParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function parseRequestParamsProvider(): array
+    public static function parseRequestParamsProvider(): array
     {
         return [
             ['gerard.name=dargent', ['gerard.name' => 'dargent']],

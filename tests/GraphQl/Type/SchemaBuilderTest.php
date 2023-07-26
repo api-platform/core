@@ -100,7 +100,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame($typeFoo, $schema->getType('Foo'));
     }
 
-    public function schemaProvider(): array
+    public static function schemaProvider(): array
     {
         return [
             'no graphql configuration' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [new ApiResource()]),

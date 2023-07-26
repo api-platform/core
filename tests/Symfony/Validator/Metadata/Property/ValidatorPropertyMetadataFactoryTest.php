@@ -337,7 +337,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedSchema, $schema);
     }
 
-    public function providePropertySchemaFormatCases(): \Generator
+    public static function providePropertySchemaFormatCases(): \Generator
     {
         yield ['dummyEmail', DummyValidatedEntity::class, ['format' => 'email']];
         yield ['dummyUuid', DummyValidatedEntity::class, ['format' => 'uuid']];
@@ -490,7 +490,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedSchema, $schema);
     }
 
-    public function provideRangeConstraintCases(): \Generator
+    public static function provideRangeConstraintCases(): \Generator
     {
         yield 'min int' => ['type' => new Type(Type::BUILTIN_TYPE_INT), 'property' => 'dummyIntMin', 'expectedSchema' => ['minimum' => 1]];
         yield 'max int' => ['type' => new Type(Type::BUILTIN_TYPE_INT), 'property' => 'dummyIntMax', 'expectedSchema' => ['maximum' => 10]];
@@ -528,7 +528,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedSchema, $schema);
     }
 
-    public function provideChoiceConstraintCases(): \Generator
+    public static function provideChoiceConstraintCases(): \Generator
     {
         yield 'single choice' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), 'property' => 'dummySingleChoice', 'expectedSchema' => ['enum' => ['a', 'b']]];
         yield 'single choice callback' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), 'property' => 'dummySingleChoiceCallback', 'expectedSchema' => ['enum' => ['a', 'b', 'c', 'd']]];
@@ -567,7 +567,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedSchema, $schema);
     }
 
-    public function provideCountConstraintCases(): \Generator
+    public static function provideCountConstraintCases(): \Generator
     {
         yield 'min' => ['property' => 'dummyMin', 'expectedSchema' => ['minItems' => 1]];
         yield 'max' => ['property' => 'dummyMax', 'expectedSchema' => ['maxItems' => 10]];
@@ -670,7 +670,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedSchema, $schema);
     }
 
-    public function provideNumericConstraintCases(): \Generator
+    public static function provideNumericConstraintCases(): \Generator
     {
         yield [
             'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]),

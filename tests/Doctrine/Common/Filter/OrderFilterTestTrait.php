@@ -51,7 +51,7 @@ trait OrderFilterTestTrait
         ], $filter->getDescription($this->resourceClass));
     }
 
-    private function provideApplyTestArguments(): array
+    private static function provideApplyTestArguments(): array
     {
         return [
             'valid values' => [

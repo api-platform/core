@@ -43,7 +43,7 @@ final class PropertySchemaUniqueRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaUniqueRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
         yield 'supported' => [new Unique(), new ApiProperty(), true];
 

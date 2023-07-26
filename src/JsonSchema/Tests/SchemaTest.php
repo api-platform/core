@@ -44,7 +44,7 @@ class SchemaTest extends TestCase
         $this->assertSame('Foo', $schema->getItemsDefinitionKey());
     }
 
-    public function versionProvider(): iterable
+    public static function versionProvider(): iterable
     {
         yield [Schema::VERSION_JSON_SCHEMA, '#/definitions/Foo'];
         yield [Schema::VERSION_SWAGGER, '#/definitions/Foo'];
@@ -85,7 +85,7 @@ class SchemaTest extends TestCase
         $this->assertArrayNotHasKey('components', $schema->getArrayCopy(false));
     }
 
-    public function definitionsDataProvider(): iterable
+    public static function definitionsDataProvider(): iterable
     {
         yield [Schema::VERSION_OPENAPI,  ['foo' => []]];
         yield [Schema::VERSION_JSON_SCHEMA,  ['foo' => []]];

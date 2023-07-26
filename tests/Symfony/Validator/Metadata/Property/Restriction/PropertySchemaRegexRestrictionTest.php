@@ -43,7 +43,7 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaRegexRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
         yield 'supported' => [new Regex(['pattern' => '/^[0-9]+$/']), new ApiProperty(), true];
         yield 'supported too' => [new Regex(['pattern' => '/[0-9]/', 'match' => false]), new ApiProperty(), true];
@@ -58,7 +58,7 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaRegexRestriction->create($constraint, $propertyMetadata));
     }
 
-    public function createProvider(): \Generator
+    public static function createProvider(): \Generator
     {
         yield 'anchored' => [new Regex(['pattern' => '/^[0-9]+$/']), new ApiProperty(), ['pattern' => '^([0-9]+)$']];
         yield 'not anchored' => [new Regex(['pattern' => '/[0-9]/']), new ApiProperty(), ['pattern' => '^(.*[0-9].*)$']];

@@ -124,7 +124,7 @@ Both `simple-phpunit` and `behat` are development dependencies and should be ava
 
 To launch unit tests:
 
-    vendor/bin/simple-phpunit --stop-on-failure -vvv
+    vendor/bin/simple-phpunit --stop-on-defect -vvv
 
 If you want coverage, you will need the `pcov` PHP extension and run:
 

@@ -26,7 +26,7 @@ class ElasticsearchVersionTest extends TestCase
         self::assertSame($expected, ElasticsearchVersion::supportsMappingType($version));
     }
 
-    public function supportsDocumentTypeProvider(): \Generator
+    public static function supportsDocumentTypeProvider(): \Generator
     {
         yield 'ES 5' => ['5.5.0', true];
         yield 'ES 5 dev' => ['5.x', true];

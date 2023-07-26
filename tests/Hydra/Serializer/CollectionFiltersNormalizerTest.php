@@ -47,9 +47,7 @@ class CollectionFiltersNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            $decoratedProphecy->getSupportedTypes(Argument::any())->willReturn(['*' => true]);
-        } else {
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
             $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
         }
@@ -59,14 +57,12 @@ class CollectionFiltersNormalizerTest extends TestCase
             $decoratedProphecy->reveal(),
             $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            $this->prophesize(ContainerInterface::class)->reveal()
+            $this->prophesize(ContainerInterface::class)->reveal(),
         );
 
         $this->assertTrue($normalizer->supportsNormalization('foo', 'abc'));
 
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
-        } else {
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());
         }
     }
@@ -337,5 +333,37 @@ class CollectionFiltersNormalizerTest extends TestCase
             'resource_class' => Dummy::class,
             'operation_name' => 'get',
         ]));
+    }
+
+    public function testGetSupportedTypes(): void
+    {
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->markTestSkipped('Symfony Serializer < 6.3');
+        }
+
+        // TODO: use prophecy when getSupportedTypes() will be added to the interface
+        $normalizer = new CollectionFiltersNormalizer(
+            new class() implements NormalizerInterface {
+                public function normalize(mixed $object, string $format = null, array $context = [])
+                {
+                    return null;
+                }
+
+                public function supportsNormalization(mixed $data, string $format = null): bool
+                {
+                    return true;
+                }
+
+                public function getSupportedTypes(?string $format): array
+                {
+                    return ['*' => true];
+                }
+            },
+            $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
+        );
+
+        $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
     }
 }

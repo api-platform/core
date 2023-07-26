@@ -81,7 +81,7 @@ class PersistProcessorTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function getTrackingPolicyParameters(): array
+    public static function getTrackingPolicyParameters(): array
     {
         return [
             'deferred explicit ORM' => [ClassMetadataInfo::class, true, true],

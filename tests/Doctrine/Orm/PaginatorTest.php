@@ -90,7 +90,7 @@ class PaginatorTest extends TestCase
         new Paginator($doctrinePaginator->reveal());
     }
 
-    public function initializeProvider(): array
+    public static function initializeProvider(): array
     {
         return [
             'First of three pages of 15 items each' => [0, 15, 42, 1, 3],
