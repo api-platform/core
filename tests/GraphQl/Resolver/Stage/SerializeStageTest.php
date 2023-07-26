@@ -80,8 +80,10 @@ class SerializeStageTest extends TestCase
     /**
      * @dataProvider applyProvider
      */
-    public function testApply(object|array $itemOrCollection, string $operationName, array $context, bool $paginationEnabled, ?array $expectedResult): void
+    public function testApply(object|array $itemOrCollection, string $operationName, callable $contextFactory, bool $paginationEnabled, ?array $expectedResult): void
     {
+        $context = $contextFactory($this);
+
         $resourceClass = 'myResource';
         $operation = $context['is_mutation'] ? new Mutation() : new Query();
         if ($context['is_subscription']) {
@@ -107,16 +109,16 @@ class SerializeStageTest extends TestCase
 
     public static function applyProvider(): iterable
     {
-        $defaultContext = [
+        $defaultContextFactory = fn (self $that): array => [
             'args' => [],
-            'info' => self::createStub(ResolveInfo::class),
+            'info' => $that->prophesize(ResolveInfo::class)->reveal(),
         ];
 
-        yield 'item' => [new \stdClass(), 'item_query', $defaultContext + ['is_collection' => false, 'is_mutation' => false, 'is_subscription' => false], false, ['normalized_item']];
-        yield 'collection without pagination' => [[new \stdClass(), new \stdClass()], 'collection_query', $defaultContext + ['is_collection' => true, 'is_mutation' => false, 'is_subscription' => false], false, [['normalized_item'], ['normalized_item']]];
-        yield 'mutation' => [new \stdClass(), 'create', array_merge($defaultContext, ['args' => ['input' => ['clientMutationId' => 'clientMutationId']], 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false]), false, ['shortName' => ['normalized_item'], 'clientMutationId' => 'clientMutationId']];
-        yield 'delete mutation' => [new \stdClass(), 'delete', array_merge($defaultContext, ['args' => ['input' => ['id' => '/iri/4']], 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false]), false, ['shortName' => ['id' => '/iri/4'], 'clientMutationId' => null]];
-        yield 'subscription' => [new \stdClass(), 'update', array_merge($defaultContext, ['args' => ['input' => ['clientSubscriptionId' => 'clientSubscriptionId']], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]), false, ['shortName' => ['normalized_item'], 'clientSubscriptionId' => 'clientSubscriptionId']];
+        yield 'item' => [new \stdClass(), 'item_query', fn (self $that): array => $defaultContextFactory($that) + ['is_collection' => false, 'is_mutation' => false, 'is_subscription' => false], false, ['normalized_item']];
+        yield 'collection without pagination' => [[new \stdClass(), new \stdClass()], 'collection_query', fn (self $that): array => $defaultContextFactory($that) + ['is_collection' => true, 'is_mutation' => false, 'is_subscription' => false], false, [['normalized_item'], ['normalized_item']]];
+        yield 'mutation' => [new \stdClass(), 'create', fn (self $that): array => array_merge($defaultContextFactory($that), ['args' => ['input' => ['clientMutationId' => 'clientMutationId']], 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false]), false, ['shortName' => ['normalized_item'], 'clientMutationId' => 'clientMutationId']];
+        yield 'delete mutation' => [new \stdClass(), 'delete', fn (self $that): array => array_merge($defaultContextFactory($that), ['args' => ['input' => ['id' => '/iri/4']], 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false]), false, ['shortName' => ['id' => '/iri/4'], 'clientMutationId' => null]];
+        yield 'subscription' => [new \stdClass(), 'update', fn (self $that): array => array_merge($defaultContextFactory($that), ['args' => ['input' => ['clientSubscriptionId' => 'clientSubscriptionId']], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]), false, ['shortName' => ['normalized_item'], 'clientSubscriptionId' => 'clientSubscriptionId']];
     }
 
     /**
