@@ -12,12 +12,6 @@
             "homepage": "https://dunglas.fr"
         }
     ],
-    "repositories": [
-        {
-            "type": "github",
-            "url": "https://github.com/dunglas/prophecy-phpunit"
-        }
-    ],
     "require": {
         "php": ">=8.1",
         "doctrine/inflector": "^1.0 || ^2.0",
@@ -34,7 +28,7 @@
     },
     "require-dev": {
         "behat/behat": "^3.1",
-        "behat/mink": "^1.9@dev",
+        "behat/mink": "^1.9",
         "doctrine/cache": "^1.11 || ^2.1",
         "doctrine/common": "^3.2.2",
         "doctrine/data-fixtures": "^1.2.2",
