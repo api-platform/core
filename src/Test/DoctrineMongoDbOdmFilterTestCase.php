@@ -55,7 +55,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
 
     protected function doTestApply(?array $properties, array $filterParameters, array $expectedPipeline, callable $filterFactory = null, string $resourceClass = null): void
     {
-        $filterFactory ??= fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): FilterInterface => new ($this->filterClass)($that, $managerRegistry, null, $properties);
+        $filterFactory ??= fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): FilterInterface => new ($this->filterClass)($managerRegistry, null, $properties);
 
         $repository = $this->repository;
         if ($resourceClass) {
@@ -63,7 +63,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
         }
         $resourceClass = $resourceClass ?: $this->resourceClass;
         $aggregationBuilder = $repository->createAggregationBuilder();
-        $filterCallable = $filterFactory($this, $this->managerRegistry, $properties, $this);
+        $filterCallable = $filterFactory($this, $this->managerRegistry, $properties);
         $context = ['filters' => $filterParameters];
         $filterCallable->apply($aggregationBuilder, $resourceClass, null, $context);
         $pipeline = [];
