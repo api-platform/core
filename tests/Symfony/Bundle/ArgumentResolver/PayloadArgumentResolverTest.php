@@ -38,7 +38,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $resolver = $this->createArgumentResolver();
         $argument = self::createArgumentMetadata(ResourceImplementation::class);
 
-        $request = static::createRequest('PUT', [
+        $request = self::createRequest('PUT', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
@@ -52,7 +52,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $resolver = $this->createArgumentResolver();
         $argument = self::createArgumentMetadata(ResourceInterface::class);
 
-        $request = static::createRequest('PUT', [
+        $request = self::createRequest('PUT', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
@@ -66,7 +66,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $resolver = $this->createArgumentResolver();
         $argument = self::createArgumentMetadata(NotResource::class);
 
-        $request = static::createRequest('PUT', [
+        $request = self::createRequest('PUT', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update_with_dto',
             'data' => new NotResource(),
@@ -82,7 +82,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
     {
         $resolver = $this->createArgumentResolver();
 
-        $request = static::createRequest('PUT', [
+        $request = self::createRequest('PUT', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
@@ -107,7 +107,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $resolver = $this->createArgumentResolver();
         $argument = self::createArgumentMetadata(ResourceImplementation::class);
 
-        $request = static::createRequest('PUT', [
+        $request = self::createRequest('PUT', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
@@ -124,7 +124,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $resolver = $this->createArgumentResolver();
         $argument = $this->createArgumentMetadata(ResourceInterface::class);
 
-        $request = static::createRequest('PUT', [
+        $request = self::createRequest('PUT', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
@@ -138,39 +138,39 @@ class PayloadArgumentResolverTest extends KernelTestCase
 
     public static function provideUnsupportedRequests(): iterable
     {
-        yield 'GET request' => [static::createRequest('GET', [
+        yield 'GET request' => [self::createRequest('GET', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
         ])];
 
-        yield 'HEAD request' => [static::createRequest('HEAD', [
+        yield 'HEAD request' => [self::createRequest('HEAD', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
         ])];
 
-        yield 'OPTIONS request' => [static::createRequest('OPTIONS', [
+        yield 'OPTIONS request' => [self::createRequest('OPTIONS', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
         ])];
 
-        yield 'TRACE request' => [static::createRequest('TRACE', [
+        yield 'TRACE request' => [self::createRequest('TRACE', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
         ])];
 
-        yield 'DELETE request' => [static::createRequest('DELETE', [
+        yield 'DELETE request' => [self::createRequest('DELETE', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update',
             'data' => new ResourceImplementation(),
         ])];
 
-        yield 'request without attributes' => [static::createRequest('PUT', [])];
+        yield 'request without attributes' => [self::createRequest('PUT', [])];
 
-        yield 'request on operation with deserialization disabled' => [static::createRequest('PUT', [
+        yield 'request on operation with deserialization disabled' => [self::createRequest('PUT', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update_no_deserialize',
             'data' => new ResourceImplementation(),
@@ -203,7 +203,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $resource = new ResourceImplementation();
 
         yield 'simple' => [
-            static::createRequest('PUT', [
+            self::createRequest('PUT', [
                 '_api_resource_class' => ResourceImplementation::class,
                 '_api_operation_name' => '_api_/resource_implementations{._format}_put',
                 'data' => $resource,
@@ -213,7 +213,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         ];
 
         yield 'with another argument named $data' => [
-            static::createRequest('PUT', [
+            self::createRequest('PUT', [
                 '_api_resource_class' => ResourceImplementation::class,
                 '_api_operation_name' => '_api_/resource_implementations{._format}_put',
                 'data' => $resource,
