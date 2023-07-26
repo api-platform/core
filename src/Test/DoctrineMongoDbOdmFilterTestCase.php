@@ -55,7 +55,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
 
     protected function doTestApply(?array $properties, array $filterParameters, array $expectedPipeline, callable $filterFactory = null, string $resourceClass = null): void
     {
-        $filterFactory ??= ($this->filterClass)(...);
+        $filterFactory ??= fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): FilterInterface => new ($this->filterClass)($that, $managerRegistry, null, $properties);
 
         $repository = $this->repository;
         if ($resourceClass) {
