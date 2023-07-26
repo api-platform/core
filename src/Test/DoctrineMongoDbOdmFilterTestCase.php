@@ -59,7 +59,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
             $filterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): FilterInterface {
                 $filterClass = $this->filterClass;
 
-                return new $filterClass($managerRegistry, null, $properties);
+                return new $filterClass($this, $managerRegistry, null, $properties);
             };
         }
 
