@@ -19,8 +19,7 @@ class DummyUniqueValidatedEntity
 {
     /**
      * @var string[]
-     *
-     * @Assert\Unique
      */
+    #[Assert\Unique]
     public $dummyItems;
 }
