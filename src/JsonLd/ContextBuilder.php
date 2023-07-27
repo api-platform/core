@@ -35,7 +35,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
 
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null, private readonly bool $enableDocs = true)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null)
     {
     }
 
@@ -44,15 +44,10 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
      */
     public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_URL): array
     {
-        $context = [
+        return [
+            '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
             'hydra' => self::HYDRA_NS,
         ];
-
-        if ($this->enableDocs) {
-            $context['@vocab'] = $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#';
-        }
-
-        return $context;
     }
 
     /**
