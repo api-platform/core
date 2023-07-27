@@ -31,7 +31,6 @@
         "behat/mink": "^1.9",
         "doctrine/cache": "^1.11 || ^2.1",
         "doctrine/common": "^3.2.2",
-        "doctrine/data-fixtures": "^1.2.2",
         "doctrine/dbal": "^3.4.0",
         "doctrine/doctrine-bundle": "^1.12 || ^2.0",
         "doctrine/mongodb-odm": "^2.2",
