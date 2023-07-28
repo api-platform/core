@@ -87,7 +87,6 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
 
     public function hasCacheableSupportsMethod(): bool
     {
-        return false;
         if (method_exists(Serializer::class, 'getSupportedTypes')) {
             trigger_deprecation(
                 'api-platform/core',
