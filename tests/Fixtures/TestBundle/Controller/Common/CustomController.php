@@ -26,9 +26,8 @@ class CustomController extends AbstractController
 {
     /**
      * Custom route for a non API Platform route.
-     *
-     * @Route(methods={"GET"}, name="custom_external_route", path="/common/custom/object")
      */
+    #[Route(methods: ['GET'], name: 'custom_external_route', path: '/common/custom/object')]
     public function __invoke(): CustomObject
     {
         return new CustomObject(1, 'Lorem ipsum dolor sit amet');

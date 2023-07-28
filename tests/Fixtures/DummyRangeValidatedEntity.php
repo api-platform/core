@@ -19,43 +19,37 @@ class DummyRangeValidatedEntity
 {
     /**
      * @var int
-     *
-     * @Assert\Range(min=1)
      */
+    #[Assert\Range(min: 1)]
     public $dummyIntMin;
 
     /**
      * @var int
-     *
-     * @Assert\Range(max=10)
      */
+    #[Assert\Range(max: 10)]
     public $dummyIntMax;
 
     /**
      * @var int
-     *
-     * @Assert\Range(min=1, max=10)
      */
+    #[Assert\Range(min: 1, max: 10)]
     public $dummyIntMinMax;
 
     /**
      * @var float
-     *
-     * @Assert\Range(min=1.5)
      */
+    #[Assert\Range(min: '1.5')]
     public $dummyFloatMin;
 
     /**
      * @var float
-     *
-     * @Assert\Range(max=10.5)
      */
+    #[Assert\Range(max: '10.5')]
     public $dummyFloatMax;
 
     /**
      * @var float
-     *
-     * @Assert\Range(min=1.5, max=10.5)
      */
+    #[Assert\Range(min: '1.5', max: '10.5')]
     public $dummyFloatMinMax;
 }

@@ -17,9 +17,7 @@ use Symfony\Component\Validator\Constraints\Compound;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Regex;
 
-/**
- * @Annotation
- */
+#[\Attribute]
 final class DummyCompoundRequirements extends Compound
 {
     public function getConstraints(array $options): array

@@ -19,51 +19,44 @@ class DummyValidatedChoiceEntity
 {
     /**
      * @var string
-     *
-     * @Assert\Choice(choices={"a", "b"})
      */
+    #[Assert\Choice(choices: ['a', 'b'])]
     public $dummySingleChoice;
 
     /**
      * @var string
-     *
-     * @Assert\Choice(callback={DummyValidatedChoiceEntity::class, "getChoices"})
      */
+    #[Assert\Choice(callback: [self::class, 'getChoices'])]
     public $dummySingleChoiceCallback;
 
     /**
      * @var string[]
-     *
-     * @Assert\Choice(choices={"a", "b"}, multiple=true)
      */
+    #[Assert\Choice(choices: ['a', 'b'], multiple: true)]
     public $dummyMultiChoice;
 
     /**
      * @var string[]
-     *
-     * @Assert\Choice(callback={DummyValidatedChoiceEntity::class, "getChoices"}, multiple=true)
      */
+    #[Assert\Choice(callback: [self::class, 'getChoices'], multiple: true)]
     public $dummyMultiChoiceCallback;
 
     /**
      * @var string[]
-     *
-     * @Assert\Choice(choices={"a", "b", "c", "d"}, multiple=true, min=2)
      */
+    #[Assert\Choice(choices: ['a', 'b', 'c', 'd'], multiple: true, min: 2)]
     public $dummyMultiChoiceMin;
 
     /**
      * @var string[]
-     *
-     * @Assert\Choice(choices={"a", "b", "c", "d"}, multiple=true, max=4)
      */
+    #[Assert\Choice(choices: ['a', 'b', 'c', 'd'], multiple: true, max: 4)]
     public $dummyMultiChoiceMax;
 
     /**
      * @var string[]
-     *
-     * @Assert\Choice(choices={"a", "b", "c", "d"}, multiple=true, min=2, max=4)
      */
+    #[Assert\Choice(choices: ['a', 'b', 'c', 'd'], multiple: true, min: 2, max: 4)]
     public $dummyMultiChoiceMinMax;
 
     public static function getChoices(): array

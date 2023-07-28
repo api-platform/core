@@ -20,15 +20,10 @@ class DummyIgnoreProperty
 {
     public $visibleWithoutGroup;
 
-    /**
-     * @Groups({"dummy"})
-     */
+    #[Groups('dummy')]
     public $visibleWithGroup;
 
-    /**
-     * @Groups({"dummy"})
-     *
-     * @Ignore
-     */
+    #[Groups('dummy')]
+    #[Ignore]
     public $ignored;
 }
