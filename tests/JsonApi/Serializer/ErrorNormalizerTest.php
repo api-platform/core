@@ -41,8 +41,8 @@ class ErrorNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('json'));
         $this->assertSame([
-            \Exception::class => true,
-            FlattenException::class => true,
+            \Exception::class => false,
+            FlattenException::class => false,
         ], $normalizer->getSupportedTypes($normalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {

@@ -698,42 +698,23 @@ class FieldsBuilderTest extends TestCase
                     'deprecationReason' => null,
                 ],
                 'clientMutationId' => GraphQLType::string(),
-            ]
+            ],
         ];
-            yield 'custom mutation' => ['resourceClass', (new Mutation())->withResolver('resolver')->withName('mutation'),
-                [
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true),
+        yield 'custom mutation' => ['resourceClass', (new Mutation())->withResolver('resolver')->withName('mutation'),
+            [
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true),
+            ],
+            true, 0, null,
+            [
+                'propertyBool' => [
+                    'type' => GraphQLType::nonNull(GraphQLType::string()),
+                    'description' => 'propertyBool description',
+                    'args' => [],
+                    'resolve' => null,
+                    'deprecationReason' => null,
                 ],
-                true, 0, null,
-                [
-                    'propertyBool' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => 'propertyBool description',
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                    'clientMutationId' => GraphQLType::string(),
-                ],
-            ];
-            yield 'mutation nested input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
-                [
-                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                ],
-                true, 1, null,
-                [
-                    'id' => [
-                        'type' => GraphQLType::id(),
-                    ],
-                    'propertyBool' => [
-                        'type' => GraphQLType::nonNull(GraphQLType::string()),
-                        'description' => null,
-                        'args' => [],
-                        'resolve' => null,
-                        'deprecationReason' => null,
-                    ],
-                    'clientMutationId' => GraphQLType::string(),
-                ],
+                'clientMutationId' => GraphQLType::string(),
+            ],
         ];
         yield 'mutation nested input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
             [

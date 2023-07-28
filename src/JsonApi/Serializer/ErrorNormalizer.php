@@ -77,8 +77,8 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     {
         if (self::FORMAT === $format) {
             return [
-                \Exception::class => true,
-                FlattenException::class => true,
+                \Exception::class => false,
+                FlattenException::class => false,
             ];
         }
 
