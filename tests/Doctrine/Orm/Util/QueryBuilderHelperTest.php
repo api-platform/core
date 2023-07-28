@@ -130,7 +130,7 @@ class QueryBuilderHelperTest extends TestCase
         $this->assertSame(RelatedDummy::class, $actual);
     }
 
-    public function provideAddJoinOnce(): \Iterator
+    public static function provideAddJoinOnce(): \Iterator
     {
         yield [
             null,

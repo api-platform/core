@@ -10,7 +10,6 @@ concurrency:
 
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
 jobs:
   commitlint:
@@ -48,7 +47,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           ini-values: memory_limit=-1
           tools: pecl, composer, php-cs-fixer
           coverage: none
@@ -75,7 +74,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -134,7 +133,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -202,7 +201,7 @@ jobs:
         with:
           php-version: latest
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
       - name: Run ${{ matrix.component }} tests
         working-directory: src/${{ matrix.component }}
@@ -233,7 +232,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -336,7 +335,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -386,7 +385,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -552,8 +551,6 @@ jobs:
         php:
           - '8.2'
       fail-fast: false
-    env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -562,7 +559,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -592,9 +589,6 @@ jobs:
         php:
           - '8.2'
       fail-fast: false
-    # env:
-      # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
-      #SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -603,7 +597,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -626,7 +620,8 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit
+        # The PHPUnit Bridge doesn't support PHPUnit 10 yet: https://github.com/symfony/symfony/issues/49069
+        run: vendor/bin/phpunit -c phpunit10.xml.dist
 
   behat-symfony-next:
     name: Behat (PHP ${{ matrix.php }}) (Symfony dev)
@@ -645,7 +640,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages
@@ -692,7 +687,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -713,6 +708,8 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&ignoreFile=./tests/.ignored-deprecations
 
   windows-behat:
     name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
@@ -734,7 +731,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -765,9 +762,6 @@ jobs:
         php:
           - '8.2'
       fail-fast: false
-      # env:
-      # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
-      #SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -776,7 +770,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -798,6 +792,8 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: max[self]=0&ignoreFile=./tests/.ignored-deprecations
 
   behat-symfony-lowest:
     name: Behat (PHP ${{ matrix.php }}) (Symfony lowest)
@@ -816,7 +812,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages

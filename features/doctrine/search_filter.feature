@@ -1038,7 +1038,7 @@ Feature: Search filter on collections
   @createSchema
   Scenario: Custom search filters can use Doctrine Expressions as join conditions
     Given there is a dummy object with 3 relatedDummies and their thirdLevel
-    When I send a "GET" request to "/dummy_ressource_with_custom_filter?custom=3"
+    When I send a "GET" request to "/dummy_resource_with_custom_filter?custom=3"
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON node "hydra:totalItems" should be equal to 1

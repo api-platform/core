@@ -19,6 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoInputOutput as DummyD
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
+use Doctrine\Common\Collections\Collection;
 
 final class DummyDtoInputOutputProvider implements ProviderInterface
 {
@@ -38,7 +39,7 @@ final class DummyDtoInputOutputProvider implements ProviderInterface
         $outputDto->id = $data->id;
         $outputDto->baz = $data->num;
         $outputDto->bat = $data->str;
-        $outputDto->relatedDummies = (array) $data->relatedDummies;
+        $outputDto->relatedDummies = $data->relatedDummies instanceof Collection ? $data->relatedDummies : (array) $data->relatedDummies;
 
         return $outputDto;
     }

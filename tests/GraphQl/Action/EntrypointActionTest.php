@@ -114,7 +114,7 @@ class EntrypointActionTest extends TestCase
         $this->assertSame($expectedResponse->getContent(), $mockedEntrypoint($request)->getContent());
     }
 
-    public function multipartRequestProvider(): array
+    public static function multipartRequestProvider(): array
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',

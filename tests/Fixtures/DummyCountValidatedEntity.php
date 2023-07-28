@@ -19,22 +19,19 @@ class DummyCountValidatedEntity
 {
     /**
      * @var array
-     *
-     * @Assert\Count(min=1)
      */
+    #[Assert\Count(min: 1)]
     public $dummyMin;
 
     /**
      * @var array
-     *
-     * @Assert\Count(max=10)
      */
+    #[Assert\Count(max: 10)]
     public $dummyMax;
 
     /**
      * @var array
-     *
-     * @Assert\Count(min=1, max=10)
      */
+    #[Assert\Count(min: 1, max: 10)]
     public $dummyMinMax;
 }

@@ -82,7 +82,7 @@ class DeserializeStageTest extends TestCase
         $this->assertSame($denormalizedData, $result);
     }
 
-    public function objectToPopulateProvider(): array
+    public static function objectToPopulateProvider(): array
     {
         return [
             'null' => [null, ['denormalization' => true]],

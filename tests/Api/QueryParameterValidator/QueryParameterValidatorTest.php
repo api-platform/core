@@ -48,6 +48,8 @@ class QueryParameterValidatorTest extends TestCase
 
     /**
      * unsafe method should not use filter validations.
+     *
+     * @doesNotPerformAssertions
      */
     public function testOnKernelRequestWithUnsafeMethod(): void
     {
@@ -58,6 +60,8 @@ class QueryParameterValidatorTest extends TestCase
 
     /**
      * If the tested filter is non-existent, then nothing should append.
+     *
+     * @doesNotPerformAssertions
      */
     public function testOnKernelRequestWithWrongFilter(): void
     {

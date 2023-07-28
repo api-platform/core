@@ -111,7 +111,7 @@ class VarnishPurgerTest extends TestCase
         self::assertSame($regexesToSend, $client->sentRegexes); // @phpstan-ignore-line
     }
 
-    public function provideChunkHeaderCases(): \Generator
+    public static function provideChunkHeaderCases(): \Generator
     {
         yield 'no iri' => [
             50,

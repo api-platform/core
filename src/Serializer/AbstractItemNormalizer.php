@@ -42,6 +42,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Base item normalizer.
@@ -87,11 +88,25 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $this->resourceClassResolver->isResourceClass($class);
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => true];
+    }
+
     /**
      * {@inheritdoc}
      */
     public function hasCacheableSupportsMethod(): bool
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
         return true;
     }
 

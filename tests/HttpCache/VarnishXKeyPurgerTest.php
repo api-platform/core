@@ -141,7 +141,7 @@ class VarnishXKeyPurgerTest extends TestCase
         self::assertSame($keysToSend, $client->sentKeys); // @phpstan-ignore-line
     }
 
-    public function provideChunkHeaderCases(): \Generator
+    public static function provideChunkHeaderCases(): \Generator
     {
         yield 'no iri' => [
             50,

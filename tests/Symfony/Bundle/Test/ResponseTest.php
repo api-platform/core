@@ -55,7 +55,7 @@ class ResponseTest extends TestCase
         $response->getContent();
     }
 
-    public function errorProvider(): iterable
+    public static function errorProvider(): iterable
     {
         yield [ServerException::class, 500];
         yield [ClientException::class, 400];

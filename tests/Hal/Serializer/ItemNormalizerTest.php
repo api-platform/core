@@ -72,6 +72,9 @@ class ItemNormalizerTest extends TestCase
         $normalizer->denormalize(['foo'], 'Foo');
     }
 
+    /**
+     * @group legacy
+     */
     public function testSupportsNormalization(): void
     {
         $std = new \stdClass();
@@ -97,10 +100,15 @@ class ItemNormalizerTest extends TestCase
             $nameConverter->reveal()
         );
 
-        $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonhal'));
+        $this->assertTrue($normalizer->supportsNormalization($dummy, $normalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
-        $this->assertFalse($normalizer->supportsNormalization($std, 'jsonhal'));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertFalse($normalizer->supportsNormalization($std, $normalizer::FORMAT));
+        $this->assertEmpty($normalizer->getSupportedTypes('xml'));
+        $this->assertSame(['*' => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     public function testNormalize(): void

@@ -18,12 +18,16 @@ use ApiPlatform\Tests\Mock\Exception\ErrorCodeSerializable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 class ErrorNormalizerTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testSupportsNormalization(): void
     {
         $normalizer = new ErrorNormalizer();
@@ -35,6 +39,15 @@ class ErrorNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new FlattenException(), ErrorNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new FlattenException(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
+        $this->assertEmpty($normalizer->getSupportedTypes('json'));
+        $this->assertSame([
+            \Exception::class => true,
+            FlattenException::class => true,
+        ], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     /**
@@ -105,7 +118,7 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
-    public function errorProvider(): array
+    public static function errorProvider(): array
     {
         return [
             [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', false],

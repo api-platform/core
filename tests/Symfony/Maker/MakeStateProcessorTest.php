@@ -56,7 +56,7 @@ class MakeStateProcessorTest extends KernelTestCase
         $this->assertStringContainsString('Next: Open your new state processor class and start customizing it.', $display);
     }
 
-    public function stateProcessorProvider(): \Generator
+    public static function stateProcessorProvider(): \Generator
     {
         yield 'Generate state processor' => [
             'isInteractive' => true,

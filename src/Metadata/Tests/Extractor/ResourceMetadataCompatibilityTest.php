@@ -521,7 +521,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         $this->assertEquals(new ResourceMetadataCollection(self::RESOURCE_CLASS, $this->buildApiResources()), $collection);
     }
 
-    public function getExtractors(): array
+    public static function getExtractors(): array
     {
         return [
             [XmlResourceExtractor::class, new XmlResourceAdapter()],

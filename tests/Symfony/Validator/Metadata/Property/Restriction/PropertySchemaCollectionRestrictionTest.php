@@ -59,7 +59,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
         yield 'supported' => [new Collection(['fields' => []]), new ApiProperty(), true];
 
@@ -74,7 +74,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));
     }
 
-    public function createProvider(): \Generator
+    public static function createProvider(): \Generator
     {
         yield 'empty' => [new Collection(['fields' => []]), new ApiProperty(), ['type' => 'object', 'properties' => [], 'additionalProperties' => false]];
 

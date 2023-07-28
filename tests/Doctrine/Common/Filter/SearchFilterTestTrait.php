@@ -21,7 +21,7 @@ trait SearchFilterTestTrait
 {
     public function testGetDescription(): void
     {
-        $filter = $this->buildSearchFilter($this->managerRegistry, [
+        $filter = $this->buildSearchFilter($this, $this->managerRegistry, [
             'id' => null,
             'name' => null,
             'alias' => null,
@@ -179,7 +179,7 @@ trait SearchFilterTestTrait
         ], $filter->getDescription($this->resourceClass));
     }
 
-    private function provideApplyTestArguments(): array
+    private static function provideApplyTestArguments(): array
     {
         return [
             'exact' => [

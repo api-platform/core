@@ -28,6 +28,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -158,17 +159,26 @@ class PartialCollectionViewNormalizerTest extends TestCase
         return $normalizer->normalize($paginatorProphecy->reveal(), null, ['resource_class' => SoMany::class, 'operation_name' => 'get']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testSupportsNormalization(): void
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
+            $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
+        }
         $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null, Argument::type('array'))->willReturn(true)->shouldBeCalled();
-        $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
+
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $this->assertTrue($normalizer->supportsNormalization(new \stdClass()));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     public function testSetNormalizer(): void
@@ -182,5 +192,32 @@ class PartialCollectionViewNormalizerTest extends TestCase
 
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $normalizer->setNormalizer($injectedNormalizer);
+    }
+
+    public function testGetSupportedTypes(): void
+    {
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->markTestSkipped('Symfony Serializer < 6.3');
+        }
+
+        // TODO: use prophecy when getSupportedTypes() will be added to the interface
+        $normalizer = new PartialCollectionViewNormalizer(new class() implements NormalizerInterface {
+            public function normalize(mixed $object, string $format = null, array $context = [])
+            {
+                return null;
+            }
+
+            public function supportsNormalization(mixed $data, string $format = null): bool
+            {
+                return true;
+            }
+
+            public function getSupportedTypes(?string $format): array
+            {
+                return ['*' => true];
+            }
+        });
+
+        $this->assertSame(['*' => true], $normalizer->getSupportedTypes('jsonld'));
     }
 }

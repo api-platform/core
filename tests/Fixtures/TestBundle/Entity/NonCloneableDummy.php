@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -22,33 +22,25 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Dummy class that cannot be cloned.
  *
  * @author Colin O'Dell <colinodell@gmail.com>
- *
- * @ApiResource
- *
- * @ORM\Entity
  */
+#[ORM\Entity]
+#[ApiResource]
 class NonCloneableDummy
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     *
-     * @ORM\Id
-     *
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
-     *
-     * @Assert\NotBlank
-     *
-     * @ApiProperty(iri="http://schema.org/name")
      */
+    #[ApiProperty(iris: ['http://schema.org/name'])]
+    #[ORM\Column]
+    #[Assert\NotBlank]
     private $name;
 
     public function getId()

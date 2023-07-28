@@ -39,7 +39,7 @@ class FormatsResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             new ApiResource(

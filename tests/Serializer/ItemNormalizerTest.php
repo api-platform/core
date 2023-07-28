@@ -36,6 +36,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -46,6 +47,9 @@ class ItemNormalizerTest extends TestCase
     use ExpectDeprecationTrait;
     use ProphecyTrait;
 
+    /**
+     * @group legacy
+     */
     public function testSupportNormalization(): void
     {
         $std = new \stdClass();
@@ -74,7 +78,11 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertSame(['*' => true], $normalizer->getSupportedTypes('any'));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     public function testNormalize(): void

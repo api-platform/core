@@ -394,7 +394,7 @@ class XmlExtractorTest extends TestCase
         (new XmlResourceExtractor([$path]))->getResources();
     }
 
-    public function getInvalidPaths(): array
+    public static function getInvalidPaths(): array
     {
         return [
             [

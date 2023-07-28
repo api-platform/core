@@ -43,7 +43,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
     }
 
-    public function getRequest(): array
+    public static function getRequest(): array
     {
         return [
             [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get'])],

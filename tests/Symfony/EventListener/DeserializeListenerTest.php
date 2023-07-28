@@ -209,7 +209,7 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function methodProvider(): iterable
+    public static function methodProvider(): iterable
     {
         yield ['POST', false];
         yield ['PUT', true];

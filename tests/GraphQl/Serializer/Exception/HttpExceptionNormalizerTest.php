@@ -51,7 +51,7 @@ class HttpExceptionNormalizerTest extends TestCase
         }
     }
 
-    public function exceptionProvider(): array
+    public static function exceptionProvider(): array
     {
         $exceptionMessage = 'exception message';
 

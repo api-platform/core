@@ -311,7 +311,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.symfony.uri_variables.transformer.uuid', ['api_platform.uri_variables.transformer']);
     }
 
-    public function dataProviderCommonConfigurationAliasNameConverter(): \Iterator
+    public static function dataProviderCommonConfigurationAliasNameConverter(): \Iterator
     {
         yield ['dummyValue', true];
         yield [null, false];
@@ -1127,6 +1127,9 @@ class ApiPlatformExtensionTest extends TestCase
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['maker']['enabled'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertTrue($this->container->has('api_platform.maker.command.state_processor'));
+        $this->assertTrue($this->container->has('api_platform.maker.command.state_provider'));
     }
 
     public function testArgumentResolverConfiguration(): void
@@ -1139,7 +1142,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.argument_resolver.payload',
         ];
 
-        $this->assertContainerHas($services, []);
+        $this->assertContainerHas($services);
 
         // argument_resolver.xml
         $this->assertServiceHasTags('api_platform.argument_resolver.payload', ['controller.argument_value_resolver']);
@@ -1245,6 +1248,9 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertEquals('api_platform.http_cache.http_client', $service->getArgument(0)->getTag());
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testLegacyOpenApiApiKeysConfiguration(): void
     {
         $this->expectException(InvalidConfigurationException::class);

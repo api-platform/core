@@ -25,6 +25,7 @@ use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -33,6 +34,9 @@ class CollectionNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
+    /**
+     * @group legacy
+     */
     public function testSupportsNormalize(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -45,7 +49,16 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
         $this->assertFalse($normalizer->supportsNormalization([], 'xml', ['resource_class' => 'Foo']));
         $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml', ['resource_class' => 'Foo']));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+
+        $this->assertEmpty($normalizer->getSupportedTypes('json'));
+        $this->assertSame([
+            'native-array' => true,
+            '\Traversable' => true,
+        ], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     public function testNormalizePaginator(): void

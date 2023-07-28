@@ -30,10 +30,10 @@ class BooleanFilterTest extends DoctrineMongoDbOdmFilterTestCase
     protected string $filterClass = BooleanFilter::class;
     protected string $resourceClass = Dummy::class;
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'string ("true")' => [
                     [

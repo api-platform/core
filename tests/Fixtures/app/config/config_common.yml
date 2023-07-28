@@ -265,10 +265,6 @@ services:
         alias: property_accessor
         public: true
 
-    test.annotation_reader:
-        alias: annotation_reader
-        public: true
-
     app.dummy_validation.group_generator:
         class: ApiPlatform\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         tags:

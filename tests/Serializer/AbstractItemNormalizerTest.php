@@ -40,6 +40,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -51,6 +52,9 @@ class AbstractItemNormalizerTest extends TestCase
     use ExpectDeprecationTrait;
     use ProphecyTrait;
 
+    /**
+     * @group legacy
+     */
     public function testSupportNormalizationAndSupportDenormalization(): void
     {
         $std = new \stdClass();
@@ -82,8 +86,12 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization($std));
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
         $this->assertFalse($normalizer->supportsNormalization([]));
+        $this->assertSame(['*' => true], $normalizer->getSupportedTypes('any'));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     public function testNormalize(): void
@@ -710,6 +718,8 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testCanDenormalizeInputClassWithDifferentFieldsThanResourceClass(): void
     {
+        $this->markTestSkipped('TODO: check why this test has been commented');
+
         // $data = [
         //     'dummyName' => 'Dummy Name',
         // ];
