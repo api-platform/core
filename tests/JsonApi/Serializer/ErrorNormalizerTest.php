@@ -46,7 +46,7 @@ class ErrorNormalizerTest extends TestCase
         ], $normalizer->getSupportedTypes($normalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+            $this->assertFalse($normalizer->hasCacheableSupportsMethod());
         }
     }
 
