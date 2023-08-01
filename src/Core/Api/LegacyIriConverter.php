@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Api;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
+use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -64,6 +65,14 @@ final class LegacyIriConverter implements IriConverterInterface
     public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
         if (null === $this->iriConverter) {
+            if ($identifiers = ($context['uri_variables'] ?? null)) {
+                try {
+                    return $this->legacyIriConverter->getItemIriFromResourceClass($item, $identifiers, $referenceType);
+                }
+                catch (InvalidArgumentException $e) {
+                }
+            }
+
             return \is_string($item) ? $this->legacyIriConverter->getIriFromResourceClass($item, $referenceType) : $this->legacyIriConverter->getIriFromItem($item, $referenceType);
         }
 
