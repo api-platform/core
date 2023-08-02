@@ -11,6 +11,7 @@ doctrine:
         mappings:
             TestBundle:
                 type: 'attribute'
+        report_fields_where_declared: true
 
 web_profiler:
     toolbar: true
