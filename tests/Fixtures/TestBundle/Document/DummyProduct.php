@@ -35,7 +35,7 @@ class DummyProduct
     /**
      * @var int The id
      */
-    #[ODM\Id(strategy:'None', type: 'int')]
+    #[ODM\Id(strategy: 'None', type: 'int')]
     private ?int $id = null;
     #[ODM\ReferenceMany(targetDocument: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
     private Collection|iterable $offers;
