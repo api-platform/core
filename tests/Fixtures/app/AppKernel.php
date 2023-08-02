@@ -16,6 +16,7 @@ use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
+use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\Command\TailCursorDoctrineODMCommand;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
@@ -216,6 +217,15 @@ class AppKernel extends Kernel
                 'graphql_playground' => false,
             ],
         ]);
+
+        // TODO: remove this check and move this config in config_common.yml when dropping support for DoctrineBundle <2.10
+        if (defined(ConnectionFactory::class.'::DEFAULT_SCHEME_MAP')) {
+            $c->prependExtensionConfig('doctrine', [
+                'orm' => [
+                    'report_fields_where_declared' => true,
+                ],
+            ]);
+        }
 
         $loader->load(__DIR__.'/config/config_swagger.php');
 
