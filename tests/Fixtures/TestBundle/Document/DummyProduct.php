@@ -35,7 +35,7 @@ class DummyProduct
     /**
      * @var int The id
      */
-    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    #[ODM\Id(type: 'int')]
     private ?int $id = null;
     #[ODM\ReferenceMany(targetDocument: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
     private Collection|iterable $offers;
@@ -74,6 +74,11 @@ class DummyProduct
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getName(): string

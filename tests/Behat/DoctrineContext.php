@@ -1483,17 +1483,21 @@ final class DoctrineContext implements Context
     public function createProductWithOffers(): void
     {
         $offer = $this->buildDummyOffer();
+        $offer->setId(1);
         $offer->setValue(2);
+
         $aggregate = $this->buildDummyAggregateOffer();
         $aggregate->setValue(1);
         $aggregate->addOffer($offer);
 
         $product = $this->buildDummyProduct();
+        $product->setId(2);
         $product->setName('Dummy product');
         $product->addOffer($aggregate);
 
         $relatedProduct = $this->buildDummyProduct();
         $relatedProduct->setName('Dummy related product');
+        $relatedProduct->setId(1);
         $relatedProduct->setParent($product);
 
         $product->addRelatedProduct($relatedProduct);
