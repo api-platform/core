@@ -1,0 +1,13 @@
+pdg:
+    guides:
+        base_url: '/docs/guide'
+        output: 'dist/guides'
+        src: './guides'
+    references:
+        base_url: '/docs/reference'
+        exclude: ['*Factory.php', '*.tpl.php']
+        exclude_path: ['JsonSchema/Tests', 'Metadata/Tests', 'OpenApi/Tests']
+        namespace: 'ApiPlatform'
+        output: 'dist/reference'
+        src: '../src'
+        tags_to_ignore: ['@experimental', '@internal']

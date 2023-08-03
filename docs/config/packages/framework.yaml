@@ -1,0 +1,3 @@
+when@test:
+    framework:
+        test: true

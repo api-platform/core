@@ -89,6 +89,50 @@ class HttpOperation extends Operation
         protected ?array $requirements = null,
         protected ?array $options = null,
         protected ?bool $stateless = null,
+        /**
+         * The `sunset` option indicates when a deprecated operation will be removed.
+         *
+         * <CodeSelector>
+         * ```php
+         * <?php
+         * // api/src/Entity/Parchment.php
+         * use ApiPlatform\Metadata\Get;
+         *
+         * #[Get(deprecationReason: 'Create a Book instead', sunset: '01/01/2020')]
+         * class Parchment
+         * {
+         *     // ...
+         * }
+         * ```
+         *
+         * ```yaml
+         * # api/config/api_platform/resources.yaml
+         * resources:
+         *     App\Entity\Parchment:
+         *         - operations:
+         *               ApiPlatform\Metadata\Get:
+         *                   deprecationReason: 'Create a Book instead'
+         *                   sunset: '01/01/2020'
+         * ```
+         *
+         * ```xml
+         * <?xml version="1.0" encoding="UTF-8" ?>
+         * <!-- api/config/api_platform/resources.xml -->
+         *
+         * <resources
+         *         xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+         *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         *         xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+         *         https://api-platform.com/schema/metadata/resources-3.0.xsd">
+         *     <resource class="App\Entity\Parchment">
+         *         <operations>
+         *             <operation class="ApiPlatform\Metadata\Get" deprecationReason="Create a Book instead" sunset="01/01/2020" />
+         *         <operations>
+         *     </resource>
+         * </resources>
+         * ```
+         * </CodeSelector>
+         */
         protected ?string $sunset = null,
         protected ?string $acceptPatch = null,
         protected $status = null,

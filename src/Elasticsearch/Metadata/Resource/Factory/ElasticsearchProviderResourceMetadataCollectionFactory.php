@@ -35,7 +35,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function create(string $resourceClass): ResourceMetadataCollection
     {

@@ -21,7 +21,7 @@
 
     <coverage processUncoveredFiles="true">
         <include>
-            <directory>.</directory>
+            <directory>src</directory>
         </include>
         <exclude>
             <directory>features</directory>
