@@ -321,6 +321,12 @@ Breaking changes:
 * Metadata: `Patch` is added to the automatic CRUD
 * Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
     
+## v2.7.14
+
+### Bug fixes
+
+* [deed442e0](https://github.com/api-platform/core/commit/deed442e0fd2b2ed6446e79fc1462800bd08c1de) fix: handle item iri with identifiers in LegacyIriConverter (#5670)
+
 ## v2.7.13
 
 ### Bug fixes
