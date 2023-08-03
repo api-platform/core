@@ -24,7 +24,7 @@ final class CallableProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {

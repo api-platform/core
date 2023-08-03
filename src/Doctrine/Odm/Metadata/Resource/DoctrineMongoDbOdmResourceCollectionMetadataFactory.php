@@ -31,7 +31,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function create(string $resourceClass): ResourceMetadataCollection
     {

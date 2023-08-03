@@ -24,7 +24,7 @@ final class CallableProcessor implements ProcessorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {

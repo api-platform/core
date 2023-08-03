@@ -51,6 +51,50 @@ final class ApiProperty
         private ?bool $identifier = null,
         private $default = null,
         private mixed $example = null,
+        /**
+         * The `deprecationReason` option deprecates the current operation with a deprecation message.
+         *
+         * <CodeSelector>
+         * ```php
+         * <?php
+         * // api/src/Entity/Review.php
+         * use ApiPlatform\Metadata\ApiProperty;
+         * use ApiPlatform\Metadata\ApiResource;
+         *
+         * #[ApiResource]
+         * class Review
+         * {
+         *     #[ApiProperty(deprecationReason: "Use the rating property instead")]
+         *     public string $letter;
+         * }
+         * ```
+         *
+         * ```yaml
+         * # api/config/api_platform/properties.yaml
+         * properties:
+         *     App\Entity\Review:
+         *         letter:
+         *             deprecationReason: 'Create a Book instead'
+         * ```
+         *
+         * ```xml
+         * <?xml version="1.0" encoding="UTF-8" ?>
+         * <!-- api/config/api_platform/properties.xml -->
+         *
+         * <properties
+         *         xmlns="https://api-platform.com/schema/metadata/properties-3.0"
+         *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         *         xsi:schemaLocation="https://api-platform.com/schema/metadata/properties-3.0
+         *         https://api-platform.com/schema/metadata/properties-3.0.xsd">
+         *     <property resource="App\Entity\Review" name="letter" deprecationReason="Create a Book instead" />
+         * </properties>
+         * ```
+         * </CodeSelector>
+         *
+         * - With JSON-lD / Hydra, [an `owl:deprecated` annotation property](https://www.w3.org/TR/owl2-syntax/#Annotation_Properties) will be added to the appropriate data structure
+         * - With Swagger / OpenAPI, [a `deprecated` property](https://swagger.io/docs/specification/2-0/paths-and-operations/) will be added
+         * - With GraphQL, the [`isDeprecated` and `deprecationReason` properties](https://facebook.github.io/graphql/June2018/#sec-Deprecation) will be added to the schema
+         */
         private ?string $deprecationReason = null,
         private ?bool $fetchable = null,
         private ?bool $fetchEager = null,

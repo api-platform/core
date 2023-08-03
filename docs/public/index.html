@@ -1,0 +1,82 @@
+<pre id="response"></pre>
+<script>
+	// from guides/xxx.php
+	let guide = 'use-doctrine-orm-filters'
+	let stdoutTimer = null
+	let response = ''
+	function showResponse() {
+		document.getElementById('response').innerHTML = response
+		response = ''
+	}
+
+	const NUM = "number"
+	const STR = "string"
+	var Module = {
+		locateFile: function(path, prefix) {
+			if (path.endsWith('.data')) {
+				return './php-wasm/'+path
+			}
+
+			return prefix + path
+		},
+		onRuntimeInitialized: function() {
+			const ccall = Module['ccall']
+
+			ccall("pib_init", NUM, [STR], [])
+
+			const phpVersion = ccall("pib_exec", STR, [STR], ["phpversion();"])
+			console.log("php version", phpVersion)
+		ccall('pib_run', NUM, [STR], [`?> 
+<?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+ini_set('log_errors', 1);
+chdir('/src');
+// foreach(glob('/src/vendor/symfony/framework-bundle/Kernel/*') as $filename){
+//    echo $filename, '<br>'; 
+// }
+
+require './vendor/autoload.php';
+
+use ApiPlatform\\Playground\\Kernel;
+
+$app = function (array $context) {
+		return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG'], "${guide}");
+};
+
+$runtime = $_SERVER['APP_RUNTIME'] ?? $_ENV['APP_RUNTIME'] ?? 'Symfony\\Component\\Runtime\\SymfonyRuntime';
+$runtime = new $runtime(['disable_dotenv']);
+[$app, $args] = $runtime
+    ->getResolver($app)
+    ->resolve();
+
+$app = $app(...$args);
+$app->executeMigrations();
+$app->loadFixtures();
+$app->request();
+`])
+
+		},
+		onAbort: function(reason) {
+			console.error(`WASM aborted: ${reason}`)
+		},
+		print: function(data) {
+			if (!data) {
+				return
+			}
+
+			response += data
+			clearTimeout(stdoutTimer)
+			stdoutTimer = setTimeout(() => showResponse())
+		},
+		printErr: function(data) {
+			if (data) {
+				console.error(data)
+			}
+		},
+	}
+</script>
+<script src="./php-wasm/php-web.data.js"></script>
+<script src="./php-wasm/php-web.js"></script>

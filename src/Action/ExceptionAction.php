@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Renders a normalized exception for a given {@see FlattenException}.
+ * Renders a normalized exception for a given see [FlattenException](https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/ErrorHandler/Exception/FlattenException.php).
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
