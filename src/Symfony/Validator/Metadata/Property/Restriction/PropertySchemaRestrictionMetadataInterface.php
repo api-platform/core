@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Interface PropertySchemaRestrictionsInterface.
+ * This interface is autoconfigured with the `api_platform.metadata.property_schema_restriction` tag.
+ * It is used to generate a Resource schema using property restrictions based on the Symfony’s built-in validator. For example, the [Regex](https://symfony.com/doc/current/reference/constraints/Regex.html) constraint uses a [pattern](https://swagger.io/docs/specification/data-models/data-types/#pattern) type within the JSON schema.
  *
  * @author Andrii Penchuk penja7@gmail.com
  */

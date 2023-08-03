@@ -21,13 +21,85 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Filters the collection by boolean values.
+ * The boolean filter allows you to search on boolean fields and values.
  *
- * Filters collection on equality of boolean properties. The value is specified
- * as one of ( "true" | "false" | "1" | "0" ) in the query.
+ * Syntax: `?property=<true|false|1|0>`.
  *
- * For each property passed, if the resource does not have such property or if
- * the value is not one of ( "true" | "false" | "1" | "0" ) the property is ignored.
+ * <CodeSelector>
+ * ```php
+ * <?php
+ * // api/src/Entity/Book.php
+ * use ApiPlatform\Metadata\ApiFilter;
+ * use ApiPlatform\Metadata\ApiResource;
+ * use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+ *
+ * #[ApiResource]
+ * #[ApiFilter(BooleanFilter::class, properties: ['published'])]
+ * class Book
+ * {
+ *     // ...
+ * }
+ * ```
+ *
+ * ```yaml
+ * # config/services.yaml
+ * services:
+ *     book.boolean_filter:
+ *         parent: 'api_platform.doctrine.orm.boolean_filter'
+ *         arguments: [ { published: ~ } ]
+ *         tags:  [ 'api_platform.filter' ]
+ *         # The following are mandatory only if a _defaults section is defined with inverted values.
+ *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
+ *         autowire: false
+ *         autoconfigure: false
+ *         public: false
+ *
+ * # api/config/api_platform/resources.yaml
+ * resources:
+ *     App\Entity\Book:
+ *         - operations:
+ *               ApiPlatform\Metadata\GetCollection:
+ *                   filters: ['book.boolean_filter']
+ * ```
+ *
+ * ```xml
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <!-- api/config/services.xml -->
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <container
+ *         xmlns="http://symfony.com/schema/dic/services"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="http://symfony.com/schema/dic/services
+ *         https://symfony.com/schema/dic/services/services-1.0.xsd">
+ *     <services>
+ *         <service id="book.boolean_filter" parent="api_platform.doctrine.orm.boolean_filter">
+ *             <argument type="collection">
+ *                 <argument key="published"/>
+ *             </argument>
+ *             <tag name="api_platform.filter"/>
+ *         </service>
+ *     </services>
+ * </container>
+ * <!-- api/config/api_platform/resources.xml -->
+ * <resources
+ *         xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+ *         https://api-platform.com/schema/metadata/resources-3.0.xsd">
+ *     <resource class="App\Entity\Book">
+ *         <operations>
+ *             <operation class="ApiPlatform\Metadata\GetCollection">
+ *                 <filters>
+ *                     <filter>book.boolean_filter</filter>
+ *                 </filters>
+ *             </operation>
+ *         </operations>
+ *     </resource>
+ * </resources>
+ * ```
+ * </CodeSelector>
+ *
+ * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?published=true`.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>

@@ -142,9 +142,9 @@ final class Pagination
      * Gets info about the pagination.
      *
      * Returns an array with the following info as values:
-     *   - the page {@see Pagination::getPage()}
-     *   - the offset {@see Pagination::getOffset()}
-     *   - the limit {@see Pagination::getLimit()}
+     *   - the page {@see Pagination::getPage}
+     *   - the offset {@see Pagination::getOffset}
+     *   - the limit {@see Pagination::getLimit}
      *
      * @throws InvalidArgumentException
      */

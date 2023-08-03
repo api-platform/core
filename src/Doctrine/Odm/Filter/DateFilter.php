@@ -21,7 +21,95 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
 /**
- * Filters the collection by date intervals.
+ * The date filter allows to filter a collection by date intervals.
+ *
+ * Syntax: `?property[<after|before|strictly_after|strictly_before>]=value`.
+ *
+ * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php).
+ *
+ * The `after` and `before` filters will filter including the value whereas `strictly_after` and `strictly_before` will filter excluding the value.
+ *
+ * The date filter is able to deal with date properties having `null` values. Four behaviors are available at the property level of the filter:
+ * - Use the default behavior of the DBMS: use `null` strategy
+ * - Exclude items: use `ApiPlatform\Doctrine\Odm\Filter\DateFilter::EXCLUDE_NULL` (`exclude_null`) strategy
+ * - Consider items as oldest: use `ApiPlatform\Doctrine\Odm\Filter\DateFilter::INCLUDE_NULL_BEFORE` (`include_null_before`) strategy
+ * - Consider items as youngest: use `ApiPlatform\Doctrine\Odm\Filter\DateFilter::INCLUDE_NULL_AFTER` (`include_null_after`) strategy
+ * - Always include items: use `ApiPlatform\Doctrine\Odm\Filter\DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER` (`include_null_before_and_after`) strategy
+ *
+ * <CodeSelector>
+ * ```php
+ * <?php
+ * // api/src/Entity/Book.php
+ * use ApiPlatform\Metadata\ApiFilter;
+ * use ApiPlatform\Metadata\ApiResource;
+ * use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
+ *
+ * #[ApiResource]
+ * #[ApiFilter(DateFilter::class, properties: ['createdAt'])]
+ * class Book
+ * {
+ *     // ...
+ * }
+ * ```
+ *
+ * ```yaml
+ * # config/services.yaml
+ * services:
+ *     book.date_filter:
+ *         parent: 'api_platform.doctrine.odm.date_filter'
+ *         arguments: [ { createdAt: ~ } ]
+ *         tags:  [ 'api_platform.filter' ]
+ *         # The following are mandatory only if a _defaults section is defined with inverted values.
+ *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
+ *         autowire: false
+ *         autoconfigure: false
+ *         public: false
+ *
+ * # api/config/api_platform/resources.yaml
+ * resources:
+ *     App\Entity\Book:
+ *         - operations:
+ *               ApiPlatform\Metadata\GetCollection:
+ *                   filters: ['book.date_filter']
+ * ```
+ *
+ * ```xml
+ * <!-- api/config/services.xml -->
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <container
+ *         xmlns="http://symfony.com/schema/dic/services"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="http://symfony.com/schema/dic/services
+ *         https://symfony.com/schema/dic/services/services-1.0.xsd">
+ *     <services>
+ *         <service id="book.date_filter" parent="api_platform.doctrine.odm.date_filter">
+ *             <argument type="collection">
+ *                 <argument key="createdAt"></argument>
+ *             </argument>
+ *             <tag name="api_platform.filter"/>
+ *         </service>
+ *     </services>
+ * </container>
+ * <!-- api/config/api_platform/resources.xml -->
+ * <resources
+ *         xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+ *         https://api-platform.com/schema/metadata/resources-3.0.xsd">
+ *     <resource class="App\Entity\Book">
+ *         <operations>
+ *             <operation class="ApiPlatform\Metadata\GetCollection">
+ *                 <filters>
+ *                     <filter>book.date_filter</filter>
+ *                 </filters>
+ *             </operation>
+ *         </operations>
+ *     </resource>
+ * </resources>
+ * ```
+ * </CodeSelector>
+ *
+ * Given that the collection endpoint is `/books`, you can filter books by date with the following query: `/books?createdAt[after]=2018-03-19`.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
