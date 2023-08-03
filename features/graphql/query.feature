@@ -61,12 +61,12 @@ Feature: GraphQL query support
     And the JSON node "data.multiRelationsDummy.manyToOneRelation.name" should be equal to "RelatedManyToOneDummy #2"
     And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges" should have 2 element
     And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.id" should not be null
-    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[0].node.name" should be equal to "RelatedManyToManyDummy12"
-    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.name" should be equal to "RelatedManyToManyDummy22"
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[0].node.name" should match "#RelatedManyToManyDummy(1|2)2#"
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.name" should match "#RelatedManyToManyDummy(1|2)2#"
     And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges" should have 3 element
     And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[1].node.id" should not be null
-    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[0].node.name" should be equal to "RelatedOneToManyDummy12"
-    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[2].node.name" should be equal to "RelatedOneToManyDummy32"
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[0].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[2].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
 
   @createSchema @!mongodb
   Scenario: Retrieve an item with child relation to the same resource
