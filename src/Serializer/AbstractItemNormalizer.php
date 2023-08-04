@@ -92,7 +92,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         return [
             'object' => true,
-            'native-array' => true,
         ];
     }
 

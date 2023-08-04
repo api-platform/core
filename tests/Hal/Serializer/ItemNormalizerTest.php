@@ -99,7 +99,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
         $this->assertFalse($normalizer->supportsNormalization($std, $normalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('xml'));
-        $this->assertSame(['object' => true, 'native-array' => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+        $this->assertSame(['object' => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());
