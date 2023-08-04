@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\GraphQl;
 
 use ApiPlatform\GraphQl\Executor;
-use PHPUnit\Framework\TestCase;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -28,7 +28,6 @@ class ExecutorTest extends TestCase
         $executor = new Executor(true);
 
         $expected = new DisableIntrospection(DisableIntrospection::ENABLED);
-        
         $this->assertIsObject($executor);
         $this->assertEquals($expected, DocumentValidator::getRule('DisableIntrospection'));
     }
@@ -38,7 +37,6 @@ class ExecutorTest extends TestCase
         $executor = new Executor(false);
 
         $expected = new DisableIntrospection(DisableIntrospection::DISABLED);
-
         $this->assertIsObject($executor);
         $this->assertEquals($expected, DocumentValidator::getRule('DisableIntrospection'));
     }
