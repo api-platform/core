@@ -28,6 +28,8 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class NotExposedOperationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use OperationDefaultsTrait;
+
     public static $skolemUriTemplate = '/.well-known/genid/{id}';
 
     private $linkFactory;
@@ -69,13 +71,13 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
         // No item operation has been found on all resources for resource class: generate one on the last resource
         // Helpful to generate an IRI for a resource without declaring the Get operation
         /** @var HttpOperation $operation */
-        $operation = (new NotExposed())->withClass($resource->getClass())->withShortName($resource->getShortName()); // @phpstan-ignore-line $resource is defined if count > 0
+        [$key, $operation] = $this->getOperationWithDefaults($resource, new NotExposed(), true, ['uriTemplate']); // @phpstan-ignore-line $resource is defined if count > 0
 
         if (!$this->linkFactory->createLinksFromIdentifiers($operation)) {
             $operation = $operation->withUriTemplate(self::$skolemUriTemplate);
         }
 
-        $operations->add(sprintf('_api_%s_get', $operation->getShortName()), $operation)->sort(); // @phpstan-ignore-line $operation exists
+        $operations->add($key, $operation)->sort(); // @phpstan-ignore-line $operation exists
 
         return $resourceMetadataCollection;
     }
