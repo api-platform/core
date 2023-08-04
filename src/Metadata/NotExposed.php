@@ -45,7 +45,7 @@ final class NotExposed extends HttpOperation
         bool $stateless = null,
         string $sunset = null,
         string $acceptPatch = null,
-        $status = null,
+        $status = 404,
         string $host = null,
         array $schemes = null,
         string $condition = null,
