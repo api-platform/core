@@ -90,7 +90,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     public function getSupportedTypes(?string $format): array
     {
-        return ['*' => true];
+        return [
+            'object' => true,
+            'native-array' => true,
+        ];
     }
 
     /**
