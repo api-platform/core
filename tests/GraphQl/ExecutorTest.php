@@ -28,7 +28,7 @@ class ExecutorTest extends TestCase
         $executor = new Executor(true);
 
         $expected = new DisableIntrospection(DisableIntrospection::ENABLED);
-        $this->assertIsObject($executor);
+        $this->assertNotNull($executor);
         $this->assertEquals($expected, DocumentValidator::getRule('DisableIntrospection'));
     }
 
@@ -37,7 +37,7 @@ class ExecutorTest extends TestCase
         $executor = new Executor(false);
 
         $expected = new DisableIntrospection(DisableIntrospection::DISABLED);
-        $this->assertIsObject($executor);
+        $this->assertNotNull($executor);
         $this->assertEquals($expected, DocumentValidator::getRule('DisableIntrospection'));
     }
 }
