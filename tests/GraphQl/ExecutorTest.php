@@ -19,7 +19,7 @@ use GraphQL\Validator\Rules\DisableIntrospection;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @author Alan Poulain <contact@alanpoulain.eu>
+ * @author Julien Verger <julien.verger@gmail.com>
  */
 class ExecutorTest extends TestCase
 {
@@ -28,7 +28,7 @@ class ExecutorTest extends TestCase
         $executor = new Executor(true);
 
         $expected = new DisableIntrospection(DisableIntrospection::ENABLED);
-        $this->assertNotNull($executor);
+        $this->assertIsObject($executor);
         $this->assertEquals($expected, DocumentValidator::getRule('DisableIntrospection'));
     }
 
@@ -37,7 +37,7 @@ class ExecutorTest extends TestCase
         $executor = new Executor(false);
 
         $expected = new DisableIntrospection(DisableIntrospection::DISABLED);
-        $this->assertNotNull($executor);
+        $this->assertIsObject($executor);
         $this->assertEquals($expected, DocumentValidator::getRule('DisableIntrospection'));
     }
 }
