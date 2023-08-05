@@ -42,7 +42,7 @@ jobs:
                     restore-keys: ${{ runner.os }}-composer-
             -   name: Install project dependencies
                 working-directory: docs
-                run: composer install --no-interaction --no-progress --ansi
+                run: composer install --no-interaction --no-progress --ansi && composer require webonyx/graphql-php
             -   name: Test guides
                 working-directory: docs
                 env:
@@ -53,10 +53,5 @@ jobs:
                     for d in guides/*.php; do
                       rm -f var/data.db
                       echo "Testing guide $d"
-                      pdg-phpunit $d
-                      code=$?
-                      if [[ $code -ne 0 ]]; then
-                        break
-                      fi
+                      pdg-phpunit $d || exit 1
                     done
-                    exit $code
