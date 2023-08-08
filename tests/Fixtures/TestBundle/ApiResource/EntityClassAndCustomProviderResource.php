@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -25,7 +24,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\State\EntityClassAndCustomProviderReso
     operations: [
         new Get(
             uriTemplate: '/entityClassAndCustomProviderResources/{id}',
-            uriVariables: ['id']
         ),
         new GetCollection(
             uriTemplate: '/entityClassAndCustomProviderResources'
@@ -36,8 +34,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\State\EntityClassAndCustomProviderReso
 )]
 class EntityClassAndCustomProviderResource
 {
-    #[ApiProperty(identifier: true)]
     public ?int $id;
-
     public ?string $value;
 }

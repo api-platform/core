@@ -5,7 +5,7 @@ Feature: Use state options to use an entity that is not a resource
 
   @!mongodb
   @createSchema
-  Scenario: Get collection 
+  Scenario: Get collection
     Given there are 5 separated entities
     When I send a "GET" request to "/separated_entities"
     Then the response status code should be 200
@@ -35,7 +35,7 @@ Feature: Use state options to use an entity that is not a resource
 
   @!mongodb
   @createSchema
-  Scenario: Get ordered collection 
+  Scenario: Get ordered collection
     Given there are 5 separated entities
     When I send a "GET" request to "/separated_entities?order[value]=desc"
     Then the response status code should be 200
@@ -45,10 +45,32 @@ Feature: Use state options to use an entity that is not a resource
 
   @!mongodb
   @createSchema
-  Scenario: Get item 
+  Scenario: Get item
     Given there are 5 separated entities
     When I send a "GET" request to "/separated_entities/1"
-    Then print last JSON response
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @!mongodb
+  @createSchema
+  Scenario: Get item
+    Given there are 5 separated entities
+    When I send a "GET" request to "/separated_entities/1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @!mongodb
+  @createSchema
+  Scenario: Get all EntityClassAndCustomProviderResources
+    Given there are 1 separated entities
+    When I send a "GET" request to "/entityClassAndCustomProviderResources"
+    Then the response status code should be 200
+
+  @!mongodb
+  @createSchema
+  Scenario: Get one EntityClassAndCustomProviderResource
+    Given there are 1 separated entities
+    When I send a "GET" request to "/entityClassAndCustomProviderResources/1"
+    Then the response status code should be 200

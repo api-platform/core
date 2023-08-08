@@ -200,15 +200,3 @@ Feature: Uri Variables
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/companies/1/employees/2"
     Then the response status code should be 404
-
-  @!mongodb
-  Scenario: Get all EntityClassAndCustomProviderResources
-    Given there are 1 separated entities
-    When I send a "GET" request to "/entityClassAndCustomProviderResources"
-    Then the response status code should be 200
-
-  @!mongodb
-  Scenario: Get one EntityClassAndCustomProviderResource
-    Given there are 1 separated entities
-    When I send a "GET" request to "/entityClassAndCustomProviderResources/1"
-    Then the response status code should be 200
