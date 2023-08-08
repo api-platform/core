@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
+use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -126,7 +127,10 @@ final class SerializeListener
         $resourcesToPush = new ResourceList();
         $context['resources_to_push'] = &$resourcesToPush;
         $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'resources_to_push';
-        if (($options = $operation?->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+        if (($options = $operation?->getStateOptions()) && (
+            ($options instanceof Options && $options->getEntityClass())
+            || ($options instanceof ODMOptions && $options->getDocumentClass())
+        )) {
             $context['force_resource_class'] = $operation->getClass();
         }
 

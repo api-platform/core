@@ -62,6 +62,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDoc
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\IriOnlyDummy as IriOnlyDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\LinkHandledDummy as LinkHandledDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsDummy as MultiRelationsDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsRelatedDummy as MultiRelationsRelatedDummyDocument;
@@ -84,6 +85,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedSecuredDummy as Relate
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\SeparatedEntity as SeparatedEntityDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
@@ -147,6 +149,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\Event;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\ItemLog;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\Group;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\LinkHandledDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
@@ -2055,7 +2058,7 @@ final class DoctrineContext implements Context
     public function thereAreSeparatedEntities(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $entity = new SeparatedEntity();
+            $entity = $this->buildSeparatedEntity();
             $entity->value = (string) $i;
             $this->manager->persist($entity);
         }
@@ -2199,6 +2202,18 @@ final class DoctrineContext implements Context
             $this->manager->persist($log);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are a few link handled dummies
+     */
+    public function thereAreAFewLinkHandledDummies(): void
+    {
+        $this->manager->persist($this->buildLinkHandledDummy('foo'));
+        $this->manager->persist($this->buildLinkHandledDummy('bar'));
+        $this->manager->persist($this->buildLinkHandledDummy('baz'));
+        $this->manager->persist($this->buildLinkHandledDummy('foz'));
         $this->manager->flush();
     }
 
@@ -2545,5 +2560,15 @@ final class DoctrineContext implements Context
     private function buildVideoGame(): VideoGame|VideoGameDocument
     {
         return $this->isOrm() ? new VideoGame() : new VideoGameDocument();
+    }
+
+    private function buildSeparatedEntity(): SeparatedEntity|SeparatedEntityDocument
+    {
+        return $this->isOrm() ? new SeparatedEntity() : new SeparatedEntityDocument();
+    }
+
+    private function buildLinkHandledDummy(string $slug): LinkHandledDummy|LinkHandledDummyDocument
+    {
+        return $this->isOrm() ? new LinkHandledDummy($slug) : new LinkHandledDummyDocument($slug);
     }
 }

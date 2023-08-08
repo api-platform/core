@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Doctrine\Odm\State;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
+use ApiPlatform\Doctrine\Odm\State\Options;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -29,12 +30,14 @@ use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @group mongodb
  */
 class CollectionProviderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     private ObjectProphecy $managerRegistryProphecy;
@@ -166,5 +169,29 @@ class CollectionProviderTest extends TestCase
 
         $dataProvider = new CollectionProvider($this->resourceMetadataFactoryProphecy->reveal(), $this->managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
         $this->assertSame($iterator, $dataProvider->provide($operation, []));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testHandleLinksCallable(): void
+    {
+        $this->expectDeprecation('The Doctrine\ODM\MongoDB\Aggregation\Builder::execute method is deprecated (This method was deprecated in doctrine/mongodb-odm 2.2. Please use getAggregation() instead.).');
+        $class = 'foo';
+        $resourceMetadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $it = $this->createStub(Iterator::class);
+        $it->method('current')->willReturn(null);
+        $aggregationBuilder = $this->createStub(Builder::class);
+        $aggregationBuilder->method('hydrate')->willReturnSelf();
+        $aggregationBuilder->method('execute')->willReturn($it);
+        $repository = $this->createStub(DocumentRepository::class);
+        $repository->method('createAggregationBuilder')->willReturn($aggregationBuilder);
+        $manager = $this->createStub(DocumentManager::class);
+        $manager->method('getRepository')->willReturn($repository);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($manager);
+        $operation = new GetCollection(class: $class, stateOptions: new Options(handleLinks: fn () => $this->assertTrue(true)));
+        $dataProvider = new CollectionProvider($resourceMetadata, $managerRegistry);
+        $dataProvider->provide($operation, ['id' => 1]);
     }
 }

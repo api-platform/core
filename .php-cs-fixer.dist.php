@@ -17,6 +17,7 @@ $finder = PhpCsFixer\Finder::create()
         'src/Core/Bridge/Symfony/Maker/Resources/skeleton',
         'tests/Fixtures/app/var',
         'docs/guides',
+        'docs/var',
     ])
     ->notPath('src/Symfony/Bundle/DependencyInjection/Configuration.php')
     ->notPath('src/Annotation/ApiFilter.php') // temporary

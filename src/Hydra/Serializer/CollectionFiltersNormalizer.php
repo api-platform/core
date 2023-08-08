@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Api\FilterLocatorTrait;
+use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -111,8 +112,14 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             }
         }
 
-        if (($options = $operation?->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
-            $resourceClass = $options->getEntityClass();
+        if ($options = $operation->getStateOptions()) {
+            if ($options instanceof Options && $options->getEntityClass()) {
+                $resourceClass = $options->getEntityClass();
+            }
+
+            if ($options instanceof ODMOptions && $options->getDocumentClass()) {
+                $resourceClass = $options->getDocumentClass();
+            }
         }
 
         if ($currentFilters) {
