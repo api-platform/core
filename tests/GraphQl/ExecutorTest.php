@@ -26,7 +26,7 @@ class ExecutorTest extends TestCase
     public function testEnableIntrospectionQuery(): void
     {
         $executor = new Executor(true);
-        
+
         $expected = new DisableIntrospection(DisableIntrospection::DISABLED);
         $this->assertIsObject($executor);
         $this->assertEquals($expected, DocumentValidator::getRule(DisableIntrospection::class));
