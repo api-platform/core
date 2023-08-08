@@ -19,6 +19,18 @@ final class Components
 
     private ?\ArrayObject $schemas;
 
+    /**
+     * @param \ArrayObject<string, Schema>|\ArrayObject<string, Reference>                                 $schemas
+     * @param \ArrayObject<string, Response>|\ArrayObject<string, Reference>                               $responses
+     * @param \ArrayObject<string, Parameter>|\ArrayObject<string, Reference>                              $parameters
+     * @param \ArrayObject<string, Example>|\ArrayObject<string, Reference>                                $examples
+     * @param \ArrayObject<string, RequestBody>|\ArrayObject<string, Reference>                            $requestBodies
+     * @param \ArrayObject<string, Header>|\ArrayObject<string, Reference>                                 $headers
+     * @param \ArrayObject<string, SecurityScheme>|\ArrayObject<string, Reference>                         $headers
+     * @param \ArrayObject<string, Link>|\ArrayObject<string, Reference>                                   $links
+     * @param \ArrayObject<string, array<string, PathItem>>|\ArrayObject<string, array<string, Reference>> $callbacks
+     * @param \ArrayObject<string, PathItem>|\ArrayObject<string, Reference>                               $pathItems
+     */
     public function __construct(\ArrayObject $schemas = null, private ?\ArrayObject $responses = null, private ?\ArrayObject $parameters = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $requestBodies = null, private ?\ArrayObject $headers = null, private ?\ArrayObject $securitySchemes = null, private ?\ArrayObject $links = null, private ?\ArrayObject $callbacks = null, private ?\ArrayObject $pathItems = null)
     {
         $schemas?->ksort();

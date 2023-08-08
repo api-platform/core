@@ -5,6 +5,10 @@
 ### Bug fixes
 
 * [0c1c1c36f](https://github.com/api-platform/core/commit/0c1c1c36f55ba96119e6c22ea25fb69c85b20161) fix(symfony): enable API Platform in LexikJWTAuthenticationBundle (#5609)
+
+
+  You can disable this behaviour by setting the configuration key `lexik_jwt_authentication.api_platform.enabled` to `false`
+
 * [146991ba4](https://github.com/api-platform/core/commit/146991ba42014f0141195bc43be5cd875665407c) fix(openapi): merge parameters with deprecated openApiContext (#5703)
 * [14969aa0c](https://github.com/api-platform/core/commit/14969aa0c6f021bb4bf3e9d13b00e710c22110de) fix(serializer): put replaces embed collection (#5604)
 * [9cb0ee43c](https://github.com/api-platform/core/commit/9cb0ee43c175927f3002e86d23443d8d43fa14b3) fix(metadata): missing xml/yaml properties (#5684)

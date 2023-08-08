@@ -37,6 +37,7 @@ use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\Paths;
+use ApiPlatform\OpenApi\Model\Schema;
 use ApiPlatform\OpenApi\Model\Server;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
@@ -64,7 +65,7 @@ class OpenApiNormalizerTest extends TestCase
 
     public function testNormalizeWithSchemas(): void
     {
-        $openApi = new OpenApi(new Info('My API', '1.0.0', 'An amazing API'), [new Server('https://example.com')], new Paths(), new Components(new \ArrayObject(['z' => [], 'b' => []])));
+        $openApi = new OpenApi(new Info('My API', '1.0.0', 'An amazing API'), [new Server('https://example.com')], new Paths(), new Components(new \ArrayObject(['z' => new Schema(), 'b' => new Schema()])));
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
 

@@ -148,7 +148,7 @@ final class IriConverter implements IriConverterInterface
             }
         }
 
-        if (!$operation->getName() || ($operation instanceof HttpOperation && SkolemIriConverter::$skolemUriTemplate === $operation->getUriTemplate())) {
+        if (!$operation->getName() || ($operation instanceof HttpOperation && $operation->getUriTemplate() && str_starts_with($operation->getUriTemplate(), SkolemIriConverter::$skolemUriTemplate))) {
             return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }
 
