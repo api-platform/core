@@ -16,6 +16,8 @@ namespace ApiPlatform\GraphQl;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
+use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\DisableIntrospection;
 
 /**
  * Wrapper for the GraphQL facade.
@@ -24,6 +26,15 @@ use GraphQL\Type\Schema;
  */
 final class Executor implements ExecutorInterface
 {
+    public function __construct(private readonly bool $graphQlIntrospectionEnabled = true)
+    {
+        DocumentValidator::addRule(
+            new DisableIntrospection(
+                $this->graphQlIntrospectionEnabled ? DisableIntrospection::DISABLED : DisableIntrospection::ENABLED
+            )
+        );
+    }
+
     /**
      * {@inheritdoc}
      */
