@@ -11,13 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\HttpCache;
+namespace ApiPlatform\HttpCache\State;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +39,7 @@ final class AddTagsProcessor implements ProcessorInterface
 {
     use UriVariablesResolverTrait;
 
-    public function __construct(private readonly ProcessorInterface $inner, private readonly IriConverterInterface $iriConverter, private readonly ?PurgerInterface $purger = null)
+    public function __construct(private readonly ProcessorInterface $decorated, private readonly IriConverterInterface $iriConverter, private readonly ?PurgerInterface $purger = null)
     {
     }
 
@@ -47,7 +48,7 @@ final class AddTagsProcessor implements ProcessorInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        $response = $this->inner->process($data, $operation, $uriVariables, $context);
+        $response = $this->decorated->process($data, $operation, $uriVariables, $context);
 
         if (
             !($request = $context['request'] ?? null)
@@ -59,7 +60,7 @@ final class AddTagsProcessor implements ProcessorInterface
             return $response;
         }
 
-        $resources = $request->attributes->get('_resources');
+        $resources = $request->attributes->get('_resources', []);
         if ($operation instanceof CollectionOperationInterface) {
             // Allows to purge collections
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());

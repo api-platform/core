@@ -27,15 +27,15 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class DenormalizeProvider implements ProviderInterface
 {
     /**
-     * @param ProviderInterface<object> $inner
+     * @param ProviderInterface<object> $decorated
      */
-    public function __construct(private readonly ProviderInterface $inner, private readonly DenormalizerInterface $denormalizer, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(private readonly ProviderInterface $decorated, private readonly DenormalizerInterface $denormalizer, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
     {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $data = $this->inner->provide($operation, $uriVariables, $context);
+        $data = $this->decorated->provide($operation, $uriVariables, $context);
 
         if (!($operation->canDeserialize() ?? true) || (!$operation instanceof Mutation)) {
             return $data;

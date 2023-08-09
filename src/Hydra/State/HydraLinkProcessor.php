@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\State;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\Link;
@@ -24,16 +24,16 @@ use Symfony\Component\WebLink\Link;
 final class HydraLinkProcessor implements ProcessorInterface
 {
     /**
-     * @param ProcessorInterface<mixed> $inner
+     * @param ProcessorInterface<mixed> $decorated
      */
-    public function __construct(private readonly ProcessorInterface $inner, private readonly UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly ProcessorInterface $decorated, private readonly UrlGeneratorInterface $urlGenerator)
     {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (!($request = $context['request'] ?? null) || !$operation instanceof HttpOperation) {
-            return $this->inner->process($data, $operation, $uriVariables, $context);
+            return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
         $apiDocUrl = $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL);
@@ -46,6 +46,6 @@ final class HydraLinkProcessor implements ProcessorInterface
         $link = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);
         $request->attributes->set('_links', $linkProvider->withLink($link));
 
-        return $this->inner->process($data, $operation, $uriVariables, $context);
+        return $this->decorated->process($data, $operation, $uriVariables, $context);
     }
 }

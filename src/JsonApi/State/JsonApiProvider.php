@@ -15,11 +15,10 @@ namespace ApiPlatform\JsonApi\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 final class JsonApiProvider implements ProviderInterface
 {
-    public function __construct(private readonly ProviderInterface $inner, private readonly string $orderParameterName = 'order')
+    public function __construct(private readonly ProviderInterface $decorated, private readonly string $orderParameterName = 'order')
     {
     }
 
@@ -28,7 +27,7 @@ final class JsonApiProvider implements ProviderInterface
         $request = $context['request'] ?? null;
 
         if (!$request || 'jsonapi' !== $request->getRequestFormat()) {
-            return $this->inner->provide($operation, $uriVariables, $context);
+            return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
         $filters = $request->attributes->get('_api_filters', []);
@@ -71,37 +70,35 @@ final class JsonApiProvider implements ProviderInterface
             $filters = array_merge($pageParameter, $filters);
         }
 
-        $this->transformFieldsetsParameters($request, $operation);
+        [$included, $properties] = $this->transformFieldsetsParameters($queryParameters, $operation->getShortName() ?? '');
 
-        $request->attributes->set('_api_filters', $filters);
+        if ($properties) {
+            $request->attributes->set('_api_filter_property', $properties);
+        }
 
-        return $this->inner->provide($operation, $uriVariables, $context);
+        if ($included) {
+            $request->attributes->set('_api_included', $included);
+        }
+
+        if ($filters) {
+            $request->attributes->set('_api_filters', $filters);
+        }
+
+        return $this->decorated->provide($operation, $uriVariables, $context);
     }
 
-    private function transformFieldsetsParameters(Request $request, Operation $operation): void
+    private function transformFieldsetsParameters(array $queryParameters, string $resourceShortName): array
     {
-        $queryParameters = $request->query->all();
         $includeParameter = $queryParameters['include'] ?? null;
         $fieldsParameter = $queryParameters['fields'] ?? null;
 
-        if (
-            (!$fieldsParameter && !$includeParameter)
-            || ($fieldsParameter && !\is_array($fieldsParameter))
-            || (!\is_string($includeParameter))
-        ) {
-            return;
-        }
-
-        $includeParameter = explode(',', $includeParameter);
+        $includeParameter = \is_string($includeParameter) ? explode(',', $includeParameter) : [];
         if (!$fieldsParameter) {
-            $request->attributes->set('_api_included', $includeParameter);
-
-            return;
+            return [$includeParameter, []];
         }
-
-        $resourceShortName = $operation->getShortName();
 
         $properties = [];
+        $included = [];
         foreach ($fieldsParameter as $resourceType => $fields) {
             $fields = explode(',', (string) $fields);
 
@@ -109,13 +106,12 @@ final class JsonApiProvider implements ProviderInterface
                 $properties = array_merge($properties, $fields);
             } elseif (\in_array($resourceType, $includeParameter, true)) {
                 $properties[$resourceType] = $fields;
-
-                $request->attributes->set('_api_included', array_merge($request->attributes->get('_api_included', []), [$resourceType]));
+                $included[] = $resourceType;
             } else {
                 $properties[$resourceType] = $fields;
             }
         }
 
-        $request->attributes->set('_api_filter_property', $properties);
+        return [$included, $properties];
     }
 }

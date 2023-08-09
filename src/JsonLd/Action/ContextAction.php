@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd\Action;
 
 use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\JsonLd\Context;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -60,14 +59,14 @@ final class ContextAction
         if (null !== $request && $this->provider && $this->processor && $this->serializer) {
             $operation = new Get(
                 outputFormats: ['jsonld' => ['application/ld+json']],
-                class: Context::class,
-                read: false,
+                validate: false,
+                provider: fn () => $this->getContext($shortName),
                 serialize: false
             );
             $context = ['request' => $request];
-            $this->provider->provide($operation, [], $context);
+            $jsonLdContext = $this->provider->provide($operation, [], $context);
 
-            return $this->processor->process($this->serializer->serialize($this->getContext($shortName), 'json'), $operation, [], $context);
+            return $this->processor->process($this->serializer->serialize($jsonLdContext, 'json'), $operation, [], $context);
         }
 
         if (!$context = $this->getContext($shortName)) {

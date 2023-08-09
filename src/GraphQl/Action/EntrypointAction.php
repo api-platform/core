@@ -16,7 +16,7 @@ namespace ApiPlatform\GraphQl\Action;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\ExecutorInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
-use ApiPlatform\Util\ContentNegotiationTrait;
+use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;

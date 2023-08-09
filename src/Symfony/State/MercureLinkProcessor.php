@@ -20,21 +20,21 @@ use Symfony\Component\Mercure\Discovery;
 final class MercureLinkProcessor implements ProcessorInterface
 {
     /**
-     * @param ProcessorInterface<mixed> $inner
+     * @param ProcessorInterface<mixed> $decorated
      */
-    public function __construct(private readonly ProcessorInterface $inner, private readonly Discovery $discovery)
+    public function __construct(private readonly ProcessorInterface $decorated, private readonly Discovery $discovery)
     {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (!($request = $context['request'] ?? null) || !$mercure = $operation->getMercure()) {
-            return $this->inner->process($data, $operation, $uriVariables, $context);
+            return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
         $hub = \is_array($mercure) ? ($mercure['hub'] ?? null) : null;
         $this->discovery->addLink($request, $hub);
 
-        return $this->inner->process($data, $operation, $uriVariables, $context);
+        return $this->decorated->process($data, $operation, $uriVariables, $context);
     }
 }

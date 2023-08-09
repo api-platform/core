@@ -27,13 +27,13 @@ final class ResolverProvider implements ProviderInterface
 {
     use ClassInfoTrait;
 
-    public function __construct(private readonly ProviderInterface $inner, private readonly ContainerInterface $queryResolverLocator)
+    public function __construct(private readonly ProviderInterface $decorated, private readonly ContainerInterface $queryResolverLocator)
     {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $item = $this->inner->provide($operation, $uriVariables, $context);
+        $item = $this->decorated->provide($operation, $uriVariables, $context);
 
         if (!$operation instanceof GraphQlOperation || null === ($queryResolverId = $operation->getResolver())) {
             return $item;

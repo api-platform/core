@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\State\Provider;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\GraphQl\Util\ArrayTrait;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Util\ArrayTrait;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -38,12 +38,8 @@ final class ReadProvider implements ProviderInterface
     use ClassInfoTrait;
     use IdentifierTrait;
 
-    public function __construct(
-        private readonly ProviderInterface $provider,
-        private readonly IriConverterInterface $iriConverter,
-        private readonly ?SerializerContextBuilderInterface $serializerContextBuilder,
-        private readonly string $nestingSeparator
-    ) {
+    public function __construct(private readonly ProviderInterface $provider, private readonly IriConverterInterface $iriConverter, private readonly ?SerializerContextBuilderInterface $serializerContextBuilder, private readonly string $nestingSeparator)
+    {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null

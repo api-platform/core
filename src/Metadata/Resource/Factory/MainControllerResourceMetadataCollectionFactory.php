@@ -48,7 +48,7 @@ final class MainControllerResourceMetadataCollectionFactory implements ResourceM
 
                 if (false === $this->useSymfonyEvents) {
                     $operation = $operation->withController('api_platform.symfony.main_controller');
-                    $operations->add($operation->getName(), $operation);
+                    $operations->add($key, $operation);
                 }
             }
 

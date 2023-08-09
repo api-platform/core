@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @deprecated
+ * @deprecated since API Platform 3 and Error resource is used {@see ApiPlatform\Symfony\EventListener\ErrorListener}
  */
 final class ExceptionAction
 {

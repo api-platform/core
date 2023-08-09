@@ -29,7 +29,7 @@ use ApiPlatform\State\ProviderInterface;
  */
 final class SwaggerUiProvider implements ProviderInterface
 {
-    public function __construct(private readonly ProviderInterface $inner, private readonly OpenApiFactoryInterface $openApiFactory)
+    public function __construct(private readonly ProviderInterface $decorated, private readonly OpenApiFactoryInterface $openApiFactory)
     {
     }
 
@@ -37,7 +37,7 @@ final class SwaggerUiProvider implements ProviderInterface
     {
         // We went through the DocumentationAction
         if (OpenApi::class === $operation->getClass()) {
-            return $this->inner->provide($operation, $uriVariables, $context);
+            return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
         if (
@@ -45,7 +45,7 @@ final class SwaggerUiProvider implements ProviderInterface
             || !($request = $context['request'] ?? null)
             || 'html' !== $request->getRequestFormat()
         ) {
-            return $this->inner->provide($operation, $uriVariables, $context);
+            return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
         if (!$request->attributes->has('_api_requested_operation')) {
@@ -57,7 +57,7 @@ final class SwaggerUiProvider implements ProviderInterface
         // @see features/main/content_negotiation.feature:119
         // DocumentationAction has no content negotation as well we want HTML so render swagger ui
         if (!$operation instanceof Error && Documentation::class !== $operation->getClass()) {
-            $this->inner->provide($operation, $uriVariables, $context);
+            $this->decorated->provide($operation, $uriVariables, $context);
         }
 
         $swaggerUiOperation = new Get(

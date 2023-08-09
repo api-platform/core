@@ -32,7 +32,7 @@ use Symfony\Contracts\Translation\TranslatorTrait;
 
 final class DeserializeProvider implements ProviderInterface
 {
-    public function __construct(private readonly ProviderInterface $inner, private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private ?TranslatorInterface $translator = null)
+    public function __construct(private readonly ProviderInterface $decorated, private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private ?TranslatorInterface $translator = null)
     {
         if (null === $this->translator) {
             $this->translator = new class() implements TranslatorInterface, LocaleAwareInterface {
@@ -44,7 +44,7 @@ final class DeserializeProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $data = $this->inner->provide($operation, $uriVariables, $context);
+        $data = $this->decorated->provide($operation, $uriVariables, $context);
 
         // We need request content
         if (!$operation instanceof HttpOperation || !($request = $context['request'] ?? null)) {

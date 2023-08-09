@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Util;
+namespace ApiPlatform\Metadata\Util;
 
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;

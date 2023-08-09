@@ -14,11 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Action\NotFoundAction;
-use ApiPlatform\Api\FilterInterface;
-use ApiPlatform\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
@@ -44,9 +39,14 @@ use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface as GraphQlS
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
+use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
@@ -247,6 +247,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.uri_variables.converter',
             'api_platform.uri_variables.transformer.date_time',
             'api_platform.uri_variables.transformer.integer',
+
+            'api_platform.state_provider.content_negotiation',
+            'api_platform.state_provider.deserialize',
+            'api_platform.state_processor.respond',
+            'api_platform.state_processor.add_link_header',
+            'api_platform.state_processor.serialize',
         ];
 
         $aliases = [
@@ -1246,9 +1252,6 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertEquals('api_platform.http_cache.http_client', $service->getArgument(0)->getTag());
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
     public function testLegacyOpenApiApiKeysConfiguration(): void
     {
         $this->expectException(InvalidConfigurationException::class);

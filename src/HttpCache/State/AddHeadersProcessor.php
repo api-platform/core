@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\HttpCache;
+namespace ApiPlatform\HttpCache\State;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
@@ -20,13 +20,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AddHeadersProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly ProcessorInterface $inner, private readonly bool $etag = false, private readonly ?int $maxAge = null, private readonly ?int $sharedMaxAge = null, private readonly ?array $vary = null, private readonly ?bool $public = null, private readonly ?int $staleWhileRevalidate = null, private readonly ?int $staleIfError = null)
+    /**
+     * @param ProcessorInterface<Response>|ProcessorInterface<mixed> $decorated
+     */
+    public function __construct(private readonly ProcessorInterface $decorated, private readonly bool $etag = false, private readonly ?int $maxAge = null, private readonly ?int $sharedMaxAge = null, private readonly ?array $vary = null, private readonly ?bool $public = null, private readonly ?int $staleWhileRevalidate = null, private readonly ?int $staleIfError = null)
     {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        $response = $this->inner->process($data, $operation, $uriVariables, $context);
+        $response = $this->decorated->process($data, $operation, $uriVariables, $context);
 
         if (
             !($request = $context['request'] ?? null)
@@ -37,14 +40,14 @@ final class AddHeadersProcessor implements ProcessorInterface
             return $response;
         }
 
-        if (!$response->getContent() || !$response->isSuccessful()) {
+        if (!($content = $response->getContent()) || !$response->isSuccessful()) {
             return $response;
         }
 
         $resourceCacheHeaders = $operation->getCacheHeaders() ?? [];
 
         if ($this->etag && !$response->getEtag()) {
-            $response->setEtag(md5((string) $response->getContent()));
+            $response->setEtag(md5((string) $content));
         }
 
         if (null !== ($maxAge = $resourceCacheHeaders['max_age'] ?? $this->maxAge) && !$response->headers->hasCacheControlDirective('max-age')) {

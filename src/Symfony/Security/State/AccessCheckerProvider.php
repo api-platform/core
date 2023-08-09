@@ -11,15 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\Security;
+namespace ApiPlatform\Symfony\Security\State;
 
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
+use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Allows access to content the resourceAccessChecker.
@@ -28,11 +29,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 final class AccessCheckerProvider implements ProviderInterface
 {
-    public function __construct(
-        private readonly ProviderInterface $inner,
-        private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker = null,
-        private readonly ?string $event = null,
-    ) {
+    public function __construct(private readonly ProviderInterface $decorated, private readonly ResourceAccessCheckerInterface $resourceAccessChecker, private readonly ?string $event = null)
+    {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -51,7 +49,7 @@ final class AccessCheckerProvider implements ProviderInterface
                 $message = $operation->getSecurityMessage();
         }
 
-        $body = $this->inner->provide($operation, $uriVariables, $context);
+        $body = $this->decorated->provide($operation, $uriVariables, $context);
         if (null === $isGranted) {
             return $body;
         }
@@ -66,7 +64,7 @@ final class AccessCheckerProvider implements ProviderInterface
 
             $resourceAccessCheckerContext = [
                 'object' => $body,
-                'previous_object' => $request->attributes->get('previous_data'),
+                'previous_object' => $request?->attributes->get('previous_data'),
                 'request' => $request,
             ];
         } else {
@@ -77,7 +75,7 @@ final class AccessCheckerProvider implements ProviderInterface
         }
 
         if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $isGranted, $resourceAccessCheckerContext)) {
-            throw $operation instanceof GraphQlOperation ? new AccessDeniedHttpException($message ?? 'Access Denied.') : throw new AccessDeniedException($message ?? 'Access Denied.');
+            $operation instanceof GraphQlOperation ? throw new AccessDeniedHttpException($message ?? 'Access Denied.') : throw new AccessDeniedException($message ?? 'Access Denied.');
         }
 
         return $body;

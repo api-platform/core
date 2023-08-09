@@ -16,8 +16,8 @@ namespace ApiPlatform\State\Provider;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Util\ContentNegotiationTrait;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
@@ -30,7 +30,7 @@ final class ContentNegotiationProvider implements ProviderInterface
      * @param array<string, string[]> $formats
      * @param array<string, string[]> $errorFormats
      */
-    public function __construct(private readonly ProviderInterface $inner, Negotiator $negotiator = null, private readonly array $formats = [], private readonly array $errorFormats = [])
+    public function __construct(private readonly ProviderInterface $decorated, Negotiator $negotiator = null, private readonly array $formats = [], private readonly array $errorFormats = [])
     {
         $this->negotiator = $negotiator ?? new Negotiator();
     }
@@ -38,7 +38,7 @@ final class ContentNegotiationProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if (!($request = $context['request'] ?? null) || !$operation instanceof HttpOperation) {
-            return $this->inner->provide($operation, $uriVariables, $context);
+            return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
         $isErrorOperation = $operation instanceof ErrorOperation;
@@ -53,7 +53,7 @@ final class ContentNegotiationProvider implements ProviderInterface
             $request->setRequestFormat($this->getRequestFormat($request, $formats, false));
         }
 
-        return $this->inner->provide($operation, $uriVariables, $context);
+        return $this->decorated->provide($operation, $uriVariables, $context);
     }
 
     /**

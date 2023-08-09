@@ -20,13 +20,13 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 final class AddLinkHeaderProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly ProcessorInterface $inner, private readonly ?HttpHeaderSerializer $serializer = new HttpHeaderSerializer())
+    public function __construct(private readonly ProcessorInterface $decorated, private readonly ?HttpHeaderSerializer $serializer = new HttpHeaderSerializer())
     {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        $response = $this->inner->process($data, $operation, $uriVariables, $context);
+        $response = $this->decorated->process($data, $operation, $uriVariables, $context);
 
         if (
             !($request = $context['request'] ?? null)

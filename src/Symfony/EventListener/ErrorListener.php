@@ -19,10 +19,10 @@ use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
-use ApiPlatform\Util\ContentNegotiationTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
@@ -34,7 +34,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttp
 /**
  * This error listener extends the Symfony one in order to add
  * the `_api_operation` attribute when the request is duplicated.
- * It will later be used to retrieve the exceptionToStatus from the operation ({@see ExceptionAction}).
+ * It will later be used to retrieve the exceptionToStatus from the operation ({@see ApiPlatform\Action\ExceptionAction}).
  */
 final class ErrorListener extends SymfonyErrorListener
 {

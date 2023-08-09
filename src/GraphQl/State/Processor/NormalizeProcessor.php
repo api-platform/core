@@ -56,14 +56,8 @@ final class NormalizeProcessor implements ProcessorInterface
      */
     private function getData(mixed $itemOrCollection, GraphQlOperation $operation, array $uriVariables = [], array $context = []): ?array
     {
-        $isCollection = $operation instanceof CollectionOperationInterface;
-        $isMutation = $operation instanceof Mutation;
-        $isSubscription = $operation instanceof Subscription;
-        $isDelete = $operation instanceof DeleteOperationInterface;
-        $shortName = $operation->getShortName();
-
         if (!($operation->canSerialize() ?? true)) {
-            if ($isCollection) {
+            if ($operation instanceof CollectionOperationInterface) {
                 if ($this->pagination->isGraphQlEnabled($operation, $context)) {
                     return 'cursor' === $this->pagination->getGraphQlPaginationType($operation) ?
                         $this->getDefaultCursorBasedPaginatedData() :
@@ -73,11 +67,11 @@ final class NormalizeProcessor implements ProcessorInterface
                 return [];
             }
 
-            if ($isMutation) {
+            if ($operation instanceof Mutation) {
                 return $this->getDefaultMutationData($context);
             }
 
-            if ($isSubscription) {
+            if ($operation instanceof Subscription) {
                 return $this->getDefaultSubscriptionData($context);
             }
 
@@ -87,15 +81,15 @@ final class NormalizeProcessor implements ProcessorInterface
         $normalizationContext = $this->serializerContextBuilder->create($operation->getClass(), $operation, $context, normalization: true);
 
         $data = null;
-        if (!$isCollection) {
-            if ($isMutation && $isDelete) {
+        if (!$operation instanceof CollectionOperationInterface) {
+            if ($operation instanceof Mutation && $operation instanceof DeleteOperationInterface) {
                 $data = ['id' => $this->getIdentifierFromOperation($operation, $context['args'] ?? [])];
             } else {
                 $data = $this->normalizer->normalize($itemOrCollection, ItemNormalizer::FORMAT, $normalizationContext);
             }
         }
 
-        if ($isCollection && is_iterable($itemOrCollection)) {
+        if ($operation instanceof CollectionOperationInterface && is_iterable($itemOrCollection)) {
             if (!$this->pagination->isGraphQlEnabled($operation, $context)) {
                 $data = [];
                 foreach ($itemOrCollection as $index => $object) {
@@ -112,8 +106,10 @@ final class NormalizeProcessor implements ProcessorInterface
             throw new \UnexpectedValueException('Expected serialized data to be a nullable array.');
         }
 
+        $isMutation = $operation instanceof Mutation;
+        $isSubscription = $operation instanceof Subscription;
         if ($isMutation || $isSubscription) {
-            $wrapFieldName = lcfirst($shortName);
+            $wrapFieldName = lcfirst($operation->getShortName());
 
             return [$wrapFieldName => $data] + ($isMutation ? $this->getDefaultMutationData($context) : $this->getDefaultSubscriptionData($context));
         }
