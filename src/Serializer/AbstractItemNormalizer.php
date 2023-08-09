@@ -513,9 +513,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $collectionKeyType = $type->getCollectionKeyTypes()[0] ?? null;
         $collectionKeyBuiltinType = $collectionKeyType?->getBuiltinType();
         $childContext = $this->createChildContext(['resource_class' => $className] + $context, $attribute, $format);
-        unset($childContext['uri_variables']);
-        if ($this->resourceMetadataCollectionFactory) {
-            $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($className)->getOperation();
+        $lastUriVariable = \array_key_exists('uri_variables', $childContext) ? array_key_last($childContext['uri_variables']) : null;
+        if ('id' === $lastUriVariable) {
+            unset($childContext['uri_variables']);
+            if ($this->resourceMetadataCollectionFactory) {
+                $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($className)->getOperation();
+            }
         }
 
         $values = [];
