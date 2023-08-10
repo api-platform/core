@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Serializer;
+namespace ApiPlatform\Serializer\Tests;
 
 use ApiPlatform\Serializer\ResourceList;
 use PHPUnit\Framework\TestCase;

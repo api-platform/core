@@ -11,24 +11,24 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Serializer;
+namespace ApiPlatform\Serializer\Tests;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DtoWithNullValue;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\Dummy;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritance;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceChild;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceRelated;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\NonCloneableDummy;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\RelatedDummy;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\SecuredDummy;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5584\DtoWithNullValue;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceRelated;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NonCloneableDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

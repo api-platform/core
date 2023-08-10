@@ -11,20 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Api;
+namespace ApiPlatform\Metadata\Tests;
 
-use ApiPlatform\Api\IdentifiersExtractor;
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyWithEnumIdentifier;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationMultiple;
-use ApiPlatform\Tests\Fixtures\TestBundle\State\RelationMultipleProvider;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyWithEnumIdentifier;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelationMultiple;
+use ApiPlatform\Metadata\Tests\Fixtures\State\RelationMultipleProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;

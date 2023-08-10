@@ -14,10 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Tests\Fixtures\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
-use Doctrine\Common\Collections\Collection;
 
 /**
  * Dummy.
@@ -194,44 +190,6 @@ class Dummy
         return $this->arrayData;
     }
 
-    public function getRelatedDummy(): ?RelatedDummy
-    {
-        return $this->relatedDummy;
-    }
-
-    public function setRelatedDummy(RelatedDummy $relatedDummy): void
-    {
-        $this->relatedDummy = $relatedDummy;
-    }
-
-    public function addRelatedDummy(RelatedDummy $relatedDummy): void
-    {
-        $this->relatedDummies->add($relatedDummy);
-    }
-
-    public function getRelatedOwnedDummy()
-    {
-        return $this->relatedOwnedDummy;
-    }
-
-    public function setRelatedOwnedDummy(RelatedOwnedDummy $relatedOwnedDummy): void
-    {
-        $this->relatedOwnedDummy = $relatedOwnedDummy;
-        if ($this !== $this->relatedOwnedDummy->getOwningDummy()) {
-            $this->relatedOwnedDummy->setOwningDummy($this);
-        }
-    }
-
-    public function getRelatedOwningDummy()
-    {
-        return $this->relatedOwningDummy;
-    }
-
-    public function setRelatedOwningDummy(RelatedOwningDummy $relatedOwningDummy): void
-    {
-        $this->relatedOwningDummy = $relatedOwningDummy;
-    }
-
     public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;
@@ -253,10 +211,5 @@ class Dummy
     public function getDummy()
     {
         return $this->dummy;
-    }
-
-    public function getRelatedDummies(): Collection|iterable
-    {
-        return $this->relatedDummies;
     }
 }

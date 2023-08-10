@@ -11,18 +11,18 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Serializer;
+namespace ApiPlatform\Serializer\Tests;
 
 use ApiPlatform\Api\FilterInterface;
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Serializer\SerializerFilterContextBuilder;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyGroup;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;

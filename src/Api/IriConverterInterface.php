@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-interface IriConverterInterface extends \ApiPlatform\Metadata\IriConverterInterface
-{
+class_exists(\ApiPlatform\Metadata\IriConverterInterface::class);
+
+if (!class_exists(IriConverterInterface::class)) {
+    interface IriConverterInterface extends \ApiPlatform\Metadata\IriConverterInterface
+    {
+    }
 }

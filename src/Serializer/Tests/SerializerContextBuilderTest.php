@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Serializer;
+namespace ApiPlatform\Serializer\Tests;
 
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Patch;

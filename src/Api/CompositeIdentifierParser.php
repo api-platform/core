@@ -17,6 +17,7 @@ namespace ApiPlatform\Api;
  * Normalizes a composite identifier.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @deprecated
  */
 final class CompositeIdentifierParser
 {

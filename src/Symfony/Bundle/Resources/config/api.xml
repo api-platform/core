@@ -176,6 +176,7 @@
             <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
         </service>
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
+        <service id="ApiPlatform\Metadata\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener">
             <argument key="$controller">api_platform.action.placeholder</argument>
