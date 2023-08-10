@@ -22,21 +22,21 @@
     "require": {
         "php": ">=8.1",
         "api-platform/metadata": "*@dev || ^3.1",
+        "api-platform/serializer": "*@dev || ^3.1",
         "api-platform/state": "*@dev || ^3.1",
         "symfony/property-info": "^6.1",
         "symfony/serializer": "^6.1",
-        "symfony/http-foundation": "^6.1",
-        "symfony/http-kernel": "^6.1"
+        "webonyx/graphql-php": "^14.0 || ^15.0"
     },
     "require-dev": {
-        "doctrine/common": "^3.2.2",
         "phpspec/prophecy-phpunit": "^2.0",
+        "api-platform/symfony": "*@dev || ^3.1",
+        "api-platform/validator": "*@dev || ^3.1",
+        "twig/twig": "^3.7",
+        "symfony/mercure-bundle": "*",
         "symfony/phpunit-bridge": "^6.1",
         "symfony/routing": "^6.1",
-        "symfony/validator": "^6.1",
-        "symfony/twig-bundle": "^6.1",
-        "symfony/mercure-bundle": "*",
-        "webonyx/graphql-php": "^14.0 || ^15.0"
+        "symfony/validator": "^6.1"
     },
     "autoload": {
         "psr-4": {
@@ -72,6 +72,18 @@
         {
             "type": "path",
             "url": "../State"
+        },
+        {
+            "type": "path",
+            "url": "../Serializer"
+        },
+        {
+            "type": "path",
+            "url": "../Symfony"
+        },
+        {
+            "type": "path",
+            "url": "../Validator"
         }
     ]
 }

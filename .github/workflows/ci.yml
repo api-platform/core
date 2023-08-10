@@ -196,6 +196,7 @@ jobs:
           - HttpCache
           - RamseyUuid
           - GraphQl
+          - Serializer
       fail-fast: false
     steps:
       - name: Checkout

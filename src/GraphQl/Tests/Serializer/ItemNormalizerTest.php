@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Tests\Serializer;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;

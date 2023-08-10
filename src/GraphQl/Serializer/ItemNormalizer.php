@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Serializer;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Serializer\Filter;
+namespace ApiPlatform\Serializer\Tests\Filter;
 
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;

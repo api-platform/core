@@ -1,77 +1,82 @@
 {
-  "name": "api-platform/elasticseach",
-  "description": "Elasticsearch support",
-  "type": "library",
-  "keywords": [
-    "Filter",
-    "Elasticsearch"
-  ],
-  "homepage": "https://api-platform.com",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Kévin Dunglas",
-      "email": "kevin@dunglas.fr",
-      "homepage": "https://dunglas.fr"
+    "name": "api-platform/elasticseach",
+    "description": "Elasticsearch support",
+    "type": "library",
+    "keywords": [
+        "Filter",
+        "Elasticsearch"
+    ],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        },
+        {
+            "name": "API Platform Community",
+            "homepage": "https://api-platform.com/community/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "api-platform/metadata": "*@dev || ^3.1",
+        "api-platform/state": "*@dev || ^3.1",
+        "api-platform/serializer": "*@dev || ^3.1",
+        "elasticsearch/elasticsearch": "^7.11.0",
+        "symfony/cache": "^6.1",
+        "symfony/console": "^6.2",
+        "symfony/property-info": "^6.1",
+        "symfony/serializer": "^6.1",
+        "symfony/uid": "^6.1",
+        "symfony/property-access": "^6.1"
     },
-    {
-      "name": "API Platform Community",
-      "homepage": "https://api-platform.com/community/contributors"
-    }
-  ],
-  "require": {
-    "php": ">=8.1",
-    "api-platform/metadata": "*@dev || ^3.1",
-    "api-platform/state": "*@dev || ^3.1",
-    "elasticsearch/elasticsearch": "^7.11.0",
-    "symfony/cache": "^6.1",
-    "symfony/console": "^6.2",
-    "symfony/property-info": "^6.1",
-    "symfony/serializer": "^6.1",
-    "symfony/uid": "^6.1",
-    "symfony/property-access": "^6.1"
-  },
-  "conflict": {
-    "elasticsearch/elasticsearch": ">=8.0"
-  },
-  "require-dev": {
-    "phpspec/prophecy-phpunit": "^2.0",
-    "symfony/phpunit-bridge": "^6.1"
-  },
-  "autoload": {
-    "psr-4": {
-      "ApiPlatform\\Elasticsearch\\": ""
+    "conflict": {
+        "elasticsearch/elasticsearch": ">=8.0"
     },
-    "exclude-from-classmap": [
-      "/Tests/"
+    "require-dev": {
+        "phpspec/prophecy-phpunit": "^2.0",
+        "symfony/phpunit-bridge": "^6.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\Elasticsearch\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "3.2.x-dev"
+        },
+        "symfony": {
+            "require": "^6.1"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Metadata"
+        },
+        {
+            "type": "path",
+            "url": "../State"
+        },
+        {
+            "type": "path",
+            "url": "../Serializer"
+        }
     ]
-  },
-  "config": {
-    "preferred-install": {
-      "*": "dist"
-    },
-    "sort-packages": true,
-    "allow-plugins": {
-      "composer/package-versions-deprecated": true,
-      "phpstan/extension-installer": true
-    }
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-main": "3.2.x-dev"
-    },
-    "symfony": {
-      "require": "^6.1"
-    }
-  },
-  "repositories": [
-    {
-      "type": "path",
-      "url": "../Metadata"
-    },
-   {
-     "type": "path",
-     "url": "../State"
-   }
-  ]
 }
