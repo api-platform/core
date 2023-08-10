@@ -1042,3 +1042,12 @@ Feature: Search filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON node "hydra:totalItems" should be equal to 1
+
+  @!mongodb
+  @createSchema
+  Scenario: Filters can use UUIDs
+    Given there is a group object with uuid "61817181-0ecc-42fb-a6e7-d97f2ddcb344" and 2 users
+    When I send a "GET" request to "/issue5735/users?groups=/issue5735/groups/61817181-0ecc-42fb-a6e7-d97f2ddcb344"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "hydra:totalItems" should be equal to 2

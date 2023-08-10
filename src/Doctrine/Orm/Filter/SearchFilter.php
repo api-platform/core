@@ -17,7 +17,6 @@ use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
-use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
@@ -217,30 +216,45 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             return;
         }
 
-        $values = array_map($this->getIdFromValue(...), $values);
-        // todo: handle composite IDs
+        /**
+         * For an association, just get the associated entity (or a reference) and add a simple join!
+         */
+        $rootAlias = $alias;
+        $joinAlias = $queryNameGenerator->generateJoinAlias($field);
+        $joinParameter = $queryNameGenerator->generateParameterName($field);
 
-        $associationResourceClass = $metadata->getAssociationTargetClass($field);
-        $associationMetadata = $this->getClassMetadata($associationResourceClass);
-        $associationFieldIdentifier = $associationMetadata->getIdentifierFieldNames()[0];
-        $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
+        try {
+            $item = $this->getIriConverter()->getResourceFromIri($value, ['fetch_data' => false]);
 
-        if (!$this->hasValidValues($values, $doctrineTypeField)) {
-            $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
-            ]);
+            if($metadata->isCollectionValuedAssociation($field)){
+                $joinCondition = sprintf(':%s MEMBER OF %s.%s', $joinParameter, $rootAlias, $field);
+            }
+            else{
+                $joinCondition = sprintf(':%s = %s.%s', $joinParameter, $rootAlias, $field);
+            }
+        }
+        catch (InvalidArgumentException) {
+            //not an IRI, get the identifier the old way
+            $associationResourceClass = $metadata->getAssociationTargetClass($field);
+            $associationMetadata = $this->getClassMetadata($associationResourceClass);
+            $associationFieldIdentifier = $associationMetadata->getIdentifierFieldNames()[0];
+            $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
 
-            return;
+            if (!$this->hasValidValues($values, $doctrineTypeField)) {
+                $this->logger->notice('Invalid filter ignored', [
+                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                ]);
+
+                return;
+            }
+
+            $joinCondition = sprintf('%s.%s = :%s', $joinAlias, $associationFieldIdentifier, $joinParameter);
+            $item = $value;
         }
 
-        $associationAlias = $alias;
-        $associationField = $field;
-        if ($metadata->isCollectionValuedAssociation($associationField) || $metadata->isAssociationInverseSide($field)) {
-            $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $associationField);
-            $associationField = $associationFieldIdentifier;
-        }
 
-        $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive);
+        $queryBuilder->join(sprintf('%s.%s', $rootAlias, $field), $joinAlias, Join::WITH , $joinCondition)
+                        ->setParameter($joinParameter, $item);
     }
 
     /**

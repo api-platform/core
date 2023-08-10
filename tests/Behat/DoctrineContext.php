@@ -144,6 +144,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\Group;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
@@ -2156,6 +2157,29 @@ final class DoctrineContext implements Context
         $mainEntity->setName('main');
         $this->manager->persist($subEntity);
         $this->manager->persist($mainEntity);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a group object with uuid :uuid and :nbUsers users
+     */
+    public function thereIsAGroupWithUuidAndNUsers(string $uuid, int $nbUsers): void
+    {
+        $group = new Group();
+        $group->setUuid(\Symfony\Component\Uid\Uuid::fromString($uuid));
+
+        $this->manager->persist($group);
+
+        for ($i = 0; $i < $nbUsers; ++$i) {
+            $user = new \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\User();
+            $user->addGroup($group);
+            $this->manager->persist($user);
+        }
+
+        // add another user not in this group
+        $user = new \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\User();
+        $this->manager->persist($user);
+
         $this->manager->flush();
     }
 
