@@ -101,8 +101,6 @@ class SecuredDummy
 
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
-     *
-     * @var mixed
      */
     #[ApiProperty(security: "is_granted('ROLE_USER')")]
     protected $relatedSecuredDummy;
@@ -114,8 +112,6 @@ class SecuredDummy
 
     /**
      * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
-     *
-     * @var mixed
      */
     protected $publicRelatedSecuredDummy;
 
@@ -180,5 +176,4 @@ class SecuredDummy
     {
         $this->owner = $owner;
     }
-
 }

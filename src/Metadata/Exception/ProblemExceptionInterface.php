@@ -11,8 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Exception;
+namespace ApiPlatform\Metadata\Exception;
 
+/**
+ * Implements the Problem Error specification.
+ */
 interface ProblemExceptionInterface
 {
     public function getType(): string;
