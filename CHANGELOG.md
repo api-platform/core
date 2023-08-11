@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.7.15
+
+### Bug fixes
+
+* [a874e4419](https://github.com/api-platform/core/commit/a874e4419d52889b9659b56984b6f38975930b9f)  fix(serializer): use name converter api-platform#5495
+
 ## v2.7.14
 
 ### Bug fixes
