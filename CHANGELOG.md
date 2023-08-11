@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.1.14
+
+### Bug fixes
+
+* [146f55330](https://github.com/api-platform/core/commit/146f55330e3df8301ac84345b69a25cdfb908b27) fix(metadata): operation NotExposed status to 404 (#5717)
+* [4dcfc16c3](https://github.com/api-platform/core/commit/4dcfc16c38ab4c371a37a7d92d2f2f205de31f89) fix(symfony): perf regression with Symfony 6.3  (#5721)
+* [4f9626f42](https://github.com/api-platform/core/commit/4f9626f42b75a5fd1f9d681c80ad6c4ee56318fe) fix(serializer): use data if no uri_variables provided (#5743)
+* [7bb92a52f](https://github.com/api-platform/core/commit/7bb92a52f5c6e02705547408281eba93f73b588e) fix(doctrine): use stateOptions only within doctrine context (#5726)
+* [83dbfbff1](https://github.com/api-platform/core/commit/83dbfbff1717dabba7ce9e814d0bdb556b49fcb8) fix(metadata): generated NotExposed operation should inherit resource options (#5722)
+* [ccad63683](https://github.com/api-platform/core/commit/ccad6368303d341f37eff0317cc8e433504c460f) Revert "fix: search on nested sub-entity that doesn't use "id" as its ORM identifier (#5623)" (#5744)
+* [e2745855b](https://github.com/api-platform/core/commit/e2745855be4986d361626d1b853e45cde229d3d8) fix(openapi): model Example, Header and Reference (#5716)
+* [ebf03104f](https://github.com/api-platform/core/commit/ebf03104fcbffc5af74d78c3e9b14d02d7527214) fix(jsonld): skolem uri template may have a _format (#5729)
+
 ## v3.1.13
 
 ### Bug fixes
