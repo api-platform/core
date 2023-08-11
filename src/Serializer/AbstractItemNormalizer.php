@@ -375,13 +375,21 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $object;
         }
 
+        $options = $this->getFactoryOptions($context);
+        $propertyNames = iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $options));
+
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
         foreach (array_keys($data) as $attribute) {
+            $attribute = $this->nameConverter ? $this->nameConverter->denormalize((string) $attribute) : $attribute;
+            if (!\in_array($attribute, $propertyNames, true)) {
+                continue;
+            }
+
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
                 if (null !== $previousObject) {
                     $this->setValue($object, $attribute, $this->propertyAccessor->getValue($previousObject, $attribute));
                 } else {
-                    $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $this->getFactoryOptions($context));
+                    $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
                     $this->setValue($object, $attribute, $propertyMetadata->getDefault());
                 }
             }
