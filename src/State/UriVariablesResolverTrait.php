@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
-use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
-use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\UriVariablesConverterInterface;
+use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 
 trait UriVariablesResolverTrait
 {

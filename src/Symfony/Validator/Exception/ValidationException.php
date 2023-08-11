@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator\Exception;
 
-use ApiPlatform\Api\CompositeIdentifierParser;
-use ApiPlatform\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\ErrorResource;
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use ApiPlatform\Validator\Exception\ValidationException as BaseValidationException;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;

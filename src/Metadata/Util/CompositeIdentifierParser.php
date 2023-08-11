@@ -17,6 +17,7 @@ namespace ApiPlatform\Metadata\Util;
  * Normalizes a composite identifier.
  *
  * @internal
+ *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class CompositeIdentifierParser
