@@ -86,11 +86,7 @@ class ItemNormalizer extends AbstractItemNormalizer
 
     private function getContextUriVariables(array $data, $operation, array $context): array
     {
-        if (!isset($context['uri_variables'])) {
-            return ['id' => $data['id']];
-        }
-
-        $uriVariables = $context['uri_variables'];
+        $uriVariables = $context['uri_variables'] ?? $data;
 
         /** @var Link $uriVariable */
         foreach ($operation->getUriVariables() as $uriVariable) {
