@@ -192,11 +192,31 @@ Feature: Exposing a collection of objects should use the specified operation to 
 
   Scenario: Get a collection referencing an invalid itemUriTemplate
     When I send a "GET" request to "/issue5662/admin/reviews"
-    Then the response status code should be 400
+    Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "hydra:Error"
-    And the JSON node "hydra:title" should be equal to "An error occurred"
-    And the JSON node "hydra:description" should be equal to 'Unable to find operation "/issue5662/reviews/{id}{._format}"'
-    And the JSON node "trace" should exist
+    And the JSON should be equal to:
+    """
+    {
+        "@context": "/contexts/Review",
+        "@id": "/issue5662/admin/reviews",
+        "@type": "hydra:Collection",
+        "hydra:totalItems": 2,
+        "hydra:member": [
+            {
+                "@id": "/issue5662/admin/reviews/1",
+                "@type": "Review",
+                "book": "/issue5662/books/a",
+                "id": 1,
+                "body": "Best book ever!"
+            },
+            {
+                "@id": "/issue5662/admin/reviews/2",
+                "@type": "Review",
+                "book": "/issue5662/books/b",
+                "id": 2,
+                "body": "Worst book ever!"
+            }
+        ]
+    }
+    """
