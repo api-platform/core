@@ -356,12 +356,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!isset($data[$mapping->getTypeProperty()])) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class), null, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'] . '.' . $mapping->getTypeProperty() : $mapping->getTypeProperty());
+            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class), null, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty());
         }
 
         $type = $data[$mapping->getTypeProperty()];
         if (null === ($mappedClass = $mapping->getClassForType($type))) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type "%s" is not a valid value.', $type), $type, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'] . '.' . $mapping->getTypeProperty() : $mapping->getTypeProperty(), true);
+            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type "%s" is not a valid value.', $type), $type, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty(), true);
         }
 
         return $mappedClass;
@@ -491,7 +491,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && str_contains($format, 'json')) {
             $isValid = \is_float($value) || \is_int($value);
         } else {
-            $isValid = \call_user_func('is_' . $builtinType, $value);
+            $isValid = \call_user_func('is_'.$builtinType, $value);
         }
 
         if (!$isValid) {
@@ -515,7 +515,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
         $values = [];
         foreach ($value as $index => $obj) {
-            if (null !== $collectionKeyBuiltinType && !\call_user_func('is_' . $collectionKeyBuiltinType, $index)) {
+            if (null !== $collectionKeyBuiltinType && !\call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
                 throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyBuiltinType, \gettype($index)), $index, [$collectionKeyBuiltinType], ($context['deserialization_path'] ?? false) ? sprintf('key(%s)', $context['deserialization_path']) : null, true);
             }
 
@@ -577,7 +577,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $options['serializer_groups'] = (array) $context[self::GROUPS];
         }
 
-        $operationCacheKey = ($context['resource_class'] ?? '') . ($context['operation_name'] ?? '') . ($context['api_normalize'] ?? '');
+        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? '').($context['api_normalize'] ?? '');
         if ($operationCacheKey && isset($this->localFactoryOptionsCache[$operationCacheKey])) {
             return $options + $this->localFactoryOptionsCache[$operationCacheKey];
         }
@@ -633,6 +633,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
                 $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
+
                 return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
             }
 
@@ -646,6 +647,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
                 $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
+
                 return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
             }
 
@@ -660,13 +662,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             // Anonymous resources
             if ($type->getClassName()) {
-				$childContext = $this->createChildContext($this->createOperationContext($context, null), $attribute, $format);
+                $childContext = $this->createChildContext($this->createOperationContext($context, null), $attribute, $format);
                 $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
+
                 return $this->serializer->normalize($attributeValue, $format, $childContext);
             }
 
             if ('array' === $type->getBuiltinType()) {
-				$childContext = $this->createChildContext($this->createOperationContext($context, null), $attribute, $format);
+                $childContext = $this->createChildContext($this->createOperationContext($context, null), $attribute, $format);
+
                 return $this->serializer->normalize($attributeValue, $format, $childContext);
             }
         }
@@ -795,7 +799,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
-				$childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
+                $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
+
                 return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);
             }
 
@@ -811,7 +816,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 unset($context['resource_class']);
 
-                return $this->serializer->denormalize($value, $className . '[]', $format, $context);
+                return $this->serializer->denormalize($value, $className.'[]', $format, $context);
             }
 
             if (null !== $className = $type->getClassName()) {
