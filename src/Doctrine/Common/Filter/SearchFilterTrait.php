@@ -124,13 +124,7 @@ trait SearchFilterTrait
             $iriConverter = $this->getIriConverter();
             $item = $iriConverter->getResourceFromIri($value, ['fetch_data' => false]);
 
-            if (null === $this->identifiersExtractor) {
-                return $this->getPropertyAccessor()->getValue($item, 'id');
-            }
-
-            $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item);
-
-            return 1 === \count($identifiers) ? array_pop($identifiers) : $identifiers;
+            return $this->getPropertyAccessor()->getValue($item, 'id');
         } catch (InvalidArgumentException) {
             // Do nothing, return the raw value
         }
