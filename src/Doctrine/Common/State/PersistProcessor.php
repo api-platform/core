@@ -111,6 +111,8 @@ final class PersistProcessor implements ProcessorInterface
 
     /**
      * Checks if doctrine does not manage data automatically.
+     *
+     * @param mixed $data
      */
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {
