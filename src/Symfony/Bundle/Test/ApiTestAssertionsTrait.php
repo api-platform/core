@@ -74,7 +74,7 @@ trait ApiTestAssertionsTrait
             throw new \InvalidArgumentException('$json must be array or string (JSON array or JSON object)');
         }
 
-        static::assertEqualsCanonicalizing($json, self::getHttpResponse()->toArray(false), $message);
+        static::assertEquals($json, self::getHttpResponse()->toArray(false), $message);
     }
 
     /**
