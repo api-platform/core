@@ -25,7 +25,9 @@ use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
+use ApiPlatform\Serializer\NormalizeItemEvent;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -52,9 +54,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     private array $componentsCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?EventDispatcher $eventDispatcher = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $eventDispatcher);
     }
 
     /**
@@ -222,10 +224,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
         if (null !== $relatedObject) {
             $iri = $this->iriConverter->getIriFromResource($relatedObject);
             $context['iri'] = $iri;
-
-            if (isset($context['resources'])) {
-                $context['resources'][$iri] = $iri;
-            }
         }
 
         if (null === $relatedObject || isset($context['api_included'])) {
@@ -241,12 +239,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $normalizedRelatedObject;
         }
 
-        return [
+        $data = [
             'data' => [
                 'type' => $this->getResourceShortName($resourceClass),
                 'id' => $iri,
             ],
         ];
+
+        if ($this->eventDispatcher) {
+            $event = new NormalizeItemEvent($relatedObject, $format, $context, $iri, $data);
+            $this->eventDispatcher->dispatch($event, NormalizeItemEvent::JSONAPI_NORMALIZE_RELATION);
+        }
+
+        return $data;
     }
 
     /**

@@ -25,5 +25,12 @@
             <argument type="service" id="api_platform.http_cache.purger" on-invalid="null" />
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-2" />
         </service>
+
+        <service id="api_platform.http_cache.listener.normalizer.collect_tags" class="ApiPlatform\HttpCache\EventListener\NormalizerListener">
+            <tag name="kernel.event_listener" event="api_platform.normalizer.normalize_item.pre" method="onPreNormalizeItem" />
+            <tag name="kernel.event_listener" event="api_platform.normalizer.normalize_relation" method="onNormalizeRelation" />
+            <tag name="kernel.event_listener" event="api_platform.jsonapi.normalizer.normalize_relation" method="onJsonApiNormalizeRelation" />
+        </service>
+
     </services>
 </container>

@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Util\CloneTrait;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -61,7 +62,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected array $localCache = [];
     protected array $localFactoryOptionsCache = [];
 
-    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?EventDispatcher $eventDispatcher = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = fn ($object): ?string => $this->iriConverter->getIriFromResource($object);
@@ -160,11 +161,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $emptyResourceAsIri = $context['api_empty_resource_as_iri'] ?? false;
         unset($context['api_empty_resource_as_iri']);
 
-        if (isset($context['resources'])) {
-            $context['resources'][$iri] = $iri;
+        if ($this->eventDispatcher) {
+            $event = new NormalizeItemEvent($object, $format, $context, $iri, null);
+            $this->eventDispatcher->dispatch($event, NormalizeItemEvent::NORMALIZE_ITEM_PRE);
         }
 
         $data = parent::normalize($object, $format, $context);
+
+        if ($this->eventDispatcher) {
+            $event = new NormalizeItemEvent($object, $format, $context, $iri, $data);
+            $this->eventDispatcher->dispatch($event, NormalizeItemEvent::NORMALIZE_ITEM_POST);
+        }
 
         if ($emptyResourceAsIri && \is_array($data) && 0 === \count($data)) {
             return $iri;
@@ -635,7 +642,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
 
-            return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
+            $data = $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
+
+            if ($this->eventDispatcher) {
+                $event = new NormalizeAttributeEvent($object, $format, $context, $context['iri'], $data, $attribute, $propertyMetadata, $type, $childContext);
+                $this->eventDispatcher->dispatch($event, NormalizeAttributeEvent::NORMALIZE_ATTRIBUTE);
+            }
+
+            return $data;
         }
 
         if (
@@ -650,7 +664,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
 
-            return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
+            $data = $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
+            if ($this->eventDispatcher) {
+                $event = new NormalizeAttributeEvent($object, $format, $context, $context['iri'], $data, $attribute, $propertyMetadata, $type, $childContext);
+                $this->eventDispatcher->dispatch($event, NormalizeAttributeEvent::NORMALIZE_ATTRIBUTE);
+            }
+
+            return $data;
         }
 
         if (!$this->serializer instanceof NormalizerInterface) {
@@ -728,8 +748,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $iri = $this->iriConverter->getIriFromResource($relatedObject);
 
-        if (isset($context['resources'])) {
-            $context['resources'][$iri] = $iri;
+        if ($this->eventDispatcher) {
+            $event = new NormalizeItemEvent($relatedObject, $format, $context, $iri, $iri);
+            $this->eventDispatcher->dispatch($event, NormalizeItemEvent::NORMALIZE_RELATION);
         }
 
         $push = $propertyMetadata->getPush() ?? false;
