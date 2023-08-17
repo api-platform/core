@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Collection state provider using the Doctrine ORM.
@@ -36,9 +37,10 @@ final class CollectionProvider implements ProviderInterface
     /**
      * @param QueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $collectionExtensions = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $collectionExtensions = [], NameConverterInterface $nameConverter = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->nameConverter = $nameConverter;
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable

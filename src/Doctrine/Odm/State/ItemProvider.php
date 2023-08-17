@@ -22,6 +22,7 @@ use ApiPlatform\State\ProviderInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Item state provider using the Doctrine ODM.
@@ -36,9 +37,10 @@ final class ItemProvider implements ProviderInterface
     /**
      * @param AggregationItemExtensionInterface[] $itemExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $itemExtensions = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $itemExtensions = [], NameConverterInterface $nameConverter = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->nameConverter = $nameConverter;
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
