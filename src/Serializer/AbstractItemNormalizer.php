@@ -441,7 +441,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $security = $propertyMetadata->getSecurity();
         if (null !== $this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
-                'object' => $object,
+                'object' => $object ?? $context[self::OBJECT_TO_POPULATE] ?? null,
             ]);
         }
 
