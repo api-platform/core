@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\RamseyUuid\Serializer;
+namespace ApiPlatform\RamseyUuid\Tests\Serializer;
 
 use ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer;
 use PHPUnit\Framework\TestCase;

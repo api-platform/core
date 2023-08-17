@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\RamseyUuid\UriVariableTransformer;
+namespace ApiPlatform\RamseyUuid\Tests\UriVariableTransformer;
 
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\RamseyUuid\UriVariableTransformer\UuidUriVariableTransformer;
