@@ -23,11 +23,11 @@ class CustomConverter extends CamelCaseToSnakeCaseNameConverter
 {
     public function normalize(string $propertyName): string
     {
-        return 'nameConverted' === $propertyName ? parent::normalize($propertyName) : $propertyName;
+        return str_ends_with($propertyName, 'Converted') ? parent::normalize($propertyName) : $propertyName;
     }
 
     public function denormalize(string $propertyName): string
     {
-        return 'name_converted' === $propertyName ? parent::denormalize($propertyName) : $propertyName;
+        return str_ends_with($propertyName, '_converted') ? parent::denormalize($propertyName) : $propertyName;
     }
 }
