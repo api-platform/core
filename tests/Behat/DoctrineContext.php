@@ -62,6 +62,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDoc
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\IriOnlyDummy as IriOnlyDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue5723\Issue5723Bar as Issue5723BarDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue5723\Issue5723Foo as Issue5723FooDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsDummy as MultiRelationsDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsRelatedDummy as MultiRelationsRelatedDummyDocument;
@@ -142,6 +144,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5723\Issue5723Bar;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5723\Issue5723Foo;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
@@ -1745,6 +1749,32 @@ final class DoctrineContext implements Context
         $this->manager->persist($person);
         $this->manager->persist($greeting);
 
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a Foo named :name with a Bar and a collection of Bars
+     */
+    public function thereIsAFooWithABarAndACollectionOfBars(string $name): void
+    {
+        if ($this->isOrm()) {
+            $foo = new Issue5723Foo();
+            $bar = new Issue5723Bar();
+            $bar2 = new Issue5723Bar();
+        } else {
+            $foo = new Issue5723FooDocument();
+            $bar = new Issue5723BarDocument();
+            $bar2 = new Issue5723BarDocument();
+        }
+        $foo->name = $name;
+        $bar->fooConverted = $foo;
+        $bar->name = 'bar';
+        $bar2->name = 'bar2';
+        $foo->barConverted = $bar2;
+        $this->manager->persist($foo);
+        $this->manager->persist($bar);
+        $this->manager->persist($bar2);
         $this->manager->flush();
         $this->manager->clear();
     }

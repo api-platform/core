@@ -21,14 +21,16 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 final class PersistProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
     use LinksHandlerTrait;
 
-    public function __construct(private readonly ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, NameConverterInterface $nameConverter = null)
     {
+        $this->nameConverter = $nameConverter;
     }
 
     /**

@@ -1,6 +1,38 @@
 Feature: GraphQL collection support
 
   @createSchema
+  Scenario: Retrieve a collection with converted entities
+    Given there is a Foo named Alice with a Bar and a collection of Bars
+    When I send the following GraphQL request:
+    """
+    {
+      issue5723Foos {
+        edges {
+          node {
+            bar_converted {
+              id
+              name
+            }
+            bars_converted {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.issue5723Foos.edges[0].node.bars_converted.edges[0].node.name" should not be null
+    And the JSON node "data.issue5723Foos.edges[0].node.bar_converted.name" should not be null
+
+  @createSchema
   Scenario: Retrieve a collection through a GraphQL query
     Given there are 4 dummy objects with relatedDummy and its thirdLevel
     When I send the following GraphQL request:
