@@ -25,5 +25,8 @@
             <argument type="service" id="api_platform.http_cache.purger" on-invalid="null" />
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-2" />
         </service>
+
+        <service id="api_platform.http_cache.tag_collector" class="ApiPlatform\HttpCache\TagCollector" />
+
     </services>
 </container>
