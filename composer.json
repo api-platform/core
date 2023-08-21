@@ -79,6 +79,7 @@
         "symfony/routing": "^6.1",
         "symfony/security-bundle": "^6.1",
         "symfony/security-core": "^6.1",
+        "symfony/stopwatch": "^6.1",
         "symfony/twig-bundle": "^6.1",
         "symfony/uid": "^6.1",
         "symfony/validator": "^6.1",

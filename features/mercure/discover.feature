@@ -6,7 +6,7 @@ Feature: Mercure discovery support
   @createSchema
   Scenario: Checks that the Mercure Link is added
     Given I send a "GET" request to "/dummy_mercures"
-    Then the header "Link" should contain '<https://demo.mercure.rocks/hub>; rel="mercure"'
+    Then the header "Link" should contain '<https://demo.mercure.rocks>; rel="mercure"'
 
   Scenario: Checks that the Mercure Link is not added on endpoints where updates are not dispatched
     Given I send a "GET" request to "/"
