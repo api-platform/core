@@ -35,6 +35,9 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
         ),
         new API\Get(
             uriTemplate: self::API_RESOURCE,
+            uriVariables: [
+                self::API_ID_PLACEHOLDER => new API\Link(fromClass: self::class, identifiers: ['id']),
+            ],
         ),
         new API\Post(
             read: false,
@@ -42,6 +45,9 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
         ),
         new API\Put(
             uriTemplate: self::API_RESOURCE,
+            uriVariables: [
+                self::API_ID_PLACEHOLDER => new API\Link(fromClass: self::class, identifiers: ['id']),
+            ],
         ),
     ],
 )]
