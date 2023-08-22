@@ -128,8 +128,10 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPassenger;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProperty;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummySubEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiResourceChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyWithSubEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EntityClassWithDateTime;
@@ -144,6 +146,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\Event;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\ItemLog;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\Group;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
@@ -2146,6 +2149,43 @@ final class DoctrineContext implements Context
         $entity = new EntityClassWithDateTime();
         $entity->setStart(new \DateTime());
         $this->manager->persist($entity);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a dummy entity with a sub entity with id :strId and name :name
+     */
+    public function thereIsADummyWithSubEntity(string $strId, string $name): void
+    {
+        $subEntity = new DummySubEntity($strId, $name);
+        $mainEntity = new DummyWithSubEntity();
+        $mainEntity->setSubEntity($subEntity);
+        $mainEntity->setName('main');
+        $this->manager->persist($subEntity);
+        $this->manager->persist($mainEntity);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a group object with uuid :uuid and :nbUsers users
+     */
+    public function thereIsAGroupWithUuidAndNUsers(string $uuid, int $nbUsers): void
+    {
+        $group = new Group();
+        $group->setUuid(\Symfony\Component\Uid\Uuid::fromString($uuid));
+
+        $this->manager->persist($group);
+
+        for ($i = 0; $i < $nbUsers; ++$i) {
+            $user = new \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\Issue5735User();
+            $user->addGroup($group);
+            $this->manager->persist($user);
+        }
+
+        // add another user not in this group
+        $user = new \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\Issue5735User();
+        $this->manager->persist($user);
+
         $this->manager->flush();
     }
 
