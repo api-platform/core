@@ -1,5 +1,5 @@
+@issue5736
 Feature: Resources, subresources and their subresources with uri variables that are not `id`
-  @issue5736
   As a client software developer
   I need to be able to update subresources and their deeper subresources
 
