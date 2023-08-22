@@ -13,6 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-interface UrlGeneratorInterface extends \ApiPlatform\Metadata\UrlGeneratorInterface
-{
+class_alias(
+    \ApiPlatform\Metadata\UrlGeneratorInterface::class,
+    __NAMESPACE__.'\UrlGeneratorInterface'
+);
+
+if (false) {
+    interface UrlGeneratorInterface extends \ApiPlatform\Metadata\UrlGeneratorInterface
+    {
+    }
 }

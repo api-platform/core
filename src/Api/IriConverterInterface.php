@@ -15,7 +15,12 @@ namespace ApiPlatform\Api;
 
 class_exists(\ApiPlatform\Metadata\IriConverterInterface::class);
 
-if (!class_exists(IriConverterInterface::class)) {
+class_alias(
+    \ApiPlatform\Metadata\IriConverterInterface::class,
+    __NAMESPACE__.'\IriConverterInterface'
+);
+
+if (false) {
     interface IriConverterInterface extends \ApiPlatform\Metadata\IriConverterInterface
     {
     }

@@ -15,7 +15,12 @@ namespace ApiPlatform\Api;
 
 class_exists(\ApiPlatform\Metadata\IdentifiersExtractorInterface::class);
 
-if (!class_exists(IdentifiersExtractorInterface::class)) {
+class_alias(
+    \ApiPlatform\Metadata\IdentifiersExtractorInterface::class,
+    __NAMESPACE__.'\IdentifiersExtractorInterface'
+);
+
+if (false) {
     interface IdentifiersExtractorInterface extends \ApiPlatform\Metadata\IdentifiersExtractorInterface
     {
     }
