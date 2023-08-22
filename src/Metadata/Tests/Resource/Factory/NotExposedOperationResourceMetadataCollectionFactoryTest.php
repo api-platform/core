@@ -228,6 +228,7 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
                 new ApiResource(
                     shortName: 'AttributeResource',
                     uriTemplate: '/custom_api_resources',
+                    uriVariables: ['slug'],
                     types: ['https://schema.org/Book'],
                     operations: [
                         '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
