@@ -138,8 +138,6 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('json', $request->getRequestFormat());
     }
 
-
-
     public function testSupportedAcceptHeaderSymfonyBuiltInFormat(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
@@ -290,7 +288,6 @@ class AddFormatListenerTest extends TestCase
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
-
     }
 
     public function testAcceptHeaderTakePrecedenceOverRequestFormat(): void
