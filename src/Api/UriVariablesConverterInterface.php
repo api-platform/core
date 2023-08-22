@@ -15,7 +15,12 @@ namespace ApiPlatform\Api;
 
 class_exists(\ApiPlatform\Metadata\UriVariablesConverterInterface::class);
 
-if (!class_exists(UriVariablesConverterInterface::class)) {
+class_alias(
+    \ApiPlatform\Metadata\UriVariablesConverterInterface::class,
+    __NAMESPACE__.'\UriVariablesConverterInterface'
+);
+
+if (false) { // @phpstan-ignore-line
     interface UriVariablesConverterInterface extends \ApiPlatform\Metadata\UriVariablesConverterInterface
     {
     }
