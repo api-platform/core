@@ -39,7 +39,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
             uriVariables: [
                 Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, toProperty: 'company', identifiers: ['id']),
                 Team::API_ID_PLACEHOLDER    => new API\Link(fromClass: Team::class, toProperty: 'team', identifiers: ['id']),
-                self::API_ID_PLACEHOLDER    => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Employee::API_ID_PLACEHOLDER    => new API\Link(fromClass: self::class, identifiers: ['id']),
             ],
         ),
     ],

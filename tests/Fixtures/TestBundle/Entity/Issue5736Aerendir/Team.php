@@ -40,7 +40,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
             uriTemplate: self::API_RESOURCE,
             uriVariables: [
                 Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, toProperty: 'company', identifiers: ['id']),
-                self::API_ENDPOINT          => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Team::API_ID_PLACEHOLDER    => new API\Link(fromClass: self::class, identifiers: ['id']),
             ],
         ),
         new API\Post(
@@ -55,7 +55,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
             uriTemplate: self::API_RESOURCE,
             uriVariables: [
                 Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, toProperty: 'company', identifiers: ['id']),
-                self::API_ENDPOINT          => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Team::API_ID_PLACEHOLDER    => new API\Link(fromClass: self::class, identifiers: ['id']),
             ],
         ),
     ],
