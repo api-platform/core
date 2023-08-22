@@ -142,6 +142,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\Event;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\ItemLog;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
@@ -2144,6 +2146,23 @@ final class DoctrineContext implements Context
         $entity = new EntityClassWithDateTime();
         $entity->setStart(new \DateTime());
         $this->manager->persist($entity);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are logs on an event
+     */
+    public function thereAreLogsOnAnEvent(): void
+    {
+        $entity = new Event();
+        $entity->logs = new ArrayCollection([new ItemLog(), new ItemLog()]);
+        $entity->uuid = Uuid::fromString('03af3507-271e-4cca-8eee-6244fb06e95b');
+        $this->manager->persist($entity);
+        foreach ($entity->logs as $log) {
+            $log->item = $entity;
+            $this->manager->persist($log);
+        }
+
         $this->manager->flush();
     }
 
