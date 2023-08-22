@@ -4,6 +4,18 @@ Feature: Resources, subresources and their subresources with uri variables that 
   I need to be able to update subresources and their deeper subresources
 
   @createSchema
+  Scenario: POST Company
+    Given I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/issue5736_companies" with body:
+    """
+    {
+      "name": "Company 1"
+    }
+    """
+
+    Then the response status code should be 201
+
+  @createSchema
   Scenario: PUT Team with POST Employee
     Given I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/issue5736_companies/" with body:
