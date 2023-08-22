@@ -17,16 +17,17 @@ use ApiPlatform\Metadata as API;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ORM\Table(name: 'issue5736_companies')]
 #[API\ApiResource(
     normalizationContext: [
-        AbstractNormalizer::GROUPS => ['company:read'],
+        AbstractNormalizer::GROUPS => [self::GROUP_NOR_READ],
     ],
     denormalizationContext: [
-        AbstractNormalizer::GROUPS => ['company:write'],
+        AbstractNormalizer::GROUPS => [self::GROUP_DENOR_WRITE],
     ],
     operations: [
         new API\GetCollection(
@@ -49,13 +50,17 @@ class Company
     public const API_ID_PLACEHOLDER = 'issue5736_company';
     public const API_ENDPOINT = 'issue5736_companies';
     public const API_RESOURCE = '/' . self::API_ENDPOINT . '/{' . self::API_ID_PLACEHOLDER . '}';
+    public const GROUP_NOR_READ    = 'company:read';
+    public const GROUP_DENOR_WRITE = 'company:write';
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups([self::GROUP_NOR_READ])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups([self::GROUP_NOR_READ, self::GROUP_DENOR_WRITE])]
     private string $name;
 
     /** @var Collection<Team>  */
