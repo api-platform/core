@@ -20,7 +20,7 @@ class_alias(
     __NAMESPACE__.'\IdentifiersExtractorInterface'
 );
 
-if (false) {
+if (false) { // @phpstan-ignore-line
     interface IdentifiersExtractorInterface extends \ApiPlatform\Metadata\IdentifiersExtractorInterface
     {
     }

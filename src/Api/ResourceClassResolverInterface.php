@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-class_alias(
-    \ApiPlatform\Metadata\ResourceClassResolverInterface::class,
-    __NAMESPACE__.'\ResourceClassResolverInterface'
-);
+class_exists(\ApiPlatform\Metadata\ResourceClassResolverInterface::class);
 
 if (false) { // @phpstan-ignore-line
     interface ResourceClassResolverInterface extends \ApiPlatform\Metadata\ResourceClassResolverInterface

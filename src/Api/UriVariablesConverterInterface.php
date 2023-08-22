@@ -20,7 +20,7 @@ class_alias(
     __NAMESPACE__.'\UriVariablesConverterInterface'
 );
 
-if (false) {
+if (false) { // @phpstan-ignore-line
     interface UriVariablesConverterInterface extends \ApiPlatform\Metadata\UriVariablesConverterInterface
     {
     }

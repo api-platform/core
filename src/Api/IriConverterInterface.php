@@ -20,7 +20,7 @@ class_alias(
     __NAMESPACE__.'\IriConverterInterface'
 );
 
-if (false) {
+if (false) { // @phpstan-ignore-line
     interface IriConverterInterface extends \ApiPlatform\Metadata\IriConverterInterface
     {
     }

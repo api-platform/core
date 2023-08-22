@@ -18,7 +18,7 @@ class_alias(
     __NAMESPACE__.'\UrlGeneratorInterface'
 );
 
-if (false) {
+if (false) { // @phpstan-ignore-line
     interface UrlGeneratorInterface extends \ApiPlatform\Metadata\UrlGeneratorInterface
     {
     }
