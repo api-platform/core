@@ -10,8 +10,6 @@ concurrency:
 
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  COVERAGE: '0'
-  SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
 jobs:
   commitlint:
@@ -34,13 +32,13 @@ jobs:
             npm install --no-fund --no-audit @commitlint/config-conventional @commitlint/cli
             echo $commit | ./node_modules/.bin/commitlint -g .commitlintrc
   php-cs-fixer:
-    name: PHP-cs-fixer (PHP ${{ matrix.php }})
+    name: PHP CS Fixer (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '8.1'
+          - '8.2'
       fail-fast: false
     steps:
       - name: Checkout
@@ -49,7 +47,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           ini-values: memory_limit=-1
           tools: pecl, composer, php-cs-fixer
           coverage: none
@@ -76,7 +74,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -135,7 +133,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -147,9 +145,6 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Enable code coverage
-        if: matrix.coverage
-        run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Install PHPUnit
@@ -157,13 +152,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: |
-          mkdir -p build/logs/phpunit
-          if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml
-          else
-            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
-          fi
+        run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v3
@@ -203,6 +192,11 @@ jobs:
           - JsonSchema
           - OpenApi
           - Metadata
+          - Elasticsearch
+          - HttpCache
+          - RamseyUuid
+          - GraphQl
+          - Serializer
       fail-fast: false
     steps:
       - name: Checkout
@@ -212,7 +206,7 @@ jobs:
         with:
           php-version: latest
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
       - name: Run ${{ matrix.component }} tests
         working-directory: src/${{ matrix.component }}
@@ -243,7 +237,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -255,23 +249,16 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Enable code coverage
-        if: matrix.coverage
-        run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests (PHP 8)
+      - name: Run Behat tests (PHP ${{ matrix.php }})
         run: |
           mkdir -p build/logs/behat
-          if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default-coverage --no-interaction
-          else
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction
-          fi
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --no-interaction ${{ matrix.coverage && '--profile=default-coverage' || '--profile=default' }}
       - name: Merge code coverage reports
         if: matrix.coverage
         run: |
@@ -353,7 +340,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -403,7 +390,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -457,8 +444,6 @@ jobs:
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
-      - name: Enable code coverage
-        run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -480,11 +465,7 @@ jobs:
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
-          if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction
-          else
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction
-          fi
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction
       - name: Merge code coverage reports
         run: |
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
@@ -575,8 +556,6 @@ jobs:
         php:
           - '8.2'
       fail-fast: false
-    env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -585,7 +564,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -615,9 +594,6 @@ jobs:
         php:
           - '8.2'
       fail-fast: false
-    # env:
-      # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
-      #SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -626,7 +602,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -649,7 +625,8 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit
+        # The PHPUnit Bridge doesn't support PHPUnit 10 yet: https://github.com/symfony/symfony/issues/49069
+        run: vendor/bin/phpunit -c phpunit10.xml.dist
 
   behat-symfony-next:
     name: Behat (PHP ${{ matrix.php }}) (Symfony dev)
@@ -668,7 +645,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages
@@ -715,7 +692,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -736,6 +713,8 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&ignoreFile=./tests/.ignored-deprecations
 
   windows-behat:
     name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
@@ -757,7 +736,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -788,9 +767,6 @@ jobs:
         php:
           - '8.2'
       fail-fast: false
-      # env:
-      # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
-      #SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -799,7 +775,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -821,6 +797,8 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: max[self]=0&ignoreFile=./tests/.ignored-deprecations
 
   behat-symfony-lowest:
     name: Behat (PHP ${{ matrix.php }}) (Symfony lowest)
@@ -839,7 +817,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages

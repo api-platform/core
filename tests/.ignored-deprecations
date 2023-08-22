@@ -1,0 +1,9 @@
+# No fix available yet, see https://github.com/doctrine/dbal/issues/5784
+%Subscribing to onSchemaCreateTable events is deprecated\.%
+
+# Fixed by https://github.com/doctrine/orm/pull/10855
+%Column::setCustomSchemaOptions\(\) is deprecated\. Use setPlatformOptions\(\) instead\.%
+
+# Fixed in DoctrineMongoDBBundle 4.6
+%Accessing Doctrine\\Common\\Lexer\\Token properties via ArrayAccess is deprecated, use the value, type or position property instead%
+%Do the same.*Doctrine\\Bundle\\MongoDBBundle%

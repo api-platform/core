@@ -50,7 +50,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
         if (!class_exists(AtLeastOneOf::class)) {
             return;
@@ -68,7 +68,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
     }
 
-    public function createProvider(): \Generator
+    public static function createProvider(): \Generator
     {
         yield 'empty' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), []];
 

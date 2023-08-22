@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" backupGlobals="false" bootstrap="tests/Fixtures/app/bootstrap.php" colors="true">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd" backupGlobals="false" bootstrap="tests/Fixtures/app/bootstrap.php" colors="true">
     <php>
         <ini name="error_reporting" value="-1" />
         <ini name="memory_limit" value="-1" />
-        <server name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
+        <server name="SYMFONY_DEPRECATIONS_HELPER" value="max[total]=0&amp;ignoreFile=./tests/.ignored-deprecations" />
         <!-- This is necessary for GitHub Actions to work properly -->
         <server name="SYMFONY_PHPUNIT_DIR" value="vendor/bin/.phpunit" />
         <server name="SYMFONY_PHPUNIT_REMOVE" value="symfony/yaml" />
@@ -21,7 +21,7 @@
 
     <coverage processUncoveredFiles="true">
         <include>
-            <directory>.</directory>
+            <directory>src</directory>
         </include>
         <exclude>
             <directory>features</directory>

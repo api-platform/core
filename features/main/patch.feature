@@ -58,3 +58,25 @@ Feature: Sending PATCH requets
       }
     }
     """
+
+  Scenario: Patch a relation with uri variables that are not `id`
+    When I add "Content-Type" header equal to "application/merge-patch+json"
+    And I send a "PATCH" request to "/betas/1" with body:
+    """
+      {
+        "alpha": "/alphas/2"
+      }
+    """
+    Then the response should be in JSON
+    And the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Beta",
+      "@id": "/betas/1",
+      "@type": "Beta",
+      "betaId": 1,
+      "alpha": "/alphas/2"
+    }
+    """

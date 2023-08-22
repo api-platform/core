@@ -29,7 +29,7 @@ class ReservedAttributeNameConverterTest extends TestCase
         $this->reservedAttributeNameConverter = new ReservedAttributeNameConverter(new CustomConverter());
     }
 
-    public function propertiesProvider(): array
+    public static function propertiesProvider(): array
     {
         return [
             ['id', '_id'],

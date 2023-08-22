@@ -48,4 +48,11 @@ final class AddGroupNormalizer implements NormalizerAwareInterface, NormalizerIn
 
         return $data instanceof RelationGroupImpactOnCollection;
     }
+
+    public function getSupportedTypes($format): array
+    {
+        return [
+            RelationGroupImpactOnCollection::class => false,
+        ];
+    }
 }

@@ -159,4 +159,3 @@ services:
             $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
         tags:
             - name: 'api_platform.state_processor'
-

@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Converts {@see \Exception} or {@see FlattenException} or to a JSON API error representation.
@@ -72,8 +73,29 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 
+    public function getSupportedTypes($format): array
+    {
+        if (self::FORMAT === $format) {
+            return [
+                \Exception::class => false,
+                FlattenException::class => false,
+            ];
+        }
+
+        return [];
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
         return false;
     }
 }

@@ -42,7 +42,7 @@ class TraversablePaginatorTest extends TestCase
         self::assertSame($results, iterator_to_array($paginator));
     }
 
-    public function initializeProvider(): array
+    public static function initializeProvider(): array
     {
         return [
             'First of three pages of 3 items each' => [[0, 1, 2, 3, 4, 5, 6], 1, 3, 7, 3, 3],

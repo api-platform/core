@@ -90,7 +90,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         $this->assertSame($expectedProcessor, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProcessor());
     }
 
-    public function operationProvider(): iterable
+    public static function operationProvider(): iterable
     {
         $default = (new Get())->withName('get')->withClass(Dummy::class);
 

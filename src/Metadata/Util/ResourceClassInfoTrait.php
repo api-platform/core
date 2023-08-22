@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Util;
 
+use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 
@@ -25,7 +26,10 @@ trait ResourceClassInfoTrait
 {
     use ClassInfoTrait;
 
-    private ?ResourceClassResolverInterface $resourceClassResolver = null;
+    /**
+     * @var LegacyResourceClassResolverInterface|ResourceClassResolverInterface|null
+     */
+    private $resourceClassResolver;
     private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null;
 
     /**

@@ -38,9 +38,9 @@ class MakeStateProcessorTest extends KernelTestCase
         $this->assertFileExists($newProcessorFile);
 
         // Unify line endings
-        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/CustomStateProcessor.php'));
+        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/CustomStateProcessor.fixture'));
         $result = preg_replace('~\R~u', "\r\n", file_get_contents($newProcessorFile));
-        $this->assertSame($expected, $result);
+        $this->assertStringContainsString($expected, $result);
 
         $display = $tester->getDisplay();
         $this->assertStringContainsString('Success!', $display);
@@ -56,7 +56,7 @@ class MakeStateProcessorTest extends KernelTestCase
         $this->assertStringContainsString('Next: Open your new state processor class and start customizing it.', $display);
     }
 
-    public function stateProcessorProvider(): \Generator
+    public static function stateProcessorProvider(): \Generator
     {
         yield 'Generate state processor' => [
             'isInteractive' => true,

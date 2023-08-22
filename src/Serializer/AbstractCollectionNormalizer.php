@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -56,7 +55,33 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     public function hasCacheableSupportsMethod(): bool
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
         return true;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        /*
+         * At this point, support anything that is_iterable(), i.e. array|Traversable
+         * for non-objects, symfony uses 'native-'.\gettype($data) :
+         * https://github.com/tucksaun/symfony/blob/400685a68b00b0932f8ef41096578872b643099c/src/Symfony/Component/Serializer/Serializer.php#L254
+         */
+        if (static::FORMAT === $format) {
+            return [
+                'native-array' => true,
+                '\Traversable' => true,
+            ];
+        }
+
+        return [];
     }
 
     /**

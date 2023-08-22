@@ -22,73 +22,45 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class DummyIriWithValidationEntity
 {
-    /**
-     * @Assert\Url
-     */
+    #[Assert\Url]
     public $dummyUrl;
 
-    /**
-     * @Assert\Email
-     */
+    #[Assert\Email]
     public $dummyEmail;
 
-    /**
-     * @Assert\Uuid
-     */
+    #[Assert\Uuid]
     public $dummyUuid;
 
-    /**
-     * @Assert\CardScheme(schemes="MASTERCARD")
-     */
+    #[Assert\CardScheme(schemes: 'MASTERCARD')]
     public $dummyCardScheme;
 
-    /**
-     * @Assert\Bic
-     */
+    #[Assert\Bic]
     public $dummyBic;
 
-    /**
-     * @Assert\Iban
-     */
+    #[Assert\Iban]
     public $dummyIban;
 
-    /**
-     * @Assert\Date
-     */
+    #[Assert\Date]
     public $dummyDate;
 
-    /**
-     * @Assert\DateTime
-     */
+    #[Assert\DateTime]
     public $dummyDateTime;
 
-    /**
-     * @Assert\Time
-     */
+    #[Assert\Time]
     public $dummyTime;
 
-    /**
-     * @Assert\Image
-     */
+    #[Assert\Image]
     public $dummyImage;
 
-    /**
-     * @Assert\File
-     */
+    #[Assert\File]
     public $dummyFile;
 
-    /**
-     * @Assert\Currency
-     */
+    #[Assert\Currency]
     public $dummyCurrency;
 
-    /**
-     * @Assert\Isbn
-     */
+    #[Assert\Isbn]
     public $dummyIsbn;
 
-    /**
-     * @Assert\Issn
-     */
+    #[Assert\Issn]
     public $dummyIssn;
 }

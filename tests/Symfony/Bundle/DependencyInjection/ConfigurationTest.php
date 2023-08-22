@@ -121,6 +121,9 @@ class ConfigurationTest extends TestCase
                 'graphiql' => [
                     'enabled' => true,
                 ],
+                'introspection' => [
+                    'enabled' => true,
+                ],
                 'nesting_separator' => '_',
                 'collection' => [
                     'pagination' => [
@@ -217,10 +220,11 @@ class ConfigurationTest extends TestCase
             'maker' => [
                 'enabled' => true,
             ],
+            'keep_legacy_inflector' => true,
         ], $config);
     }
 
-    public function invalidHttpStatusCodeProvider(): array
+    public static function invalidHttpStatusCodeProvider(): array
     {
         return [
             [0],
@@ -232,6 +236,8 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeProvider
+     *
+     * @param mixed $invalidHttpStatusCode
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode): void
     {
@@ -247,7 +253,7 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
-    public function invalidHttpStatusCodeValueProvider(): array
+    public static function invalidHttpStatusCodeValueProvider(): array
     {
         return [
             [true],
@@ -261,6 +267,8 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeValueProvider
+     *
+     * @param mixed $invalidHttpStatusCodeValue
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue): void
     {

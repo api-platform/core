@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Exception;
 
-use ApiPlatform\Exception\ExceptionInterface;
-
 /**
  * Non unique identifier exception.
  *

@@ -19,8 +19,7 @@ class DummyCompoundValidatedEntity
 {
     /**
      * @var string
-     *
-     * @DummyCompoundRequirements
      */
+    #[DummyCompoundRequirements]
     public $dummy;
 }

@@ -31,6 +31,7 @@ use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
@@ -79,6 +80,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ]);
             $container->prependExtensionConfig('framework', [
                 'property_info' => [
+                    'enabled' => true,
+                ],
+            ]);
+        }
+        if (isset($container->getExtensions()['lexik_jwt_authentication'])) {
+            $container->prependExtensionConfig('lexik_jwt_authentication', [
+                'api_platform' => [
                     'enabled' => true,
                 ],
             ]);
@@ -141,6 +149,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
         }
+
+        $this->registerInflectorConfiguration($config);
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
@@ -160,6 +170,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
+        $container->setParameter('api_platform.keep_legacy_inflector', $config['keep_legacy_inflector']);
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);
@@ -488,6 +499,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $enabled = $this->isConfigEnabled($container, $config['graphql']);
 
+        $graphqlIntrospectionEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['introspection']);
+
         $graphiqlEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']);
         $graphqlPlayGroundEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphql_playground']);
         if ($graphqlPlayGroundEnabled) {
@@ -495,6 +508,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.graphql.enabled', $enabled);
+        $container->setParameter('api_platform.graphql.introspection.enabled', $graphqlIntrospectionEnabled);
         $container->setParameter('api_platform.graphql.graphiql.enabled', $graphiqlEnabled);
         $container->setParameter('api_platform.graphql.graphql_playground.enabled', $graphqlPlayGroundEnabled);
         $container->setParameter('api_platform.graphql.collection.pagination', $config['graphql']['collection']['pagination']);
@@ -785,5 +799,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerArgumentResolverConfiguration(XmlFileLoader $loader): void
     {
         $loader->load('argument_resolver.xml');
+    }
+
+    private function registerInflectorConfiguration(array $config): void
+    {
+        if ($config['keep_legacy_inflector']) {
+            Inflector::keepLegacyInflector(true);
+            trigger_deprecation('api-platform/core', '3.2', 'Using doctrine/inflector is deprecated since API Platform 3.2 and will be removed in API Platform 4. Use symfony/string instead. Run "composer require symfony/string" and set "keep_legacy_inflector" to false in config.');
+        } else {
+            Inflector::keepLegacyInflector(false);
+        }
     }
 }

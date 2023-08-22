@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Serializer;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\ItemNormalizer as BaseItemNormalizer;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
@@ -54,6 +54,11 @@ final class ItemNormalizer extends BaseItemNormalizer
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
+    }
+
+    public function getSupportedTypes($format): array
+    {
+        return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
     }
 
     /**

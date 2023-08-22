@@ -24,7 +24,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -42,8 +41,12 @@ final class SchemaFactory implements SchemaFactoryInterface
     public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
-    public function __construct(private readonly TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(?TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
+        if ($typeFactory) {
+            trigger_deprecation('api-platform/core', '3.2', sprintf('The "%s" is not needed anymore and will not be used anymore.', TypeFactoryInterface::class));
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
     }
@@ -144,7 +147,6 @@ final class SchemaFactory implements SchemaFactoryInterface
     private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format): void
     {
         $version = $schema->getVersion();
-        $swagger = Schema::VERSION_SWAGGER === $version;
         if (Schema::VERSION_SWAGGER === $version || Schema::VERSION_OPENAPI === $version) {
             $additionalPropertySchema = $propertyMetadata->getOpenapiContext();
         } else {
@@ -156,74 +158,49 @@ final class SchemaFactory implements SchemaFactoryInterface
             $additionalPropertySchema ?? []
         );
 
-        if (false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
-            $propertySchema['readOnly'] = true;
-        }
-        if (!$swagger && false === $propertyMetadata->isReadable()) {
-            $propertySchema['writeOnly'] = true;
-        }
-        if (null !== $description = $propertyMetadata->getDescription()) {
-            $propertySchema['description'] = $description;
+        $types = $propertyMetadata->getBuiltinTypes() ?? [];
+
+        // never override the following keys if at least one is already set
+        // or if property has no type(s) defined
+        // or if property schema is already fully defined (type=string + format || enum)
+        $propertySchemaType = $propertySchema['type'] ?? false;
+        if ([] === $types
+            || ($propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
+            || (\is_array($propertySchemaType) ? \array_key_exists('string', $propertySchemaType) : 'string' !== $propertySchemaType)
+            || ($propertySchema['format'] ?? $propertySchema['enum'] ?? false)
+        ) {
+            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
+
+            return;
         }
 
-        $deprecationReason = $propertyMetadata->getDeprecationReason();
+        // property schema is created in SchemaPropertyMetadataFactory, but it cannot build resource reference ($ref)
+        // complete property schema with resource reference ($ref) only if it's related to an object
 
-        // see https://github.com/json-schema-org/json-schema-spec/pull/737
-        if (!$swagger && null !== $deprecationReason) {
-            $propertySchema['deprecated'] = true;
-        }
-        // externalDocs is an OpenAPI specific extension, but JSON Schema allows additional keys, so we always add it
-        // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
-        $iri = $propertyMetadata->getTypes()[0] ?? null;
-        if (null !== $iri) {
-            $propertySchema['externalDocs'] = ['url' => $iri];
-        }
+        $version = $schema->getVersion();
+        $subSchema = new Schema($version);
+        $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
 
-        // TODO: 3.0 support multiple types
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
-
-        if (!isset($propertySchema['default']) && !empty($default = $propertyMetadata->getDefault()) && (null === $type?->getClassName() || !$this->isResourceClass($type->getClassName()))) {
-            if ($default instanceof \BackedEnum) {
-                $default = $default->value;
-            }
-            $propertySchema['default'] = $default;
-        }
-
-        if (!isset($propertySchema['example']) && !empty($example = $propertyMetadata->getExample())) {
-            $propertySchema['example'] = $example;
-        }
-
-        if (!isset($propertySchema['example']) && isset($propertySchema['default'])) {
-            $propertySchema['example'] = $propertySchema['default'];
-        }
-
-        $valueSchema = [];
-        if (null !== $type) {
-            if ($isCollection = $type->isCollection()) {
-                $keyType = $type->getCollectionKeyTypes()[0] ?? null;
+        foreach ($types as $type) {
+            if ($type->isCollection()) {
                 $valueType = $type->getCollectionValueTypes()[0] ?? null;
             } else {
-                $keyType = null;
                 $valueType = $type;
             }
 
-            if (null === $valueType) {
-                $builtinType = 'string';
-                $className = null;
-            } else {
-                $builtinType = $valueType->getBuiltinType();
-                $className = $valueType->getClassName();
+            $className = $valueType?->getClassName();
+            if (null === $className || !$this->isResourceClass($className)) {
+                continue;
             }
 
-            $valueSchema = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
+            $subSchema = $this->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+            $propertySchema['anyOf'] = [['$ref' => $subSchema['$ref']], ['type' => 'null']];
+            // prevent "type" and "anyOf" conflict
+            unset($propertySchema['type']);
+            break;
         }
 
-        if (\array_key_exists('type', $propertySchema) && \array_key_exists('$ref', $valueSchema)) {
-            $propertySchema = new \ArrayObject($propertySchema);
-        } else {
-            $propertySchema = new \ArrayObject($propertySchema + $valueSchema);
-        }
-        $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = $propertySchema;
+        $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
     }
 
     private function buildDefinitionName(string $className, string $format = 'json', string $inputOrOutputClass = null, Operation $operation = null, array $serializerContext = null): string

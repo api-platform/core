@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
@@ -24,8 +23,9 @@ use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\Pagination\Pagination;
-use ApiPlatform\Util\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
@@ -213,17 +213,23 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                     'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null,
                 ];
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $context);
+                $propertyTypes = $propertyMetadata->getBuiltinTypes();
 
                 if (
-                    null === ($propertyType = $propertyMetadata->getBuiltinTypes()[0] ?? null)
+                    !$propertyTypes
                     || (!$input && false === $propertyMetadata->isReadable())
                     || ($input && $operation instanceof Mutation && false === $propertyMetadata->isWritable())
                 ) {
                     continue;
                 }
 
-                if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
-                    $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
+                // guess union/intersect types: check each type until finding a valid one
+                foreach ($propertyTypes as $propertyType) {
+                    if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
+                        $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
+                        // stop at the first valid type
+                        break;
+                    }
                 }
             }
         }

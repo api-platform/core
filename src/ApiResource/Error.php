@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\ApiResource;
 
-use ApiPlatform\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Get;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 use Symfony\Component\Serializer\Annotation\Groups;

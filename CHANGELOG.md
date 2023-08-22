@@ -1,5 +1,50 @@
 # Changelog
 
+## v3.1.14
+
+### Bug fixes
+
+* [146f55330](https://github.com/api-platform/core/commit/146f55330e3df8301ac84345b69a25cdfb908b27) fix(metadata): operation NotExposed status to 404 (#5717)
+* [4dcfc16c3](https://github.com/api-platform/core/commit/4dcfc16c38ab4c371a37a7d92d2f2f205de31f89) fix(symfony): perf regression with Symfony 6.3  (#5721)
+* [4f9626f42](https://github.com/api-platform/core/commit/4f9626f42b75a5fd1f9d681c80ad6c4ee56318fe) fix(serializer): use data if no uri_variables provided (#5743)
+* [7bb92a52f](https://github.com/api-platform/core/commit/7bb92a52f5c6e02705547408281eba93f73b588e) fix(doctrine): use stateOptions only within doctrine context (#5726)
+* [83dbfbff1](https://github.com/api-platform/core/commit/83dbfbff1717dabba7ce9e814d0bdb556b49fcb8) fix(metadata): generated NotExposed operation should inherit resource options (#5722)
+* [ccad63683](https://github.com/api-platform/core/commit/ccad6368303d341f37eff0317cc8e433504c460f) Revert "fix: search on nested sub-entity that doesn't use "id" as its ORM identifier (#5623)" (#5744)
+* [e2745855b](https://github.com/api-platform/core/commit/e2745855be4986d361626d1b853e45cde229d3d8) fix(openapi): model Example, Header and Reference (#5716)
+* [ebf03104f](https://github.com/api-platform/core/commit/ebf03104fcbffc5af74d78c3e9b14d02d7527214) fix(jsonld): skolem uri template may have a _format (#5729)
+
+## v3.1.13
+
+### Bug fixes
+
+* [0c1c1c36f](https://github.com/api-platform/core/commit/0c1c1c36f55ba96119e6c22ea25fb69c85b20161) fix(symfony): enable API Platform in LexikJWTAuthenticationBundle (#5609)
+
+
+  You can disable this behaviour by setting the configuration key `lexik_jwt_authentication.api_platform.enabled` to `false`
+
+* [146991ba4](https://github.com/api-platform/core/commit/146991ba42014f0141195bc43be5cd875665407c) fix(openapi): merge parameters with deprecated openApiContext (#5703)
+* [14969aa0c](https://github.com/api-platform/core/commit/14969aa0c6f021bb4bf3e9d13b00e710c22110de) fix(serializer): put replaces embed collection (#5604)
+* [9cb0ee43c](https://github.com/api-platform/core/commit/9cb0ee43c175927f3002e86d23443d8d43fa14b3) fix(metadata): missing xml/yaml properties (#5684)
+* [a8796238d](https://github.com/api-platform/core/commit/a8796238d7ff96a7c8b9946604b8049a7ae37681) fix: filters don't have to implement the "legacy" FilterInterface (#5619)
+* [ada115966](https://github.com/api-platform/core/commit/ada1159668b1df757b7104e63f1d62812a988d38) fix: don't implement deprecated CacheableSupportsMethodInterface with Symfony 6.3+ (#5696)
+* [b8cbdb1cb](https://github.com/api-platform/core/commit/b8cbdb1cbd75893990e47391e306b9903eb63600) fix(doctrine): search on nested sub-entity that doesn't use "id" as its ORM identifier (#5623)
+* [e21e9faee](https://github.com/api-platform/core/commit/e21e9faee0537fc29b5b008bdc1fae2638b66431) fix(symfony): support for custom controller with class method (#5681)
+
+### Features
+
+* [011fd4862](https://github.com/api-platform/core/commit/011fd48625d8051321dd3368b7c95a4f6045fe56) feat(serializer): support for getSupportedTypes (symfony 6.3) (#5671)
+* [db2cc9567](https://github.com/api-platform/core/commit/db2cc9567b29199c43ee3a8ba095ff9023435998) feat(serializer): support for getSupportedTypes (symfony 6.3) (#5672)
+
+## v3.1.12
+
+### Bug fixes
+
+* [1bcca0930](https://github.com/api-platform/core/commit/1bcca093074a85da071a8b16c250e084a7c3b68a) fix(symfony): provider can throw validation exception (#5586)
+* [57bfefbfa](https://github.com/api-platform/core/commit/57bfefbfa42dd893b6ec3cb66c0402597927efc6) [547078cf7](https://github.com/api-platform/core/commit/547078cf7ce89d6dbfcccf4fa6dbe7031b04b94c) fix(metadata): convert composite uri variables w/ proper type
+* [a0f12b667](https://github.com/api-platform/core/commit/a0f12b667a076c6647d7d8281c7a6e3a6bd68692) fix(serializer): disable_type_enforcement with null values (#5593)
+
+Also updates: graphiql, opensans
+
 ## v3.1.11
 
 ### Bug fixes
@@ -311,6 +356,19 @@ Breaking changes:
 * Metadata: `Patch` is added to the automatic CRUD
 * Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
     
+## v2.7.14
+
+### Bug fixes
+
+* [deed442e0](https://github.com/api-platform/core/commit/deed442e0fd2b2ed6446e79fc1462800bd08c1de) fix: handle item iri with identifiers in LegacyIriConverter (#5670)
+
+## v2.7.13
+
+### Bug fixes
+
+* [20371ccad](https://github.com/api-platform/core/commit/20371ccadf3eeaea14c23ed693635d5d2b7cc060) fix: IriConverterInterface injection and deprecation (#5630)
+* [c5f709d17](https://github.com/api-platform/core/commit/c5f709d17f9352bd6c12e272fc3660c346afd900) fix: api:upgrade-resource output formatting (#5624)
+
 ## v2.7.12
 
 ### Bug fixes

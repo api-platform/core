@@ -71,4 +71,9 @@ class DummyPlainIdentifierDenormalizer implements DenormalizerInterface, Denorma
             && ('1' === ($data['relatedDummy'] ?? null) || ['1'] === ($data['relatedDummies'] ?? null))
             && !isset($context[self::class]);
     }
+
+    public function getSupportedTypes($format): array
+    {
+        return 'json' === $format ? ['*' => false] : [];
+    }
 }

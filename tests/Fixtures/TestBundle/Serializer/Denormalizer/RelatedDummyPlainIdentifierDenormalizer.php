@@ -65,4 +65,9 @@ class RelatedDummyPlainIdentifierDenormalizer implements DenormalizerAwareInterf
             && '1' === ($data['thirdLevel'] ?? null)
             && !isset($context[self::class]);
     }
+
+    public function getSupportedTypes($format): array
+    {
+        return 'json' === $format ? ['*' => false] : [];
+    }
 }

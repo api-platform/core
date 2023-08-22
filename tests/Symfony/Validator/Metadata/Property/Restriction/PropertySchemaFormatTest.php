@@ -45,7 +45,7 @@ final class PropertySchemaFormatTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
         yield 'email' => [new Email(), new ApiProperty(), true];
         yield 'url' => [new Url(), new ApiProperty(), true];
@@ -68,7 +68,7 @@ final class PropertySchemaFormatTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->create($constraint, $propertyMetadata));
     }
 
-    public function createProvider(): \Generator
+    public static function createProvider(): \Generator
     {
         yield 'email' => [new Email(), new ApiProperty(), ['format' => 'email']];
         yield 'url' => [new Url(), new ApiProperty(), ['format' => 'uri']];

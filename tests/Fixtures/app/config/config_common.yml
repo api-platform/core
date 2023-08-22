@@ -61,6 +61,7 @@ api_platform:
     http_cache:
         invalidation:
             enabled: true
+    keep_legacy_inflector: false
     defaults:
         extra_properties:
             standard_put: true
@@ -87,7 +88,7 @@ api_platform:
 
 parameters:
     container.autowiring.strict_mode: true
-    container.dumper.inline_class_loader: true
+    .container.dumper.inline_class_loader: true
 
 services:
     test.client:
@@ -264,10 +265,6 @@ services:
         alias: property_accessor
         public: true
 
-    test.annotation_reader:
-        alias: annotation_reader
-        public: true
-
     app.dummy_validation.group_generator:
         class: ApiPlatform\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         tags:
@@ -429,3 +426,14 @@ services:
         tags:
             -  { name: 'serializer.normalizer' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\AuthorItemProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\BookCollectionProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\LibraryItemProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }

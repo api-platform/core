@@ -19,9 +19,11 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -30,6 +32,9 @@ class ConstraintViolationNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
+    /**
+     * @group legacy
+     */
     public function testSupportNormalization(): void
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
@@ -38,15 +43,20 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new ConstraintViolationList(), ConstraintViolationListNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new ConstraintViolationList(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ConstraintViolationListNormalizer::FORMAT));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertEmpty($normalizer->getSupportedTypes('json'));
+        $this->assertSame([ConstraintViolationListInterface::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     /**
      * @dataProvider nameConverterProvider
      */
-    public function testNormalize(object|null $nameConverter, array $expected): void
+    public function testNormalize(callable $nameConverterFactory, array $expected): void
     {
-        $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverter);
+        $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterFactory($this));
 
         // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
         $constraint = new NotNull();
@@ -59,7 +69,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($list));
     }
 
-    public function nameConverterProvider(): iterable
+    public static function nameConverterProvider(): iterable
     {
         $expected = [
             'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
@@ -82,13 +92,23 @@ class ConstraintViolationNormalizerTest extends TestCase
             ],
         ];
 
-        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize(Argument::type('string'))->will(fn ($args) => '_'.$args[0]);
-        yield [$nameConverterProphecy->reveal(), $expected];
+        $nameConverterFactory = function (self $that): NameConverterInterface {
+            $nameConverterProphecy = $that->prophesize(NameConverterInterface::class);
+            $nameConverterProphecy->normalize(Argument::type('string'))->will(fn ($args) => '_'.$args[0]);
 
-        $nameConverterProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
-        $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(fn ($args) => '_'.$args[0]);
-        yield [$nameConverterProphecy->reveal(), $expected];
+            return $nameConverterProphecy->reveal();
+        };
+        yield [$nameConverterFactory, $expected];
+
+        $nameConverterFactory = function (self $that): NameConverterInterface {
+            $nameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
+            $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(
+                fn ($args) => '_'.$args[0]
+            );
+
+            return $nameConverterProphecy->reveal();
+        };
+        yield [$nameConverterFactory, $expected];
 
         $expected = [
             'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
@@ -110,6 +130,6 @@ class ConstraintViolationNormalizerTest extends TestCase
                 ],
             ],
         ];
-        yield [null, $expected];
+        yield [fn () => null, $expected];
     }
 }

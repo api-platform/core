@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  * Configures cache HTTP headers for the current response.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated use \Symfony\EventListener\AddHeadersListener.php instead
  */
 final class AddHeadersListener
 {

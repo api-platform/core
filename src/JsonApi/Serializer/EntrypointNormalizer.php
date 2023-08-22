@@ -20,8 +20,9 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Normalizes the API entrypoint.
@@ -74,8 +75,22 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
         return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 
+    public function getSupportedTypes($format): array
+    {
+        return self::FORMAT === $format ? [Entrypoint::class => true] : [];
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
         return true;
     }
 }

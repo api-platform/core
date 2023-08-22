@@ -39,7 +39,7 @@ class InputOutputResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame($expected, $factory->create('Foo')[0]->getInput());
     }
 
-    public function getAttributes(): array
+    public static function getAttributes(): array
     {
         return [
             // no input class defined

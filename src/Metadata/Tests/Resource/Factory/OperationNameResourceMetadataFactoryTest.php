@@ -15,7 +15,7 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\OperationNameResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -29,7 +29,7 @@ class OperationNameResourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider operationProvider
      */
-    public function testGeneratesName(Operation $operation, string $expectedOperationName): void
+    public function testGeneratesName(HttpOperation $operation, string $expectedOperationName): void
     {
         $decorated = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $decorated->create('a')->willReturn(new ResourceMetadataCollection('a', [
@@ -42,7 +42,7 @@ class OperationNameResourceMetadataFactoryTest extends TestCase
         $this->assertEquals($operation->withName($expectedOperationName), $result->getOperation($expectedOperationName));
     }
 
-    public function operationProvider(): array
+    public static function operationProvider(): array
     {
         return [
             [new Get(), '_api_a_get'],

@@ -52,9 +52,15 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
 
         $restriction['type'] = 'array';
 
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
-        if ($type) {
-            $restriction['items'] = ['type' => Type::BUILTIN_TYPE_STRING === $type->getBuiltinType() ? 'string' : 'number', 'enum' => $choices];
+        $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
+        $types = array_unique(array_map(fn (Type $type) => Type::BUILTIN_TYPE_STRING === $type->getBuiltinType() ? 'string' : 'number', $builtInTypes));
+
+        if ($count = \count($types)) {
+            if (1 === $count) {
+                $types = $types[0];
+            }
+
+            $restriction['items'] = ['type' => $types, 'enum' => $choices];
         }
 
         if (null !== $constraint->min) {
@@ -73,6 +79,8 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
      */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
-        return $constraint instanceof Choice && null !== ($type = $propertyMetadata->getBuiltinTypes()[0] ?? null) && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true);
+        $types = array_map(fn (Type $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+
+        return $constraint instanceof Choice && \count($types) && array_intersect($types, [Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT]);
     }
 }

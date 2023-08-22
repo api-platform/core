@@ -18,14 +18,17 @@ use ApiPlatform\Metadata\Operation;
 /**
  * Retrieves data from a persistence layer.
  *
- * @author Antoine Bluchet <soyuka@gmail.com>
- *
  * @template T of object
+ *
+ * @author Antoine Bluchet <soyuka@gmail.com>
  */
 interface ProviderInterface
 {
     /**
      * Provides data.
+     *
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
      *
      * @return T|Pagination\PartialPaginatorInterface<T>|iterable<T>|null
      */

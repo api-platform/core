@@ -56,7 +56,7 @@ class ResourceAccessCheckerTest extends TestCase
         $this->assertSame($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
     }
 
-    public function getGranted(): array
+    public static function getGranted(): array
     {
         return [[true], [false]];
     }

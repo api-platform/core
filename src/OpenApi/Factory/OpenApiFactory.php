@@ -370,6 +370,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         'externalDocs' => new ExternalDocumentation(description: $value['description'] ?? '', url: $value['url'] ?? ''),
                         'requestBody' => new RequestBody(description: $value['description'] ?? '', content: isset($value['content']) ? new \ArrayObject($value['content'] ?? []) : null, required: $value['required'] ?? false),
                         'callbacks' => new \ArrayObject($value ?? []),
+                        'parameters' => $openapiOperation->getParameters(),
                         default => $value,
                     };
 

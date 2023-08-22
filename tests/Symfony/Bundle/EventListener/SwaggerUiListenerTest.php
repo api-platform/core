@@ -40,7 +40,7 @@ class SwaggerUiListenerTest extends TestCase
         $this->assertSame($controller, $request->attributes->get('_controller'));
     }
 
-    public function getParameters(): array
+    public static function getParameters(): array
     {
         $respondRequest = new Request([], [], ['_api_respond' => true]);
         $respondRequest->setRequestFormat('html');

@@ -21,7 +21,11 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Document denormalizer for Elasticsearch.
@@ -30,13 +34,23 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class DocumentNormalizer extends ObjectNormalizer
+final class DocumentNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     public const FORMAT = 'elasticsearch';
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
-    {
-        parent::__construct($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
+    private readonly ObjectNormalizer $decoratedNormalizer;
+
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        private readonly ?NameConverterInterface $nameConverter = null,
+        PropertyAccessorInterface $propertyAccessor = null,
+        PropertyTypeExtractorInterface $propertyTypeExtractor = null,
+        ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
+        callable $objectClassResolver = null,
+        array $defaultContext = [],
+    ) {
+        $this->decoratedNormalizer = new ObjectNormalizer($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
     }
 
     /**
@@ -44,7 +58,7 @@ final class DocumentNormalizer extends ObjectNormalizer
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context); // @phpstan-ignore-line symfony bc-layer
+        return self::FORMAT === $format && $this->decoratedNormalizer->supportsDenormalization($data, $type, $format, $context); // @phpstan-ignore-line symfony bc-layer
     }
 
     /**
@@ -56,7 +70,7 @@ final class DocumentNormalizer extends ObjectNormalizer
             $data = $this->populateIdentifier($data, $class)['_source'];
         }
 
-        return parent::denormalize($data, $class, $format, $context);
+        return $this->decoratedNormalizer->denormalize($data, $class, $format, $context);
     }
 
     /**
@@ -102,5 +116,21 @@ final class DocumentNormalizer extends ObjectNormalizer
         }
 
         return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setSerializer(SerializerInterface $serializer): void
+    {
+        $this->decoratedNormalizer->setSerializer($serializer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedTypes(?string $format): array
+    {
+        return self::FORMAT === $format ? ['object' => true] : [];
     }
 }

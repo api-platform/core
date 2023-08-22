@@ -77,4 +77,11 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
     {
         return $data instanceof Error && $data->getPrevious() instanceof ValidationException;
     }
+
+    public function getSupportedTypes($format): array
+    {
+        return [
+            Error::class => false,
+        ];
+    }
 }

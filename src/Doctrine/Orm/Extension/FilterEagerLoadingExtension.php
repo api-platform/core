@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
@@ -167,12 +167,13 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
             /** @var Join $joinPart */
             $joinString = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getJoin());
             $pos = strpos($joinString, '.');
+            $joinCondition = (string) $joinPart->getCondition();
             if (false === $pos) {
-                if (null !== $joinPart->getCondition() && null !== $this->resourceClassResolver && $this->resourceClassResolver->isResourceClass($joinString)) {
+                if ($joinCondition && $this->resourceClassResolver?->isResourceClass($joinString)) {
                     $newAlias = $queryNameGenerator->generateJoinAlias($joinPart->getAlias());
                     $aliases[] = "{$joinPart->getAlias()}.";
                     $replacements[] = "$newAlias.";
-                    $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getCondition());
+                    $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinCondition);
                     $join = new Join($joinPart->getJoinType(), $joinPart->getJoin(), $newAlias, $joinPart->getConditionType(), $condition);
                     $queryBuilderClone->add('join', [$replacement => $join], true); // @phpstan-ignore-line
                 }
@@ -184,7 +185,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
             $newAlias = $queryNameGenerator->generateJoinAlias($association);
             $aliases[] = "{$joinPart->getAlias()}.";
             $replacements[] = "$newAlias.";
-            $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getCondition() ?? '');
+            $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinCondition);
             QueryBuilderHelper::addJoinOnce($queryBuilderClone, $queryNameGenerator, $alias, $association, $joinPart->getJoinType(), $joinPart->getConditionType(), $condition, $originAlias, $newAlias);
         }
 

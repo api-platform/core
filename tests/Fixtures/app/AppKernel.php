@@ -16,12 +16,13 @@ use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
+use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\Command\TailCursorDoctrineODMCommand;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
-use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MakerBundle\MakerBundle;
@@ -30,6 +31,7 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
@@ -80,10 +82,6 @@ class AppKernel extends Kernel
             $bundles[] = new DoctrineMongoDBBundle();
         }
 
-        if (class_exists(NelmioApiDocBundle::class)) {
-            $bundles[] = new NelmioApiDocBundle();
-        }
-
         $bundles[] = new TestBundle();
 
         return $bundles;
@@ -97,10 +95,6 @@ class AppKernel extends Kernel
     protected function configureRoutes($routes): void
     {
         $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
-
-        if (class_exists(NelmioApiDocBundle::class)) {
-            $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
-        }
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
@@ -131,6 +125,7 @@ class AppKernel extends Kernel
             'messenger' => $messengerConfig,
             'router' => ['utf8' => true],
             'http_method_override' => false,
+            'annotations' => false,
         ]);
 
         $alg = class_exists(NativePasswordHasher::class, false) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';
@@ -214,23 +209,6 @@ class AppKernel extends Kernel
             $twigConfig['exception_controller'] = null;
         }
         $c->prependExtensionConfig('twig', $twigConfig);
-
-        if (class_exists(NelmioApiDocBundle::class)) {
-            $c->prependExtensionConfig('nelmio_api_doc', [
-                'sandbox' => [
-                    'accept_type' => 'application/json',
-                    'body_format' => [
-                        'formats' => ['json'],
-                        'default_format' => 'json',
-                    ],
-                    'request_format' => [
-                        'formats' => ['json' => 'application/json'],
-                    ],
-                ],
-            ]);
-            $c->prependExtensionConfig('api_platform', ['enable_nelmio_api_doc' => true]);
-        }
-
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
@@ -239,6 +217,15 @@ class AppKernel extends Kernel
                 'graphql_playground' => false,
             ],
         ]);
+
+        // TODO: remove this check and move this config in config_common.yml when dropping support for DoctrineBundle <2.10
+        if (defined(ConnectionFactory::class.'::DEFAULT_SCHEME_MAP')) {
+            $c->prependExtensionConfig('doctrine', [
+                'orm' => [
+                    'report_fields_where_declared' => true,
+                ],
+            ]);
+        }
 
         $loader->load(__DIR__.'/config/config_swagger.php');
 
@@ -257,5 +244,16 @@ class AppKernel extends Kernel
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_orm'],
             ],
         ]);
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new class() implements CompilerPassInterface {
+            public function process(ContainerBuilder $container): void
+            {
+                // Deprecated command triggering a Symfony depreciation
+                $container->removeDefinition(TailCursorDoctrineODMCommand::class);
+            }
+        });
     }
 }

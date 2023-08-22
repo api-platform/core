@@ -32,7 +32,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function groupsProvider(): array
+    public static function groupsProvider(): array
     {
         return [
             [['dummy_read'], ['dummy_write']],
@@ -42,6 +42,9 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
 
     /**
      * @dataProvider groupsProvider
+     *
+     * @param mixed $readGroups
+     * @param mixed $writeGroups
      */
     public function testCreate($readGroups, $writeGroups): void
     {

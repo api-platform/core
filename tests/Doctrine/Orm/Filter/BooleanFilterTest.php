@@ -27,10 +27,10 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
 
     protected string $filterClass = BooleanFilter::class;
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'string ("true")' => [
                     sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),

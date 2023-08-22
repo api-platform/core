@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator\Exception;
 
-use ApiPlatform\Exception\ExceptionInterface;
+use ApiPlatform\Metadata\Exception\ExceptionInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**

@@ -40,7 +40,7 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
     /**
      * Adds the formats attributes.
      *
-     * @see OperationResourceMetadataFactory
+     * @see UriTemplateResourceMetadataCollectionFactory
      *
      * @throws ResourceClassNotFoundException
      */
