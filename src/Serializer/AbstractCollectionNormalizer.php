@@ -37,6 +37,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         initContext as protected;
     }
     use NormalizerAwareTrait;
+    use OperationContextTrait;
 
     /**
      * This constant must be overridden in the child class.
@@ -88,29 +89,12 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
-        $context = $this->initContext($resourceClass, $context);
+        $collectionContext = $this->initContext($resourceClass, $context);
         $data = [];
-        $paginationData = $this->getPaginationData($object, $context);
+        $paginationData = $this->getPaginationData($object, $collectionContext);
 
-        // We need to keep this operation for serialization groups for later
-        if (isset($context['operation'])) {
-            $context['root_operation'] = $context['operation'];
-        }
-
-        if (isset($context['operation_name'])) {
-            $context['root_operation_name'] = $context['operation_name'];
-        }
-
-        /** @var ResourceMetadata|ResourceMetadataCollection */
-        $metadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? '');
-        if ($metadata instanceof ResourceMetadataCollection && ($operation = $context['operation'] ?? null) instanceof CollectionOperationInterface && ($itemUriTemplate = $operation->getItemUriTemplate())) {
-            $context['operation'] = $metadata->getOperation($itemUriTemplate);
-        } else {
-            unset($context['operation']);
-        }
-
-        unset($context['operation_type'], $context['operation_name']);
-        $itemsData = $this->getItemsData($object, $format, $context);
+        $childContext = $this->createOperationContext($collectionContext, $resourceClass);
+        $itemsData = $this->getItemsData($object, $format, $childContext);
 
         return array_merge_recursive($data, $paginationData, $itemsData);
     }

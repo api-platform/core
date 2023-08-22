@@ -63,6 +63,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     use CloneTrait;
     use ContextTrait;
     use InputOutputMetadataTrait;
+    use OperationContextTrait;
 
     public const IS_TRANSFORMED_TO_SAME_CLASS = 'is_transformed_to_same_class';
 
@@ -210,6 +211,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $context = $this->initContext($resourceClass, $context);
         }
 
+        // Never remove this, with `application/json` we don't use our AbstractCollectionNormalizer and we need
+        // to remove the collection operation from our context or we'll introduce security issues
         if (isset($context['operation']) && $context['operation'] instanceof CollectionOperationInterface) {
             unset($context['operation_name']);
             unset($context['operation']);
@@ -638,6 +641,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $collectionKeyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
         $collectionKeyBuiltinType = null === $collectionKeyType ? null : $collectionKeyType->getBuiltinType();
+        $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
 
         $values = [];
         foreach ($value as $index => $obj) {
@@ -645,7 +649,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new InvalidArgumentException(sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyBuiltinType, \gettype($index)));
             }
 
-            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $this->createChildContext($context, $attribute, $format));
+            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $childContext);
         }
 
         return $values;
@@ -742,6 +746,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $options['operation_name'] = $context['operation_name'];
         }
 
+        // Preserve this context here since its deprecated in 2.7 and removed in 3.0.
         if (isset($context['collection_operation_name'])) {
             $options['collection_operation_name'] = $context['collection_operation_name'];
         }
@@ -811,12 +816,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-            $childContext = $this->createChildContext($context, $attribute, $format);
-            $childContext['resource_class'] = $resourceClass;
-            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                $childContext['operation'] = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
-            }
-            unset($childContext['iri'], $childContext['uri_variables']);
+            $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
 
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -831,12 +831,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-            $childContext = $this->createChildContext($context, $attribute, $format);
-            $childContext['resource_class'] = $resourceClass;
-            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                $childContext['operation'] = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
-            }
-            unset($childContext['iri'], $childContext['uri_variables']);
+            $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
 
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -903,7 +898,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
-            $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $context);
+            $relatedContext = $this->createOperationContext($context, $resourceClass);
+            $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $relatedContext);
             if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
                 throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
             }
@@ -996,11 +992,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $this->resourceClassResolver->isResourceClass($className)
         ) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
-            $childContext = $this->createChildContext($context, $attribute, $format);
-            $childContext['resource_class'] = $resourceClass;
-            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                $childContext['operation'] = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
-            }
+            $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
 
             return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);
         }

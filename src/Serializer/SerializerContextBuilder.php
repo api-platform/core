@@ -75,6 +75,12 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['uri'] = $request->getUri();
             $context['input'] = $operation->getInput();
             $context['output'] = $operation->getOutput();
+
+            // Special case as this is usually handled by our OperationContextTrait, here we want to force the IRI in the response
+            if (!$operation instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && $operation->getItemUriTemplate()) {
+                $context['item_uri_template'] = $operation->getItemUriTemplate();
+            }
+
             $context['types'] = $operation->getTypes();
             $context['uri_variables'] = [];
 
