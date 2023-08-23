@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Metadata\NotExposed;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException as ExceptionValidationException;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -28,12 +27,12 @@ final class PostWithUriVariables
     {
     }
 
-    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public static function process(): self
     {
         return new self(id: 1);
     }
 
-    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): void
+    public static function provide(): void
     {
         throw new ExceptionValidationException(new ConstraintViolationList());
     }

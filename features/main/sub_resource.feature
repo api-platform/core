@@ -607,3 +607,23 @@ Feature: Sub-resource support
       | invalid_uri                                              | collection_uri                                     | item_uri                                             |
       | /subresource_organizations/invalid/subresource_employees | /subresource_organizations/1/subresource_employees | /subresource_organizations/1/subresource_employees/1 |
       | /subresource_organizations/invalid/subresource_factories | /subresource_organizations/1/subresource_factories | /subresource_organizations/1/subresource_factories/1 |
+
+  @!mongodb
+  @createSchema
+  Scenario: I can POST on a subresource using CreateProvider with parent_uri_template
+    Given I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/subresource_categories/1/subresource_bikes" with body:
+    """
+    {
+      "name": "Hello World!"
+    }
+    """
+    Then the response status code should be 404
+    Given I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/subresource_categories_with_create_provider/1/subresource_bikes" with body:
+    """
+    {
+      "name": "Hello World!"
+    }
+    """
+    Then the response status code should be 201
