@@ -111,7 +111,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
             ];
         }
 
-        return DocumentNormalizer::FORMAT === $format ? $this->decorated->getSupportedTypes($format) : [];
+        return DocumentNormalizer::FORMAT !== $format ? $this->decorated->getSupportedTypes($format) : [];
     }
 
     /**
