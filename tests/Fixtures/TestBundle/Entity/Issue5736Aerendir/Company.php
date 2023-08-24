@@ -31,22 +31,22 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
     ],
     operations: [
         new API\GetCollection(
-            uriTemplate: self::API_ENDPOINT,
+            uriTemplate: Company::API_ENDPOINT,
         ),
         new API\Get(
-            uriTemplate: self::API_RESOURCE,
+            uriTemplate: Company::API_RESOURCE,
             uriVariables: [
-                self::API_ID_PLACEHOLDER => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Company::API_ID_PLACEHOLDER => new API\Link(fromClass: self::class, identifiers: ['id']),
             ],
         ),
         new API\Post(
             read: false,
-            uriTemplate: self::API_ENDPOINT,
+            uriTemplate: Company::API_ENDPOINT,
         ),
         new API\Put(
-            uriTemplate: self::API_RESOURCE,
+            uriTemplate: Company::API_RESOURCE,
             uriVariables: [
-                self::API_ID_PLACEHOLDER => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Company::API_ID_PLACEHOLDER => new API\Link(fromClass: self::class, identifiers: ['id']),
             ],
         ),
     ],

@@ -15,16 +15,17 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5736Aerendir;
 
 use ApiPlatform\Metadata as API;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'issue5736_employees')]
 #[API\ApiResource(
     normalizationContext: [
-        AbstractNormalizer::GROUPS => ['employee:read'],
+        AbstractNormalizer::GROUPS => [self::GROUP_NOR_READ],
     ],
     denormalizationContext: [
-        AbstractNormalizer::GROUPS => ['employee:write'],
+        AbstractNormalizer::GROUPS => [self::GROUP_DENOR_WRITE],
     ],
     operations: [
         new API\GetCollection(
@@ -49,21 +50,27 @@ class Employee
     public const API_ID_PLACEHOLDER = 'issue5736_employee';
     public const API_ENDPOINT = Team::API_RESOURCE . '/employees';
     public const API_RESOURCE = self::API_ENDPOINT . '/{' . self::API_ID_PLACEHOLDER . '}';
+    public const GROUP_NOR_READ    = 'employee:read';
+    public const GROUP_DENOR_WRITE = 'employee:write';
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
+    #[Groups([self::GROUP_NOR_READ, Team::GROUP_NOR_READ])]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'employees')]
     #[ORM\JoinColumn(name: 'company', nullable: false)]
+    #[Groups([self::GROUP_NOR_READ])]
     private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'employees')]
     #[ORM\JoinColumn(name: 'team', nullable: false)]
+    #[Groups([self::GROUP_NOR_READ, Team::GROUP_NOR_READ])]
     private Team $team;
 
     #[ORM\Column]
+    #[Groups([self::GROUP_NOR_READ])]
     private string $name;
 
     /**
