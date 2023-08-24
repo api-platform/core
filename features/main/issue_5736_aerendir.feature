@@ -16,6 +16,26 @@ Feature: Resources, subresources and their subresources with uri variables that 
     Then the response status code should be 201
 
   @createSchema
+  Scenario: POST Company then POST Team
+    Given I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/issue5736_companies" with body:
+    """
+    {
+      "name": "Company 1"
+    }
+    """
+
+    And I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/issue5736_companies/1/issue5736_teams" with body:
+    """
+    {
+      "name": "Team 1"
+    }
+    """
+
+    Then the response status code should be 201
+
+  @createSchema
   Scenario: PUT Team with POST Employee
     Given I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/issue5736_companies/" with body:
