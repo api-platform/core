@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
-#[ORM\Entity(repositoryClass: CompanyRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: 'issue5736_companies')]
 #[API\ApiResource(
     normalizationContext: [

@@ -72,12 +72,12 @@ class Team implements CompanyAwareInterface
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
-    #[Groups([self::GROUP_NOR_READ])]
+    #[Groups([self::GROUP_NOR_READ, self::GROUP_DENOR_WRITE])]
     private ?int $id;
 
     #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'teams')]
     #[ORM\JoinColumn(name: 'company', nullable: false)]
-    #[Groups([self::GROUP_NOR_READ])]
+    #[Groups([self::GROUP_NOR_READ, self::GROUP_DENOR_WRITE])]
     private Company $company;
 
     /** @var Collection<Employee>  */
@@ -86,7 +86,7 @@ class Team implements CompanyAwareInterface
     private Collection $employees;
 
     #[ORM\Column]
-    #[Groups([self::GROUP_NOR_READ])]
+    #[Groups([self::GROUP_NOR_READ, self::GROUP_DENOR_WRITE])]
     private string $name;
 
     public function __construct()
@@ -102,5 +102,15 @@ class Team implements CompanyAwareInterface
     public function setCompany(Company $company) : void
     {
         $this->company = $company;
+    }
+
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name) : void
+    {
+        $this->name = $name;
     }
 }

@@ -18,12 +18,14 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5736Aerendir\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5736Aerendir\CompanyAwareInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5736Aerendir\CompanyRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 
 class SetCompany5736Processor implements ProcessorInterface
 {
     public function __construct(
         private readonly ProcessorInterface $decorated,
-        private readonly CompanyRepository $companyRepository,
+        private readonly EntityManagerInterface $entityManager,
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
@@ -36,9 +38,14 @@ class SetCompany5736Processor implements ProcessorInterface
             throw new \LogicException(sprintf('The uri variable "%1$s" doesn\'t exist. Please, set "uriVariables.%1$s" on entity "%2$s"', Company::API_ID_PLACEHOLDER, $data::class));
         }
 
-        // Here we need to get the Account from the repository
-        $account = $this->companyRepository->findOneByIdOrThrow($uriVariables[Company::API_ID_PLACEHOLDER]);
-        $data->setCompany($account);
+        $id = (string) $uriVariables[Company::API_ID_PLACEHOLDER];
+        $company = $this->entityManager->getRepository(Company::class)->findOneById($id);
+
+        if ( ! $company instanceof Company) {
+            throw new EntityNotFoundException(sprintf('The company with ID "%s" was not found.', $id));
+        }
+
+        $data->setCompany($company);
 
         return $this->decorated->process($data, $operation, $uriVariables, $context);
     }
