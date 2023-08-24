@@ -33,9 +33,13 @@ class SubresourceOrganization
     #[ORM\OneToMany(mappedBy: 'subresourceOrganization', targetEntity: SubresourceEmployee::class, orphanRemoval: true)]
     private Collection $employees;
 
+    #[ORM\OneToMany(mappedBy: 'subresourceOrganization', targetEntity: SubresourceFactory::class, orphanRemoval: true)]
+    private Collection $factories;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
+        $this->factories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -78,6 +82,34 @@ class SubresourceOrganization
         // set the owning side to null (unless already changed)
         if ($this->employees->removeElement($employee) && $employee->getSubresourceOrganization() === $this) {
             $employee->setSubresourceOrganization(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SubresourceFactory>
+     */
+    public function getSubresourceFactories(): Collection
+    {
+        return $this->factories;
+    }
+
+    public function addSubresourceFactory(SubresourceFactory $factory): self
+    {
+        if (!$this->factories->contains($factory)) {
+            $this->factories->add($factory);
+            $factory->setSubresourceOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubresourceFactory(SubresourceFactory $factory): self
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->factories->removeElement($factory) && $factory->getSubresourceOrganization() === $this) {
+            $factory->setSubresourceOrganization(null);
         }
 
         return $this;

@@ -127,3 +127,18 @@ services:
             $entityManager: '@doctrine.orm.default_entity_manager'
         tags:
             - name: 'api_platform.state_processor'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5605\MainResourceProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5605\MainResourceProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5605\SubResourceProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5605\SubResourceProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'

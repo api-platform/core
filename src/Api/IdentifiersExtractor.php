@@ -72,10 +72,11 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         }
 
         $identifiers = [];
-        foreach ($links ?? [] as $link) {
-            if (1 < (is_countable($link->getIdentifiers()) ? \count($link->getIdentifiers()) : 0)) {
+        foreach ($links ?? [] as $k => $link) {
+            $linkIdentifiers = $link->getIdentifiers() ?? [$k];
+            if (1 < \count($linkIdentifiers)) {
                 $compositeIdentifiers = [];
-                foreach ($link->getIdentifiers() as $identifier) {
+                foreach ($linkIdentifiers as $identifier) {
                     $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $identifier, $link->getParameterName());
                 }
 
@@ -84,7 +85,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
 
             $parameterName = $link->getParameterName();
-            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $link->getIdentifiers()[0], $parameterName, $link->getToProperty());
+            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $linkIdentifiers[0], $parameterName, $link->getToProperty());
         }
 
         return $identifiers;
