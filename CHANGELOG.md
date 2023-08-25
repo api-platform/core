@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.1.15
+
+### Bug fixes
+
+* [07c9989eb](https://github.com/api-platform/core/commit/07c9989eb2717d8881801c843706194499b6c903) fix(metadata): notexposed no urivariables inheritance (#5765)
+* [8d04dcf5f](https://github.com/api-platform/core/commit/8d04dcf5f63c152ffa4e9ae00c8d6624c97f2855) fix(metadata): fix POST on subresource (#5734)
+* [a774f4c51](https://github.com/api-platform/core/commit/a774f4c51167dbbe585269f14a7c51a3f9e38c3c) fix(doctrine): searchfilter with nested custom identifiers (#5760)
+* [b7258ef38](https://github.com/api-platform/core/commit/b7258ef38302c92869ab23d0dc83a2cb411526a7) fix: error 500 on request with 'empty' accept headers, e.g. 'accept: 0' or 'accept: ' (#5767)
+
 ## v3.1.14
 
 ### Bug fixes
