@@ -1259,4 +1259,13 @@ class ApiPlatformExtensionTest extends TestCase
 
         (new ApiPlatformExtension())->load($config, $this->container);
     }
+
+    public function testHasClassMetadataCache(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $this->container->setParameter('kernel.debug', true);
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertFalse($this->container->hasDefinition('api_platform.serializer.mapping.cache_class_metadata_factory'));
+    }
 }
