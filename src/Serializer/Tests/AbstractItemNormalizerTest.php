@@ -627,7 +627,6 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $concreteDummyChildContext = Argument::allOf(
             Argument::type('array'),
-            Argument::withEntry('resource_class', DummyTableInheritanceChild::class),
             Argument::not(Argument::withKey('iri'))
         );
         $serializerProphecy->normalize($concreteDummy, null, $concreteDummyChildContext)->willReturn(['foo' => 'concrete']);
