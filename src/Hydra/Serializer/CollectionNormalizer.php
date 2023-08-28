@@ -43,7 +43,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
-        if ($this->resourceMetadataCollectionFactory) {
+        if ($resourceMetadataCollectionFactory) {
             trigger_deprecation('api-platform/core', '3.0', sprintf('Injecting "%s" within "%s" is not needed anymore and this dependency will be removed in 4.0.', ResourceMetadataCollectionFactoryInterface::class, self::class));
         }
 
