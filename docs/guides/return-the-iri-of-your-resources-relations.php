@@ -15,21 +15,18 @@ namespace App\ApiResource {
     use ApiPlatform\Metadata\GetCollection;
     use ApiPlatform\Metadata\Link;
     use ApiPlatform\Metadata\Operation;
-    use ApiPlatform\State\ProviderInterface;
-    use Symfony\Component\Serializer\Annotation\Groups;
 
     #[ApiResource(
         operations: [
-            new Get(normalizationContext: ['groups' => ['read']], provider: Brand::class),
+            new Get(provider: Brand::class.'::provide'),
         ],
     )]
-    class Brand implements ProviderInterface
+    class Brand
     {
         public function __construct(
             #[ApiProperty(identifier: true)]
             public readonly int $id = 1,
 
-            #[Groups('read')]
             public readonly string $name = 'Anon',
 
             // Setting uriTemplate on a relation with a resource collection will try to find the related operation.
@@ -38,13 +35,11 @@ namespace App\ApiResource {
              * @var array<int, Car> $cars
              */
             #[ApiProperty(uriTemplate: '/brands/{brandId}/cars')]
-            #[Groups('read')]
             private array $cars = [],
 
             // Setting uriTemplate on a relation with a resource item will try to find the related operation.
             // It is based on the uriTemplate set on the operation defined on the Address resource (see below).
             #[ApiProperty(uriTemplate: '/brands/{brandId}/addresses/{id}')]
-            #[Groups('read')]
             private ?Address $headQuarters = null
         )
         {
@@ -79,9 +74,9 @@ namespace App\ApiResource {
             return $this;
         }
 
-        public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+        public static function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
         {
-            return (new self(1, 'Ford'))
+            return (new Brand(1, 'Ford'))
                     ->setHeadQuarters(new Address(1, 'One American Road near Michigan Avenue, Dearborn, Michigan'))
                     ->addCar(new Car(1, 'Torpedo Roadster'));
         }
@@ -142,7 +137,6 @@ namespace App\ApiResource {
         public function __construct(
             #[ApiProperty(identifier: true)]
             public readonly int $id = 1,
-            #[Groups('read')]
             public readonly string $name = 'Anon',
             private ?Brand $brand = null
         )
@@ -176,30 +170,31 @@ namespace App\Playground {
 
     function request(): Request
     {
-        return Request::create('/brands/1.jsonld', 'GET');
+        return Request::create(uri: '/brands/1', method: 'GET', server: ['HTTP_ACCEPT' => 'application/ld+json']);
     }
 }
 
 
 namespace App\Tests {
-    use ApiPlatform\Playground\Test\TestGuideTrait;
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use App\ApiResource\Brand;
 
     final class BrandTest extends ApiTestCase
     {
-        use TestGuideTrait;
 
         public function testResourceExposeIRI(): void
         {
-            static::createClient()->request('GET', '/brands/1.jsonld');
+            static::createClient()->request('GET', '/brands/1', ['headers' => [
+                'Accept: application/ld+json'
+            ]]);
 
             $this->assertResponseIsSuccessful();
-            $this->assertMatchesResourceCollectionJsonSchema(Brand::class, '_api_/brand{._format}_get_item');
+            $this->assertMatchesResourceCollectionJsonSchema(Brand::class, '_api_/brands/{id}{._format}_get');
             $this->assertJsonContains([
                 "@context" => "/contexts/Brand",
                 "@id" => "/brands/1",
                 "@type" => "Brand",
+                "name"=> "Ford",
                 "cars" => "/brands/1/cars",
                 "headQuarters" => "/brands/1/addresses/1"
             ]);

@@ -40,7 +40,7 @@ final class ApiProperty
      * @param string[]    $types                   the RDF types of this property
      * @param string[]    $iris
      * @param Type[]      $builtinTypes
-     * @param string|null $uriTemplate             whether to return the subRessource collection IRI instead of an iterable of IRI
+     * @param string|null $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
      */
     public function __construct(
         private ?string $description = null,
@@ -469,6 +469,8 @@ final class ApiProperty
 
     /**
      * Whether to return the subRessource collection IRI instead of an iterable of IRI.
+     *
+     * @experimental
      */
     public function getUriTemplate(): ?string
     {
