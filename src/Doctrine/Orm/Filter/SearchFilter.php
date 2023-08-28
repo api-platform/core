@@ -196,6 +196,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         if ($metadata->hasField($field)) {
             if ('id' === $field) {
                 $values = array_map($this->getIdFromValue(...), $values);
+                // todo: handle composite IDs
             }
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
@@ -216,13 +217,44 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             return;
         }
 
-        $values = array_map($this->getIdFromValue(...), $values);
-
+        // association, let's fetch the entity (or reference to it) if we can so we can make sure we get its orm id
         $associationResourceClass = $metadata->getAssociationTargetClass($field);
-        $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];
+        $associationMetadata = $this->getClassMetadata($associationResourceClass);
+        $associationFieldIdentifier = $associationMetadata->getIdentifierFieldNames()[0];
         $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
 
-        if (!$this->hasValidValues($values, $doctrineTypeField)) {
+        $values = array_map(function ($value) use ($associationFieldIdentifier, $doctrineTypeField) {
+            if (is_numeric($value)) {
+                return $value;
+            }
+            try {
+                $item = $this->getIriConverter()->getResourceFromIri($value, ['fetch_data' => false]);
+
+                return $this->propertyAccessor->getValue($item, $associationFieldIdentifier);
+            } catch (InvalidArgumentException) {
+                /*
+                 * Can we do better? This is not the ApiResource the call was made on,
+                 * so we don't get any kind of api metadata for it without (a lot of?) work elsewhere...
+                 * Let's just pretend it's always the ORM id for now.
+                 */
+                if (!$this->hasValidValues([$value], $doctrineTypeField)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $associationFieldIdentifier)),
+                    ]);
+
+                    return null;
+                }
+
+                return $value;
+            }
+        }, $values);
+
+        $expected = \count($values);
+        $values = array_filter($values, static fn ($value) => null !== $value);
+        if ($expected > \count($values)) {
+            /*
+             * Shouldn't this actually fail harder?
+             */
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
             ]);

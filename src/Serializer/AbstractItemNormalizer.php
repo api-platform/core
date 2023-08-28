@@ -17,7 +17,6 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -56,6 +55,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     use CloneTrait;
     use ContextTrait;
     use InputOutputMetadataTrait;
+    use OperationContextTrait;
 
     protected PropertyAccessorInterface $propertyAccessor;
     protected array $localCache = [];
@@ -134,6 +134,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->serializer->normalize($object, $format, $context);
         }
 
+        // Never remove this, with `application/json` we don't use our AbstractCollectionNormalizer and we need
+        // to remove the collection operation from our context or we'll introduce security issues
         if (isset($context['operation']) && $context['operation'] instanceof CollectionOperationInterface) {
             unset($context['operation_name']);
             unset($context['operation']);
@@ -585,14 +587,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         // This is a hot spot
         if (isset($context['resource_class'])) {
             // Note that the groups need to be read on the root operation
-            $operation = $context['root_operation'] ?? $context['operation'] ?? null;
-
-            if (!$operation && $this->resourceMetadataCollectionFactory && $this->resourceClassResolver->isResourceClass($context['resource_class'])) {
-                $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
-                $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['root_operation_name'] ?? $context['operation_name'] ?? null);
-            }
-
-            if ($operation) {
+            if ($operation = ($context['root_operation'] ?? null)) {
                 $options['normalization_groups'] = $operation->getNormalizationContext()['groups'] ?? null;
                 $options['denormalization_groups'] = $operation->getDenormalizationContext()['groups'] ?? null;
                 $options['operation_name'] = $operation->getName();
@@ -724,8 +719,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
-            $relatedContext = $context;
-            unset($relatedContext['force_resource_class']);
+            $relatedContext = $this->createOperationContext($context, $resourceClass);
             $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $relatedContext);
             if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
                 throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
@@ -915,30 +909,5 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         } catch (NoSuchPropertyException) {
             // Properties not found are ignored
         }
-    }
-
-    private function createOperationContext(array $context, string $resourceClass = null): array
-    {
-        if (isset($context['operation']) && !isset($context['root_operation'])) {
-            $context['root_operation'] = $context['operation'];
-            $context['root_operation_name'] = $context['operation_name'];
-        }
-
-        unset($context['iri'], $context['uri_variables']);
-        if (!$resourceClass) {
-            return $context;
-        }
-
-        unset($context['operation'], $context['operation_name']);
-        $context['resource_class'] = $resourceClass;
-        if ($this->resourceMetadataCollectionFactory) {
-            try {
-                $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
-                $context['operation_name'] = $context['operation']->getName();
-            } catch (OperationNotFoundException) {
-            }
-        }
-
-        return $context;
     }
 }

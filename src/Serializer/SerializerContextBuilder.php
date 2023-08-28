@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
@@ -52,6 +53,11 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $context['uri'] = $request->getUri();
         $context['input'] = $operation->getInput();
         $context['output'] = $operation->getOutput();
+
+        // Special case as this is usually handled by our OperationContextTrait, here we want to force the IRI in the response
+        if (!$operation instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && $operation->getItemUriTemplate()) {
+            $context['item_uri_template'] = $operation->getItemUriTemplate();
+        }
 
         if ($operation->getTypes()) {
             $context['types'] = $operation->getTypes();

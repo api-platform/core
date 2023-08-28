@@ -106,6 +106,10 @@ final class IriConverter implements IriConverterInterface
     {
         $resourceClass = $context['force_resource_class'] ?? (\is_string($resource) ? $resource : $this->getObjectClass($resource));
 
+        if ($this->operationMetadataFactory && isset($context['item_uri_template'])) {
+            $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
+        }
+
         $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_c' : '_i');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
             return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
@@ -130,11 +134,6 @@ final class IriConverter implements IriConverterInterface
         }
 
         $identifiersExtractorOperation = $operation;
-        if ($this->operationMetadataFactory && isset($context['item_uri_template'])) {
-            $identifiersExtractorOperation = null;
-            $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
-        }
-
         // In symfony the operation name is the route name, try to find one if none provided
         if (
             !$operation->getName()

@@ -264,6 +264,32 @@ class AddFormatListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
+    public function testZeroAcceptHeader(): void
+    {
+        $this->expectException(NotAcceptableHttpException::class);
+        $this->expectExceptionMessage('Requested format "0" is not supported. Supported MIME types are "application/octet-stream", "application/json"');
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
+        $request->headers->set('Accept', '0');
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $eventProphecy->getRequest()->willReturn($request);
+        $event = $eventProphecy->reveal();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('Foo', [
+            new ApiResource(operations: [
+                'get' => new Get(outputFormats: [
+                    'binary' => ['application/octet-stream'],
+                    'json' => ['application/json'],
+                ]),
+            ]),
+        ]));
+
+        $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelRequest($event);
+    }
+
     public function testAcceptHeaderTakePrecedenceOverRequestFormat(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);

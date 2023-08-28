@@ -26,12 +26,16 @@ class CompositeKeyWithDifferentType
     #[ApiProperty(identifier: true)]
     public ?string $verificationKey;
 
-    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): array
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): self
     {
         if (!\is_string($uriVariables['verificationKey'])) {
             throw new \RuntimeException('verificationKey should be a string.');
         }
 
-        return $context;
+        $t = new self();
+        $t->id = $uriVariables['id'];
+        $t->verificationKey = $uriVariables['verificationKey'];
+
+        return $t;
     }
 }
