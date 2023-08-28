@@ -78,6 +78,32 @@ class UpgradeApiResourceCommandTest extends TestCase
         $this->assertStringNotContainsString('+private function nothingToDo() : void', $display);
     }
 
+    /**
+     * @requires PHP 8.1
+     *
+     * @dataProvider debugResourceProvider
+     */
+    public function testTargetSingleResource(string $entityClass, array $subresourceOperationFactoryReturn, array $expectedStrings): void
+    {
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([$entityClass]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create($entityClass)->willReturn(new ResourceMetadata());
+        $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
+        $subresourceOperationFactoryProphecy->create($entityClass)->willReturn($subresourceOperationFactoryReturn);
+
+        $commandTester = $this->getCommandTester($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $subresourceOperationFactoryProphecy->reveal());
+        $commandTester->execute(['class' => 'ApiPlatform\\Tests\\Fixtures\\TestBundle\\Entity\\DummyToUpgradeWithOnlyAttribute']);
+
+        $display = $commandTester->getDisplay();
+
+        if ($entityClass !== DummyToUpgradeWithOnlyAttribute::class) {
+            $this->assertEmpty($display);
+        } else {
+            $this->assertStringContainsString('begin diff', $display);
+        }
+    }
+
     public function debugResourceProvider(): array
     {
         $entityClasses = [

@@ -35,6 +35,7 @@ use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -77,7 +78,8 @@ Once you executed this script, make sure that the "metadata_backward_compatibili
 This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute and use the "ApiPlatform\Metadata\ApiResource" attribute instead.')
             ->addOption('dry-run', '-d', InputOption::VALUE_OPTIONAL, 'Dry mode outputs a diff instead of writing files.', true)
             ->addOption('silent', '-s', InputOption::VALUE_NONE, 'Silent output.')
-            ->addOption('force', '-f', InputOption::VALUE_NONE, 'Writes the files in place and skips PHP version check.');
+            ->addOption('force', '-f', InputOption::VALUE_NONE, 'Writes the files in place and skips PHP version check.')
+            ->addArgument('class', InputArgument::OPTIONAL, 'A fully qualified class name.');
     }
 
     /**
@@ -101,6 +103,10 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
 
         $prettyPrinter = new Standard();
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            if ($input->getArgument('class') && $input->getArgument('class') !== $resourceClass) {
+                continue;
+            }
+
             try {
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             } catch (ResourceClassNotFoundException $e) {
