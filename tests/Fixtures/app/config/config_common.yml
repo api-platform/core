@@ -63,7 +63,7 @@ api_platform:
             enabled: true
     defaults:
         extra_properties:
-            standard_put: true
+            standard_put: false
         normalization_context: 
             skip_null_values: false
         pagination_client_enabled:            true
