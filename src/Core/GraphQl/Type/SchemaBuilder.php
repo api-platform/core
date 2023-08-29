@@ -103,13 +103,19 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 'fields' => $queryFields,
             ]),
             'typeLoader' => function ($name) {
-                $type = $this->typesContainer->get($name);
+                try{
+                    $type = $this->typesContainer->get($name);
 
-                if ($type instanceof WrappingType) {
-                    return $type->getWrappedType(true);
+                    if ($type instanceof WrappingType) {
+                        return $type->getWrappedType(true);
+                    }
+
+                    return $type;
+                }
+                catch (TypeNotFoundException) {
+                    return null;
                 }
 
-                return $type;
             },
         ];
 
