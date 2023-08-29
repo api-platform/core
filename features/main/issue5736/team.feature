@@ -24,21 +24,24 @@ Feature: Resources, subresources and their subresources with uri variables that 
                 "@type": "Team",
                 "id": 1,
                 "company": "/issue5736_companies/1",
-                "name": "Team #1"
+                "name": "Team #1",
+                "employees": []
             },
             {
                 "@id": "/issue5736_companies/1/issue5736_teams/2",
                 "@type": "Team",
                 "id": 2,
                 "company": "/issue5736_companies/1",
-                "name": "Team #2"
+                "name": "Team #2",
+                "employees": []
             },
             {
                 "@id": "/issue5736_companies/1/issue5736_teams/3",
                 "@type": "Team",
                 "id": 3,
                 "company": "/issue5736_companies/1",
-                "name": "Team #3"
+                "name": "Team #3",
+                "employees": []
             }
         ]
     }
@@ -65,7 +68,8 @@ Feature: Resources, subresources and their subresources with uri variables that 
        "@type": "Team",
        "id": 1,
        "company": "/issue5736_companies/1",
-       "name": "Team 1"
+       "name": "Team 1",
+       "employees": []
     }
     """
 
@@ -86,7 +90,8 @@ Feature: Resources, subresources and their subresources with uri variables that 
       "@type": "Team",
       "id": 1,
       "company": "/issue5736_companies/1",
-      "name": "Team #1"
+      "name": "Team #1",
+      "employees": []
     }
     """
 
@@ -112,6 +117,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
       "@type": "Team",
       "id": 1,
       "company": "/issue5736_companies/1",
-      "name": "Team #1 - edited"
+      "name": "Team #1 - edited",
+      "employees": []
     }
     """
