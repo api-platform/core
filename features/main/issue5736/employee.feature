@@ -5,13 +5,13 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: PUT Team with POST Employee
-    Given there is a company with name "Company #1"
-    And there is a team "Team #1" in company 1
+    Given there are 2 companies
+    And there are 2 teams in company 2
     And I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "/issue5736_companies/1/issue5736_teams/1" with body:
+    And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
-      "name": "Team #1 - edited",
+      "name": "Team #2 - edited",
       "employees": [
         {
           "name": "Employee #1"
@@ -26,17 +26,17 @@ Feature: Resources, subresources and their subresources with uri variables that 
     """
     {
       "@context": "/contexts/Team",
-          "@id": "/issue5736_companies/1/issue5736_teams/1",
+          "@id": "/issue5736_companies/2/issue5736_teams/2",
           "@type": "Team",
-          "id": 1,
-          "company": "/issue5736_companies/1",
-          "name": "Team #1 - edited",
+          "id": 2,
+          "company": "/issue5736_companies/2",
+          "name": "Team #2 - edited",
           "employees": [
               {
-                  "@id": "/issue5736_companies/1/issue5736_teams/1/employees/1",
+                  "@id": "/issue5736_companies/2/issue5736_teams/2/employees/1",
                   "@type": "Employee",
                   "id": 1,
-                  "team": "/issue5736_companies/1/issue5736_teams/1",
+                  "team": "/issue5736_companies/2/issue5736_teams/2",
                   "name": "Employee #1"
               }
           ]
@@ -45,33 +45,33 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: PUT Team with PUT Employee
-    Given there is a company with name "Company #1"
-    And there is a team "Team #1" in company 1
-    And there are 3 employees in team 1
+    Given there are 2 companies
+    And there are 2 teams in company 2
+    And there are 3 employees in team 2
     And I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "/issue5736_companies/1/issue5736_teams/1" with body:
+    And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
       "employees": [
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/1",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/1",
           "@type": "Employee",
           "id": 1,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #1"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/2",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/2",
           "@type": "Employee",
           "id": 2,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #2"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/3",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/3",
           "@type": "Employee",
           "id": 3,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #3 - edited"
         }
       ]
@@ -84,31 +84,31 @@ Feature: Resources, subresources and their subresources with uri variables that 
     """
     {
       "@context": "/contexts/Team",
-      "@id": "/issue5736_companies/1/issue5736_teams/1",
+      "@id": "/issue5736_companies/2/issue5736_teams/2",
       "@type": "Team",
-      "id": 1,
-      "company": "/issue5736_companies/1",
-      "name": "Team #1",
+      "id": 2,
+      "company": "/issue5736_companies/2",
+      "name": "Team #2",
       "employees": [
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/1",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/1",
           "@type": "Employee",
           "id": 1,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #1"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/2",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/2",
           "@type": "Employee",
           "id": 2,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #2"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/3",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/3",
           "@type": "Employee",
           "id": 3,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #3 - edited"
         }
       ]
@@ -117,26 +117,26 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: PUT Team with DELETE Employee
-    Given there is a company with name "Company #1"
-    And there is a team "Team #1" in company 1
-    And there are 3 employees in team 1
+    Given there are 2 companies
+    And there are 2 teams in company 2
+    And there are 3 employees in team 2
     And I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "/issue5736_companies/1/issue5736_teams/1" with body:
+    And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
       "employees": [
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/1",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/1",
           "@type": "Employee",
           "id": 1,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #1"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/2",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/2",
           "@type": "Employee",
           "id": 2,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #2"
         }
       ]
@@ -149,24 +149,24 @@ Feature: Resources, subresources and their subresources with uri variables that 
     """
     {
       "@context": "/contexts/Team",
-      "@id": "/issue5736_companies/1/issue5736_teams/1",
+      "@id": "/issue5736_companies/2/issue5736_teams/2",
       "@type": "Team",
-      "id": 1,
-      "company": "/issue5736_companies/1",
-      "name": "Team #1",
+      "id": 2,
+      "company": "/issue5736_companies/2",
+      "name": "Team #2",
       "employees": [
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/1",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/1",
           "@type": "Employee",
           "id": 1,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #1"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/2",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/2",
           "@type": "Employee",
           "id": 2,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #2"
         }
       ]
@@ -175,26 +175,26 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: PUT Team with PUT Employee and DELETE Employee
-    Given there is a company with name "Company #1"
-    And there is a team "Team #1" in company 1
-    And there are 3 employees in team 1
+    Given there are 2 companies
+    And there are 2 teams in company 2
+    And there are 3 employees in team 2
     And I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "/issue5736_companies/1/issue5736_teams/1" with body:
+    And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
       "employees": [
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/1",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/1",
           "@type": "Employee",
           "id": 1,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #1"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/2",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/2",
           "@type": "Employee",
           "id": 2,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #2 - edited"
         }
       ]
@@ -207,24 +207,24 @@ Feature: Resources, subresources and their subresources with uri variables that 
     """
     {
       "@context": "/contexts/Team",
-      "@id": "/issue5736_companies/1/issue5736_teams/1",
+      "@id": "/issue5736_companies/2/issue5736_teams/2",
       "@type": "Team",
-      "id": 1,
-      "company": "/issue5736_companies/1",
-      "name": "Team #1",
+      "id": 2,
+      "company": "/issue5736_companies/2",
+      "name": "Team #2",
       "employees": [
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/1",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/1",
           "@type": "Employee",
           "id": 1,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #1"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/2",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/2",
           "@type": "Employee",
           "id": 2,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #2 - edited"
         }
       ]
@@ -233,26 +233,26 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: PUT Team with PUT Employee and DELETE Employee and POST Employee
-    Given there is a company with name "Company #1"
-    And there is a team "Team #1" in company 1
-    And there are 3 employees in team 1
+    Given there are 2 companies
+    And there are 2 teams in company 2
+    And there are 3 employees in team 2
     And I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "/issue5736_companies/1/issue5736_teams/1" with body:
+    And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
       "employees": [
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/1",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/1",
           "@type": "Employee",
           "id": 1,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #1"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/2",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/2",
           "@type": "Employee",
           "id": 2,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #2 - edited"
         },
         {
@@ -268,31 +268,31 @@ Feature: Resources, subresources and their subresources with uri variables that 
     """
     {
       "@context": "/contexts/Team",
-      "@id": "/issue5736_companies/1/issue5736_teams/1",
+      "@id": "/issue5736_companies/2/issue5736_teams/2",
       "@type": "Team",
-      "id": 1,
-      "company": "/issue5736_companies/1",
-      "name": "Team #1",
+      "id": 2,
+      "company": "/issue5736_companies/2",
+      "name": "Team #2",
       "employees": [
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/1",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/1",
           "@type": "Employee",
           "id": 1,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #1"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/2",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/2",
           "@type": "Employee",
           "id": 2,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #2 - edited"
         },
         {
-          "@id": "/issue5736_companies/1/issue5736_teams/1/employees/4",
+          "@id": "/issue5736_companies/2/issue5736_teams/2/employees/4",
           "@type": "Employee",
           "id": 4,
-          "team": "/issue5736_companies/1/issue5736_teams/1",
+          "team": "/issue5736_companies/2/issue5736_teams/2",
           "name": "Employee #4"
         }
       ]

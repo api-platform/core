@@ -5,9 +5,9 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: GET Teams collection
-    Given there is a company with name "Company #1"
-    And there are 3 teams in company 1
-    And I send a "GET" request to "/issue5736_companies/1/issue5736_teams"
+    Given there are 2 companies
+    And there are 3 teams in company 2
+    And I send a "GET" request to "/issue5736_companies/2/issue5736_teams"
 
     Then the response status code should be 200
     And the response should be in JSON
@@ -15,31 +15,31 @@ Feature: Resources, subresources and their subresources with uri variables that 
     """
     {
         "@context": "/contexts/Team",
-        "@id": "/issue5736_companies/1/issue5736_teams",
+        "@id": "/issue5736_companies/2/issue5736_teams",
         "@type": "hydra:Collection",
         "hydra:totalItems": 3,
         "hydra:member": [
             {
-                "@id": "/issue5736_companies/1/issue5736_teams/1",
+                "@id": "/issue5736_companies/2/issue5736_teams/1",
                 "@type": "Team",
                 "id": 1,
-                "company": "/issue5736_companies/1",
+                "company": "/issue5736_companies/2",
                 "name": "Team #1",
                 "employees": []
             },
             {
-                "@id": "/issue5736_companies/1/issue5736_teams/2",
+                "@id": "/issue5736_companies/2/issue5736_teams/2",
                 "@type": "Team",
                 "id": 2,
-                "company": "/issue5736_companies/1",
+                "company": "/issue5736_companies/2",
                 "name": "Team #2",
                 "employees": []
             },
             {
-                "@id": "/issue5736_companies/1/issue5736_teams/3",
+                "@id": "/issue5736_companies/2/issue5736_teams/3",
                 "@type": "Team",
                 "id": 3,
-                "company": "/issue5736_companies/1",
+                "company": "/issue5736_companies/2",
                 "name": "Team #3",
                 "employees": []
             }
@@ -49,9 +49,9 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: POST Team
-    Given there is a company with name "Company #1"
+    Given there are 2 companies
     And I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/issue5736_companies/1/issue5736_teams" with body:
+    And I send a "POST" request to "/issue5736_companies/2/issue5736_teams" with body:
     """
     {
       "name": "Team 1"
@@ -64,10 +64,10 @@ Feature: Resources, subresources and their subresources with uri variables that 
     """
     {
        "@context": "/contexts/Team",
-       "@id": "/issue5736_companies/1/issue5736_teams/1",
+       "@id": "/issue5736_companies/2/issue5736_teams/1",
        "@type": "Team",
        "id": 1,
-       "company": "/issue5736_companies/1",
+       "company": "/issue5736_companies/2",
        "name": "Team 1",
        "employees": []
     }
@@ -75,10 +75,10 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: GET Team
-    Given there is a company with name "Company #1"
-    And there is a team "Team #1" in company 1
+    Given there are 2 companies
+    And there are 2 teams in company 2
     And I add "Content-Type" header equal to "application/ld+json"
-    And I send a "GET" request to "/issue5736_companies/1/issue5736_teams/1"
+    And I send a "GET" request to "/issue5736_companies/2/issue5736_teams/2"
 
     Then the response status code should be 200
     And the response should be in JSON
@@ -86,24 +86,24 @@ Feature: Resources, subresources and their subresources with uri variables that 
     """
     {
       "@context": "/contexts/Team",
-      "@id": "/issue5736_companies/1/issue5736_teams/1",
+      "@id": "/issue5736_companies/2/issue5736_teams/2",
       "@type": "Team",
-      "id": 1,
-      "company": "/issue5736_companies/1",
-      "name": "Team #1",
+      "id": 2,
+      "company": "/issue5736_companies/2",
+      "name": "Team #2",
       "employees": []
     }
     """
 
   @createSchema
   Scenario: PUT Team
-    Given there is a company with name "Company #1"
-    And there is a team "Team #1" in company 1
+    Given there are 2 companies
+    And there are 2 teams in company 2
     And I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "/issue5736_companies/1/issue5736_teams/1" with body:
+    And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
-      "name": "Team #1 - edited"
+      "name": "Team #2 - edited"
     }
     """
 
@@ -113,11 +113,11 @@ Feature: Resources, subresources and their subresources with uri variables that 
     """
     {
       "@context": "/contexts/Team",
-      "@id": "/issue5736_companies/1/issue5736_teams/1",
+      "@id": "/issue5736_companies/2/issue5736_teams/2",
       "@type": "Team",
-      "id": 1,
-      "company": "/issue5736_companies/1",
-      "name": "Team #1 - edited",
+      "id": 2,
+      "company": "/issue5736_companies/2",
+      "name": "Team #2 - edited",
       "employees": []
     }
     """
