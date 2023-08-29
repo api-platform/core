@@ -20,15 +20,18 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'issue5736_teams')]
 #[API\ApiResource(
     normalizationContext: [
         AbstractNormalizer::GROUPS => [Team::GROUP_NOR_READ],
+        AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
     ],
     denormalizationContext: [
         AbstractNormalizer::GROUPS => [Team::GROUP_DENOR_WRITE],
+        AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
     ],
     operations: [
         new API\GetCollection(
@@ -80,14 +83,14 @@ class Team implements CompanyAwareInterface
     #[Groups([Team::GROUP_NOR_READ, Team::GROUP_DENOR_WRITE])]
     private ?Company $company = null;
 
-    /** @var Collection<Employee>  */
-    #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'team')]
-    #[Groups([Team::GROUP_NOR_READ, Team::GROUP_DENOR_WRITE])]
-    private Collection $employees;
-
     #[ORM\Column]
     #[Groups([Team::GROUP_NOR_READ, Team::GROUP_DENOR_WRITE])]
     private string $name;
+
+    /** @var Collection<Employee>  */
+    #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'team', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups([Team::GROUP_NOR_READ, Team::GROUP_DENOR_WRITE])]
+    private Collection $employees;
 
     public function __construct()
     {
@@ -101,7 +104,12 @@ class Team implements CompanyAwareInterface
 
     public function getCompany() : ?Company
     {
-        return isset($this->company) ? $this->company : null;
+        return $this->hasCompany() ? $this->company : null;
+    }
+
+    public function hasCompany() : bool
+    {
+        return isset($this->company);
     }
 
     public function setCompany(Company $company) : void
@@ -117,5 +125,41 @@ class Team implements CompanyAwareInterface
     public function setName(string $name) : void
     {
         $this->name = $name;
+    }
+
+    public function getEmployees() : Collection
+    {
+        return $this->employees;
+    }
+
+    public function setEmployees(Collection $employees) : void
+    {
+        $this->resetEmployees();
+
+        foreach ($employees as $employee) {
+            $this->addEmployee($employee);
+        }
+    }
+
+    public function addEmployee(Employee $employee) : void
+    {
+        $predictate = static fn (int $key, Employee $element): bool => $employee->hasTeam() && $element->hasTeam() && $element->getTeam() === $employee->getTeam();
+
+        if (false === $this->employees->exists($predictate)) {
+            $this->employees->add($employee);
+
+            // This has to be after the adding of the line to an infinite loop
+            $employee->setTeam($this);
+        }
+    }
+
+    public function removeEmployee(Employee $employee) : void
+    {
+        $this->employees->removeElement($employee);
+    }
+
+    private function resetEmployees(): void
+    {
+        $this->employees = new ArrayCollection();
     }
 }

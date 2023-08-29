@@ -17,15 +17,18 @@ use ApiPlatform\Metadata as API;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'issue5736_employees')]
 #[API\ApiResource(
     normalizationContext: [
         AbstractNormalizer::GROUPS => [self::GROUP_NOR_READ],
+        AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
     ],
     denormalizationContext: [
         AbstractNormalizer::GROUPS => [self::GROUP_DENOR_WRITE],
+        AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
     ],
     operations: [
         new API\GetCollection(
@@ -38,9 +41,9 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
         new API\Get(
             uriTemplate: self::API_RESOURCE,
             uriVariables: [
-                Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, toProperty: 'company', identifiers: ['id']),
-                Team::API_ID_PLACEHOLDER    => new API\Link(fromClass: Team::class, toProperty: 'team', identifiers: ['id']),
-                Employee::API_ID_PLACEHOLDER    => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Company::API_ID_PLACEHOLDER  => new API\Link(fromClass: Company::class, toProperty: 'company', identifiers: ['id']),
+                Team::API_ID_PLACEHOLDER     => new API\Link(fromClass: Team::class, toProperty: 'team', identifiers: ['id']),
+                Employee::API_ID_PLACEHOLDER => new API\Link(fromClass: self::class, identifiers: ['id']),
             ],
         ),
     ],
@@ -70,7 +73,7 @@ class Employee
     private Team $team;
 
     #[ORM\Column]
-    #[Groups([self::GROUP_NOR_READ])]
+    #[Groups([self::GROUP_NOR_READ, Team::GROUP_NOR_READ, Team::GROUP_DENOR_WRITE])]
     private string $name;
 
     /**
@@ -86,9 +89,18 @@ class Employee
         return $this->team;
     }
 
+    public function hasTeam() : bool
+    {
+        return isset($this->team);
+    }
+
     public function setTeam(Team $team) : void
     {
         $this->team = $team;
+
+        if ($team->hasCompany()) {
+            $this->setCompany($team->getCompany());
+        }
     }
 
     public function getName() : string
@@ -99,5 +111,15 @@ class Employee
     public function setName(string $name) : void
     {
         $this->name = $name;
+    }
+
+    public function getCompany() : Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company) : void
+    {
+        $this->company = $company;
     }
 }

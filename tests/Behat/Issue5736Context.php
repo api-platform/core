@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Behat;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5736Aerendir\Company;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5736Aerendir\Employee;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5736Aerendir\Team;
 use Behat\Behat\Context\Context;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -106,6 +107,24 @@ final class Issue5736Context implements Context
             $team->setCompany($company);
 
             $this->manager->persist($team);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb employees in team :teamId
+     */
+    public function thereAreNbEmployees(int $nb, int $teamId): void
+    {
+        $team = $this->manager->getRepository(Team::class)->findOneBy(['id' => $teamId]);
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $employee = new Employee();
+            $employee->setName('Employee #'.$i);
+            $employee->setTeam($team);
+
+            $this->manager->persist($employee);
         }
 
         $this->manager->flush();
