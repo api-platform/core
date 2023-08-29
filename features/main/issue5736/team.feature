@@ -50,7 +50,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
   @createSchema
   Scenario: POST Team
     Given there are 2 companies
-    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/issue5736_companies/2/issue5736_teams" with body:
     """
     {
@@ -77,7 +77,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
   Scenario: GET Team
     Given there are 2 companies
     And there are 2 teams in company 2
-    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "GET" request to "/issue5736_companies/2/issue5736_teams/2"
 
     Then the response status code should be 200
@@ -99,7 +99,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
   Scenario: PUT Team
     Given there are 2 companies
     And there are 2 teams in company 2
-    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {

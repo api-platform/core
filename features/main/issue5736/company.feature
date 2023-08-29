@@ -42,7 +42,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: POST Company
-    Given I add "Content-Type" header equal to "application/ld+json"
+    Given I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/issue5736_companies" with body:
     """
     {
@@ -66,7 +66,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
   @createSchema
   Scenario: GET Company
     Given there are 3 companies
-    Given I add "Content-Type" header equal to "application/ld+json"
+    Given I add "Content-Type" header equal to "application/json"
     And I send a "GET" request to "/issue5736_companies/1"
 
     Then the response status code should be 200
@@ -85,7 +85,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
   @createSchema
   Scenario: PUT Company
     Given there are 3 companies
-    Given I add "Content-Type" header equal to "application/ld+json"
+    Given I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/issue5736_companies/1" with body:
     """
     {

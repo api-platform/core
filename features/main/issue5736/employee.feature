@@ -7,7 +7,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
   Scenario: PUT Team with POST Employee
     Given there are 2 companies
     And there are 2 teams in company 2
-    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
@@ -48,7 +48,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
     Given there are 2 companies
     And there are 2 teams in company 2
     And there are 3 employees in team 2
-    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
@@ -120,7 +120,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
     Given there are 2 companies
     And there are 2 teams in company 2
     And there are 3 employees in team 2
-    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
@@ -178,7 +178,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
     Given there are 2 companies
     And there are 2 teams in company 2
     And there are 3 employees in team 2
-    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
@@ -236,7 +236,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
     Given there are 2 companies
     And there are 2 teams in company 2
     And there are 3 employees in team 2
-    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/issue5736_companies/2/issue5736_teams/2" with body:
     """
     {
