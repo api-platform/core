@@ -2,6 +2,7 @@ default:
   suites:
     default:
       contexts:
+        - 'ApiPlatform\Tests\Behat\Issue5736Context'
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
         - 'ApiPlatform\Tests\Behat\GraphqlContext'

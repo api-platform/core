@@ -4,6 +4,8 @@ services:
         autowire: true
         autoconfigure: true
 
+    ApiPlatform\Tests\Behat\Issue5736Context:
+        $doctrine: '@doctrine'
     ApiPlatform\Tests\Behat\CommandContext: ~
     ApiPlatform\Tests\Behat\DoctrineContext:
         $doctrine: '@doctrine'
