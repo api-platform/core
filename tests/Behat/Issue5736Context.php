@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Behat;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5736Aerendir\Company;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5736Aerendir\Team;
 use Behat\Behat\Context\Context;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\SchemaManager;
@@ -49,6 +50,19 @@ final class Issue5736Context implements Context
     }
 
     /**
+     * @Given there is a company with name :companyName
+     */
+    public function thereIsACompany(string $companyName): void
+    {
+        $company = new Company();
+        $company->setName($companyName);
+
+        $this->manager->persist($company);
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb companies
      */
     public function thereAreNbCompanies(int $nb): void
@@ -58,6 +72,40 @@ final class Issue5736Context implements Context
             $company->setName('Company #'.$i);
 
             $this->manager->persist($company);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a team :teamName in company :companyId
+     */
+    public function thereIsATeam(string $teamName, int $companyId): void
+    {
+        $company = $this->manager->getRepository(Company::class)->findOneBy(['id' => $companyId]);
+
+        $team = new Team();
+        $team->setName($teamName);
+        $team->setCompany($company);
+
+        $this->manager->persist($team);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb teams in company :companyId
+     */
+    public function thereAreNbTeams(int $nb, int $companyId): void
+    {
+        $company = $this->manager->getRepository(Company::class)->findOneBy(['id' => $companyId]);
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $team = new Team();
+            $team->setName('Team #'.$i);
+            $team->setCompany($company);
+
+            $this->manager->persist($team);
         }
 
         $this->manager->flush();

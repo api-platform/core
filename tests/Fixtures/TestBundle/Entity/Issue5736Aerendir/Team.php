@@ -25,38 +25,38 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 #[ORM\Table(name: 'issue5736_teams')]
 #[API\ApiResource(
     normalizationContext: [
-        AbstractNormalizer::GROUPS => [self::GROUP_NOR_READ],
+        AbstractNormalizer::GROUPS => [Team::GROUP_NOR_READ],
     ],
     denormalizationContext: [
-        AbstractNormalizer::GROUPS => [self::GROUP_DENOR_WRITE],
+        AbstractNormalizer::GROUPS => [Team::GROUP_DENOR_WRITE],
     ],
     operations: [
         new API\GetCollection(
-            uriTemplate: self::API_ENDPOINT,
+            uriTemplate: Team::API_ENDPOINT,
             uriVariables: [
                 Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, toProperty: 'company', identifiers: ['id']),
             ],
         ),
         new API\Get(
-            uriTemplate: self::API_RESOURCE,
+            uriTemplate: Team::API_RESOURCE,
             uriVariables: [
                 Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, toProperty: 'company', identifiers: ['id']),
-                Team::API_ID_PLACEHOLDER    => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Team::API_ID_PLACEHOLDER    => new API\Link(fromClass: Team::class, identifiers: ['id']),
             ],
         ),
         new API\Post(
             read: false,
             processor: SetCompany5736Processor::class,
-            uriTemplate: self::API_ENDPOINT,
+            uriTemplate: Team::API_ENDPOINT,
             uriVariables: [
                 Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, toProperty: 'company', identifiers: ['id']),
             ],
         ),
         new API\Put(
-            uriTemplate: self::API_RESOURCE,
+            uriTemplate: Team::API_RESOURCE,
             uriVariables: [
                 Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, toProperty: 'company', identifiers: ['id']),
-                Team::API_ID_PLACEHOLDER    => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Team::API_ID_PLACEHOLDER    => new API\Link(fromClass: Team::class, identifiers: ['id']),
             ],
         ),
     ],
@@ -65,28 +65,28 @@ class Team implements CompanyAwareInterface
 {
     public const API_ID_PLACEHOLDER = 'issue5736_team';
     public const API_ENDPOINT = Company::API_RESOURCE . '/issue5736_teams';
-    public const API_RESOURCE = self::API_ENDPOINT . '/{' . self::API_ID_PLACEHOLDER . '}';
+    public const API_RESOURCE = Team::API_ENDPOINT . '/{' . Team::API_ID_PLACEHOLDER . '}';
     public const GROUP_NOR_READ    = 'team:read';
     public const GROUP_DENOR_WRITE = 'team:write';
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
-    #[Groups([self::GROUP_NOR_READ, self::GROUP_DENOR_WRITE])]
-    private ?int $id;
+    #[Groups([Team::GROUP_NOR_READ, Team::GROUP_DENOR_WRITE])]
+    private int $id;
 
     #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'teams')]
     #[ORM\JoinColumn(name: 'company', nullable: false)]
-    #[Groups([self::GROUP_NOR_READ, self::GROUP_DENOR_WRITE])]
-    private Company $company;
+    #[Groups([Team::GROUP_NOR_READ, Team::GROUP_DENOR_WRITE])]
+    private ?Company $company = null;
 
     /** @var Collection<Employee>  */
     #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'team')]
-    #[Groups([self::GROUP_NOR_READ, self::GROUP_DENOR_WRITE])]
+    #[Groups([Team::GROUP_NOR_READ, Team::GROUP_DENOR_WRITE])]
     private Collection $employees;
 
     #[ORM\Column]
-    #[Groups([self::GROUP_NOR_READ, self::GROUP_DENOR_WRITE])]
+    #[Groups([Team::GROUP_NOR_READ, Team::GROUP_DENOR_WRITE])]
     private string $name;
 
     public function __construct()
@@ -94,9 +94,14 @@ class Team implements CompanyAwareInterface
         $this->employees = new ArrayCollection();
     }
 
-    public function getCompany() : Company
+    public function getId() : int
     {
-        return $this->company;
+        return $this->id;
+    }
+
+    public function getCompany() : ?Company
+    {
+        return isset($this->company) ? $this->company : null;
     }
 
     public function setCompany(Company $company) : void
