@@ -22,22 +22,19 @@ Feature: Resources, subresources and their subresources with uri variables that 
                 "@id": "/issue5736_companies/1",
                 "@type": "Company",
                 "id": 1,
-                "name": "Company #1",
-                "teams": []
+                "name": "Company #1"
             },
             {
                 "@id": "/issue5736_companies/2",
                 "@type": "Company",
                 "id": 2,
-                "name": "Company #2",
-                "teams": []
+                "name": "Company #2"
             },
             {
                 "@id": "/issue5736_companies/3",
                 "@type": "Company",
                 "id": 3,
-                "name": "Company #3",
-                "teams": []
+                "name": "Company #3"
             }
         ]
     }
@@ -45,7 +42,7 @@ Feature: Resources, subresources and their subresources with uri variables that 
 
   @createSchema
   Scenario: POST Company
-    Given I add "Content-Type" header equal to "application/json"
+    Given I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/issue5736_companies" with body:
     """
     {
@@ -62,15 +59,14 @@ Feature: Resources, subresources and their subresources with uri variables that 
       "@id": "/issue5736_companies/1",
       "@type": "Company",
       "id": 1,
-      "name": "Company 1",
-      "teams": []
+      "name": "Company 1"
     }
     """
 
   @createSchema
   Scenario: GET Company
     Given there are 3 companies
-    Given I add "Content-Type" header equal to "application/json"
+    Given I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/issue5736_companies/1"
 
     Then the response status code should be 200
@@ -82,15 +78,14 @@ Feature: Resources, subresources and their subresources with uri variables that 
       "@id": "/issue5736_companies/1",
       "@type": "Company",
       "id": 1,
-      "name": "Company #1",
-      "teams": []
+      "name": "Company #1"
     }
     """
 
   @createSchema
   Scenario: PUT Company
     Given there are 3 companies
-    Given I add "Content-Type" header equal to "application/json"
+    Given I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/issue5736_companies/1" with body:
     """
     {
@@ -107,7 +102,6 @@ Feature: Resources, subresources and their subresources with uri variables that 
       "@id": "/issue5736_companies/1",
       "@type": "Company",
       "id": 1,
-      "name": "Company 1 - edited",
-      "teams": []
+      "name": "Company 1 - edited"
     }
     """

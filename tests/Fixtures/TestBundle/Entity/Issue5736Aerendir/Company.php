@@ -24,10 +24,10 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 #[ORM\Table(name: 'issue5736_companies')]
 #[API\ApiResource(
     normalizationContext: [
-        AbstractNormalizer::GROUPS => [self::GROUP_NOR_READ],
+        AbstractNormalizer::GROUPS => [Company::GROUP_NOR_READ],
     ],
     denormalizationContext: [
-        AbstractNormalizer::GROUPS => [self::GROUP_DENOR_WRITE],
+        AbstractNormalizer::GROUPS => [Company::GROUP_DENOR_WRITE],
     ],
     operations: [
         new API\GetCollection(
@@ -36,7 +36,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
         new API\Get(
             uriTemplate: Company::API_RESOURCE,
             uriVariables: [
-                Company::API_ID_PLACEHOLDER => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, identifiers: ['id']),
             ],
         ),
         new API\Post(
@@ -46,7 +46,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
         new API\Put(
             uriTemplate: Company::API_RESOURCE,
             uriVariables: [
-                Company::API_ID_PLACEHOLDER => new API\Link(fromClass: self::class, identifiers: ['id']),
+                Company::API_ID_PLACEHOLDER => new API\Link(fromClass: Company::class, identifiers: ['id']),
             ],
         ),
     ],
@@ -55,18 +55,18 @@ class Company
 {
     public const API_ID_PLACEHOLDER = 'issue5736_company';
     public const API_ENDPOINT = 'issue5736_companies';
-    public const API_RESOURCE = '/' . self::API_ENDPOINT . '/{' . self::API_ID_PLACEHOLDER . '}';
+    public const API_RESOURCE = '/' . Company::API_ENDPOINT . '/{' . Company::API_ID_PLACEHOLDER . '}';
     public const GROUP_NOR_READ    = 'company:read';
     public const GROUP_DENOR_WRITE = 'company:write';
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[Groups([self::GROUP_NOR_READ])]
+    #[Groups([Company::GROUP_NOR_READ])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups([self::GROUP_NOR_READ, self::GROUP_DENOR_WRITE])]
+    #[Groups([Company::GROUP_NOR_READ, Company::GROUP_DENOR_WRITE])]
     private string $name;
 
     /** @var Collection<Team>  */
