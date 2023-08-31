@@ -93,7 +93,7 @@ class ItemNormalizer extends AbstractItemNormalizer
 
     private function getContextUriVariables(array $data, $operation, array $context): array
     {
-        $uriVariables = $context['uri_variables'] ?? null;
+        $uriVariables = $context['uri_variables'] ?? [];
 
         $operationUriVariables = $operation->getUriVariables();
         if ((null !== $uriVariable = array_shift($operationUriVariables)) && \count($uriVariable->getIdentifiers())) {
