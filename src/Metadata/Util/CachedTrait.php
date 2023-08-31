@@ -24,6 +24,11 @@ trait CachedTrait
     private CacheItemPoolInterface $cacheItemPool;
     private array $localCache = [];
 
+    public function reset(): void
+    {
+        $this->localCache = [];
+    }
+
     private function getCached(string $cacheKey, callable $getValue): mixed
     {
         if (\array_key_exists($cacheKey, $this->localCache)) {

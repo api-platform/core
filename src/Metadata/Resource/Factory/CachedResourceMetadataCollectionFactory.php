@@ -16,13 +16,14 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Caches resource metadata.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class CachedResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
+final class CachedResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface, ResetInterface
 {
     public const CACHE_KEY_PREFIX = 'resource_metadata_collection_';
     private array $localCache = [];
@@ -62,5 +63,13 @@ final class CachedResourceMetadataCollectionFactory implements ResourceMetadataC
         $this->cacheItemPool->save($cacheItem);
 
         return $resourceMetadataCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset(): void
+    {
+        $this->localCache = [];
     }
 }
