@@ -18,13 +18,14 @@ use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * {@inheritdoc}
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
+final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface, ResetInterface
 {
     use ResourceClassInfoTrait;
 
@@ -103,6 +104,16 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
         }
 
         return $identifiers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        unset($this->localCache, $this->localResourceCache);
+        $this->localCache = [];
+        $this->localResourceCache = [];
     }
 
     private function getKeys($item, callable $retriever): array

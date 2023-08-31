@@ -15,13 +15,14 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Cache\CachedTrait;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * {@inheritdoc}
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-final class CachedRouteNameResolver implements RouteNameResolverInterface
+final class CachedRouteNameResolver implements RouteNameResolverInterface, ResetInterface
 {
     use CachedTrait;
 

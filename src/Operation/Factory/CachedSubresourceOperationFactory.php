@@ -15,11 +15,12 @@ namespace ApiPlatform\Core\Operation\Factory;
 
 use ApiPlatform\Core\Cache\CachedTrait;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @internal
  */
-final class CachedSubresourceOperationFactory implements SubresourceOperationFactoryInterface
+final class CachedSubresourceOperationFactory implements SubresourceOperationFactoryInterface, ResetInterface
 {
     use CachedTrait;
 

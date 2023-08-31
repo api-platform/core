@@ -16,13 +16,14 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 use ApiPlatform\Core\Cache\CachedTrait;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Caches resource name collection.
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-final class CachedResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
+final class CachedResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface, ResetInterface
 {
     use CachedTrait;
 

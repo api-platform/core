@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Caches document metadata.
@@ -25,7 +26,7 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInterface
+final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInterface, ResetInterface
 {
     private const CACHE_KEY_PREFIX = 'index_metadata';
 
@@ -37,6 +38,15 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
     {
         $this->cacheItemPool = $cacheItemPool;
         $this->decorated = $decorated;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        unset($this->localCache);
+        $this->localCache = [];
     }
 
     /**

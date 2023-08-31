@@ -37,6 +37,7 @@
         <service id="api_platform.elasticsearch.metadata.document.metadata_factory.cached" class="ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory" decorates="api_platform.elasticsearch.metadata.document.metadata_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.elasticsearch.cache.metadata.document" />
             <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory.cached.inner" />
+            <tag name="kernel.reset" method="reset"/>
         </service>
 
         <service id="api_platform.elasticsearch.identifier_extractor" class="ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractor" public="false">

@@ -27,6 +27,7 @@
         <service id="api_platform.route_name_resolver.cached" class="ApiPlatform\Core\Bridge\Symfony\Routing\CachedRouteNameResolver" decorates="api_platform.route_name_resolver" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.route_name_resolver" />
             <argument type="service" id="api_platform.route_name_resolver.cached.inner" />
+            <tag name="kernel.reset" method="reset"/>
         </service>
 
         <service id="api_platform.route_loader" class="ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader" public="false">
@@ -267,6 +268,7 @@
             <argument type="service" id="api_platform.identifiers_extractor.cached.inner" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.resource_class_resolver" />
+            <tag name="kernel.reset" method="reset"/>
         </service>
         <service id="ApiPlatform\Core\Api\IdentifiersExtractorInterface" alias="api_platform.identifiers_extractor.cached" />
 
@@ -297,6 +299,7 @@
         <service id="api_platform.subresource_operation_factory.cached" class="ApiPlatform\Core\Operation\Factory\CachedSubresourceOperationFactory" decorates="api_platform.subresource_operation_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.subresource_operation_factory" />
             <argument type="service" id="api_platform.subresource_operation_factory.cached.inner" />
+            <tag name="kernel.reset" method="reset"/>
         </service>
 
         <!-- Cache -->

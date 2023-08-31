@@ -16,13 +16,14 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 use ApiPlatform\Core\Cache\CachedTrait;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Caches property metadata.
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInterface
+final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInterface, ResetInterface
 {
     use CachedTrait;
 

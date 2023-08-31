@@ -10,6 +10,7 @@
         <service id="api_platform.metadata.resource.name_collection_factory.cached" class="ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceNameCollectionFactory" decorates="api_platform.metadata.resource.name_collection_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.resource" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory.cached.inner" />
+            <tag name="kernel.reset" method="reset"/>
         </service>
         <service id="ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface" alias="api_platform.metadata.resource.name_collection_factory" />
 
@@ -36,6 +37,7 @@
         <service id="api_platform.metadata.resource.metadata_factory.cached" class="ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.resource" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.cached.inner" />
+            <tag name="kernel.reset" method="reset"/>
         </service>
 
         <service id="ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" alias="api_platform.metadata.resource.metadata_factory" />
@@ -52,6 +54,7 @@
         <service id="api_platform.metadata.property.name_collection_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.property" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory.cached.inner" />
+            <tag name="kernel.reset" method="reset"/>
         </service>
 
         <!-- Property metadata -->
@@ -72,6 +75,7 @@
         <service id="api_platform.metadata.property.metadata_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.property" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.cached.inner" />
+            <tag name="kernel.reset" method="reset"/>
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory.default_property" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="30" class="ApiPlatform\Core\Metadata\Property\Factory\DefaultPropertyMetadataFactory" public="false">
