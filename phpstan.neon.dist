@@ -85,3 +85,5 @@ parameters:
 		-
 			message: '#^Property .+ is unused.$#'
 			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php
+
+		- '#Elasticsearch\\.*#'
