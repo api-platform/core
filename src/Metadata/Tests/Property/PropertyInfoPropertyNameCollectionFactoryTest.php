@@ -93,11 +93,11 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
         $collection = $factory->create(DummyIgnoreProperty::class, ['serializer_groups' => ['dummy']]);
 
         self::assertCount(1, $collection);
-        self::assertNotContains('ignored', $collection);
+        self::assertNotContains('ignored', (array) $collection);
 
         $collection = $factory->create(DummyIgnoreProperty::class);
 
         self::assertCount(2, $collection);
-        self::assertNotContains('ignored', $collection);
+        self::assertNotContains('ignored', (array) $collection);
     }
 }

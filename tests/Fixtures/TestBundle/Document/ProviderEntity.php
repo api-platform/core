@@ -37,9 +37,6 @@ class ProviderEntity
     #[ODM\Field]
     private ?string $foo = null;
 
-    /**
-     * @return int
-     */
     public function getId(): ?int
     {
         return $this->id;
