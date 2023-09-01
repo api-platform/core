@@ -37,9 +37,6 @@ class ProcessorEntity
     #[Assert\NotBlank]
     private string $foo;
 
-    /**
-     * @return int
-     */
     public function getId(): ?int
     {
         return $this->id;
