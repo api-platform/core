@@ -344,8 +344,6 @@ final class DoctrineContext implements Context
 
     /**
      * @Given there are :nb fooDummy objects with fake names
-     *
-     * @param mixed $nb
      */
     public function thereAreFooDummyObjectsWithFakeNames($nb): void
     {
@@ -1782,8 +1780,6 @@ final class DoctrineContext implements Context
 
     /**
      * @Given there are :nb DummyDtoCustom
-     *
-     * @param mixed $nb
      */
     public function thereAreNbDummyDtoCustom($nb): void
     {

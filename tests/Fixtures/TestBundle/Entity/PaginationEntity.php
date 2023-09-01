@@ -36,9 +36,6 @@ class PaginationEntity
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    /**
-     * @return int
-     */
     public function getId(): ?int
     {
         return $this->id;

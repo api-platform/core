@@ -166,7 +166,7 @@ final class ItemNormalizerTest extends TestCase
             }
         });
 
-        $this->assertEmpty($this->itemNormalizer->getSupportedTypes('json'));
-        $this->assertSame(['*' => true], $this->itemNormalizer->getSupportedTypes($this->itemNormalizer::FORMAT));
+        $this->assertEmpty($this->itemNormalizer->getSupportedTypes($this->itemNormalizer::FORMAT));
+        $this->assertSame(['*' => true], $this->itemNormalizer->getSupportedTypes('json'));
     }
 }
