@@ -2,7 +2,7 @@
 // ---
 // slug: extend-openapi-documentation
 // name: Extend OpenAPI Documentation
-// position: 10
+// position: 5
 // executable: true
 // ---
 

@@ -2,6 +2,7 @@
 // ---
 // slug: use-doctrine-orm-filters
 // name: Use Doctrine Filters
+// position: 14
 // executable: true
 // ---
 
