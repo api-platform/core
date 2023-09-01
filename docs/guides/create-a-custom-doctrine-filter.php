@@ -3,6 +3,7 @@
 // slug: create-a-custom-doctrine-filter
 // name: Create a Custom Doctrine Filter
 // executable: true
+// position: 10
 // tags: doctrine
 // ---
 

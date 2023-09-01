@@ -1,3 +1,10 @@
 when@test:
     framework:
         test: true
+api_platform:
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    defaults:
+        extraProperties:
+            standard_put: true

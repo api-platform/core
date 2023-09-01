@@ -1,7 +1,8 @@
 <?php
 // ---
-// slug: doctrine-orm-and-mongodb-odm-service-filters
-// name: Doctrine ORM and MongoDB ODM Service Filters
+// slug: doctrine-orm-service-filter
+// name: Doctrine ORM Service Filters
+// position: 11
 // executable: true
 // ---
 

@@ -1,15 +1,14 @@
 <?php
 // ---
-// slug: doctrine-orm-and-odm-attribute-filters
-// name: Doctrine ORM and ODM Attribute Filters
+// position: 13
+// slug: use-doctrine-search-filter
+// name: Doctrine ORM SearchFilter
 // executable: true
 // ---
 
 // API Platform provides a generic system to apply filters and sort criteria on collections. Useful filters for Doctrine ORM, MongoDB ODM and ElasticSearch are provided with the library.
 //
 // By default, all filters are disabled. They must be enabled explicitly.
-//
-// Filters can be declared as attributes (see [custom filters](/docs/guide/custom-filters)), and they can be linked to a Resource or a property as following:
 
 namespace App\Entity {
     use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
@@ -18,12 +17,11 @@ namespace App\Entity {
     use Doctrine\ORM\Mapping as ORM;
 
     #[ApiResource]
-    /*
-     * By using the `#[ApiFilter]` attribute, this attribute automatically declares the service,
-     * and you just have to use the filter class you want.
-     *
-     * If the filter is declared on the resource, you can specify on which properties it applies.
-     */
+    //
+    // By using the `#[ApiFilter]` attribute, this attribute automatically declares the service,
+    // and you just have to use the filter class you want.
+    //
+    // If the filter is declared on the resource, you can specify on which properties it applies.
     #[ApiFilter(SearchFilter::class, properties: ['title'])]
     #[ORM\Entity]
     class Book
@@ -35,9 +33,7 @@ namespace App\Entity {
         public ?string $title = null;
 
         #[ORM\Column]
-        /*
-         * When declaring a filter on a property, no need to specify the `properties` option.
-         */
+        // We can also declare the filter attribute on a property.
         #[ApiFilter(SearchFilter::class)]
         public ?string $author = null;
     }

@@ -1,8 +1,9 @@
 <?php
 // ---
-// slug: handle-a-pagination-on-a-custom-collection
-// name: Handle a Pagination on a Custom Collection
+// slug: custom-pagination
+// name: Custom pagination
 // executable: true
+// position: 12
 // tags: state
 // ---
 

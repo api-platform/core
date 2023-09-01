@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Playground\DependencyInjection\Compiler;
 
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Playground\Metadata\Property\Factory\PropertyNameCollectionFactory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
