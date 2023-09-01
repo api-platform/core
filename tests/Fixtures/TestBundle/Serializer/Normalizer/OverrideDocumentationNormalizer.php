@@ -28,7 +28,6 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
 
     /**
      * @param mixed|null $format
-     * @param mixed      $object
      *
      * @throws ExceptionInterface
      */
@@ -50,7 +49,6 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
 
     /**
      * @param mixed|null $format
-     * @param mixed      $data
      */
     public function supportsNormalization($data, $format = null): bool
     {
