@@ -15,15 +15,16 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\ApiResource\Error;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Util\ErrorFormatGuesser;
+use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
+use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
 use ApiPlatform\Validator\Exception\ValidationException;
+use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,10 +34,11 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttp
 /**
  * This error listener extends the Symfony one in order to add
  * the `_api_operation` attribute when the request is duplicated.
- * It will later be used to retrieve the exceptionToStatus from the operation ({@see ExceptionAction}).
+ * It will later be used to retrieve the exceptionToStatus from the operation ({@see ApiPlatform\Action\ExceptionAction}).
  */
 final class ErrorListener extends SymfonyErrorListener
 {
+    use ContentNegotiationTrait;
     use OperationRequestInitiatorTrait;
 
     public function __construct(
@@ -48,20 +50,19 @@ final class ErrorListener extends SymfonyErrorListener
         private readonly array $errorFormats = [],
         private readonly array $exceptionToStatus = [],
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
-        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null
+        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
+        Negotiator $negotiator = null
     ) {
         parent::__construct($controller, $logger, $debug, $exceptionsMapping);
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->negotiator = $negotiator ?? new Negotiator();
     }
 
     protected function duplicateRequest(\Throwable $exception, Request $request): Request
     {
         $dup = parent::duplicateRequest($exception, $request);
-
         $apiOperation = $this->initializeOperation($request);
-
-        $resourceClass = $exception::class;
-        $format = ErrorFormatGuesser::guessErrorFormat($request, $this->errorFormats);
+        $format = $this->getRequestFormat($request, $this->errorFormats, false);
 
         if ($this->resourceClassResolver?->isResourceClass($exception::class)) {
             $resourceCollection = $this->resourceMetadataCollectionFactory->create($exception::class);
@@ -70,7 +71,7 @@ final class ErrorListener extends SymfonyErrorListener
             foreach ($resourceCollection as $resource) {
                 foreach ($resource->getOperations() as $op) {
                     foreach ($op->getOutputFormats() as $key => $value) {
-                        if ($key === $format['key']) {
+                        if ($key === $format) {
                             $operation = $op;
                             break 3;
                         }
@@ -86,33 +87,49 @@ final class ErrorListener extends SymfonyErrorListener
         } elseif ($this->resourceMetadataCollectionFactory) {
             // Create a generic, rfc7807 compatible error according to the wanted format
             /** @var HttpOperation $operation */
-            $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format['key'] ?? null));
+            $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format));
             $operation = $operation->withStatus($this->getStatusCode($apiOperation, $request, $operation, $exception));
             $errorResource = Error::createFromException($exception, $operation->getStatus());
-            $resourceClass = Error::class;
         } else {
-            $operation = new Get(name: '_api_errors_problem', class: Error::class, outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]);
+            /** @var HttpOperation $operation */
+            $operation = new ErrorOperation(name: '_api_errors_problem', class: Error::class, outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]);
             $operation = $operation->withStatus($this->getStatusCode($apiOperation, $request, $operation, $exception));
             $errorResource = Error::createFromException($exception, $operation->getStatus());
-            $resourceClass = Error::class;
         }
 
-        $identifiers = $this->identifiersExtractor?->getIdentifiersFromItem($errorResource, $operation) ?? [];
+        if (!$operation->getProvider()) {
+            $operation = $operation->withProvider(provider: fn () => 'jsonapi' === $format && $errorResource instanceof ConstraintViolationListAwareExceptionInterface ? $errorResource->getConstraintViolationList() : $errorResource);
+        }
 
-        $dup->attributes->set('_api_error', true);
-        $dup->attributes->set('_api_resource_class', $resourceClass);
+        // For our swagger Ui errors
+        if ('html' === $format) {
+            $operation = $operation->withOutputFormats(['html' => ['text/html']]);
+        }
+
+        $identifiers = [];
+        try {
+            $identifiers = $this->identifiersExtractor?->getIdentifiersFromItem($errorResource, $operation) ?? [];
+        } catch (\Exception $e) {
+        }
+
+        if ($exception instanceof ValidationException) {
+            if (!($apiOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
+                $operation = $operation->withNormalizationContext([
+                    'groups' => ['legacy_'.$format],
+                    'force_iri_generation' => false,
+                ]);
+            }
+        }
+
+        $dup->attributes->set('_api_resource_class', $operation->getClass());
         $dup->attributes->set('_api_previous_operation', $apiOperation);
         $dup->attributes->set('_api_operation', $operation);
         $dup->attributes->set('_api_operation_name', $operation->getName());
         $dup->attributes->remove('exception');
-        $dup->attributes->set('data', $errorResource);
-        // Once we get rid of the SwaggerUiAction we'll be able to do this properly
-        $dup->attributes->set('_api_exception_swagger_data', [
-            '_route' => $request->attributes->get('_route'),
-            '_route_params' => $request->attributes->get('_route_params'),
-            '_api_resource_class' => $request->attributes->get('_api_resource_class'),
-            '_api_operation_name' => $request->attributes->get('_api_operation_name'),
-        ]);
+        // These are for swagger
+        $dup->attributes->set('_api_original_route', $request->attributes->get('_route'));
+        $dup->attributes->set('_api_original_route_params', $request->attributes->get('_route_params'));
+        $dup->attributes->set('_api_requested_operation', $request->attributes->get('_api_requested_operation'));
 
         foreach ($identifiers as $name => $value) {
             $dup->attributes->set($name, $value);
@@ -175,13 +192,15 @@ final class ErrorListener extends SymfonyErrorListener
         return 500;
     }
 
-    private function getFormatOperation(string $format): ?string
+    private function getFormatOperation(?string $format): string
     {
         return match ($format) {
+            'json' => '_api_errors_problem',
             'jsonproblem' => '_api_errors_problem',
             'jsonld' => '_api_errors_hydra',
             'jsonapi' => '_api_errors_jsonapi',
-            default => null
+            'html' => '_api_errors_problem', // This will be intercepted by the SwaggerUiProvider
+            default => '_api_errors_problem'
         };
     }
 }

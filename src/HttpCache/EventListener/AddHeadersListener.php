@@ -53,6 +53,9 @@ final class AddHeadersListener
         }
 
         $operation = $this->initializeOperation($request);
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
         $resourceCacheHeaders = $attributes['cache_headers'] ?? $operation?->getCacheHeaders() ?? [];
 
         if ($this->etag && !$response->getEtag()) {

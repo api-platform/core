@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\FormatMatcher;
+use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -48,6 +49,14 @@ final class AddFormatListener
     {
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
+
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
+
+        if ($operation instanceof ErrorOperation) {
+            return;
+        }
 
         if (!($request->attributes->has('_api_resource_class')
             || $request->attributes->getBoolean('_api_respond', false)

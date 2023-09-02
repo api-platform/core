@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator\Exception;
 
+use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use ApiPlatform\Validator\Exception\ValidationException as BaseValidationException;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -27,14 +27,15 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ErrorResource(uriTemplate: '/validation_errors/{id}', provider: 'api_platform.state_provider.default_error',
+#[ErrorResource(
+    uriTemplate: '/validation_errors/{id}',
     status: 422,
     uriVariables: ['id'],
     shortName: 'ConstraintViolationList',
     operations: [
-        new Get(name: '_api_validation_errors_hydra', outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => 'jsonld', 'skip_null_values' => true]),
-        new Get(name: '_api_validation_errors_problem', outputFormats: ['jsonproblem' => ['application/problem+json']], normalizationContext: ['groups' => 'json', 'skip_null_values' => true]),
-        new Get(name: '_api_validation_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => 'jsonapi', 'skip_null_values' => true], provider: 'api_platform.json_api.state_provider.default_error'),
+        new ErrorOperation(name: '_api_validation_errors_hydra', outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]),
+        new ErrorOperation(name: '_api_validation_errors_problem', outputFormats: ['jsonproblem' => ['application/problem+json'], 'json' => ['application/problem+json']], normalizationContext: ['groups' => ['json'], 'skip_null_values' => true]),
+        new ErrorOperation(name: '_api_validation_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]),
     ]
 )]
 final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface
@@ -96,25 +97,25 @@ final class ValidationException extends BaseValidationException implements Const
         return $this->__toString();
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem'])]
+    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
     public function getType(): string
     {
         return '/validation_errors/'.$this->getId();
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem'])]
+    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
     public function getTitle(): ?string
     {
         return $this->errorTitle ?? 'An error occurred';
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem'])]
+    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
     public function getDetail(): ?string
     {
         return $this->__toString();
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem'])]
+    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
     public function getStatus(): ?int
     {
         return 422;
@@ -127,7 +128,7 @@ final class ValidationException extends BaseValidationException implements Const
     }
 
     #[SerializedName('violations')]
-    #[Groups(['json', 'jsonld', 'legacy_jsonld', 'legacy_jsonproblem'])]
+    #[Groups(['json', 'jsonld', 'legacy_jsonld', 'legacy_jsonproblem', 'legacy_json'])]
     public function getViolations(): iterable
     {
         foreach ($this->getConstraintViolationList() as $violation) {

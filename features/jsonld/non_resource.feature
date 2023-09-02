@@ -40,6 +40,7 @@ Feature: JSON-LD non-resource handling
     """
     And the JSON node "notAResource.@id" should exist
 
+  @createSchema
   Scenario: Get a resource containing a raw object with selected properties
     Given there are 1 dummy objects with relatedDummy and its thirdLevel
     When I send a "GET" request to "/contain_non_resources/1?properties[]=id&properties[nested][notAResource][]=foo&properties[notAResource][]=bar"

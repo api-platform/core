@@ -113,6 +113,10 @@ resources:
                         another_custom_property:
                             'Lorem ipsum': 'Dolor sit amet'
                         foo: bar
+                    links:
+                        -
+                            rel: 'http://www.w3.org/ns/json-ld#error'
+                            href: 'http://www.w3.org/ns/hydra/error'
                 -
                     uriTemplate: '/users/{userId}/comments/{commentId}{._format}'
                     class: ApiPlatform\Metadata\Get
@@ -124,6 +128,10 @@ resources:
                         commentId:
                             - ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment
                             - id
+                    links:
+                        -
+                            rel: 'http://www.w3.org/ns/json-ld#error'
+                            href: 'http://www.w3.org/ns/hydra/error'
             formats:
                 json: null
                 jsonld: null
@@ -214,12 +222,17 @@ resources:
             exceptionToStatus:
                 Symfony\Component\Serializer\Exception\ExceptionInterface: 400
             queryParameterValidationEnabled: true
+            links: null
             graphQlOperations:
                 -
                     args:
                         foo:
                             type: custom
                             bar: baz
+                    extraArgs:
+                        bar:
+                            type: custom
+                            baz: qux
                     shortName: Comment
                     description: 'Creates a Comment.'
                     class: ApiPlatform\Metadata\GraphQl\Mutation

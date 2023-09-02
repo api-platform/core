@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Util;
 
-use ApiPlatform\Util\ArrayTrait;
+use ApiPlatform\GraphQl\Util\ArrayTrait;
 use PHPUnit\Framework\TestCase;
 
 class ArrayTraitTest extends TestCase

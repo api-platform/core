@@ -46,6 +46,7 @@ final class Post extends HttpOperation
         bool|OpenApiOperation $openapi = null,
         array $exceptionToStatus = null,
         bool $queryParameterValidationEnabled = null,
+        array $links = null,
 
         string $shortName = null,
         string $class = null,
@@ -122,6 +123,7 @@ final class Post extends HttpOperation
             openapi: $openapi,
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            links: $links,
             shortName: $shortName,
             class: $class,
             paginationEnabled: $paginationEnabled,

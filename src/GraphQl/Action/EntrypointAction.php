@@ -16,9 +16,11 @@ namespace ApiPlatform\GraphQl\Action;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\ExecutorInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
+use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
+use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,17 +34,33 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class EntrypointAction
 {
+    use ContentNegotiationTrait;
     private int $debug;
 
-    public function __construct(private readonly SchemaBuilderInterface $schemaBuilder, private readonly ExecutorInterface $executor, private readonly ?GraphiQlAction $graphiQlAction, private readonly ?GraphQlPlaygroundAction $graphQlPlaygroundAction, private readonly NormalizerInterface $normalizer, private readonly ErrorHandlerInterface $errorHandler, bool $debug = false, private readonly bool $graphiqlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false, private readonly ?string $defaultIde = null)
-    {
+    public function __construct(
+        private readonly SchemaBuilderInterface $schemaBuilder,
+        private readonly ExecutorInterface $executor,
+        private readonly ?GraphiQlAction $graphiQlAction,
+        private readonly ?GraphQlPlaygroundAction $graphQlPlaygroundAction,
+        private readonly NormalizerInterface $normalizer,
+        private readonly ErrorHandlerInterface $errorHandler,
+        bool $debug = false,
+        private readonly bool $graphiqlEnabled = false,
+        private readonly bool $graphQlPlaygroundEnabled = false,
+        private readonly ?string $defaultIde = null,
+        Negotiator $negotiator = null
+    ) {
         $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
+        $this->negotiator = $negotiator ?? new Negotiator();
     }
 
     public function __invoke(Request $request): Response
     {
+        $formats = ['json' => ['application/json'], 'html' => ['text/html']];
+        $format = $this->getRequestFormat($request, $formats, false);
+
         try {
-            if ($request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
+            if ($request->isMethod('GET') && 'html' === $format) {
                 if ('graphiql' === $this->defaultIde && $this->graphiqlEnabled && $this->graphiQlAction) {
                     return ($this->graphiQlAction)($request);
                 }
@@ -72,6 +90,8 @@ final class EntrypointAction
 
     /**
      * @throws BadRequestHttpException
+     *
+     * @return array{0: array<string, mixed>|null, 1: string, 2: array<string, mixed>}
      */
     private function parseRequest(Request $request): array
     {
@@ -103,7 +123,11 @@ final class EntrypointAction
     }
 
     /**
+     * @param array<string,mixed> $variables
+     *
      * @throws BadRequestHttpException
+     *
+     * @return array{0: array<string, mixed>, 1: string, 2: array<string, mixed>}
      */
     private function parseData(?string $query, ?string $operationName, array $variables, string $jsonContent): array
     {
@@ -127,7 +151,13 @@ final class EntrypointAction
     }
 
     /**
+     * @param array<string,mixed> $variables
+     * @param array<string,mixed> $bodyParameters
+     * @param array<string,mixed> $files
+     *
      * @throws BadRequestHttpException
+     *
+     * @return array{0: array<string, mixed>, 1: string, 2: array<string, mixed>}
      */
     private function parseMultipartRequest(?string $query, ?string $operationName, array $variables, array $bodyParameters, array $files): array
     {
@@ -148,6 +178,10 @@ final class EntrypointAction
     }
 
     /**
+     * @param array<string,mixed> $map
+     * @param array<string,mixed> $variables
+     * @param array<string,mixed> $files
+     *
      * @throws BadRequestHttpException
      */
     private function applyMapToVariables(array $map, array $variables, array $files): array
@@ -185,6 +219,8 @@ final class EntrypointAction
 
     /**
      * @throws BadRequestHttpException
+     *
+     * @return array<string, mixed>
      */
     private function decodeVariables(string $variables): array
     {

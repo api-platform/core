@@ -133,7 +133,7 @@ class SerializeStageTest extends TestCase
             'is_mutation' => false,
             'is_subscription' => false,
             'args' => $args,
-            'info' => self::createStub(ResolveInfo::class),
+            'info' => self::createMock(ResolveInfo::class),
         ];
 
         /** @var Operation $operation */

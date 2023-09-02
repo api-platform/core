@@ -30,6 +30,10 @@ final class SwaggerUiListener
             return;
         }
 
+        if (($operation = $request->attributes->get('_api_operation')) && 'api_platform.symfony.main_controller' === $operation->getController()) {
+            return;
+        }
+
         $request->attributes->set('_controller', 'api_platform.swagger_ui.action');
     }
 }

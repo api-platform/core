@@ -5,15 +5,13 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.http_cache.listener.response.configure" class="ApiPlatform\HttpCache\EventListener\AddHeadersListener">
+        <service id="api_platform.http_cache.processor.add_headers" class="ApiPlatform\HttpCache\State\AddHeadersProcessor" decorates="api_platform.state_processor.respond">
+            <argument type="service" id="api_platform.http_cache.processor.add_headers.inner" />
             <argument>%api_platform.http_cache.etag%</argument>
             <argument>%api_platform.http_cache.max_age%</argument>
             <argument>%api_platform.http_cache.shared_max_age%</argument>
             <argument>%api_platform.http_cache.vary%</argument>
             <argument>%api_platform.http_cache.public%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory"></argument>
-
-            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-1" />
         </service>
     </services>
 </container>

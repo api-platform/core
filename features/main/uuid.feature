@@ -127,7 +127,7 @@ Feature: Using uuid identifier on resource
     When I send a "GET" request to "/ramsey_uuid_dummies/41B29566-144B-E1D05DEFE78"
     Then the response status code should be 404
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   @!mongodb
   @createSchema
@@ -180,7 +180,7 @@ Feature: Using uuid identifier on resource
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   @!mongodb
   Scenario: Update a resource with a bad Ramsey\Uuid\Uuid non-id field
@@ -193,7 +193,7 @@ Feature: Using uuid identifier on resource
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   @!mongodb
   @createSchema

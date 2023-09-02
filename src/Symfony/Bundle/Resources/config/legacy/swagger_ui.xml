@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.swagger.listener.ui" class="ApiPlatform\Symfony\Bundle\EventListener\SwaggerUiListener">
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+        </service>
+        <service id="api_platform.swagger_ui.listener" alias="api_platform.swagger.listener.ui" />
+    </services>
+</container>

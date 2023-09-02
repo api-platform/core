@@ -351,7 +351,7 @@ Feature: Relations support
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   Scenario: Post a relation with a not existing IRI
     When I add "Content-Type" header equal to "application/ld+json"
@@ -363,7 +363,7 @@ Feature: Relations support
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   Scenario: Update an embedded relation
     When I add "Content-Type" header equal to "application/ld+json"
@@ -470,7 +470,7 @@ Feature: Relations support
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "hydra:description" should contain 'Invalid IRI "certainly not an IRI".'
 
   Scenario: Passing an invalid type to a relation
@@ -483,7 +483,7 @@ Feature: Relations support
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {

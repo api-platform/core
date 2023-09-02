@@ -99,6 +99,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         if (!$resourceFilters) {
             return $data;
         }
+
         $requestParts = parse_url($context['request_uri'] ?? '');
         if (!\is_array($requestParts)) {
             return $data;

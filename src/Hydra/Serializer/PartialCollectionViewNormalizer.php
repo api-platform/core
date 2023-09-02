@@ -69,6 +69,9 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             $currentPage = $object->getCurrentPage();
         }
 
+        // TODO: This needs to be changed as well as I wrote in the CollectionFiltersNormalizer
+        // We should not rely on the request_uri but instead rely on the UriTemplate
+        // This needs that we implement the RFC and that we do more parsing before calling the serialization (MainController)
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
         $appliedFilters = $parsed['parameters'];
         unset($appliedFilters[$this->enabledParameterName]);
