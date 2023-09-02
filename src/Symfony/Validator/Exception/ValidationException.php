@@ -30,6 +30,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 #[ErrorResource(
     uriTemplate: '/validation_errors/{id}',
     status: 422,
+    openapi: false,
     uriVariables: ['id'],
     shortName: 'ConstraintViolationList',
     operations: [
