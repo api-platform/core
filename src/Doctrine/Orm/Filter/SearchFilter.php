@@ -21,6 +21,9 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -133,17 +136,29 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 {
+    use ResourceClassInfoTrait;
     use SearchFilterTrait;
 
     public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null, NameConverterInterface $nameConverter = null)
-    {
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        IriConverterInterface $iriConverter,
+        PropertyAccessorInterface $propertyAccessor = null,
+        LoggerInterface $logger = null,
+        array $properties = null,
+        IdentifiersExtractorInterface $identifiersExtractor = null,
+        NameConverterInterface $nameConverter = null,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
+        ResourceClassResolverInterface $resourceClassResolver = null
+    ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->iriConverter = $iriConverter;
         $this->identifiersExtractor = $identifiersExtractor;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     protected function getIriConverter(): IriConverterInterface
@@ -221,9 +236,22 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $associationResourceClass = $metadata->getAssociationTargetClass($field);
         $associationMetadata = $this->getClassMetadata($associationResourceClass);
         $associationFieldIdentifier = $associationMetadata->getIdentifierFieldNames()[0];
-        $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
+        $associationResourceApiIdField = $associationFieldIdentifier;
 
-        $values = array_map(function ($value) use ($associationFieldIdentifier, $doctrineTypeField) {
+        // dig into the subResource metadata to find out which field we're looking at
+        if ($this->isResourceClass($associationResourceClass) && $this->resourceMetadataFactory) {
+            $associationApiMetadata = $this->resourceMetadataFactory->create($associationResourceClass);
+            $variables = $associationApiMetadata->getOperation()->getUriVariables();
+            if (1 === \count($variables)) { // otherwise let's just give up at this point, too complicated
+                $varName = array_key_first($variables);
+                $associationResourceApiIdField = $variables[$varName]->getIdentifiers()[0]; // this will be needed to get the correct value
+            }
+        }
+
+        $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
+        $associationRepository = $this->managerRegistry->getManagerForClass($associationResourceClass)?->getRepository($associationResourceClass);
+
+        $values = array_map(function ($value) use ($associationFieldIdentifier, $associationResourceApiIdField, $doctrineTypeField, $associationRepository) {
             if (is_numeric($value)) {
                 return $value;
             }
@@ -232,11 +260,15 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
                 return $this->propertyAccessor->getValue($item, $associationFieldIdentifier);
             } catch (InvalidArgumentException) {
-                /*
-                 * Can we do better? This is not the ApiResource the call was made on,
-                 * so we don't get any kind of api metadata for it without (a lot of?) work elsewhere...
-                 * Let's just pretend it's always the ORM id for now.
-                 */
+                // replace the value of $associationResourceApiIdField by that of $associationFieldIdentifier if necessary!
+                if ($associationFieldIdentifier !== $associationResourceApiIdField && $associationRepository) {
+                    // use $associationResourceApiIdField to fetch the entity
+                    $entity = $associationRepository->findOneBy([
+                        $associationResourceApiIdField => $value,
+                    ]);
+                    $value = $this->getPropertyAccessor()->getValue($entity, $associationFieldIdentifier);
+                }
+
                 if (!$this->hasValidValues([$value], $doctrineTypeField)) {
                     $this->logger->notice('Invalid filter ignored', [
                         'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $associationFieldIdentifier)),
