@@ -444,6 +444,8 @@ $deprecatedClassesWithoutAliases = [
     ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\ConstantScoreFilterExtension::class => ApiPlatform\Elasticsearch\Extension\ConstantScoreFilterExtension::class,
     ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortExtension::class => ApiPlatform\Elasticsearch\Extension\SortExtension::class,
     ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortFilterExtension::class => ApiPlatform\Elasticsearch\Extension\SortFilterExtension::class,
+
+    ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer::class => ApiPlatform\Elasticsearch\Serializer\ItemNormalizer::class,
 ];
 
 spl_autoload_register(function ($className) use ($deprecatedInterfaces, $deprecatedClassesWithoutAliases, $deprecatedClassesWithAliases) {
