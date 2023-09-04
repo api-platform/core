@@ -14,8 +14,10 @@
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
         <service id="ApiPlatform\Api\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
+        <service id="ApiPlatform\Metadata\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
 
         <service id="ApiPlatform\Api\UrlGeneratorInterface" alias="api_platform.router" />
+        <service id="ApiPlatform\Metadata\UrlGeneratorInterface" alias="api_platform.router" />
 
         <service id="api_platform.router" class="ApiPlatform\Symfony\Routing\Router" public="false">
             <argument type="service" id="router" />
@@ -26,6 +28,7 @@
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument key="$debug">%kernel.debug%</argument>
         </service>
         <service id="ApiPlatform\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
@@ -95,6 +98,8 @@
 
         <service id="api_platform.action.entrypoint" class="ApiPlatform\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.state_provider" on-invalid="null" />
+            <argument type="service" id="api_platform.state_processor" on-invalid="null" />
         </service>
 
         <service id="api_platform.action.documentation" class="ApiPlatform\Documentation\Action\DocumentationAction" public="true">
@@ -103,6 +108,8 @@
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
             <argument type="service" id="api_platform.openapi.factory" on-invalid="null" />
+            <argument type="service" id="api_platform.state_provider" on-invalid="null" />
+            <argument type="service" id="api_platform.state_processor" on-invalid="null" />
         </service>
 
         <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
@@ -148,6 +155,7 @@
         </service>
         <service id="api_platform.identifiers_extractor" alias="api_platform.api.identifiers_extractor" />
         <service id="ApiPlatform\Api\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
+        <service id="ApiPlatform\Metadata\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
 
         <service id="api_platform.uri_variables.converter" class="ApiPlatform\Api\UriVariablesConverter" public="false">
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
@@ -166,7 +174,7 @@
         <service id="api_platform.iri_converter" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Symfony\Routing\IriConverter" public="false">
-            <argument type="service" id="api_platform.state_provider" />
+            <argument type="service" id="api_platform.state_provider.locator" />
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.api.identifiers_extractor" />
             <argument type="service" id="api_platform.resource_class_resolver" />
@@ -179,7 +187,7 @@
         <service id="ApiPlatform\Metadata\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener">
-            <argument key="$controller">api_platform.action.placeholder</argument>
+            <argument key="$controller">api_platform.symfony.main_controller</argument>
             <argument key="$logger" type="service" id="logger" on-invalid="null" />
             <argument key="$debug">%kernel.debug%</argument>
             <argument key="$resourceMetadataCollectionFactory" type="service" id="api_platform.metadata.resource.metadata_collection_factory" />

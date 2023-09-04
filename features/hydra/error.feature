@@ -42,12 +42,13 @@ Feature: Error handling
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should be equal to 'Nested documents for attribute "relatedDummy" are not allowed. Use IRIs instead.'
     And the JSON node "trace" should exist
+    And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
 
   Scenario: Get an error during deserialization of collection
     When I add "Content-Type" header equal to "application/ld+json"
@@ -62,7 +63,7 @@ Feature: Error handling
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
@@ -79,7 +80,7 @@ Feature: Error handling
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
@@ -97,7 +98,7 @@ Feature: Error handling
       """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"

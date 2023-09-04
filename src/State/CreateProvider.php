@@ -40,7 +40,7 @@ final class CreateProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        if (!$uriVariables || !$operation instanceof HttpOperation || null !== $operation->getController()) {
+        if (!$uriVariables || !$operation instanceof HttpOperation || (null !== $operation->getController() && 'api_platform.symfony.main_controller' !== $operation->getController())) {
             return $this->decorated->provide($operation, $uriVariables, $context);
         }
 

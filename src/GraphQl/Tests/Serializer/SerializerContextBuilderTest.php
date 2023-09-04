@@ -87,10 +87,7 @@ class SerializerContextBuilderTest extends TestCase
      */
     public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, callable $advancedNameConverter = null, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
     {
-        $resolverContext = [
-            'is_mutation' => $isMutation,
-            'is_subscription' => $isSubscription,
-        ];
+        $resolverContext = [];
 
         $operation = $this->buildOperationFromContext($isMutation, $isSubscription, $expectedContext, true, $resourceClass);
         if ($noInfo) {

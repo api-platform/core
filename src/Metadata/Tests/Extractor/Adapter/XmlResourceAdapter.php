@@ -64,6 +64,7 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'queryParameterValidationEnabled',
         'stateOptions',
         'collectDenormalizationErrors',
+        'links',
     ];
 
     /**
@@ -492,6 +493,18 @@ XML_WRAP
                 $child->addAttribute('name', $key);
             }
         }
+    }
+
+    private function buildLinks(\SimpleXMLElement $resource, array $values = null): void
+    {
+        if (!$values) {
+            return;
+        }
+
+        $node = $resource->addChild('links');
+        $childNode = $node->addChild('link');
+        $childNode->addAttribute('rel', $values[0]['rel']);
+        $childNode->addAttribute('href', $values[0]['href']);
     }
 
     private function parse($value): ?string

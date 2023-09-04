@@ -14,11 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Action\NotFoundAction;
-use ApiPlatform\Api\FilterInterface;
-use ApiPlatform\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
@@ -44,9 +39,14 @@ use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface as GraphQlS
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
+use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
@@ -247,6 +247,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.uri_variables.converter',
             'api_platform.uri_variables.transformer.date_time',
             'api_platform.uri_variables.transformer.integer',
+
+            'api_platform.state_provider.content_negotiation',
+            'api_platform.state_provider.deserialize',
+            'api_platform.state_processor.respond',
+            'api_platform.state_processor.add_link_header',
+            'api_platform.state_processor.serialize',
         ];
 
         $aliases = [
@@ -631,8 +637,7 @@ class ApiPlatformExtensionTest extends TestCase
         $services = [
             // graphql.xml
             'api_platform.graphql.executor',
-            'api_platform.graphql.query_resolver_locator',
-            'api_platform.graphql.mutation_resolver_locator',
+            'api_platform.graphql.resolver_locator',
             'api_platform.graphql.iterable_type',
             'api_platform.graphql.upload_type',
             'api_platform.graphql.type_locator',
@@ -685,8 +690,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContainerHas($services, $aliases);
 
         // graphql.xml
-        $this->assertServiceHasTags('api_platform.graphql.query_resolver_locator', ['container.service_locator']);
-        $this->assertServiceHasTags('api_platform.graphql.mutation_resolver_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.resolver_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.graphql.iterable_type', ['api_platform.graphql.type']);
         $this->assertServiceHasTags('api_platform.graphql.upload_type', ['api_platform.graphql.type']);
         $this->assertServiceHasTags('api_platform.graphql.type_locator', ['container.service_locator']);
@@ -1157,9 +1161,9 @@ class ApiPlatformExtensionTest extends TestCase
             FilterInterface::class => 'api_platform.filter',
             ValidationGroupsGeneratorInterface::class => 'api_platform.validation_groups_generator',
             PropertySchemaRestrictionMetadataInterface::class => 'api_platform.metadata.property_schema_restriction',
-            QueryItemResolverInterface::class => 'api_platform.graphql.query_resolver',
-            QueryCollectionResolverInterface::class => 'api_platform.graphql.query_resolver',
-            MutationResolverInterface::class => 'api_platform.graphql.mutation_resolver',
+            QueryItemResolverInterface::class => 'api_platform.graphql.resolver',
+            QueryCollectionResolverInterface::class => 'api_platform.graphql.resolver',
+            MutationResolverInterface::class => 'api_platform.graphql.resolver',
             GraphQlTypeInterface::class => 'api_platform.graphql.type',
             ErrorHandlerInterface::class => 'api_platform.graphql.error_handler',
             QueryItemExtensionInterface::class => 'api_platform.doctrine.orm.query_extension.item',
@@ -1248,9 +1252,6 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertEquals('api_platform.http_cache.http_client', $service->getArgument(0)->getTag());
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
     public function testLegacyOpenApiApiKeysConfiguration(): void
     {
         $this->expectException(InvalidConfigurationException::class);

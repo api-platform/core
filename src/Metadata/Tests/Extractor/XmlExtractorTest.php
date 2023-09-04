@@ -100,6 +100,7 @@ class XmlExtractorTest extends TestCase
                     'read' => null,
                     'write' => null,
                     'stateOptions' => null,
+                    'links' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments{._format}',
@@ -271,6 +272,7 @@ class XmlExtractorTest extends TestCase
                             'provider' => null,
                             'itemUriTemplate' => null,
                             'stateOptions' => null,
+                            'links' => null,
                         ],
                         [
                             'name' => null,
@@ -369,6 +371,7 @@ class XmlExtractorTest extends TestCase
                             'processor' => null,
                             'provider' => null,
                             'stateOptions' => null,
+                            'links' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -378,6 +381,7 @@ class XmlExtractorTest extends TestCase
                     'read' => null,
                     'write' => null,
                     'stateOptions' => null,
+                    'links' => null,
                 ],
             ],
         ], $extractor->getResources());

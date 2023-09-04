@@ -46,6 +46,9 @@ final class ValidateListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
 
         if (
             $controllerResult instanceof Response

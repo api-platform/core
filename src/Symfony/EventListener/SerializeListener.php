@@ -71,6 +71,11 @@ final class SerializeListener
         }
 
         $operation = $this->initializeOperation($request);
+
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
+
         if (!($operation?->canSerialize() ?? true)) {
             return;
         }

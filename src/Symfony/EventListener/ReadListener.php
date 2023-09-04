@@ -60,6 +60,10 @@ final class ReadListener
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
 
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
+
         if (!($attributes = RequestAttributesExtractor::extractAttributes($request))) {
             return;
         }

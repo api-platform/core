@@ -51,6 +51,9 @@ final class QueryParameterValidateListener
         }
 
         $operation = $this->initializeOperation($request);
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
 
         if (!($operation?->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface) {
             return;

@@ -32,22 +32,22 @@ class InnerFieldsNameConverterTest extends TestCase
 
     public function testNormalize(): void
     {
-        $decoratedProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
-        $decoratedProphecy->normalize('fooBar', null, null, [])->willReturn('foo_bar')->shouldBeCalled();
-        $decoratedProphecy->normalize('bazQux', null, null, [])->willReturn('baz_qux')->shouldBeCalled();
+        $innerProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
+        $innerProphecy->normalize('fooBar', null, null, [])->willReturn('foo_bar')->shouldBeCalled();
+        $innerProphecy->normalize('bazQux', null, null, [])->willReturn('baz_qux')->shouldBeCalled();
 
-        $innerFieldsNameConverter = new InnerFieldsNameConverter($decoratedProphecy->reveal());
+        $innerFieldsNameConverter = new InnerFieldsNameConverter($innerProphecy->reveal());
 
         self::assertSame('foo_bar.baz_qux', $innerFieldsNameConverter->normalize('fooBar.bazQux'));
     }
 
     public function testDenormalize(): void
     {
-        $decoratedProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
-        $decoratedProphecy->denormalize('foo_bar', null, null, [])->willReturn('fooBar')->shouldBeCalled();
-        $decoratedProphecy->denormalize('baz_qux', null, null, [])->willReturn('bazQux')->shouldBeCalled();
+        $innerProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
+        $innerProphecy->denormalize('foo_bar', null, null, [])->willReturn('fooBar')->shouldBeCalled();
+        $innerProphecy->denormalize('baz_qux', null, null, [])->willReturn('bazQux')->shouldBeCalled();
 
-        $innerFieldsNameConverter = new InnerFieldsNameConverter($decoratedProphecy->reveal());
+        $innerFieldsNameConverter = new InnerFieldsNameConverter($innerProphecy->reveal());
 
         self::assertSame('fooBar.bazQux', $innerFieldsNameConverter->denormalize('foo_bar.baz_qux'));
     }

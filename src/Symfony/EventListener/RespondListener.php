@@ -49,9 +49,13 @@ final class RespondListener
      */
     public function onKernelView(ViewEvent $event): void
     {
-        $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
+        $controllerResult = $event->getControllerResult();
         $operation = $this->initializeOperation($request);
+
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
 
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 

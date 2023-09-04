@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.listener.view.validate" class="ApiPlatform\Symfony\EventListener\ValidateListener">
+            <argument type="service" id="api_platform.validator" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
+        </service>
+        <service id="api_platform.listener.view.validate_query_parameters" class="ApiPlatform\Symfony\EventListener\QueryParameterValidateListener" public="false">
+            <argument type="service" id="api_platform.validator.query_parameter_validator" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument>%api_platform.validator.query_parameter_validation%</argument>
+
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="16" />
+        </service>
+    </services>
+</container>

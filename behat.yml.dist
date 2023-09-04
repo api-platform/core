@@ -16,7 +16,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@controller'
   extensions:
     'FriendsOfBehat\SymfonyExtension':
       bootstrap: 'tests/Fixtures/app/bootstrap.php'
@@ -52,7 +52,7 @@ postgres:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
+        tags: '~@sqlite&&~@mongodb&&~@elasticsearch&&~@controller'
 
 mongodb:
   suites:
@@ -142,3 +142,39 @@ elasticsearch-coverage:
         - 'ApiPlatform\Tests\Behat\CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
+
+legacy:
+  suites:
+    default:
+      contexts:
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\DoctrineContext'
+        - 'ApiPlatform\Tests\Behat\GraphqlContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\HydraContext'
+        - 'ApiPlatform\Tests\Behat\OpenApiContext'
+        - 'ApiPlatform\Tests\Behat\HttpCacheContext'
+        - 'ApiPlatform\Tests\Behat\JsonApiContext'
+        - 'ApiPlatform\Tests\Behat\JsonHalContext'
+        - 'ApiPlatform\Tests\Behat\MercureContext'
+        - 'ApiPlatform\Tests\Behat\XmlContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'behatch:context:rest'
+      filters:
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+  extensions:
+    'FriendsOfBehat\SymfonyExtension':
+      bootstrap: 'tests/Fixtures/app/bootstrap.php'
+      kernel:
+        environment: 'test'
+        debug: true
+        class: AppKernel
+        path: 'tests/Fixtures/app/AppKernel.php'
+    'Behat\MinkExtension':
+      base_url: 'http://example.com/'
+      files_path: 'features/files'
+      sessions:
+        default:
+          symfony: ~
+    'Behatch\Extension': ~
+

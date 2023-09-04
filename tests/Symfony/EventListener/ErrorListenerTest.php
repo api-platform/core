@@ -44,13 +44,12 @@ final class ErrorListenerTest extends TestCase
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolver->isResourceClass($exception::class)->willReturn(false);
         $kernel = $this->prophesize(KernelInterface::class);
-        $kernel->handle(Argument::that(function ($request) use ($operation) {
-            $this->assertTrue($request->attributes->has('_api_exception_swagger_data'));
+        $kernel->handle(Argument::that(function ($request) {
+            $this->assertTrue($request->attributes->has('_api_original_route'));
+            $this->assertTrue($request->attributes->has('_api_original_route_params'));
+            $this->assertTrue($request->attributes->has('_api_requested_operation'));
+            $this->assertTrue($request->attributes->has('_api_previous_operation'));
             $this->assertEquals('_api_errors_problem', $request->attributes->get('_api_operation_name'));
-            $this->assertTrue($request->attributes->get('_api_error'));
-            $this->assertEquals($request->attributes->get('_api_operation'), $operation);
-            $this->assertEquals($request->attributes->get('_api_resource_class'), Error::class);
-            $this->assertInstanceOf(Error::class, $request->attributes->get('data'));
 
             return true;
         }), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response());
@@ -69,13 +68,12 @@ final class ErrorListenerTest extends TestCase
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolver->isResourceClass($exception::class)->willReturn(false);
         $kernel = $this->prophesize(KernelInterface::class);
-        $kernel->handle(Argument::that(function ($request) use ($operation) {
-            $this->assertTrue($request->attributes->has('_api_exception_swagger_data'));
+        $kernel->handle(Argument::that(function ($request) {
+            $this->assertTrue($request->attributes->has('_api_original_route'));
+            $this->assertTrue($request->attributes->has('_api_original_route_params'));
+            $this->assertTrue($request->attributes->has('_api_requested_operation'));
+            $this->assertTrue($request->attributes->has('_api_previous_operation'));
             $this->assertEquals('_api_errors_hydra', $request->attributes->get('_api_operation_name'));
-            $this->assertTrue($request->attributes->get('_api_error'));
-            $this->assertEquals($request->attributes->get('_api_operation'), $operation);
-            $this->assertEquals($request->attributes->get('_api_resource_class'), Error::class);
-            $this->assertInstanceOf(Error::class, $request->attributes->get('data'));
 
             return true;
         }), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response());
@@ -94,20 +92,19 @@ final class ErrorListenerTest extends TestCase
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolver->isResourceClass(Error::class)->willReturn(true);
         $kernel = $this->prophesize(KernelInterface::class);
-        $kernel->handle(Argument::that(function ($request) use ($operation) {
-            $this->assertTrue($request->attributes->has('_api_exception_swagger_data'));
+        $kernel->handle(Argument::that(function ($request) {
+            $this->assertTrue($request->attributes->has('_api_original_route'));
+            $this->assertTrue($request->attributes->has('_api_original_route_params'));
+            $this->assertTrue($request->attributes->has('_api_requested_operation'));
+            $this->assertTrue($request->attributes->has('_api_previous_operation'));
             $this->assertEquals('_api_errors_hydra', $request->attributes->get('_api_operation_name'));
-            $this->assertTrue($request->attributes->get('_api_error'));
-            $this->assertEquals($request->attributes->get('_api_operation'), $operation);
-            $this->assertEquals($request->attributes->get('_api_resource_class'), Error::class);
             $this->assertEquals($request->attributes->get('id'), 1);
-            $this->assertInstanceOf(Error::class, $request->attributes->get('data'));
 
             return true;
         }), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response());
         $exceptionEvent = new ExceptionEvent($kernel->reveal(), Request::create('/'), HttpKernelInterface::SUB_REQUEST, $exception);
         $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractor->getIdentifiersFromItem($exception, $operation)->willReturn(['id' => 1]);
+        $identifiersExtractor->getIdentifiersFromItem($exception, Argument::any())->willReturn(['id' => 1]);
         $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory->reveal(), ['jsonld' => ['application/ld+json']], [], $identifiersExtractor->reveal(), $resourceClassResolver->reveal());
         $errorListener->onKernelException($exceptionEvent);
     }

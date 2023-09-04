@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
- * Converts inner fields with a decorated name converter.
+ * Converts inner fields with a inner name converter.
  *
  * @experimental
  *
@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
 {
-    public function __construct(private readonly NameConverterInterface $decorated = new CamelCaseToSnakeCaseNameConverter())
+    public function __construct(private readonly NameConverterInterface $inner = new CamelCaseToSnakeCaseNameConverter())
     {
     }
 
@@ -51,7 +51,7 @@ final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
         $convertedProperties = [];
 
         foreach (explode('.', $propertyName) as $decomposedProperty) {
-            $convertedProperties[] = $this->decorated->{$normalization ? 'normalize' : 'denormalize'}($decomposedProperty, $class, $format, $context);
+            $convertedProperties[] = $this->inner->{$normalization ? 'normalize' : 'denormalize'}($decomposedProperty, $class, $format, $context);
         }
 
         return implode('.', $convertedProperties);

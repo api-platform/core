@@ -1,5 +1,28 @@
 # Changelog
 
+## v3.2.0-alpha.1
+
+### Bug fixes
+
+* [33b1658a0](https://github.com/api-platform/core/commit/33b1658a0e100e0ca9e7bf46aa2307ead9b1744e) fix(serializer): disable_type_enforcement with null values (#5593)
+* [49981505a](https://github.com/api-platform/core/commit/49981505a8af281d00e35f1424432fae65686eb8) fix(metadata): convert composite uri variables w/ proper type
+* [502234cf5](https://github.com/api-platform/core/commit/502234cf55d6a58c79b68c5193bade9ba605107e) fix: allowed composite identifiers with differents types
+* [51e4295b2](https://github.com/api-platform/core/commit/51e4295b26e606c5da10d434b6e98dadb8a243b2) fix: missing parent construct calls with named arguments (#5387)
+* [9116f1554](https://github.com/api-platform/core/commit/9116f1554581bf5362146cdc4d5fdbebc71e3528) fix(symfony): provider can throw validation exception (#5586)
+* [b58ec1207](https://github.com/api-platform/core/commit/b58ec1207da8ba5b669937508a17451af61b0688) fix(metadata): correct interface aliases (#5766)
+* [c353e5aa4](https://github.com/api-platform/core/commit/c353e5aa474d7a2e6c701bfa1c369b560e928c17) fix(graphql): do not add id field if operation already has a dedicated input type (#5095)
+* [ccef472ca](https://github.com/api-platform/core/commit/ccef472cade42b189fa8cb7793e27fad1349e289) fix(openapi): use 3.1 version (#5489)
+
+
+### Features
+
+* [4ef0ef856](https://github.com/api-platform/core/commit/4ef0ef856ced658ac942fd6a2c6f7c5c563078d1) feat: error as resources, jsonld errors are now problem-compliant (#5433)
+* [6babb3d6b](https://github.com/api-platform/core/commit/6babb3d6b707290fdf314c0e96acd525d6f96670) feat: replace doctrine/inflector by symfony/string (#5637)
+* [7a1d351b0](https://github.com/api-platform/core/commit/7a1d351b0a37fc7107c548708f4b9e38a9dedc76) feat(tests): add a method to generate the IRI from a resource (#5582)
+* [851aa3778](https://github.com/api-platform/core/commit/851aa3778ef8a6f959a44b759fc343e9f8cfc8bf) feat(graphql)!: add extra args for custom queries or mutations (#5359)
+* [92a81f024](https://github.com/api-platform/core/commit/92a81f024541054b9322e7457b75c721261e14e0) feat(graphql): allow to disable the introspection query (#5711)
+* [d793ffb92](https://github.com/api-platform/core/commit/d793ffb9228a21655ee35f0b90a959f93281a4cf) feat: union/intersect types (#5470)
+
 ## v3.1.15
 
 ### Bug fixes

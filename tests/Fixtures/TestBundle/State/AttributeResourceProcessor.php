@@ -14,10 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 class AttributeResourceProcessor
 {
-    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
+    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): AttributeResource
     {
+        $dummy = new Dummy();
+        $dummy->setId(1);
+        $a = new AttributeResource(2, 'Patched');
+        $a->dummy = $dummy;
+
+        return $a;
     }
 }

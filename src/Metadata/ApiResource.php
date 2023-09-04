@@ -925,6 +925,7 @@ class ApiResource extends Metadata
         protected ?bool $compositeIdentifier = null,
         protected ?array $exceptionToStatus = null,
         protected ?bool $queryParameterValidationEnabled = null,
+        protected ?array $links = null,
         protected ?array $graphQlOperations = null,
         $provider = null,
         $processor = null,
@@ -1367,6 +1368,22 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->graphQlOperations = $graphQlOperations;
+
+        return $self;
+    }
+
+    public function getLinks(): ?array
+    {
+        return $this->links;
+    }
+
+    /**
+     * @param Link[] $links
+     */
+    public function withLinks(array $links): self
+    {
+        $self = clone $this;
+        $self->links = $links;
 
         return $self;
     }
