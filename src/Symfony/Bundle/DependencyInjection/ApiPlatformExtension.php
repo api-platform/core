@@ -780,13 +780,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        $loader->load('elasticsearch.xml');
+        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\Client::class;
 
+        $clientDefinition = new Definition($clientClass);
+        $container->setDefinition('api_platform.elasticsearch.client', $clientDefinition);
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
-
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
-        $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
+        $loader->load('elasticsearch.xml');
+
+        // @phpstan-ignore-next-line
+        if (\Elasticsearch\Client::class === $clientClass) {
+            $loader->load('legacy/elasticsearch.xml');
+            $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
+            $container->setDefinition('api_platform.elasticsearch.client_for_metadata', $clientDefinition);
+        }
     }
 
     private function registerSecurityConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

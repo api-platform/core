@@ -20,16 +20,13 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Tests\Fixtures\Metadata\Get;
-use Elasticsearch\Client;
+use Elasticsearch\Client as LegacyClient;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Namespaces\CatNamespace;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
-/**
- * @group legacy
- */
 class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ExpectDeprecationTrait;
@@ -37,11 +34,10 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
 
     public function testConstruct(): void
     {
-        $this->expectDeprecation('Since api-platform/core 3.1: ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory is deprecated and will be removed in v4');
         self::assertInstanceOf(
             ResourceMetadataCollectionFactoryInterface::class,
             new ElasticsearchProviderResourceMetadataCollectionFactory(
-                $this->prophesize(Client::class)->reveal(),
+                class_exists(LegacyClient::class) ? $this->prophesize(LegacyClient::class)->reveal() : null,
                 $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal()
             )
         );
@@ -52,6 +48,10 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
      */
     public function testCreate(?bool $elasticsearchFlag, int $expectedCatCallCount, ?bool $expectedResult): void
     {
+        if (interface_exists(\Elastic\Elasticsearch\ClientInterface::class)) {
+            $this->markTestSkipped('\Elastic\Elasticsearch\ClientInterface doesn\'t have cat method signature.');
+        }
+
         if (null !== $elasticsearchFlag) {
             $solution = $elasticsearchFlag
                 ? sprintf('Pass an instance of %s to $stateOptions instead', Options::class)
@@ -65,6 +65,7 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
         $decorated = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $decorated->create(Foo::class)->willReturn($metadata)->shouldBeCalled();
 
+        // @phpstan-ignore-next-line
         $catNamespace = $this->prophesize(CatNamespace::class);
         if ($elasticsearchFlag) {
             $catNamespace->indices(['index' => 'foo'])->willReturn([[
@@ -80,10 +81,12 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
                 'pri.store.size' => '42kb',
             ]]);
         } else {
+            // @phpstan-ignore-next-line
             $catNamespace->indices(['index' => 'foo'])->willThrow(new Missing404Exception());
         }
 
-        $client = $this->prophesize(Client::class);
+        // @phpstan-ignore-next-line
+        $client = $this->prophesize(LegacyClient::class);
         $client->cat()->willReturn($catNamespace)->shouldBeCalledTimes($expectedCatCallCount);
 
         $resourceMetadataFactory = new ElasticsearchProviderResourceMetadataCollectionFactory($client->reveal(), $decorated->reveal(), false);

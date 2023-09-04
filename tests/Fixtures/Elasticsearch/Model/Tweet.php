@@ -15,12 +15,13 @@ namespace ApiPlatform\Tests\Fixtures\Elasticsearch\Model;
 
 use ApiPlatform\Elasticsearch\Filter\MatchFilter;
 use ApiPlatform\Elasticsearch\Filter\OrderFilter;
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(normalizationContext: ['groups' => ['tweet:read']])]
+#[ApiResource(normalizationContext: ['groups' => ['tweet:read']], stateOptions: new Options(index: 'tweet'))]
 #[ApiFilter(OrderFilter::class, properties: ['id', 'author.id'])]
 #[ApiFilter(MatchFilter::class, properties: ['message', 'author.firstName'])]
 class Tweet

@@ -1,0 +1,34 @@
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.elasticsearch.cache.metadata.document" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <service id="api_platform.elasticsearch.metadata.document.metadata_factory" alias="api_platform.elasticsearch.metadata.document.metadata_factory.configured" />
+
+        <service id="ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface" alias="api_platform.elasticsearch.metadata.document.metadata_factory" />
+
+        <service id="api_platform.elasticsearch.metadata.document.metadata_factory.configured" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory" public="false">
+            <argument>%api_platform.elasticsearch.mapping%</argument>
+        </service>
+
+        <service id="api_platform.elasticsearch.metadata.document.metadata_factory.attribute" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory" decorates="api_platform.elasticsearch.metadata.document.metadata_factory" decoration-priority="20" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory.attribute.inner" />
+        </service>
+
+        <service id="api_platform.elasticsearch.metadata.document.metadata_factory.cat" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory" decorates="api_platform.elasticsearch.metadata.document.metadata_factory" decoration-priority="10" public="false">
+            <argument type="service" id="api_platform.elasticsearch.client" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory.cat.inner" />
+        </service>
+
+        <service id="api_platform.elasticsearch.metadata.document.metadata_factory.cached" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory" decorates="api_platform.elasticsearch.metadata.document.metadata_factory" decoration-priority="-10" public="false">
+            <argument type="service" id="api_platform.elasticsearch.cache.metadata.document" />
+            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory.cached.inner" />
+        </service>
+    </services>
+</container>
