@@ -106,6 +106,7 @@ final class QueryChecker
             foreach ($orderBy->getParts() as $part) {
                 if (str_contains((string) $part, '.')) {
                     [$alias] = explode('.', (string) $part);
+                    $alias = str_contains($alias, '(') ? substr($alias, strpos($alias, '(') + 1) : $alias;
 
                     $orderByAliases[] = $alias;
                 }
