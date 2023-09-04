@@ -30,7 +30,7 @@ final class NotExposed extends HttpOperation
      * {@inheritdoc}
      */
     public function __construct(
-        string $method = self::METHOD_GET,
+        string $method = 'GET',
         string $uriTemplate = null,
         array $types = null,
         $formats = null,
@@ -59,6 +59,7 @@ final class NotExposed extends HttpOperation
         array $exceptionToStatus = null,
 
         bool $queryParameterValidationEnabled = null,
+        array $links = null,
 
         string $shortName = null,
         string $class = null,
@@ -134,6 +135,7 @@ final class NotExposed extends HttpOperation
             openapi: $openapi,
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            links: $links,
             shortName: $shortName,
             class: $class,
             paginationEnabled: $paginationEnabled,

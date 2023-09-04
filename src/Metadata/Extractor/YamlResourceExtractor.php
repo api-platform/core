@@ -22,6 +22,7 @@ use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\WebLink\Link;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -121,6 +122,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'inputFormats' => $this->buildArrayValue($resource, 'inputFormats'),
             'outputFormats' => $this->buildArrayValue($resource, 'outputFormats'),
             'stateOptions' => $this->buildStateOptions($resource),
+            'links' => $this->buildLinks($resource),
         ]);
     }
 
@@ -377,6 +379,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             $data[] = array_merge($datum, [
                 'resolver' => $this->phpize($operation, 'resolver', 'string'),
                 'args' => $operation['args'] ?? null,
+                'extraArgs' => $operation['extraArgs'] ?? null,
                 'class' => (string) $class,
                 'read' => $this->phpize($operation, 'read', 'bool'),
                 'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
@@ -409,5 +412,22 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return null;
+    }
+
+    /**
+     * @return Link[]
+     */
+    private function buildLinks(array $resource): ?array
+    {
+        if (!isset($resource['links']) || !\is_array($resource['links'])) {
+            return null;
+        }
+
+        $links = [];
+        foreach ($resource['links'] as $link) {
+            $links[] = new Link(rel: $link['rel'], href: $link['href']);
+        }
+
+        return $links;
     }
 }

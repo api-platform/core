@@ -10,7 +10,7 @@ Feature: Documentation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
     # Context
-    And the JSON node "openapi" should be equal to "3.0.0"
+    And the JSON node "openapi" should be equal to "3.1.0"
     # Root properties
     And the JSON node "info.title" should be equal to "My Dummy API"
     And the JSON node "info.description" should contain "This is a test API."
@@ -86,19 +86,19 @@ Feature: Documentation support
     {
       "default": "male",
       "example": "male",
-      "type": "string",
+      "type": ["string", "null"],
       "enum": [
           "male",
           "female",
           null
-      ],
-      "nullable": true
+      ]
     }
     """
     And the "playMode" property exists for the OpenAPI class "VideoGame"
     And the "playMode" property for the OpenAPI class "VideoGame" should be equal to:
     """
     {
+      "owl:maxCardinality": 1,
       "type": "string",
       "format": "iri-reference"
     }
@@ -238,8 +238,7 @@ Feature: Documentation support
                                         "type": "string"
                                     },
                                     "property": {
-                                        "type": "string",
-                                        "nullable": true
+                                        "type": ["string", "null"]
                                     },
                                     "required": {
                                         "type": "boolean"
@@ -310,12 +309,15 @@ Feature: Documentation support
     And the "resourceRelated" property for the OpenAPI class "Resource" should be equal to:
     """
     {
-      "readOnly":true,
-      "anyOf":[
+      "owl:maxCardinality": 1,
+      "readOnly": true,
+      "anyOf": [
         {
-          "$ref":"#/components/schemas/ResourceRelated"
+          "$ref": "#/components/schemas/ResourceRelated"
+        },
+        {
+          "type": "null"
         }
-      ],
-      "nullable":true
+      ]
     }
     """

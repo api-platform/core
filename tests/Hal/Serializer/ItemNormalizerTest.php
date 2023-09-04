@@ -20,6 +20,11 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\ActivableInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Author;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Library;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\TimestampableInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -167,6 +172,71 @@ class ItemNormalizerTest extends TestCase
             'name' => 'hello',
         ];
         $this->assertEquals($expected, $normalizer->normalize($dummy));
+    }
+
+    public function testNormalizeWithUnionIntersectTypes(): void
+    {
+        $author = new Author(id: 2, name: 'Isaac Asimov');
+        $library = new Library(id: 3, name: 'Le Bâteau Livre');
+        $book = new Book();
+        $book->author = $author;
+        $book->library = $library;
+
+        $propertyNameCollection = new PropertyNameCollection(['author', 'library']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Book::class, [])->willReturn($propertyNameCollection);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Book::class, 'author', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, ActivableInterface::class),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, TimestampableInterface::class),
+            ])->withReadable(true)
+        );
+        $propertyMetadataFactoryProphecy->create(Book::class, 'library', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, ActivableInterface::class),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, TimestampableInterface::class),
+            ])->withReadable(true)
+        );
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($book, Argument::cetera())->willReturn('/books/1');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Book::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(ActivableInterface::class)->willReturn(false);
+        $resourceClassResolverProphecy->isResourceClass(TimestampableInterface::class)->willReturn(false);
+        $resourceClassResolverProphecy->getResourceClass($book, null)->willReturn(Book::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Book::class)->willReturn(Book::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $nameConverter = $this->prophesize(NameConverterInterface::class);
+        $nameConverter->normalize('author', Argument::any(), Argument::any(), Argument::any())->willReturn('author');
+        $nameConverter->normalize('library', Argument::any(), Argument::any(), Argument::any())->willReturn('library');
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            $nameConverter->reveal()
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            '_links' => [
+                'self' => [
+                    'href' => '/books/1',
+                ],
+            ],
+            'author' => null,
+            'library' => null,
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($book));
     }
 
     public function testNormalizeWithoutCache(): void

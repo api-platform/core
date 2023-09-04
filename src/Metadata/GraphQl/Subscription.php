@@ -21,6 +21,7 @@ final class Subscription extends Operation
     public function __construct(
         string $resolver = null,
         array $args = null,
+        array $extraArgs = null,
         array $links = null,
 
         string $shortName = null,
@@ -72,6 +73,7 @@ final class Subscription extends Operation
         parent::__construct(
             resolver: $resolver,
             args: $args,
+            extraArgs: $extraArgs,
             links: $links,
             shortName: $shortName,
             class: $class,

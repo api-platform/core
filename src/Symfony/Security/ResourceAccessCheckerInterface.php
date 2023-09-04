@@ -22,6 +22,8 @@ interface ResourceAccessCheckerInterface
 {
     /**
      * Checks if the given item can be accessed by the current user.
+     *
+     * @param array{object?: mixed, previous_object?: mixed, request?: \Symfony\Component\HttpFoundation\Request} $extraVariables
      */
     public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool;
 }

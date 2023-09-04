@@ -85,6 +85,20 @@ trait ResourceExtractorTrait
         return $data;
     }
 
+    private function buildExtraArgs(\SimpleXMLElement $resource): ?array
+    {
+        if (!isset($resource->extraArgs->arg)) {
+            return null;
+        }
+
+        $data = [];
+        foreach ($resource->extraArgs->arg as $arg) {
+            $data[(string) $arg['id']] = $this->buildValues($arg->values);
+        }
+
+        return $data;
+    }
+
     private function buildValues(\SimpleXMLElement $resource): array
     {
         $data = [];

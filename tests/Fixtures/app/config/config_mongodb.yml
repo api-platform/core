@@ -102,19 +102,19 @@ services:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemDocumentResolver'
         public: false
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.query_resolver.dummy_custom_item_no_read_and_serialize_document:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeItemDocumentResolver'
         public: false
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_only_persist_document:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumOnlyPersistDocumentMutationResolver'
         public: false
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.messenger_handler.messenger_with_inputs:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Document\MessengerWithInputHandler'

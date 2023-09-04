@@ -2,6 +2,9 @@
 @v3
 Feature: Expose only a collection of objects
 
+  Background:
+    Given I add "Accept" header equal to "application/ld+json"
+
   # A NotExposed operation with "routeName: api_genid" is automatically added to this resource.
   Scenario: Get a collection of objects without identifiers from a single resource with a single collection
     When I send a "GET" request to "/chairs"
@@ -168,7 +171,7 @@ Feature: Expose only a collection of objects
     When I send a "GET" request to "<uri>"
     Then the response status code should be 404
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "hydra:description" should be equal to "<hydra:description>"
     Examples:
       | uri                      | hydra:description                                                                                                          |

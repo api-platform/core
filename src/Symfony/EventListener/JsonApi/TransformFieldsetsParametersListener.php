@@ -31,6 +31,9 @@ final class TransformFieldsetsParametersListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+        if (($operation = $request->attributes->get('_api_operation')) && 'api_platform.symfony.main_controller' === $operation->getController()) {
+            return;
+        }
 
         $queryParameters = $request->query->all();
         $includeParameter = $queryParameters['include'] ?? null;

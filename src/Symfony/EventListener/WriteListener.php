@@ -59,6 +59,11 @@ final class WriteListener
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
 
+        // API Platform 3.2 has a MainController where everything is handled by processors/providers
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
+
         if (
             $controllerResult instanceof Response
             || $request->isMethodSafe()

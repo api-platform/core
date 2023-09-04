@@ -1,10 +1,10 @@
 *.log
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
-/.phpunit.result.cache
+.phpunit.result.cache
 /.phpunit.cache/
 /build/
-/composer.lock
+composer.lock
 /composer.phar
 /phpstan.neon
 /phpunit.xml
@@ -16,3 +16,4 @@
 /tests/Metadata/Extractor/Adapter/*.yaml
 /vendor/
 /Dockerfile
+

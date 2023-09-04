@@ -59,6 +59,7 @@
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:group ref="base"/>
             <xsd:element name="args" minOccurs="0" type="args"/>
+            <xsd:element name="extraArgs" minOccurs="0" type="args"/>
         </xsd:sequence>
         <xsd:attributeGroup ref="base"/>
         <xsd:attribute type="xsd:string" name="resolver"/>
@@ -392,6 +393,19 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="link">
+        <xsd:complexType>
+            <xsd:attribute name="rel" type="xsd:string"/>
+            <xsd:attribute name="href" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="links">
+        <xsd:sequence>
+            <xsd:element ref="link"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
     <xsd:group name="base">
         <xsd:sequence>
             <xsd:element name="denormalizationContext" minOccurs="0" type="sequenceWithValues"/>
@@ -423,6 +437,7 @@
             <xsd:element name="schemes" minOccurs="0" type="schemes"/>
             <xsd:element name="types" minOccurs="0" type="types"/>
             <xsd:element name="uriVariables" minOccurs="0" type="uriVariables"/>
+            <xsd:element name="links" minOccurs="0" type="links"/>
         </xsd:sequence>
     </xsd:group>
 

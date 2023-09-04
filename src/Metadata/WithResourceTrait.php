@@ -15,12 +15,7 @@ namespace ApiPlatform\Metadata;
 
 trait WithResourceTrait
 {
-    public function withResource(ApiResource $resource): self
-    {
-        return $this->copyFrom($resource);
-    }
-
-    protected function copyFrom(ApiResource|Operation $resource): ApiResource|Operation
+    protected function copyFrom(Metadata $resource): static
     {
         $self = clone $this;
         foreach (get_class_methods($resource) as $method) {

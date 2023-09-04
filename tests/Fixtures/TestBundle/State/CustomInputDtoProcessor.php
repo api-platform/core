@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
@@ -37,7 +36,7 @@ final class CustomInputDtoProcessor implements ProcessorInterface
         /**
          * @var DummyDtoCustom|\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoCustom
          */
-        $resourceObject = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? new $context['resource_class']();
+        $resourceObject = $context['previous_data'] ?? new $context['resource_class']();
         $resourceObject->lorem = $data->foo;
         $resourceObject->ipsum = (string) $data->bar;
 

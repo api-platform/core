@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -34,7 +33,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function createLinkFromProperty(ApiResource|Operation $operation, string $property): Link
+    public function createLinkFromProperty(Metadata $operation, string $property): Link
     {
         $metadata = $this->propertyMetadataFactory->create($resourceClass = $operation->getClass(), $property);
         $relationClass = $this->getPropertyClassType($metadata->getBuiltinTypes());
@@ -50,7 +49,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromIdentifiers(ApiResource|Operation $operation): array
+    public function createLinksFromIdentifiers(Metadata $operation): array
     {
         $identifiers = $this->getIdentifiersFromResourceClass($resourceClass = $operation->getClass());
 
@@ -72,7 +71,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromRelations(ApiResource|Operation $operation): array
+    public function createLinksFromRelations(Metadata $operation): array
     {
         $links = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass = $operation->getClass()) as $property) {
@@ -93,7 +92,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromAttributes(ApiResource|Operation $operation): array
+    public function createLinksFromAttributes(Metadata $operation): array
     {
         $links = [];
         try {

@@ -23,6 +23,7 @@ use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\Config\Util\XmlUtils;
+use Symfony\Component\WebLink\Link;
 
 /**
  * Extracts an array of metadata from a list of XML files.
@@ -94,6 +95,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'exceptionToStatus' => $this->buildExceptionToStatus($resource),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
             'stateOptions' => $this->buildStateOptions($resource),
+            'links' => $this->buildLinks($resource),
         ]);
     }
 
@@ -424,6 +426,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             $data[] = array_merge($datum, [
                 'resolver' => $this->phpize($operation, 'resolver', 'string'),
                 'args' => $this->buildArgs($operation),
+                'extraArgs' => $this->buildExtraArgs($operation),
                 'class' => (string) $operation['class'],
                 'read' => $this->phpize($operation, 'read', 'bool'),
                 'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
@@ -453,5 +456,23 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         return null;
+    }
+
+    /**
+     * @return Link[]
+     */
+    private function buildLinks(\SimpleXMLElement $resource): ?array
+    {
+        $links = $resource->links ?? null;
+        if (!$resource->links) {
+            return null;
+        }
+
+        $links = [];
+        foreach ($resource->links as $link) {
+            $links[] = new Link(rel: (string) $link->link->attributes()->rel, href: (string) $link->link->attributes()->href);
+        }
+
+        return $links;
     }
 }

@@ -62,7 +62,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
 
             foreach ($operations as $operation) {
                 // An item operation has been found, nothing to do anymore in this factory
-                if ((HttpOperation::METHOD_GET === $operation->getMethod() && !$operation instanceof CollectionOperationInterface) || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false)) {
+                if (('GET' === $operation->getMethod() && !$operation instanceof CollectionOperationInterface) || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false)) {
                     return $resourceMetadataCollection;
                 }
             }

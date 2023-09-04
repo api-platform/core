@@ -121,6 +121,9 @@ class ConfigurationTest extends TestCase
                 'graphiql' => [
                     'enabled' => true,
                 ],
+                'introspection' => [
+                    'enabled' => true,
+                ],
                 'nesting_separator' => '_',
                 'collection' => [
                     'pagination' => [
@@ -217,6 +220,8 @@ class ConfigurationTest extends TestCase
             'maker' => [
                 'enabled' => true,
             ],
+            'keep_legacy_inflector' => true,
+            'event_listeners_backward_compatibility_layer' => true,
         ], $config);
     }
 
@@ -279,6 +284,26 @@ class ConfigurationTest extends TestCase
     /**
      * Test config for api keys.
      */
+    public function testInvalidApiKeysConfig(): void
+    {
+        $this->expectExceptionMessage('The api keys "key" is not valid according to the pattern enforced by OpenAPI 3.1 ^[a-zA-Z0-9._-]+$.');
+        $exampleConfig = [
+            'name' => 'Authorization',
+            'type' => 'query',
+        ];
+
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'swagger' => [
+                    'api_keys' => ['Some Authorization name, like JWT' => $exampleConfig, 'Another-Auth' => $exampleConfig],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Test config for api keys.
+     */
     public function testApiKeysConfig(): void
     {
         $exampleConfig = [
@@ -289,13 +314,13 @@ class ConfigurationTest extends TestCase
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'api_keys' => ['Some Authorization name, like JWT' => $exampleConfig],
+                    'api_keys' => ['authorization_name_like_JWT' => $exampleConfig],
                 ],
             ],
         ]);
 
         $this->assertArrayHasKey('api_keys', $config['swagger']);
-        $this->assertSame($exampleConfig, $config['swagger']['api_keys']['Some Authorization name, like JWT']);
+        $this->assertSame($exampleConfig, $config['swagger']['api_keys']['authorization_name_like_JWT']);
     }
 
     /**

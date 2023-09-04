@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
@@ -27,6 +27,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * {@inheritdoc}
+ *
+ * @deprecated use ApiPlatform\Metadata\IdentifiersExtractor instead
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */

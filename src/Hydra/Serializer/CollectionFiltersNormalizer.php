@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\FilterLocatorTrait;
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -99,6 +99,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         if (!$resourceFilters) {
             return $data;
         }
+
         $requestParts = parse_url($context['request_uri'] ?? '');
         if (!\is_array($requestParts)) {
             return $data;

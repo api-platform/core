@@ -29,21 +29,11 @@ use ApiPlatform\State\OptionsInterface;
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class ApiResource
+class ApiResource extends Metadata
 {
     use WithResourceTrait;
 
     protected ?Operations $operations;
-
-    /**
-     * @var string|callable|null
-     */
-    protected $provider;
-
-    /**
-     * @var string|callable|null
-     */
-    protected $processor;
 
     /**
      * @param array<int, HttpOperation>|array<string, HttpOperation>|Operations|null $operations   Operations is a list of HttpOperation
@@ -935,12 +925,54 @@ class ApiResource
         protected ?bool $compositeIdentifier = null,
         protected ?array $exceptionToStatus = null,
         protected ?bool $queryParameterValidationEnabled = null,
+        protected ?array $links = null,
         protected ?array $graphQlOperations = null,
         $provider = null,
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
         protected array $extraProperties = [],
     ) {
+        parent::__construct(
+            shortName: $shortName,
+            class: $class,
+            description: $description,
+            urlGenerationStrategy: $urlGenerationStrategy,
+            deprecationReason: $deprecationReason,
+            normalizationContext: $normalizationContext,
+            denormalizationContext: $denormalizationContext,
+            collectDenormalizationErrors: $collectDenormalizationErrors,
+            validationContext: $validationContext,
+            filters: $filters,
+            elasticsearch: $elasticsearch,
+            mercure: $mercure,
+            messenger: $messenger,
+            input: $input,
+            output: $output,
+            order: $order,
+            fetchPartial: $fetchPartial,
+            forceEager: $forceEager,
+            paginationEnabled: $paginationEnabled,
+            paginationType: $paginationType,
+            paginationItemsPerPage: $paginationItemsPerPage,
+            paginationMaximumItemsPerPage: $paginationMaximumItemsPerPage,
+            paginationPartial: $paginationPartial,
+            paginationClientEnabled: $paginationClientEnabled,
+            paginationClientItemsPerPage: $paginationClientItemsPerPage,
+            paginationClientPartial: $paginationClientPartial,
+            paginationFetchJoinCollection: $paginationFetchJoinCollection,
+            paginationUseOutputWalkers: $paginationUseOutputWalkers,
+            security: $security,
+            securityMessage: $securityMessage,
+            securityPostDenormalize: $securityPostDenormalize,
+            securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
+            securityPostValidation: $securityPostValidation,
+            securityPostValidationMessage: $securityPostValidationMessage,
+            provider: $provider,
+            processor: $processor,
+            stateOptions: $stateOptions,
+            extraProperties: $extraProperties
+        );
+
         $this->operations = null === $operations ? null : new Operations($operations);
         $this->provider = $provider;
         $this->processor = $processor;
@@ -971,32 +1003,6 @@ class ApiResource
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
-
-        return $self;
-    }
-
-    public function getShortName(): ?string
-    {
-        return $this->shortName;
-    }
-
-    public function withShortName(string $shortName): self
-    {
-        $self = clone $this;
-        $self->shortName = $shortName;
-
-        return $self;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function withDescription(string $description): self
-    {
-        $self = clone $this;
-        $self->description = $description;
 
         return $self;
     }
@@ -1246,45 +1252,6 @@ class ApiResource
         return $self;
     }
 
-    public function getClass(): ?string
-    {
-        return $this->class;
-    }
-
-    public function withClass(string $class): self
-    {
-        $self = clone $this;
-        $self->class = $class;
-
-        return $self;
-    }
-
-    public function getUrlGenerationStrategy(): ?int
-    {
-        return $this->urlGenerationStrategy;
-    }
-
-    public function withUrlGenerationStrategy(int $urlGenerationStrategy): self
-    {
-        $self = clone $this;
-        $self->urlGenerationStrategy = $urlGenerationStrategy;
-
-        return $self;
-    }
-
-    public function getDeprecationReason(): ?string
-    {
-        return $this->deprecationReason;
-    }
-
-    public function withDeprecationReason(string $deprecationReason): self
-    {
-        $self = clone $this;
-        $self->deprecationReason = $deprecationReason;
-
-        return $self;
-    }
-
     public function getCacheHeaders(): ?array
     {
         return $this->cacheHeaders;
@@ -1294,45 +1261,6 @@ class ApiResource
     {
         $self = clone $this;
         $self->cacheHeaders = $cacheHeaders;
-
-        return $self;
-    }
-
-    public function getNormalizationContext(): ?array
-    {
-        return $this->normalizationContext;
-    }
-
-    public function withNormalizationContext(array $normalizationContext): self
-    {
-        $self = clone $this;
-        $self->normalizationContext = $normalizationContext;
-
-        return $self;
-    }
-
-    public function getDenormalizationContext(): ?array
-    {
-        return $this->denormalizationContext;
-    }
-
-    public function withDenormalizationContext(array $denormalizationContext): self
-    {
-        $self = clone $this;
-        $self->denormalizationContext = $denormalizationContext;
-
-        return $self;
-    }
-
-    public function getCollectDenormalizationErrors(): ?bool
-    {
-        return $this->collectDenormalizationErrors;
-    }
-
-    public function withCollectDenormalizationErrors(bool $collectDenormalizationErrors = null): self
-    {
-        $self = clone $this;
-        $self->collectDenormalizationErrors = $collectDenormalizationErrors;
 
         return $self;
     }
@@ -1389,187 +1317,6 @@ class ApiResource
         return $self;
     }
 
-    public function getValidationContext(): ?array
-    {
-        return $this->validationContext;
-    }
-
-    public function withValidationContext(array $validationContext): self
-    {
-        $self = clone $this;
-        $self->validationContext = $validationContext;
-
-        return $self;
-    }
-
-    /**
-     * @return string[]|null
-     */
-    public function getFilters(): ?array
-    {
-        return $this->filters;
-    }
-
-    public function withFilters(array $filters): self
-    {
-        $self = clone $this;
-        $self->filters = $filters;
-
-        return $self;
-    }
-
-    /**
-     * @deprecated this will be removed in v4
-     */
-    public function getElasticsearch(): ?bool
-    {
-        return $this->elasticsearch;
-    }
-
-    /**
-     * @deprecated this will be removed in v4
-     */
-    public function withElasticsearch(bool $elasticsearch): self
-    {
-        $self = clone $this;
-        $self->elasticsearch = $elasticsearch;
-
-        return $self;
-    }
-
-    /**
-     * @return array|bool|mixed|null
-     */
-    public function getMercure()
-    {
-        return $this->mercure;
-    }
-
-    public function withMercure($mercure): self
-    {
-        $self = clone $this;
-        $self->mercure = $mercure;
-
-        return $self;
-    }
-
-    public function getMessenger()
-    {
-        return $this->messenger;
-    }
-
-    public function withMessenger($messenger): self
-    {
-        $self = clone $this;
-        $self->messenger = $messenger;
-
-        return $self;
-    }
-
-    public function getInput()
-    {
-        return $this->input;
-    }
-
-    public function withInput($input): self
-    {
-        $self = clone $this;
-        $self->input = $input;
-
-        return $self;
-    }
-
-    public function getOutput()
-    {
-        return $this->output;
-    }
-
-    public function withOutput($output): self
-    {
-        $self = clone $this;
-        $self->output = $output;
-
-        return $self;
-    }
-
-    public function getOrder(): ?array
-    {
-        return $this->order;
-    }
-
-    public function withOrder(array $order): self
-    {
-        $self = clone $this;
-        $self->order = $order;
-
-        return $self;
-    }
-
-    public function getFetchPartial(): ?bool
-    {
-        return $this->fetchPartial;
-    }
-
-    public function withFetchPartial(bool $fetchPartial): self
-    {
-        $self = clone $this;
-        $self->fetchPartial = $fetchPartial;
-
-        return $self;
-    }
-
-    public function getForceEager(): ?bool
-    {
-        return $this->forceEager;
-    }
-
-    public function withForceEager(bool $forceEager): self
-    {
-        $self = clone $this;
-        $self->forceEager = $forceEager;
-
-        return $self;
-    }
-
-    public function getPaginationClientEnabled(): ?bool
-    {
-        return $this->paginationClientEnabled;
-    }
-
-    public function withPaginationClientEnabled(bool $paginationClientEnabled): self
-    {
-        $self = clone $this;
-        $self->paginationClientEnabled = $paginationClientEnabled;
-
-        return $self;
-    }
-
-    public function getPaginationClientItemsPerPage(): ?bool
-    {
-        return $this->paginationClientItemsPerPage;
-    }
-
-    public function withPaginationClientItemsPerPage(bool $paginationClientItemsPerPage): self
-    {
-        $self = clone $this;
-        $self->paginationClientItemsPerPage = $paginationClientItemsPerPage;
-
-        return $self;
-    }
-
-    public function getPaginationClientPartial(): ?bool
-    {
-        return $this->paginationClientPartial;
-    }
-
-    public function withPaginationClientPartial(bool $paginationClientPartial): self
-    {
-        $self = clone $this;
-        $self->paginationClientPartial = $paginationClientPartial;
-
-        return $self;
-    }
-
     public function getPaginationViaCursor(): ?array
     {
         return $this->paginationViaCursor;
@@ -1579,175 +1326,6 @@ class ApiResource
     {
         $self = clone $this;
         $self->paginationViaCursor = $paginationViaCursor;
-
-        return $self;
-    }
-
-    public function getPaginationEnabled(): ?bool
-    {
-        return $this->paginationEnabled;
-    }
-
-    public function withPaginationEnabled(bool $paginationEnabled): self
-    {
-        $self = clone $this;
-        $self->paginationEnabled = $paginationEnabled;
-
-        return $self;
-    }
-
-    public function getPaginationFetchJoinCollection(): ?bool
-    {
-        return $this->paginationFetchJoinCollection;
-    }
-
-    public function withPaginationFetchJoinCollection(bool $paginationFetchJoinCollection): self
-    {
-        $self = clone $this;
-        $self->paginationFetchJoinCollection = $paginationFetchJoinCollection;
-
-        return $self;
-    }
-
-    public function getPaginationUseOutputWalkers(): ?bool
-    {
-        return $this->paginationUseOutputWalkers;
-    }
-
-    public function withPaginationUseOutputWalkers(bool $paginationUseOutputWalkers): self
-    {
-        $self = clone $this;
-        $self->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-
-        return $self;
-    }
-
-    public function getPaginationItemsPerPage(): ?int
-    {
-        return $this->paginationItemsPerPage;
-    }
-
-    public function withPaginationItemsPerPage(int $paginationItemsPerPage): self
-    {
-        $self = clone $this;
-        $self->paginationItemsPerPage = $paginationItemsPerPage;
-
-        return $self;
-    }
-
-    public function getPaginationMaximumItemsPerPage(): ?int
-    {
-        return $this->paginationMaximumItemsPerPage;
-    }
-
-    public function withPaginationMaximumItemsPerPage(int $paginationMaximumItemsPerPage): self
-    {
-        $self = clone $this;
-        $self->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
-
-        return $self;
-    }
-
-    public function getPaginationPartial(): ?bool
-    {
-        return $this->paginationPartial;
-    }
-
-    public function withPaginationPartial(bool $paginationPartial): self
-    {
-        $self = clone $this;
-        $self->paginationPartial = $paginationPartial;
-
-        return $self;
-    }
-
-    public function getPaginationType(): ?string
-    {
-        return $this->paginationType;
-    }
-
-    public function withPaginationType(string $paginationType): self
-    {
-        $self = clone $this;
-        $self->paginationType = $paginationType;
-
-        return $self;
-    }
-
-    public function getSecurity(): ?string
-    {
-        return $this->security;
-    }
-
-    public function withSecurity(string $security): self
-    {
-        $self = clone $this;
-        $self->security = $security;
-
-        return $self;
-    }
-
-    public function getSecurityMessage(): ?string
-    {
-        return $this->securityMessage;
-    }
-
-    public function withSecurityMessage(string $securityMessage): self
-    {
-        $self = clone $this;
-        $self->securityMessage = $securityMessage;
-
-        return $self;
-    }
-
-    public function getSecurityPostDenormalize(): ?string
-    {
-        return $this->securityPostDenormalize;
-    }
-
-    public function withSecurityPostDenormalize(string $securityPostDenormalize): self
-    {
-        $self = clone $this;
-        $self->securityPostDenormalize = $securityPostDenormalize;
-
-        return $self;
-    }
-
-    public function getSecurityPostDenormalizeMessage(): ?string
-    {
-        return $this->securityPostDenormalizeMessage;
-    }
-
-    public function withSecurityPostDenormalizeMessage(string $securityPostDenormalizeMessage): self
-    {
-        $self = clone $this;
-        $self->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-
-        return $self;
-    }
-
-    public function getSecurityPostValidation(): ?string
-    {
-        return $this->securityPostValidation;
-    }
-
-    public function withSecurityPostValidation(string $securityPostValidation = null): self
-    {
-        $self = clone $this;
-        $self->securityPostValidation = $securityPostValidation;
-
-        return $self;
-    }
-
-    public function getSecurityPostValidationMessage(): ?string
-    {
-        return $this->securityPostValidationMessage;
-    }
-
-    public function withSecurityPostValidationMessage(string $securityPostValidationMessage = null): self
-    {
-        $self = clone $this;
-        $self->securityPostValidationMessage = $securityPostValidationMessage;
 
         return $self;
     }
@@ -1794,60 +1372,18 @@ class ApiResource
         return $self;
     }
 
-    /**
-     * @return string|callable|null
-     */
-    public function getProcessor()
+    public function getLinks(): ?array
     {
-        return $this->processor;
-    }
-
-    public function withProcessor($processor): self
-    {
-        $self = clone $this;
-        $self->processor = $processor;
-
-        return $self;
+        return $this->links;
     }
 
     /**
-     * @return string|callable|null
+     * @param Link[] $links
      */
-    public function getProvider()
-    {
-        return $this->provider;
-    }
-
-    public function withProvider($provider): self
+    public function withLinks(array $links): self
     {
         $self = clone $this;
-        $self->provider = $provider;
-
-        return $self;
-    }
-
-    public function getExtraProperties(): array
-    {
-        return $this->extraProperties;
-    }
-
-    public function withExtraProperties(array $extraProperties): self
-    {
-        $self = clone $this;
-        $self->extraProperties = $extraProperties;
-
-        return $self;
-    }
-
-    public function getStateOptions(): ?OptionsInterface
-    {
-        return $this->stateOptions;
-    }
-
-    public function withStateOptions(?OptionsInterface $stateOptions): self
-    {
-        $self = clone $this;
-        $self->stateOptions = $stateOptions;
+        $self->links = $links;
 
         return $self;
     }

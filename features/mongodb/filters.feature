@@ -10,7 +10,7 @@ Feature: Filters on collections
     When I send a "GET" request to "/dummies?relatedDummy.thirdLevel.badFourthLevel.level=4"
     Then the response status code should be 500
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
@@ -21,7 +21,7 @@ Feature: Filters on collections
     When I send a "GET" request to "/dummies?relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level=3"
     Then the response status code should be 500
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"

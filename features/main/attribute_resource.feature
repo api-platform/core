@@ -98,7 +98,8 @@ Feature: Resource attributes
     When I send a "GET" request to "/photos/1/resize/300/100"
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+    And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
     And the JSON node "hydra:description" should be equal to 'Unable to generate an IRI for the item of type "ApiPlatform\Tests\Fixtures\TestBundle\Entity\IncompleteUriVariableConfigured"'
 
   Scenario: Uri variables with Post operation

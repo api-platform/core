@@ -99,9 +99,12 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
             $fieldName = $this->nameConverter->normalize($fieldName, $class, self::FORMAT);
         }
 
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
-        if ($type && null !== $type->getClassName()) {
-            return "data/relationships/$fieldName";
+        $types = $propertyMetadata->getBuiltinTypes() ?? [];
+
+        foreach ($types as $type) {
+            if (null !== $type->getClassName()) {
+                return "data/relationships/$fieldName";
+            }
         }
 
         return "data/attributes/$fieldName";

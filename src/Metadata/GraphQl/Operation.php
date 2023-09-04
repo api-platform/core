@@ -37,6 +37,7 @@ class Operation extends AbstractOperation
     public function __construct(
         protected ?string $resolver = null,
         protected ?array $args = null,
+        protected ?array $extraArgs = null,
         protected ?array $links = null,
 
         string $shortName = null,
@@ -156,6 +157,19 @@ class Operation extends AbstractOperation
     {
         $self = clone $this;
         $self->args = $args;
+
+        return $self;
+    }
+
+    public function getExtraArgs(): ?array
+    {
+        return $this->extraArgs;
+    }
+
+    public function withExtraArgs(array $extraArgs = null): self
+    {
+        $self = clone $this;
+        $self->extraArgs = $extraArgs;
 
         return $self;
     }

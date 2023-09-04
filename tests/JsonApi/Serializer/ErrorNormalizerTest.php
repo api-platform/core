@@ -41,17 +41,19 @@ class ErrorNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('json'));
         $this->assertSame([
-            \Exception::class => true,
-            FlattenException::class => true,
+            \Exception::class => false,
+            FlattenException::class => false,
         ], $normalizer->getSupportedTypes($normalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+            $this->assertFalse($normalizer->hasCacheableSupportsMethod());
         }
     }
 
     /**
      * @dataProvider errorProvider
+     *
+     * @group legacy
      *
      * @param int    $status          http status code of the Exception
      * @param string $originalMessage original message of the Exception
@@ -74,6 +76,9 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
+    /**
+     * @group legacy
+     */
     public function testNormalizeAnExceptionWithCustomErrorCode(): void
     {
         $status = Response::HTTP_BAD_REQUEST;
@@ -92,6 +97,9 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
+    /**
+     * @group legacy
+     */
     public function testNormalizeAFlattenExceptionWithCustomErrorCode(): void
     {
         $status = Response::HTTP_BAD_REQUEST;

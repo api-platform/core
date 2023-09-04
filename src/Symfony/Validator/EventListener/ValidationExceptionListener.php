@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Validator\EventListener;
 
 use ApiPlatform\Exception\FilterValidationException;
+use ApiPlatform\Symfony\EventListener\ExceptionListener;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
 use ApiPlatform\Validator\Exception\ValidationException;
@@ -23,12 +24,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Handles validation errors.
+ * todo remove this class.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class ValidationExceptionListener
 {
-    public function __construct(private readonly SerializerInterface $serializer, private readonly array $errorFormats, private readonly array $exceptionToStatus = [])
+    public function __construct(private readonly SerializerInterface $serializer, private readonly array $errorFormats, private readonly array $exceptionToStatus = [], private readonly ?ExceptionListener $exceptionListener = null)
     {
     }
 
@@ -37,6 +39,14 @@ final class ValidationExceptionListener
      */
     public function onKernelException(ExceptionEvent $event): void
     {
+        if ($this->exceptionListener) {
+            $this->exceptionListener->onKernelException($event);
+
+            return;
+        }
+
+        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated and will be removed in 4.x.', __CLASS__));
+
         $exception = $event->getThrowable();
         if (!$exception instanceof ConstraintViolationListAwareExceptionInterface && !$exception instanceof FilterValidationException) {
             return;

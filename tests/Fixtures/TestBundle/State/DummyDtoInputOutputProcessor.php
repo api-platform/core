@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoInputOutput as DummyDtoInputOutputDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\InputDto as InputDtoDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
@@ -32,10 +33,14 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
     /**
      * {@inheritDoc}
      *
-     * @param InputDto $data
+     * @param InputDto|InputDtoDocument|mixed $data
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
+        if (!($data instanceof InputDto || $data instanceof InputDtoDocument)) {
+            throw new \RuntimeException('Data is not an InputDto');
+        }
+
         /** @var EntityManager */
         $manager = $this->registry->getManagerForClass($operation->getClass());
         $entity = new ($operation->getClass())();

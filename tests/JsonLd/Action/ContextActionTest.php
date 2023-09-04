@@ -25,9 +25,14 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ProviderInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -55,7 +60,7 @@ class ContextActionTest extends TestCase
         $contextBuilderProphecy->getBaseContext()->willReturn(['/contexts']);
         $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
 
-        $this->assertEquals(['@context' => ['/contexts']], $contextAction('Error'));
+        $this->assertEquals(['@context' => ['/contexts']], $contextAction('ConstraintViolationList'));
     }
 
     public function testContextActionWithResourceClass(): void
@@ -70,17 +75,17 @@ class ContextActionTest extends TestCase
         $resourceMetadataCollectionFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(
             new ResourceMetadataCollection('dummy', [
                 (new ApiResource())
-                ->withShortName('dummy')
-                ->withDescription('dummy')
-                ->withTypes(['#dummy'])
-                ->withOperations(new Operations([
-                    'get' => (new Get())->withShortName('dummy'),
-                    'put' => (new Put())->withShortName('dummy'),
-                    'get_collection' => (new GetCollection())->withShortName('dummy'),
-                    'post' => (new Post())->withShortName('dummy'),
-                    'custom' => (new Get())->withUriTemplate('/foo')->withShortName('dummy'),
-                    'custom2' => (new Post())->withUriTemplate('/foo')->withShortName('dummy'),
-                ])),
+                    ->withShortName('dummy')
+                    ->withDescription('dummy')
+                    ->withTypes(['#dummy'])
+                    ->withOperations(new Operations([
+                        'get' => (new Get())->withShortName('dummy'),
+                        'put' => (new Put())->withShortName('dummy'),
+                        'get_collection' => (new GetCollection())->withShortName('dummy'),
+                        'post' => (new Post())->withShortName('dummy'),
+                        'custom' => (new Get())->withUriTemplate('/foo')->withShortName('dummy'),
+                        'custom2' => (new Post())->withUriTemplate('/foo')->withShortName('dummy'),
+                    ])),
             ])
         );
         $this->assertEquals(['@context' => ['/dummies']], $contextAction('dummy'));
@@ -113,5 +118,21 @@ class ContextActionTest extends TestCase
             ])
         );
         $contextAction('dummy');
+    }
+
+    public function testWithProvider(): void
+    {
+        $c = ['@context' => []];
+        $contextBuilder = $this->createMock(ContextBuilderInterface::class);
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())->method('serialize')->with($c, 'json')->willReturn('@');
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())->method('provide')->willReturn($c);
+        $processor = $this->createMock(ProcessorInterface::class);
+        $processor->expects($this->once())->method('process')->willReturn(new JsonResponse('@'));
+        $contextAction = new ContextAction($contextBuilder, $resourceNameCollectionFactory, $resourceMetadataCollectionFactory, $provider, $processor, $serializer);
+        $contextAction->__invoke('dummy', $this->createMock(Request::class));
     }
 }

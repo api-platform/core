@@ -153,7 +153,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
 
         switch ($operator) {
             case self::PARAMETER_BETWEEN:
-                $rangeValue = explode('..', $value);
+                $rangeValue = explode('..', $value, 2);
 
                 $rangeValue = $this->normalizeBetweenValues($rangeValue);
                 if (null === $rangeValue) {

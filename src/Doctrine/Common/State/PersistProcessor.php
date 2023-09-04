@@ -17,8 +17,6 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
 
@@ -50,19 +48,19 @@ final class PersistProcessor implements ProcessorInterface
         // PUT: reset the existing object managed by Doctrine and merge data sent by the user in it
         // This custom logic is needed because EntityManager::merge() has been deprecated and UPSERT isn't supported:
         // https://github.com/doctrine/orm/issues/8461#issuecomment-1250233555
-        if ($operation instanceof HttpOperation && HttpOperation::METHOD_PUT === $operation->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? false)) {
+        if ($operation instanceof HttpOperation && 'PUT' === $operation->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? false)) {
             \assert(method_exists($manager, 'getReference'));
             // TODO: the call to getReference is most likely to fail with complex identifiers
             $newData = $data;
-            if (isset($context['previous_data'])) {
-                $newData = 1 === \count($uriVariables) ? $manager->getReference($class, current($uriVariables)) : clone $context['previous_data'];
+            if ($previousData = $context['previous_data']) {
+                $newData = 1 === \count($uriVariables) ? $manager->getReference($class, current($uriVariables)) : clone $previousData;
             }
 
             $identifiers = array_reverse($uriVariables);
             $links = $this->getLinks($class, $operation, $context);
             $reflectionProperties = $this->getReflectionProperties($data);
 
-            if (!isset($context['previous_data'])) {
+            if (!$previousData) {
                 foreach (array_reverse($links) as $link) {
                     if ($link->getExpandedValue() || !$link->getFromClass()) {
                         continue;
@@ -115,7 +113,7 @@ final class PersistProcessor implements ProcessorInterface
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {
         $classMetadata = $manager->getClassMetadata($this->getObjectClass($data));
-        if (($classMetadata instanceof ClassMetadataInfo || $classMetadata instanceof ClassMetadata) && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
+        if (method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
             return $classMetadata->isChangeTrackingDeferredExplicit();
         }
 

@@ -40,15 +40,18 @@ class ErrorNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('json'));
         $this->assertSame([
-            \Exception::class => true,
-            FlattenException::class => true,
+            \Exception::class => false,
+            FlattenException::class => false,
         ], $normalizer->getSupportedTypes($normalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+            $this->assertFalse($normalizer->hasCacheableSupportsMethod());
         }
     }
 
+    /**
+     * @group legacy
+     */
     public function testNormalize(): void
     {
         $normalizer = new ErrorNormalizer();
@@ -74,6 +77,8 @@ class ErrorNormalizerTest extends TestCase
     /**
      * @dataProvider providerStatusCode
      *
+     * @group legacy
+     *
      * @param int    $status          http status code of the Exception
      * @param string $originalMessage original message of the Exception
      * @param bool   $debug           simulates kernel debug variable
@@ -96,6 +101,9 @@ class ErrorNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($exception, null, ['statusCode' => $status]));
     }
 
+    /**
+     * @group legacy
+     */
     public static function providerStatusCode(): \Iterator
     {
         yield [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', false];
@@ -107,6 +115,9 @@ class ErrorNormalizerTest extends TestCase
         yield [509, Response::$statusTexts[Response::HTTP_INTERNAL_SERVER_ERROR], true];
     }
 
+    /**
+     * @group legacy
+     */
     public function testErrorServerNormalizeContextStatus(): void
     {
         $normalizer = new ErrorNormalizer(false);

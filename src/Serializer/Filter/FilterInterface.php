@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Filter;
 
-use ApiPlatform\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Metadata\FilterInterface as BaseFilterInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

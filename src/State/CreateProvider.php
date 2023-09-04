@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -41,7 +40,7 @@ final class CreateProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        if (!$uriVariables || !$operation instanceof HttpOperation || null !== $operation->getController()) {
+        if (!$uriVariables || !$operation instanceof HttpOperation || (null !== $operation->getController() && 'api_platform.symfony.main_controller' !== $operation->getController())) {
             return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
