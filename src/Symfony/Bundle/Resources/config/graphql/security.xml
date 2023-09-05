@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.graphql.state_provider.access_checker" class="ApiPlatform\Symfony\Security\State\AccessCheckerProvider" decorates="api_platform.graphql.state_provider.read">
+            <argument type="service" id="api_platform.graphql.state_provider.access_checker.inner" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+        </service>
+
+        <service id="api_platform.graphql.state_provider.access_checker.post_deserialize" class="ApiPlatform\Symfony\Security\State\AccessCheckerProvider" decorates="api_platform.graphql.state_provider.denormalizer">
+            <argument type="service" id="api_platform.graphql.state_provider.access_checker.post_deserialize.inner" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+            <argument>post_denormalize</argument>
+        </service>
+
+        <service id="api_platform.graphql.state_provider.access_checker.post_validate" class="ApiPlatform\Symfony\Security\State\AccessCheckerProvider" decorates="api_platform.graphql.state_provider.validate">
+            <argument type="service" id="api_platform.graphql.state_provider.access_checker.post_validate.inner" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+            <argument>post_validate</argument>
+        </service>
+    </services>
+</container>

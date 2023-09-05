@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Util;
+namespace ApiPlatform\GraphQl\Tests\Util;
 
 use ApiPlatform\GraphQl\Util\ArrayTrait;
 use PHPUnit\Framework\TestCase;

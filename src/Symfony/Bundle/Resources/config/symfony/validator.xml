@@ -25,11 +25,6 @@
             <argument type="service" id="api_platform.validator" />
         </service>
 
-        <service id="api_platform.graphql.state_provider.validate" class="ApiPlatform\Symfony\Validator\State\ValidateProvider" decorates="api_platform.graphql.state_provider" decoration-priority="200">
-            <argument type="service" id="api_platform.graphql.state_provider.validate.inner" />
-            <argument type="service" id="api_platform.validator" />
-        </service>
-
     </services>
 
 </container>

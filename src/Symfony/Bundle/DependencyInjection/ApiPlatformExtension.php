@@ -704,6 +704,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('metadata/validator.xml');
             $loader->load('symfony/validator.xml');
 
+            if ($this->isConfigEnabled($container, $config['graphql'])) {
+                $loader->load('graphql/validator.xml');
+            }
+
             $container->registerForAutoconfiguration(ValidationGroupsGeneratorInterface::class)
                 ->addTag('api_platform.validation_groups_generator');
             $container->registerForAutoconfiguration(PropertySchemaRestrictionMetadataInterface::class)
@@ -808,6 +812,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('security.xml');
         $loader->load('legacy/security.xml');
+
+        if ($this->isConfigEnabled($container, $config['graphql'])) {
+            $loader->load('graphql/security.xml');
+        }
     }
 
     private function registerOpenApiConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
