@@ -160,7 +160,7 @@ final class IriConverter implements IriConverterInterface
     private function generateSkolemIri(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = [], string $resourceClass = null): string
     {
         if (!$this->decorated) {
-            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
+            $this->throwInvalidArgumentException($operation->getClass(), $resource);
         }
 
         // Use a skolem iri, the route is defined in genid.xml
@@ -177,7 +177,7 @@ final class IriConverter implements IriConverterInterface
             } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers) {
-                    throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+                    $this->throwInvalidArgumentException($operation->getClass(), $resource, $e->getCode(), $e);
                 }
             }
         }
@@ -185,7 +185,30 @@ final class IriConverter implements IriConverterInterface
         try {
             return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
         } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+            $this->throwInvalidArgumentException($operation->getClass(), $resource, $e->getCode(), $e);
         }
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function throwInvalidArgumentException(string $operationClass, object|string $resource, int $code = 0, ?\Throwable $throwable = null): void
+    {
+        $resourceClass = \is_object($resource) ? $resource::class : $resource;
+
+        $message = sprintf(
+            'Unable to generate an IRI for the item of type "%s"',
+            $operationClass
+        );
+
+        if ($operationClass !== $resourceClass) {
+            $message = sprintf(
+                'Unable to generate an IRI for the operation resource "%s" and relating item of type "%s"',
+                $operationClass,
+                $resourceClass
+            );
+        }
+
+        throw new InvalidArgumentException($message, $code, $throwable);
     }
 }
