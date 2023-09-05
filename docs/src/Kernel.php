@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Playground;
 
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Playground\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\Playground\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Playground\Doctrine\StaticMappingDriver;
-use ApiPlatform\Playground\Metadata\Property\Factory\PropertyNameCollectionFactory;
 use ApiPlatform\Playground\Metadata\Resource\Factory\ClassResourceNameCollectionFactory;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
@@ -29,18 +27,15 @@ use Doctrine\Migrations\Version\Version;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 
-use Symfony\Component\Serializer\Annotation\Groups;
 use function App\DependencyInjection\configure; // @phpstan-ignore-line
 use function App\Playground\request;
 
@@ -115,7 +110,6 @@ class Kernel extends BaseKernel
             configure($container);
         }
     }
-
 
     public function request(Request $request = null): Response
     {
