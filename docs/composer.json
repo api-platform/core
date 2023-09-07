@@ -53,6 +53,5 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^10"
-    },
-    "minimum-stability": "dev"
+    }
 }
