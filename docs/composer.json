@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "api-platform/core": "*",
+        "api-platform/core": "^3.1",
         "symfony/expression-language": "6.2.*",
         "nelmio/cors-bundle": "^2.2",
         "phpstan/phpdoc-parser": "^1.15",
@@ -34,18 +34,8 @@
         "zenstruck/foundry": "^1.31",
         "symfony/http-client": "^6.2",
         "symfony/browser-kit": "^6.2",
-        "justinrainbow/json-schema": "^5.2",
-        "symfony/asset": "7.0.x-dev"
+        "justinrainbow/json-schema": "^5.2"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../",
-            "options": {
-                "symlink": false
-            }
-        }
-    ],
     "config": {
         "allow-plugins": {
             "symfony/runtime": true
