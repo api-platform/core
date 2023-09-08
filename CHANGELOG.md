@@ -1,5 +1,20 @@
 # Changelog
 
+## v3.1.17
+
+### Bug fixes
+
+* [50999d651](https://github.com/api-platform/core/commit/50999d651e04b7d026ee172e8d6e0b24327979b0) fix(symfony): missing translation contracts (#5799)
+
+## v3.1.16
+
+### Bug fixes
+
+* [c14b6f419](https://github.com/api-platform/core/commit/c14b6f41941f8d95cfd92691eb94ede40cec2125) fix(graphql): add cache_key in item normalizer (#5686)
+* [c2b3514c0](https://github.com/api-platform/core/commit/c2b3514c08d8567490402397dd3e1bc4c85da9ad) fix(serializer): no mapping cache in debug mode (#5777)
+* [c7892a646](https://github.com/api-platform/core/commit/c7892a646a671cf3d501831920d03426045d3324) fix(serializer): retrieve only first uriVariable from operation (#5788)
+* [c8b974131](https://github.com/api-platform/core/commit/c8b974131c98e225378fb28134ca47c5a2cc5fb7) fix(serializer): correct supported types for elasticsearch item normalizer decorator (#5769)
+
 ## v3.1.15
 
 ### Bug fixes
