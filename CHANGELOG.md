@@ -1,5 +1,23 @@
 # Changelog
 
+## v3.2.0-alpha.2
+
+### Bug fixes
+
+* [6c9e121db](https://github.com/api-platform/core/commit/6c9e121db88256d79c9c4c78c05993b3465c025e) fix(elasticsearch): elasticsearch 8 compatibility (#5795)
+* [7ecfdff85](https://github.com/api-platform/core/commit/7ecfdff85e997feafab1377ae6309e273a4e9678) fix(symfony): graphql security/validator only when enabled
+
+### Features
+
+* [0d04f28f2](https://github.com/api-platform/core/commit/0d04f28f230f5e9ab789644caba7efac1fe20cfa) feat(metadata): improve CreateProvider (#5770)
+* [46e84ffc1](https://github.com/api-platform/core/commit/46e84ffc182df12221967ab91403f2b0692847be) feat(symfony): add mercure asserts (#5764)
+* [c7dcd3669](https://github.com/api-platform/core/commit/c7dcd36690927bdf3bd08055cdf4fff5c08de4da) feat(doctrine): stateOptions can handleLinks for query optimization (#5732)
+
+Notes:
+
+- Adds `assertMercureUpdateMatchesJsonSchema(Update $update, array $topics, array|object|string $jsonSchema = '', bool $private = false, string $id = null, string $type = null, int $retry = null, string $message = '')`
+- The handle links feature is experimental until 3.3
+
 ## v3.2.0-alpha.1
 
 ### Bug fixes
@@ -130,7 +148,7 @@ Also updates: graphiql, opensans
 * [05b572234](https://github.com/api-platform/core/commit/05b5722347810f6af9b458b60c28a0bb38301f64) fix(jsonschema): access related subschema on readableLink (#5515)
 * [138c51218](https://github.com/api-platform/core/commit/138c512186145f79b1b00f25e1785cc533eb6107) fix(serializer): skip unknown property and use the name converter
 * [23ef01aa2](https://github.com/api-platform/core/commit/23ef01aa2d5700ede458f32e09c6a85967d60c1d) fix(openapi): restore OpenApiFactory::OPENAPI_DEFINITION_NAME (#5516)
-* [871824c44](https://github.com/api-platform/core/commit/871824c443f0e1fb5bfbddeef648b5da2745d291) fix(symfony): check operations parameters (#5513) 
+* [871824c44](https://github.com/api-platform/core/commit/871824c443f0e1fb5bfbddeef648b5da2745d291) fix(symfony): check operations parameters (#5513)
 * [af5cd209d](https://github.com/api-platform/core/commit/af5cd209d5e1761b1b0a7bf4de2e81280f32a167) fix(serializer): cache class metadata factory (#5512)
 * [f128e3b3c](https://github.com/api-platform/core/commit/f128e3b3ce17f34e4767c547c5857c754555fdd3) fix(openapi): yaml parameters extractor (#5487)
 
@@ -154,9 +172,9 @@ Also updates: graphiql, opensans
 * [a5aa52923](https://github.com/api-platform/core/commit/a5aa5292391acb10e49d24a8bb56bdd622a05e41) fix(metadata): remove ReflectionEnum usage (#5453)
 * [bf29fb973](https://github.com/api-platform/core/commit/bf29fb973271d30d5e3ab878d65b75f2805d5928) fix(openapi): document PropertyFilter within parameter (#5458)
 * [cfdc9ad9b](https://github.com/api-platform/core/commit/cfdc9ad9baa2a7bc8d206e92b51ee7513abe575a) fix(metadata): add default operations config (#5459)
-* [6e35a714f](https://github.com/api-platform/core/commit/cfdc9ad9baa2a7bc8d206e92b51ee7513abe575a) perf(symfony): cache identifier metadata factory (#5466) 
+* [6e35a714f](https://github.com/api-platform/core/commit/cfdc9ad9baa2a7bc8d206e92b51ee7513abe575a) perf(symfony): cache identifier metadata factory (#5466)
 
-Notes: 
+Notes:
 
 - #5473 changes the priority of the `ApiPlatform\Symfony\EventListener\QueryParameterValidateListener` from 16 to 2 so that it occurs after the security listener.
 - ReflectionEnum was removed as it was causing segfaults with opcache preload and an unidentified PHP extension
@@ -237,7 +255,7 @@ Notes:
 
 ### Backward compatibility
 
-- only use named arguments on metadata attributes (`Get`, `Query`, `Operation`, `ApiProperty` etc.) as we don't guarantee the backward compatibility on positional arguments 
+- only use named arguments on metadata attributes (`Get`, `Query`, `Operation`, `ApiProperty` etc.) as we don't guarantee the backward compatibility on positional arguments
 
 ## v3.0.12
 
@@ -254,7 +272,7 @@ Notes:
 * [0154bf13c](https://github.com/api-platform/core/commit/0154bf13c3aa99b6bfe2c17c875a51e876aca43f) fix(metadata): homogenize operations constructor (#5344)
     Note: we made clear that we are supporting only named arguments on our Attributes. We do not support backward compatibility on positional arguments.
 * [53cb25fab](https://github.com/api-platform/core/commit/53cb25fab0fcec2d336590c7e82e1c6a8728d00a) fix(symfony): annotation reader argument optional (#5358)
-* [722802c13](https://github.com/api-platform/core/commit/722802c13200179cd9ce7b2812738471a9340f27) fix(graphql): usable YAML/XML configuration (#5333) 
+* [722802c13](https://github.com/api-platform/core/commit/722802c13200179cd9ce7b2812738471a9340f27) fix(graphql): usable YAML/XML configuration (#5333)
     Note: `paginationViaCursor` was removed from GraphQl operations as it had no behavior
 * [937786efe](https://github.com/api-platform/core/commit/937786efeab77f939d67973d7b4e7bc4fd8eec17) fix(metadata): extract identifier using `Link::toProperty` (#5352)
 
@@ -374,7 +392,7 @@ Notes:
 
 Various cleanup in services and removal of backward compatibility layer.
 
-## 3.0.0-rc.2 
+## 3.0.0-rc.2
 
 * JsonLd: correct the `api_jsonld_context` route format (#4844)
 * Metadata: remove metadata_backward_compatibility_layer option (#4843)
@@ -401,7 +419,7 @@ Breaking changes:
 * Serializer: `skip_null_values` now defaults to `true`
 * Metadata: `Patch` is added to the automatic CRUD
 * Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
-    
+
 ## v2.7.14
 
 ### Bug fixes
@@ -534,7 +552,7 @@ Breaking changes:
 
 Various cs fixes and PHPDoc to help upgrading to 3.0.
 
-## 2.7.0-rc.2 
+## 2.7.0-rc.2
 
 * Symfony: the upgrade command now updates ApiFilter as well (#4845)
 * Symfony: maker command to create a state Processor (#4423)
@@ -588,9 +606,9 @@ Doctrine: new interfaces for Filters and Extensions ready, switch to the `ApiPla
 * GraphQl: output creates its own type in TypeBuilder (#4766)
 * Metadata: clear missing metadata cache pools (#4770)
 * Metadata: property override when value is set (#4767)
-* Metadata: add read and write to extractor (#4760) 
+* Metadata: add read and write to extractor (#4760)
 * JsonSchema: factory backward compatibility layer (#4758)
-* Metadata: defaults properly overrides metadata (#4759) 
+* Metadata: defaults properly overrides metadata (#4759)
 * Metadata: Add missing processor and provider to extractor (#4754)
 
 ## 2.7.0-alpha.5
