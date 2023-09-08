@@ -54,7 +54,7 @@ class CreateProviderTest extends TestCase
                     new ApiResource(operations: [$parentOperation]),
                 ])
             );
-        $decorated->provide($parentOperation, $uriVariables)->shouldBeCalled()->willReturn(new Company());
+        $decorated->provide($parentOperation, $uriVariables, [])->shouldBeCalled()->willReturn(new Company());
 
         $createProvider = new CreateProvider($decorated->reveal(), $resourceMetadataCollectionFactory->reveal());
         $createProvider->provide($operation, $uriVariables);
@@ -78,7 +78,7 @@ class CreateProviderTest extends TestCase
                     new ApiResource(operations: [$parentOperation]),
                 ])
             );
-        $decorated->provide($parentOperation, $uriVariables)->shouldBeCalled()->willReturn(null);
+        $decorated->provide($parentOperation, $uriVariables, [])->shouldBeCalled()->willReturn(null);
 
         $this->expectException(NotFoundHttpException::class);
 
@@ -104,7 +104,7 @@ class CreateProviderTest extends TestCase
                     new ApiResource(operations: [$parentOperation]),
                 ])
             );
-        $decorated->provide($parentOperation, $uriVariables)->shouldBeCalled()->willThrow(ProviderNotFoundException::class);
+        $decorated->provide($parentOperation, $uriVariables, [])->shouldBeCalled()->willThrow(ProviderNotFoundException::class);
 
         $this->expectException(NotFoundHttpException::class);
 
@@ -127,7 +127,7 @@ class CreateProviderTest extends TestCase
         $parentOperation = new Get(uriVariables: ['id' => $link], class: Company::class);
 
         $resourceMetadataCollectionFactory->create(Company::class)->shouldBeCalledOnce()->willThrow(ResourceClassNotFoundException::class);
-        $decorated->provide($parentOperation, $uriVariables)->shouldNotBeCalled();
+        $decorated->provide($parentOperation, $uriVariables, [])->shouldNotBeCalled();
 
         $this->expectException(ResourceClassNotFoundException::class);
 
@@ -157,7 +157,7 @@ class CreateProviderTest extends TestCase
                     new ApiResource(),
                 ])
             );
-        $decorated->provide($parentOperation, $uriVariables)->shouldNotBeCalled();
+        $decorated->provide($parentOperation, $uriVariables, [])->shouldNotBeCalled();
 
         $this->expectException(OperationNotFoundException::class);
 
@@ -191,7 +191,7 @@ class CreateProviderTest extends TestCase
                     ]),
                 ])
             );
-        $decorated->provide($parentOperation, $uriVariables)->shouldBeCalled()->willReturn(new Company());
+        $decorated->provide($parentOperation, $uriVariables, [])->shouldBeCalled()->willReturn(new Company());
 
         $createProvider = new CreateProvider($decorated->reveal(), $resourceMetadataCollectionFactory->reveal());
         $createProvider->provide($operation, $uriVariables);
@@ -215,7 +215,7 @@ class CreateProviderTest extends TestCase
                     new ApiResource(operations: [$parentOperation]),
                 ])
             );
-        $decorated->provide($parentOperation, $uriVariables)->shouldBeCalled()->willReturn(new Company());
+        $decorated->provide($parentOperation, $uriVariables, [])->shouldBeCalled()->willReturn(new Company());
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('An error occurred while trying to create an instance of the "ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyResourceWithComplexConstructor" resource. Consider writing your own "ApiPlatform\State\ProviderInterface" implementation and setting it as `provider` on your operation instead.');
