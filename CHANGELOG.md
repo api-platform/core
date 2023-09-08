@@ -13,7 +13,6 @@
 * [c353e5aa4](https://github.com/api-platform/core/commit/c353e5aa474d7a2e6c701bfa1c369b560e928c17) fix(graphql): do not add id field if operation already has a dedicated input type (#5095)
 * [ccef472ca](https://github.com/api-platform/core/commit/ccef472cade42b189fa8cb7793e27fad1349e289) fix(openapi): use 3.1 version (#5489)
 
-
 ### Features
 
 * [4ef0ef856](https://github.com/api-platform/core/commit/4ef0ef856ced658ac942fd6a2c6f7c5c563078d1) feat: error as resources, jsonld errors are now problem-compliant (#5433)
@@ -22,6 +21,21 @@
 * [851aa3778](https://github.com/api-platform/core/commit/851aa3778ef8a6f959a44b759fc343e9f8cfc8bf) feat(graphql)!: add extra args for custom queries or mutations (#5359)
 * [92a81f024](https://github.com/api-platform/core/commit/92a81f024541054b9322e7457b75c721261e14e0) feat(graphql): allow to disable the introspection query (#5711)
 * [d793ffb92](https://github.com/api-platform/core/commit/d793ffb9228a21655ee35f0b90a959f93281a4cf) feat: union/intersect types (#5470)
+
+## v3.1.17
+
+### Bug fixes
+
+* [50999d651](https://github.com/api-platform/core/commit/50999d651e04b7d026ee172e8d6e0b24327979b0) fix(symfony): missing translation contracts (#5799)
+
+## v3.1.16
+
+### Bug fixes
+
+* [c14b6f419](https://github.com/api-platform/core/commit/c14b6f41941f8d95cfd92691eb94ede40cec2125) fix(graphql): add cache_key in item normalizer (#5686)
+* [c2b3514c0](https://github.com/api-platform/core/commit/c2b3514c08d8567490402397dd3e1bc4c85da9ad) fix(serializer): no mapping cache in debug mode (#5777)
+* [c7892a646](https://github.com/api-platform/core/commit/c7892a646a671cf3d501831920d03426045d3324) fix(serializer): retrieve only first uriVariable from operation (#5788)
+* [c8b974131](https://github.com/api-platform/core/commit/c8b974131c98e225378fb28134ca47c5a2cc5fb7) fix(serializer): correct supported types for elasticsearch item normalizer decorator (#5769)
 
 ## v3.1.15
 
