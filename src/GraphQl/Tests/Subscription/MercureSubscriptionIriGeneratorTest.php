@@ -35,7 +35,7 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->defaultHub = new Hub('https://demo.mercure.rocks/hub', new StaticTokenProvider('xx'));
+        $this->defaultHub = new Hub('https://demo.mercure.rocks', new StaticTokenProvider('xx'));
         $this->managedHub = new Hub('https://demo.mercure.rocks/managed', new StaticTokenProvider('xx'));
 
         $this->registry = new HubRegistry($this->defaultHub, ['default' => $this->defaultHub, 'managed' => $this->managedHub]);

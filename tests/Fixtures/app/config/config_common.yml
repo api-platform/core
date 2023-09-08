@@ -1,3 +1,9 @@
+parameters:
+    container.autowiring.strict_mode: true
+    .container.dumper.inline_class_loader: true
+    env(MERCURE_URL): https://demo.mercure.rocks
+    env(MERCURE_JWT_SECRET): eyJhbGciOiJIUzI1NiJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOlsiKiJdLCJzdWJzY3JpYmUiOlsiaHR0cHM6Ly9leGFtcGxlLmNvbS9teS1wcml2YXRlLXRvcGljIiwie3NjaGVtZX06Ly97K2hvc3R9L2RlbW8vYm9va3Mve2lkfS5qc29ubGQiLCIvLndlbGwta25vd24vbWVyY3VyZS9zdWJzY3JpcHRpb25zey90b3BpY317L3N1YnNjcmliZXJ9Il0sInBheWxvYWQiOnsidXNlciI6Imh0dHBzOi8vZXhhbXBsZS5jb20vdXNlcnMvZHVuZ2xhcyIsInJlbW90ZUFkZHIiOiIxMjcuMC4wLjEifX19.KKPIikwUzRuB3DTpVw6ajzwSChwFw5omBMmMcWKiDcM
+
 doctrine:
     dbal:
         driver: 'pdo_sqlite'
@@ -19,8 +25,8 @@ web_profiler:
 mercure:
     hubs:
         default:
-            url: https://demo.mercure.rocks/hub
-            jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJmb28iLCJiYXIiXSwicHVibGlzaCI6WyJmb28iXX19.LRLvirgONK13JgacQ_VbcjySbVhkSmHy3IznH3tA9PM
+            url: '%env(MERCURE_URL)%'
+            jwt: '%env(MERCURE_JWT_SECRET)%'
 
 api_platform:
     title:                             'My Dummy API'
@@ -87,10 +93,6 @@ api_platform:
             - '%kernel.project_dir%/../TestBundle/Model'
     mercure:
         include_type: true
-
-parameters:
-    container.autowiring.strict_mode: true
-    .container.dumper.inline_class_loader: true
 
 services:
     test.client:

@@ -55,7 +55,7 @@ class AddLinkHeaderListenerTest extends TestCase
     public static function provider(): \Iterator
     {
         yield ['<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"', new Request()];
-        yield ['<https://demo.mercure.rocks/hub>; rel="mercure",<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"', new Request([], [], ['_links' => new GenericLinkProvider([new Link('mercure', 'https://demo.mercure.rocks/hub')])])];
+        yield ['<https://demo.mercure.rocks>; rel="mercure",<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"', new Request([], [], ['_links' => new GenericLinkProvider([new Link('mercure', 'https://demo.mercure.rocks')])])];
     }
 
     public function testSkipWhenPreflightRequest(): void

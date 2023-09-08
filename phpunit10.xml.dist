@@ -21,6 +21,7 @@
   <groups>
     <exclude>
       <group>mongodb</group>
+      <group>mercure</group>
     </exclude>
   </groups>
 

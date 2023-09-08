@@ -209,9 +209,68 @@ JSON;
         $this->assertNull(self::findIriBy($resource, ['name' => 'not-exist']));
     }
 
-    private function recreateSchema(): void
+    /**
+     * @group mercure
+     */
+    public function testGetMercureMessages(): void
     {
-        self::bootKernel();
+        // debug mode is required to get Mercure TraceableHub
+        $this->recreateSchema(['debug' => true, 'environment' => 'mercure']);
+
+        self::createClient()->request('POST', '/direct_mercures', [
+            'headers' => [
+                'content-type' => 'application/ld+json',
+                'accept' => 'application/ld+json',
+            ],
+            'body' => '{"name": "Hello World!"}',
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, self::getMercureMessages());
+        self::assertMercureUpdateMatchesJsonSchema(
+            update: self::getMercureMessage(),
+            topics: ['http://localhost/direct_mercures/1'],
+            jsonSchema: <<<JSON
+{
+    "\$schema": "https:\/\/json-schema.org\/draft-07\/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "@context": {
+            "readOnly": true,
+            "type": "string",
+            "pattern": "^/contexts/DirectMercure$"
+        },
+        "@id": {
+            "readOnly": true,
+            "type": "string",
+            "pattern": "^/direct_mercures/.+$"
+        },
+        "@type": {
+            "readOnly": true,
+            "type": "string"
+        },
+        "id": {
+            "type": "number"
+        },
+        "name": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "@context",
+        "@id",
+        "@type",
+        "id",
+        "name"
+    ]
+}
+JSON
+        );
+    }
+
+    private function recreateSchema(array $options = []): void
+    {
+        self::bootKernel($options);
 
         /** @var EntityManagerInterface $manager */
         $manager = static::getContainer()->get('doctrine')->getManager();
