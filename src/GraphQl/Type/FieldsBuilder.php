@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
+use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
@@ -425,8 +426,14 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
             }
 
             $entityClass = $resourceClass;
-            if (($options = $resourceOperation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
-                $entityClass = $options->getEntityClass();
+            if ($options = $resourceOperation->getStateOptions()) {
+                if ($options instanceof Options && $options->getEntityClass()) {
+                    $entityClass = $options->getEntityClass();
+                }
+
+                if ($options instanceof ODMOptions && $options->getDocumentClass()) {
+                    $entityClass = $options->getDocumentClass();
+                }
             }
 
             foreach ($this->filterLocator->get($filterId)->getDescription($entityClass) as $key => $value) {

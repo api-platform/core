@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Factory;
 
+use ApiPlatform\Doctrine\Odm\State\Options as DoctrineODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options as DoctrineOptions;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
@@ -561,8 +562,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $filter = $this->filterLocator->get($filterId);
             $entityClass = $operation->getClass();
-            if (($options = $operation->getStateOptions()) && $options instanceof DoctrineOptions && $options->getEntityClass()) {
-                $entityClass = $options->getEntityClass();
+            if ($options = $operation->getStateOptions()) {
+                if ($options instanceof DoctrineOptions && $options->getEntityClass()) {
+                    $entityClass = $options->getEntityClass();
+                }
+
+                if ($options instanceof DoctrineODMOptions && $options->getDocumentClass()) {
+                    $entityClass = $options->getDocumentClass();
+                }
             }
 
             foreach ($filter->getDescription($entityClass) as $name => $data) {

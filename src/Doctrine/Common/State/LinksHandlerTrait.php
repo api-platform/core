@@ -14,17 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Common\State;
 
 use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use Psr\Container\ContainerInterface;
 
 trait LinksHandlerTrait
 {
     private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    private ?ContainerInterface $handleLinksLocator;
 
     /**
      * @return Link[]
@@ -111,5 +113,23 @@ trait LinksHandlerTrait
         }
 
         return [];
+    }
+
+    private function getLinksHandler(Operation $operation): ?callable
+    {
+        if (!($options = $operation->getStateOptions()) || !method_exists($options, 'getHandleLinks') || null === $options->getHandleLinks()) {
+            return null;
+        }
+
+        $handleLinks = $options->getHandleLinks(); // @phpstan-ignore-line method_exists called above
+        if (\is_callable($handleLinks)) {
+            return $handleLinks;
+        }
+
+        if ($this->handleLinksLocator && \is_string($handleLinks) && $this->handleLinksLocator->has($handleLinks)) {
+            return [$this->handleLinksLocator->get($handleLinks), 'handleLinks'];
+        }
+
+        throw new RuntimeException(sprintf('Could not find handleLinks service "%s"', $handleLinks));
     }
 }

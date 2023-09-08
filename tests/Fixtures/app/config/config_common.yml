@@ -441,3 +441,11 @@ services:
     ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\LibraryItemProvider:
         tags:
             - { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\LinkHandledDummyLinksHandler:
+        tags:
+            - {name: 'api_platform.doctrine.orm.links_handler'}
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ODMLinkHandledDummyLinksHandler:
+        tags:
+            - {name: 'api_platform.doctrine.odm.links_handler'}

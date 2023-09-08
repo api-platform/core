@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Doctrine\Orm\State;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
@@ -284,5 +285,24 @@ class ItemProviderTest extends TestCase
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
 
         $this->assertEquals($returnObject, $dataProvider->provide($operation, ['employeeId' => 1]));
+    }
+
+    public function testHandleLinksCallable(): void
+    {
+        $class = 'foo';
+        $resourceMetadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $query = $this->createStub(AbstractQuery::class);
+        $query->method('getOneOrNullResult')->willReturn(null);
+        $qb = $this->createStub(QueryBuilder::class);
+        $qb->method('getQuery')->willReturn($query);
+        $repository = $this->createStub(EntityRepository::class);
+        $repository->method('createQueryBuilder')->willReturn($qb);
+        $manager = $this->createStub(EntityManagerInterface::class);
+        $manager->method('getRepository')->willReturn($repository);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($manager);
+        $operation = new Get(class: $class, stateOptions: new Options(handleLinks: fn () => $this->assertTrue(true)));
+        $dataProvider = new ItemProvider($resourceMetadata, $managerRegistry);
+        $dataProvider->provide($operation, ['id' => 1]);
     }
 }

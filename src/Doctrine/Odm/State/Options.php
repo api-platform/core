@@ -11,32 +11,32 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Orm\State;
+namespace ApiPlatform\Doctrine\Odm\State;
 
 use ApiPlatform\State\OptionsInterface;
 
 class Options implements OptionsInterface
 {
     /**
-     * @param string|callable $handleLinks experimental callable, typed mixed as we may want a service name in the future
+     * @param mixed $handleLinks experimental callable, typed mixed as we may want a service name in the future
      *
-     * @see \ApiPlatform\Doctrine\Orm\State\LinksHandlerInterface
+     * @see \ApiPlatform\Doctrine\Odm\State\LinksHandlerInterface
      */
     public function __construct(
-        protected ?string $entityClass = null,
+        protected ?string $documentClass = null,
         protected mixed $handleLinks = null,
     ) {
     }
 
-    public function getEntityClass(): ?string
+    public function getDocumentClass(): ?string
     {
-        return $this->entityClass;
+        return $this->documentClass;
     }
 
-    public function withEntityClass(?string $entityClass): self
+    public function withDocumentClass(?string $documentClass): self
     {
         $self = clone $this;
-        $self->entityClass = $entityClass;
+        $self->documentClass = $documentClass;
 
         return $self;
     }

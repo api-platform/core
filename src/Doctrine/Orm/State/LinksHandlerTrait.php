@@ -20,6 +20,9 @@ use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * @internal
+ */
 trait LinksHandlerTrait
 {
     use CommonLinksHandlerTrait;

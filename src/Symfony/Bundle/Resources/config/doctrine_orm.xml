@@ -130,6 +130,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
+            <argument type="tagged_locator" tag="api_platform.doctrine.orm.links_handler" index-by="key" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\CollectionProvider" />
             <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine.orm.state.collection_provider" />
@@ -140,6 +141,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
+            <argument type="tagged_locator" tag="api_platform.doctrine.orm.links_handler" index-by="key" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\ItemProvider" />
             <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine.orm.state.item_provider" />

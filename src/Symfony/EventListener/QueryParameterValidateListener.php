@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
+use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -64,8 +65,14 @@ final class QueryParameterValidateListener
 
         $class = $attributes['resource_class'];
 
-        if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
-            $class = $options->getEntityClass();
+        if ($options = $operation->getStateOptions()) {
+            if ($options instanceof Options && $options->getEntityClass()) {
+                $class = $options->getEntityClass();
+            }
+
+            if ($options instanceof ODMOptions && $options->getDocumentClass()) {
+                $class = $options->getDocumentClass();
+            }
         }
 
         $this->queryParameterValidator->validateFilters($class, $operation->getFilters() ?? [], $queryParameters);

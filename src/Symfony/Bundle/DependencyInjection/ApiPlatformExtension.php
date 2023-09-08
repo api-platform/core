@@ -17,11 +17,13 @@ use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter as DoctrineMongoDbOdmAbstractFilter;
+use ApiPlatform\Doctrine\Odm\State\LinksHandlerInterface as OdmLinksHandlerInterface;
 use ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter as DoctrineOrmAbstractFilter;
+use ApiPlatform\Doctrine\Orm\State\LinksHandlerInterface as OrmLinksHandlerInterface;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
@@ -616,6 +618,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
         $container->registerForAutoconfiguration(DoctrineOrmAbstractFilter::class);
 
+        $container->registerForAutoconfiguration(OrmLinksHandlerInterface::class)
+            ->addTag('api_platform.doctrine.orm.links_handler');
+
         $loader->load('doctrine_orm.xml');
 
         if ($this->isConfigEnabled($container, $config['eager_loading'])) {
@@ -640,6 +645,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection');
         $container->registerForAutoconfiguration(DoctrineMongoDbOdmAbstractFilter::class)
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
+        $container->registerForAutoconfiguration(OdmLinksHandlerInterface::class)
+            ->addTag('api_platform.doctrine.odm.links_handler');
 
         $loader->load('doctrine_mongodb_odm.xml');
     }

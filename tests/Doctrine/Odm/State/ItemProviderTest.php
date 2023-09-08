@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Doctrine\Odm\State;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider;
+use ApiPlatform\Doctrine\Odm\State\Options;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
@@ -32,12 +33,14 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @group mongodb
  */
 class ItemProviderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     public function testGetItemSingleIdentifier(): void
@@ -212,5 +215,29 @@ class ItemProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(ProviderEntity::class)->willReturn($managerProphecy->reveal());
 
         return $managerRegistryProphecy->reveal();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testHandleLinksCallable(): void
+    {
+        $this->expectDeprecation('The Doctrine\ODM\MongoDB\Aggregation\Builder::execute method is deprecated (This method was deprecated in doctrine/mongodb-odm 2.2. Please use getAggregation() instead.).');
+        $class = 'foo';
+        $resourceMetadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $it = $this->createStub(Iterator::class);
+        $it->method('current')->willReturn(null);
+        $aggregationBuilder = $this->createStub(Builder::class);
+        $aggregationBuilder->method('hydrate')->willReturnSelf();
+        $aggregationBuilder->method('execute')->willReturn($it);
+        $repository = $this->createStub(DocumentRepository::class);
+        $repository->method('createAggregationBuilder')->willReturn($aggregationBuilder);
+        $manager = $this->createStub(DocumentManager::class);
+        $manager->method('getRepository')->willReturn($repository);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($manager);
+        $operation = new Get(class: $class, stateOptions: new Options(handleLinks: fn () => $this->assertTrue(true)));
+        $dataProvider = new ItemProvider($resourceMetadata, $managerRegistry);
+        $dataProvider->provide($operation, ['id' => 1]);
     }
 }
