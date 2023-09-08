@@ -57,7 +57,7 @@ final class CreateProvider implements ProviderInterface
             ->create($relationClass)
             ->getOperation($operation->getExtraProperties()['parent_uri_template'] ?? null);
         try {
-            $relation = $this->decorated->provide($parentOperation, $uriVariables);
+            $relation = $this->decorated->provide($parentOperation, $uriVariables, $context);
         } catch (ProviderNotFoundException) {
             $relation = null;
         }

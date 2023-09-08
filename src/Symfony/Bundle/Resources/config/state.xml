@@ -81,7 +81,7 @@
         <service id="ApiPlatform\State\Pagination\PaginationOptions" alias="api_platform.pagination_options" />
 
         <service id="api_platform.state_provider.create" class="ApiPlatform\State\CreateProvider">
-            <argument type="service" id="api_platform.state_provider" />
+            <argument type="service" id="api_platform.state_provider.locator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
 
             <tag name="api_platform.state_provider" key="ApiPlatform\State\CreateProvider" />
