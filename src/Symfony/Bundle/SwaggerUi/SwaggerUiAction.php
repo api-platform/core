@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\SwaggerUi;
 
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
@@ -94,13 +93,15 @@ final class SwaggerUiAction
             $swaggerData['shortName'] = $metadata->getShortName();
             $swaggerData['operationId'] = $this->normalizeOperationName($metadata->getName());
 
-            [$swaggerData['path'], $swaggerData['method']] = $this->getPathAndMethod($swaggerData);
+            if ($data = $this->getPathAndMethod($swaggerData)) {
+                [$swaggerData['path'], $swaggerData['method']] = $data;
+            }
         }
 
         return new Response($this->twig->render('@ApiPlatform/SwaggerUi/index.html.twig', $swaggerContext + ['swagger_data' => $swaggerData]));
     }
 
-    private function getPathAndMethod(array $swaggerData): array
+    private function getPathAndMethod(array $swaggerData): ?array
     {
         foreach ($swaggerData['spec']['paths'] as $path => $operations) {
             foreach ($operations as $method => $operation) {
@@ -110,6 +111,6 @@ final class SwaggerUiAction
             }
         }
 
-        throw new RuntimeException(sprintf('The operation "%s" cannot be found in the Swagger specification.', $swaggerData['operationId']));
+        return null;
     }
 }
