@@ -49,7 +49,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         $propertySchema = $propertyMetadata->getSchema() ?? [];
 
-        if (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
+        if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable())) {
             $propertySchema['readOnly'] = true;
         }
 
@@ -122,6 +122,11 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
                 $propertySchema['owl:maxCardinality'] = 1;
+            }
+
+            if ($isCollection && null !== $propertyMetadata->getUriTemplate()) {
+                $keyType = null;
+                $isCollection = false;
             }
 
             $propertyType = $this->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $propertyMetadata->isReadableLink());

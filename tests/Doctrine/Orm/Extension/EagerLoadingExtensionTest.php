@@ -28,6 +28,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PropertyCollectionIriOnly;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PropertyCollectionIriOnlyRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UnknownDummy;
 use Doctrine\ORM\EntityManager;
@@ -883,5 +885,40 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30);
         $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+    }
+
+    public function testAvoidFetchCollectionOnIriOnlyProperty(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $relationPropertyMetadata = new ApiProperty();
+        $relationPropertyMetadata = $relationPropertyMetadata->withFetchEager(true);
+        $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
+        $relationPropertyMetadata = $relationPropertyMetadata->withReadable(true);
+        $relationPropertyMetadata = $relationPropertyMetadata->withUriTemplate('/property-collection-relations');
+
+        $propertyMetadataFactoryProphecy->create(PropertyCollectionIriOnly::class, 'propertyCollectionIriOnlyRelation', ['serializer_groups' => ['read'], 'normalization_groups' => 'read'])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy->associationMappings = [
+            'propertyCollectionIriOnlyRelation' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => PropertyCollectionIriOnlyRelation::class],
+        ];
+
+        $emProphecy = $this->prophesize(EntityManager::class);
+        $emProphecy->getClassMetadata(PropertyCollectionIriOnly::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
+        $emProphecy->getClassMetadata(PropertyCollectionIriOnlyRelation::class)->shouldNotBecalled();
+
+        $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
+
+        $queryBuilderProphecy->leftJoin('o.propertyCollectionIriOnlyRelation', 'propertyCollectionIriOnlyRelation_a1')->shouldNotBeCalled();
+        $queryBuilderProphecy->addSelect('propertyCollectionIriOnlyRelation_a1')->shouldNotBeCalled();
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+        $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30);
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), PropertyCollectionIriOnly::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'read']));
     }
 }

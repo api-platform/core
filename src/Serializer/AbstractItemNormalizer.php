@@ -607,10 +607,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['api_attribute'] = $attribute;
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
 
-        $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
         if ($context['api_denormalize'] ?? false) {
-            return $attributeValue;
+            return $this->propertyAccessor->getValue($object, $attribute);
         }
 
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
@@ -622,12 +620,27 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 && ($className = $collectionValueType->getClassName())
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
+
+                // @see ApiPlatform\Hal\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
+                // @see ApiPlatform\JsonApi\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
+                if ('jsonld' === $format && $itemUriTemplate = $propertyMetadata->getUriTemplate()) {
+                    $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
+                        operationName: $itemUriTemplate,
+                        forceCollection: true,
+                        httpOperation: true
+                    );
+
+                    return $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
+                }
+
+                $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+
                 if (!is_iterable($attributeValue)) {
                     throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
                 }
 
                 $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-                $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
 
                 return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
             }
@@ -636,12 +649,25 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 ($className = $type->getClassName())
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
+                unset($childContext['iri'], $childContext['uri_variables']);
+
+                if ('jsonld' === $format && $uriTemplate = $propertyMetadata->getUriTemplate()) {
+                    $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
+                        operationName: $uriTemplate,
+                        httpOperation: true
+                    );
+
+                    return $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
+                }
+
+                $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+
                 if (!\is_object($attributeValue) && null !== $attributeValue) {
                     throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
                 }
 
                 $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-                $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
 
                 return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
             }
@@ -660,11 +686,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $childContext = $this->createChildContext($this->createOperationContext($context, null), $attribute, $format);
                 $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
 
+                $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+
                 return $this->serializer->normalize($attributeValue, $format, $childContext);
             }
 
             if ('array' === $type->getBuiltinType()) {
                 $childContext = $this->createChildContext($this->createOperationContext($context, null), $attribute, $format);
+
+                $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                 return $this->serializer->normalize($attributeValue, $format, $childContext);
             }
@@ -676,6 +706,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         unset($context['resource_class']);
         unset($context['force_resource_class']);
+
+        $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
         return $this->serializer->normalize($attributeValue, $format, $context);
     }

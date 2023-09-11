@@ -1,91 +1,134 @@
 {
-  "type": "object",
-  "properties": {
-    "_links": {
-      "$ref": "#/definitions/links"
-    },
-    "_embedded": {
-      "$ref": "#/definitions/embedded"
-    }
-  },
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "HAL Schema",
+  "description": "JSON Hypertext Application Language Version 8 Internet-Draft, according to https://tools.ietf.org/html/draft-kelly-json-hal-08 borrowed from https://github.com/scottsmith130/hal-json-schema/blob/master/hal.json",
   "definitions": {
-    "links": {
-      "title": "HAL Links",
-      "description": "Object of links with the rels as the keys",
+    "link": {
+      "title": "Link Object",
+      "description": "A Link Object represents a hyperlink from the containing resource to a URI.",
       "type": "object",
-      "additionalProperties": {
-        "oneOf": [
-          {
-            "$ref": "#/definitions/linkObject"
-          },
-          {
-            "$ref": "#/definitions/linkArray"
-          }
-        ]
-      }
-    },
-    "linkArray": {
-      "title": "HAL Link Array",
-      "description": "An array of linkObjects of the same link relation",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/linkObject"
-      }
-    },
-    "linkObject": {
-      "title": "HAL Link Object",
-      "description": "An object with link information",
-      "type": "object",
-      "properties": {
-        "name": {
-          "$ref": "base.json#/definitions/name"
-        },
-        "href": {
-          "anyOf": [
-            {
-              "$ref": "link.json#/definitions/href"
-            },
-            {
-              "$ref": "link.json#/definitions/hrefTemplated"
-            }
-          ]
-        },
-        "templated": {
-          "$ref": "link.json#/definitions/isTemplated"
-        },
-        "type": {
-          "$ref": "base.json#/definitions/mediaType"
-        },
-        "deprecation": {
-          "$ref": "link.json#/definitions/isDeprecated"
-        }
-      },
       "required": [
         "href"
+      ],
+      "properties": {
+        "href": {
+          "description": "Its value is either a URI [RFC3986] or a URI Template [RFC6570]. If the value is a URI Template then the Link Object SHOULD have a \"templated\" attribute whose value is true.",
+          "type": "string"
+        },
+        "templated": {
+          "description": "Its value is boolean and SHOULD be true when the Link Object's \"href\" property is a URI Template. Its value SHOULD be considered false if it is undefined or any other value than true.",
+          "type": "boolean"
+        },
+        "type": {
+          "description": "Its value is a string used as a hint to indicate the media type expected when dereferencing the target resource.",
+          "type": "string"
+        },
+        "deprecation": {
+          "description": "Its presence indicates that the link is to be deprecated (i.e. removed) at a future date. Its value is a URL that SHOULD provide further information about the deprecation. A client SHOULD provide some notification (for example, by logging a warning message) whenever it traverses over a link that has this property. The notification SHOULD include the deprecation property's value so that a client maintainer can easily find information about the deprecation.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Its value MAY be used as a secondary key for selecting Link Objects which share the same relation type.",
+          "type": "string"
+        },
+        "profile": {
+          "description": "Its value is a string which is a URI that hints about the profile [RFC6906] of the target resource.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Its value is a string and is intended for labelling the link with a human-readable identifier (as defined by [RFC5988]).",
+          "type": "string"
+        },
+        "hreflang": {
+          "description": "Its value is a string and is intended for indicating the language of the target resource (as defined by [RFC5988]).",
+          "type": "string"
+        }
+      }
+    },
+    "curiesLink": {
+      "description": "Custom link relation types (Extension Relation Types in [RFC5988]) SHOULD be URIs that when dereferenced in a web browser provide relevant documentation, in the form of an HTML page, about the meaning and/or behaviour of the target Resource. This will improve the discoverability of the API. The CURIE Syntax [W3C.NOTE-curie-20101216] MAY be used for brevity for these URIs. CURIEs are established within a HAL document via a set of Link Objects with the relation type \"curies\" on the root Resource Object. These links contain a URI Template with the token 'rel', and are named via the \"name\" property.",
+      "allOf": [
+        {
+          "required": [
+            "href",
+            "templated",
+            "name"
+          ],
+          "properties": {
+            "templated": {
+              "enum": [
+                true
+              ]
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/link"
+        }
       ]
     },
-    "embedded": {
-      "title": "HAL Embedded Resource",
-      "description": "An embedded HAL resource",
+    "resource": {
+      "title": "Resource Object",
+      "description": "A Resource Object represents a resource. It has two reserved properties: (1) \"_links\" which contain links to other resources, and (2) \"_embedded\" which contain embedded resources. All other properties MUST be valid JSON, and represent the current state of the resource.",
       "type": "object",
-      "additionalProperties": {
-        "oneOf": [
-          {
-            "$ref": "#"
+      "properties": {
+        "_links": {
+          "description": "It is an object whose property names are link relation types (as defined by [RFC5988]) and values are either a Link Object or an array of Link Objects.  The subject resource of these links is the Resource Object of which the containing \"_links\" object is a property.",
+          "type": "object",
+          "properties": {
+            "curies": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/curiesLink"
+                },
+                {
+                  "type": "array",
+                  "items": [
+                    {
+                      "$ref": "#/definitions/curiesLink"
+                    }
+                  ]
+                }
+              ]
+            }
           },
-          {
-            "$ref": "#/definitions/embeddedArray"
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/link"
+              },
+              {
+                "type": "array",
+                "items": [
+                  {
+                    "$ref": "#/definitions/link"
+                  }
+                ]
+              }
+            ]
           }
-        ]
-      }
-    },
-    "embeddedArray": {
-      "title": "HAL Embedded Array",
-      "description": "An array of embedded resources with the same link relation",
-      "type": "array",
-      "items": {
-        "$ref": "#"
+        },
+        "_embedded": {
+          "description": "It is an object whose property names are link relation types (as defined by [RFC5988]) and values are either a Resource Object or an array of Resource Objects. Embedded Resources MAY be a full, partial, or inconsistent version of the representation served from the target URI.",
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/resource"
+              },
+              {
+                "type": "array",
+                "items": [
+                  {
+                    "$ref": "#/definitions/resource"
+                  }
+                ]
+              }
+            ]
+          }
+        }
       }
     }
-  }
+  },
+  "$ref": "#/definitions/resource"
 }

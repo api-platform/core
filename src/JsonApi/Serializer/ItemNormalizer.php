@@ -104,7 +104,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         // Get and populate relations
-        $allRelationshipsData = $this->getComponents($object, $format, $context)['relationships'];
+        ['relationships' => $allRelationshipsData, 'links' => $links] = $this->getComponents($object, $format, $context);
         $populatedRelationContext = $context;
         $relationshipsData = $this->getPopulatedRelations($object, $format, $populatedRelationContext, $allRelationshipsData);
 
@@ -126,7 +126,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $resourceData['relationships'] = $relationshipsData;
         }
 
-        $document = ['data' => $resourceData];
+        $document = [];
+
+        if ($links) {
+            $document['links'] = $links;
+        }
+
+        $document['data'] = $resourceData;
 
         if ($includedResourcesData) {
             $document['included'] = $includedResourcesData;
@@ -310,6 +316,22 @@ final class ItemNormalizer extends AbstractItemNormalizer
                     'type' => $this->getResourceShortName($className),
                     'cardinality' => $isOne ? 'one' : 'many',
                 ];
+
+                // if we specify the uriTemplate, generates its value for link definition
+                // @see ApiPlatform\Serializer\AbstractItemNormalizer:getAttributeValue logic for intentional duplicate content
+                if ($itemUriTemplate = $propertyMetadata->getUriTemplate()) {
+                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+                    $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
+                    $childContext = $this->createChildContext($context, $attribute, $format);
+                    unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation']);
+
+                    $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(
+                        operationName: $itemUriTemplate,
+                        httpOperation: true
+                    );
+
+                    $components['links'][$attribute] = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
+                }
 
                 $components['relationships'][] = $relation;
                 $isRelationship = true;

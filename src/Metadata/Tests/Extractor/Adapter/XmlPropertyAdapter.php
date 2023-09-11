@@ -43,6 +43,7 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
         'initializable',
         'iris',
         'genId',
+        'uriTemplate',
     ];
 
     /**
