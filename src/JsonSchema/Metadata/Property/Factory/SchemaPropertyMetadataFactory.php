@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema\Metadata\Property\Factory;
 
 use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -47,6 +48,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             }
         }
 
+        $link = (($options['schema_type'] ?? null) === Schema::TYPE_INPUT) ? $propertyMetadata->isWritableLink() : $propertyMetadata->isReadableLink();
         $propertySchema = $propertyMetadata->getSchema() ?? [];
 
         if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable())) {
@@ -89,8 +91,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             $propertySchema['example'] = $propertySchema['default'];
         }
 
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
-
         // never override the following keys if at least one is already set
         if ([] === $types
             || ($propertySchema['type'] ?? $propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
@@ -129,7 +129,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
                 $isCollection = false;
             }
 
-            $propertyType = $this->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $propertyMetadata->isReadableLink());
+            $propertyType = $this->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $link);
             if (!\in_array($propertyType, $valueSchema, true)) {
                 $valueSchema[] = $propertyType;
             }
@@ -254,7 +254,8 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             ];
         }
 
-        return ['type' => 'string'];
+        // TODO: add propertyNameCollectionFactory and recurse to find the underlying schema? Right now SchemaFactory does the job so we don't compute anything here.
+        return ['type' => Schema::UNKNOWN_TYPE];
     }
 
     /**
