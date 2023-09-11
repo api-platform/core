@@ -93,4 +93,21 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
         $this->assertStringContainsString('Related.jsonld-location.read_collection', $result);
     }
+
+    /**
+     * When serializer groups are present the Schema should have an embed resource. #5470 breaks array references when serializer groups are present.
+     */
+    public function testArraySchemaWithReference(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\BagOfTests', '--type' => 'input']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['tests'], [
+            'type' => 'array',
+            'items' => [
+                '$ref' => '#/definitions/TestEntity.jsonld-write',
+            ],
+        ]);
+    }
 }

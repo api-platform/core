@@ -126,7 +126,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $definition['externalDocs'] = ['url' => $operation->getTypes()[0]];
         }
 
-        $options = $this->getFactoryOptions($serializerContext, $validationGroups, $operation instanceof HttpOperation ? $operation : null);
+        $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups, $operation instanceof HttpOperation ? $operation : null);
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
             if (!$propertyMetadata->isReadable() && !$propertyMetadata->isWritable()) {
@@ -164,10 +164,16 @@ final class SchemaFactory implements SchemaFactoryInterface
         // or if property has no type(s) defined
         // or if property schema is already fully defined (type=string + format || enum)
         $propertySchemaType = $propertySchema['type'] ?? false;
-        if ([] === $types
-            || ($propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
-            || (\is_array($propertySchemaType) ? \array_key_exists('string', $propertySchemaType) : 'string' !== $propertySchemaType)
-            || ($propertySchema['format'] ?? $propertySchema['enum'] ?? false)
+
+        $isUnknown = 'array' === $propertySchemaType && Schema::UNKNOWN_TYPE === ($propertySchema['items']['type'] ?? null);
+
+        if (
+            !$isUnknown && (
+                [] === $types
+                || ($propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
+                || (\is_array($propertySchemaType) ? \array_key_exists('string', $propertySchemaType) : 'string' !== $propertySchemaType)
+                || ($propertySchema['format'] ?? $propertySchema['enum'] ?? false)
+            )
         ) {
             $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
 
@@ -176,13 +182,13 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         // property schema is created in SchemaPropertyMetadataFactory, but it cannot build resource reference ($ref)
         // complete property schema with resource reference ($ref) only if it's related to an object
-
         $version = $schema->getVersion();
         $subSchema = new Schema($version);
         $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
 
         foreach ($types as $type) {
-            if ($type->isCollection()) {
+            $isCollection = $type->isCollection();
+            if ($isCollection) {
                 $valueType = $type->getCollectionValueTypes()[0] ?? null;
             } else {
                 $valueType = $type;
@@ -194,8 +200,18 @@ final class SchemaFactory implements SchemaFactoryInterface
             }
 
             $subSchema = $this->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
-            $propertySchema['anyOf'] = [['$ref' => $subSchema['$ref']], ['type' => 'null']];
-            // prevent "type" and "anyOf" conflict
+            if ($isCollection) {
+                $propertySchema['items']['$ref'] = $subSchema['$ref'];
+                unset($propertySchema['items']['type']);
+                break;
+            }
+
+            if ($type->isNullable()) {
+                $propertySchema['anyOf'] = [['$ref' => $subSchema['$ref']], ['type' => 'null']];
+            } else {
+                $propertySchema['$ref'] = $subSchema['$ref'];
+            }
+
             unset($propertySchema['type']);
             break;
         }
