@@ -28,7 +28,7 @@
         "willdurand/negotiation": "^3.0"
     },
     "require-dev": {
-        "behat/behat": "^3.1",
+        "behat/behat": "^3.11",
         "behat/mink": "^1.9",
         "doctrine/cache": "^1.11 || ^2.1",
         "doctrine/common": "^3.2.2",
