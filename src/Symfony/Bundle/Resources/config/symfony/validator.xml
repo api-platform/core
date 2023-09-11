@@ -15,12 +15,12 @@
             <argument type="service" id="api_platform.filter_locator" />
         </service>
 
-        <service id="api_platform.state_provider.query_parameter_validate" class="ApiPlatform\Symfony\Validator\State\QueryParameterValidateProvider" decorates="api_platform.state_provider" decoration-priority="200">
+        <service id="api_platform.state_provider.query_parameter_validate" class="ApiPlatform\Symfony\Validator\State\QueryParameterValidateProvider" decorates="api_platform.state_provider.main" decoration-priority="200">
             <argument type="service" id="api_platform.state_provider.query_parameter_validate.inner" />
             <argument type="service" id="api_platform.validator.query_parameter_validator" />
         </service>
 
-        <service id="api_platform.state_provider.validate" class="ApiPlatform\Symfony\Validator\State\ValidateProvider" decorates="api_platform.state_provider" decoration-priority="200">
+        <service id="api_platform.state_provider.validate" class="ApiPlatform\Symfony\Validator\State\ValidateProvider" decorates="api_platform.state_provider.main" decoration-priority="200">
             <argument type="service" id="api_platform.state_provider.validate.inner" />
             <argument type="service" id="api_platform.validator" />
         </service>

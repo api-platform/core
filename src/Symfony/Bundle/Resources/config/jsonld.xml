@@ -56,8 +56,8 @@
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.state_provider" on-invalid="null" />
-            <argument type="service" id="api_platform.state_processor" on-invalid="null" />
+            <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
+            <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
             <argument type="service" id="api_platform.serializer" on-invalid="null" />
         </service>
     </services>

@@ -22,7 +22,7 @@
 
         <!-- State -->
 
-        <service id="api_platform.hydra.processor.link" class="ApiPlatform\Hydra\State\HydraLinkProcessor" decorates="api_platform.state_processor" decoration-priority="410">
+        <service id="api_platform.hydra.processor.link" class="ApiPlatform\Hydra\State\HydraLinkProcessor" decorates="api_platform.state_processor.main" decoration-priority="410">
             <argument type="service" id="api_platform.hydra.processor.link.inner" />
             <argument type="service" id="api_platform.router" />
         </service>

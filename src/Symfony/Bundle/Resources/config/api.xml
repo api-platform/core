@@ -98,8 +98,8 @@
 
         <service id="api_platform.action.entrypoint" class="ApiPlatform\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.state_provider" on-invalid="null" />
-            <argument type="service" id="api_platform.state_processor" on-invalid="null" />
+            <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
+            <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
         </service>
 
         <service id="api_platform.action.documentation" class="ApiPlatform\Documentation\Action\DocumentationAction" public="true">
@@ -108,8 +108,8 @@
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
             <argument type="service" id="api_platform.openapi.factory" on-invalid="null" />
-            <argument type="service" id="api_platform.state_provider" on-invalid="null" />
-            <argument type="service" id="api_platform.state_processor" on-invalid="null" />
+            <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
+            <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
         </service>
 
         <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
