@@ -321,3 +321,44 @@ Feature: Documentation support
       ]
     }
     """
+
+  Scenario: Retrieve the JSON OpenAPI documentation
+    Given I add "Accept" header equal to "application/vnd.openapi+json"
+    And I send a "GET" request to "/docs"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/vnd.openapi+json; charset=utf-8"
+    # Context
+    And the JSON node "openapi" should be equal to "3.1.0"
+    # Root properties
+    And the JSON node "info.title" should be equal to "My Dummy API"
+    And the JSON node "info.description" should contain "This is a test API."
+    And the JSON node "info.description" should contain "Made with love"
+    # Security Schemes
+    And the JSON node "components.securitySchemes" should be equal to:
+     """
+    {
+        "oauth": {
+            "type": "oauth2",
+            "description": "OAuth 2.0 implicit Grant",
+            "flows": {
+                "implicit": {
+                    "authorizationUrl": "http://my-custom-server/openid-connect/auth",
+                    "scopes": {}
+                }
+            }
+        },
+        "Some_Authorization_Name": {
+            "type": "apiKey",
+            "description": "Value for the Authorization header parameter.",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+    """
+
+    Scenario: Retrieve the YAML OpenAPI documentation
+    Given I add "Accept" header equal to "application/vnd.openapi+yaml"
+    And I send a "GET" request to "/docs"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/vnd.openapi+yaml; charset=utf-8"

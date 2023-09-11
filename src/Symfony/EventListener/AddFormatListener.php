@@ -34,7 +34,7 @@ final class AddFormatListener
 {
     use OperationRequestInitiatorTrait;
 
-    public function __construct(private readonly Negotiator $negotiator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [], private readonly array $errorFormats = [])
+    public function __construct(private readonly Negotiator $negotiator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [], private readonly array $errorFormats = [], private readonly array $docsFormats = [])
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
@@ -65,7 +65,7 @@ final class AddFormatListener
             return;
         }
 
-        $formats = $operation?->getOutputFormats() ?? $this->formats;
+        $formats = $operation?->getOutputFormats() ?? ('api_doc' === $request->attributes->get('_route') ? $this->docsFormats : $this->formats);
 
         $this->addRequestFormats($request, $formats);
 
