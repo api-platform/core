@@ -837,6 +837,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('security.xml');
         $loader->load('legacy/security.xml');
 
+        if (interface_exists(ValidatorInterface::class)) {
+            $loader->load('symfony/security_validator.xml');
+        }
+
         if ($this->isConfigEnabled($container, $config['graphql'])) {
             $loader->load('graphql/security.xml');
         }

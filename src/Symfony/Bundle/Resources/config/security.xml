@@ -27,12 +27,6 @@
             <argument>post_denormalize</argument>
         </service>
 
-        <service id="api_platform.state_provider.access_checker.post_validate" class="ApiPlatform\Symfony\Security\State\AccessCheckerProvider" decorates="api_platform.state_provider.validate">
-            <argument type="service" id="api_platform.state_provider.access_checker.post_validate.inner" />
-            <argument type="service" id="api_platform.security.resource_access_checker" />
-            <argument>post_validate</argument>
-        </service>
-
         <service id="api_platform.security.expression_language_provider" class="ApiPlatform\Symfony\Security\Core\Authorization\ExpressionLanguageProvider" public="false">
             <tag name="security.expression_language_provider" />
         </service>
