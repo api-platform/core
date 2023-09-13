@@ -30,8 +30,10 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @final
  */
-final class BooleanFilter extends AbstractFilter
+class BooleanFilter extends AbstractFilter
 {
     use BooleanFilterTrait;
 

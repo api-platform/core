@@ -29,8 +29,10 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @final
  */
-final class NumericFilter extends AbstractFilter
+class NumericFilter extends AbstractFilter
 {
     use NumericFilterTrait;
 

@@ -30,8 +30,10 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @final
  */
-final class NumericFilter extends AbstractFilter
+class NumericFilter extends AbstractFilter
 {
     use NumericFilterTrait;
 

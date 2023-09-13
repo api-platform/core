@@ -36,8 +36,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Interpretation: filter products which have a brand
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @final
  */
-final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
+class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 {
     use ExistsFilterTrait;
 

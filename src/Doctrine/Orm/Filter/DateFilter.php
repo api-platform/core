@@ -28,8 +28,10 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ *
+ * @final
  */
-final class DateFilter extends AbstractFilter implements DateFilterInterface
+class DateFilter extends AbstractFilter implements DateFilterInterface
 {
     use DateFilterTrait;
 

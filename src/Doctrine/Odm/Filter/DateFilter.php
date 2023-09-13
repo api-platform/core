@@ -26,8 +26,10 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @final
  */
-final class DateFilter extends AbstractFilter implements DateFilterInterface
+class DateFilter extends AbstractFilter implements DateFilterInterface
 {
     use DateFilterTrait;
 

@@ -23,8 +23,10 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @final
  */
-final class RangeFilter extends AbstractFilter implements RangeFilterInterface
+class RangeFilter extends AbstractFilter implements RangeFilterInterface
 {
     use RangeFilterTrait;
 
