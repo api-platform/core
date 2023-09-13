@@ -379,6 +379,7 @@ Breaking changes:
 * Serializer: `skip_null_values` now defaults to `true`
 * Metadata: `Patch` is added to the automatic CRUD
 * Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
+* Doctrine: remove `@final` annotation from filters and mark them as `final`
     
 ## v2.7.14
 
