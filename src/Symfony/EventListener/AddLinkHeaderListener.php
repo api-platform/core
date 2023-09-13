@@ -14,12 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\CorsTrait;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\State\Util\CorsTrait;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\Mercure\Discovery;
-use Symfony\Component\WebLink\Link;
 
 /**
  * Adds the HTTP Link header pointing to the Mercure hub for resources having their updates dispatched.
@@ -45,7 +44,7 @@ final class AddLinkHeaderListener
         $operation = $this->initializeOperation($request);
 
         // API Platform 3.2 has a MainController where everything is handled by processors/providers
-        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+        if ('api_platform.symfony.main_controller' === $operation?->getController() || $this->isPreflightRequest($request)) {
             return;
         }
 

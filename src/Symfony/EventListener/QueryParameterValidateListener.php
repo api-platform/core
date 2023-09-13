@@ -18,9 +18,9 @@ use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
-use ApiPlatform\Util\RequestParser;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
+use ApiPlatform\State\Util\RequestParser;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**

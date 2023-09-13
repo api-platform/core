@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\State\Processor;
+namespace ApiPlatform\Symfony\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Serializer\ResourceList;

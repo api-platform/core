@@ -20,8 +20,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Serializer\ResourceList;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

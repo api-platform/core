@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Psr\Container\ContainerInterface;
 
 final class CallableProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly ContainerInterface $locator)
+    public function __construct(private readonly ?ContainerInterface $locator = null)
     {
     }
 

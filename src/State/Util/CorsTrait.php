@@ -11,14 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Util;
+namespace ApiPlatform\State\Util;
 
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * CORS utils.
- *
- * To be removed when https://github.com/symfony/symfony/pull/34391 wil be merged.
  *
  * @internal
  *
