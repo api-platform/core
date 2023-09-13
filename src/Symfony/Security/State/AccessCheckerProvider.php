@@ -23,7 +23,8 @@ use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
- * Allows access to content the resourceAccessChecker.
+ * Allows access based on the ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface.
+ * This implementation covers GraphQl and HTTP.
  *
  * @see ResourceAccessCheckerInterface
  */
