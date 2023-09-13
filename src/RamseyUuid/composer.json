@@ -1,9 +1,9 @@
 {
     "name": "api-platform/ramsey-uuid",
-    "description": "API Platform RamseyUuid support",
+    "description": "API Platform RamseyUuid bridge",
     "type": "library",
     "keywords": [
-        "UUid",
+        "UUID",
         "API"
     ],
     "homepage": "https://api-platform.com",

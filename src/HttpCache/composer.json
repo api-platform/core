@@ -1,6 +1,6 @@
 {
   "name": "api-platform/http-cache",
-  "description": "HttpCache support",
+  "description": "API Platform HttpCache component",
   "type": "library",
   "keywords": [
     "Cache",

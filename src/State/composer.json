@@ -1,6 +1,6 @@
 {
     "name": "api-platform/state",
-    "description": "API Platform state interfaces",
+    "description": "API Platform State component ",
     "type": "library",
     "keywords": ["REST", "GraphQL", "API", "JSON-LD", "Hydra", "JSONAPI", "OpenAPI", "HAL", "Swagger"],
     "homepage": "https://api-platform.com",

@@ -15,7 +15,7 @@ namespace ApiPlatform\Hydra\EventListener;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
-use ApiPlatform\Util\CorsTrait;
+use ApiPlatform\State\Util\CorsTrait;
 use Psr\Link\EvolvableLinkProviderInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\WebLink\GenericLinkProvider;

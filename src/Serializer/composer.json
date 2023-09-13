@@ -1,6 +1,6 @@
 {
     "name": "api-platform/serializer",
-    "description": "Build GraphQL API endpoints",
+    "description": "API Platform core Serializer",
     "type": "library",
     "keywords": [
         "Serializer",
