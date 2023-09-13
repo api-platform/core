@@ -44,9 +44,18 @@ class Kernel extends BaseKernel
     use MicroKernelTrait;
     private $declaredClasses = [];
 
-    public function __construct(string $environment, bool $debug, private string $guide)
+    public function __construct(string $environment, bool $debug, string $guide = null)
     {
         parent::__construct($environment, $debug);
+
+        if (!$guide) {
+            $guide = $_SERVER['APP_GUIDE'] ?? $_ENV['APP_GUIDE'] ?? null;
+
+            if (!$guide) {
+                throw new \RuntimeException('No guide.');
+            }
+        }
+
         $this->guide = $guide;
         require_once "{$this->getProjectDir()}/guides/{$this->guide}.php";
     }
