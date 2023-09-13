@@ -31,8 +31,10 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @final
  */
-final class BooleanFilter extends AbstractFilter
+class BooleanFilter extends AbstractFilter
 {
     use BooleanFilterTrait;
 

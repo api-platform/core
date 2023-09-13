@@ -24,8 +24,10 @@ use Doctrine\ORM\QueryBuilder;
  * Filters the collection by range.
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
+ *
+ * @final
  */
-final class RangeFilter extends AbstractFilter implements RangeFilterInterface
+class RangeFilter extends AbstractFilter implements RangeFilterInterface
 {
     use RangeFilterTrait;
 

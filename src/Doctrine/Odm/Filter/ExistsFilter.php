@@ -34,8 +34,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @final
  */
-final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
+class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 {
     use ExistsFilterTrait;
 

@@ -34,8 +34,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @final
  */
-final class SearchFilter extends AbstractFilter implements SearchFilterInterface
+class SearchFilter extends AbstractFilter implements SearchFilterInterface
 {
     use SearchFilterTrait;
 

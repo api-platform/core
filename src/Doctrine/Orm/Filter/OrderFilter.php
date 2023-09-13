@@ -35,8 +35,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ *
+ * @final
  */
-final class OrderFilter extends AbstractFilter implements OrderFilterInterface
+class OrderFilter extends AbstractFilter implements OrderFilterInterface
 {
     use OrderFilterTrait;
 
