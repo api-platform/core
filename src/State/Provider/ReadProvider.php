@@ -20,9 +20,9 @@ use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
-use ApiPlatform\Util\CloneTrait;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestParser;
+use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\State\Util\RequestParser;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -79,8 +79,7 @@ final class ReadProvider implements ProviderInterface
         if (
             null === $data
             && 'POST' !== $operation->getMethod()
-            && (
-                'PUT' !== $operation->getMethod()
+            && ('PUT' !== $operation->getMethod()
                 || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
             )
         ) {

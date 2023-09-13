@@ -22,7 +22,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;

@@ -17,7 +17,7 @@ use ApiPlatform\Api\FormatMatcher;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use Negotiation\Exception\InvalidArgument;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;

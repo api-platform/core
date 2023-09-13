@@ -19,7 +19,7 @@ use Psr\Container\ContainerInterface;
 
 final class CallableProvider implements ProviderInterface
 {
-    public function __construct(private readonly ContainerInterface $locator)
+    public function __construct(private readonly ?ContainerInterface $locator = null)
     {
     }
 
@@ -32,7 +32,7 @@ final class CallableProvider implements ProviderInterface
             return $provider($operation, $uriVariables, $context);
         }
 
-        if (\is_string($provider)) {
+        if ($this->locator && \is_string($provider)) {
             if (!$this->locator->has($provider)) {
                 throw new ProviderNotFoundException(sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
             }
