@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Util;
+namespace ApiPlatform\State\Tests\Util;
 
-use ApiPlatform\Util\RequestParser;
+use ApiPlatform\State\Util\RequestParser;
 use PHPUnit\Framework\TestCase;
 
 /**

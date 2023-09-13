@@ -18,14 +18,14 @@ use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
-use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\State\Util\RequestParser;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
-use ApiPlatform\Util\RequestParser;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

@@ -19,7 +19,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Util\RequestParser;
+use ApiPlatform\State\Util\RequestParser;
 
 final class QueryParameterValidateProvider implements ProviderInterface
 {

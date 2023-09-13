@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Util;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\State\Util\RequestParser;
 
 /**
  * Parses and creates IRIs.

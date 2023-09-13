@@ -1,10 +1,11 @@
 {
     "name": "api-platform/elasticseach",
-    "description": "Elasticsearch support",
+    "description": "API Platform Elasticsearch bridge",
     "type": "library",
     "keywords": [
         "Filter",
-        "Elasticsearch"
+        "Elasticsearch",
+        "search"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
