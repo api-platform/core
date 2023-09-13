@@ -2,7 +2,7 @@
 rm -f yarn.lock
 # Keep the yarn.lock file in the repo to benefit from GitHub security alerts: https://github.blog/2019-07-02-yarn-support-for-security-alerts/
 echo "{}" > package.json
-yarn add @fontsource/open-sans https://github.com/soyuka/swagger-ui#3.1-openapi-support
+yarn add @fontsource/open-sans swagger-ui-dist
 yarn add --production es6-promise fetch react react-dom graphiql graphql-playground-react@1.7.26 redoc
 
 dest=src/Symfony/Bundle/Resources/public/fonts/open-sans/
@@ -32,13 +32,13 @@ if [[ -d "$dest" ]]; then
   rm -Rf "$dest"
 fi
 mkdir -p "$dest"
-cp node_modules/swagger-ui/dist/swagger-ui-bundle.js "$dest"
-cp node_modules/swagger-ui/dist/swagger-ui-bundle.js.map "$dest"
-cp node_modules/swagger-ui/dist/swagger-ui-standalone-preset.js "$dest"
-cp node_modules/swagger-ui/dist/swagger-ui-standalone-preset.js.map "$dest"
-cp node_modules/swagger-ui/dist/swagger-ui.css "$dest"
-cp node_modules/swagger-ui/dist/swagger-ui.css.map "$dest"
-cp node_modules/swagger-ui/dist/oauth2-redirect.html "$dest"
+cp node_modules/swagger-ui-dist/swagger-ui-bundle.js "$dest"
+cp node_modules/swagger-ui-dist/swagger-ui-bundle.js.map "$dest"
+cp node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js "$dest"
+cp node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js.map "$dest"
+cp node_modules/swagger-ui-dist/swagger-ui.css "$dest"
+cp node_modules/swagger-ui-dist/swagger-ui.css.map "$dest"
+cp node_modules/swagger-ui-dist/oauth2-redirect.html "$dest"
 
 dest=src/Symfony/Bundle/Resources/public/react/
 if [[ -d "$dest" ]]; then
