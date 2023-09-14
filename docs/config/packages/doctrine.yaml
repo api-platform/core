@@ -1,6 +1,6 @@
 doctrine:
   dbal:
-    url: 'sqlite:///%kernel.project_dir%/var/data.db'
+    url: 'sqlite:///%kernel.project_dir%/var/%guide%.db'
   orm:
     auto_generate_proxy_classes: true
     naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware

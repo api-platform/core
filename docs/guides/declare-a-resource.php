@@ -5,7 +5,6 @@
 // position: 1
 // executable: true
 // tags: design
-// homepage: true
 // ---
 
 // # Declare a Resource

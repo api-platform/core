@@ -1,7 +1,7 @@
 <?php
 // ---
-// position: 13
-// slug: use-doctrine-search-filter
+// position: 10
+// slug: doctrine-search-filter
 // name: Doctrine ORM SearchFilter
 // executable: true
 // ---
@@ -58,10 +58,33 @@ namespace DoctrineMigrations {
         {
             $this->addSql('CREATE TABLE book (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title VARCHAR(255) NOT NULL, author VARCHAR(255) NOT NULL)');
         }
+    }
+}
 
-        public function down(Schema $schema): void
+namespace App\Fixtures {
+
+    use App\Entity\Book;
+    use Doctrine\Bundle\FixturesBundle\Fixture;
+    use Doctrine\Persistence\ObjectManager;
+    use function Zenstruck\Foundry\anonymous;
+    use function Zenstruck\Foundry\repository;
+    use function Zenstruck\Foundry\faker;
+
+    final class BookFixtures extends Fixture
+    {
+        public function load(ObjectManager $manager): void
         {
-            $this->addSql('DROP TABLE book');
+            $bookFactory = anonymous(Book::class);
+            if (repository(Book::class)->count()) {
+                return;
+            }
+
+            $bookFactory->many(10)->create(fn() =>
+                [
+                    'title' => faker()->name(),
+                    'author' => faker()->firstName(),
+                ]
+            );
         }
     }
 }
