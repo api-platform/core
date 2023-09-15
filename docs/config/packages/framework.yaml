@@ -5,6 +5,8 @@ api_platform:
   formats:
     jsonld: ['application/ld+json']
     json: ['application/json']
+  docs_formats:
+    jsonopenapi: ['application/vnd.openapi+json']
   event_listeners_backward_compatibility_layer: false
   keep_legacy_inflector: false
   defaults:

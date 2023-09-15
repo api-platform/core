@@ -4,7 +4,7 @@
 // name: Create a Custom Doctrine Filter
 // executable: true
 // position: 10
-// tags: doctrine
+// tags: doctrine, expert
 // ---
 
 // Custom filters can be written by implementing the `ApiPlatform\Api\FilterInterface` interface.

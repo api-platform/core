@@ -69,6 +69,7 @@ namespace App\Fixtures {
     use Doctrine\Persistence\ObjectManager;
     use function Zenstruck\Foundry\anonymous;
     use function Zenstruck\Foundry\repository;
+    use function Zenstruck\Foundry\faker;
 
     final class BookFixtures extends Fixture
     {
@@ -79,9 +80,11 @@ namespace App\Fixtures {
                 return;
             }
 
-            $bookFactory->many(10)->create([
-                'title' => 'title'
-            ]);
+            $bookFactory->many(10)->create(fn() =>
+                [
+                    'title' => faker()->name(),
+                ]
+            );
         }
     }
 }

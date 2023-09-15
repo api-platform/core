@@ -1,9 +1,10 @@
 <?php
 // ---
-// position: 10
+// position: 7
 // slug: doctrine-search-filter
 // name: Doctrine ORM SearchFilter
 // executable: true
+// tags: doctrine
 // ---
 
 // API Platform provides a generic system to apply filters and sort criteria on collections. Useful filters for Doctrine ORM, MongoDB ODM and ElasticSearch are provided with the library.
@@ -33,8 +34,9 @@ namespace App\Entity {
         public ?string $title = null;
 
         #[ORM\Column]
-        // We can also declare the filter attribute on a property.
-        #[ApiFilter(SearchFilter::class)]
+        // We can also declare the filter attribute on a property and specify the strategy that should be used.
+        // For a list of availabe options [head to the documentation](/docs/core/filters/#search-filter)
+        #[ApiFilter(SearchFilter::class, strategy: 'partial')]
         public ?string $author = null;
     }
 }
@@ -44,7 +46,8 @@ namespace App\Playground {
 
     function request(): Request
     {
-        return Request::create('/books.jsonld', 'GET');
+        // Try changing the search value [in the interactive Playground](/playground/doctrine-search-filter).
+        return Request::create('/books.jsonld?author=a', 'GET');
     }
 }
 

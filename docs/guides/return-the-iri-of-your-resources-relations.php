@@ -3,7 +3,7 @@
 // slug: return-the-iri-of-your-resources-relations
 // name: How to return an IRI instead of an object for your resources relations ?
 // executable: true
-// tags: serialization
+// tags: serialization, expert
 // ---
 
 // This guide shows you how to expose the IRI of a related (sub)ressource relation instead of an object.
@@ -173,7 +173,6 @@ namespace App\Playground {
         return Request::create(uri: '/brands/1', method: 'GET', server: ['HTTP_ACCEPT' => 'application/ld+json']);
     }
 }
-
 
 namespace App\Tests {
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;

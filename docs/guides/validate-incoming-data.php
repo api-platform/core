@@ -1,8 +1,9 @@
 <?php
-// --- 
-// slug: use-validation-groups
-// name: Use Validation Groups
-// position: 3 
+// ---
+// slug: validate-incoming-data
+// name: Validate incoming data
+// executable: true
+// position: 5
 // tags: validation
 // ---
 
@@ -10,7 +11,7 @@
 // When processing the incoming request, when creating or updating content, API-Platform will validate the
 // incoming content. It will use the [Symfony's validator](https://symfony.com/doc/current/validation.html).
 //
-// API Platform takes care of validating the data sent to the API by the client (usually user data entered through forms). 
+// API Platform takes care of validating the data sent to the API by the client (usually user data entered through forms).
 // By default, the framework relies on the powerful [Symfony Validator Component](http://symfony.com/doc/current/validation.html) for this task, but you can replace it with your preferred validation library such as the [PHP filter extension](https://www.php.net/manual/en/intro.filter.php) if you want to.
 // Validation is called when handling a POST, PATCH, PUT request as follows :
 
@@ -34,7 +35,7 @@ namespace App\Entity {
     /**
      * A product.
      */
-    #[ORM\Entity] 
+    #[ORM\Entity]
     #[ApiResource]
     class Product
     {
@@ -49,8 +50,12 @@ namespace App\Entity {
          * @var string[] Describe the product
          */
         #[MinimalProperties]
-        #[ORM\Column(type: 'json')] 
+        #[ORM\Column(type: 'json')]
         public $properties;
+
+        public function getId(): ?int {
+            return $this->id;
+        }
     }
 }
 
@@ -80,6 +85,23 @@ namespace App\Validator\Constraints {
                 $this->context->buildViolation($constraint->message)->addViolation();
             }
         }
+    }
+}
+
+namespace App\Playground {
+    use Symfony\Component\HttpFoundation\Request;
+
+    function request(): Request
+    {
+        return Request::create(
+            uri: '/products',
+            method: 'POST',
+            server: [
+                'CONTENT_TYPE' => 'application/ld+json',
+                'HTTP_ACCEPT' => 'application/ld+json'
+            ],
+            content: '{"name": "test", "properties": {"description": "Test product"}}'
+        );
     }
 }
 

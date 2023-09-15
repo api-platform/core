@@ -4,7 +4,7 @@
 // name: Custom pagination
 // executable: true
 // position: 12
-// tags: state
+// tags: expert
 // ---
 
 // In case you're using a custom collection (through a Provider), make sure you return the `Paginator` object to get the full hydra response with `hydra:view` (which contains information about first, last, next and previous page).
