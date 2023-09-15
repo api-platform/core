@@ -42,7 +42,7 @@ final class EntrypointAction
     {
         if ($this->provider && $this->processor) {
             $context = ['request' => $request];
-            $operation = new Get(class: Entrypoint::class, provider: fn () => new Entrypoint($this->resourceNameCollectionFactory->create()));
+            $operation = new Get(read: true, serialize: true, class: Entrypoint::class, provider: fn () => new Entrypoint($this->resourceNameCollectionFactory->create()));
             $body = $this->provider->provide($operation, [], $context);
 
             return $this->processor->process($body, $operation, [], $context);

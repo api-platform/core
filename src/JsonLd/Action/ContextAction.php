@@ -61,7 +61,8 @@ final class ContextAction
                 outputFormats: ['jsonld' => ['application/ld+json']],
                 validate: false,
                 provider: fn () => $this->getContext($shortName),
-                serialize: false
+                serialize: false,
+                read: true
             );
             $context = ['request' => $request];
             $jsonLdContext = $this->provider->provide($operation, [], $context);

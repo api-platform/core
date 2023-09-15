@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Metadata\Error as ErrorOperation;
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -64,32 +65,44 @@ final class ErrorListener extends SymfonyErrorListener
         $apiOperation = $this->initializeOperation($request);
         $format = $this->getRequestFormat($request, $this->errorFormats, false);
 
-        if ($this->resourceClassResolver?->isResourceClass($exception::class)) {
-            $resourceCollection = $this->resourceMetadataCollectionFactory->create($exception::class);
+        if ($this->resourceMetadataCollectionFactory) {
+            if ($this->resourceClassResolver?->isResourceClass($exception::class)) {
+                $resourceCollection = $this->resourceMetadataCollectionFactory->create($exception::class);
 
-            $operation = null;
-            foreach ($resourceCollection as $resource) {
-                foreach ($resource->getOperations() as $op) {
-                    foreach ($op->getOutputFormats() as $key => $value) {
-                        if ($key === $format) {
-                            $operation = $op;
-                            break 3;
+                $operation = null;
+                foreach ($resourceCollection as $resource) {
+                    foreach ($resource->getOperations() as $op) {
+                        foreach ($op->getOutputFormats() as $key => $value) {
+                            if ($key === $format) {
+                                $operation = $op;
+                                break 3;
+                            }
                         }
                     }
                 }
-            }
 
-            // No operation found for the requested format, we take the first available
-            if (!$operation) {
-                $operation = $resourceCollection->getOperation();
+                // No operation found for the requested format, we take the first available
+                if (!$operation) {
+                    $operation = $resourceCollection->getOperation();
+                }
+                $errorResource = $exception;
+                if ($errorResource instanceof ProblemExceptionInterface && $operation instanceof HttpOperation) {
+                    $statusCode = $this->getStatusCode($apiOperation, $request, $operation, $exception);
+                    $operation = $operation->withStatus($statusCode);
+                    $errorResource->setStatus($statusCode);
+                }
+            } else {
+                // Create a generic, rfc7807 compatible error according to the wanted format
+                $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format));
+                // status code may be overriden by the exceptionToStatus option
+                $statusCode = 500;
+                if ($operation instanceof HttpOperation) {
+                    $statusCode = $this->getStatusCode($apiOperation, $request, $operation, $exception);
+                    $operation = $operation->withStatus($statusCode);
+                }
+
+                $errorResource = Error::createFromException($exception, $statusCode);
             }
-            $errorResource = $exception;
-        } elseif ($this->resourceMetadataCollectionFactory) {
-            // Create a generic, rfc7807 compatible error according to the wanted format
-            /** @var HttpOperation $operation */
-            $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format));
-            $operation = $operation->withStatus($this->getStatusCode($apiOperation, $request, $operation, $exception));
-            $errorResource = Error::createFromException($exception, $operation->getStatus());
         } else {
             /** @var HttpOperation $operation */
             $operation = new ErrorOperation(name: '_api_errors_problem', class: Error::class, outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]);

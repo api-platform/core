@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Controller;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -62,6 +63,14 @@ final class MainController
             $operation = $operation->withValidate(!$request->isMethodSafe() && !$request->isMethod('DELETE'));
         }
 
+        if (null === $operation->canRead() && $operation instanceof HttpOperation) {
+            $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe());
+        }
+
+        if (null === $operation->canDeserialize() && $operation instanceof HttpOperation) {
+            $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
+        }
+
         $body = $this->provider->provide($operation, $uriVariables, $context);
 
         // The provider can change the Operation, extract it again from the Request attributes
@@ -82,6 +91,10 @@ final class MainController
 
         if (null === $operation->canWrite()) {
             $operation = $operation->withWrite(!$request->isMethodSafe());
+        }
+
+        if (null === $operation->canSerialize()) {
+            $operation = $operation->withSerialize(true);
         }
 
         return $this->processor->process($body, $operation, $uriVariables, $context);
