@@ -48,7 +48,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     public function __construct(
         private readonly string $title,
         private readonly string $detail,
-        #[ApiProperty(identifier: true)] private readonly int $status,
+        #[ApiProperty(identifier: true)] private int $status,
         private readonly array $originalTrace,
         private ?string $instance = null,
         private string $type = 'about:blank',
@@ -130,6 +130,11 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     public function getStatus(): ?int
     {
         return $this->status;
+    }
+
+    public function setStatus(int $status): void
+    {
+        $this->status = $status;
     }
 
     #[Groups(['jsonld', 'jsonproblem', 'legacy_jsonproblem'])]

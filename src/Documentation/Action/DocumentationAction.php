@@ -78,7 +78,7 @@ final class DocumentationAction
     {
         if ($this->provider && $this->processor) {
             $context['request'] = $request;
-            $operation = new Get(class: OpenApi::class, provider: fn () => $this->openApiFactory->__invoke($context), normalizationContext: [ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null], outputFormats: $this->documentationFormats);
+            $operation = new Get(class: OpenApi::class, read: true, serialize: true, provider: fn () => $this->openApiFactory->__invoke($context), normalizationContext: [ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null], outputFormats: $this->documentationFormats);
             if ('html' === $format) {
                 $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
             }
@@ -104,6 +104,8 @@ final class DocumentationAction
             $context['request'] = $request;
             $operation = new Get(
                 class: Documentation::class,
+                read: true,
+                serialize: true,
                 provider: fn () => new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version)
             );
 

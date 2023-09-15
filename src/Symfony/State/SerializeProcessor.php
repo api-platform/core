@@ -36,7 +36,7 @@ final class SerializeProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        if ($data instanceof Response || !($operation->canSerialize() ?? true) || !($request = $context['request'] ?? null)) {
+        if ($data instanceof Response || !$operation->canSerialize() || !($request = $context['request'] ?? null)) {
             return $this->processor->process($data, $operation, $uriVariables, $context);
         }
 

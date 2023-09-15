@@ -49,7 +49,8 @@ final class ReadProvider implements ProviderInterface
         }
 
         $request = ($context['request'] ?? null);
-        if (!($operation->canRead() ?? true) || (!$operation->getUriVariables() && !$request?->isMethodSafe())) {
+
+        if (!$operation->canRead()) {
             return null;
         }
 

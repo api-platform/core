@@ -31,3 +31,10 @@ Feature: Using exception_to_status config
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+
+  @!mongodb
+  Scenario: Override validation exception status code from delete operation
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "DELETE" request to "/error_with_overriden_status/1"
+    Then the response status code should be 403
+    And the JSON node "status" should be equal to 403

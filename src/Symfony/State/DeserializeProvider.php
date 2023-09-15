@@ -51,10 +51,7 @@ final class DeserializeProvider implements ProviderInterface
             return $data;
         }
 
-        if (
-            !($operation->canDeserialize() ?? true)
-            || !\in_array($method = $operation->getMethod(), ['POST', 'PUT', 'PATCH'], true)
-        ) {
+        if (!$operation->canDeserialize()) {
             return $data;
         }
 
@@ -73,6 +70,8 @@ final class DeserializeProvider implements ProviderInterface
         if (!$format = $request->attributes->get('input_format') ?? null) {
             throw new UnsupportedMediaTypeHttpException('Format not supported.');
         }
+
+        $method = $operation->getMethod();
 
         if (
             null !== $data

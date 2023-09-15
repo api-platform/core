@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\State;
 
+use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
@@ -22,6 +23,7 @@ use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
 use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Response\Elasticsearch;
 use Elasticsearch\Client as LegacyClient;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -72,7 +74,12 @@ final class CollectionProvider implements ProviderInterface
             'body' => $body,
         ];
 
-        $documents = $this->client->search($params); // @phpstan-ignore-line
+        try {
+            $documents = $this->client->search($params); // @phpstan-ignore-line
+        } catch (ClientResponseException $e) {
+            $response = $e->getResponse();
+            throw new Error(status: $response->getStatusCode(), detail: (string) $response->getBody(), title: $response->getReasonPhrase(), originalTrace: $e->getTrace());
+        }
 
         if ($documents instanceof Elasticsearch) {
             $documents = $documents->asArray();

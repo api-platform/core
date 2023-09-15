@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\State;
 
+use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
@@ -65,8 +66,15 @@ final class ItemProvider implements ProviderInterface
 
         try {
             $document = $this->client->get($params); // @phpstan-ignore-line
-        } catch (Missing404Exception|ClientResponseException) { // @phpstan-ignore-line
+        } catch (Missing404Exception) { // @phpstan-ignore-line
             return null;
+        } catch (ClientResponseException $e) {
+            $response = $e->getResponse();
+            if (404 === $response->getStatusCode()) {
+                return null;
+            }
+
+            throw new Error(status: $response->getStatusCode(), detail: (string) $response->getBody(), title: $response->getReasonPhrase(), originalTrace: $e->getTrace());
         }
 
         if ($document instanceof Elasticsearch) {

@@ -41,6 +41,8 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 )]
 final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface
 {
+    private int $status = 422;
+
     public function __construct(private readonly ConstraintViolationListInterface $constraintViolationList, string $message = '', int $code = 0, \Throwable $previous = null, string $errorTitle = null)
     {
         parent::__construct($message ?: $this->__toString(), $code, $previous, $errorTitle);
@@ -119,7 +121,12 @@ final class ValidationException extends BaseValidationException implements Const
     #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
     public function getStatus(): ?int
     {
-        return 422;
+        return $this->status;
+    }
+
+    public function setStatus(int $status): void
+    {
+        $this->status = $status;
     }
 
     #[Groups(['jsonld', 'json'])]
