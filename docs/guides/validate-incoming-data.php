@@ -81,9 +81,22 @@ namespace App\Validator\Constraints {
     {
         public function validate($value, Constraint $constraint): void
         {
-            if (!array_diff(['description', 'price'], $value)) {
+            if (!array_key_exists('description', $value) || !array_key_exists('price', $value)) {
                 $this->context->buildViolation($constraint->message)->addViolation();
             }
+        }
+    }
+}
+
+namespace DoctrineMigrations {
+    use Doctrine\DBAL\Schema\Schema;
+    use Doctrine\Migrations\AbstractMigration;
+
+    final class Migration extends AbstractMigration
+    {
+        public function up(Schema $schema): void
+        {
+            $this->addSql('CREATE TABLE product (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL, properties CLOB NOT NULL)');
         }
     }
 }

@@ -13,11 +13,16 @@ namespace App\Validator {
     use Symfony\Component\Validator\Constraint;
     use Symfony\Component\Validator\ConstraintValidator;
 
-    #[\Attribute(\Attribute::TARGET_CLASS)]
+    #[\Attribute]
     class AssertCanDelete extends Constraint
     {
         public string $message = 'For whatever reason we denied removeal of this data.';
         public string $mode = 'strict';
+
+        public function getTargets(): string
+        {
+            return self::CLASS_CONSTRAINT;
+        }
     }
 }
 
@@ -31,8 +36,7 @@ namespace App\Validator {
     {
         public function validate(mixed $value, Constraint $constraint)
         {
-            dump($value);
-            // $this->context->buildViolation($constraint->message)->addViolation();
+            $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
 }
@@ -43,13 +47,15 @@ namespace App\Entity {
     use ApiPlatform\Metadata\Delete;
     use App\Validator\AssertCanDelete;
     use Doctrine\ORM\Mapping as ORM;
+    use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 
     #[ORM\Entity]
     #[Delete(
         // By default, validation is not triggered on a DELETE operation, let's activate it.
         validate: true,
         // Just as with serialization we can add [validation groups](/docs/core/validation/#using-validation-groups).
-        validationContext: ['groups' => ['deleteValidation']]
+        validationContext: ['groups' => ['deleteValidation']],
+        exceptionToStatus: [ValidationException::class => 403]
     )]
     // Here we use the previously created constraint on the class directly.
     #[AssertCanDelete(groups: ['deleteValidation'])]
@@ -79,6 +85,7 @@ namespace App\Playground {
 }
 
 namespace App\Fixtures {
+
     use App\Entity\Book;
     use Doctrine\Bundle\FixturesBundle\Fixture;
     use Doctrine\Persistence\ObjectManager;
@@ -95,7 +102,8 @@ namespace App\Fixtures {
                 return;
             }
 
-            $bookFactory->many(10)->create(fn() =>
+            $bookFactory->many(10)->create(
+                fn () =>
                 [
                     'title' => faker()->name(),
                 ]
@@ -117,4 +125,3 @@ namespace DoctrineMigrations {
         }
     }
 }
-
