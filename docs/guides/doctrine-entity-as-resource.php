@@ -7,8 +7,9 @@
 // executable: true
 // ---
 
+// # API Resource on a Doctrine Entity.
+//
 // API Platform is compatible with [Doctrine ORM](https://www.doctrine-project.org), all we need is to declare an
-// API Resource on a Doctrine Entity.
 namespace App\Entity {
 
     use ApiPlatform\Metadata\ApiResource;
@@ -16,7 +17,7 @@ namespace App\Entity {
     use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
     use Doctrine\ORM\Mapping as ORM;
 
-    // When an ApiResource is declared on an ORM\Entity we have access to [Doctrine filters](https://api-platform.com/docs/core/filters/).
+    // When an ApiResource is declared on an `\ORM\Entity` we have access to [Doctrine filters](https://api-platform.com/docs/core/filters/).
     #[ApiResource]
     #[ApiFilter(OrderFilter::class)]
     #[ORM\Entity]

@@ -118,21 +118,45 @@ namespace App\Playground {
     }
 }
 
-//If the data submitted by the client is invalid, the HTTP status code will be set to 422 Unprocessable Entity and the response's body will contain the list of violations serialized in a format compliant with the requested one. For instance, a validation error will look like the following if the requested format is JSON-LD (the default):
-// ```json
-// {
-//   "@context": "/contexts/ConstraintViolationList",
-//   "@type": "ConstraintViolationList",
-//   "hydra:title": "An error occurred",
-//   "hydra:description": "properties: The product must have the minimal properties required (\"description\", \"price\")",
-//   "violations": [
-//     {
-//       "propertyPath": "properties",
-//       "message": "The product must have the minimal properties required (\"description\", \"price\")"
-//     }
-//   ]
-//  }
-// ```
-//
-// Take a look at the [Errors Handling guide](errors.md) to learn how API Platform converts PHP exceptions like validation
-// errors to HTTP errors.
+namespace App\Tests {
+    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+    use App\Entity\Book;
+    use ApiPlatform\Playground\Test\TestGuideTrait;
+
+    final class BookTest extends ApiTestCase
+    {
+        use TestGuideTrait;
+
+        public function testValidation(): void
+        {
+            $response = static::createClient()->request(method: 'POST', url: '/products', options: [
+                'json' => ['name' => 'test', 'properties' => ['description' => 'foo']],
+                'headers' => ['content-type' => 'application/ld+json']
+            ]);
+
+            //If the data submitted by the client is invalid, the HTTP status code will be set to 422 Unprocessable Entity and the response's body will contain the list of violations serialized in a format compliant with the requested one. For instance, a validation error will look like the following if the requested format is JSON-LD (the default):
+            // ```json
+            // {
+            //   "@context": "/contexts/ConstraintViolationList",
+            //   "@type": "ConstraintViolationList",
+            //   "hydra:title": "An error occurred",
+            //   "hydra:description": "properties: The product must have the minimal properties required (\"description\", \"price\")",
+            //   "violations": [
+            //     {
+            //       "propertyPath": "properties",
+            //       "message": "The product must have the minimal properties required (\"description\", \"price\")"
+            //     }
+            //   ]
+            //  }
+            // ```
+            $this->assertResponseStatusCodeSame(422);
+            $this->assertJsonContains([
+                'hydra:description' => 'properties: The product must have the minimal properties required ("description", "price")',
+                'title' => 'An error occurred',
+                'violations' => [
+                    ['propertyPath' => 'properties', 'message' => 'The product must have the minimal properties required ("description", "price")']
+                ],
+            ]);
+        }
+    }
+}

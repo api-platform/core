@@ -4,6 +4,7 @@
 // name: How to return an IRI instead of an object for your resources relations ?
 // executable: true
 // tags: serialization, expert
+// position: 11
 // ---
 
 // This guide shows you how to expose the IRI of a related (sub)ressource relation instead of an object.
