@@ -18,6 +18,7 @@ use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
@@ -111,7 +112,10 @@ final class ErrorListener extends SymfonyErrorListener
         }
 
         if (!$operation->getProvider()) {
-            $operation = $operation->withProvider(provider: fn () => 'jsonapi' === $format && $errorResource instanceof ConstraintViolationListAwareExceptionInterface ? $errorResource->getConstraintViolationList() : $errorResource);
+            $data = 'jsonapi' === $format && $errorResource instanceof ConstraintViolationListAwareExceptionInterface ? $errorResource->getConstraintViolationList() : $errorResource;
+            $dup->attributes->set('_api_error_resource', $data);
+            $operation = $operation->withExtraProperties(['_api_error_resource' => $data])
+                                   ->withProvider([self::class, 'provide']);
         }
 
         // For our swagger Ui errors
@@ -215,5 +219,18 @@ final class ErrorListener extends SymfonyErrorListener
             'html' => '_api_errors_problem', // This will be intercepted by the SwaggerUiProvider
             default => '_api_errors_problem'
         };
+    }
+
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    {
+        if ($data = ($context['request'] ?? null)?->attributes->get('_api_error_resource')) {
+            return $data;
+        }
+
+        if ($data = $operation->getExtraProperties()['_api_error_resource'] ?? null) {
+            return $data;
+        }
+
+        throw new \LogicException(sprintf('We could not find the thrown exception in the %s.', self::class));
     }
 }
