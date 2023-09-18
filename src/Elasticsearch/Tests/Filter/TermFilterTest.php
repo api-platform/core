@@ -87,7 +87,7 @@ class TermFilterTest extends TestCase
         );
     }
 
-    public function testApplyWithNestedProperty(): void
+    public function testApplyWithNestedArrayProperty(): void
     {
         $fooType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
         $barType = new Type(Type::BUILTIN_TYPE_STRING);
@@ -115,6 +115,37 @@ class TermFilterTest extends TestCase
 
         self::assertEquals(
             ['bool' => ['must' => [['nested' => ['path' => 'foo', 'query' => ['term' => ['foo.bar' => 'Krupicka']]]]]]],
+            $termFilter->apply([], Foo::class, null, ['filters' => ['foo.bar' => 'Krupicka']])
+        );
+    }
+
+    public function testApplyWithNestedObjectProperty(): void
+    {
+        $fooType = new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class);
+        $barType = new Type(Type::BUILTIN_TYPE_STRING);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([$fooType]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn((new ApiProperty())->withBuiltinTypes([$barType]))->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();
+
+        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
+        $nameConverterProphecy->normalize('foo.bar', Foo::class, null, Argument::type('array'))->willReturn('foo.bar')->shouldBeCalled();
+
+        $termFilter = new TermFilter(
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(PropertyAccessorInterface::class)->reveal(),
+            $nameConverterProphecy->reveal(),
+            ['foo.bar' => null]
+        );
+
+        self::assertSame(
+            ['bool' => ['must' => [['term' => ['foo.bar' => 'Krupicka']]]]],
             $termFilter->apply([], Foo::class, null, ['filters' => ['foo.bar' => 'Krupicka']])
         );
     }

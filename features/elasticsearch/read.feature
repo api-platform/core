@@ -499,7 +499,7 @@ Feature: Retrieve from Elasticsearch
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/books{?order[id],order[library.id],message,message[],library.firstName,library.firstName[]}",
+        "hydra:template": "/books{?order[id],order[library.id],message,message[],library.firstName,library.firstName[],library.relatedGenres.name,library.relatedGenres.name[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -536,6 +536,18 @@ Feature: Retrieve from Elasticsearch
             "@type": "IriTemplateMapping",
             "variable": "library.firstName[]",
             "property": "library.firstName",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "library.relatedGenres.name",
+            "property": "library.relatedGenres.name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "library.relatedGenres.name[]",
+            "property": "library.relatedGenres.name",
             "required": false
           }
         ]
@@ -615,7 +627,7 @@ Feature: Retrieve from Elasticsearch
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/books{?order[id],order[library.id],message,message[],library.firstName,library.firstName[]}",
+        "hydra:template": "/books{?order[id],order[library.id],message,message[],library.firstName,library.firstName[],library.relatedGenres.name,library.relatedGenres.name[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -652,6 +664,18 @@ Feature: Retrieve from Elasticsearch
             "@type": "IriTemplateMapping",
             "variable": "library.firstName[]",
             "property": "library.firstName",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "library.relatedGenres.name",
+            "property": "library.relatedGenres.name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "library.relatedGenres.name[]",
+            "property": "library.relatedGenres.name",
             "required": false
           }
         ]
@@ -714,7 +738,7 @@ Feature: Retrieve from Elasticsearch
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/books{?order[id],order[library.id],message,message[],library.firstName,library.firstName[]}",
+        "hydra:template": "/books{?order[id],order[library.id],message,message[],library.firstName,library.firstName[],library.relatedGenres.name,library.relatedGenres.name[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -751,6 +775,18 @@ Feature: Retrieve from Elasticsearch
             "@type": "IriTemplateMapping",
             "variable": "library.firstName[]",
             "property": "library.firstName",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "library.relatedGenres.name",
+            "property": "library.relatedGenres.name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "library.relatedGenres.name[]",
+            "property": "library.relatedGenres.name",
             "required": false
           }
         ]
