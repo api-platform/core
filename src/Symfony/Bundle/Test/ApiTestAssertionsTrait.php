@@ -178,7 +178,7 @@ trait ApiTestAssertionsTrait
     {
         $hub = self::getMercureRegistry()->getHub($name);
         if (!$hub instanceof TraceableHub) {
-            static::fail('You must enabled the profiler to make Mercure update assertions.');
+            static::fail('You must enable "framework.test" to make Mercure update assertions.');
         }
 
         return $hub;
