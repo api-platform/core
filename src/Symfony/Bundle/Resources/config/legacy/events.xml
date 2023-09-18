@@ -61,7 +61,7 @@
             <argument type="service" id="api_platform.serializer" />
             <argument>%api_platform.error_formats%</argument>
             <argument>%api_platform.exception_to_status%</argument>
-            <argument type="service" id="api_platform.listener.exception" />
+            <argument type="service" id="api_platform.listener.exception" on-invalid="null" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
         </service>

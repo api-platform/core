@@ -24,7 +24,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Handles validation errors.
- * todo remove this class.
+ * TODO: remove this class.
+ *
+ * @deprecated
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -39,9 +41,8 @@ final class ValidationExceptionListener
      */
     public function onKernelException(ExceptionEvent $event): void
     {
+        // API Platform 3.2 handles every exception through the exception listener so we just skip this one
         if ($this->exceptionListener) {
-            $this->exceptionListener->onKernelException($event);
-
             return;
         }
 
