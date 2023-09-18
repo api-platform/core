@@ -16,6 +16,7 @@ namespace ApiPlatform\State\Processor;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
@@ -39,8 +40,11 @@ final class RespondProcessor implements ProcessorInterface
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
-    public function __construct(private ?IriConverterInterface $iriConverter = null, private readonly ?ResourceClassResolverInterface $resourceClassResolver = null)
-    {
+    public function __construct(
+        private ?IriConverterInterface $iriConverter = null,
+        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
+        private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
@@ -75,11 +79,15 @@ final class RespondProcessor implements ProcessorInterface
 
         if ($hasData = ($this->resourceClassResolver && $originalData && \is_object($originalData) && $this->resourceClassResolver->isResourceClass($this->getObjectClass($originalData))) && $this->iriConverter) {
             if (
-                ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false)
-                && 301 === $operation->getStatus()
+                300 <= $status && $status < 400
+                && (($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) || ($operation->getExtraProperties()['canonical_uri_template'] ?? null))
             ) {
-                $status = 301;
-                $headers['Location'] = $this->iriConverter->getIriFromResource($originalData, UrlGeneratorInterface::ABS_PATH, $operation);
+                $canonicalOperation = $operation;
+                if ($this->operationMetadataFactory && null !== ($operation->getExtraProperties()['canonical_uri_template'] ?? null)) {
+                    $canonicalOperation = $this->operationMetadataFactory->create($operation->getExtraProperties()['canonical_uri_template'], $context);
+                }
+
+                $headers['Location'] = $this->iriConverter->getIriFromResource($originalData, UrlGeneratorInterface::ABS_PATH, $canonicalOperation);
             } elseif ('PUT' === $method && !$request->attributes->get('previous_data') && null === $status && ($operation instanceof Put && ($operation->getAllowCreate() ?? false))) {
                 $status = 201;
             }
