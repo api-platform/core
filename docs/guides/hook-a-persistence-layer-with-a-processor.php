@@ -8,6 +8,7 @@
 // ---
 
 // # Hook a Persistence Layer with a Processor
+
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ApiResource;
     use App\State\BookProcessor;
@@ -17,7 +18,9 @@ namespace App\ApiResource {
     #[ApiResource(processor: BookProcessor::class, provider: BookProvider::class)]
     class Book
     {
-        public function __construct(public string $id, public string $title) {}
+        public function __construct(public string $id, public string $title)
+        {
+        }
     }
 }
 
@@ -39,11 +42,13 @@ namespace App\State {
         {
             $id = $uriVariables['id'] ?? $data->id;
             file_put_contents(sprintf('book-%s.json', $id), json_encode($data));
+
             return $data;
         }
     }
 
-    final class BookProvider implements ProviderInterface {
+    final class BookProvider implements ProviderInterface
+    {
         public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Book
         {
             if ($operation instanceof CollectionInterface) {
@@ -56,6 +61,7 @@ namespace App\State {
             }
 
             $data = json_decode(file_get_contents($file));
+
             return new Book($data->id, $data->title);
         }
     }

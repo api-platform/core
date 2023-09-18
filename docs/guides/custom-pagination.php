@@ -12,7 +12,6 @@
 // The following example shows how to handle it using a custom Provider. You will need to use the Doctrine Paginator and pass it to the API Platform Paginator.
 
 namespace App\Entity {
-
     use ApiPlatform\Metadata\ApiResource;
     use ApiPlatform\Metadata\GetCollection;
     use App\Repository\BookRepository;
@@ -22,7 +21,7 @@ namespace App\Entity {
     /* Use custom Provider on operation to retrieve the custom collection */
     #[ApiResource(
         operations: [
-            new GetCollection(provider: BooksListProvider::class)
+            new GetCollection(provider: BooksListProvider::class),
         ]
     )]
     #[ORM\Entity(repositoryClass: BookRepository::class)]
@@ -71,7 +70,6 @@ namespace App\Repository {
 }
 
 namespace App\State {
-
     use ApiPlatform\Doctrine\Orm\Paginator;
     use ApiPlatform\Metadata\Operation;
     use ApiPlatform\State\Pagination\Pagination;
@@ -105,7 +103,6 @@ namespace App\Playground {
 }
 
 namespace DoctrineMigrations {
-
     use Doctrine\DBAL\Schema\Schema;
     use Doctrine\Migrations\AbstractMigration;
 
@@ -123,6 +120,7 @@ namespace App\Fixtures {
     use Doctrine\Bundle\FixturesBundle\Fixture;
     use Doctrine\Persistence\ObjectManager;
     use Zenstruck\Foundry\AnonymousFactory;
+
     use function Zenstruck\Foundry\faker;
 
     final class BookFixtures extends Fixture
@@ -148,9 +146,9 @@ namespace App\Fixtures {
 }
 
 namespace App\Tests {
+    use ApiPlatform\Playground\Test\TestGuideTrait;
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use App\Entity\Book;
-    use ApiPlatform\Playground\Test\TestGuideTrait;
 
     final class BookTest extends ApiTestCase
     {

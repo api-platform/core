@@ -11,12 +11,13 @@
 //
 // When using subresources with doctrine, API Platform tries to handle your links,
 // and the algorithm sometimes overcomplicates SQL queries.
+
 namespace App\Entity {
     use ApiPlatform\Doctrine\Orm\State\Options;
     use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
     use ApiPlatform\Metadata\ApiResource;
-    use ApiPlatform\Metadata\GetCollection;
     use ApiPlatform\Metadata\Get;
+    use ApiPlatform\Metadata\GetCollection;
     use ApiPlatform\Metadata\Link;
     use Doctrine\ORM\Mapping as ORM;
     use Doctrine\ORM\QueryBuilder;
@@ -48,7 +49,7 @@ namespace App\Entity {
 
         // This function gets called in our generic ItemProvider or CollectionProvider, the idea is to create the WHERE clause
         // to get the correct data. You can also perform joins or whatever SQL clause you need:
-        static public function handleLinks(QueryBuilder $queryBuilder, array $uriVariables, QueryNameGeneratorInterface $queryNameGenerator, array $context)
+        public static function handleLinks(QueryBuilder $queryBuilder, array $uriVariables, QueryNameGeneratorInterface $queryNameGenerator, array $context): void
         {
             $queryBuilder
                 ->andWhere($queryBuilder->getRootAliases()[0].'.company = :companyId')
@@ -69,7 +70,6 @@ namespace App\Entity {
 }
 
 namespace App\Playground {
-
     use Symfony\Component\HttpFoundation\Request;
 
     function request(): Request
@@ -80,7 +80,6 @@ namespace App\Playground {
 }
 
 namespace DoctrineMigrations {
-
     use Doctrine\DBAL\Schema\Schema;
     use Doctrine\Migrations\AbstractMigration;
 
@@ -91,21 +90,20 @@ namespace DoctrineMigrations {
             $this->addSql('CREATE TABLE company (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL);');
             $this->addSql('CREATE TABLE employee (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, company_id INTEGER DEFAULT NULL, name VARCHAR(255) NOT NULL, CONSTRAINT FK_COMPANY FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE);
 ');
-      $this->addSql('CREATE INDEX FK_COMPANY ON employee (company_id)');
-
+            $this->addSql('CREATE INDEX FK_COMPANY ON employee (company_id)');
         }
     }
 }
 
 namespace App\Fixtures {
-
-    use App\Entity\Employee;
     use App\Entity\Company;
+    use App\Entity\Employee;
     use Doctrine\Bundle\FixturesBundle\Fixture;
     use Doctrine\Persistence\ObjectManager;
+
     use function Zenstruck\Foundry\anonymous;
-    use function Zenstruck\Foundry\repository;
     use function Zenstruck\Foundry\faker;
+    use function Zenstruck\Foundry\repository;
 
     final class BookFixtures extends Fixture
     {
@@ -117,16 +115,15 @@ namespace App\Fixtures {
                 return;
             }
 
-            $companyFactory->many(1)->create(fn() => [
-                'name' => faker()->company()
+            $companyFactory->many(1)->create(fn () => [
+                'name' => faker()->company(),
             ]);
 
             $employeeFactory = anonymous(Employee::class);
-            $employeeFactory->many(10)->create(fn() =>
-                [
-                    'name' => faker()->name(),
-                    'company' => $companyRepository->first()
-                ]
+            $employeeFactory->many(10)->create(fn () => [
+                'name' => faker()->name(),
+                'company' => $companyRepository->first(),
+            ]
             );
         }
     }

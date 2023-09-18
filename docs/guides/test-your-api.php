@@ -6,10 +6,11 @@
 // position: 7
 // tags: tests
 // ---
+
 namespace App\Tests {
+    use ApiPlatform\Playground\Test\TestGuideTrait;
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use App\ApiResource\Book;
-    use ApiPlatform\Playground\Test\TestGuideTrait;
 
     // API Platform [testing utilities](/docs/core/testing/) provides an [ApiTestCase](/docs/reference/Symfony/Bundle/Test/ApiTestCase/)
     // that allows you to send an HTTP Request, and to perform assertions on the Response.
@@ -52,13 +53,15 @@ namespace App\ApiResource {
     {
         public string $id;
 
-        static public function provide($operation) {
-           return $operation instanceof CollectionOperationInterface ? [] : null;
+        public static function provide($operation)
+        {
+            return $operation instanceof CollectionOperationInterface ? [] : null;
         }
     }
 }
 
 // # Test your API
+
 namespace App\Playground {
     use Symfony\Component\HttpFoundation\Request;
 
@@ -68,7 +71,7 @@ namespace App\Playground {
             uri: '/books/1',
             method: 'GET',
             server: [
-                'HTTP_ACCEPT' => 'application/ld+json'
+                'HTTP_ACCEPT' => 'application/ld+json',
             ]
         );
     }

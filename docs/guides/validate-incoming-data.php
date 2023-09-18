@@ -15,12 +15,12 @@
 // By default, the framework relies on the powerful [Symfony Validator Component](http://symfony.com/doc/current/validation.html) for this task, but you can replace it with your preferred validation library such as the [PHP filter extension](https://www.php.net/manual/en/intro.filter.php) if you want to.
 // Validation is called when handling a POST, PATCH, PUT request as follows :
 
-//graph LR
-//Request --> Deserialization
-//Deserialization --> Validation
-//Validation --> Persister
-//Persister --> Serialization
-//Serialization --> Response
+// graph LR
+// Request --> Deserialization
+// Deserialization --> Validation
+// Validation --> Persister
+// Persister --> Serialization
+// Serialization --> Response
 
 // In this guide we're going to use [Symfony's built-in constraints](http://symfony.com/doc/current/reference/constraints.html) and a [custom constraint](http://symfony.com/doc/current/validation/custom_constraint.html). Let's start by shaping our to-be-validated resource:
 
@@ -53,7 +53,8 @@ namespace App\Entity {
         #[ORM\Column(type: 'json')]
         public $properties;
 
-        public function getId(): ?int {
+        public function getId(): ?int
+        {
             return $this->id;
         }
     }
@@ -61,6 +62,7 @@ namespace App\Entity {
 
 // The `MinimalProperties` constraint will check that the `properties` data holds at least two values: description and price.
 // We start by creating the constraint:
+
 namespace App\Validator\Constraints {
     use Symfony\Component\Validator\Constraint;
 
@@ -81,7 +83,7 @@ namespace App\Validator\Constraints {
     {
         public function validate($value, Constraint $constraint): void
         {
-            if (!array_key_exists('description', $value) || !array_key_exists('price', $value)) {
+            if (!\array_key_exists('description', $value) || !\array_key_exists('price', $value)) {
                 $this->context->buildViolation($constraint->message)->addViolation();
             }
         }
@@ -111,7 +113,7 @@ namespace App\Playground {
             method: 'POST',
             server: [
                 'CONTENT_TYPE' => 'application/ld+json',
-                'HTTP_ACCEPT' => 'application/ld+json'
+                'HTTP_ACCEPT' => 'application/ld+json',
             ],
             content: '{"name": "test", "properties": {"description": "Test product"}}'
         );
@@ -119,9 +121,8 @@ namespace App\Playground {
 }
 
 namespace App\Tests {
-    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-    use App\Entity\Book;
     use ApiPlatform\Playground\Test\TestGuideTrait;
+    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 
     final class BookTest extends ApiTestCase
     {
@@ -131,10 +132,10 @@ namespace App\Tests {
         {
             $response = static::createClient()->request(method: 'POST', url: '/products', options: [
                 'json' => ['name' => 'test', 'properties' => ['description' => 'foo']],
-                'headers' => ['content-type' => 'application/ld+json']
+                'headers' => ['content-type' => 'application/ld+json'],
             ]);
 
-            //If the data submitted by the client is invalid, the HTTP status code will be set to 422 Unprocessable Entity and the response's body will contain the list of violations serialized in a format compliant with the requested one. For instance, a validation error will look like the following if the requested format is JSON-LD (the default):
+            // If the data submitted by the client is invalid, the HTTP status code will be set to 422 Unprocessable Entity and the response's body will contain the list of violations serialized in a format compliant with the requested one. For instance, a validation error will look like the following if the requested format is JSON-LD (the default):
             // ```json
             // {
             //   "@context": "/contexts/ConstraintViolationList",
@@ -154,7 +155,7 @@ namespace App\Tests {
                 'hydra:description' => 'properties: The product must have the minimal properties required ("description", "price")',
                 'title' => 'An error occurred',
                 'violations' => [
-                    ['propertyPath' => 'properties', 'message' => 'The product must have the minimal properties required ("description", "price")']
+                    ['propertyPath' => 'properties', 'message' => 'The product must have the minimal properties required ("description", "price")'],
                 ],
             ]);
         }

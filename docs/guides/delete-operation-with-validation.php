@@ -8,10 +8,9 @@
 // ---
 
 // Let's add a [custom Constraint](https://symfony.com/doc/current/validation/custom_constraint.html).
-namespace App\Validator {
 
+namespace App\Validator {
     use Symfony\Component\Validator\Constraint;
-    use Symfony\Component\Validator\ConstraintValidator;
 
     #[\Attribute]
     class AssertCanDelete extends Constraint
@@ -27,27 +26,25 @@ namespace App\Validator {
 }
 
 // And a custom validator following Symfony's naming conventions.
-namespace App\Validator {
 
-    use Symfony\Component\Validator\ConstraintValidator;
+namespace App\Validator {
     use Symfony\Component\Validator\Constraint;
+    use Symfony\Component\Validator\ConstraintValidator;
 
     class AssertCanDeleteValidator extends ConstraintValidator
     {
-        public function validate(mixed $value, Constraint $constraint)
+        public function validate(mixed $value, Constraint $constraint): void
         {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
 }
 
-
 namespace App\Entity {
-
     use ApiPlatform\Metadata\Delete;
+    use ApiPlatform\Symfony\Validator\Exception\ValidationException;
     use App\Validator\AssertCanDelete;
     use Doctrine\ORM\Mapping as ORM;
-    use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 
     #[ORM\Entity]
     #[Delete(
@@ -75,7 +72,6 @@ namespace App\Entity {
 }
 
 namespace App\Playground {
-
     use Symfony\Component\HttpFoundation\Request;
 
     function request(): Request
@@ -85,13 +81,13 @@ namespace App\Playground {
 }
 
 namespace App\Fixtures {
-
     use App\Entity\Book;
     use Doctrine\Bundle\FixturesBundle\Fixture;
     use Doctrine\Persistence\ObjectManager;
+
     use function Zenstruck\Foundry\anonymous;
-    use function Zenstruck\Foundry\repository;
     use function Zenstruck\Foundry\faker;
+    use function Zenstruck\Foundry\repository;
 
     final class BookFixtures extends Fixture
     {
@@ -103,8 +99,7 @@ namespace App\Fixtures {
             }
 
             $bookFactory->many(10)->create(
-                fn () =>
-                [
+                fn () => [
                     'title' => faker()->name(),
                 ]
             );
@@ -113,7 +108,6 @@ namespace App\Fixtures {
 }
 
 namespace DoctrineMigrations {
-
     use Doctrine\DBAL\Schema\Schema;
     use Doctrine\Migrations\AbstractMigration;
 

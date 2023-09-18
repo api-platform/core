@@ -65,13 +65,13 @@ namespace DoctrineMigrations {
 }
 
 namespace App\Fixtures {
-
     use App\Entity\Book;
     use Doctrine\Bundle\FixturesBundle\Fixture;
     use Doctrine\Persistence\ObjectManager;
+
     use function Zenstruck\Foundry\anonymous;
-    use function Zenstruck\Foundry\repository;
     use function Zenstruck\Foundry\faker;
+    use function Zenstruck\Foundry\repository;
 
     final class BookFixtures extends Fixture
     {
@@ -82,20 +82,19 @@ namespace App\Fixtures {
                 return;
             }
 
-            $bookFactory->many(10)->create(fn() =>
-                [
-                    'title' => faker()->name(),
-                    'author' => faker()->firstName(),
-                ]
+            $bookFactory->many(10)->create(fn () => [
+                'title' => faker()->name(),
+                'author' => faker()->firstName(),
+            ]
             );
         }
     }
 }
 
 namespace App\Tests {
+    use ApiPlatform\Playground\Test\TestGuideTrait;
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use App\Entity\Book;
-    use ApiPlatform\Playground\Test\TestGuideTrait;
 
     final class BookTest extends ApiTestCase
     {
@@ -110,7 +109,7 @@ namespace App\Tests {
             $this->assertJsonContains([
                 'hydra:search' => [
                     '@type' => 'hydra:IriTemplate',
-                    'hydra:template' => '/books.jsonld{?title,title[],author,author[]}',
+                    'hydra:template' => '/books.jsonld{?title,title[],author}',
                     'hydra:variableRepresentation' => 'BasicRepresentation',
                     'hydra:mapping' => [
                         [
@@ -128,12 +127,6 @@ namespace App\Tests {
                         [
                             '@type' => 'IriTemplateMapping',
                             'variable' => 'author',
-                            'property' => 'author',
-                            'required' => false,
-                        ],
-                        [
-                            '@type' => 'IriTemplateMapping',
-                            'variable' => 'author[]',
                             'property' => 'author',
                             'required' => false,
                         ],

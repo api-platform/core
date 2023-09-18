@@ -10,13 +10,13 @@
 namespace App\ApiResource {
     use ApiPlatform\Metadata\Post;
     use ApiPlatform\OpenApi\Model\Operation;
-    use ApiPlatform\OpenApi\Model\Response;
     use ApiPlatform\OpenApi\Model\RequestBody;
+    use ApiPlatform\OpenApi\Model\Response;
 
     #[Post(
         openapi: new Operation(
             responses: [
-                '200' => new Response(description: 'Ok')
+                '200' => new Response(description: 'Ok'),
             ],
             summary: 'Add a book to the library.',
             description: 'My awesome operation',
@@ -26,25 +26,26 @@ namespace App\ApiResource {
                         'application/ld+json' => [
                             'schema' => [
                                 'properties' => [
-                                    'id' => ['type' => 'integer', 'required' => true, 'description' => 'id']
-                                ]
+                                    'id' => ['type' => 'integer', 'required' => true, 'description' => 'id'],
+                                ],
                             ],
                             'example' => [
-                                'id' => 12345
-                            ]
-                        ]
+                                'id' => 12345,
+                            ],
+                        ],
                     ]
                 )
             )
         )
     )]
-    class Book {
+    class Book
+    {
     }
 }
 
 namespace App\Tests {
-    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use ApiPlatform\Playground\Test\TestGuideTrait;
+    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 
     final class BookTest extends ApiTestCase
     {
@@ -55,9 +56,8 @@ namespace App\Tests {
             $response = static::createClient()->request('GET', '/docs', options: ['headers' => ['accept' => 'application/vnd.openapi+json']]);
             $this->assertResponseStatusCodeSame(200);
             $this->assertJsonContains([
-                'paths' => ['/books' => ['post' => ['summary' => 'Add a book to the library.', 'description' => 'My awesome operation']]]
+                'paths' => ['/books' => ['post' => ['summary' => 'Add a book to the library.', 'description' => 'My awesome operation']]],
             ]);
         }
     }
 }
-

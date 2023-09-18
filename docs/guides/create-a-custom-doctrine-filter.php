@@ -39,8 +39,8 @@ namespace App\Filter {
              * Otherwise this filter is applied to order and page as well.
              */
             if (
-                !$this->isPropertyEnabled($property, $resourceClass) ||
-                !$this->isPropertyMapped($property, $resourceClass)
+                !$this->isPropertyEnabled($property, $resourceClass)
+                || !$this->isPropertyMapped($property, $resourceClass)
             ) {
                 return;
             }
@@ -138,9 +138,9 @@ namespace DoctrineMigrations {
 }
 
 namespace App\Tests {
+    use ApiPlatform\Playground\Test\TestGuideTrait;
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use App\Entity\Book;
-    use ApiPlatform\Playground\Test\TestGuideTrait;
 
     final class BookTest extends ApiTestCase
     {

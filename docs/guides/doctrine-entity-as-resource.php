@@ -10,11 +10,11 @@
 // # API Resource on a Doctrine Entity.
 //
 // API Platform is compatible with [Doctrine ORM](https://www.doctrine-project.org), all we need is to declare an
-namespace App\Entity {
 
-    use ApiPlatform\Metadata\ApiResource;
-    use ApiPlatform\Metadata\ApiFilter;
+namespace App\Entity {
     use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+    use ApiPlatform\Metadata\ApiFilter;
+    use ApiPlatform\Metadata\ApiResource;
     use Doctrine\ORM\Mapping as ORM;
 
     // When an ApiResource is declared on an `\ORM\Entity` we have access to [Doctrine filters](https://api-platform.com/docs/core/filters/).
@@ -37,20 +37,20 @@ namespace App\Entity {
 }
 
 namespace App\Playground {
-
     use Symfony\Component\HttpFoundation\Request;
 
     function request(): Request
     {
         // Persistence is automatic, you can try to create or read data:
         return Request::create('/books?order[id]=desc', 'GET');
+
         return Request::create('/books/1', 'GET');
+
         return Request::create(uri: '/books', method: 'POST', server: ['CONTENT_TYPE' => 'application/ld+json'], content: json_encode(['id' => 1, 'title' => 'API Platform rocks.']));
     }
 }
 
 namespace DoctrineMigrations {
-
     use Doctrine\DBAL\Schema\Schema;
     use Doctrine\Migrations\AbstractMigration;
 
@@ -64,13 +64,13 @@ namespace DoctrineMigrations {
 }
 
 namespace App\Fixtures {
-
     use App\Entity\Book;
     use Doctrine\Bundle\FixturesBundle\Fixture;
     use Doctrine\Persistence\ObjectManager;
+
     use function Zenstruck\Foundry\anonymous;
-    use function Zenstruck\Foundry\repository;
     use function Zenstruck\Foundry\faker;
+    use function Zenstruck\Foundry\repository;
 
     final class BookFixtures extends Fixture
     {
@@ -81,19 +81,17 @@ namespace App\Fixtures {
                 return;
             }
 
-            $bookFactory->many(10)->create(fn() =>
-                [
-                    'title' => faker()->name(),
-                ]
+            $bookFactory->many(10)->create(fn () => [
+                'title' => faker()->name(),
+            ]
             );
         }
     }
 }
 
 namespace App\Tests {
-
-    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use ApiPlatform\Playground\Test\TestGuideTrait;
+    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 
     final class BookTest extends ApiTestCase
     {
