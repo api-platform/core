@@ -46,7 +46,7 @@ namespace App\ApiResource {
     }
 }
 
-// Check our next guide to [provide the resource state](./provide-the-resource-state).
+// Check our next guide to [provide the resource state](/playground/provide-the-resource-state).
 
 namespace App\Playground {
     use Symfony\Component\HttpFoundation\Request;

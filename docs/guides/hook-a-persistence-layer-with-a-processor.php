@@ -14,7 +14,7 @@ namespace App\ApiResource {
     use App\State\BookProcessor;
     use App\State\BookProvider;
 
-    // We use a `BookProcessor` as the [ApiResource::processor](http://localhost:3000/reference/Metadata/ApiResource#processor) option.
+    // We use a `BookProcessor` as the [ApiResource::processor](/docs/reference/Metadata/ApiResource#processor) option.
     #[ApiResource(processor: BookProcessor::class, provider: BookProvider::class)]
     class Book
     {
