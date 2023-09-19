@@ -3,7 +3,8 @@
 // slug: return-the-iri-of-your-resources-relations
 // name: How to return an IRI instead of an object for your resources relations ?
 // executable: true
-// tags: serialization
+// tags: serialization, expert
+// position: 11
 // ---
 
 // This guide shows you how to expose the IRI of a related (sub)ressource relation instead of an object.
@@ -41,8 +42,7 @@ namespace App\ApiResource {
             // It is based on the uriTemplate set on the operation defined on the Address resource (see below).
             #[ApiProperty(uriTemplate: '/brands/{brandId}/addresses/{id}')]
             private ?Address $headQuarters = null
-        )
-        {
+        ) {
         }
 
         /**
@@ -76,7 +76,7 @@ namespace App\ApiResource {
 
         public static function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
         {
-            return (new Brand(1, 'Ford'))
+            return (new self(1, 'Ford'))
                     ->setHeadQuarters(new Address(1, 'One American Road near Michigan Avenue, Dearborn, Michigan'))
                     ->addCar(new Car(1, 'Torpedo Roadster'));
         }
@@ -84,7 +84,7 @@ namespace App\ApiResource {
 
     #[ApiResource(
         operations: [
-            new Get,
+            new Get(),
             // Without the use of uriTemplate on the property this would be used coming from the Brand resource, but not anymore.
             new GetCollection(uriTemplate: '/cars'),
             // This operation will be used to create the IRI instead since the uriTemplate matches.
@@ -103,8 +103,7 @@ namespace App\ApiResource {
             public readonly int $id = 1,
             public readonly string $name = 'Anon',
             private ?Brand $brand = null
-        )
-        {
+        ) {
         }
 
         public function getBrand(): Brand
@@ -129,7 +128,7 @@ namespace App\ApiResource {
                     'brandId' => new Link(toProperty: 'brand', fromClass: Brand::class),
                     'id' => new Link(fromClass: Address::class),
                 ]
-            )
+            ),
         ],
     )]
     class Address
@@ -139,8 +138,7 @@ namespace App\ApiResource {
             public readonly int $id = 1,
             public readonly string $name = 'Anon',
             private ?Brand $brand = null
-        )
-        {
+        ) {
         }
 
         public function getBrand(): Brand
@@ -174,29 +172,27 @@ namespace App\Playground {
     }
 }
 
-
 namespace App\Tests {
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use App\ApiResource\Brand;
 
     final class BrandTest extends ApiTestCase
     {
-
         public function testResourceExposeIRI(): void
         {
             static::createClient()->request('GET', '/brands/1', ['headers' => [
-                'Accept: application/ld+json'
+                'Accept: application/ld+json',
             ]]);
 
             $this->assertResponseIsSuccessful();
             $this->assertMatchesResourceCollectionJsonSchema(Brand::class, '_api_/brands/{id}{._format}_get');
             $this->assertJsonContains([
-                "@context" => "/contexts/Brand",
-                "@id" => "/brands/1",
-                "@type" => "Brand",
-                "name"=> "Ford",
-                "cars" => "/brands/1/cars",
-                "headQuarters" => "/brands/1/addresses/1"
+                '@context' => '/contexts/Brand',
+                '@id' => '/brands/1',
+                '@type' => 'Brand',
+                'name' => 'Ford',
+                'cars' => '/brands/1/cars',
+                'headQuarters' => '/brands/1/addresses/1',
             ]);
         }
     }

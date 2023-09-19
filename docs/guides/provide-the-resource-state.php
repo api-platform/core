@@ -10,6 +10,7 @@
 // # Provide the Resource State
 // Our model is the same then in the previous guide ([Declare a Resource](./declare-a-resource). API Platform will declare
 // CRUD operations if we don't declare them.
+
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ApiResource;
     use App\State\BookProvider;
@@ -37,15 +38,17 @@ namespace App\State {
             if ($operation instanceof CollectionOperationInterface) {
                 $book = new Book();
                 $book->id = '1';
+
                 // $book2 = new Book();
                 // $book2->id = '2';
                 // As an exercise you can edit the code and add a second book in the collection.
-                return [$book, /** $book2 */];
+                return [$book/* $book2 */];
             }
 
             $book = new Book();
             // The value at `$uriVariables['id']` is the one that matches the `{id}` variable of the **[URI template](/explanation/uri#uri-template)**.
             $book->id = $uriVariables['id'];
+
             return $book;
         }
     }
@@ -59,4 +62,3 @@ namespace App\Playground {
         return Request::create('/books.jsonld', 'GET');
     }
 }
-

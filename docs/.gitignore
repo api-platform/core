@@ -13,3 +13,4 @@ node_modules
 composer.lock
 vendor
 var
+.php-cs-fixer.cache
