@@ -42,6 +42,7 @@ final class ErrorListener extends SymfonyErrorListener
 {
     use ContentNegotiationTrait;
     use OperationRequestInitiatorTrait;
+    private static mixed $error;
 
     public function __construct(
         object|array|string|null $controller,
@@ -112,10 +113,8 @@ final class ErrorListener extends SymfonyErrorListener
         }
 
         if (!$operation->getProvider()) {
-            $data = 'jsonapi' === $format && $errorResource instanceof ConstraintViolationListAwareExceptionInterface ? $errorResource->getConstraintViolationList() : $errorResource;
-            $dup->attributes->set('_api_error_resource', $data);
-            $operation = $operation->withExtraProperties(['_api_error_resource' => $data])
-                                   ->withProvider([self::class, 'provide']);
+            static::$error = 'jsonapi' === $format && $errorResource instanceof ConstraintViolationListAwareExceptionInterface ? $errorResource->getConstraintViolationList() : $errorResource;
+            $operation = $operation->withProvider([self::class, 'provide']);
         }
 
         // For our swagger Ui errors
@@ -221,13 +220,9 @@ final class ErrorListener extends SymfonyErrorListener
         };
     }
 
-    public static function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public static function provide(): mixed
     {
-        if ($data = ($context['request'] ?? null)?->attributes->get('_api_error_resource')) {
-            return $data;
-        }
-
-        if ($data = $operation->getExtraProperties()['_api_error_resource'] ?? null) {
+        if ($data = static::$error) {
             return $data;
         }
 
