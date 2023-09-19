@@ -11,11 +11,11 @@
 //
 // API Platform provides a convenient way to create Doctrine ORM and MongoDB ODM filters. If you use [custom state providers](/docs/guide/state-providers), you can still create filters by implementing the previously mentioned interface, but - as API Platform isn't aware of your persistence system's internals - you have to create the filtering logic by yourself.
 //
-// Doctrine ORM filters have access to the context created from the HTTP request and to the `QueryBuilder` instance used to retrieve data from the database. They are only applied to collections. If you want to deal with the DQL query generated to retrieve items, [extensions](/docs/in-depth/extensions) are the way to go.
+// Doctrine ORM filters have access to the context created from the HTTP request and to the `QueryBuilder` instance used to retrieve data from the database. They are only applied to collections. If you want to deal with the DQL query generated to retrieve items, [extensions](/docs/core/extensions/) are the way to go.
 //
 // A Doctrine ORM filter is basically a class implementing the `ApiPlatform\Doctrine\Orm\Filter\FilterInterface`. API Platform includes a convenient abstract class implementing this interface and providing utility methods: `ApiPlatform\Doctrine\Orm\Filter\AbstractFilter`.
 //
-// Note: Doctrine MongoDB ODM filters have access to the context created from the HTTP request and to the [aggregation builder](https://www.doctrine-project.org/projects/doctrine-mongodb-odm/en/latest/reference/aggregation-builder.html) instance used to retrieve data from the database and to execute [complex operations on data](https://docs.mongodb.com/manual/aggregation/). They are only applied to collections. If you want to deal with the aggregation pipeline generated to retrieve items, [extensions](/docs/in-depth/extensions) are the way to go.
+// Note: Doctrine MongoDB ODM filters have access to the context created from the HTTP request and to the [aggregation builder](https://www.doctrine-project.org/projects/doctrine-mongodb-odm/en/latest/reference/aggregation-builder.html) instance used to retrieve data from the database and to execute [complex operations on data](https://docs.mongodb.com/manual/aggregation/). They are only applied to collections. If you want to deal with the aggregation pipeline generated to retrieve items, [extensions](/docs/core/extensions/) are the way to go.
 //
 // A Doctrine MongoDB ODM filter is basically a class implementing the `ApiPlatform\Doctrine\Odm\Filter\FilterInterface`. API Platform includes a convenient abstract class implementing this interface and providing utility methods: `ApiPlatform\Doctrine\Odm\Filter\AbstractFilter`.
 //

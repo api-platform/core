@@ -40,6 +40,8 @@ Notes:
 * [92a81f024](https://github.com/api-platform/core/commit/92a81f024541054b9322e7457b75c721261e14e0) feat(graphql): allow to disable the introspection query (#5711)
 * [d793ffb92](https://github.com/api-platform/core/commit/d793ffb9228a21655ee35f0b90a959f93281a4cf) feat: union/intersect types (#5470)
 
+## v3.1.18
+
 ## v3.1.17
 
 ### Bug fixes
@@ -419,7 +421,8 @@ Breaking changes:
 * Serializer: `skip_null_values` now defaults to `true`
 * Metadata: `Patch` is added to the automatic CRUD
 * Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
-
+* Doctrine: remove `@final` annotation from filters and mark them as `final`
+    
 ## v2.7.14
 
 ### Bug fixes
