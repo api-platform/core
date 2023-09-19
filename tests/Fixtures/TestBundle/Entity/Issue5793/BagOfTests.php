@@ -40,9 +40,14 @@ class BagOfTests
     #[Groups(['read', 'write'])]
     private Collection $tests;
 
+    #[ORM\OneToMany(mappedBy: 'bagOfTests', targetEntity: NonResourceTestEntity::class)]
+    #[Groups(['read', 'write'])]
+    private Collection $nonResourceTests;
+
     public function __construct()
     {
         $this->tests = new ArrayCollection();
+        $this->nonResourceTests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,6 +91,33 @@ class BagOfTests
             // set the owning side to null (unless already changed)
             if ($test->getBagOfTests() === $this) {
                 $test->setBagOfTests(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getNonResourceTests(): Collection
+    {
+        return $this->nonResourceTests;
+    }
+
+    public function addNonResourceTest(NonResourceTestEntity $nonResourceTest): static
+    {
+        if (!$this->nonResourceTests->contains($nonResourceTest)) {
+            $this->nonResourceTests->add($nonResourceTest);
+            $nonResourceTest->setBagOfTests($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNonResourceTest(NonResourceTestEntity $nonResourceTest): static
+    {
+        if ($this->nonResourceTests->removeElement($nonResourceTest)) {
+            // set the owning side to null (unless already changed)
+            if ($nonResourceTest->getBagOfTests() === $this) {
+                $nonResourceTest->setBagOfTests(null);
             }
         }
 
