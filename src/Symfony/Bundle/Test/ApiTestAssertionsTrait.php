@@ -164,6 +164,26 @@ trait ApiTestAssertionsTrait
         static::assertSame($retry, $update->getRetry(), $message);
     }
 
+    public static function getMercureRegistry(): HubRegistry
+    {
+        $container = static::getContainer();
+        if ($container->has(HubRegistry::class)) {
+            return $container->get(HubRegistry::class);
+        }
+
+        static::fail('A client must have Mercure enabled to make update assertions. Did you forget to require symfony/mercure?');
+    }
+
+    public static function getMercureHub(string $name = null): TraceableHub
+    {
+        $hub = self::getMercureRegistry()->getHub($name);
+        if (!$hub instanceof TraceableHub) {
+            static::fail('You must enable "framework.test" to make Mercure update assertions.');
+        }
+
+        return $hub;
+    }
+
     private static function getHttpClient(Client $newClient = null): ?Client
     {
         static $client;
@@ -213,25 +233,5 @@ trait ApiTestAssertionsTrait
         }
 
         return $resourceMetadataFactoryCollection;
-    }
-
-    private static function getMercureRegistry(): HubRegistry
-    {
-        $container = static::getContainer();
-        if ($container->has(HubRegistry::class)) {
-            return $container->get(HubRegistry::class);
-        }
-
-        static::fail('A client must have Mercure enabled to make update assertions. Did you forget to require symfony/mercure?');
-    }
-
-    private static function getMercureHub(string $name = null): TraceableHub
-    {
-        $hub = self::getMercureRegistry()->getHub($name);
-        if (!$hub instanceof TraceableHub) {
-            static::fail('You must enabled the profiler to make Mercure update assertions.');
-        }
-
-        return $hub;
     }
 }
