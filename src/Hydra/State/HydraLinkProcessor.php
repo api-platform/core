@@ -40,14 +40,14 @@ final class HydraLinkProcessor implements ProcessorInterface
         }
 
         $apiDocUrl = $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL);
-        $linkProvider = $request->attributes->get('_links') ?? new GenericLinkProvider();
+        $linkProvider = $request->attributes->get('_api_platform_links') ?? new GenericLinkProvider();
 
         foreach ($operation->getLinks() ?? [] as $link) {
             $linkProvider = $linkProvider->withLink($link);
         }
 
         $link = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);
-        $request->attributes->set('_links', $linkProvider->withLink($link));
+        $request->attributes->set('_api_platform_links', $linkProvider->withLink($link));
 
         return $this->decorated->process($data, $operation, $uriVariables, $context);
     }

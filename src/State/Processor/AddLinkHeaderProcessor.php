@@ -36,11 +36,9 @@ final class AddLinkHeaderProcessor implements ProcessorInterface
         }
 
         // We add our header here as Symfony does it only for the main Request and we want it to be done on errors (sub-request) as well
-        $linksProvider = $request->attributes->get('_links');
+        $linksProvider = $request->attributes->get('_api_platform_links');
         if ($this->serializer && ($links = $linksProvider->getLinks())) {
             $response->headers->set('Link', $this->serializer->serialize($links));
-            // We don't want Symfony WebLink component do add links twice
-            $request->attributes->set('_links', []);
         }
 
         return $response;

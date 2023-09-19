@@ -18,7 +18,6 @@ use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
@@ -107,7 +106,7 @@ final class ErrorListener extends SymfonyErrorListener
             }
         } else {
             /** @var HttpOperation $operation */
-            $operation = new ErrorOperation(name: '_api_errors_problem', class: Error::class, outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]);
+            $operation = new ErrorOperation(name: '_api_errors_problem', class: Error::class, outputFormats: ['jsonld' => ['application/problem+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]);
             $operation = $operation->withStatus($this->getStatusCode($apiOperation, $request, $operation, $exception));
             $errorResource = Error::createFromException($exception, $operation->getStatus());
         }
@@ -128,13 +127,17 @@ final class ErrorListener extends SymfonyErrorListener
         } catch (\Exception $e) {
         }
 
-        if ($exception instanceof ValidationException) {
-            if (!($apiOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
-                $operation = $operation->withNormalizationContext([
-                    'groups' => ['legacy_'.$format],
-                    'force_iri_generation' => false,
-                ]);
-            }
+        if ($exception instanceof ValidationException && !($apiOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
+            $operation = $operation->withNormalizationContext([
+                'groups' => ['legacy_'.$format],
+                'force_iri_generation' => false,
+            ]);
+        }
+
+        if ('jsonld' === $format && !($apiOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
+            $operation = $operation->withOutputFormats(['jsonld' => ['application/ld+json']])
+                                   ->withLinks([])
+                                   ->withExtraProperties(['rfc_7807_compliant_errors' => false] + $operation->getExtraProperties());
         }
 
         $dup->attributes->set('_api_resource_class', $operation->getClass());

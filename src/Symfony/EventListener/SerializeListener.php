@@ -142,11 +142,11 @@ final class SerializeListener
             return;
         }
 
-        $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
+        $linkProvider = $request->attributes->get('_api_platform_links', new GenericLinkProvider());
         foreach ($resourcesToPush as $resourceToPush) {
             $linkProvider = $linkProvider->withLink((new Link('preload', $resourceToPush))->withAttribute('as', 'fetch'));
         }
-        $request->attributes->set('_links', $linkProvider);
+        $request->attributes->set('_api_platform_links', $linkProvider);
     }
 
     /**

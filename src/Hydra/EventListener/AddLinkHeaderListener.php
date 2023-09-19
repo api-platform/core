@@ -51,7 +51,7 @@ final class AddLinkHeaderListener
 
         $apiDocUrl = $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL);
         $apiDocLink = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);
-        $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
+        $linkProvider = $request->attributes->get('_api_platform_links', new GenericLinkProvider());
 
         if (!$linkProvider instanceof EvolvableLinkProviderInterface) {
             return;
@@ -63,6 +63,6 @@ final class AddLinkHeaderListener
             }
         }
 
-        $request->attributes->set('_links', $linkProvider->withLink($apiDocLink));
+        $request->attributes->set('_api_platform_links', $linkProvider->withLink($apiDocLink));
     }
 }
