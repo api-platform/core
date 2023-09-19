@@ -21,8 +21,8 @@
 // ```
 //
 // Two namespaces are available to register API resources: `App\Entity` (for Doctrine) and `App\ApiResource`.
-namespace App\Entity {
 
+namespace App\Entity {
     use ApiPlatform\Metadata\ApiResource;
     use Doctrine\ORM\Mapping as ORM;
 
@@ -45,33 +45,36 @@ namespace App\Entity {
 }
 
 // We can declare as many namespaces or classes that we need to for this code to work.
+
 namespace App\Service {
     use Psr\Log\LoggerInterface;
 
     class MyService
     {
-        public function __construct(private LoggerInterface $logger) {}
+        public function __construct(private LoggerInterface $logger)
+        {
+        }
     }
 }
 
 // If you need to change something within Symfony's Container you need to declare this namespace with a `configure` method.
-namespace App\DependencyInjection {
 
+namespace App\DependencyInjection {
     use App\Service\MyService;
     use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
     use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
-    function configure(ContainerConfigurator $configurator)
+    function configure(ContainerConfigurator $configurator): void
     {
         $services = $configurator->services();
         $services->set(MyService::class)
-            ->args([service('logger')])
-        ;
+            ->args([service('logger')]);
     }
 }
 
-
 // Doctrine migrations will run from this namespace.
+
 namespace DoctrineMigrations {
     use Doctrine\DBAL\Schema\Schema;
     use Doctrine\Migrations\AbstractMigration;
@@ -86,10 +89,12 @@ namespace DoctrineMigrations {
 }
 
 // And we can load fixtures using [Foundry](https://github.com/zenstruck/foundry)
+
 namespace App\Fixtures {
     use App\Entity\Book;
     use Doctrine\Bundle\FixturesBundle\Fixture;
     use Doctrine\Persistence\ObjectManager;
+
     use function Zenstruck\Foundry\anonymous;
 
     final class BookFixtures extends Fixture
@@ -98,13 +103,14 @@ namespace App\Fixtures {
         {
             $bookFactory = anonymous(Book::class);
             $bookFactory->many(10)->create([
-                'title' => 'title'
+                'title' => 'title',
             ]);
         }
     }
 }
 
 // The `request` method is the one executed by the API Platform online Playground on startup.
+
 namespace App\Playground {
     use Symfony\Component\HttpFoundation\Request;
 
@@ -115,10 +121,11 @@ namespace App\Playground {
 }
 
 // The Guide huge advantage is that it is also tested with phpunit.
+
 namespace App\Tests {
+    use ApiPlatform\Playground\Test\TestGuideTrait;
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use App\Entity\Book;
-    use ApiPlatform\Playground\Test\TestGuideTrait;
 
     final class BookTest extends ApiTestCase
     {

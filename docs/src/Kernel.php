@@ -43,10 +43,20 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
     private $declaredClasses = [];
+    private string $guide;
 
-    public function __construct(string $environment, bool $debug, private string $guide)
+    public function __construct(string $environment, bool $debug, string $guide = null)
     {
         parent::__construct($environment, $debug);
+
+        if (!$guide) {
+            $guide = $_SERVER['APP_GUIDE'] ?? $_ENV['APP_GUIDE'] ?? null;
+
+            if (!$guide) {
+                throw new \RuntimeException('No guide.');
+            }
+        }
+
         $this->guide = $guide;
         require_once "{$this->getProjectDir()}/guides/{$this->guide}.php";
     }
@@ -99,12 +109,9 @@ class Kernel extends BaseKernel
         $builder->addCompilerPass(new AttributeFilterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101);
         $builder->addCompilerPass(new FilterPass());
 
-        $container->parameters()->set(
-            'database_url',
-            sprintf('sqlite:///%s/%s', $this->getCacheDir(), 'data.db')
-        );
+        $container->parameters()->set('guide', $this->guide);
 
-        $services->set('doctrine.orm.default_metadata_driver', StaticMappingDriver::class)->args(['$classes' => $resources]);
+        $services->set('doctrine.orm.default_metadata_driver', StaticMappingDriver::class)->args(['$classes' => $entities]);
 
         if (\function_exists('App\DependencyInjection\configure')) {
             configure($container);
