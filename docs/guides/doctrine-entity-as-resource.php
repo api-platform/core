@@ -17,7 +17,7 @@ namespace App\Entity {
     use ApiPlatform\Metadata\ApiResource;
     use Doctrine\ORM\Mapping as ORM;
 
-    // When an ApiResource is declared on an `\ORM\Entity` we have access to [Doctrine filters](https://api-platform.com/docs/core/filters/).
+    // When an ApiResource is declared on an `\ORM\Entity` we have access to [Doctrine filters](/docs/core/filters/).
     #[ApiResource]
     #[ApiFilter(OrderFilter::class)]
     #[ORM\Entity]

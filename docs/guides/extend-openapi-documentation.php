@@ -7,6 +7,7 @@
 // tags: openapi, expert
 // ---
 
+// # Extend OpenAPI Documentation
 namespace App\ApiResource {
     use ApiPlatform\Metadata\Post;
     use ApiPlatform\OpenApi\Model\Operation;
@@ -14,12 +15,15 @@ namespace App\ApiResource {
     use ApiPlatform\OpenApi\Model\Response;
 
     #[Post(
+        // To extend the OpenAPI documentation we use an [OpenApi Operation model](/docs/reference/OpenApi/Model/Operation/).
+        // When a field is not specified API Platform will add the missing informations.
         openapi: new Operation(
             responses: [
                 '200' => new Response(description: 'Ok'),
             ],
             summary: 'Add a book to the library.',
             description: 'My awesome operation',
+            // Each of the Operation field that you want to customize has a model in our [OpenApi reference](/docs/reference/).
             requestBody: new RequestBody(
                 content: new \ArrayObject(
                     [

@@ -8,14 +8,14 @@
 // ---
 
 // # Provide the Resource State
-// Our model is the same then in the previous guide ([Declare a Resource](./declare-a-resource). API Platform will declare
+// Our model is the same then in the previous guide ([Declare a Resource](/playground/declare-a-resource). API Platform will declare
 // CRUD operations if we don't declare them.
 
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ApiResource;
     use App\State\BookProvider;
 
-    // We use a `BookProvider` as the [ApiResource::provider](/reference/Metadata/ApiResource#provider) option.
+    // We use a `BookProvider` as the [ApiResource::provider](/docs/reference/Metadata/ApiResource#provider) option.
     #[ApiResource(provider: BookProvider::class)]
     class Book
     {
@@ -39,14 +39,14 @@ namespace App\State {
                 $book = new Book();
                 $book->id = '1';
 
-                // $book2 = new Book();
-                // $book2->id = '2';
+                /** $book2 = new Book();
+                $book2->id = '2'; */
                 // As an exercise you can edit the code and add a second book in the collection.
                 return [$book/* $book2 */];
             }
 
             $book = new Book();
-            // The value at `$uriVariables['id']` is the one that matches the `{id}` variable of the **[URI template](/explanation/uri#uri-template)**.
+            // The value at `$uriVariables['id']` is the one that matches the `{id}` variable of the **[URI template](/docs/core/subresources/)**.
             $book->id = $uriVariables['id'];
 
             return $book;
