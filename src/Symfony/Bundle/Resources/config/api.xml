@@ -100,6 +100,7 @@
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
             <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
+            <argument>%api_platform.docs_formats%</argument>
         </service>
 
         <service id="api_platform.action.documentation" class="ApiPlatform\Documentation\Action\DocumentationAction" public="true">

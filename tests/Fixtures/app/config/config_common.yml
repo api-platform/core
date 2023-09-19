@@ -48,6 +48,8 @@ api_platform:
         jsonopenapi:                   ['application/vnd.openapi+json']
         yamlopenapi:                   ['application/vnd.openapi+yaml']
         jsonld:                        ['application/ld+json']
+        jsonhal:                       ['application/hal+json']
+        jsonapi:                       ['application/vnd.api+json']
     error_formats:
         jsonproblem:                   ['application/problem+json']
         jsonld:                        ['application/ld+json']
