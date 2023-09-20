@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator\Exception;
 
+use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
@@ -21,6 +22,7 @@ use ApiPlatform\Validator\Exception\ValidationException as BaseValidationExcepti
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\WebLink\Link;
 
 /**
  * Thrown when a validation error occurs.
@@ -34,8 +36,16 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
     uriVariables: ['id'],
     shortName: 'ConstraintViolationList',
     operations: [
-        new ErrorOperation(name: '_api_validation_errors_hydra', outputFormats: ['jsonld' => ['application/ld+json']], normalizationContext: ['groups' => ['jsonld'], 'skip_null_values' => true]),
-        new ErrorOperation(name: '_api_validation_errors_problem', outputFormats: ['jsonproblem' => ['application/problem+json'], 'json' => ['application/problem+json']], normalizationContext: ['groups' => ['json'], 'skip_null_values' => true]),
+        new ErrorOperation(name: '_api_validation_errors_problem', outputFormats: ['json' => ['application/problem+json']], normalizationContext: ['groups' => ['json'], 'skip_null_values' => true]),
+        new ErrorOperation(
+            name: '_api_validation_errors_hydra',
+            outputFormats: ['jsonld' => ['application/problem+json']],
+            links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')],
+            normalizationContext: [
+                'groups' => ['jsonld'],
+                'skip_null_values' => true,
+            ]
+        ),
         new ErrorOperation(name: '_api_validation_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]),
     ]
 )]

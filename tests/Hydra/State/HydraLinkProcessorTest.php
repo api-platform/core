@@ -33,7 +33,7 @@ class HydraLinkProcessorTest extends TestCase
         $request = $this->createMock(Request::class);
         $request->attributes = $this->createMock(ParameterBag::class);
 
-        $request->attributes->expects($this->once())->method('set')->with('_links', $this->callback(function ($linkProvider) {
+        $request->attributes->expects($this->once())->method('set')->with('_api_platform_links', $this->callback(function ($linkProvider) {
             $this->assertInstanceOf(GenericLinkProvider::class, $linkProvider);
             $this->assertEquals($linkProvider->getLinks(), [new Link('a', 'b'), new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', '/docs')]);
 

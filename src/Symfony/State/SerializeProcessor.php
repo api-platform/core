@@ -65,11 +65,11 @@ final class SerializeProcessor implements ProcessorInterface
         $serialized = $this->serializer->serialize($data, $request->getRequestFormat(), $serializerContext);
         $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
         if (\count($resourcesToPush)) {
-            $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
+            $linkProvider = $request->attributes->get('_api_platform_links', new GenericLinkProvider());
             foreach ($resourcesToPush as $resourceToPush) {
                 $linkProvider = $linkProvider->withLink((new Link('preload', $resourceToPush))->withAttribute('as', 'fetch'));
             }
-            $request->attributes->set('_links', $linkProvider);
+            $request->attributes->set('_api_platform_links', $linkProvider);
         }
 
         return $this->processor->process($serialized, $operation, $uriVariables, $context);
