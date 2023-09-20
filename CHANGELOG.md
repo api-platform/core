@@ -1,5 +1,28 @@
 # Changelog
 
+## v3.2.0-beta.1
+
+### Bug fixes
+
+* [1c6862dd5](https://github.com/api-platform/core/commit/1c6862dd51fb97d5c78652ce672a0814e79f7d70) fix(symfony): use static variable to store Error (#5837)
+* [2703a4507](https://github.com/api-platform/core/commit/2703a45072e9477b068d3484f197ca0571a89c2a) fix(swagger): no throw when operation is not found
+* [2dd058a45](https://github.com/api-platform/core/commit/2dd058a4546f329628c1de459c2673c010ee9a35) fix(symfony): use "main" state alias for decoration (#5806)
+* [3dedf6d9d](https://github.com/api-platform/core/commit/3dedf6d9d739277fed06ce24f840de119bd6881d) fix: exception to status on error resource (#5823)
+* [4ac62b0c2](https://github.com/api-platform/core/commit/4ac62b0c2d88b95d58f2e9477579ceca28313874) fix(jsonschema): build non-resource class schema (#5842)
+* [660955b69](https://github.com/api-platform/core/commit/660955b692ef7516ecc70ae937ca7707049deb85) fix(symfony): show documentation as entrypoint when requesting html (#5836)
+* [7ebff2702](https://github.com/api-platform/core/commit/7ebff270275bfd2f3283ba42d3ddb28699292b53) fix: errors without compatibility flag (#5841)
+* [828e42997](https://github.com/api-platform/core/commit/828e4299762cae94f99f4d807eca4e61367a36a5) fix: Mercure assertions to public to allow Mercure Hub reset (#5834)
+* [bd62ddf6f](https://github.com/api-platform/core/commit/bd62ddf6fa743466b4e323dfc9eac2b7b787579b) fix(jsonschema): allow embed resources
+
+### Features
+
+* [2141b0118](https://github.com/api-platform/core/commit/2141b01189a25b8a242a6878bcafb3be276f8a41) feat: deprecate not setting formats manually (#5808)
+* [231eba328](https://github.com/api-platform/core/commit/231eba32888e239510aff77a4233f81ab53c4355) Revert "feat(elasticsearch): filtering on nested fields (#5820)" (#5825)
+* [3fa0176a3](https://github.com/api-platform/core/commit/3fa0176a34a7cbc24a612b69404dc8c6be82f8a6) feat(metadata): add canonical_uri_template (#5832)
+* [b9cf49969](https://github.com/api-platform/core/commit/b9cf49969e4207ca6044338d992eb8ff97f5740e) feat(openapi): update Swagger UI to v5.6.2 (#5807)
+* [d85884d53](https://github.com/api-platform/core/commit/d85884d53bda3f0bfc60435f5b0e69e7522d70c8) feat(elasticsearch): filtering on nested fields (#5820)
+* [e65d2c35a](https://github.com/api-platform/core/commit/e65d2c35a983813de55104ebd12c49bdfeb8cdc5) feat(serializer): add ApiProperty::uriTemplate option (#5675)
+
 ## v3.2.0-alpha.2
 
 ### Bug fixes
