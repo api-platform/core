@@ -540,9 +540,35 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             try {
                 return $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
-                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
+                if (!isset($context['not_normalizable_value_exceptions'])) {
+                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
+                }
+                $context['not_normalizable_value_exceptions'][] = NotNormalizableValueException::createForUnexpectedDataType(
+                    $e->getMessage(),
+                    $value,
+                    [$className],
+                    $context['deserialization_path'] ?? null,
+                    true,
+                    $e->getCode(),
+                    $e
+                );
+
+                return null;
             } catch (InvalidArgumentException $e) {
-                throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
+                if (!isset($context['not_normalizable_value_exceptions'])) {
+                    throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
+                }
+                $context['not_normalizable_value_exceptions'][] = NotNormalizableValueException::createForUnexpectedDataType(
+                    $e->getMessage(),
+                    $value,
+                    [$className],
+                    $context['deserialization_path'] ?? null,
+                    true,
+                    $e->getCode(),
+                    $e
+                );
+
+                return null;
             }
         }
 
@@ -562,10 +588,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!\is_array($value)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute must be "array" (nested document) or "string" (IRI), "%s" given.', $attributeName, \gettype($value)), $value, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null);
+            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute must be "array" (nested document) or "string" (IRI), "%s" given.', $attributeName, \gettype($value)), $value, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         }
 
-        throw new UnexpectedValueException(sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName));
+        throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName), $value, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
     }
 
     /**
