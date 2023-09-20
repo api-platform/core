@@ -40,6 +40,8 @@ class FieldDatatypeTraitTest extends TestCase
     {
         $fieldDatatype = $this->getValidFieldDatatype();
 
+        self::assertSame('foo.foo.bar', $fieldDatatype->getNestedFieldPath(Foo::class, 'foo.foo.bar.baz'));
+        self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.foo.baz'));
         self::assertSame('foo.bar', $fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar.foo.baz'));
         self::assertSame('bar', $fieldDatatype->getNestedFieldPath(Foo::class, 'bar.foo'));
         self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'baz'));
