@@ -195,7 +195,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             }
 
             $className = $valueType?->getClassName();
-            if (null === $className || !$this->isResourceClass($className)) {
+            if (null === $className) {
                 continue;
             }
 
