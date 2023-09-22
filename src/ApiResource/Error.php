@@ -41,7 +41,8 @@ use Symfony\Component\WebLink\Link;
             links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')]
         ),
         new Operation(name: '_api_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]),
-    ]
+    ],
+    graphQlOperations: []
 )]
 class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface
 {
