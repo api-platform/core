@@ -464,6 +464,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (null !== $this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
                 'object' => $object,
+                'property' => $attribute,
             ]);
         }
 
@@ -482,6 +483,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
                 'object' => $object,
                 'previous_object' => $previousObject,
+                'property' => $attribute,
             ]);
         }
 

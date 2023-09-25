@@ -326,6 +326,11 @@ services:
         arguments:
             $router: '@router'
 
+    app.security.voter.secured_dummy_attribute_based:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Security\SecuredDummyAttributeBasedVoter'
+        tags:
+            - { name: 'security.voter' }
+
     ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager:
         decorates: 'doctrine.orm.default_entity_manager'
         arguments:
