@@ -27,6 +27,11 @@ interface SearchFilterInterface
     public const STRATEGY_EXACT = 'exact';
 
     /**
+     * @var string Exact matching case-insensitive
+     */
+    public const STRATEGY_IEXACT = 'iexact';
+
+    /**
      * @var string The value must be contained in the field
      */
     public const STRATEGY_PARTIAL = 'partial';
