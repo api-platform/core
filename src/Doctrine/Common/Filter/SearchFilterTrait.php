@@ -66,7 +66,7 @@ trait SearchFilterTrait
                 $strategy = $this->getProperties()[$property] ?? self::STRATEGY_EXACT;
                 $filterParameterNames = [$propertyName];
 
-                if (self::STRATEGY_EXACT === $strategy || self::STRATEGY_IEXACT === $strategy) {
+                if (\in_array($strategy, [self::STRATEGY_EXACT, self::STRATEGY_IEXACT], true)) {
                     $filterParameterNames[] = $propertyName.'[]';
                 }
 
