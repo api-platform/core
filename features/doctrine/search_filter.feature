@@ -76,7 +76,7 @@ Feature: Search filter on collections
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummy_cars{?availableAt[before],availableAt[strictly_before],availableAt[after],availableAt[strictly_after],canSell,foobar[],foobargroups[],foobargroups_override[],colors.prop,colors,colors[],secondColors,secondColors[],thirdColors,thirdColors[],uuid,uuid[],name}",
+        "hydra:template": "/dummy_cars{?availableAt[before],availableAt[strictly_before],availableAt[after],availableAt[strictly_after],canSell,foobar[],foobargroups[],foobargroups_override[],colors.prop,colors,colors[],secondColors,secondColors[],thirdColors,thirdColors[],uuid,uuid[],name,brand,brand[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -185,6 +185,18 @@ Feature: Search filter on collections
             "@type": "IriTemplateMapping",
             "variable": "name",
             "property": "name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "brand",
+            "property": "brand",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "brand[]",
+            "property": "brand",
             "required": false
           }
         ]
