@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -30,6 +31,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyMercure;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyOffer;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MercureWithTopicsAndGetOperation;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
@@ -167,6 +169,123 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertEquals(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4', 'http://example.com/custom_topics/1'], $topics);
         $this->assertEquals([false, false, false, false, false, true, false], $private);
         $this->assertEquals([null, null, null, null, null, 10, null], $retry);
+    }
+
+    public function testPublishUpdateMultipleTopicsUsingExpressionLanguage(): void
+    {
+        $mercure = [
+            'topics' => [
+                '@=iri(object)',
+                '@=iri(object, '.UrlGeneratorInterface::ABS_PATH.')',
+                '@=iri(object, '.UrlGeneratorInterface::ABS_URL.', getOperation(object, "/custom_resource/mercure_with_topics_and_get_operations/{id}{._format}"))',
+            ],
+        ];
+
+        $toInsert = new MercureWithTopicsAndGetOperation();
+        $toInsert->id = 1;
+        $toInsert->name = 'Hello World!';
+
+        $toUpdate = new MercureWithTopicsAndGetOperation();
+        $toUpdate->id = 2;
+        $toUpdate->name = 'Hello World!';
+
+        $toDelete = new MercureWithTopicsAndGetOperation();
+        $toDelete->id = 3;
+        $toDelete->name = 'Hello World!';
+
+        // Even if it's the Post operation which sends Updates to Mercure,
+        // the `mercure` configuration is retrieved from the first operation
+        // of the resource because the Doctrine Listener doesn't have a
+        // reference to the operation.
+        $getOperation = (new Get())->withMercure($mercure)->withShortName('MercureWithTopicsAndGetOperation');
+        $customGetOperation = (new Get(uriTemplate: '/custom_resource/mercure_with_topics_and_get_operations/{id}{._format}'));
+        $postOperation = (new Post());
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(MercureWithTopicsAndGetOperation::class))->willReturn(MercureWithTopicsAndGetOperation::class);
+        $resourceClassResolverProphecy->isResourceClass(MercureWithTopicsAndGetOperation::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $iriConverterProphecy->getIriFromResource($toInsert, UrlGeneratorInterface::ABS_URL, null)->willReturn('http://example.com/mercure_with_topics_and_get_operations/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toInsert, UrlGeneratorInterface::ABS_PATH, null)->willReturn('/mercure_with_topics_and_get_operations/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toInsert, UrlGeneratorInterface::ABS_URL, Argument::exact($customGetOperation))->willReturn('http://example.com/custom_resource/mercure_with_topics_and_get_operations/1')->shouldBeCalled();
+
+        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL, null)->willReturn('http://example.com/mercure_with_topics_and_get_operations/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_PATH, null)->willReturn('/mercure_with_topics_and_get_operations/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL, Argument::exact($customGetOperation))->willReturn('http://example.com/custom_resource/mercure_with_topics_and_get_operations/2')->shouldBeCalled();
+
+        $iriConverterProphecy->getIriFromResource($toDelete)->willReturn('/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, null)->willReturn('http://example.com/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, null)->willReturn('/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::exact($customGetOperation))->willReturn('http://example.com/custom_resource/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+
+        $resourceMetadataFactoryProphecy->create(MercureWithTopicsAndGetOperation::class)->willReturn(new ResourceMetadataCollection(MercureWithTopicsAndGetOperation::class, [
+            (new ApiResource())->withOperations(new Operations([
+                'get' => $getOperation,
+                'custom_get' => $customGetOperation,
+                'post' => $postOperation,
+            ])),
+        ]))->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toInsert, 'jsonld', [])->willReturn('{"@type":"MercureWithTopicsAndGetOperation","@id":"/mercure_with_topics_and_get_operations/1","id":1,"name":"Hello World!"}')->shouldBeCalled();
+        $serializerProphecy->serialize($toUpdate, 'jsonld', [])->willReturn('{"@type":"MercureWithTopicsAndGetOperation","@id":"/mercure_with_topics_and_get_operations/2","id":2,"name":"Hello World!"}')->shouldBeCalled();
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            null,
+            null,
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals([
+            '{"@type":"MercureWithTopicsAndGetOperation","@id":"/mercure_with_topics_and_get_operations/1","id":1,"name":"Hello World!"}',
+            '{"@type":"MercureWithTopicsAndGetOperation","@id":"/mercure_with_topics_and_get_operations/2","id":2,"name":"Hello World!"}',
+            '{"@id":"\/mercure_with_topics_and_get_operations\/3","@type":"MercureWithTopicsAndGetOperation"}',
+        ], $data);
+        $this->assertEquals([
+            'http://example.com/mercure_with_topics_and_get_operations/1', '/mercure_with_topics_and_get_operations/1', 'http://example.com/custom_resource/mercure_with_topics_and_get_operations/1',
+            'http://example.com/mercure_with_topics_and_get_operations/2', '/mercure_with_topics_and_get_operations/2', 'http://example.com/custom_resource/mercure_with_topics_and_get_operations/2',
+            'http://example.com/mercure_with_topics_and_get_operations/3', '/mercure_with_topics_and_get_operations/3', 'http://example.com/custom_resource/mercure_with_topics_and_get_operations/3',
+        ], $topics);
     }
 
     public function testPublishGraphQlUpdates(): void
