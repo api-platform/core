@@ -92,39 +92,10 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
      */
     private function update(ApiProperty $propertyMetadata, array $metadata): ApiProperty
     {
-        $metadataAccessors = [
-            'description' => 'get',
-            'readable' => 'is',
-            'writable' => 'is',
-            'writableLink' => 'is',
-            'readableLink' => 'is',
-            'required' => 'is',
-            'identifier' => 'is',
-            'default' => 'get',
-            'example' => 'get',
-            'deprecationReason' => 'get',
-            'fetchable' => 'is',
-            'fetchEager' => 'get',
-            'jsonldContext' => 'get',
-            'openapiContext' => 'get',
-            'jsonSchemaContext' => 'get',
-            'push' => 'get',
-            'security' => 'get',
-            'securityPostDenormalize' => 'get',
-            'types' => 'get',
-            'builtinTypes' => 'get',
-            'schema' => 'get',
-            'initializable' => 'is',
-            'genId' => 'get',
-            'extraProperties' => 'get',
-        ];
-
-        foreach ($metadataAccessors as $metadataKey => $accessorPrefix) {
-            if (null === $metadata[$metadataKey]) {
-                continue;
+        foreach (get_class_methods(ApiProperty::class) as $method) {
+            if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches) && null !== $val = $metadata[lcfirst($matches[1])]) {
+                $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
             }
-
-            $propertyMetadata = $propertyMetadata->{'with'.ucfirst($metadataKey)}($metadata[$metadataKey]);
         }
 
         return $propertyMetadata;
