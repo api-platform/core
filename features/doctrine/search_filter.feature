@@ -1045,10 +1045,21 @@ Feature: Search filter on collections
 
   @!mongodb
   @createSchema
-  Scenario: Filters can use UUIDs
+  Scenario: Filters can use UUID based IRIs
     Given there is a group object with uuid "61817181-0ecc-42fb-a6e7-d97f2ddcb344" and 2 users
     And there is a group object with uuid "32510d53-f737-4e70-8d9d-58e292c871f8" and 1 users
     When I send a "GET" request to "/issue5735/issue5735_users?groups[]=/issue5735/groups/61817181-0ecc-42fb-a6e7-d97f2ddcb344&groups[]=/issue5735/groups/32510d53-f737-4e70-8d9d-58e292c871f8"
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON node "hydra:totalItems" should be equal to 3
+
+  @!mongodb
+  @createSchema
+  Scenario: Filters can use UUID directly
+    Given there is a group object with uuid "61817181-0ecc-42fb-a6e7-d97f2ddcb344" and 2 users
+    And there is a group object with uuid "32510d53-f737-4e70-8d9d-58e292c871f8" and 1 users
+    When I send a "GET" request to "/issue5735/issue5735_users?groups[]=61817181-0ecc-42fb-a6e7-d97f2ddcb344&groups[]=32510d53-f737-4e70-8d9d-58e292c871f8"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "hydra:totalItems" should be equal to 3
+
