@@ -1,0 +1,126 @@
+{
+    "name": "api-platform/laravel",
+    "description": "API Platform support for Laravel",
+    "keywords": [
+        "todo"
+    ],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        },
+        {
+            "name": "API Platform Community",
+            "homepage": "https://api-platform.com/community/contributors"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "api-platform/documentation": "*@dev || ^3.1",
+        "api-platform/hydra": "*@dev || ^3.1",
+        "api-platform/json-schema": "*@dev || ^3.1",
+        "api-platform/jsonld": "*@dev || ^3.1",
+        "api-platform/metadata": "*@dev || ^3.1",
+        "api-platform/openapi": "*@dev || ^3.1",
+        "api-platform/serializer": "*@dev || ^3.1",
+        "api-platform/state": "*@dev || ^3.1",
+        "illuminate/config": "^11.0",
+        "laravel/framework": "^11.0",
+        "illuminate/contracts": "^11.0",
+        "illuminate/database": "^11.0",
+        "illuminate/http": "^11.0",
+        "illuminate/pagination": "^11.0",
+        "illuminate/routing": "^11.0",
+        "illuminate/support": "^11.0",
+        "illuminate/container": "^11.0",
+        "symfony/web-link": "^6.3",
+        "willdurand/negotiation": "^3.1"
+    },
+    "require-dev": {
+        "doctrine/dbal": "^3.7",
+        "larastan/larastan": "^2.0",
+        "orchestra/testbench": "^9.12",
+        "phpunit/phpunit": "^10"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\Laravel\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "suggest": {
+        "phpdocumentor/reflection-docblock": ""
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ApiPlatform\\Laravel\\ApiPlatformProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Metadata"
+        },
+        {
+            "type": "path",
+            "url": "../State"
+        },
+        {
+            "type": "path",
+            "url": "../Serializer"
+        },
+        {
+            "type": "path",
+            "url": "../Hydra"
+        },
+        {
+            "type": "path",
+            "url": "../JsonLd"
+        },
+        {
+            "type": "path",
+            "url": "../Documentation"
+        },
+        {
+            "type": "path",
+            "url": "../OpenApi"
+        },
+        {
+            "type": "path",
+            "url": "../JsonSchema"
+        }
+    ],
+    "autoload-dev": {
+        "psr-4": {
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "test": "@php vendor/bin/testbench package:test",
+        "serve": [
+            "@build",
+            "@php vendor/bin/testbench serve"
+        ]
+    }
+}

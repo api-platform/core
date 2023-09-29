@@ -52,6 +52,15 @@
         "friends-of-behat/mink-extension": "^2.2",
         "friends-of-behat/symfony-extension": "^2.1",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
+        "illuminate/config": "^10.0||^11.0",
+        "illuminate/container": "^10.0||^11.0",
+        "illuminate/contracts": "^10.0||^11.0",
+        "illuminate/database": "^10.0||^11.0",
+        "illuminate/http": "^10.0||^11.0",
+        "illuminate/pagination": "^10.0||^11.0",
+        "illuminate/routing": "^10.0||^11.0",
+        "illuminate/support": "^10.0||^11.0",
+        "laravel/framework": "^10.0||^11.0",
         "jangregor/phpstan-prophecy": "^1.0",
         "justinrainbow/json-schema": "^5.2.1",
         "phpspec/prophecy-phpunit": "^2.0",
@@ -181,7 +190,8 @@
             "api-platform/serializer",
             "api-platform/state",
             "api-platform/symfony",
-            "api-platform/validator"
+            "api-platform/validator",
+            "api-platform/laravel"
         ]
     },
     "repositories": [
@@ -202,6 +212,7 @@
       {"type": "path", "url": "./src/Serializer"},
       {"type": "path", "url": "./src/State"},
       {"type": "path", "url": "./src/Symfony"},
-      {"type": "path", "url": "./src/Validator"}
+      {"type": "path", "url": "./src/Validator"},
+      {"type": "path", "url": "./src/Laravel"}
     ]
 }

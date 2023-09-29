@@ -177,6 +177,11 @@ jobs:
         run: |
           ./vendor/bin/phpstan --version
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
+      - name: Run PHPStan analysis (laravel)
+        working-directory: 'src/Laravel'
+        run: |
+          composer update
+          ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -1333,3 +1338,38 @@ jobs:
           name: openapi-docs-php${{ matrix.php }}
           path: build/out/openapi
         continue-on-error: true
+
+  laravel:
+    name: Laravel (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.2'
+          - '8.3'
+        include:
+          - php: '8.2'
+            coverage: true
+          - php: '8.3'
+            coverage: true
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          ini-values: memory_limit=-1
+      - name: Run ${{ matrix.component }} install
+        run: |
+          composer update
+          composer api-platform/laravel update
+      - name: PHP version tweaks
+        run: |
+          composer run-script build
+          composer run-script test
+        working-directory: 'src/Laravel'
