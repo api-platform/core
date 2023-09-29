@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -34,6 +35,9 @@ class BagOfTests
 
     #[ORM\Column(length: 255)]
     #[Groups(['read', 'write'])]
+    // ignore "type" schema property to ensure "schema" is properly overridden
+    // see JsonSchemaGenerateCommandTest::testArraySchemaWithReference
+    #[ApiProperty(schema: ['maxLength' => 255])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'bagOfTests', targetEntity: TestEntity::class)]

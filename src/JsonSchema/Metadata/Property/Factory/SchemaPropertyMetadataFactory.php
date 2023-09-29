@@ -31,6 +31,8 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 {
     use ResourceClassInfoTrait;
 
+    public const JSON_SCHEMA_USER_DEFINED = 'user_defined_schema';
+
     public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly ?PropertyMetadataFactoryInterface $decorated = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
@@ -46,6 +48,13 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             } catch (PropertyNotFoundException) {
                 $propertyMetadata = new ApiProperty();
             }
+        }
+
+        $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+        // see AttributePropertyMetadataFactory
+        if (true === ($extraProperties[self::JSON_SCHEMA_USER_DEFINED] ?? false)) {
+            // schema seems to have been declared by the user: do not override nor complete user value
+            return $propertyMetadata;
         }
 
         $link = (($options['schema_type'] ?? null) === Schema::TYPE_INPUT) ? $propertyMetadata->isWritableLink() : $propertyMetadata->isReadableLink();

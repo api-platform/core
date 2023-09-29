@@ -382,7 +382,10 @@ class YamlExtractorTest extends TestCase
                             'order' => null,
                             'paginationViaCursor' => null,
                             'exceptionToStatus' => null,
-                            'extraProperties' => null,
+                            'extraProperties' => [
+                                'foo' => 'bar',
+                                'boolean' => true,
+                            ],
                             'read' => null,
                             'deserialize' => null,
                             'validate' => null,

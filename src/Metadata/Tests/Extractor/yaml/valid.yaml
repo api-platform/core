@@ -18,6 +18,9 @@ resources:
                     uriVariables:
                         userId: [ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User, 'author']
                         id: 'id'
+                    extraProperties:
+                        foo: 'bar'
+                        boolean: true
 
     ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SingleFileConfigDummy:
         shortName: single_file_config

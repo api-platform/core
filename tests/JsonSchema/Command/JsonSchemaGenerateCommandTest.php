@@ -116,5 +116,9 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
                 '$ref' => '#/definitions/NonResourceTestEntity.jsonld-write',
             ],
         ]);
+
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['description'], [
+            'maxLength' => 255,
+        ]);
     }
 }
