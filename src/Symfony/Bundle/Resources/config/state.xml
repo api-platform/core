@@ -27,7 +27,7 @@
             <argument type="service" id="api_platform.serializer.context_builder" />
         </service>
 
-        <service id="api_platform.state_provider.deserialize" class="ApiPlatform\Symfony\State\DeserializeProvider" decorates="api_platform.state_provider.main" decoration-priority="300">
+        <service id="api_platform.state_provider.deserialize" class="ApiPlatform\State\Provider\DeserializeProvider" decorates="api_platform.state_provider.main" decoration-priority="300">
             <argument type="service" id="api_platform.state_provider.deserialize.inner" />
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
@@ -45,7 +45,7 @@
             <argument type="service" id="api_platform.state_processor.add_link_header.inner" />
         </service>
 
-        <service id="api_platform.state_processor.serialize" class="ApiPlatform\Symfony\State\SerializeProcessor" decorates="api_platform.state_processor.main" decoration-priority="200">
+        <service id="api_platform.state_processor.serialize" class="ApiPlatform\State\Processor\SerializeProcessor" decorates="api_platform.state_processor.main" decoration-priority="200">
             <argument type="service" id="api_platform.state_processor.serialize.inner" />
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />

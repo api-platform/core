@@ -10,7 +10,7 @@
         <service id="api_platform.property_info" alias="property_info" public="false" />
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
 
-        <service id="api_platform.resource_class_resolver" class="ApiPlatform\Api\ResourceClassResolver" public="false">
+        <service id="api_platform.resource_class_resolver" class="ApiPlatform\Metadata\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
         <service id="ApiPlatform\Api\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
@@ -149,7 +149,7 @@
         </service>
 
         <!-- Identifiers -->
-        <service id="api_platform.api.identifiers_extractor" class="ApiPlatform\Api\IdentifiersExtractor" public="false">
+        <service id="api_platform.api.identifiers_extractor" class="ApiPlatform\Metadata\IdentifiersExtractor" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />

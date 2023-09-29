@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface as LegacyUrlGeneratorInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -27,7 +28,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     public const FORMAT = 'jsonld';
 
     // @phpstan-ignore-next-line prevent BC break (can't remove this useless argument)
-    public function __construct(private readonly ?UrlGeneratorInterface $urlGenerator = null, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly null|LegacyUrlGeneratorInterface|UrlGeneratorInterface $urlGenerator = null, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
     {
         parent::__construct($serializePayloadFields, $nameConverter);
     }

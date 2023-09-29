@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface as LegacyUrlGeneratorInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -22,6 +23,8 @@ use Symfony\Component\Serializer\Serializer;
 
 /**
  * Converts {@see \Exception} or {@see FlattenException} to a Hydra error representation.
+ *
+ * @deprecated
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
@@ -34,7 +37,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     public const TITLE = 'title';
     private array $defaultContext = [self::TITLE => 'An error occurred'];
 
-    public function __construct(private readonly UrlGeneratorInterface $urlGenerator, private readonly bool $debug = false, array $defaultContext = [])
+    public function __construct(private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator, private readonly bool $debug = false, array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }

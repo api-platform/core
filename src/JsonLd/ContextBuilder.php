@@ -101,7 +101,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             $referenceType = $resourceMetadata->getUrlGenerationStrategy();
         }
 
-        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], $referenceType);
+        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], $referenceType ?? UrlGeneratorInterface::ABS_PATH);
     }
 
     /**

@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Routing;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Api\UriVariablesConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
+use ApiPlatform\Api\UriVariablesConverterInterface as LegacyUriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\ItemNotFoundException;
@@ -27,9 +25,14 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UriVariablesConverterInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\AttributesExtractor;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
@@ -52,7 +55,7 @@ final class IriConverter implements IriConverterInterface
     private $localOperationCache = [];
     private $localIdentifiersExtractorOperationCache = [];
 
-    public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
+    public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface|LegacyUriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->uriVariablesConverter = $uriVariablesConverter;

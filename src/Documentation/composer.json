@@ -1,0 +1,26 @@
+{
+    "name": "api-platform/documentation",
+    "description": "API Platform documentation controller.",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\Documentation\\": ""
+       }
+    },
+    "authors": [
+		{
+		  "name": "Kévin Dunglas",
+		  "email": "kevin@dunglas.fr",
+		  "homepage": "https://dunglas.fr"
+		},
+		{
+		  "name": "API Platform Community",
+		  "homepage": "https://api-platform.com/community/contributors"
+		}
+    ],
+    "require": {
+        "api-platform/openapi": "*@dev || ^3.1",
+        "api-platform/metadata": "*@dev || ^3.1"
+    }
+}
