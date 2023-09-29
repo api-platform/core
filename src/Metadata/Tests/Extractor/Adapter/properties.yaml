@@ -34,6 +34,7 @@ properties:
             initializable: true
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
+                user_defined_schema: true
             iris:
                 - 'https://schema.org/totalPrice'
             genId: true

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests\Extractor;
 
+use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Extractor\XmlPropertyExtractor;
 use ApiPlatform\Metadata\Extractor\YamlPropertyExtractor;
@@ -69,6 +70,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'initializable' => true,
         'extraProperties' => [
             'custom_property' => 'Lorem ipsum dolor sit amet',
+            SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED => true,
         ],
         'iris' => ['https://schema.org/totalPrice'],
         'genId' => true,

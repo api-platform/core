@@ -358,6 +358,7 @@ class XmlExtractorTest extends TestCase
                             ],
                             'extraProperties' => [
                                 'foo' => 'bar',
+                                'boolean' => true,
                             ],
                             'read' => null,
                             'deserialize' => null,

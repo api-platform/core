@@ -105,6 +105,7 @@
                 <extraProperties>
                     <values>
                         <value name="foo">bar</value>
+                        <value name="boolean">true</value>
                     </values>
                 </extraProperties>
             </operation>
