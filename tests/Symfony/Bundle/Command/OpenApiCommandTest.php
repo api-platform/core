@@ -99,7 +99,9 @@ YAML;
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
 
         $expected = <<<YAML
-ve
+      security:
+        JWT:
+          '0': CURRENCY_READ
 YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
