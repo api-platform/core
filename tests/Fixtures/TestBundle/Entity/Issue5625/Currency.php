@@ -23,11 +23,6 @@ use ApiPlatform\OpenApi\Model\Operation;
 #[ApiResource(operations: [new Get(openapi: new Operation(security: ['JWT' => ['CURRENCY_READ']]))])]
 class Currency
 {
-    private $id;
+    public $id;
     public $name;
-
-    public function getId()
-    {
-        return $this->id;
-    }
 }
