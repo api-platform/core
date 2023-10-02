@@ -29,6 +29,7 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     public const JSON_FORMAT = 'jsonopenapi';
     public const YAML_FORMAT = 'yamlopenapi';
     private const EXTENSION_PROPERTIES_KEY = 'extensionProperties';
+    private const SECURITY_KEY = 'security';
 
     public function __construct(private readonly NormalizerInterface $decorated)
     {
@@ -55,6 +56,13 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
             if (self::EXTENSION_PROPERTIES_KEY === $key) {
                 foreach ($data[self::EXTENSION_PROPERTIES_KEY] as $extensionPropertyKey => $extensionPropertyValue) {
                     $data[$extensionPropertyKey] = $extensionPropertyValue;
+                }
+                continue;
+            }
+
+            if (self::SECURITY_KEY === $key && \is_array($value)) {
+                foreach ($data[self::SECURITY_KEY] as $securityKey => $securityValue) {
+                    $data[self::SECURITY_KEY][$securityKey] = (object) $securityValue;
                 }
                 continue;
             }
