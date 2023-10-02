@@ -59,7 +59,6 @@ class OpenApiCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
 
         $result = $this->tester->getDisplay();
-
         $this->assertYaml($result);
         $operationId = 'api_dummy_cars_get_collection';
 
@@ -117,7 +116,6 @@ YAML;
         $this->tester->run(['command' => 'api:openapi:export', '--output' => $tmpFile]);
 
         $this->assertJson((string) @file_get_contents($tmpFile));
-
         @unlink($tmpFile);
     }
 
