@@ -133,6 +133,8 @@ final class ApiLoader extends Loader
 
         if ($this->docsEnabled) {
             $routeCollection->addCollection($this->fileLoader->load('docs.xml'));
+        } else {
+            $routeCollection->addCollection($this->fileLoader->load('docs_jsonld.xml'));
         }
 
         if ($this->graphqlEnabled) {
