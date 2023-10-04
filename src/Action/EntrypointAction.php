@@ -45,6 +45,10 @@ final class EntrypointAction
             $context = ['request' => $request];
             $operation = new Get(outputFormats: $this->documentationFormats, read: true, serialize: true, class: Entrypoint::class, provider: fn () => new Entrypoint($this->resourceNameCollectionFactory->create()));
             $body = $this->provider->provide($operation, [], $context);
+            // see https://github.com/api-platform/core/issues/5845#issuecomment-1732400657
+            if ($request && ($apiOperation = $request->attributes->get('_api_operation'))) {
+                $operation = $apiOperation;
+            }
 
             return $this->processor->process($body, $operation, [], $context);
         }
