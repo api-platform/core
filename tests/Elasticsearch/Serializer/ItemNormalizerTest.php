@@ -83,6 +83,13 @@ final class ItemNormalizerTest extends TestCase
         self::assertSame(['foo'], $this->itemNormalizer->normalize($object, 'json', ['groups' => 'foo']));
     }
 
+    public function testNormalizeToString(): void
+    {
+        $this->normalizerProphecy->normalize($object = (object) ['foo'], 'json', ['groups' => 'foo'])->willReturn('/foo/iri')->shouldBeCalledOnce();
+
+        self::assertSame('/foo/iri', $this->itemNormalizer->normalize($object, 'json', ['groups' => 'foo']));
+    }
+
     public function testSupportsNormalization(): void
     {
         $this->normalizerProphecy->supportsNormalization($object = (object) ['foo'], 'json')->willReturn(true)->shouldBeCalledOnce();

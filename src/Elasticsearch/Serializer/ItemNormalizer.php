@@ -84,7 +84,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         return $this->decorated->normalize($object, $format, $context);
     }
