@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 /**
  * @author Brian Fox <brian@brianfox.fr>
  */
-#[ApiResource(normalizationContext: ['groups' => ['default'], 'enable_max_depth' => true], denormalizationContext: ['groups' => ['default'], 'enable_max_depth' => true])]
+#[ApiResource(normalizationContext: ['groups' => ['default'], 'enable_max_depth' => true], denormalizationContext: ['groups' => ['default'], 'enable_max_depth' => true], graphQlOperations: [])]
 #[ORM\Entity]
 class MaxDepthDummy
 {

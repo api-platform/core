@@ -31,7 +31,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
         new Get(uriTemplate: '/dummy_exception_to_statuses/{id}', exceptionToStatus: [NotFoundException::class => 404]),
         new Put(uriTemplate: '/dummy_exception_to_statuses/{id}'),
         new GetCollection(uriTemplate: '/dummy_exception_to_statuses'),
-    ]
+    ],
+    graphQlOperations: []
 )]
 #[ApiFilter(RequiredFilter::class)]
 #[ORM\Entity]

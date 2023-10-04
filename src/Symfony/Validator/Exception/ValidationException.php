@@ -47,7 +47,8 @@ use Symfony\Component\WebLink\Link;
             ]
         ),
         new ErrorOperation(name: '_api_validation_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]),
-    ]
+    ],
+    graphQlOperations: []
 )]
 final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface
 {

@@ -30,7 +30,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Julien Deniau <julien.deniau@gmail.com>
  */
-#[ApiResource(filters: [ArrayItemsFilter::class, BoundsFilter::class, EnumFilter::class, LengthFilter::class, MultipleOfFilter::class, PatternFilter::class, RequiredFilter::class, RequiredAllowEmptyFilter::class])]
+#[ApiResource(filters: [ArrayItemsFilter::class, BoundsFilter::class, EnumFilter::class, LengthFilter::class, MultipleOfFilter::class, PatternFilter::class, RequiredFilter::class, RequiredAllowEmptyFilter::class], graphQlOperations: [])]
 #[ORM\Entity]
 class FilterValidator
 {
