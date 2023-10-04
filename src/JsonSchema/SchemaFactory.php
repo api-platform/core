@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
+use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
@@ -157,6 +158,15 @@ final class SchemaFactory implements SchemaFactoryInterface
             $propertyMetadata->getSchema() ?? [],
             $additionalPropertySchema ?? []
         );
+
+        $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+        // see AttributePropertyMetadataFactory
+        if (true === ($extraProperties[SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED] ?? false)) {
+            // schema seems to have been declared by the user: do not override nor complete user value
+            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
+
+            return;
+        }
 
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
 

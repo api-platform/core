@@ -104,10 +104,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $json = json_decode($result, associative: true);
 
         $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['tests'], [
-            'type' => 'array',
-            'items' => [
-                '$ref' => '#/definitions/TestEntity.jsonld-write',
-            ],
+            'type' => 'string',
+            'foo' => 'bar',
         ]);
 
         $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['nonResourceTests'], [
