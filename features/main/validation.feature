@@ -73,6 +73,39 @@ Feature: Using validations groups
     """
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
+  @createSchema
+  Scenario: Create a resource with serializedName property
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "dummy_validation_serialized_name" with body:
+    """
+    {
+      "code": "My Dummy"
+    }
+    """
+    Then the response status code should be 422
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+      {
+        "@id": "/validation_errors/ad32d13f-c3d4-423b-909a-857b961eb720",
+        "@type": "ConstraintViolationList",
+        "status": 422,
+        "violations": [
+          {
+            "propertyPath": "test",
+            "message": "This value should not be null.",
+            "code": "ad32d13f-c3d4-423b-909a-857b961eb720"
+          }
+        ],
+        "hydra:title": "An error occurred",
+        "hydra:description": "title: This value should not be null.",
+        "type": "/validation_errors/ad32d13f-c3d4-423b-909a-857b961eb720",
+        "title": "An error occurred",
+        "detail": "title: This value should not be null."
+      }
+    """
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+
   @!mongodb
   @createSchema
   Scenario: Create a resource with collectDenormalizationErrors
