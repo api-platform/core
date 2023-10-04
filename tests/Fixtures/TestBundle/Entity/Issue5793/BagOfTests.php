@@ -42,6 +42,7 @@ class BagOfTests
 
     #[ORM\OneToMany(mappedBy: 'bagOfTests', targetEntity: TestEntity::class)]
     #[Groups(['read', 'write'])]
+    #[ApiProperty(schema: ['type' => 'string'], jsonSchemaContext: ['foo' => 'bar'])]
     private Collection $tests;
 
     #[ORM\OneToMany(mappedBy: 'bagOfTests', targetEntity: NonResourceTestEntity::class)]
