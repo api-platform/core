@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common\Filter;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
+use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -30,9 +32,9 @@ trait SearchFilterTrait
 {
     use PropertyHelperTrait;
 
-    protected IriConverterInterface $iriConverter;
+    protected IriConverterInterface|LegacyIriConverterInterface $iriConverter;
     protected PropertyAccessorInterface $propertyAccessor;
-    protected ?IdentifiersExtractorInterface $identifiersExtractor = null;
+    protected null|IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface $identifiersExtractor = null;
 
     /**
      * {@inheritdoc}

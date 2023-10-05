@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Hal\Serializer;
 use ApiPlatform\Api\Entrypoint;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Documentation\Entrypoint as DocumentationEntrypoint;
 use ApiPlatform\Hal\Serializer\EntrypointNormalizer;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -54,7 +55,7 @@ class EntrypointNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), EntrypointNormalizer::FORMAT));
 
         $this->assertEmpty($normalizer->getSupportedTypes('json'));
-        $this->assertSame([Entrypoint::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+        $this->assertSame([Entrypoint::class => true, DocumentationEntrypoint::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());

@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Metadata\Resource;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\PropertyLinkFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -27,7 +28,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class DoctrineOrmLinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInterface
 {
-    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly LinkFactoryInterface&PropertyLinkFactoryInterface $linkFactory)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, private readonly LinkFactoryInterface&PropertyLinkFactoryInterface $linkFactory)
     {
     }
 

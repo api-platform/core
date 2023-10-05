@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Action;
 
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -54,7 +54,7 @@ final class ContextAction
      *
      * @return array{'@context': array<string, mixed>}|Response
      */
-    public function __invoke(string $shortName, Request $request = null): array|Response
+    public function __invoke(string $shortName = 'Entrypoint', Request $request = null): array|Response
     {
         if (null !== $request && $this->provider && $this->processor && $this->serializer) {
             $operation = new Get(

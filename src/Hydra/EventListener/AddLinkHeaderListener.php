@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\EventListener;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface as LegacyUrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\Util\CorsTrait;
 use Psr\Link\EvolvableLinkProviderInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -30,7 +31,7 @@ final class AddLinkHeaderListener
 {
     use CorsTrait;
 
-    public function __construct(private readonly UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator)
     {
     }
 

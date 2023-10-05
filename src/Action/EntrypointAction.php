@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Generates the API entrypoint.
  *
+ * @deprecated use ApiPlatform\Documentation\Action\EntrypointAction
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class EntrypointAction

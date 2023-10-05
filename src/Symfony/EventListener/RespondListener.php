@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,7 +40,7 @@ final class RespondListener
 
     public function __construct(
         ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
-        private readonly ?IriConverterInterface $iriConverter = null,
+        private readonly null|IriConverterInterface|LegacyIriConverterInterface $iriConverter = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }

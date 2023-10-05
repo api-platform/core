@@ -26,11 +26,18 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\WebLink\Link;
 
 #[ErrorResource(
-    uriTemplate: '/errors/{status}',
     types: ['hydra:Error'],
     openapi: false,
     operations: [
-        new Operation(name: '_api_errors_problem', outputFormats: ['json' => ['application/problem+json']], normalizationContext: ['groups' => ['jsonproblem'], 'skip_null_values' => true]),
+        new Operation(
+            name: '_api_errors_problem',
+            outputFormats: ['json' => ['application/problem+json']],
+            normalizationContext: [
+                'groups' => ['jsonproblem'],
+                'skip_null_values' => true,
+            ],
+            uriTemplate: '/errors/{status}'
+        ),
         new Operation(
             name: '_api_errors_hydra',
             outputFormats: ['jsonld' => ['application/problem+json']],
@@ -38,9 +45,15 @@ use Symfony\Component\WebLink\Link;
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
             ],
-            links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')]
+            links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')],
+            uriTemplate: '/hydra_errors/{status}'
         ),
-        new Operation(name: '_api_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]),
+        new Operation(
+            name: '_api_errors_jsonapi',
+            outputFormats: ['jsonapi' => ['application/vnd.api+json']],
+            normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true],
+            uriTemplate: '/jsonapi_errors/{status}'
+        ),
     ],
     graphQlOperations: []
 )]

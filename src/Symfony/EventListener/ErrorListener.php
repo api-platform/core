@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
@@ -36,6 +38,8 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttp
  * This error listener extends the Symfony one in order to add
  * the `_api_operation` attribute when the request is duplicated.
  * It will later be used to retrieve the exceptionToStatus from the operation ({@see ApiPlatform\Action\ExceptionAction}).
+ *
+ * @internal since API Platform 3.2
  */
 final class ErrorListener extends SymfonyErrorListener
 {
@@ -51,8 +55,8 @@ final class ErrorListener extends SymfonyErrorListener
         ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         private readonly array $errorFormats = [],
         private readonly array $exceptionToStatus = [],
-        private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
-        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
+        private readonly null|IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface $identifiersExtractor = null,
+        private readonly null|ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver = null,
         Negotiator $negotiator = null
     ) {
         parent::__construct($controller, $logger, $debug, $exceptionsMapping);
