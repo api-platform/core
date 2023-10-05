@@ -245,28 +245,30 @@ final class PublishMercureUpdatesListener
 
     private function evaluateTopics(array &$options, object $object): void
     {
-        if ($options['topics'] ?? false) {
-            $topics = [];
-            foreach ((array) $options['topics'] as $topic) {
-                if (!\is_string($topic)) {
-                    $topics[] = $topic;
-                    continue;
-                }
+        if (!($options['topics'] ?? false)) {
+            return;
+        }
 
-                if (!str_starts_with($topic, '@=')) {
-                    $topics[] = $topic;
-                    continue;
-                }
-
-                if (null === $this->expressionLanguage) {
-                    throw new \LogicException('The "@=" expression syntax cannot be used without the Expression Language component. Try running "composer require symfony/expression-language".');
-                }
-
-                $topics[] = $this->expressionLanguage->evaluate(substr($topic, 2), ['object' => $object]);
+        $topics = [];
+        foreach ((array) $options['topics'] as $topic) {
+            if (!\is_string($topic)) {
+                $topics[] = $topic;
+                continue;
             }
 
-            $options['topics'] = $topics;
+            if (!str_starts_with($topic, '@=')) {
+                $topics[] = $topic;
+                continue;
+            }
+
+            if (null === $this->expressionLanguage) {
+                throw new \LogicException('The "@=" expression syntax cannot be used without the Expression Language component. Try running "composer require symfony/expression-language".');
+            }
+
+            $topics[] = $this->expressionLanguage->evaluate(substr($topic, 2), ['object' => $object]);
         }
+
+        $options['topics'] = $topics;
     }
 
     /**
