@@ -59,11 +59,6 @@ final class ValidationException extends BaseValidationException implements Const
         parent::__construct($message ?: $this->__toString(), $code, $previous, $errorTitle);
     }
 
-    public function getConstraintViolationList(): ConstraintViolationListInterface
-    {
-        return $this->constraintViolationList;
-    }
-
     public function getId(): string
     {
         $ids = [];
@@ -148,21 +143,8 @@ final class ValidationException extends BaseValidationException implements Const
 
     #[SerializedName('violations')]
     #[Groups(['json', 'jsonld', 'legacy_jsonld', 'legacy_jsonproblem', 'legacy_json'])]
-    public function getViolations(): iterable
+    public function getConstraintViolationList(): ConstraintViolationListInterface
     {
-        foreach ($this->getConstraintViolationList() as $violation) {
-            $propertyPath = $violation->getPropertyPath();
-            $violationData = [
-                'propertyPath' => $propertyPath,
-                'message' => $violation->getMessage(),
-                'code' => $violation->getCode(),
-            ];
-
-            if ($hint = $violation->getParameters()['hint'] ?? false) {
-                $violationData['hint'] = $hint;
-            }
-
-            yield $violationData;
-        }
+        return $this->constraintViolationList;
     }
 }

@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} the API Problem spec (RFC 7807).
  *
  * @see https://tools.ietf.org/html/rfc7807
+ * @deprecated this is not used anymore internally and will be removed in 4.0
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

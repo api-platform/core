@@ -59,10 +59,7 @@ class ConstraintViolationNormalizerTest extends TestCase
      */
     public function testNormalize(callable $nameConverterFactory, ?array $fields, array $expected): void
     {
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList'])->willReturn('/context/foo')->shouldBeCalled();
-
-        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), $fields, $nameConverterFactory($this));
+        $normalizer = new ConstraintViolationListNormalizer(null, $fields, $nameConverterFactory($this));
 
         // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
         $constraint = new NotNull();
@@ -78,40 +75,28 @@ class ConstraintViolationNormalizerTest extends TestCase
     public static function nameConverterAndPayloadFieldsProvider(): iterable
     {
         $basicExpectation = [
-            '@context' => '/context/foo',
-            '@type' => 'ConstraintViolationList',
-            'hydra:title' => 'An error occurred',
-            'hydra:description' => "d: a\n4: 1",
-            'violations' => [
-                [
-                    'propertyPath' => 'd',
-                    'message' => 'a',
-                    'code' => 'f24bdbad0becef97a6887238aa58221c',
-                ],
-                [
-                    'propertyPath' => '4',
-                    'message' => '1',
-                    'code' => null,
-                ],
+            [
+                'propertyPath' => 'd',
+                'message' => 'a',
+                'code' => 'f24bdbad0becef97a6887238aa58221c',
+            ],
+            [
+                'propertyPath' => '4',
+                'message' => '1',
+                'code' => null,
             ],
         ];
 
         $nameConverterBasedExpectation = [
-            '@context' => '/context/foo',
-            '@type' => 'ConstraintViolationList',
-            'hydra:title' => 'An error occurred',
-            'hydra:description' => "_d: a\n_4: 1",
-            'violations' => [
-                [
-                    'propertyPath' => '_d',
-                    'message' => 'a',
-                    'code' => 'f24bdbad0becef97a6887238aa58221c',
-                ],
-                [
-                    'propertyPath' => '_4',
-                    'message' => '1',
-                    'code' => null,
-                ],
+            [
+                'propertyPath' => '_d',
+                'message' => 'a',
+                'code' => 'f24bdbad0becef97a6887238aa58221c',
+            ],
+            [
+                'propertyPath' => '_4',
+                'message' => '1',
+                'code' => null,
             ],
         ];
 
@@ -132,19 +117,19 @@ class ConstraintViolationNormalizerTest extends TestCase
         $nullNameConverterFactory = fn () => null;
 
         $expected = $nameConverterBasedExpectation;
-        $expected['violations'][0]['payload'] = ['severity' => 'warning'];
+        $expected[0]['payload'] = ['severity' => 'warning'];
         yield [$advancedNameConverterFactory, ['severity', 'anotherField1'], $expected];
         yield [$nameConverterFactory, ['severity', 'anotherField1'], $expected];
         $expected = $basicExpectation;
-        $expected['violations'][0]['payload'] = ['severity' => 'warning'];
+        $expected[0]['payload'] = ['severity' => 'warning'];
         yield [$nullNameConverterFactory, ['severity', 'anotherField1'], $expected];
 
         $expected = $nameConverterBasedExpectation;
-        $expected['violations'][0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
+        $expected[0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
         yield [$advancedNameConverterFactory, null, $expected];
         yield [$nameConverterFactory, null, $expected];
         $expected = $basicExpectation;
-        $expected['violations'][0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
+        $expected[0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
         yield [$nullNameConverterFactory, null, $expected];
 
         yield [$advancedNameConverterFactory, [], $nameConverterBasedExpectation];

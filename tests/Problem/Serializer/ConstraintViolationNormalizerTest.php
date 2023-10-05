@@ -17,6 +17,7 @@ use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -30,6 +31,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 class ConstraintViolationNormalizerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     /**
@@ -52,10 +54,13 @@ class ConstraintViolationNormalizerTest extends TestCase
     }
 
     /**
+     * @group legacy
+     *
      * @dataProvider nameConverterProvider
      */
     public function testNormalize(callable $nameConverterFactory, array $expected): void
     {
+        $this->expectDeprecation('Since api-platform 3.2: "ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer::ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer::getMessagesAndViolations" will be removed in 4.0, use "ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer::getViolations');
         $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterFactory($this));
 
         // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
