@@ -42,12 +42,17 @@ class BagOfTests
 
     #[ORM\OneToMany(mappedBy: 'bagOfTests', targetEntity: TestEntity::class)]
     #[Groups(['read', 'write'])]
-    #[ApiProperty(schema: ['type' => 'string'], jsonSchemaContext: ['foo' => 'bar'])]
+    #[ApiProperty(jsonSchemaContext: ['foo' => 'bar'], schema: ['type' => 'string'])]
     private Collection $tests;
 
     #[ORM\OneToMany(mappedBy: 'bagOfTests', targetEntity: NonResourceTestEntity::class)]
     #[Groups(['read', 'write'])]
     private Collection $nonResourceTests;
+
+    #[ORM\ManyToOne(targetEntity: TestEntity::class)]
+    #[ORM\JoinColumn(name: 'type', referencedColumnName: 'id', nullable: false)]
+    #[Groups(['read', 'write'])]
+    protected ?TestEntity $type = null;
 
     public function __construct()
     {
@@ -125,6 +130,18 @@ class BagOfTests
                 $nonResourceTest->setBagOfTests(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getType(): ?TestEntity
+    {
+        return $this->type;
+    }
+
+    public function setType(?TestEntity $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

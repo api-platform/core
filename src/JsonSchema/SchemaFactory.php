@@ -175,7 +175,8 @@ final class SchemaFactory implements SchemaFactoryInterface
         // or if property schema is already fully defined (type=string + format || enum)
         $propertySchemaType = $propertySchema['type'] ?? false;
 
-        $isUnknown = 'array' === $propertySchemaType && Schema::UNKNOWN_TYPE === ($propertySchema['items']['type'] ?? null);
+        $isUnknown = Schema::UNKNOWN_TYPE === $propertySchemaType
+            || ('array' === $propertySchemaType && Schema::UNKNOWN_TYPE === ($propertySchema['items']['type'] ?? null));
 
         if (
             !$isUnknown && (
