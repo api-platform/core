@@ -979,6 +979,52 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class);
     }
 
+    public function testBadRelationTypeWithExceptionToValidationErrors(): void
+    {
+        $data = [
+            'relatedDummy' => 22,
+        ];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummy']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)
+        );
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            [],
+            null,
+            null,
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        // 'not_normalizable_value_exceptions' is set by Serializer thanks to DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS
+        $actual = $normalizer->denormalize($data, Dummy::class, null, ['not_normalizable_value_exceptions' => []]);
+        $this->assertNull($actual->relatedDummy);
+    }
+
     public function testInnerDocumentNotAllowed(): void
     {
         $this->expectException(UnexpectedValueException::class);

@@ -162,7 +162,8 @@ Feature: Using validations groups
         {
           "propertyPath": "relatedDummy",
           "message": "This value should be of type array|string.",
-          "code": "0"
+          "code": "0",
+          "hint": "The type of the \"relatedDummy\" attribute must be \"array\" (nested document) or \"string\" (IRI), \"integer\" given."
         },
         {
           "propertyPath": "relatedDummies",
