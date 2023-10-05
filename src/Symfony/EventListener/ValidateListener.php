@@ -46,7 +46,7 @@ final class ValidateListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
-        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+        if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
             return;
         }
 

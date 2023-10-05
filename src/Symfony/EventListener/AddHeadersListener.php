@@ -35,7 +35,7 @@ final class AddHeadersListener
     public function onKernelResponse(ResponseEvent $event): void
     {
         $request = $event->getRequest();
-        if (!$request->isMethodCacheable()) {
+        if (!$request->isMethodCacheable() || $request->attributes->get('_api_platform_disable_listeners')) {
             return;
         }
 

@@ -62,7 +62,7 @@ final class DenyAccessListener
      */
     private function checkSecurity(Request $request, string $attribute, array $extraVariables = []): void
     {
-        if (!$this->resourceAccessChecker || !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
+        if ($request->attributes->get('_api_platform_disable_listeners') || !$this->resourceAccessChecker || !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             return;
         }
 
