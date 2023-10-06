@@ -192,34 +192,14 @@ final class PublishMercureUpdatesListener
 
         $options['enable_async_update'] ??= true;
 
-        if ($options['topics'] ?? false) {
-            $topics = [];
-            foreach ((array) $options['topics'] as $topic) {
-                if (!\is_string($topic)) {
-                    $topics[] = $topic;
-                    continue;
-                }
-
-                if (!str_starts_with($topic, '@=')) {
-                    $topics[] = $topic;
-                    continue;
-                }
-
-                if (null === $this->expressionLanguage) {
-                    throw new \LogicException('The "@=" expression syntax cannot be used without the Expression Language component. Try running "composer require symfony/expression-language".');
-                }
-
-                $topics[] = $this->expressionLanguage->evaluate(substr($topic, 2), ['object' => $object]);
-            }
-
-            $options['topics'] = $topics;
-        }
-
         if ('deletedObjects' === $property) {
             $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
             if (null === $types) {
                 $types = [$operation->getShortName()];
             }
+
+            // We need to evaluate it here, because in publishUpdate() the resource would be already deleted
+            $this->evaluateTopics($options, $object);
 
             $this->deletedObjects[(object) [
                 'id' => $this->iriConverter->getIriFromResource($object),
@@ -246,6 +226,9 @@ final class PublishMercureUpdatesListener
             $resourceClass = $this->getObjectClass($object);
             $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext() ?? [];
 
+            // We need to evaluate it here, because in storeObjectToPublish() the resource would not have been persisted yet
+            $this->evaluateTopics($options, $object);
+
             $iri = $options['topics'] ?? $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL);
             $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);
         }
@@ -260,6 +243,34 @@ final class PublishMercureUpdatesListener
 
             $this->hubRegistry->getHub($options['hub'] ?? null)->publish($update);
         }
+    }
+
+    private function evaluateTopics(array &$options, object $object): void
+    {
+        if (!($options['topics'] ?? false)) {
+            return;
+        }
+
+        $topics = [];
+        foreach ((array) $options['topics'] as $topic) {
+            if (!\is_string($topic)) {
+                $topics[] = $topic;
+                continue;
+            }
+
+            if (!str_starts_with($topic, '@=')) {
+                $topics[] = $topic;
+                continue;
+            }
+
+            if (null === $this->expressionLanguage) {
+                throw new \LogicException('The "@=" expression syntax cannot be used without the Expression Language component. Try running "composer require symfony/expression-language".');
+            }
+
+            $topics[] = $this->expressionLanguage->evaluate(substr($topic, 2), ['object' => $object]);
+        }
+
+        $options['topics'] = $topics;
     }
 
     /**
