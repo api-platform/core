@@ -58,6 +58,7 @@ final class AddTagsListener
             !$request->isMethodCacheable()
             || !$response->isCacheable()
             || (!$attributes = RequestAttributesExtractor::extractAttributes($request))
+            || $request->attributes->get('_api_platform_disable_listeners')
         ) {
             return;
         }

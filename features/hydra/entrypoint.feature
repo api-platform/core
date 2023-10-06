@@ -4,6 +4,7 @@ Feature: Entrypoint support
   I need to access to an entrypoint listing top-level resources
 
   Scenario: Retrieve the Entrypoint
+    When I add "Accept" header equal to "application/ld+json"
     When I send a "GET" request to "/"
     Then the response status code should be 200
     And the response should be in JSON

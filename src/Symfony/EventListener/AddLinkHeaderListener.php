@@ -49,7 +49,7 @@ final class AddLinkHeaderListener
         $operation = $this->initializeOperation($request);
 
         // API Platform 3.2 has a MainController where everything is handled by processors/providers
-        if ('api_platform.symfony.main_controller' === $operation?->getController() || $this->isPreflightRequest($request)) {
+        if ('api_platform.symfony.main_controller' === $operation?->getController() || $this->isPreflightRequest($request) || $request->attributes->get('_api_platform_disable_listeners')) {
             return;
         }
 

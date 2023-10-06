@@ -96,7 +96,7 @@
         <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
         <service id="ApiPlatform\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
 
-        <service id="api_platform.action.entrypoint" class="ApiPlatform\Action\EntrypointAction" public="true">
+        <service id="api_platform.action.entrypoint" class="ApiPlatform\Documentation\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
             <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />

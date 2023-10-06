@@ -70,6 +70,7 @@ final class DeserializeListener
             || $request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
+            || $request->attributes->get('_api_platform_disable_listeners')
         ) {
             return;
         }

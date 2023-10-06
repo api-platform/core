@@ -47,6 +47,7 @@ final class QueryParameterValidateListener
             !$request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || 'GET' !== $request->getMethod()
+            || $request->attributes->get('_api_platform_disable_listeners')
         ) {
             return;
         }
