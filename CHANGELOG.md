@@ -1,5 +1,45 @@
 # Changelog
 
+## v3.2.0-beta.2
+
+### Bug fixes
+
+* [2e48c7ecc](https://github.com/api-platform/core/commit/2e48c7ecccde87653bfc859c5f8b96cc37b8fe51) fix(jsonschema): do not override nor complete ApiProperty::schema user value (#5855 #5869, #5864)
+* [6a62a53f8](https://github.com/api-platform/core/commit/6a62a53f854ec93947d1c4a5a32007df09e55d06) fix(hydra): hydra:search iexact strategies
+* [adbc57865](https://github.com/api-platform/core/commit/adbc57865dd1a0f56bf627ad9a319f3ed0307148) fix(openapi): entrypoint text/html 200 (#5868, #5863)
+* [d42f00ce1](https://github.com/api-platform/core/commit/d42f00ce18adaa55323e3cdedab8ba434ef247e2) fix(validation): normalize constraint violation list (#5866)
+
+### Features
+
+* [1fccb8413](https://github.com/api-platform/core/commit/1fccb8413a902a1011f049d0f8ddcd8d5456d335) feat(doctrine): add SearchFilter case-insensitive strategies constants
+* [2cf9d552a](https://github.com/api-platform/core/commit/2cf9d552aa3b8b14820fc71e79cb6bf74347eaa8) feat: improve 'not_normalizable_value_exception' (#5844)
+* [c76d9b0b7](https://github.com/api-platform/core/commit/c76d9b0b7819036f684da214ad6fac2c3c7fa852) feat(serializer): allow usage of genId property for collection (#5870)
+
+Notes:
+
+- `ApiPlatform\Api` got moved to `ApiPlatform\Metadata`
+
+## v3.2.0-beta.1
+
+### Bug fixes
+
+* [1c6862dd5](https://github.com/api-platform/core/commit/1c6862dd51fb97d5c78652ce672a0814e79f7d70) fix(symfony): use static variable to store Error (#5837, #5828)
+* [2703a4507](https://github.com/api-platform/core/commit/2703a45072e9477b068d3484f197ca0571a89c2a) fix(swagger): no throw when operation is not found
+* [2dd058a45](https://github.com/api-platform/core/commit/2dd058a4546f329628c1de459c2673c010ee9a35) fix(symfony): use "main" state alias for decoration (#5806)
+* [3dedf6d9d](https://github.com/api-platform/core/commit/3dedf6d9d739277fed06ce24f840de119bd6881d) fix: exception to status on error resource (#5823)
+* [4ac62b0c2](https://github.com/api-platform/core/commit/4ac62b0c2d88b95d58f2e9477579ceca28313874) fix(jsonschema): build non-resource class schema (#5842)
+* [660955b69](https://github.com/api-platform/core/commit/660955b692ef7516ecc70ae937ca7707049deb85) fix(symfony): show documentation as entrypoint when requesting html (#5836)
+* [7ebff2702](https://github.com/api-platform/core/commit/7ebff270275bfd2f3283ba42d3ddb28699292b53) fix: errors without compatibility flag (#5841)
+* [828e42997](https://github.com/api-platform/core/commit/828e4299762cae94f99f4d807eca4e61367a36a5) fix: Mercure assertions to public to allow Mercure Hub reset (#5834)
+
+### Features
+
+* [2141b0118](https://github.com/api-platform/core/commit/2141b01189a25b8a242a6878bcafb3be276f8a41) feat: deprecate not setting formats manually (#5808)
+* [3fa0176a3](https://github.com/api-platform/core/commit/3fa0176a34a7cbc24a612b69404dc8c6be82f8a6) feat(metadata): add canonical_uri_template (#5832)
+* [b9cf49969](https://github.com/api-platform/core/commit/b9cf49969e4207ca6044338d992eb8ff97f5740e) feat(openapi): update Swagger UI to v5.6.2 (#5807)
+* [e65d2c35a](https://github.com/api-platform/core/commit/e65d2c35a983813de55104ebd12c49bdfeb8cdc5) feat(serializer): add ApiProperty::uriTemplate option (#5675)
+
+
 ## v3.2.0-alpha.2
 
 ### Bug fixes
