@@ -148,7 +148,7 @@ final class ErrorListener extends SymfonyErrorListener
         $dup->attributes->set('_api_previous_operation', $apiOperation);
         $dup->attributes->set('_api_operation', $operation);
         $dup->attributes->set('_api_operation_name', $operation->getName());
-        $dup->attributes->remove('exception');
+        $dup->attributes->set('exception', $errorResource);
         // These are for swagger
         $dup->attributes->set('_api_original_route', $request->attributes->get('_route'));
         $dup->attributes->set('_api_original_route_params', $request->attributes->get('_route_params'));
