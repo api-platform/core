@@ -73,6 +73,7 @@ class DummyCar
     private bool $canSell;
     #[ORM\Column(type: 'datetime')]
     private \DateTime $availableAt;
+    #[ApiFilter(SearchFilter::class, strategy: SearchFilter::STRATEGY_IEXACT)]
     #[Serializer\Groups(['colors'])]
     #[Serializer\SerializedName('carBrand')]
     #[ORM\Column]

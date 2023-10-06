@@ -65,6 +65,7 @@ class DummyCar
     private ?bool $canSell = null;
     #[ODM\Field(type: 'date')]
     private ?\DateTime $availableAt = null;
+    #[ApiFilter(SearchFilter::class, strategy: SearchFilter::STRATEGY_IEXACT)]
     #[Serializer\Groups(['colors'])]
     #[Serializer\SerializedName('carBrand')]
     #[ODM\Field]

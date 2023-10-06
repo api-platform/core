@@ -41,7 +41,6 @@ class OpenApiCommandTest extends KernelTestCase
         $application = new Application(static::$kernel);
         $application->setCatchExceptions(false);
         $application->setAutoExit(false);
-
         $this->tester = new ApplicationTester($application);
 
         $this->handleDeprecations();
@@ -59,6 +58,7 @@ class OpenApiCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
 
         $result = $this->tester->getDisplay();
+
         $this->assertYaml($result);
         $operationId = 'api_dummy_cars_get_collection';
 
@@ -95,6 +95,14 @@ YAML;
   version: 0.0.0
 YAML;
 
+        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
+
+        $expected = <<<YAML
+      security:
+        -
+          JWT:
+            - CURRENCY_READ
+YAML;
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
     }
 
