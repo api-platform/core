@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.7.16
+
+### Bug fixes
+
+* [0d44bbb13](https://github.com/api-platform/core/commit/0d44bbb1353d1ccd8a823b1328b1a77058059014) fix(serializer): Remove ItemNormalizer wrong return type (#5865)
+* [2c86ca36f](https://github.com/api-platform/core/commit/2c86ca36f4682fa59046628f1169a850c43338fb) fix: Add missing deprecated elasticsearch related interfaces/classes (#5746)
+* [fb8cfeff3](https://github.com/api-platform/core/commit/fb8cfeff36c298c723dc9810fb7796cc1fb5b41e) fix(doctrine): fix BC break about final filters (#5815)
+
+### Features
+
+* [36e95a814](https://github.com/api-platform/core/commit/36e95a8144d45540feabae64185e6e4b686aab5a) feat: allow upgrading single resource (#5768)
+
 ## v2.7.15
 
 ### Bug fixes
