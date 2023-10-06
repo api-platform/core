@@ -718,7 +718,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             if ('array' === $type->getBuiltinType()) {
-                $childContext = $this->createChildContext($this->createOperationContext($context, null), $attribute, $format);
+                $childContext = $this->createChildContext($context, $attribute, $format);
+                $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
 
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
