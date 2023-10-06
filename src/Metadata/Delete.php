@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
 
@@ -44,7 +45,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         ?array $paginationViaCursor = null,
         ?array $hydraContext = null,
         ?array $openapiContext = null,
-        bool|OpenApiOperation|null $openapi = null,
+        bool|OpenApiOperation|Webhook|null $openapi = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
         ?array $links = null,

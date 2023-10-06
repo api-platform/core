@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model;
 use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\Contact;
@@ -90,12 +91,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $servers = '/' === $baseUrl || '' === $baseUrl ? [new Server('/')] : [new Server($baseUrl)];
         $paths = new Paths();
         $schemas = new \ArrayObject();
+        $webhooks = new \ArrayObject();
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
 
             foreach ($resourceMetadataCollection as $resourceMetadata) {
-                $this->collectPaths($resourceMetadata, $resourceMetadataCollection, $paths, $schemas);
+                $this->collectPaths($resourceMetadata, $resourceMetadataCollection, $paths, $schemas, $webhooks);
             }
         }
 
@@ -119,11 +121,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 new \ArrayObject(),
                 new \ArrayObject($securitySchemes)
             ),
-            $securityRequirements
+            $securityRequirements,
+            [],
+            null,
+            null,
+            $webhooks
         );
     }
 
-    private function collectPaths(ApiResource $resource, ResourceMetadataCollection $resourceMetadataCollection, Paths $paths, \ArrayObject $schemas): void
+    private function collectPaths(ApiResource $resource, ResourceMetadataCollection $resourceMetadataCollection, Paths $paths, \ArrayObject $schemas, \ArrayObject $webhooks): void
     {
         if (0 === $resource->getOperations()->count()) {
             return;
@@ -136,10 +142,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
-            $openapiOperation = $operation->getOpenapi();
+            $openapiAttribute = $operation->getOpenapi();
 
             // Operation ignored from OpenApi
-            if ($operation instanceof HttpOperation && false === $openapiOperation) {
+            if ($operation instanceof HttpOperation && false === $openapiAttribute) {
                 continue;
             }
 
@@ -163,8 +169,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
-            if (!\is_object($openapiOperation)) {
+            $pathItem = null;
+
+            if ($openapiAttribute instanceof Webhook) {
+                $pathItem = $openapiAttribute->getPathItem() ?: new PathItem();
+                $openapiOperation = $pathItem->{'get'.ucfirst(strtolower($method))}() ?: new Model\Operation();
+            } elseif (!\is_object($openapiAttribute)) {
                 $openapiOperation = new Model\Operation();
+            } else {
+                $openapiOperation = $openapiAttribute;
             }
 
             // Complete with defaults
@@ -230,7 +243,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             if ($path) {
                 $pathItem = $paths->getPath($path) ?: new PathItem();
-            } else {
+            } elseif (!$pathItem) {
                 $pathItem = new PathItem();
             }
 
@@ -391,7 +404,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
-            $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
+            if ($openapiAttribute instanceof Webhook) {
+                if (!isset($webhooks[$openapiAttribute->getName()])) {
+                    $webhooks[$openapiAttribute->getName()] = new \ArrayObject();
+                }
+                $webhooks[$openapiAttribute->getName()]->append($pathItem->{'with'.ucfirst($method)}($openapiOperation));
+            } else {
+                $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
+            }
         }
     }
 
@@ -517,7 +537,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 // Operation ignored from OpenApi
-                if ($operation instanceof HttpOperation && false === $operation->getOpenapi()) {
+                if ($operation instanceof HttpOperation && (false === $operation->getOpenapi() || $operation->getOpenapi() instanceof Webhook)) {
                     continue;
                 }
 

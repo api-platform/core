@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
 
@@ -56,7 +57,7 @@ final class NotExposed extends HttpOperation
 
         ?array $hydraContext = null,
         ?array $openapiContext = null,
-        bool|OpenApiOperation|null $openapi = false,
+        bool|OpenApiOperation|Webhook|null $openapi = false,
         ?array $exceptionToStatus = null,
 
         ?bool $queryParameterValidationEnabled = null,

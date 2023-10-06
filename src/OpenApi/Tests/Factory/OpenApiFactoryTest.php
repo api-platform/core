@@ -34,6 +34,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Model;
 use ApiPlatform\OpenApi\Model\Components;
@@ -79,6 +80,14 @@ class OpenApiFactoryTest extends TestCase
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withClass(Dummy::class)->withOutput([
             'class' => OutputDto::class,
         ])->withPaginationClientItemsPerPage(true)->withShortName('Dummy')->withDescription('This is a dummy');
+        $dummyResourceWebhook = (new ApiResource())->withOperations(new Operations([
+            'dummy webhook' => (new Get())->withUriTemplate('/dummy/{id}')->withShortName('short')->withOpenapi(new Webhook('happy webhook')),
+            'an other dummy webhook' => (new Post())->withUriTemplate('/dummies')->withShortName('short something')->withOpenapi(new Webhook('happy webhook', new Model\PathItem(post: new Operation(
+                summary: 'well...',
+                description: 'I dont\'t know what to say',
+            )))),
+        ]));
+
         $dummyResource = (new ApiResource())->withOperations(new Operations([
             'ignored' => new NotExposed(),
             'ignoredWithUriTemplate' => (new NotExposed())->withUriTemplate('/dummies/{id}'),
@@ -247,7 +256,7 @@ class OpenApiFactoryTest extends TestCase
         $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class]));
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceCollectionMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [$dummyResource]));
+        $resourceCollectionMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [$dummyResource, $dummyResourceWebhook]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
@@ -481,6 +490,20 @@ class OpenApiFactoryTest extends TestCase
         $this->assertInstanceOf(OpenApi::class, $openApi);
         $this->assertEquals($openApi->getInfo(), new Info('Test API', '1.2.3', 'This is a test API.'));
         $this->assertEquals($openApi->getServers(), [new Server('/app_dev.php/')]);
+
+        $webhooks = $openApi->getWebhooks();
+        $this->assertCount(1, $webhooks);
+
+        $this->assertNotNull($webhooks['happy webhook']);
+        $this->assertCount(2, $webhooks['happy webhook']);
+
+        $firstOperationWebhook = $webhooks['happy webhook'][0];
+        $secondOperationWebhook = $webhooks['happy webhook'][1];
+
+        $this->assertSame('dummy webhook', $firstOperationWebhook->getGet()->getOperationId());
+        $this->assertSame('an other dummy webhook', $secondOperationWebhook->getPost()->getOperationId());
+        $this->assertSame('I dont\'t know what to say', $secondOperationWebhook->getPost()->getDescription());
+        $this->assertSame('well...', $secondOperationWebhook->getPost()->getSummary());
 
         $components = $openApi->getComponents();
         $this->assertInstanceOf(Components::class, $components);
