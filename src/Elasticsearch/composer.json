@@ -1,5 +1,5 @@
 {
-    "name": "api-platform/elasticseach",
+    "name": "api-platform/elasticsearch",
     "description": "API Platform Elasticsearch bridge",
     "type": "library",
     "keywords": [
