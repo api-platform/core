@@ -75,23 +75,6 @@ final class ValidationException extends BaseValidationException implements Const
         return $id;
     }
 
-    public function __toString(): string
-    {
-        $message = '';
-        foreach ($this->constraintViolationList as $violation) {
-            if ('' !== $message) {
-                $message .= "\n";
-            }
-            if ($propertyPath = $violation->getPropertyPath()) {
-                $message .= "$propertyPath: ";
-            }
-
-            $message .= $violation->getMessage();
-        }
-
-        return $message;
-    }
-
     #[SerializedName('hydra:title')]
     #[Groups(['jsonld', 'legacy_jsonld'])]
     public function getHydraTitle(): string
@@ -99,11 +82,11 @@ final class ValidationException extends BaseValidationException implements Const
         return $this->errorTitle ?? 'An error occurred';
     }
 
-    #[SerializedName('hydra:description')]
     #[Groups(['jsonld', 'legacy_jsonld'])]
+    #[SerializedName('hydra:description')]
     public function getHydraDescription(): string
     {
-        return $this->__toString();
+        return $this->detail;
     }
 
     #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
@@ -119,9 +102,16 @@ final class ValidationException extends BaseValidationException implements Const
     }
 
     #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
+    private string $detail;
+
     public function getDetail(): ?string
     {
-        return $this->__toString();
+        return $this->detail;
+    }
+
+    public function setDetail(string $detail): void
+    {
+        $this->detail = $detail;
     }
 
     #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
@@ -146,5 +136,22 @@ final class ValidationException extends BaseValidationException implements Const
     public function getConstraintViolationList(): ConstraintViolationListInterface
     {
         return $this->constraintViolationList;
+    }
+
+    public function __toString(): string
+    {
+        $message = '';
+        foreach ($this->constraintViolationList as $violation) {
+            if ('' !== $message) {
+                $message .= "\n";
+            }
+            if ($propertyPath = $violation->getPropertyPath()) {
+                $message .= "$propertyPath: ";
+            }
+
+            $message .= $violation->getMessage();
+        }
+
+        return $message;
     }
 }
