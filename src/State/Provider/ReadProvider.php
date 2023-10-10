@@ -106,7 +106,7 @@ final class ReadProvider implements ProviderInterface
                     ->create($relationClass)
                     ->getOperation($operation->getExtraProperties()['parent_uri_template'] ?? null);
                 try {
-                    $relation = $this->provider->provide($parentOperation, [$uriVariable->getIdentifiers()[0] => $context['request']->attributes->all()[$key]], $context);
+                    $relation = $this->provider->provide($parentOperation, [$uriVariable->getIdentifiers()[0] => $request?->attributes->all()[$key]], $context);
                 } catch (ProviderNotFoundException) {
                     $relation = null;
                 }
@@ -124,8 +124,7 @@ final class ReadProvider implements ProviderInterface
                     if (!$securityObjectName) {
                         continue;
                     }
-                    var_dump($securityObjectName);
-                    $request->attributes->set($securityObjectName, $relation);
+                    $request?->attributes->set($securityObjectName, $relation);
                 } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
                     throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
                 }

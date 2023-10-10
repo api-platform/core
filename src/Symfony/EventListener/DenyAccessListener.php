@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
@@ -89,17 +90,31 @@ final class DenyAccessListener
                 $message = $operation->getSecurityMessage();
         }
 
-        if (null === $isGranted) {
-            return;
-        }
-
         $extraVariables += $request->attributes->all();
         $extraVariables['object'] = $request->attributes->get('data');
         $extraVariables['previous_object'] = $request->attributes->get('previous_data');
         $extraVariables['request'] = $request;
 
-        if (!$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {
+        if ($isGranted && !$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {
             throw new AccessDeniedException($message ?? 'Access Denied.');
+        }
+
+        if ($operation->getUriVariables()) {
+            foreach ($operation->getUriVariables() as $key => $uriVariable) {
+                if (!$uriVariable instanceof Link || !$uriVariable->getSecurity()) {
+                    continue;
+                }
+
+                $targetResource = $uriVariable->getFromClass() ?? $uriVariable->getToClass();
+
+                if (!$targetResource) {
+                    continue;
+                }
+
+                if (!$this->resourceAccessChecker->isGranted($targetResource, $uriVariable->getSecurity(), $extraVariables)) {
+                    throw new AccessDeniedException($uriVariable->getSecurityMessage() ?? 'Access Denied.');
+                }
+            }
         }
     }
 }
