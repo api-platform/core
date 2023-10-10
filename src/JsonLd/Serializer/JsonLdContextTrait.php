@@ -15,6 +15,7 @@ namespace ApiPlatform\JsonLd\Serializer;
 
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\Error;
 
 /**
  * Creates and manipulates the Serializer context.
@@ -39,6 +40,10 @@ trait JsonLdContextTrait
         if (isset($context['jsonld_embed_context'])) {
             $data['@context'] = $contextBuilder->getResourceContext($resourceClass);
 
+            return $data;
+        }
+
+        if (($operation = $context['operation'] ?? null) && ($operation->getExtraProperties()['rfc_7807_compliant_errors'] ?? false) && $operation instanceof Error) {
             return $data;
         }
 

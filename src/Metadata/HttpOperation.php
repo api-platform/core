@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\WebLink\Link as WebLink;
 
 class HttpOperation extends Operation
 {
@@ -27,10 +28,10 @@ class HttpOperation extends Operation
     public const METHOD_OPTIONS = 'OPTIONS';
 
     /**
-     * @param string[]|null                              $types         the RDF types of this property
-     * @param array<string, string|string[]>|string|null $formats       {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
-     * @param array<string, string|string[]>|string|null $inputFormats  {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
-     * @param array<string, string|string[]>|string|null $outputFormats {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
+     * @param string[]|null                                  $types         the RDF types of this property
+     * @param array<int|string, string|string[]>|string|null $formats       {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
+     * @param array<int|string, string|string[]>|string|null $inputFormats  {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
+     * @param array<int|string, string|string[]>|string|null $outputFormats {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
      * @param array<string,array{
      *     0: string,
      *     1: string
@@ -74,9 +75,10 @@ class HttpOperation extends Operation
      * @param string|bool|null       $messenger {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
      * @param string|callable|null   $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
      * @param string|callable|null   $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
+     * @param WebLink[]|null         $links
      */
     public function __construct(
-        protected string $method = self::METHOD_GET,
+        protected string $method = 'GET',
         protected ?string $uriTemplate = null,
         protected ?array $types = null,
         protected $formats = null,
@@ -89,6 +91,50 @@ class HttpOperation extends Operation
         protected ?array $requirements = null,
         protected ?array $options = null,
         protected ?bool $stateless = null,
+        /**
+         * The `sunset` option indicates when a deprecated operation will be removed.
+         *
+         * <CodeSelector>
+         * ```php
+         * <?php
+         * // api/src/Entity/Parchment.php
+         * use ApiPlatform\Metadata\Get;
+         *
+         * #[Get(deprecationReason: 'Create a Book instead', sunset: '01/01/2020')]
+         * class Parchment
+         * {
+         *     // ...
+         * }
+         * ```
+         *
+         * ```yaml
+         * # api/config/api_platform/resources.yaml
+         * resources:
+         *     App\Entity\Parchment:
+         *         - operations:
+         *               ApiPlatform\Metadata\Get:
+         *                   deprecationReason: 'Create a Book instead'
+         *                   sunset: '01/01/2020'
+         * ```
+         *
+         * ```xml
+         * <?xml version="1.0" encoding="UTF-8" ?>
+         * <!-- api/config/api_platform/resources.xml -->
+         *
+         * <resources
+         *         xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+         *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         *         xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+         *         https://api-platform.com/schema/metadata/resources-3.0.xsd">
+         *     <resource class="App\Entity\Parchment">
+         *         <operations>
+         *             <operation class="ApiPlatform\Metadata\Get" deprecationReason="Create a Book instead" sunset="01/01/2020" />
+         *         <operations>
+         *     </resource>
+         * </resources>
+         * ```
+         * </CodeSelector>
+         */
         protected ?string $sunset = null,
         protected ?string $acceptPatch = null,
         protected $status = null,
@@ -103,51 +149,52 @@ class HttpOperation extends Operation
         protected bool|OpenApiOperation|null $openapi = null,
         protected ?array $exceptionToStatus = null,
         protected ?bool $queryParameterValidationEnabled = null,
+        protected ?array $links = null,
 
-        ?string $shortName = null,
-        ?string $class = null,
-        ?bool $paginationEnabled = null,
-        ?string $paginationType = null,
-        ?int $paginationItemsPerPage = null,
-        ?int $paginationMaximumItemsPerPage = null,
-        ?bool $paginationPartial = null,
-        ?bool $paginationClientEnabled = null,
-        ?bool $paginationClientItemsPerPage = null,
-        ?bool $paginationClientPartial = null,
-        ?bool $paginationFetchJoinCollection = null,
-        ?bool $paginationUseOutputWalkers = null,
-        ?array $order = null,
-        ?string $description = null,
-        ?array $normalizationContext = null,
-        ?array $denormalizationContext = null,
-        ?bool $collectDenormalizationErrors = null,
-        ?string $security = null,
-        ?string $securityMessage = null,
-        ?string $securityPostDenormalize = null,
-        ?string $securityPostDenormalizeMessage = null,
-        ?string $securityPostValidation = null,
-        ?string $securityPostValidationMessage = null,
-        ?string $deprecationReason = null,
-        ?array $filters = null,
-        ?array $validationContext = null,
+        string $shortName = null,
+        string $class = null,
+        bool $paginationEnabled = null,
+        string $paginationType = null,
+        int $paginationItemsPerPage = null,
+        int $paginationMaximumItemsPerPage = null,
+        bool $paginationPartial = null,
+        bool $paginationClientEnabled = null,
+        bool $paginationClientItemsPerPage = null,
+        bool $paginationClientPartial = null,
+        bool $paginationFetchJoinCollection = null,
+        bool $paginationUseOutputWalkers = null,
+        array $order = null,
+        string $description = null,
+        array $normalizationContext = null,
+        array $denormalizationContext = null,
+        bool $collectDenormalizationErrors = null,
+        string $security = null,
+        string $securityMessage = null,
+        string $securityPostDenormalize = null,
+        string $securityPostDenormalizeMessage = null,
+        string $securityPostValidation = null,
+        string $securityPostValidationMessage = null,
+        string $deprecationReason = null,
+        array $filters = null,
+        array $validationContext = null,
         $input = null,
         $output = null,
         $mercure = null,
         $messenger = null,
-        ?bool $elasticsearch = null,
-        ?int $urlGenerationStrategy = null,
-        ?bool $read = null,
-        ?bool $deserialize = null,
-        ?bool $validate = null,
-        ?bool $write = null,
-        ?bool $serialize = null,
-        ?bool $fetchPartial = null,
-        ?bool $forceEager = null,
-        ?int $priority = null,
-        ?string $name = null,
+        bool $elasticsearch = null,
+        int $urlGenerationStrategy = null,
+        bool $read = null,
+        bool $deserialize = null,
+        bool $validate = null,
+        bool $write = null,
+        bool $serialize = null,
+        bool $fetchPartial = null,
+        bool $forceEager = null,
+        int $priority = null,
+        string $name = null,
         $provider = null,
         $processor = null,
-        ?OptionsInterface $stateOptions = null,
+        OptionsInterface $stateOptions = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -217,7 +264,7 @@ class HttpOperation extends Operation
         return $this->uriTemplate;
     }
 
-    public function withUriTemplate(?string $uriTemplate = null)
+    public function withUriTemplate(string $uriTemplate = null)
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
@@ -549,6 +596,22 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
+
+        return $self;
+    }
+
+    public function getLinks(): ?array
+    {
+        return $this->links;
+    }
+
+    /**
+     * @param WebLink[] $links
+     */
+    public function withLinks(array $links): self
+    {
+        $self = clone $this;
+        $self->links = $links;
 
         return $self;
     }

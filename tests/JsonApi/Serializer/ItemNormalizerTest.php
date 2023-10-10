@@ -40,6 +40,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -196,6 +197,8 @@ class ItemNormalizerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'bar')->willThrow(new NoSuchPropertyException());
 
+        $serializerProphecy = $this->prophesize(Serializer::class);
+
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
             (new ApiResource())
@@ -214,6 +217,8 @@ class ItemNormalizerTest extends TestCase
             [],
             $resourceMetadataCollectionFactoryProphecy->reveal(),
         );
+
+        $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->normalize($dummy, ItemNormalizer::FORMAT);
     }

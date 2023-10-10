@@ -30,6 +30,7 @@ final class Schema extends \ArrayObject
     public const VERSION_JSON_SCHEMA = 'json-schema';
     public const VERSION_OPENAPI = 'openapi';
     public const VERSION_SWAGGER = 'swagger';
+    public const UNKNOWN_TYPE = 'unknown_type';
 
     public function __construct(private readonly string $version = self::VERSION_JSON_SCHEMA)
     {

@@ -14,12 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\FormatMatcher;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
@@ -45,7 +44,7 @@ final class DeserializeListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'deserialize';
 
-    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
+    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
         if (null === $this->translator) {
@@ -71,11 +70,16 @@ final class DeserializeListener
             || $request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
+            || $request->attributes->get('_api_platform_disable_listeners')
         ) {
             return;
         }
 
         $operation = $this->initializeOperation($request);
+
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
 
         if (!($operation?->canDeserialize() ?? true)) {
             return;
@@ -86,11 +90,11 @@ final class DeserializeListener
         $format = $this->getFormat($request, $operation?->getInputFormats() ?? []);
         $data = $request->attributes->get('data');
         if (
-            null !== $data &&
-            (
-                HttpOperation::METHOD_POST === $method ||
-                HttpOperation::METHOD_PATCH === $method ||
-                (HttpOperation::METHOD_PUT === $method && !($operation->getExtraProperties()['standard_put'] ?? false))
+            null !== $data
+            && (
+                'POST' === $method
+                || 'PATCH' === $method
+                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? false))
             )
         ) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;

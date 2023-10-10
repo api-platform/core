@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 
-#[Get('/item_referenced_in_collection/{id}{._format}')]
+#[Get('/item_referenced_in_collection/{id}{._format}', uriVariables: ['id' => new Link(fromClass: CollectionReferencingItem::class)])]
 class ItemReferencedInCollection
 {
     public $id;

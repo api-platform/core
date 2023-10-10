@@ -16,16 +16,15 @@
         </service>
         <service id="ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface" alias="api_platform.security.resource_access_checker" />
 
-        <service id="api_platform.security.listener.request.deny_access" class="ApiPlatform\Symfony\EventListener\DenyAccessListener">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory"></argument>
+        <service id="api_platform.state_provider.access_checker" class="ApiPlatform\Symfony\Security\State\AccessCheckerProvider" decorates="api_platform.state_provider.read">
+            <argument type="service" id="api_platform.state_provider.access_checker.inner" />
             <argument type="service" id="api_platform.security.resource_access_checker" />
+        </service>
 
-            <!-- This method must be executed only when the current object is available, before deserialization -->
-            <tag name="kernel.event_listener" event="kernel.request" method="onSecurity" priority="3" />
-            <!-- This method must be executed only when the current object is available, after deserialization -->
-            <tag name="kernel.event_listener" event="kernel.request" method="onSecurityPostDenormalize" priority="1" />
-            <!-- This method must be executed only when the current object is available, after validation -->
-            <tag name="kernel.event_listener" event="kernel.view" method="onSecurityPostValidation" priority="63" />
+        <service id="api_platform.state_provider.access_checker.post_deserialize" class="ApiPlatform\Symfony\Security\State\AccessCheckerProvider" decorates="api_platform.state_provider.deserialize">
+            <argument type="service" id="api_platform.state_provider.access_checker.post_deserialize.inner" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+            <argument>post_denormalize</argument>
         </service>
 
         <service id="api_platform.security.expression_language_provider" class="ApiPlatform\Symfony\Security\Core\Authorization\ExpressionLanguageProvider" public="false">

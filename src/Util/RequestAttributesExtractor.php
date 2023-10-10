@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Extracts data used by the library form a Request instance.
  *
+ * @deprecated use \ApiPlatform\Symfony\Util\RequestAttributesExtractor although it should've been internal
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class RequestAttributesExtractor

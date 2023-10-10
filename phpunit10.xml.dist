@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd" backupGlobals="false" bootstrap="tests/Fixtures/app/bootstrap.php" colors="true" cacheDirectory=".phpunit.cache">
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <ini name="memory_limit" value="-1"/>
+    <server name="SYMFONY_DEPRECATIONS_HELPER" value="max[total]=0&amp;ignoreFile=./tests/.ignored-deprecations"/>
+    <!-- This is necessary for GitHub Actions to work properly -->
+    <server name="SYMFONY_PHPUNIT_DIR" value="vendor/bin/.phpunit"/>
+    <server name="SYMFONY_PHPUNIT_REMOVE" value="symfony/yaml"/>
+    <server name="KERNEL_DIR" value="tests/Fixtures/app/"/>
+    <server name="KERNEL_CLASS" value="AppKernel"/>
+    <env name="APP_ENV" value="test"/>
+  </php>
+
+  <testsuites>
+    <testsuite name="Project Test Suite">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+
+  <groups>
+    <exclude>
+      <group>mongodb</group>
+      <group>mercure</group>
+    </exclude>
+  </groups>
+
+  <source>
+    <include>
+      <directory>.</directory>
+    </include>
+    <exclude>
+      <directory>features</directory>
+      <directory>tests</directory>
+      <directory>vendor</directory>
+      <file>.php-cs-fixer.dist.php</file>
+    </exclude>
+  </source>
+</phpunit>

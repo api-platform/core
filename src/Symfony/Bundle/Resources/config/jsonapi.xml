@@ -15,6 +15,11 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
 
+        <service id="api_platform.jsonapi.state_provider" class="ApiPlatform\JsonApi\State\JsonApiProvider" public="false" decorates="api_platform.state_provider.read">
+            <argument type="service" id="api_platform.jsonapi.state_provider.inner" />
+            <argument>%api_platform.collection.order_parameter_name%</argument>
+        </service>
+
         <service id="api_platform.jsonapi.normalizer.entrypoint" class="ApiPlatform\JsonApi\Serializer\EntrypointNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.iri_converter" />
@@ -65,31 +70,11 @@
             <tag name="serializer.normalizer" priority="-780" />
         </service>
 
+        <!-- deprecated -->
         <service id="api_platform.jsonapi.normalizer.error" class="ApiPlatform\JsonApi\Serializer\ErrorNormalizer" public="false">
             <argument>%kernel.debug%</argument>
 
             <tag name="serializer.normalizer" priority="-790"/>
-        </service>
-
-        <!-- Event listener -->
-
-        <service id="api_platform.jsonapi.listener.request.transform_pagination_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformPaginationParametersListener">
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
-        </service>
-
-        <service id="api_platform.jsonapi.listener.request.transform_sorting_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformSortingParametersListener">
-            <argument>%api_platform.collection.order_parameter_name%</argument>
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
-        </service>
-
-        <service id="api_platform.jsonapi.listener.request.transform_fieldsets_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformFieldsetsParametersListener">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
-        </service>
-
-        <service id="api_platform.jsonapi.listener.request.transform_filtering_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformFilteringParametersListener">
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
         </service>
     </services>
 

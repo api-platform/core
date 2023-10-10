@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Exception\ProviderNotFoundException;
 use Psr\Container\ContainerInterface;
 
 final class CallableProvider implements ProviderInterface
 {
-    public function __construct(private readonly ContainerInterface $locator)
+    public function __construct(private readonly ?ContainerInterface $locator = null)
     {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
@@ -32,9 +32,9 @@ final class CallableProvider implements ProviderInterface
             return $provider($operation, $uriVariables, $context);
         }
 
-        if (\is_string($provider)) {
+        if ($this->locator && \is_string($provider)) {
             if (!$this->locator->has($provider)) {
-                throw new RuntimeException(sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
+                throw new ProviderNotFoundException(sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
             }
 
             /** @var ProviderInterface $providerInstance */
@@ -43,6 +43,6 @@ final class CallableProvider implements ProviderInterface
             return $providerInstance->provide($operation, $uriVariables, $context);
         }
 
-        throw new RuntimeException(sprintf('Provider not found on operation "%s"', $operation->getName()));
+        throw new ProviderNotFoundException(sprintf('Provider not found on operation "%s"', $operation->getName()));
     }
 }

@@ -137,9 +137,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             if (
                 // Always skip extra lazy associations
-                ClassMetadataInfo::FETCH_EXTRA_LAZY === $mapping['fetch'] ||
+                ClassMetadataInfo::FETCH_EXTRA_LAZY === $mapping['fetch']
                 // We don't want to interfere with doctrine on this association
-                (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'])
+                || (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'])
             ) {
                 continue;
             }
@@ -155,8 +155,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             }
 
             $fetchEager = $propertyMetadata->getFetchEager();
+            $uriTemplate = $propertyMetadata->getUriTemplate();
 
-            if (false === $fetchEager) {
+            if (false === $fetchEager || null !== $uriTemplate) {
                 continue;
             }
 
@@ -166,10 +167,10 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             // Avoid joining back to the parent that we just came from, but only on *ToOne relations
             if (
-                null !== $parentAssociation &&
-                isset($mapping['inversedBy']) &&
-                $mapping['inversedBy'] === $parentAssociation &&
-                $mapping['type'] & ClassMetadata::TO_ONE
+                null !== $parentAssociation
+                && isset($mapping['inversedBy'])
+                && $mapping['inversedBy'] === $parentAssociation
+                && $mapping['type'] & ClassMetadata::TO_ONE
             ) {
                 continue;
             }

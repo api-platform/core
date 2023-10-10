@@ -2,6 +2,9 @@
 @v3
 Feature: Expose only a collection of objects
 
+  Background:
+    Given I add "Accept" header equal to "application/ld+json"
+
   # A NotExposed operation with "routeName: api_genid" is automatically added to this resource.
   Scenario: Get a collection of objects without identifiers from a single resource with a single collection
     When I send a "GET" request to "/chairs"

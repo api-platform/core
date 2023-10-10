@@ -46,6 +46,7 @@ resources:
         -   graphQlOperations: null
             operations:
                 ApiPlatform\Metadata\GetCollection:
+                    uriTemplate: '/spoons'
                     provider: ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider
         -   graphQlOperations: ~
             operations:

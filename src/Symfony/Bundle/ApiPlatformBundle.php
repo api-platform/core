@@ -20,9 +20,11 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientP
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestMercureHubPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -47,10 +49,14 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new FilterPass());
         $container->addCompilerPass(new ElasticsearchClientPass());
         $container->addCompilerPass(new GraphQlTypePass());
+        // These two are deprecated
         $container->addCompilerPass(new GraphQlQueryResolverPass());
         $container->addCompilerPass(new GraphQlMutationResolverPass());
+        // We can use this one only in 4.0
+        $container->addCompilerPass(new GraphQlResolverPass());
         $container->addCompilerPass(new MetadataAwareNameConverterPass());
         $container->addCompilerPass(new TestClientPass());
+        $container->addCompilerPass(new TestMercureHubPass());
         $container->addCompilerPass(new AuthenticatorManagerPass());
     }
 }

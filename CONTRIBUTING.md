@@ -38,9 +38,18 @@ Alternatively, you can also work with the test application we provide:
     cd tests/Fixtures/app
     ./console assets:install --symlink
     symfony serve
+
+    # if you prefer keeping the server in your terminal:
+    symfony server:start --dir tests/Fixtures/app
     
     # or if you prefer using the PHP built-in web server
     php -S localhost:8000 -t public/
+
+You also have access to a `console`:
+
+```
+APP_DEBUG=1 tests/Fixtures/app/console debug:config
+```
 
 ### Matching Coding Standards
 
@@ -115,7 +124,7 @@ Both `simple-phpunit` and `behat` are development dependencies and should be ava
 
 To launch unit tests:
 
-    vendor/bin/simple-phpunit --stop-on-failure -vvv
+    vendor/bin/simple-phpunit --stop-on-defect -vvv
 
 If you want coverage, you will need the `pcov` PHP extension and run:
 

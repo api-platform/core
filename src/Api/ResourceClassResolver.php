@@ -15,10 +15,12 @@ namespace ApiPlatform\Api;
 
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 
 /**
  * {@inheritdoc}
+ *
+ * @deprecated replaced by ApiPlatform\Metadata\ResourceClassResolver
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>

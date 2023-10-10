@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Uid\Ulid;
@@ -44,7 +44,7 @@ final class TypeFactory implements TypeFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
+    public function getType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array
     {
         if ($type->isCollection()) {
             $keyType = $type->getCollectionKeyTypes()[0] ?? null;
@@ -66,7 +66,7 @@ final class TypeFactory implements TypeFactoryInterface
         return $this->addNullabilityToTypeDefinition($this->makeBasicType($type, $format, $readableLink, $serializerContext, $schema), $type, $schema);
     }
 
-    private function makeBasicType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
+    private function makeBasicType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array
     {
         return match ($type->getBuiltinType()) {
             Type::BUILTIN_TYPE_INT => ['type' => 'integer'],
@@ -117,14 +117,16 @@ final class TypeFactory implements TypeFactoryInterface
             ];
         }
         if (!$this->isResourceClass($className) && is_a($className, \BackedEnum::class, true)) {
-            $rEnum = new \ReflectionEnum($className);
-            $enumCases = array_map(static fn (\ReflectionEnumBackedCase $rCase) => $rCase->getBackingValue(), $rEnum->getCases());
+            $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
+
+            $type = \is_string($enumCases[0] ?? '') ? 'string' : 'integer';
+
             if ($nullable) {
                 $enumCases[] = null;
             }
 
             return [
-                'type' => (string) $rEnum->getBackingType(),
+                'type' => $type,
                 'enum' => $enumCases,
             ];
         }
@@ -150,6 +152,7 @@ final class TypeFactory implements TypeFactoryInterface
             throw new \LogicException('The schema factory must be injected by calling the "setSchemaFactory" method.');
         }
 
+        $serializerContext += [SchemaFactory::FORCE_SUBSCHEMA => true];
         $subSchema = $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext, false);
 
         return ['$ref' => $subSchema['$ref']];

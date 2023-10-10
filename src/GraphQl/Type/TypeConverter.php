@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -118,8 +118,8 @@ final class TypeConverter implements TypeConverterInterface
     private function getResourceType(Type $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType
     {
         if (
-            $this->typeBuilder->isCollection($type) &&
-            $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
+            $this->typeBuilder->isCollection($type)
+            && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
         ) {
             $resourceClass = $collectionValueType->getClassName();
         } else {

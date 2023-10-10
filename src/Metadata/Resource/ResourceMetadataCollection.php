@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource;
 
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -36,7 +35,7 @@ final class ResourceMetadataCollection extends \ArrayObject
         parent::__construct($input);
     }
 
-    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
+    public function getOperation(string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
     {
         $operationName ??= '';
         $cachePrefix = ($forceCollection ? self::FORCE_COLLECTION : '').($httpOperation ? self::HTTP_OPERATION : '');
@@ -59,8 +58,8 @@ final class ResourceMetadataCollection extends \ArrayObject
 
             foreach ($metadata->getOperations() ?? [] as $name => $operation) {
                 $isCollection = $operation instanceof CollectionOperationInterface;
-                $method = $operation->getMethod() ?? HttpOperation::METHOD_GET;
-                $isGetOperation = HttpOperation::METHOD_GET === $method || HttpOperation::METHOD_OPTIONS === $method || HttpOperation::METHOD_HEAD === $method;
+                $method = $operation->getMethod() ?? 'GET';
+                $isGetOperation = 'GET' === $method || 'OPTIONS' === $method || 'HEAD' === $method;
                 if ('' === $operationName && $isGetOperation && ($forceCollection ? $isCollection : !$isCollection)) {
                     return $this->operationCache[$httpCacheKey] = $operation;
                 }
@@ -102,7 +101,7 @@ final class ResourceMetadataCollection extends \ArrayObject
     private function handleNotFound(string $operationName, ?ApiResource $metadata): void
     {
         // Hide the FQDN in the exception message if possible
-        $shortName = $metadata ? $metadata->getShortName() : $this->resourceClass;
+        $shortName = $metadata?->getShortName() ? $metadata->getShortName() : $this->resourceClass;
         if (!$metadata && false !== $pos = strrpos($shortName, '\\')) {
             $shortName = substr($shortName, $pos + 1);
         }

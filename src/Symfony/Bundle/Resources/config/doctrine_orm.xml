@@ -126,15 +126,11 @@
             <argument type="service" id="api_platform.doctrine.orm.metadata.property.metadata_factory.inner" />
         </service>
 
-        <service id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="40">
-            <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory.inner" />
-        </service>
-
         <service id="api_platform.doctrine.orm.state.collection_provider" class="ApiPlatform\Doctrine\Orm\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
+            <argument type="tagged_locator" tag="api_platform.doctrine.orm.links_handler" index-by="key" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\CollectionProvider" />
             <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine.orm.state.collection_provider" />
@@ -145,6 +141,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
+            <argument type="tagged_locator" tag="api_platform.doctrine.orm.links_handler" index-by="key" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Orm\State\ItemProvider" />
             <tag name="api_platform.state_provider" priority="-100" key="api_platform.doctrine.orm.state.item_provider" />
@@ -157,7 +154,7 @@
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="logger" on-invalid="ignore" />
-            <argument key="$identifiersExtractor" type="service" id="api_platform.identifiers_extractor.cached" on-invalid="ignore" />
+            <argument key="$identifiersExtractor" type="service" id="api_platform.identifiers_extractor" on-invalid="ignore" />
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\SearchFilter" alias="api_platform.doctrine.orm.search_filter" />

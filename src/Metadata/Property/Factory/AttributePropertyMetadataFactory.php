@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Util\Reflection;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\Util\Reflection;
 
 /**
  * Creates a property metadata from {@see ApiProperty} attribute.
@@ -112,13 +113,25 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
     private function createMetadata(ApiProperty $attribute, ApiProperty $propertyMetadata = null): ApiProperty
     {
         if (null === $propertyMetadata) {
-            return $attribute;
+            return $this->handleUserDefinedSchema($attribute);
         }
 
         foreach (get_class_methods(ApiProperty::class) as $method) {
             if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches) && null !== $val = $attribute->{$method}()) {
                 $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
             }
+        }
+
+        return $this->handleUserDefinedSchema($propertyMetadata);
+    }
+
+    private function handleUserDefinedSchema(ApiProperty $propertyMetadata): ApiProperty
+    {
+        // can't know later if the schema has been defined by the user or by API Platform
+        // store extra key to make this difference
+        if (null !== $propertyMetadata->getSchema()) {
+            $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+            $propertyMetadata = $propertyMetadata->withExtraProperties([SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED => true] + $extraProperties);
         }
 
         return $propertyMetadata;

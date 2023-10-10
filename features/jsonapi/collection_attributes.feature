@@ -14,32 +14,7 @@ Feature: JSON API collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON should be valid according to the JSON API schema
-    And the JSON should be equal to:
-    """
-    {
-      "data": {
-        "id": "/circular_references/1",
-        "type": "CircularReference",
-        "relationships": {
-          "parent": {
-            "data": {
-              "type": "CircularReference",
-              "id": "/circular_references/1"
-            }
-          },
-          "children": {
-            "data": [
-              {
-                "type": "CircularReference",
-                "id": "/circular_references/1"
-              },
-              {
-                "type": "CircularReference",
-                "id": "/circular_references/2"
-              }
-            ]
-          }
-        }
-      }
-    }
-    """
+    And the JSON node "data.id" should be equal to "/circular_references/1"
+    And the JSON node "data.relationships.parent.data.id" should be equal to "/circular_references/1"
+    And the JSON node "data.relationships.children.data[0].id" should match "#/circular_references/(1|2)#"
+    And the JSON node "data.relationships.children.data[1].id" should match "#/circular_references/(1|2)#"

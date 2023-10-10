@@ -1,3 +1,9 @@
+parameters:
+    container.autowiring.strict_mode: true
+    .container.dumper.inline_class_loader: true
+    env(MERCURE_URL): https://demo.mercure.rocks
+    env(MERCURE_JWT_SECRET): eyJhbGciOiJIUzI1NiJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOlsiKiJdLCJzdWJzY3JpYmUiOlsiaHR0cHM6Ly9leGFtcGxlLmNvbS9teS1wcml2YXRlLXRvcGljIiwie3NjaGVtZX06Ly97K2hvc3R9L2RlbW8vYm9va3Mve2lkfS5qc29ubGQiLCIvLndlbGwta25vd24vbWVyY3VyZS9zdWJzY3JpcHRpb25zey90b3BpY317L3N1YnNjcmliZXJ9Il0sInBheWxvYWQiOnsidXNlciI6Imh0dHBzOi8vZXhhbXBsZS5jb20vdXNlcnMvZHVuZ2xhcyIsInJlbW90ZUFkZHIiOiIxMjcuMC4wLjEifX19.KKPIikwUzRuB3DTpVw6ajzwSChwFw5omBMmMcWKiDcM
+
 doctrine:
     dbal:
         driver: 'pdo_sqlite'
@@ -19,8 +25,8 @@ web_profiler:
 mercure:
     hubs:
         default:
-            url: https://demo.mercure.rocks/hub
-            jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJmb28iLCJiYXIiXSwicHVibGlzaCI6WyJmb28iXX19.LRLvirgONK13JgacQ_VbcjySbVhkSmHy3IznH3tA9PM
+            url: '%env(MERCURE_URL)%'
+            jwt: '%env(MERCURE_JWT_SECRET)%'
 
 api_platform:
     title:                             'My Dummy API'
@@ -36,10 +42,19 @@ api_platform:
         html:                          ['text/html']
         graphql:                       ['application/graphql']
         multipart:                     ['multipart/form-data']
+    docs_formats:
+        html:                          ['text/html']
+        json:                          ['application/json']
+        jsonopenapi:                   ['application/vnd.openapi+json']
+        yamlopenapi:                   ['application/vnd.openapi+yaml']
+        jsonld:                        ['application/ld+json']
+        jsonhal:                       ['application/hal+json']
+        jsonapi:                       ['application/vnd.api+json']
     error_formats:
         jsonproblem:                   ['application/problem+json']
         jsonld:                        ['application/ld+json']
         jsonapi:                       ['application/vnd.api+json']
+        html:                          ['text/html']
     graphql:
         enabled: true
         nesting_separator: __
@@ -61,9 +76,12 @@ api_platform:
     http_cache:
         invalidation:
             enabled: true
+    keep_legacy_inflector: false
     defaults:
         extra_properties:
             standard_put: true
+            rfc_7807_compliant_errors: true
+            legacy_api_platform_controller: true
         normalization_context: 
             skip_null_values: false
         pagination_client_enabled:            true
@@ -75,6 +93,7 @@ api_platform:
             shared_max_age:                   3600
             vary:                             ['Accept', 'Cookie']
             public:                           true
+
     doctrine_mongodb_odm: false
     mapping:
         paths:
@@ -82,10 +101,6 @@ api_platform:
             - '%kernel.project_dir%/../TestBundle/Model'
     mercure:
         include_type: true
-
-parameters:
-    container.autowiring.strict_mode: true
-    container.dumper.inline_class_loader: true
 
 services:
     test.client:
@@ -262,10 +277,6 @@ services:
         alias: property_accessor
         public: true
 
-    test.annotation_reader:
-        alias: annotation_reader
-        public: true
-
     app.dummy_validation.group_generator:
         class: ApiPlatform\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         tags:
@@ -293,42 +304,42 @@ services:
     app.graphql.query_resolver.dummy_custom_item:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryItemResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.query_resolver.dummy_custom_collection:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryCollectionResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.query_resolver.dummy_custom_collection_no_read_and_serialize:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeCollectionResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.dummy_custom:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumMutationResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_not_persisted:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNotPersistedMutationResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_no_write_custom_result:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNoWriteCustomResultMutationResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.upload_media_object:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMediaObjectResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.upload_multiple_media_object:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMultipleMediaObjectResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.date_time_type:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType'
@@ -354,17 +365,17 @@ services:
     app.graphql.query_resolver.dummy_custom_not_retrieved_item:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.query_resolver.dummy_custom_item_no_read_and_serialize:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeItemResolver'
         tags:
-            - { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_only_persist:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumOnlyPersistMutationResolver'
         tags:
-            - { name: 'api_platform.graphql.mutation_resolver' }
+            - { name: 'api_platform.graphql.resolver' }
 
     app.messenger_handler.messenger_with_inputs:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Entity\MessengerWithInputHandler'
@@ -427,3 +438,22 @@ services:
         tags:
             -  { name: 'serializer.normalizer' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\AuthorItemProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\BookCollectionProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5452\LibraryItemProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\LinkHandledDummyLinksHandler:
+        tags:
+            - {name: 'api_platform.doctrine.orm.links_handler'}
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ODMLinkHandledDummyLinksHandler:
+        tags:
+            - {name: 'api_platform.doctrine.odm.links_handler'}

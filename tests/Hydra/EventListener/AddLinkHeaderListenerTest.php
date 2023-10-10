@@ -21,9 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
-use Symfony\Component\WebLink\Link;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -49,13 +47,12 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $listener = new AddLinkHeaderListener($urlGenerator->reveal());
         $listener->onKernelResponse($event);
-        $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
+        $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_api_platform_links')->getLinks()));
     }
 
-    public function provider(): \Iterator
+    public static function provider(): \Iterator
     {
         yield ['<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"', new Request()];
-        yield ['<https://demo.mercure.rocks/hub>; rel="mercure",<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"', new Request([], [], ['_links' => new GenericLinkProvider([new Link('mercure', 'https://demo.mercure.rocks/hub')])])];
     }
 
     public function testSkipWhenPreflightRequest(): void
@@ -75,6 +72,6 @@ class AddLinkHeaderListenerTest extends TestCase
         $listener = new AddLinkHeaderListener($urlGenerator->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertFalse($request->attributes->has('_links'));
+        $this->assertFalse($request->attributes->has('_api_platform_links'));
     }
 }

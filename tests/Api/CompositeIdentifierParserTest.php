@@ -28,7 +28,7 @@ class CompositeIdentifierParserTest extends TestCase
         }
     }
 
-    public function variousIdentifiers(): array
+    public static function variousIdentifiers(): array
     {
         return [[[
             'a=bd;dc=d' => ['a' => 'bd', 'dc' => 'd'],
@@ -52,7 +52,7 @@ class CompositeIdentifierParserTest extends TestCase
         }
     }
 
-    public function compositeIdentifiers(): array
+    public static function compositeIdentifiers(): array
     {
         return [[[
             'a=bd;dc=d' => ['a' => 'bd', 'dc' => 'd'],

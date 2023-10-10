@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Filter;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -35,12 +35,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractSearchFilter extends AbstractFilter implements ConstantScoreFilterInterface
 {
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected IriConverterInterface $iriConverter, protected PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected IriConverterInterface $iriConverter, protected PropertyAccessorInterface $propertyAccessor, NameConverterInterface $nameConverter = null, array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
     }
 
-    public function apply(array $clauseBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
+    public function apply(array $clauseBody, string $resourceClass, Operation $operation = null, array $context = []): array
     {
         $searches = [];
 
@@ -96,6 +96,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
                     'property' => $property,
                     'type' => $hasAssociation ? 'string' : $this->getPhpType($type),
                     'required' => false,
+                    'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
                 ];
             }
         }
@@ -134,7 +135,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
     /**
      * Is the given property of the given resource class an identifier?
      */
-    protected function isIdentifier(string $resourceClass, string $property, ?Operation $operation = null): bool
+    protected function isIdentifier(string $resourceClass, string $property, Operation $operation = null): bool
     {
         $identifier = 'id';
         if ($operation instanceof HttpOperation) {

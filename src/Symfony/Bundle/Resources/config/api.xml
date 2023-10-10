@@ -10,12 +10,14 @@
         <service id="api_platform.property_info" alias="property_info" public="false" />
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
 
-        <service id="api_platform.resource_class_resolver" class="ApiPlatform\Api\ResourceClassResolver" public="false">
+        <service id="api_platform.resource_class_resolver" class="ApiPlatform\Metadata\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
         <service id="ApiPlatform\Api\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
+        <service id="ApiPlatform\Metadata\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
 
         <service id="ApiPlatform\Api\UrlGeneratorInterface" alias="api_platform.router" />
+        <service id="ApiPlatform\Metadata\UrlGeneratorInterface" alias="api_platform.router" />
 
         <service id="api_platform.router" class="ApiPlatform\Symfony\Routing\Router" public="false">
             <argument type="service" id="router" />
@@ -26,6 +28,7 @@
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument key="$debug">%kernel.debug%</argument>
         </service>
         <service id="ApiPlatform\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
@@ -66,13 +69,22 @@
             <argument type="service" id="api_platform.serializer.mapping.class_metadata_factory.inner" />
         </service>
 
+        <service id="api_platform.serializer.mapping.cache_class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory" decorates="api_platform.serializer.mapping.class_metadata_factory" decoration-priority="-2" public="false">
+            <argument type="service" id="api_platform.serializer.mapping.cache_class_metadata_factory.inner" />
+            <argument type="service" id="serializer.mapping.cache.symfony" />
+        </service>
+
         <!-- Resources Operations path resolver -->
         <service id="api_platform.path_segment_name_generator.underscore" class="ApiPlatform\Operation\UnderscorePathSegmentNameGenerator" public="false" />
         <service id="api_platform.path_segment_name_generator.dash" class="ApiPlatform\Operation\DashPathSegmentNameGenerator" public="false" />
 
+        <service id="api_platform.metadata.path_segment_name_generator.underscore" class="ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator" public="false" />
+        <service id="api_platform.metadata.path_segment_name_generator.dash" class="ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator" public="false" />
+
         <!-- Action -->
 
         <service id="api_platform.action.placeholder" class="ApiPlatform\Action\PlaceholderAction" public="true" />
+        <service id="ApiPlatform\Action\PlaceholderAction" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" public="true" />
@@ -84,8 +96,11 @@
         <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
         <service id="ApiPlatform\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
 
-        <service id="api_platform.action.entrypoint" class="ApiPlatform\Action\EntrypointAction" public="true">
+        <service id="api_platform.action.entrypoint" class="ApiPlatform\Documentation\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
+            <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
+            <argument>%api_platform.docs_formats%</argument>
         </service>
 
         <service id="api_platform.action.documentation" class="ApiPlatform\Documentation\Action\DocumentationAction" public="true">
@@ -94,6 +109,10 @@
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
             <argument type="service" id="api_platform.openapi.factory" on-invalid="null" />
+            <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
+            <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
+            <argument type="service" id="api_platform.negotiator" on-invalid="null" />
+            <argument>%api_platform.docs_formats%</argument>
         </service>
 
         <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
@@ -130,7 +149,7 @@
         </service>
 
         <!-- Identifiers -->
-        <service id="api_platform.api.identifiers_extractor" class="ApiPlatform\Api\IdentifiersExtractor" public="false">
+        <service id="api_platform.api.identifiers_extractor" class="ApiPlatform\Metadata\IdentifiersExtractor" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
@@ -139,6 +158,7 @@
         </service>
         <service id="api_platform.identifiers_extractor" alias="api_platform.api.identifiers_extractor" />
         <service id="ApiPlatform\Api\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
+        <service id="ApiPlatform\Metadata\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
 
         <service id="api_platform.uri_variables.converter" class="ApiPlatform\Api\UriVariablesConverter" public="false">
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
@@ -157,7 +177,7 @@
         <service id="api_platform.iri_converter" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Symfony\Routing\IriConverter" public="false">
-            <argument type="service" id="api_platform.state_provider" />
+            <argument type="service" id="api_platform.state_provider.locator" />
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.api.identifiers_extractor" />
             <argument type="service" id="api_platform.resource_class_resolver" />
@@ -167,11 +187,17 @@
             <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
         </service>
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
+        <service id="ApiPlatform\Metadata\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener">
-            <argument key="$controller">api_platform.action.exception</argument>
+            <argument key="$controller">api_platform.symfony.main_controller</argument>
             <argument key="$logger" type="service" id="logger" on-invalid="null" />
             <argument key="$debug">%kernel.debug%</argument>
+            <argument key="$resourceMetadataCollectionFactory" type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument key="$errorFormats">%api_platform.error_formats%</argument>
+            <argument key="$exceptionToStatus">%api_platform.exception_to_status%</argument>
+            <argument key="$identifiersExtractor" type="service" id="api_platform.api.identifiers_extractor"/>
+            <argument key="$resourceClassResolver" type="service" id="api_platform.resource_class_resolver"/>
         </service>
     </services>
 </container>

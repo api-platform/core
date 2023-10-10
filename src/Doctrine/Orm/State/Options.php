@@ -17,8 +17,14 @@ use ApiPlatform\State\OptionsInterface;
 
 class Options implements OptionsInterface
 {
+    /**
+     * @param string|callable $handleLinks experimental callable, typed mixed as we may want a service name in the future
+     *
+     * @see \ApiPlatform\Doctrine\Orm\State\LinksHandlerInterface
+     */
     public function __construct(
         protected ?string $entityClass = null,
+        protected mixed $handleLinks = null,
     ) {
     }
 
@@ -31,6 +37,19 @@ class Options implements OptionsInterface
     {
         $self = clone $this;
         $self->entityClass = $entityClass;
+
+        return $self;
+    }
+
+    public function getHandleLinks(): mixed
+    {
+        return $this->handleLinks;
+    }
+
+    public function withHandleLinks(mixed $handleLinks): self
+    {
+        $self = clone $this;
+        $self->handleLinks = $handleLinks;
 
         return $self;
     }

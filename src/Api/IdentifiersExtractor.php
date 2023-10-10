@@ -13,20 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * {@inheritdoc}
+ *
+ * @deprecated use ApiPlatform\Metadata\IdentifiersExtractor instead
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
@@ -72,10 +74,11 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         }
 
         $identifiers = [];
-        foreach ($links ?? [] as $link) {
-            if (1 < (is_countable($link->getIdentifiers()) ? \count($link->getIdentifiers()) : 0)) {
+        foreach ($links ?? [] as $k => $link) {
+            $linkIdentifiers = $link->getIdentifiers() ?? [$k];
+            if (1 < \count($linkIdentifiers)) {
                 $compositeIdentifiers = [];
-                foreach ($link->getIdentifiers() as $identifier) {
+                foreach ($linkIdentifiers as $identifier) {
                     $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $identifier, $link->getParameterName());
                 }
 
@@ -84,7 +87,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
 
             $parameterName = $link->getParameterName();
-            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass(), $link->getIdentifiers()[0], $parameterName, $link->getToProperty());
+            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $linkIdentifiers[0], $parameterName, $link->getToProperty());
         }
 
         return $identifiers;
@@ -93,7 +96,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     /**
      * Gets the value of the given class property.
      */
-    private function getIdentifierValue(object $item, string $class, string $property, string $parameterName, ?string $toProperty = null): float|bool|int|string
+    private function getIdentifierValue(object $item, string $class, string $property, string $parameterName, string $toProperty = null): float|bool|int|string
     {
         if ($item instanceof $class) {
             try {
@@ -153,6 +156,10 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
 
         if ($identifierValue instanceof \Stringable) {
             return (string) $identifierValue;
+        }
+
+        if ($identifierValue instanceof \BackedEnum) {
+            return (string) $identifierValue->value;
         }
 
         throw new RuntimeException(sprintf('We were not able to resolve the identifier matching parameter "%s".', $parameterName));

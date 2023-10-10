@@ -33,7 +33,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
 
     protected string $resourceClass = Dummy::class;
 
-    protected string $alias = 'o';
+    protected const ALIAS = 'o';
 
     protected string $filterClass;
 
@@ -56,11 +56,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
     protected function doTestApply(?array $properties, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $filterFactory = null, string $resourceClass = null): void
     {
         if (null === $filterFactory) {
-            $filterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): FilterInterface {
-                $filterClass = $this->filterClass;
-
-                return new $filterClass($managerRegistry, null, $properties);
-            };
+            $filterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): FilterInterface => new ($this->filterClass)($managerRegistry, null, $properties);
         }
 
         $repository = $this->repository;
@@ -69,8 +65,8 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
             $repository = $this->managerRegistry->getManagerForClass($resourceClass)->getRepository($resourceClass);
         }
         $resourceClass = $resourceClass ?: $this->resourceClass;
-        $queryBuilder = $repository->createQueryBuilder($this->alias);
-        $filterCallable = $filterFactory($this->managerRegistry, $properties);
+        $queryBuilder = $repository->createQueryBuilder(static::ALIAS);
+        $filterCallable = $filterFactory($this, $this->managerRegistry, $properties);
         $filterCallable->apply($queryBuilder, new QueryNameGenerator(), $resourceClass, null, ['filters' => $filterParameters]);
 
         $this->assertSame($expectedDql, $queryBuilder->getQuery()->getDQL());
@@ -87,10 +83,10 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
         }
     }
 
-    protected function buildFilter(?array $properties = null)
+    protected function buildFilter(array $properties = null)
     {
         return new $this->filterClass($this->managerRegistry, null, $properties);
     }
 
-    abstract public function provideApplyTestData(): array;
+    abstract public static function provideApplyTestData(): array;
 }

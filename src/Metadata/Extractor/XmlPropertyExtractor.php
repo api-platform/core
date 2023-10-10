@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Util\XmlUtils;
 
 /**
@@ -72,6 +72,7 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
                 'extraProperties' => $this->buildExtraProperties($property, 'extraProperties'),
                 'iris' => $this->buildArrayValue($property, 'iri'),
                 'genId' => $this->phpize($property, 'genId', 'bool'),
+                'uriTemplate' => $this->phpize($property, 'uriTemplate', 'string'),
             ];
         }
     }

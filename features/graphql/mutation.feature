@@ -673,7 +673,7 @@ Feature: GraphQL mutation support
       }
     }
     """
-    And the response should be in JSON
+    Then the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.createWritableId.writableId.id" should be equal to "/writable_ids/c6b722fe-0331-48c4-a214-f81f9f1ca082"
     And the JSON node "data.createWritableId.writableId._id" should be equal to "c6b722fe-0331-48c4-a214-f81f9f1ca082"
@@ -794,6 +794,7 @@ Feature: GraphQL mutation support
     And the JSON node "errors[0].extensions.violations[0].path" should be equal to "name"
     And the JSON node "errors[0].extensions.violations[0].message" should be equal to "This value should not be blank."
 
+  @createSchema
   Scenario: Execute a custom mutation
     Given there are 1 dummyCustomMutation objects
     When I send the following GraphQL request:
@@ -812,7 +813,9 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.sumDummyCustomMutation.dummyCustomMutation.result" should be equal to "8"
 
+  @createSchema
   Scenario: Execute a not persisted custom mutation (resolver returns null)
+    Given there are 1 dummyCustomMutation objects
     When I send the following GraphQL request:
     """
     mutation {

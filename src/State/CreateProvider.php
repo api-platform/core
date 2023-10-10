@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\State;
 
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\State\Exception\ProviderNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -30,41 +30,49 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @experimental
+ *
+ * @internal
  */
 final class CreateProvider implements ProviderInterface
 {
-    public function __construct(private ProviderInterface $decorated, private ?PropertyAccessorInterface $propertyAccessor = null)
-    {
+    public function __construct(
+        private ProviderInterface $decorated,
+        private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private ?PropertyAccessorInterface $propertyAccessor = null,
+    ) {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        if (!$uriVariables || !$operation instanceof HttpOperation || null !== $operation->getController()) {
+        if (!$uriVariables || !$operation instanceof HttpOperation || (null !== $operation->getController() && 'api_platform.symfony.main_controller' !== $operation->getController())) {
             return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
         $operationUriVariables = $operation->getUriVariables();
         $relationClass = current($operationUriVariables)->getFromClass();
         $key = key($operationUriVariables);
-        $relationUriVariables = [];
 
-        foreach ($operationUriVariables as $parameterName => $value) {
-            if ($key === $parameterName) {
-                $relationUriVariables['id'] = new Link(identifiers: $value->getIdentifiers(), fromClass: $value->getFromClass(), parameterName: $key);
-                continue;
-            }
-
-            $relationUriVariables[$parameterName] = $value;
+        $parentOperation = $this->resourceMetadataCollectionFactory
+            ->create($relationClass)
+            ->getOperation($operation->getExtraProperties()['parent_uri_template'] ?? null);
+        try {
+            $relation = $this->decorated->provide($parentOperation, $uriVariables, $context);
+        } catch (ProviderNotFoundException) {
+            $relation = null;
+        }
+        if (!$relation) {
+            throw new NotFoundHttpException('Not Found');
         }
 
-        $relation = $this->decorated->provide(new Get(uriVariables: $relationUriVariables, class: $relationClass), $uriVariables);
         try {
             $resource = new ($operation->getClass());
         } catch (\Throwable $e) {
             throw new RuntimeException(sprintf('An error occurred while trying to create an instance of the "%s" resource. Consider writing your own "%s" implementation and setting it as `provider` on your operation instead.', $operation->getClass(), ProviderInterface::class), 0, $e);
         }
-        $this->propertyAccessor->setValue($resource, $key, $relation);
+
+        $property = $operationUriVariables[$key]->getToProperty() ?? $key;
+        $this->propertyAccessor->setValue($resource, $property, $relation);
 
         return $resource;
     }

@@ -13,13 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\InvalidArgumentException as LegacyInvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -74,12 +76,34 @@ class ItemNormalizer extends AbstractItemNormalizer
     {
         try {
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
-        } catch (InvalidArgumentException) {
+        } catch (LegacyInvalidArgumentException|InvalidArgumentException) {
             $operation = $this->resourceMetadataCollectionFactory->create($context['resource_class'])->getOperation();
-            // todo: we could guess uri variables with the operation and the data instead of hardcoding id
-            $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => $data['id']]]);
+            if (
+                null !== ($context['uri_variables'] ?? null)
+                && $operation instanceof HttpOperation
+                && \count($operation->getUriVariables() ?? []) > 1
+            ) {
+                throw new InvalidArgumentException('Cannot find object to populate, use JSON-LD or specify an IRI at path "id".');
+            }
+            $uriVariables = $this->getContextUriVariables($data, $operation, $context);
+            $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
 
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => true]);
         }
+    }
+
+    private function getContextUriVariables(array $data, $operation, array $context): array
+    {
+        $uriVariables = $context['uri_variables'] ?? [];
+
+        $operationUriVariables = $operation->getUriVariables();
+        if ((null !== $uriVariable = array_shift($operationUriVariables)) && \count($uriVariable->getIdentifiers())) {
+            $identifier = $uriVariable->getIdentifiers()[0];
+            if (isset($data[$identifier])) {
+                $uriVariables[$uriVariable->getParameterName()] = $data[$identifier];
+            }
+        }
+
+        return $uriVariables;
     }
 }

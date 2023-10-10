@@ -164,7 +164,7 @@ Feature: GraphQL subscription support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.updateDummyMercureSubscribe.dummyMercure.id" should be equal to "/dummy_mercures/1"
     And the JSON node "data.updateDummyMercureSubscribe.dummyMercure.name" should be equal to "Dummy Mercure #1"
-    And the JSON node "data.updateDummyMercureSubscribe.mercureUrl" should match "@^https://demo.mercure.rocks/hub\?topic=http://example.com/subscriptions/[a-f0-9]+$@"
+    And the JSON node "data.updateDummyMercureSubscribe.mercureUrl" should match "@^https://demo.mercure.rocks\?topic=http://example.com/subscriptions/[a-f0-9]+$@"
     And the JSON node "data.updateDummyMercureSubscribe.clientSubscriptionId" should be equal to "myId"
 
     When I send the following GraphQL request:
@@ -182,7 +182,7 @@ Feature: GraphQL subscription support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.updateDummyMercureSubscribe.dummyMercure.id" should be equal to "/dummy_mercures/2"
-    And the JSON node "data.updateDummyMercureSubscribe.mercureUrl" should match "@^https://demo.mercure.rocks/hub\?topic=http://example.com/subscriptions/[a-f0-9]+$@"
+    And the JSON node "data.updateDummyMercureSubscribe.mercureUrl" should match "@^https://demo.mercure.rocks\?topic=http://example.com/subscriptions/[a-f0-9]+$@"
 
   Scenario: Receive Mercure updates with different payloads from subscriptions (legacy PUT in non-standard mode)
     When I add "Accept" header equal to "application/ld+json"

@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
+use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 
@@ -38,7 +40,7 @@ final class RespondListener
 
     public function __construct(
         ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
-        private readonly ?IriConverterInterface $iriConverter = null,
+        private readonly null|IriConverterInterface|LegacyIriConverterInterface $iriConverter = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
@@ -48,9 +50,13 @@ final class RespondListener
      */
     public function onKernelView(ViewEvent $event): void
     {
-        $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
+        $controllerResult = $event->getControllerResult();
         $operation = $this->initializeOperation($request);
+
+        if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
+            return;
+        }
 
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 
@@ -83,14 +89,14 @@ final class RespondListener
 
         $method = $request->getMethod();
         if (
-            $this->iriConverter &&
-            $operation &&
-            ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false)
+            $this->iriConverter
+            && $operation
+            && ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false)
             && 301 === $operation->getStatus()
         ) {
             $status = 301;
             $headers['Location'] = $this->iriConverter->getIriFromResource($request->attributes->get('data'), UrlGeneratorInterface::ABS_PATH, $operation);
-        } elseif (HttpOperation::METHOD_PUT === $method && !($attributes['previous_data'] ?? null) && null === $status) {
+        } elseif ('PUT' === $method && !($attributes['previous_data'] ?? null) && null === $status && ($operation instanceof Put && ($operation->getAllowCreate() ?? false))) {
             $status = Response::HTTP_CREATED;
         }
 
@@ -99,9 +105,13 @@ final class RespondListener
         if ($request->attributes->has('_api_write_item_iri')) {
             $headers['Content-Location'] = $request->attributes->get('_api_write_item_iri');
 
-            if ((Response::HTTP_CREATED === $status || (300 <= $status && $status < 400)) && HttpOperation::METHOD_POST === $method) {
+            if ((Response::HTTP_CREATED === $status || (300 <= $status && $status < 400)) && 'POST' === $method) {
                 $headers['Location'] = $request->attributes->get('_api_write_item_iri');
             }
+        }
+
+        if (($exception = $request->attributes->get('data')) instanceof HttpExceptionInterface) {
+            $headers = array_merge($headers, $exception->getHeaders());
         }
 
         $event->setResponse(new Response(

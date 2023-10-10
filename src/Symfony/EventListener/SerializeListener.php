@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
+use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ResourceList;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
+use ApiPlatform\Util\ErrorFormatGuesser;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -40,8 +43,13 @@ final class SerializeListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'serialize';
 
-    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
-    {
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+        private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
+        private readonly array $errorFormats = [],
+        private readonly bool $debug = false,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
 
@@ -64,6 +72,11 @@ final class SerializeListener
         }
 
         $operation = $this->initializeOperation($request);
+
+        if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
+            return;
+        }
+
         if (!($operation?->canSerialize() ?? true)) {
             return;
         }
@@ -81,6 +94,29 @@ final class SerializeListener
             return;
         }
 
+        if ($controllerResult instanceof ValidationException) {
+            $format = ErrorFormatGuesser::guessErrorFormat($request, $this->errorFormats);
+            $previousOperation = $request->attributes->get('_api_previous_operation');
+            if (!($previousOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
+                $context['groups'] = ['legacy_'.$format['key']];
+                $context['force_iri_generation'] = false;
+            }
+        }
+
+        if ($request->get('_api_error', false)) {
+            $context['skip_deprecated_exception_normalizers'] = true;
+
+            if ($this->debug) {
+                $groups = $context['groups'] ?? [];
+                if (!\is_array($groups)) {
+                    $groups = [$groups];
+                }
+
+                $groups[] = 'trace';
+                $context['groups'] = $groups;
+            }
+        }
+
         if ($included = $request->attributes->get('_api_included')) {
             $context['api_included'] = $included;
         }
@@ -91,7 +127,10 @@ final class SerializeListener
         $resourcesToPush = new ResourceList();
         $context['resources_to_push'] = &$resourcesToPush;
         $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'resources_to_push';
-        if (($options = $operation?->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+        if (($options = $operation?->getStateOptions()) && (
+            ($options instanceof Options && $options->getEntityClass())
+            || ($options instanceof ODMOptions && $options->getDocumentClass())
+        )) {
             $context['force_resource_class'] = $operation->getClass();
         }
 
@@ -103,11 +142,11 @@ final class SerializeListener
             return;
         }
 
-        $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
+        $linkProvider = $request->attributes->get('_api_platform_links', new GenericLinkProvider());
         foreach ($resourcesToPush as $resourceToPush) {
             $linkProvider = $linkProvider->withLink((new Link('preload', $resourceToPush))->withAttribute('as', 'fetch'));
         }
-        $request->attributes->set('_links', $linkProvider);
+        $request->attributes->set('_api_platform_links', $linkProvider);
     }
 
     /**

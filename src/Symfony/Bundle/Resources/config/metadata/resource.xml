@@ -35,6 +35,12 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.uri_template.inner" />
         </service>
 
+        <service id="api_platform.metadata.resource.metadata_collection_factory.main_controller" class="ApiPlatform\Metadata\Resource\Factory\MainControllerResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="500" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.main_controller.inner" />
+            <argument>%api_platform.event_listeners_backward_compatibility_layer%</argument>
+        </service>
+
+
         <service id="api_platform.metadata.resource.metadata_collection_factory.link" class="ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="500" public="false">
             <argument type="service" id="api_platform.metadata.resource.link_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.link.inner" />
@@ -53,6 +59,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.formats.inner" />
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.patch_formats%</argument>
+            <argument>%api_platform.error_formats%</argument>
         </service>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.filters" class="ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="200" public="false">

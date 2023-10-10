@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache\EventListener;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
@@ -34,6 +34,8 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  * @see https://docs.varnish-software.com/varnish-cache-plus/vmods/ykey/
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ *  @deprecated use \Symfony\EventListener\AddTagsListener.php instead
  */
 final class AddTagsListener
 {
@@ -52,6 +54,9 @@ final class AddTagsListener
     {
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
         $response = $event->getResponse();
 
         if (

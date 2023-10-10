@@ -170,7 +170,6 @@ Feature: HAL support
     }
     """
 
-
   Scenario: Embed a relation in a parent object
     When I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/relation_embedders" with body:
@@ -180,8 +179,6 @@ Feature: HAL support
     }
     """
     Then the response status code should be 201
-
-  Scenario: Get the object with the embedded relation
     When I add "Accept" header equal to "application/hal+json"
     And I send a "GET" request to "/relation_embedders/1"
     Then the response status code should be 200

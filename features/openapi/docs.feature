@@ -10,8 +10,7 @@ Feature: Documentation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
     # Context
-    # And the JSON node "openapi" should be equal to "3.1.0"
-    And the JSON node "openapi" should be equal to "3.0.0"
+    And the JSON node "openapi" should be equal to "3.1.0"
     # Root properties
     And the JSON node "info.title" should be equal to "My Dummy API"
     And the JSON node "info.description" should contain "This is a test API."
@@ -30,7 +29,7 @@ Feature: Documentation support
                 }
             }
         },
-        "Some Authorization Name": {
+        "Some_Authorization_Name": {
             "type": "apiKey",
             "description": "Value for the Authorization header parameter.",
             "name": "Authorization",
@@ -70,6 +69,7 @@ Feature: Documentation support
     And the OpenAPI class "User-user_user-write" exists
     And the OpenAPI class "UuidIdentifierDummy" exists
     And the OpenAPI class "ThirdLevel" exists
+    And the OpenAPI class "DummyCar" exists
     And the OpenAPI class "ParentDummy" doesn't exist
     And the OpenAPI class "UnknownDummy" doesn't exist
     And the OpenAPI path "/relation_embedders/{id}/custom" exists
@@ -86,19 +86,19 @@ Feature: Documentation support
     {
       "default": "male",
       "example": "male",
-      "type": "string",
+      "type": ["string", "null"],
       "enum": [
           "male",
           "female",
           null
-      ],
-      "nullable": true
+      ]
     }
     """
     And the "playMode" property exists for the OpenAPI class "VideoGame"
     And the "playMode" property for the OpenAPI class "VideoGame" should be equal to:
     """
     {
+      "owl:maxCardinality": 1,
       "type": "string",
       "format": "iri-reference"
     }
@@ -111,6 +111,9 @@ Feature: Documentation support
     And the JSON node "paths./dummies.get.parameters[3].in" should be equal to "query"
     And the JSON node "paths./dummies.get.parameters[3].required" should be false
     And the JSON node "paths./dummies.get.parameters[3].schema.type" should be equal to "boolean"
+
+    And the JSON node "paths./dummy_cars.get.parameters[8].name" should be equal to "foobar[]"
+    And the JSON node "paths./dummy_cars.get.parameters[8].description" should be equal to "Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: foobar[]={propertyName}&foobar[]={anotherPropertyName}&foobar[{nestedPropertyParent}][]={nestedProperty}"
 
     # Subcollection - check filter on subResource
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[0].name" should be equal to "id"
@@ -235,8 +238,7 @@ Feature: Documentation support
                                         "type": "string"
                                     },
                                     "property": {
-                                        "type": "string",
-                                        "nullable": true
+                                        "type": ["string", "null"]
                                     },
                                     "required": {
                                         "type": "boolean"
@@ -295,3 +297,74 @@ Feature: Documentation support
     And the JSON node "components.schemas.RamseyUuidDummy.properties.id.description" should be equal to "The dummy id."
     And the JSON node "components.schemas.RelatedDummy-barcelona" should not exist
     And the JSON node "components.schemas.RelatedDummybarcelona" should exist
+
+  @!mongodb
+  Scenario: Retrieve the OpenAPI documentation to see if shortName property is used
+    Given I send a "GET" request to "/docs.json"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the OpenAPI class "Resource" exists
+    And the OpenAPI class "ResourceRelated" exists
+    And the "resourceRelated" property for the OpenAPI class "Resource" should be equal to:
+    """
+    {
+      "owl:maxCardinality": 1,
+      "readOnly": true,
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/ResourceRelated"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+    """
+
+  Scenario: Retrieve the JSON OpenAPI documentation
+    Given I add "Accept" header equal to "application/vnd.openapi+json"
+    And I send a "GET" request to "/docs"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/vnd.openapi+json; charset=utf-8"
+    # Context
+    And the JSON node "openapi" should be equal to "3.1.0"
+    # Root properties
+    And the JSON node "info.title" should be equal to "My Dummy API"
+    And the JSON node "info.description" should contain "This is a test API."
+    And the JSON node "info.description" should contain "Made with love"
+    # Security Schemes
+    And the JSON node "components.securitySchemes" should be equal to:
+     """
+    {
+        "oauth": {
+            "type": "oauth2",
+            "description": "OAuth 2.0 implicit Grant",
+            "flows": {
+                "implicit": {
+                    "authorizationUrl": "http://my-custom-server/openid-connect/auth",
+                    "scopes": {}
+                }
+            }
+        },
+        "Some_Authorization_Name": {
+            "type": "apiKey",
+            "description": "Value for the Authorization header parameter.",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+    """
+
+    Scenario: Retrieve the YAML OpenAPI documentation
+    Given I add "Accept" header equal to "application/vnd.openapi+yaml"
+    And I send a "GET" request to "/docs"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/vnd.openapi+yaml; charset=utf-8"
+
+    Scenario: Retrieve the OpenAPI documentation
+    Given I add "Accept" header equal to "text/html"
+    And I send a "GET" request to "/"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "text/html; charset=utf-8"

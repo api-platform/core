@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -45,19 +46,45 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
         return static::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
 
+    public function getSupportedTypes($format): array
+    {
+        return $format === static::FORMAT ? [ConstraintViolationListInterface::class => true] : [];
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
         return true;
     }
 
-    protected function getMessagesAndViolations(ConstraintViolationListInterface $constraintViolationList): array
+    /**
+     * return string[].
+     */
+    protected function getViolations(ConstraintViolationListInterface $constraintViolationList): array
     {
-        $violations = $messages = [];
+        $violations = [];
 
         foreach ($constraintViolationList as $violation) {
             $class = \is_object($root = $violation->getRoot()) ? $root::class : null;
+
+            if ($this->nameConverter instanceof AdvancedNameConverterInterface) {
+                $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath(), $class, static::FORMAT);
+            } elseif ($this->nameConverter instanceof NameConverterInterface) {
+                $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath());
+            } else {
+                $propertyPath = $violation->getPropertyPath();
+            }
+
             $violationData = [
-                'propertyPath' => $this->nameConverter ? $this->nameConverter->normalize($violation->getPropertyPath(), $class, static::FORMAT) : $violation->getPropertyPath(),
+                'propertyPath' => $propertyPath,
                 'message' => $violation->getMessage(),
                 'code' => $violation->getCode(),
             ];
@@ -68,11 +95,54 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
 
             $constraint = $violation instanceof ConstraintViolation ? $violation->getConstraint() : null;
             if (
-                [] !== $this->serializePayloadFields &&
-                $constraint &&
-                $constraint->payload &&
+                [] !== $this->serializePayloadFields
+                && $constraint
+                && $constraint->payload
                 // If some fields are whitelisted, only them are added
-                $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, $this->serializePayloadFields)
+                && $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, $this->serializePayloadFields)
+            ) {
+                $violationData['payload'] = $payloadFields;
+            }
+
+            $violations[] = $violationData;
+        }
+
+        return $violations;
+    }
+
+    protected function getMessagesAndViolations(ConstraintViolationListInterface $constraintViolationList): array
+    {
+        trigger_deprecation('api-platform', '3.2', sprintf('"%s::%s" will be removed in 4.0, use "%1$s::%s', __CLASS__, __METHOD__, 'getViolations'));
+        $violations = $messages = [];
+
+        foreach ($constraintViolationList as $violation) {
+            $class = \is_object($root = $violation->getRoot()) ? $root::class : null;
+
+            if ($this->nameConverter instanceof AdvancedNameConverterInterface) {
+                $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath(), $class, static::FORMAT);
+            } elseif ($this->nameConverter instanceof NameConverterInterface) {
+                $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath());
+            } else {
+                $propertyPath = $violation->getPropertyPath();
+            }
+
+            $violationData = [
+                'propertyPath' => $propertyPath,
+                'message' => $violation->getMessage(),
+                'code' => $violation->getCode(),
+            ];
+
+            if ($hint = $violation->getParameters()['hint'] ?? false) {
+                $violationData['hint'] = $hint;
+            }
+
+            $constraint = $violation instanceof ConstraintViolation ? $violation->getConstraint() : null;
+            if (
+                [] !== $this->serializePayloadFields
+                && $constraint
+                && $constraint->payload
+                // If some fields are whitelisted, only them are added
+                && $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, $this->serializePayloadFields)
             ) {
                 $violationData['payload'] = $payloadFields;
             }

@@ -19,57 +19,49 @@ class DummyNumericValidatedEntity
 {
     /**
      * @var int
-     *
-     * @Assert\GreaterThan(value=10)
      */
+    #[Assert\GreaterThan(value: 10)]
     public $greaterThanMe;
 
     /**
      * @var float
-     *
-     * @Assert\GreaterThanOrEqual(value=10.99)
      */
+    #[Assert\GreaterThanOrEqual(value: '10.99')]
     public $greaterThanOrEqualToMe;
 
     /**
      * @var int
-     *
-     * @Assert\LessThan(value=99)
      */
+    #[Assert\LessThan(value: 99)]
     public $lessThanMe;
 
     /**
      * @var float
-     *
-     * @Assert\LessThanOrEqual(value=99.33)
      */
+    #[Assert\LessThanOrEqual(value: '99.33')]
     public $lessThanOrEqualToMe;
 
     /**
      * @var int
-     *
-     * @Assert\Positive
      */
+    #[Assert\Positive]
     public $positive;
 
     /**
      * @var int
-     *
-     * @Assert\PositiveOrZero
      */
+    #[Assert\PositiveOrZero]
     public $positiveOrZero;
 
     /**
      * @var int
-     *
-     * @Assert\Negative
      */
+    #[Assert\Negative]
     public $negative;
 
     /**
      * @var int
-     *
-     * @Assert\NegativeOrZero
      */
+    #[Assert\NegativeOrZero]
     public $negativeOrZero;
 }

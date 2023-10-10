@@ -27,11 +27,15 @@ final class TransformPaginationParametersListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+        if (($operation = $request->attributes->get('_api_operation')) && 'api_platform.symfony.main_controller' === $operation->getController()) {
+            return;
+        }
+
         $pageParameter = $request->query->all()['page'] ?? null;
 
         if (
-            !\is_array($pageParameter) ||
-            'jsonapi' !== $request->getRequestFormat()
+            !\is_array($pageParameter)
+            || 'jsonapi' !== $request->getRequestFormat()
         ) {
             return;
         }

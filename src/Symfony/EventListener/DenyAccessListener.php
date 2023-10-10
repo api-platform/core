@@ -15,9 +15,9 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -32,7 +32,7 @@ final class DenyAccessListener
 {
     use OperationRequestInitiatorTrait;
 
-    public function __construct(?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
@@ -63,11 +63,15 @@ final class DenyAccessListener
      */
     private function checkSecurity(Request $request, string $attribute, array $extraVariables = []): void
     {
-        if (!$this->resourceAccessChecker || !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
+        if ($request->attributes->get('_api_platform_disable_listeners') || !$this->resourceAccessChecker || !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             return;
         }
 
         $operation = $this->initializeOperation($request);
+        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+            return;
+        }
+
         if (!$operation) {
             return;
         }

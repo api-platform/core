@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Util;
 
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Subscription;
+
 /**
  * Identifier helper methods.
  *
@@ -27,6 +31,18 @@ trait IdentifierTrait
         $args = $context['args'];
 
         if ($context['is_mutation'] || $context['is_subscription']) {
+            return $args['input']['id'] ?? null;
+        }
+
+        return $args['id'] ?? null;
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     */
+    private function getIdentifierFromOperation(Operation $operation, array $args): ?string
+    {
+        if ($operation instanceof Subscription || $operation instanceof Mutation) {
             return $args['input']['id'] ?? null;
         }
 

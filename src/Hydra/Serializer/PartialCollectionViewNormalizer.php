@@ -15,15 +15,17 @@ namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\Util\IriHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Adds a view key to the result of a paginated Hydra collection.
@@ -67,6 +69,9 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             $currentPage = $object->getCurrentPage();
         }
 
+        // TODO: This needs to be changed as well as I wrote in the CollectionFiltersNormalizer
+        // We should not rely on the request_uri but instead rely on the UriTemplate
+        // This needs that we implement the RFC and that we do more parsing before calling the serialization (MainController)
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
         $appliedFilters = $parsed['parameters'];
         unset($appliedFilters[$this->enabledParameterName]);
@@ -106,9 +111,30 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
+    public function getSupportedTypes($format): array
+    {
+        // @deprecated remove condition when support for symfony versions under 6.3 is dropped
+        if (!method_exists($this->collectionNormalizer, 'getSupportedTypes')) {
+            return [
+                '*' => $this->collectionNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod(),
+            ];
+        }
+
+        return $this->collectionNormalizer->getSupportedTypes($format);
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
-        return $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
+        return $this->collectionNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
     }
 
     /**

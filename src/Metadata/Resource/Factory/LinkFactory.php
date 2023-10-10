@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -58,12 +57,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
             return [];
         }
 
-        $entityClass = $resourceClass;
-        if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
-            $entityClass = $options->getEntityClass();
-        }
-
-        $link = (new Link())->withFromClass($entityClass)->withIdentifiers($identifiers);
+        $link = (new Link())->withFromClass($resourceClass)->withIdentifiers($identifiers);
         $parameterName = $identifiers[0];
 
         if (1 < \count($identifiers)) {

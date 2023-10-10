@@ -40,6 +40,7 @@ Feature: JSON-LD non-resource handling
     """
     And the JSON node "notAResource.@id" should exist
 
+  @createSchema
   Scenario: Get a resource containing a raw object with selected properties
     Given there are 1 dummy objects with relatedDummy and its thirdLevel
     When I send a "GET" request to "/contain_non_resources/1?properties[]=id&properties[nested][notAResource][]=foo&properties[notAResource][]=bar"
@@ -132,3 +133,13 @@ Feature: JSON-LD non-resource handling
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "totalPrice.@id" should not exist
+
+  @!mongodb
+  @createSchema
+  Scenario: Get a resource using entityClass with a DateTime attribute
+    Given there is a resource using entityClass with a DateTime attribute
+    When I send a "GET" request to "/EntityClassWithDateTime/1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "start" should exist

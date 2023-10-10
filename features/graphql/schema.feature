@@ -15,7 +15,9 @@ Feature: GraphQL schema-related features
       ###The dummy name###
       name: String!
     }
-
+    """
+    And the command output should contain:
+    """
     ###Cursor connection for DummyFriend.###
     type DummyFriendCursorConnection {
       edges: [DummyFriendEdge]
@@ -37,41 +39,62 @@ Feature: GraphQL schema-related features
       hasPreviousPage: Boolean!
     }
     """
-
-  Scenario: Export the GraphQL schema in SDL with comment descriptions
-    When I run the command "api:graphql:export" with options:
-      | --comment-descriptions | true |
-    Then the command output should contain:
+    And the command output should contain:
     """
-    # Dummy Friend.
-    type DummyFriend implements Node {
+      ###Updates a DummyFriend.###
+      updateDummyFriend(input: updateDummyFriendInput!): updateDummyFriendPayload
+
+      ###Deletes a DummyFriend.###
+      deleteDummyFriend(input: deleteDummyFriendInput!): deleteDummyFriendPayload
+
+      ###Creates a DummyFriend.###
+      createDummyFriend(input: createDummyFriendInput!): createDummyFriendPayload
+    """
+    And the command output should contain:
+    """
+    ###Updates a DummyFriend.###
+    input updateDummyFriendInput {
       id: ID!
 
-      # The id
-      _id: Int!
+      ###The dummy name###
+      name: String
+      clientMutationId: String
+    }
+    """
+    And the command output should contain:
+    """
+    ###Updates a DummyFriend.###
+    type updateDummyFriendPayload {
+      dummyFriend: DummyFriend
+      clientMutationId: String
+    }
+    """
+    And the command output should contain:
+    """
+    ###Deletes a DummyFriend.###
+    input deleteDummyFriendInput {
+      id: ID!
+      clientMutationId: String
+    }
 
-      # The dummy name
+    ###Deletes a DummyFriend.###
+    type deleteDummyFriendPayload {
+      dummyFriend: DummyFriend
+      clientMutationId: String
+    }
+    """
+    And the command output should contain:
+    """
+    ###Creates a DummyFriend.###
+    input createDummyFriendInput {
+      ###The dummy name###
       name: String!
+      clientMutationId: String
     }
 
-    # Cursor connection for DummyFriend.
-    type DummyFriendCursorConnection {
-      edges: [DummyFriendEdge]
-      pageInfo: DummyFriendPageInfo!
-      totalCount: Int!
-    }
-
-    # Edge of DummyFriend.
-    type DummyFriendEdge {
-      node: DummyFriend
-      cursor: String!
-    }
-
-    # Information about the current page.
-    type DummyFriendPageInfo {
-      endCursor: String
-      startCursor: String
-      hasNextPage: Boolean!
-      hasPreviousPage: Boolean!
+    ###Creates a DummyFriend.###
+    type createDummyFriendPayload {
+      dummyFriend: DummyFriend
+      clientMutationId: String
     }
     """

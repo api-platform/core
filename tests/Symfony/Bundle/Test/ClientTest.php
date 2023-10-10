@@ -34,8 +34,8 @@ class ClientTest extends ApiTestCase
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);
 
-        $schemaTool->dropSchema($classes);
-        $schemaTool->createSchema($classes);
+        @$schemaTool->dropSchema($classes);
+        @$schemaTool->createSchema($classes);
     }
 
     public function testRequest(): void
@@ -104,7 +104,7 @@ class ClientTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function authBasicProvider(): iterable
+    public static function authBasicProvider(): iterable
     {
         yield ['dunglas:kevin'];
         yield [['dunglas', 'kevin']];

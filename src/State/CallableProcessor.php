@@ -13,23 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Psr\Container\ContainerInterface;
 
 final class CallableProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly ContainerInterface $locator)
+    public function __construct(private readonly ?ContainerInterface $locator = null)
     {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if (!($processor = $operation->getProcessor())) {
-            return null;
+            return $data;
         }
 
         if (\is_callable($processor)) {

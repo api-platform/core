@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test;
 
-use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -78,12 +78,12 @@ abstract class ApiTestCase extends KernelTestCase
 
         if (
             (
-                !$container->has('doctrine') ||
-                null === $objectManager = $container->get('doctrine')->getManagerForClass($resourceClass)
-            ) &&
-            (
-                !$container->has('doctrine_mongodb') ||
-                null === $objectManager = $container->get('doctrine_mongodb')->getManagerForClass($resourceClass)
+                !$container->has('doctrine')
+                || null === $objectManager = $container->get('doctrine')->getManagerForClass($resourceClass)
+            )
+            && (
+                !$container->has('doctrine_mongodb')
+                || null === $objectManager = $container->get('doctrine_mongodb')->getManagerForClass($resourceClass)
             )
         ) {
             throw new \RuntimeException(sprintf('"%s" only supports classes managed by Doctrine ORM or Doctrine MongoDB ODM. Override this method to implement your own retrieval logic if you don\'t use those libraries.', __METHOD__));
@@ -94,9 +94,17 @@ abstract class ApiTestCase extends KernelTestCase
             return null;
         }
 
-        /** @var IriConverterInterface $iriConverter */
-        $iriConverter = $container->get('api_platform.iri_converter');
+        return $this->getIriFromResource($item);
+    }
 
-        return $iriConverter->getIriFromResource($item);
+    /**
+     * Generate the IRI of a resource item.
+     */
+    protected function getIriFromResource(object $resource): ?string
+    {
+        /** @var IriConverterInterface $iriConverter */
+        $iriConverter = static::getContainer()->get('api_platform.iri_converter');
+
+        return $iriConverter->getIriFromResource($resource);
     }
 }

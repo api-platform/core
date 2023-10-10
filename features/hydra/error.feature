@@ -139,3 +139,51 @@ Feature: Error handling
     And the JSON node "@id" should be equal to "/relation_embedders/1"
     And the JSON node "anotherRelated.@id" should be equal to "/related_dummies/1"
     And the JSON node "anotherRelated.symfony" should be equal to "phalcon"
+
+  Scenario: Get an error because of sending bad type property
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/greetings" with body:
+    """
+    {
+      "0": 1
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  Scenario: Get an rfc 7807 validation error
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/validation_exception_problems" with body:
+    """
+    {}
+    """
+    Then the response status code should be 422
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+    And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
+    And the JSON node "@context" should not exist
+
+  Scenario: Get an rfc 7807 error
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/exception_problems" with body:
+    """
+    {}
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+    And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
+    And the JSON node "@context" should not exist
+
+  Scenario: Get an rfc 7807 error with backward compatibility
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/exception_problems_with_compatibility" with body:
+    """
+    {}
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Link" should not contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
+    And the JSON node "@context" should exist

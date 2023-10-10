@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Serializer;
 
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -39,8 +41,17 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        if (!$this->decorated instanceof CacheableSupportsMethodInterface) {
-            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', CacheableSupportsMethodInterface::class));
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
+        if (!$this->decorated instanceof BaseCacheableSupportsMethodInterface) {
+            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', BaseCacheableSupportsMethodInterface::class));
         }
 
         return $this->decorated->hasCacheableSupportsMethod();
@@ -88,6 +99,19 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsNormalization($data, $format);
+    }
+
+    public function getSupportedTypes($format): array
+    {
+        // @deprecated remove condition when support for symfony versions under 6.3 is dropped
+        if (!method_exists($this->decorated, 'getSupportedTypes')) {
+            return [
+                DocumentNormalizer::FORMAT => null,
+                '*' => $this->decorated instanceof BaseCacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod(),
+            ];
+        }
+
+        return DocumentNormalizer::FORMAT !== $format ? $this->decorated->getSupportedTypes($format) : [];
     }
 
     /**

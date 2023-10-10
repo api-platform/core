@@ -43,9 +43,9 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->schemaTool = new SchemaTool($this->manager);
         /** @var ClassMetadata[] $classes */
         $classes = $this->manager->getMetadataFactory()->getAllMetadata();
-        $this->schemaTool->dropSchema($classes);
+        @$this->schemaTool->dropSchema($classes);
         $this->manager->clear();
-        $this->schemaTool->createSchema($classes);
+        @$this->schemaTool->createSchema($classes);
 
         $this->ensureKernelShutdown();
     }
@@ -57,6 +57,11 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         parent::tearDown();
     }
 
+    /**
+     * TODO: remove openapiContext to get rid of the legacy.
+     *
+     * @group legacy
+     */
     public function testDebugBarContentNotResourceClass(): void
     {
         $client = static::createClient();
@@ -94,6 +99,11 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
+    /**
+     * TODO: remove openapiContext to get rid of the legacy.
+     *
+     * @group legacy
+     */
     public function testProfilerGeneralLayoutNotResourceClass(): void
     {
         $client = static::createClient();

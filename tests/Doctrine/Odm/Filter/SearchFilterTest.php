@@ -41,7 +41,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function testGetDescriptionDefaultFields(): void
     {
-        $filter = $this->buildSearchFilter($this->managerRegistry);
+        $filter = self::buildSearchFilter($this, $this->managerRegistry);
 
         $this->assertEquals([
             'id' => [
@@ -271,12 +271,12 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
-        $filterFactory = $this->buildSearchFilter(...);
+        $filterFactory = self::buildSearchFilter(...);
 
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'exact' => [
                     [
@@ -753,10 +753,10 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         );
     }
 
-    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null): SearchFilter
+    protected static function buildSearchFilter(self $that, ManagerRegistry $managerRegistry, array $properties = null): SearchFilter
     {
-        $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $relatedDummyProphecy = $that->prophesize(RelatedDummy::class);
+        $iriConverterProphecy = $that->prophesize(IriConverterInterface::class);
 
         $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
             if (str_contains((string) $args[0], '/related_dummies')) {

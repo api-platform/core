@@ -1,0 +1,72 @@
+{
+  "name": "api-platform/jsonld",
+  "description": "API JSON-LD support",
+  "type": "library",
+  "keywords": [
+    "REST",
+    "GraphQL",
+    "API",
+    "JSON-LD",
+    "Hydra",
+    "JSONAPI",
+    "OpenAPI",
+    "HAL",
+    "Swagger"
+  ],
+  "homepage": "https://api-platform.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Kévin Dunglas",
+      "email": "kevin@dunglas.fr",
+      "homepage": "https://dunglas.fr"
+    },
+    {
+      "name": "API Platform Community",
+      "homepage": "https://api-platform.com/community/contributors"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "api-platform/state": "*@dev || ^3.1",
+    "api-platform/metadata": "*@dev || ^3.1"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "ApiPlatform\\JsonLd\\": ""
+    },
+	"exclude-from-classmap": [
+		"/Tests/"
+	]
+  },
+  "config": {
+    "preferred-install": {
+      "*": "dist"
+    },
+    "sort-packages": true,
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true,
+      "phpstan/extension-installer": true
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "3.2.x-dev"
+    },
+    "symfony": {
+      "require": "^6.1"
+    }
+  },
+  "repositories": [
+      {
+          "type": "path",
+          "url": "../State"
+      },
+      {
+          "type": "path",
+          "url": "../Metadata"
+      }
+  ]
+}

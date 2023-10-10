@@ -16,6 +16,7 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludePaths:
+		- src/Symfony/Bundle/Command/OpenApiCommand.php
 		# Symfony config
 		- tests/Fixtures/app/config/config_swagger.php
 		# Symfony cache
@@ -32,6 +33,7 @@ parameters:
 			- handleNotFound
 	ignoreErrors:
 		# False positives
+		-   message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\).#'
 		-
 			message: '#but database expects#'
 			paths:
@@ -47,6 +49,7 @@ parameters:
 			message: '#is never written, only read.#'
 			paths:
 				- tests/Fixtures/TestBundle/Document/
+				- src/Metadata/Tests/Fixtures/ApiResource/
 		-
 			message: '#Parameter \#1 \$constraint of method#'
 			paths:
@@ -54,20 +57,16 @@ parameters:
 		-
 			message: '#expects ApiPlatform\\Metadata\\GraphQl\\Operation\|null, ApiPlatform\\Metadata\\Operation given#'
 			paths:
-				- tests/GraphQl/Resolver/Factory/
+				- src/GraphQl/Tests/Resolver/Factory/
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
 			path: src/Symfony/EventListener/AddFormatListener.php
-		- '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
-		-
-			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
-			path: tests/GraphQl/Type/TypeBuilderTest.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
 			message: '#Service "test" is not registered in the container\.#'
-			path: tests/GraphQl/Type/TypesContainerTest.php
+			path: src/GraphQl/Tests/Type/TypesContainerTest.php
 
 		# Expected, due to optional interfaces
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::denormalize\(\) invoked with (2|3|4) parameters, 1 required\.#'
@@ -78,6 +77,8 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
+		- '#Method GraphQL\\Type\\Definition\\WrappingType::getWrappedType\(\) invoked with 1 parameter, 0 required\.#'
+		- '#Access to an undefined property GraphQL\\Type\\Definition\\NamedType&GraphQL\\Type\\Definition\\Type::\$name\.#'
 		# See https://github.com/phpstan/phpstan-symfony/issues/27
 		-
 			message: '#^Service "[^"]+" is private.$#'
@@ -85,3 +86,6 @@ parameters:
 		-
 			message: '#^Property .+ is unused.$#'
 			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php
+		-
+			message: '#^Class .+ not found.$#'
+			path: src/Elasticsearch/Tests

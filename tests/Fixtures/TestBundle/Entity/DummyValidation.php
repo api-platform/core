@@ -22,8 +22,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(operations: [
     new GetCollection(),
     new Post(uriTemplate: 'dummy_validation{._format}'),
-    new Post(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]),
-    new Post(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator']),
+    new Post(uriTemplate: '/dummy_validation/validation_groups', validationContext: ['groups' => ['a']], extraProperties: ['rfc_7807_compliant_errors' => false]),
+    new Post(uriTemplate: '/dummy_validation/validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator'], extraProperties: ['rfc_7807_compliant_errors' => false]),
 ]
 )]
 #[ORM\Entity]

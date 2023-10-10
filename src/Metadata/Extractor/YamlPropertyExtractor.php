@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -93,6 +93,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
                     'builtinTypes' => $this->buildAttribute($propertyValues, 'builtinTypes'),
                     'schema' => $this->buildAttribute($propertyValues, 'schema'),
                     'genId' => $this->phpize($propertyValues, 'genId', 'bool'),
+                    'uriTemplate' => $this->phpize($propertyValues, 'uriTemplate', 'string'),
                 ];
             }
         }

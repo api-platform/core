@@ -19,8 +19,7 @@ class DummyValidatedHostnameEntity
 {
     /**
      * @var string
-     *
-     * @Assert\Hostname
      */
+    #[Assert\Hostname]
     public $dummyHostname;
 }

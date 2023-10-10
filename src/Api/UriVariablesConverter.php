@@ -35,6 +35,10 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * To handle the composite identifiers type correctly, use an `uri_variables_map` that maps uriVariables to their uriVariablesDefinition.
+     * Indeed, a composite identifier will already be parsed, and their corresponding properties will be the parameterName and not the defined
+     * identifiers.
      */
     public function convert(array $uriVariables, string $class, array $context = []): array
     {
@@ -43,8 +47,15 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
         $uriVariablesDefinitions = $operation->getUriVariables() ?? [];
 
         foreach ($uriVariables as $parameterName => $value) {
-            $uriVariableDefinition = $uriVariablesDefinitions[$parameterName] ?? $uriVariablesDefinitions['id'] ?? new Link();
-            if ([] === $types = $this->getIdentifierTypes($uriVariableDefinition->getFromClass() ?? $class, $uriVariableDefinition->getIdentifiers() ?? [$parameterName])) {
+            $uriVariableDefinition = $context['uri_variables_map'][$parameterName] ?? $uriVariablesDefinitions[$parameterName] ?? $uriVariablesDefinitions['id'] ?? new Link();
+
+            // When a composite identifier is used, we assume that the parameterName is the property to find our type
+            $properties = $uriVariableDefinition->getIdentifiers() ?? [$parameterName];
+            if ($uriVariableDefinition->getCompositeIdentifier()) {
+                $properties = [$parameterName];
+            }
+
+            if (!$types = $this->getIdentifierTypes($uriVariableDefinition->getFromClass() ?? $class, $properties)) {
                 continue;
             }
 

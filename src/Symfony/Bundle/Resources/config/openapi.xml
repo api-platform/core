@@ -75,6 +75,20 @@
             <argument type="service" id="api_platform.pagination_options" />
             <argument type="service" id="api_platform.router" />
         </service>
+
+        <service id="api_platform.jsonopenapi.encoder" class="ApiPlatform\Serializer\JsonEncoder" public="false">
+            <argument>jsonopenapi</argument>
+            <argument type="service" id="serializer.json.encoder" on-invalid="null" />
+
+            <tag name="serializer.encoder" />
+        </service>
+
+        <service id="api_platform.yamlopenapi.encoder" class="ApiPlatform\Serializer\YamlEncoder" public="false">
+            <argument>yamlopenapi</argument>
+            <argument type="service" id="serializer.encoder.yaml" on-invalid="null" />
+
+            <tag name="serializer.encoder" />
+        </service>
     </services>
 
 </container>

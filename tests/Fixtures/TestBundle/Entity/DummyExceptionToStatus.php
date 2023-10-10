@@ -20,16 +20,19 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\TestBundle\Exception\NotFoundException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredFilter;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyExceptionToStatusProvider;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[ApiResource(
     exceptionToStatus: [NotFoundHttpException::class => 400],
+    provider: DummyExceptionToStatusProvider::class,
     operations: [
-        new Get(exceptionToStatus: [NotFoundException::class => 404]),
-        new Put(),
-        new GetCollection(),
-    ]
+        new Get(uriTemplate: '/dummy_exception_to_statuses/{id}', exceptionToStatus: [NotFoundException::class => 404]),
+        new Put(uriTemplate: '/dummy_exception_to_statuses/{id}'),
+        new GetCollection(uriTemplate: '/dummy_exception_to_statuses'),
+    ],
+    graphQlOperations: []
 )]
 #[ApiFilter(RequiredFilter::class)]
 #[ORM\Entity]

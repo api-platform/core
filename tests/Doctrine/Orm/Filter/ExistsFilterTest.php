@@ -92,13 +92,13 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
-        $existsFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'exists');
-        $customExistsFilterFactory = fn (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'customExists');
+        $existsFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'exists');
+        $customExistsFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'customExists');
 
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'valid values' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
@@ -223,7 +223,7 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
         );
     }
 
-    protected function buildFilter(?array $properties = null)
+    protected function buildFilter(array $properties = null)
     {
         return new $this->filterClass($this->managerRegistry, null, $properties, 'exists', new CustomConverter());
     }

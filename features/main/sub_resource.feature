@@ -564,7 +564,7 @@ Feature: Sub-resource support
 
   @!mongodb
   @createSchema
-  Scenario: The generated crud should allow us to interact with the SubresourceEmployee
+  Scenario Outline: The generated crud should allow us to interact with the subresources
     Given I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/subresource_organizations" with body:
     """
@@ -574,22 +574,56 @@ Feature: Sub-resource support
     """
     Then the response status code should be 201
     Given I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/subresource_organizations/1/subresource_employees" with body:
+    And I send a "POST" request to "<invalid_uri>" with body:
+    """
+    {
+      "name": "soyuka"
+    }
+    """
+    Then the response status code should be 404
+    Given I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "<collection_uri>" with body:
     """
     {
       "name": "soyuka"
     }
     """
     Then the response status code should be 201
-    And I send a "GET" request to "/subresource_organizations/1/subresource_employees/1"
+    And I send a "GET" request to "<item_uri>"
     Then the response status code should be 200
-    And I send a "GET" request to "/subresource_organizations/1/subresource_employees"
+    And I send a "GET" request to "<collection_uri>"
     Then the response status code should be 200
     Given I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "/subresource_organizations/1/subresource_employees/1" with body:
+    And I send a "PUT" request to "<item_uri>" with body:
     """
     {
       "name": "ok"
     }
     """
     Then the response status code should be 200
+    Given I send a "DELETE" request to "<item_uri>"
+    Then the response status code should be 204
+    Examples:
+      | invalid_uri                                              | collection_uri                                     | item_uri                                             |
+      | /subresource_organizations/invalid/subresource_employees | /subresource_organizations/1/subresource_employees | /subresource_organizations/1/subresource_employees/1 |
+      | /subresource_organizations/invalid/subresource_factories | /subresource_organizations/1/subresource_factories | /subresource_organizations/1/subresource_factories/1 |
+
+  @!mongodb
+  @createSchema
+  Scenario: I can POST on a subresource using CreateProvider with parent_uri_template
+    Given I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/subresource_categories/1/subresource_bikes" with body:
+    """
+    {
+      "name": "Hello World!"
+    }
+    """
+    Then the response status code should be 404
+    Given I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/subresource_categories_with_create_provider/1/subresource_bikes" with body:
+    """
+    {
+      "name": "Hello World!"
+    }
+    """
+    Then the response status code should be 201
