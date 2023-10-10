@@ -78,7 +78,7 @@ final class AccessCheckerProvider implements ProviderInterface
         }
 
         if ($operation instanceof HttpOperation && $operation->getUriVariables()) {
-            foreach ($operation->getUriVariables() as $key => $uriVariable) {
+            foreach ($operation->getUriVariables() as $uriVariable) {
                 if (!$uriVariable instanceof Link || !$uriVariable->getSecurity()) {
                     continue;
                 }
@@ -93,7 +93,7 @@ final class AccessCheckerProvider implements ProviderInterface
                 $resourceAccessCheckerContext += $request->attributes->all();
 
                 if (!$this->resourceAccessChecker->isGranted($targetResource, $uriVariable->getSecurity(), $resourceAccessCheckerContext)) {
-                    throw new AccessDeniedHttpException($uriVariable->getSecurityMessage() ?? 'Access Denied.');
+                    throw new AccessDeniedException($uriVariable->getSecurityMessage() ?? 'Access Denied.');
                 }
             }
         }
