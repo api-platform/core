@@ -16,8 +16,6 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
-use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\CloneTrait;
@@ -116,39 +114,6 @@ final class ReadListener
             )
         ) {
             throw new NotFoundHttpException('Not Found');
-        }
-
-        if ($operation->getUriVariables()) {
-            foreach ($operation->getUriVariables() as $key => $uriVariable) {
-                if (!$uriVariable instanceof Link || !$uriVariable->getSecurity()) {
-                    continue;
-                }
-                $relationClass = $uriVariable->getFromClass() ?? $uriVariable->getToClass();
-
-                if (!$relationClass) {
-                    continue;
-                }
-
-                try {
-                    $tmp = $this->provider->provide($this->resourceMetadataCollectionFactory->create($relationClass)->getOperation(null, false, true), [$uriVariable->getIdentifiers()[0] => $parameters[$key]], $context);
-                    if (null === $tmp) {
-                        throw new NotFoundHttpException('Not Found');
-                    }
-                    $securityObjectName = $uriVariable->getSecurityObjectName();
-
-                    if (!$securityObjectName) {
-                        $securityObjectName = $uriVariable->getToProperty() ?? $uriVariable->getFromProperty();
-                    }
-
-                    if (!$securityObjectName) {
-                        continue;
-                    }
-
-                    $request->attributes->set($securityObjectName, $tmp);
-                } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
-                    throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
-                }
-            }
         }
 
         $request->attributes->set('data', $data);
