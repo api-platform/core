@@ -47,6 +47,7 @@
         <xsd:attribute type="xsd:boolean" name="openapi"/>
         <xsd:attribute type="xsd:positiveInteger" name="priority"/>
         <xsd:attribute type="xsd:string" name="name"/>
+        <xsd:attribute type="xsd:string" name="itemUriTemplate"/>
     </xsd:complexType>
 
     <xsd:complexType name="graphQlOperations">

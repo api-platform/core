@@ -80,6 +80,21 @@ Notes:
 * [92a81f024](https://github.com/api-platform/core/commit/92a81f024541054b9322e7457b75c721261e14e0) feat(graphql): allow to disable the introspection query (#5711)
 * [d793ffb92](https://github.com/api-platform/core/commit/d793ffb9228a21655ee35f0b90a959f93281a4cf) feat: union/intersect types (#5470)
 
+## v3.1.20
+
+### Bug fixes
+
+* [eebc7c5a0](https://github.com/api-platform/core/commit/eebc7c5a0bd4d2138f706b8309f53d0b972b21d4) fix: add itemUriTemplate to resources.xsd (#5872)
+
+## v3.1.19
+
+### Bug fixes
+
+* [6a62a53f8](https://github.com/api-platform/core/commit/6a62a53f854ec93947d1c4a5a32007df09e55d06) fix(hydra): add xxx[] hydra:search iexact
+* [7f0e00cd2](https://github.com/api-platform/core/commit/7f0e00cd2d838037f716e0b8588a6529ef9f158c) fix(mercure): custom topics on newly created entities causes error #5074 
+* [1fccb8413](https://github.com/api-platform/core/commit/1fccb8413a902a1011f049d0f8ddcd8d5456d335) fix(doctrine): add SearchFilter case-insensitive strategies constants
+>>>>>>> upstream/3.1
+
 ## v3.1.18
 
 ## v3.1.17
