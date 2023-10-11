@@ -28,6 +28,7 @@ use Symfony\Component\WebLink\Link;
 #[ErrorResource(
     types: ['hydra:Error'],
     openapi: false,
+    uriTemplate: '/errors/{status}',
     operations: [
         new Operation(
             name: '_api_errors_problem',
@@ -36,7 +37,6 @@ use Symfony\Component\WebLink\Link;
                 'groups' => ['jsonproblem'],
                 'skip_null_values' => true,
             ],
-            uriTemplate: '/errors/{status}'
         ),
         new Operation(
             name: '_api_errors_hydra',
@@ -46,13 +46,11 @@ use Symfony\Component\WebLink\Link;
                 'skip_null_values' => true,
             ],
             links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')],
-            uriTemplate: '/hydra_errors/{status}'
         ),
         new Operation(
             name: '_api_errors_jsonapi',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true],
-            uriTemplate: '/jsonapi_errors/{status}'
         ),
     ],
     graphQlOperations: []
