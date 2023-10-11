@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.1.20
+
+### Bug fixes
+
+* [eebc7c5a0](https://github.com/api-platform/core/commit/eebc7c5a0bd4d2138f706b8309f53d0b972b21d4) fix: add itemUriTemplate to resources.xsd (#5872)
+
 ## v3.1.19
 
 ### Bug fixes
