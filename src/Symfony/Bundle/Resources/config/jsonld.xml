@@ -43,6 +43,13 @@
             <tag name="serializer.normalizer" priority="-995" />
         </service>
 
+        <service id="api_platform.jsonld.normalizer.validation_exception" class="ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer" public="false">
+            <argument type="service" id="api_platform.jsonld.normalizer.item" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" priority="-800" />
+        </service>
+
         <service id="api_platform.jsonld.encoder" class="ApiPlatform\Serializer\JsonEncoder" public="false">
             <argument>jsonld</argument>
             <argument type="service" id="serializer.json.encoder" on-invalid="null" />

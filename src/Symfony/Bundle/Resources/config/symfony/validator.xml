@@ -25,6 +25,12 @@
             <argument type="service" id="api_platform.validator" />
         </service>
 
+        <service id="api_platform.serializer.normalizer.validation_exception" class="ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer" public="false">
+            <argument type="service" id="api_platform.serializer.normalizer.item" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" priority="-800" />
+        </service>
     </services>
 
 </container>

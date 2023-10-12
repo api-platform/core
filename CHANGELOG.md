@@ -1,5 +1,72 @@
 # Changelog
 
+## v3.2.0
+
+### Bug fixes
+
+* [2e48c7ecc](https://github.com/api-platform/core/commit/2e48c7ecccde87653bfc859c5f8b96cc37b8fe51) fix(jsonschema): do not override nor complete ApiProperty::schema user value (#5855, #5864)
+* [33b1658a0](https://github.com/api-platform/core/commit/33b1658a0e100e0ca9e7bf46aa2307ead9b1744e) fix(serializer): disable_type_enforcement with null values (#5593)
+* [3953f6f0a](https://github.com/api-platform/core/commit/3953f6f0a37e38fd8a3d6b0d9faa80f59e00ec01) fix(state): read provider without request (#5803)
+* [49981505a](https://github.com/api-platform/core/commit/49981505a8af281d00e35f1424432fae65686eb8) fix(metadata): convert composite uri variables w/ proper type
+* [4ac62b0c2](https://github.com/api-platform/core/commit/4ac62b0c2d88b95d58f2e9477579ceca28313874) fix(jsonschema): build non-resource class schema (#5842)
+* [51e4295b2](https://github.com/api-platform/core/commit/51e4295b26e606c5da10d434b6e98dadb8a243b2) fix: missing parent construct calls with named arguments (#5387)
+* [6c9e121db](https://github.com/api-platform/core/commit/6c9e121db88256d79c9c4c78c05993b3465c025e) fix(elasticsearch): elasticsearch 8 compatibility (#5795)
+* [7ecfdff85](https://github.com/api-platform/core/commit/7ecfdff85e997feafab1377ae6309e273a4e9678) fix(symfony): graphql security/validator only when enabled
+* [b58ec1207](https://github.com/api-platform/core/commit/b58ec1207da8ba5b669937508a17451af61b0688) fix(metadata): correct interface aliases (#5766)
+* [c353e5aa4](https://github.com/api-platform/core/commit/c353e5aa474d7a2e6c701bfa1c369b560e928c17) fix(graphql): do not add id field if operation already has a dedicated input type (#5095)
+* [c76d9b0b7](https://github.com/api-platform/core/commit/c76d9b0b7819036f684da214ad6fac2c3c7fa852) fix(serializer): allow usage of genId property for collection (#5870)
+
+
+### Features
+
+* [0d04f28f2](https://github.com/api-platform/core/commit/0d04f28f230f5e9ab789644caba7efac1fe20cfa) feat(metadata): improve CreateProvider (#5770)
+* [2141b0118](https://github.com/api-platform/core/commit/2141b01189a25b8a242a6878bcafb3be276f8a41) feat: deprecate not setting formats manually (#5808)
+* [2cf9d552a](https://github.com/api-platform/core/commit/2cf9d552aa3b8b14820fc71e79cb6bf74347eaa8) feat: improve 'not_normalizable_value_exception' (#5844)
+* [3fa0176a3](https://github.com/api-platform/core/commit/3fa0176a34a7cbc24a612b69404dc8c6be82f8a6) feat(metadata): add canonical_uri_template (#5832)
+* [46e84ffc1](https://github.com/api-platform/core/commit/46e84ffc182df12221967ab91403f2b0692847be) feat(symfony): add mercure asserts (#5764)
+* [4ef0ef856](https://github.com/api-platform/core/commit/4ef0ef856ced658ac942fd6a2c6f7c5c563078d1) feat: error as resources, jsonld errors are now problem-compliant (#5433)
+* [6babb3d6b](https://github.com/api-platform/core/commit/6babb3d6b707290fdf314c0e96acd525d6f96670) feat: replace doctrine/inflector by symfony/string (#5637)
+* [7a1d351b0](https://github.com/api-platform/core/commit/7a1d351b0a37fc7107c548708f4b9e38a9dedc76) feat(tests): add a method to generate the IRI from a resource (#5582)
+* [851aa3778](https://github.com/api-platform/core/commit/851aa3778ef8a6f959a44b759fc343e9f8cfc8bf) feat(graphql)!: add extra args for custom queries or mutations (#5359)
+* [92a81f024](https://github.com/api-platform/core/commit/92a81f024541054b9322e7457b75c721261e14e0) feat(graphql): allow to disable the introspection query (#5711)
+* [b9cf49969](https://github.com/api-platform/core/commit/b9cf49969e4207ca6044338d992eb8ff97f5740e) feat(openapi): update Swagger UI to v5.6.2 (#5807)
+* [ccef472ca](https://github.com/api-platform/core/commit/ccef472cade42b189fa8cb7793e27fad1349e289) feat(openapi): use OpenAPI 3.1 (#5489)
+* [c7dcd3669](https://github.com/api-platform/core/commit/c7dcd36690927bdf3bd08055cdf4fff5c08de4da) feat(doctrine): stateOptions can handleLinks for query optimization (#5732)
+* [d793ffb92](https://github.com/api-platform/core/commit/d793ffb9228a21655ee35f0b90a959f93281a4cf) feat: union/intersect types (#5470)
+* [d85884d53](https://github.com/api-platform/core/commit/d85884d53bda3f0bfc60435f5b0e69e7522d70c8) feat(elasticsearch): filtering on nested fields (#5820)
+* [e65d2c35a](https://github.com/api-platform/core/commit/e65d2c35a983813de55104ebd12c49bdfeb8cdc5) feat(serializer): add ApiProperty::uriTemplate option (#5675)
+
+### Notes
+
+Use `composer recipes:update` to update your configuration file. The default configuration file is:
+
+```yaml
+api_platform:
+    title: Hello API Platform
+    version: 1.0.0
+    formats:
+        jsonld: ['application/ld+json']
+    docs_formats:
+        jsonld: ['application/ld+json']
+        jsonopenapi: ['application/vnd.openapi+json']
+        html: ['text/html']
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+        extra_properties:
+            standard_put: true
+            rfc_7807_compliant_errors: true # this will be the default value in 4.x
+    event_listeners_backward_compatibility_layer: false # use symfony event listeners
+    keep_legacy_inflector: false # use doctrine/inflector
+```
+
+Listeners will not get removed in API Platform 4 but will rather use our new Providers and Processors. You can now force the request to go through a particular state for example:
+
+```php
+#[Post(read: true)] // to force reading even though it's a POST
+```
+
 ## v3.2.0-beta.2
 
 ### Bug fixes
@@ -79,6 +146,20 @@ Notes:
 * [851aa3778](https://github.com/api-platform/core/commit/851aa3778ef8a6f959a44b759fc343e9f8cfc8bf) feat(graphql)!: add extra args for custom queries or mutations (#5359)
 * [92a81f024](https://github.com/api-platform/core/commit/92a81f024541054b9322e7457b75c721261e14e0) feat(graphql): allow to disable the introspection query (#5711)
 * [d793ffb92](https://github.com/api-platform/core/commit/d793ffb9228a21655ee35f0b90a959f93281a4cf) feat: union/intersect types (#5470)
+
+## v3.1.20
+
+### Bug fixes
+
+* [eebc7c5a0](https://github.com/api-platform/core/commit/eebc7c5a0bd4d2138f706b8309f53d0b972b21d4) fix: add itemUriTemplate to resources.xsd (#5872)
+
+## v3.1.19
+
+### Bug fixes
+
+* [6a62a53f8](https://github.com/api-platform/core/commit/6a62a53f854ec93947d1c4a5a32007df09e55d06) fix(hydra): add xxx[] hydra:search iexact
+* [7f0e00cd2](https://github.com/api-platform/core/commit/7f0e00cd2d838037f716e0b8588a6529ef9f158c) fix(mercure): custom topics on newly created entities causes error #5074 
+* [1fccb8413](https://github.com/api-platform/core/commit/1fccb8413a902a1011f049d0f8ddcd8d5456d335) fix(doctrine): add SearchFilter case-insensitive strategies constants
 
 ## v3.1.18
 
