@@ -40,7 +40,7 @@
 
 Use `composer recipes:update` to update your configuration file. The default configuration file is:
 
-```
+```yaml
 api_platform:
     title: Hello API Platform
     version: 1.0.0
@@ -63,7 +63,7 @@ api_platform:
 
 Listeners will not get removed in API Platform 4 but will rather use our new Providers and Processors. You can now force the request to go through a particular state for example:
 
-```
+```php
 #[Post(read: true)] // to force reading even though it's a POST
 ```
 
