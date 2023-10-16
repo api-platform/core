@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\EventListener;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\NotAResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

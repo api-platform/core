@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hydra\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
