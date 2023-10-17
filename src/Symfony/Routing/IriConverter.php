@@ -120,6 +120,10 @@ final class IriConverter implements IriConverterInterface
             return null;
         }
 
+        if ($this->resourceMetadataCollectionFactory && isset($context['item_uri_template'])) {
+            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['item_uri_template']);
+        }
+
         if (!$operation) {
             $operation = (new Get())->withClass($resourceClass);
         }
@@ -133,11 +137,6 @@ final class IriConverter implements IriConverterInterface
         $isLegacySubresource = ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) && !$operation instanceof CollectionOperationInterface;
         // Custom resources should have the same IRI as requested, it was not the case pre 2.7
         $isLegacyCustomResource = ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && ($operation->getExtraProperties()['user_defined_uri_template'] ?? false);
-
-        // FIXME: to avoid the method_exists we could create an interface for the Post operation, we can't guarantee that the user extended our ApiPlatform\Metadata\Post
-        if ($operation instanceof HttpOperation && HttpOperation::METHOD_POST === $operation->getMethod() && method_exists($operation, 'getItemUriTemplate') && ($itemUriTemplate = $operation->getItemUriTemplate())) {
-            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($itemUriTemplate);
-        }
 
         // In symfony the operation name is the route name, try to find one if none provided
         if (
