@@ -37,7 +37,7 @@ final class GraphiQlAction
                 'title' => $this->title,
                 'graphiql_data' => ['entrypoint' => $this->router->generate('api_graphql_entrypoint')],
                 'assetPackage' => $this->assetPackage,
-            ]));
+            ]), 200, ['content-type' => 'text/html']);
         }
 
         throw new BadRequestHttpException('GraphiQL is not enabled.');
