@@ -88,6 +88,7 @@ class ApiPlatformExtensionTest extends TestCase
         'description' => 'description',
         'version' => 'version',
         'formats' => [
+            'json' => ['mime_types' => ['json']],
             'jsonld' => ['mime_types' => ['application/ld+json']],
             'jsonhal' => ['mime_types' => ['application/hal+json']],
         ],
@@ -1259,5 +1260,18 @@ class ApiPlatformExtensionTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $this->assertFalse($this->container->hasDefinition('api_platform.serializer.mapping.cache_class_metadata_factory'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyGraphQlConfigurationWithoutJsonFormat(): void
+    {
+        $this->expectDeprecation('Since api-platform/core 3.2: Add the "json" format to the configuration to use GraphQL.');
+        $config = self::DEFAULT_CONFIG;
+        unset($config['api_platform']['formats']['json']);
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+        $this->assertArrayHasKey('json', $this->container->getParameter('api_platform.formats'));
     }
 }
