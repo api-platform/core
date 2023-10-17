@@ -61,26 +61,33 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         private readonly string $title,
         private readonly string $detail,
         #[ApiProperty(identifier: true)] private int $status,
-        private readonly array $originalTrace,
+        array $originalTrace = null,
         private ?string $instance = null,
         private string $type = 'about:blank',
         private array $headers = []
     ) {
         parent::__construct();
+
+        if (!$originalTrace) {
+            return;
+        }
+
+        $this->originalTrace = [];
+        foreach ($originalTrace as $i => $t) {
+            unset($t['args']); // we don't want arguments in our JSON traces, especially with xdebug
+            $this->originalTrace[$i] = $t;
+        }
     }
+
+    #[SerializedName('trace')]
+    #[Groups(['trace'])]
+    public ?array $originalTrace = null;
 
     #[SerializedName('hydra:title')]
     #[Groups(['jsonld', 'legacy_jsonld'])]
     public function getHydraTitle(): string
     {
         return $this->title;
-    }
-
-    #[SerializedName('trace')]
-    #[Groups(['trace'])]
-    public function getOriginalTrace(): array
-    {
-        return $this->originalTrace;
     }
 
     #[SerializedName('hydra:description')]
