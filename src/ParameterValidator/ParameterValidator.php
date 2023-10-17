@@ -59,8 +59,16 @@ class ParameterValidator
             }
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
-                foreach ($this->validators as $validator) {
-                    if ($errors = $validator->validate($name, $data, $queryParameters)) {
+                $collectionFormat = $this->getCollectionFormat($data);
+
+                // validate simple values
+                if ($errors = $this->validate($name, $data, $queryParameters)) {
+                    $errorList[] = $errors;
+                }
+
+                // manipulate query data to validate each value
+                foreach ($this->iterateValue($name, $queryParameters, $collectionFormat) as $scalarQueryParameters) {
+                    if ($errors = $this->validate($name, $data, $scalarQueryParameters)) {
                         $errorList[] = $errors;
                     }
                 }
@@ -70,5 +78,77 @@ class ParameterValidator
         if ($errorList) {
             throw new ValidationException(array_merge(...$errorList));
         }
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $filterDescription
+     */
+    private static function getCollectionFormat(array $filterDescription): string
+    {
+        return $filterDescription['openapi']['collectionFormat'] ?? $filterDescription['swagger']['collectionFormat'] ?? 'csv';
+    }
+
+    /**
+     * @param array<string, mixed> $queryParameters
+     *
+     * @throws \InvalidArgumentException
+     */
+    private static function iterateValue(string $name, array $queryParameters, string $collectionFormat = 'csv'): \Generator
+    {
+        $candidates = array_filter(
+            $queryParameters,
+            static fn (string $key) => $key === $name || "{$key}[]" === $name,
+            \ARRAY_FILTER_USE_KEY
+        );
+
+        foreach ($candidates as $key => $value) {
+            $values = self::getValue($value, $collectionFormat);
+            foreach ($values as $v) {
+                yield [$key => $v];
+            }
+        }
+    }
+
+    /**
+     * @param int|int[]|string|string[] $value
+     *
+     * @return int[]|string[]
+     */
+    private static function getValue(int|string|array $value, string $collectionFormat = 'csv'): array
+    {
+        if (\is_array($value)) {
+            return $value;
+        }
+
+        if (\is_string($value)) {
+            return explode(self::getSeparator($collectionFormat), $value);
+        }
+
+        return [$value];
+    }
+
+    /** @return non-empty-string */
+    private static function getSeparator(string $collectionFormat): string
+    {
+        return match ($collectionFormat) {
+            'csv' => ',',
+            'ssv' => ' ',
+            'tsv' => '\t',
+            'pipes' => '|',
+            default => throw new \InvalidArgumentException(sprintf('Unknown collection format %s', $collectionFormat)),
+        };
+    }
+
+    private function validate(string $name, array $data, array $queryParameters): array
+    {
+        $errorList = [];
+
+        foreach ($this->validators as $validator) {
+            if ($errors = $validator->validate($name, $data, $queryParameters)) {
+                $errorList[] = $errors;
+            }
+        }
+
+        return array_merge(...$errorList);
     }
 }
