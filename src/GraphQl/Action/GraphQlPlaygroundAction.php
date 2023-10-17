@@ -37,7 +37,7 @@ final class GraphQlPlaygroundAction
                 'title' => $this->title,
                 'graphql_playground_data' => ['entrypoint' => $this->router->generate('api_graphql_entrypoint')],
                 'assetPackage' => $this->assetPackage,
-            ]));
+            ]), 200, ['content-type' => 'text/html']);
         }
 
         throw new BadRequestHttpException('GraphQL Playground is not enabled.');
