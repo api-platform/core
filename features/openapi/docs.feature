@@ -100,7 +100,7 @@ Feature: Documentation support
     """
     {
       "type": "string",
-      "format": "iri-reference"
+      "format": "iri-template"
     }
     """
     # Enable these tests when SF 4.4 / PHP 7.1 support is dropped
@@ -183,26 +183,26 @@ Feature: Documentation support
                     "properties": {
                         "@id": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         },
                         "@type": {
                             "type": "string"
                         },
                         "hydra:first": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         },
                         "hydra:last": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         },
                         "hydra:previous": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         },
                         "hydra:next": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         }
                     },
                     "example": {
