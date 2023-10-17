@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(operations: [new Get(provider: ItemProvider::class), new GetCollection(provider: CollectionProvider::class)], normalizationContext: ['groups' => ['book:read']], stateOptions: new Options(index: 'book'))]
 #[ApiFilter(OrderFilter::class, properties: ['id', 'library.id'])]
-#[ApiFilter(MatchFilter::class, properties: ['message', 'library.firstName'])]
+#[ApiFilter(MatchFilter::class, properties: ['message', 'library.firstName', 'library.relatedGenres.name'])]
 class Book
 {
     #[Groups(['book:read', 'library:read'])]
