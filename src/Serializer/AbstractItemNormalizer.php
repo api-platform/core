@@ -758,7 +758,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $value;
         }
 
-        if (null === $value && $type->isNullable() || ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false)) {
+        if (null === $value && ($type->isNullable() || ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false))) {
             return $value;
         }
 
