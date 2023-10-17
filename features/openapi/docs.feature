@@ -100,7 +100,7 @@ Feature: Documentation support
     """
     {
       "type": "string",
-      "format": "iri-reference"
+      "format": "iri-template"
     }
     """
     # Enable these tests when SF 4.4 / PHP 7.1 support is dropped
