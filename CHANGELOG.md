@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.2.1
+
+### Bug fixes
+
+* [05363d98f](https://github.com/api-platform/core/commit/05363d98f54babff49119a1fb55a17bb1550f21a) fix(symfony): force json format with GraphQL
+* [0c50d4ceb](https://github.com/api-platform/core/commit/0c50d4ceba9d83a2212771f21e2d1de4442c1456) fix(state): add link header processor without links (#5888)
+* [51b818304](https://github.com/api-platform/core/commit/51b818304874ec60ebab914455adc8f50402ca9d) fix: error traces without arguments (#5891)
+* [b7c094aca](https://github.com/api-platform/core/commit/b7c094acae3ac3271f42443ea2f62f22d019bea6) fix(metadata): interface breaking in 3.2 (#5883)
+* [dbd4f64de](https://github.com/api-platform/core/commit/dbd4f64debab876ab556ec87c8c973f0c38ada10) fix(graphql): docs should answer text/html
+
 ## v3.2.0
 
 ### Bug fixes
