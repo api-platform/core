@@ -857,7 +857,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        if ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false) { // @phpstan-ignore-line
+        if ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false) {
             return $value;
         }
 
