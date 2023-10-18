@@ -105,7 +105,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         // Check that the Api-Platform sidebar link is active
-        $this->assertNotEmpty($menuLink = $crawler->filter('a[href$="panel=api_platform.data_collector.request"]'));
+        $this->assertNotEmpty($menuLink = $crawler->filter('a[href*="panel=api_platform.data_collector.request"]'));
         $this->assertNotEmpty($menuLink->filter('.disabled'), 'The sidebar menu should be disabled.');
 
         $metrics = $crawler->filter('.metrics');
