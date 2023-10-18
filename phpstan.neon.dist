@@ -26,7 +26,7 @@ parameters:
 		- src/Symfony/Bundle/DependencyInjection/Configuration.php
 		# Templates for Maker
 		- src/Symfony/Maker/Resources/skeleton
-		- src/*/vendor
+		- **vendor**
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail

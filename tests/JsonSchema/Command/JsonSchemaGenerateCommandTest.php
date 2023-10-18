@@ -124,4 +124,18 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             '$ref' => '#/definitions/TestEntity.jsonld-write',
         ]);
     }
+
+    /**
+     * TODO: add deprecation (TypeFactory will be deprecated in api platform 3.3).
+     *
+     * @group legacy
+     */
+    public function testArraySchemaWithTypeFactory(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\Foo', '--type' => 'output']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals($json['definitions']['Foo.jsonld']['properties']['expiration'], ['type' => 'string', 'format' => 'date']);
+    }
 }
