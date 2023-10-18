@@ -147,6 +147,13 @@ Notes:
 * [92a81f024](https://github.com/api-platform/core/commit/92a81f024541054b9322e7457b75c721261e14e0) feat(graphql): allow to disable the introspection query (#5711)
 * [d793ffb92](https://github.com/api-platform/core/commit/d793ffb9228a21655ee35f0b90a959f93281a4cf) feat: union/intersect types (#5470)
 
+## v3.1.21
+
+### Bug fixes
+
+* [364732d83](https://github.com/api-platform/core/commit/364732d838f2fba05887fd24c75c4fb302c7af04) fix(serializer): missing parenthesis fixes #5773
+* [7afdabbc4](https://github.com/api-platform/core/commit/7afdabbc417fd1b6bf313c1f17c4b698575ceb0b) fix(jsonschema): reDoc json sample values (#5638)
+
 ## v3.1.20
 
 ### Bug fixes
