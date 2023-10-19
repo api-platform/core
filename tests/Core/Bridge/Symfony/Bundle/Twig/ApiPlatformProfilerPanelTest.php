@@ -80,12 +80,12 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $client->enableProfiler();
         // Using html to get default Swagger UI
         $client->request('GET', '/');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
         /** @var string $token */
         $token = $client->getResponse()->headers->get('X-Debug-Token');
         $crawler = $client->request('GET', "/_wdt/$token");
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
         $block = $crawler->filter('div[class*=sf-toolbar-block-api_platform]');
 
         // Check extra info content
