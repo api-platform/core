@@ -306,12 +306,12 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
         yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
         yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
-        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
-        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference', 'example' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference', 'example' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
         yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
         yield ['nullable enum' => ['type' => 'string', 'enum' => ['male', 'female', null]], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
-        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
-        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference', 'example' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference', 'example' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable, but ignored in OpenAPI V2' => [
             ['type' => 'array', 'items' => ['type' => 'string']],
