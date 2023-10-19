@@ -52,14 +52,14 @@ trait UriVariablesResolverTrait
 
                 foreach ($currentIdentifiers as $key => $value) {
                     $identifiers[$key] = $value;
-                    $uriVariableMap[$key] = $uriVariableDefinition;
+                    $uriVariablesMap[$key] = $uriVariableDefinition;
                 }
 
                 continue;
             }
 
             $identifiers[$parameterName] = $parameters[$parameterName];
-            $uriVariableMap[$parameterName] = $uriVariableDefinition;
+            $uriVariablesMap[$parameterName] = $uriVariableDefinition;
         }
 
         if ($this->uriVariablesConverter) {
