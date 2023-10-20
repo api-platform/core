@@ -113,9 +113,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    /**
-     * @legacy
-     */
     public function testProfilerGeneralLayoutNotResourceClass()
     {
         if ($this->legacy) {
