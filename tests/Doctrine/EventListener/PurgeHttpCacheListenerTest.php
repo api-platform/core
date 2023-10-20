@@ -100,7 +100,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->isReadable(Argument::type(Dummy::class), 'relatedDummy')->willReturn(true);
         $propertyAccessorProphecy->isReadable(Argument::type(Dummy::class), 'relatedOwningDummy')->willReturn(false);
-        $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedDummy')->shouldBeCalled();
+        $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedDummy')->willReturn($toInsert2)->shouldBeCalled();
         $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedOwningDummy')->shouldNotBeCalled();
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
