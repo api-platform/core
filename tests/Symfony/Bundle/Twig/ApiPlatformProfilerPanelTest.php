@@ -113,6 +113,9 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
+    /**
+     * @legacy
+     */
     public function testProfilerGeneralLayoutNotResourceClass()
     {
         if ($this->legacy) {
@@ -130,7 +133,13 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         // Check that the Api-Platform sidebar link is active
-        $this->assertNotEmpty($menuLink = $crawler->filter('a[href$="panel=api_platform.data_collector.request"]'));
+        // BC layer with new profiler, selector changed
+        if ($crawler->filter('a[href$="panel=api_platform.data_collector.request&type=request"]')->count() > 0) {
+            $menuLink = $crawler->filter('a[href$="panel=api_platform.data_collector.request&type=request"]');
+        } else {
+            $menuLink = $crawler->filter('a[href$="panel=api_platform.data_collector.request"]');
+        }
+        $this->assertNotEmpty($menuLink);
         $this->assertNotEmpty($menuLink->filter('.disabled'), 'The sidebar menu should be disabled.');
 
         $metrics = $crawler->filter('.metrics');
