@@ -16,6 +16,7 @@ use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
+use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;
@@ -250,6 +251,15 @@ class AppKernel extends Kernel
             $twigConfig['exception_controller'] = null;
         }
         $c->prependExtensionConfig('twig', $twigConfig);
+
+        // TODO: remove this check and move this config in config_common.yml when dropping support for DoctrineBundle <2.10
+        if (defined(ConnectionFactory::class.'::DEFAULT_SCHEME_MAP')) {
+            $c->prependExtensionConfig('doctrine', [
+                'orm' => [
+                    'report_fields_where_declared' => true,
+                ],
+            ]);
+        }
 
         if (class_exists(NelmioApiDocBundle::class)) {
             $c->prependExtensionConfig('nelmio_api_doc', [
