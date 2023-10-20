@@ -138,7 +138,7 @@ class AppKernel extends Kernel
             'validation' => ['enable_annotations' => true],
             'serializer' => ['enable_annotations' => true],
             'test' => null,
-            'session' => class_exists(SessionFactory::class) ? ['storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
+            'session' => class_exists(SessionFactory::class) ? ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
             'profiler' => [
                 'enabled' => true,
                 'collect' => false,
