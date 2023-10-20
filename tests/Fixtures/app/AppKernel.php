@@ -142,7 +142,7 @@ class AppKernel extends Kernel
         if (class_exists(PingWebhookMessageHandler::class)) {
             $config = [
                 'secret' => 'dunglas.fr',
-                'validation' => ['enable_annotations' => true],
+                'validation' => ['enable_attributes' => true, 'email_validation_mode' => 'html5'],
                 'serializer' => ['enable_attributes' => true],
                 'test' => null,
                 'session' => class_exists(SessionFactory::class) ? ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
@@ -150,6 +150,7 @@ class AppKernel extends Kernel
                     'enabled' => true,
                     'collect' => false,
                 ],
+                'php_errors' => ['log' => true],
                 'messenger' => $messengerConfig,
                 'router' => ['utf8' => true],
             ];
