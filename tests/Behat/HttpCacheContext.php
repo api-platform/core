@@ -13,17 +13,31 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Behat;
 
-use Behat\Behat\Context\Context;
-use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use PHPUnit\Framework\ExpectationFailedException;
+use Behat\MinkExtension\Context\MinkContext;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Context\Context;
+use ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorDefault;
+use ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorCustom;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class HttpCacheContext implements Context
 {
-    public function __construct(private readonly KernelInterface $kernel)
+    public function __construct(private readonly KernelInterface $kernel, private ContainerInterface $driverContainer)
     {
+    }
+
+    /**
+     * @BeforeScenario @customTagCollector
+     */
+    public function registerCustomTagCollector(BeforeScenarioScope $scope): void
+    {
+        $this->disableReboot($scope);
+        $this->driverContainer->set('api_platform.http_cache.tag_collector', new TagCollectorCustom());
     }
 
     /**
@@ -39,5 +53,19 @@ final class HttpCacheContext implements Context
         if ($iris !== $purgedIris) {
             throw new ExpectationFailedException(sprintf('IRIs "%s" does not match expected "%s".', $purgedIris, $iris));
         }
+    }
+
+    /**
+     * this is necessary to allow overriding services
+     * see https://github.com/FriendsOfBehat/SymfonyExtension/issues/149 for details
+     */
+    private function disableReboot(BeforeScenarioScope $scope){
+
+        /** @var MinkContext $minkContext */
+        $minkContext = $scope->getEnvironment()->getContext(MinkContext::class);
+        $client = $minkContext->getSession()->getDriver()->getClient();
+        $client->disableReboot();
+
+
     }
 }

@@ -451,3 +451,9 @@ services:
     ApiPlatform\Tests\Fixtures\TestBundle\Serializer\ErrorNormalizer:
         decorates: 'api_platform.problem.normalizer.error'
         arguments: [ '@.inner' ]
+        
+    api_platform.http_cache.tag_collector:
+        class: ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorDefault
+        public: true
+    
+
