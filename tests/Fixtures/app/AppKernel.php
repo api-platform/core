@@ -21,6 +21,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
+use Doctrine\ORM\Mapping\Driver\ReflectionBasedDriver;
 use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -253,7 +254,8 @@ class AppKernel extends Kernel
         $c->prependExtensionConfig('twig', $twigConfig);
 
         // TODO: remove this check and move this config in config_common.yml when dropping support for DoctrineBundle <2.10
-        if (defined(ConnectionFactory::class.'::DEFAULT_SCHEME_MAP')) {
+        // This class was added with report_fields_where_declared
+        if (class_exists(ReflectionBasedDriver::class)) {
             $c->prependExtensionConfig('doctrine', [
                 'orm' => [
                     'report_fields_where_declared' => true,
