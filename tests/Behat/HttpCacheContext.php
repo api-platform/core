@@ -13,14 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Behat;
 
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use PHPUnit\Framework\ExpectationFailedException;
-use Behat\MinkExtension\Context\MinkContext;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Context\Context;
-use ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorDefault;
 use ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorCustom;
+use Behat\Behat\Context\Context;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Mink\Driver\BrowserKitDriver;
+use Behat\MinkExtension\Context\MinkContext;
+use FriendsOfBehat\SymfonyExtension\Context\Environment\InitializedSymfonyExtensionEnvironment;
+use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -57,15 +59,25 @@ final class HttpCacheContext implements Context
 
     /**
      * this is necessary to allow overriding services
-     * see https://github.com/FriendsOfBehat/SymfonyExtension/issues/149 for details
+     * see https://github.com/FriendsOfBehat/SymfonyExtension/issues/149 for details.
      */
-    private function disableReboot(BeforeScenarioScope $scope){
+    private function disableReboot(BeforeScenarioScope $scope): void
+    {
+        $env = $scope->getEnvironment();
+        if (!$env instanceof InitializedSymfonyExtensionEnvironment) {
+            return;
+        }
 
-        /** @var MinkContext $minkContext */
-        $minkContext = $scope->getEnvironment()->getContext(MinkContext::class);
-        $client = $minkContext->getSession()->getDriver()->getClient();
+        $driver = $env->getContext(MinkContext::class)->getSession()->getDriver();
+        if (!$driver instanceof BrowserKitDriver) {
+            return;
+        }
+
+        $client = $driver->getClient();
+        if (!$client instanceof KernelBrowser) {
+            return;
+        }
+
         $client->disableReboot();
-
-
     }
 }

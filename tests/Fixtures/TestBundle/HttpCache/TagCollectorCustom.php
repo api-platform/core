@@ -16,7 +16,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\HttpCache;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Serializer\TagCollectorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
-use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Collects cache tags during normalization.
@@ -27,15 +26,18 @@ class TagCollectorCustom implements TagCollectorInterface
 {
     public const IRI_RELATION_DELIMITER = '#';
 
-    public function collect(mixed $object = null, string $format = null, array $context = [], string $iri = null, mixed $data = null, string $attribute = null, ApiProperty $propertyMetadata = null, Type $type = null): void
+    public function collect(array $context = []): void
     {
+        $iri = $context['iri'];
+        $object = $context['object'];
+
         if ($object instanceof RelationEmbedder) {
             $iri = '/RE/'.$object->id;
         }
 
-        if ($attribute) {
-            $this->addCacheTagsForRelation($context, $iri, $propertyMetadata);
-        } elseif (\is_array($data)) {
+        if (isset($context['property_metadata'])) {
+            $this->addCacheTagsForRelation($context, $iri, $context['property_metadata']);
+        } elseif (\is_array($context['data'])) {
             $this->addCacheTagForResource($context, $iri);
         }
     }

@@ -264,18 +264,23 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $normalizedRelatedObject;
         }
 
-        $data = [
+        $context['data'] = [
             'data' => [
                 'type' => $this->getResourceShortName($resourceClass),
                 'id' => $iri,
             ],
         ];
 
+        $context['data'] = $iri;
+        $context['object'] = $relatedObject;
+        unset($context['property_metadata']);
+        unset($context['api_attribute']);
+
         if ($this->tagCollector) {
-            $this->tagCollector->collect($relatedObject, $format, $context, $iri, $data);
+            $this->tagCollector->collect($context);
         }
 
-        return $data;
+        return $context['data'];
     }
 
     /**

@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\HttpCache;
 
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Serializer\TagCollectorInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
-use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Collects cache tags during normalization.
@@ -25,15 +22,17 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class TagCollectorDefault implements TagCollectorInterface
 {
-    public function collect(mixed $object = null, string $format = null, array $context = [], string $iri = null, mixed $data = null, string $attribute = null, ApiProperty $propertyMetadata = null, Type $type = null): void
+    public function collect(array $context = []): void
     {
-        if (!$attribute) {
-            $this->addResourceToContext($context, $iri);
+        if (!isset($context['property_metadata'])) {
+            $this->addResourceToContext($context);
         }
     }
 
-    private function addResourceToContext(array $context, ?string $iri): void
+    private function addResourceToContext(array $context): void
     {
+        $iri = $context['iri'];
+
         if (isset($context['resources']) && isset($iri)) {
             $context['resources'][$iri] = $iri;
         }
