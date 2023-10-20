@@ -271,7 +271,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             ],
         ];
 
-        $context['data'] = $iri;
+        $context['iri'] = $iri;
         $context['object'] = $relatedObject;
         unset($context['property_metadata']);
         unset($context['api_attribute']);
