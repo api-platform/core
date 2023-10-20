@@ -137,7 +137,8 @@
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "phpstan/extension-installer": true
-        }
+        },
+        "prepend-autoloader": false
     },
     "extra": {
         "branch-alias": {
