@@ -253,7 +253,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
         $matchField = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
+            [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass, true);
         }
 
         $aggregationBuilder->sort(

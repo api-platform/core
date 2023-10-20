@@ -343,7 +343,10 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
-                            '$unwind' => '$relatedDummy_lkup',
+                            '$unwind' => [
+                                'path' => '$relatedDummy_lkup',
+                                'preserveNullAndEmptyArrays' => true,
+                            ],
                         ],
                         [
                             '$sort' => [
@@ -514,7 +517,10 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
-                            '$unwind' => '$relatedDummy_lkup',
+                            '$unwind' => [
+                                'path' => '$relatedDummy_lkup',
+                                'preserveNullAndEmptyArrays' => true,
+                            ],
                         ],
                         [
                             '$sort' => [
@@ -545,6 +551,30 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     ],
                     $orderFilterFactory,
                     EmbeddedDummy::class,
+                ],
+                'nullable field in relation will be a LEFT JOIN' => [
+                    [
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$unwind' => [
+                                'path' => '$relatedDummy_lkup',
+                                'preserveNullAndEmptyArrays' => true,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'relatedDummy_lkup.name' => 1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
                 ],
             ]
         );

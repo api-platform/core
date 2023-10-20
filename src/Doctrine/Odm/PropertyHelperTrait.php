@@ -60,7 +60,7 @@ trait PropertyHelperTrait
      *               the second element is the $field name
      *               the third element is the $associations array
      */
-    protected function addLookupsForNestedProperty(string $property, Builder $aggregationBuilder, string $resourceClass): array
+    protected function addLookupsForNestedProperty(string $property, Builder $aggregationBuilder, string $resourceClass, bool $preserveNullAndEmptyArrays = false): array
     {
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $alias = '';
@@ -98,7 +98,8 @@ trait PropertyHelperTrait
                     ->localField($isOwningSide ? $localField : '_id')
                     ->foreignField($isOwningSide ? '_id' : $referenceMapping['mappedBy'])
                     ->alias($alias);
-                $aggregationBuilder->unwind("\$$alias");
+                $aggregationBuilder->unwind("\$$alias")
+                    ->preserveNullAndEmptyArrays($preserveNullAndEmptyArrays);
 
                 // association.property => association_lkup.property
                 $property = substr_replace($property, $propertyAlias, strpos($property, (string) $association), \strlen((string) $association));
