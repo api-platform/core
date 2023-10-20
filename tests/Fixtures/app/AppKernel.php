@@ -133,7 +133,7 @@ class AppKernel extends Kernel
         ];
 
         // Symfony 5.4+
-        if (class_exists(SessionFactory::class)) {
+        if (class_exists(SessionFactory::class) && !class_exists(PingWebhookMessageHandler::class)) {
             $messengerConfig['reset_on_message'] = true;
         }
 
@@ -145,7 +145,7 @@ class AppKernel extends Kernel
                 'validation' => ['enable_attributes' => true, 'email_validation_mode' => 'html5'],
                 'serializer' => ['enable_attributes' => true],
                 'test' => null,
-                'session' => class_exists(SessionFactory::class) ? ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
+                'session' => ['cookie_secure' => true, 'cookie_samesite' => 'lax', 'handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file'],
                 'profiler' => [
                     'enabled' => true,
                     'collect' => false,
@@ -153,6 +153,9 @@ class AppKernel extends Kernel
                 'php_errors' => ['log' => true],
                 'messenger' => $messengerConfig,
                 'router' => ['utf8' => true],
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'uid' => ['default_uuid_version' => 7, 'time_based_uuid_version' => 7],
             ];
         } else {
             $config = [
@@ -228,7 +231,7 @@ class AppKernel extends Kernel
             ];
         }
 
-        if (class_exists(NativePasswordHasher::class)) {
+        if (class_exists(NativePasswordHasher::class) && !class_exists(PingWebhookMessageHandler::class)) {
             $securityConfig['enable_authenticator_manager'] = true;
             unset($securityConfig['firewalls']['default']['anonymous']);
         }
@@ -259,6 +262,7 @@ class AppKernel extends Kernel
         if (class_exists(ReflectionBasedDriver::class)) {
             $c->prependExtensionConfig('doctrine', [
                 'orm' => [
+                    'enable_lazy_ghost_objects' => true,
                     'report_fields_where_declared' => true,
                 ],
             ]);

@@ -16,16 +16,32 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\MessageHandler;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class PasswordResetRequestHandler implements MessageHandlerInterface
-{
-    public function __invoke(PasswordResetRequest $passwordResetRequest): PasswordResetRequestResult
+if (\PHP_VERSION_ID >= 80000 && class_exists(AsMessageHandler::class)) {
+    #[AsMessageHandler]
+    class PasswordResetRequestHandler
     {
-        if ('does-not-exist@example.com' === $passwordResetRequest->getEmail()) {
-            throw new NotFoundHttpException('User does not exist.');
-        }
+        public function __invoke(PasswordResetRequest $passwordResetRequest): PasswordResetRequestResult
+        {
+            if ('does-not-exist@example.com' === $passwordResetRequest->getEmail()) {
+                throw new NotFoundHttpException('User does not exist.');
+            }
 
-        return new PasswordResetRequestResult(new \DateTimeImmutable('2019-07-05T15:44:00Z'));
+            return new PasswordResetRequestResult(new \DateTimeImmutable('2019-07-05T15:44:00Z'));
+        }
+    }
+} else {
+    class PasswordResetRequestHandler implements MessageHandlerInterface
+    {
+        public function __invoke(PasswordResetRequest $passwordResetRequest): PasswordResetRequestResult
+        {
+            if ('does-not-exist@example.com' === $passwordResetRequest->getEmail()) {
+                throw new NotFoundHttpException('User does not exist.');
+            }
+
+            return new PasswordResetRequestResult(new \DateTimeImmutable('2019-07-05T15:44:00Z'));
+        }
     }
 }

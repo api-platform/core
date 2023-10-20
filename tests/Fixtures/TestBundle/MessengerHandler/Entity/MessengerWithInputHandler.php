@@ -15,16 +15,32 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Entity;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MessengerInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MessengerWithInput;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class MessengerWithInputHandler implements MessageHandlerInterface
-{
-    public function __invoke(MessengerInput $data)
+if (\PHP_VERSION_ID >= 80000 && class_exists(AsMessageHandler::class)) {
+    #[AsMessageHandler]
+    class MessengerWithInputHandler
     {
-        $object = new MessengerWithInput();
-        $object->name = 'test';
-        $object->id = 1;
+        public function __invoke(MessengerInput $data)
+        {
+            $object = new MessengerWithInput();
+            $object->name = 'test';
+            $object->id = 1;
 
-        return $object;
+            return $object;
+        }
+    }
+} else {
+    class MessengerWithInputHandler implements MessageHandlerInterface
+    {
+        public function __invoke(MessengerInput $data)
+        {
+            $object = new MessengerWithInput();
+            $object->name = 'test';
+            $object->id = 1;
+
+            return $object;
+        }
     }
 }
