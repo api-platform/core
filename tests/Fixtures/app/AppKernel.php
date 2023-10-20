@@ -33,6 +33,7 @@ use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
@@ -133,19 +134,39 @@ class AppKernel extends Kernel
         if (class_exists(SessionFactory::class)) {
             $messengerConfig['reset_on_message'] = true;
         }
-        $c->prependExtensionConfig('framework', [
-            'secret' => 'dunglas.fr',
-            'validation' => ['enable_annotations' => true],
-            'serializer' => ['enable_annotations' => true],
-            'test' => null,
-            'session' => class_exists(SessionFactory::class) ? ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
-            'profiler' => [
-                'enabled' => true,
-                'collect' => false,
-            ],
-            'messenger' => $messengerConfig,
-            'router' => ['utf8' => true],
-        ]);
+
+        // This class is introduced in Symfony 6.4 just using it to use the new configuration and to avoid unnecessary deprecations
+        // Fixes framework configuration for 2.7
+        if (class_exists(PingWebhookMessageHandler::class)) {
+            $config = [
+                'secret' => 'dunglas.fr',
+                'validation' => ['enable_annotations' => true],
+                'serializer' => ['enable_attributes' => true],
+                'test' => null,
+                'session' => class_exists(SessionFactory::class) ? ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
+                'profiler' => [
+                    'enabled' => true,
+                    'collect' => false,
+                ],
+                'messenger' => $messengerConfig,
+                'router' => ['utf8' => true],
+            ];
+        } else {
+            $config = [
+                'secret' => 'dunglas.fr',
+                'validation' => ['enable_annotations' => true],
+                'serializer' => ['enable_annotations' => true],
+                'test' => null,
+                'session' => class_exists(SessionFactory::class) ? ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
+                'profiler' => [
+                    'enabled' => true,
+                    'collect' => false,
+                ],
+                'messenger' => $messengerConfig,
+                'router' => ['utf8' => true],
+            ];
+        }
+        $c->prependExtensionConfig('framework', $config);
 
         $alg = class_exists(NativePasswordHasher::class, false) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';
         $securityConfig = [
