@@ -127,7 +127,7 @@ class ItemNormalizerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
-        $iriConverterProphecy->getIriFromResource($relatedDummy)->willReturn('/related-dummies/2');
+        $iriConverterProphecy->getIriFromResource($relatedDummy, Argument::cetera())->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
@@ -190,7 +190,7 @@ class ItemNormalizerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
-        $iriConverterProphecy->getIriFromResource($relatedDummy)->willReturn('/related-dummies/2');
+        $iriConverterProphecy->getIriFromResource($relatedDummy, Argument::cetera())->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
