@@ -414,6 +414,11 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
                     $orderFilterFactory,
                     EmbeddedDummy::class,
                 ],
+                'nullable field in relation will be a LEFT JOIN' => [
+                    sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_a1 ORDER BY relatedDummy_a1.name ASC', Dummy::class),
+                    null,
+                    $orderFilterFactory,
+                ],
             ]
         );
     }
