@@ -43,6 +43,8 @@ use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrateg
 use Symfony\Component\Security\Core\User\User as SymfonyCoreUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Config\Doctrine\Orm\EntityManagerConfig;
+use Symfony\Config\Doctrine\OrmConfig;
 
 /**
  * AppKernel for tests.
@@ -257,15 +259,15 @@ class AppKernel extends Kernel
         }
         $c->prependExtensionConfig('twig', $twigConfig);
 
-        // TODO: remove this check and move this config in config_common.yml when dropping support for DoctrineBundle <2.10
-        // This class was added with report_fields_where_declared
-        if (class_exists(ReflectionBasedDriver::class)) {
-            $c->prependExtensionConfig('doctrine', [
-                'orm' => [
-                    'enable_lazy_ghost_objects' => true,
-                    'report_fields_where_declared' => true,
-                ],
-            ]);
+        $doctrineConfig = [];
+        if (method_exists(EntityManagerConfig::class, 'getReportFieldsWhereDeclared')) {
+            $doctrineConfig['orm']['report_fields_where_declared'] = true;
+        }
+        if (method_exists(OrmConfig::class, 'enableLazyGhostObjects')) {
+            $doctrineConfig['orm']['enable_lazy_ghost_objects'] = true;
+        }
+        if (!empty($doctrineConfig)) {
+            $c->prependExtensionConfig('doctrine', $doctrineConfig);
         }
 
         if (class_exists(NelmioApiDocBundle::class)) {
