@@ -457,3 +457,8 @@ services:
     ApiPlatform\Tests\Fixtures\TestBundle\State\ODMLinkHandledDummyLinksHandler:
         tags:
             - {name: 'api_platform.doctrine.odm.links_handler'}
+
+    ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\TypeFactoryDecorator:
+      decorates: 'api_platform.json_schema.type_factory'
+      arguments:
+        $decorated: '@.inner'
