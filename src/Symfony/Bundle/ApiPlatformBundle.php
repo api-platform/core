@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle;
 
+use ApiPlatform\JsonLd\DependencyInjection\NormalizerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
@@ -52,5 +53,6 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new MetadataAwareNameConverterPass());
         $container->addCompilerPass(new TestClientPass());
         $container->addCompilerPass(new AuthenticatorManagerPass());
+        $container->addCompilerPass(new NormalizerPass());
     }
 }
