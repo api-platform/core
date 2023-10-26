@@ -25,6 +25,7 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class RespondProcessorTest extends TestCase
 {
@@ -96,5 +97,20 @@ class RespondProcessorTest extends TestCase
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertNull($response->headers->get('Location'));
+    }
+
+    public function testAddsExceptionHeaders(): void
+    {
+        $operation = new Get();
+
+        /** @var ProcessorInterface<Response> $respondProcessor */
+        $respondProcessor = new RespondProcessor();
+        $req = new Request();
+        $req->attributes->set('exception', new TooManyRequestsHttpException(32));
+        $response = $respondProcessor->process('content', new Get(), context: [
+            'request' => $req,
+        ]);
+
+        $this->assertSame('32', $response->headers->get('retry-after'));
     }
 }
