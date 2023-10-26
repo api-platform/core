@@ -127,6 +127,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $errorFormats['json'] = ['application/problem+json', 'application/json'];
         }
 
+        if (!isset($errorFormats['jsonproblem'])) {
+            $errorFormats['jsonproblem'] = ['application/problem+json'];
+        }
+
         if ($this->isConfigEnabled($container, $config['graphql']) && !isset($formats['json'])) {
             trigger_deprecation('api-platform/core', '3.2', 'Add the "json" format to the configuration to use GraphQL.');
             $formats['json'] = ['application/json'];

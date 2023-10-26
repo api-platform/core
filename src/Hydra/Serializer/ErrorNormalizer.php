@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Converts {@see \Exception} or {@see FlattenException} to a Hydra error representation.
  *
- * @deprecated
+ * @deprecated we use ItemNormalizer instead
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
@@ -37,7 +37,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     public const TITLE = 'title';
     private array $defaultContext = [self::TITLE => 'An error occurred'];
 
-    public function __construct(private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator, private readonly bool $debug = false, array $defaultContext = [])
+    public function __construct(private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator, private readonly bool $debug = false, array $defaultContext = [], private readonly ?NormalizerInterface $itemNormalizer = null)
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -47,7 +47,12 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated in favor of using an Error resource.', __CLASS__));
+        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated in favor of using an Error resource. We fallback on "api_platform.serializer.normalizer.item".', __CLASS__));
+
+        if ($this->itemNormalizer) {
+            return $this->itemNormalizer->normalize($object, $format, $context);
+        }
+
         $data = [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),
             '@type' => 'hydra:Error',

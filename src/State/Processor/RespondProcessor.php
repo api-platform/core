@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Processor;
 
+use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
@@ -24,6 +25,7 @@ use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 
 /**
  * Serializes data.
@@ -63,6 +65,11 @@ final class RespondProcessor implements ProcessorInterface
             'X-Content-Type-Options' => 'nosniff',
             'X-Frame-Options' => 'deny',
         ];
+
+        $exception = $request->attributes->get('exception');
+        if (($exception instanceof HttpExceptionInterface || $exception instanceof SymfonyHttpExceptionInterface) && $exceptionHeaders = $exception->getHeaders()) {
+            $headers = array_merge($headers, $exceptionHeaders);
+        }
 
         $status = $operation->getStatus();
 

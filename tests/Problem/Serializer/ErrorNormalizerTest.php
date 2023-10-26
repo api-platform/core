@@ -38,11 +38,14 @@ class ErrorNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new FlattenException(), ErrorNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new FlattenException(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
-        $this->assertEmpty($normalizer->getSupportedTypes('json'));
         $this->assertSame([
             \Exception::class => false,
             FlattenException::class => false,
         ], $normalizer->getSupportedTypes($normalizer::FORMAT));
+        $this->assertSame([
+            \Exception::class => false,
+            FlattenException::class => false,
+        ], $normalizer->getSupportedTypes('json')); // note: jsonproblem is the default for json
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertFalse($normalizer->hasCacheableSupportsMethod());

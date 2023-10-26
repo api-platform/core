@@ -73,6 +73,8 @@
         <!-- deprecated -->
         <service id="api_platform.jsonapi.normalizer.error" class="ApiPlatform\JsonApi\Serializer\ErrorNormalizer" public="false">
             <argument>%kernel.debug%</argument>
+            <argument type="collection"></argument>
+            <argument type="service" id="api_platform.jsonapi.normalizer.item" on-invalid="null" />
 
             <tag name="serializer.normalizer" priority="-790"/>
         </service>
