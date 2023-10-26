@@ -1274,4 +1274,15 @@ class ApiPlatformExtensionTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
         $this->assertArrayHasKey('json', $this->container->getParameter('api_platform.formats'));
     }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/5919
+     */
+    public function testGraphQlLegacyConfigurationInDebugMode(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+        $this->assertTrue($this->container->hasDefinition('api_platform.graphql.resolver.factory.item'));
+    }
 }
