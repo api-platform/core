@@ -18,7 +18,9 @@ use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\ChildFoo;
 use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\Dummy;
+use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\ParentFoo;
 use ApiPlatform\Metadata\GraphQl\Query;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -242,6 +244,24 @@ class ItemResolverFactoryTest extends TestCase
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Custom query resolver "query_resolver_id" has to return an item of class stdClass but returned an item of class Dummy.');
+
+        ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info);
+    }
+
+    public function testResolveInheritedClass(): void
+    {
+        $resourceClass = ParentFoo::class;
+        $rootClass = $resourceClass;
+        $operationName = 'custom_query';
+        $operation = (new Query())->withName($operationName);
+        $source = ['source'];
+        $args = ['args'];
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'field';
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
+
+        $readStageItem = new ChildFoo();
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
         ($this->itemResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info);
     }
