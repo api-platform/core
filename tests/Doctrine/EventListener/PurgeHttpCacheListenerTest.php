@@ -201,13 +201,16 @@ class PurgeHttpCacheListenerTest extends TestCase
         // @phpstan-ignore-next-line
         $dummyClassMetadata->associationMappings = [
             'notAResource' => [],
+            'collectionOfNotAResource' => ['targetEntity' => NotAResource::class],
         ];
         $emProphecy->getClassMetadata(ContainNonResource::class)->willReturn($dummyClassMetadata);
         $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->isReadable(Argument::type(ContainNonResource::class), 'notAResource')->willReturn(true);
+        $propertyAccessorProphecy->isReadable(Argument::type(ContainNonResource::class), 'collectionOfNotAResource')->shouldNotBeCalled();
         $propertyAccessorProphecy->getValue(Argument::type(ContainNonResource::class), 'notAResource')->shouldBeCalled()->willReturn($nonResource);
+        $propertyAccessorProphecy->getValue(Argument::type(ContainNonResource::class), 'collectionOfNotAResource')->shouldNotBeCalled();
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
         $listener->onFlush($eventArgs);

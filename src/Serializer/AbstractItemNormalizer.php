@@ -789,7 +789,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $normalizedRelatedObject;
         }
 
-        $iri = $this->iriConverter->getIriFromResource($relatedObject);
+        $iri = $this->iriConverter->getIriFromResource(resource: $relatedObject, context: $context);
 
         if (isset($context['resources'])) {
             $context['resources'][$iri] = $iri;
