@@ -1,5 +1,23 @@
 # Changelog
 
+## v3.2.2
+
+### Bug fixes
+
+* [3d0dfc148](https://github.com/api-platform/core/commit/3d0dfc148ec864364d1c36dfaa2690e1fc58dfc5) fix(symfony): swagger ui should use base url (#5918)
+* [4f51b5198](https://github.com/api-platform/core/commit/4f51b519853cf972070db79a8b82c824afa000fc) fix(symfony): use http exception headers (#5932)
+* [547c4e605](https://github.com/api-platform/core/commit/547c4e605c60c54642abc06c37462f5e47fbe25d) fix(graphql): item resolver inheritance error  (#5910)
+* [6b5df95ca](https://github.com/api-platform/core/commit/6b5df95caf2e3c6f807f2083ea3526fcd2ae473a) fix(doctrine): odm order filter should use a left join on nullable fields (#5911)
+* [ae090c7c4](https://github.com/api-platform/core/commit/ae090c7c4ec9619655ae95534b87a07aa7b2b061) fix(graphql): use normalization context to get item from IRI (#5915)
+* [b2d9ce40c](https://github.com/api-platform/core/commit/b2d9ce40cf27ee9743aafff4f163e195ae47b880) fix(serializer): pass $context to IriConverter (#5908)
+* [c2824c1d7](https://github.com/api-platform/core/commit/c2824c1d72f04a0d05b902b08a475a95db18e69f) fix(jsonschema): restore type factory usage (#5897)
+* [cd6f5834b](https://github.com/api-platform/core/commit/cd6f5834b7458798054fb4c7b3ea94f193246405) fix(serializer): use error normalizers (#5931)
+* [d9f77402d](https://github.com/api-platform/core/commit/d9f77402d55c40a867edf8fa15cee67c2801574f) fix(graphql): service missing in debug mode (#5930)
+
+Note:
+
+`extra_properties.skip_deprecated_exception_normalizers` is set to `false` so that decorating Error normalizers works. Set it to `true` to avoid deprecations and decorate the corresponding `ItemNormalizer` instead.
+
 ## v3.2.1
 
 ### Bug fixes
@@ -181,7 +199,7 @@ Notes:
 ### Bug fixes
 
 * [6a62a53f8](https://github.com/api-platform/core/commit/6a62a53f854ec93947d1c4a5a32007df09e55d06) fix(hydra): add xxx[] hydra:search iexact
-* [7f0e00cd2](https://github.com/api-platform/core/commit/7f0e00cd2d838037f716e0b8588a6529ef9f158c) fix(mercure): custom topics on newly created entities causes error #5074 
+* [7f0e00cd2](https://github.com/api-platform/core/commit/7f0e00cd2d838037f716e0b8588a6529ef9f158c) fix(mercure): custom topics on newly created entities causes error #5074
 * [1fccb8413](https://github.com/api-platform/core/commit/1fccb8413a902a1011f049d0f8ddcd8d5456d335) fix(doctrine): add SearchFilter case-insensitive strategies constants
 
 ## v3.1.18
@@ -566,7 +584,7 @@ Breaking changes:
 * Metadata: `Patch` is added to the automatic CRUD
 * Symfony: generated route names and operation names changed, route naming can be changed directly within metadata
 * Doctrine: remove `@final` annotation from filters and mark them as `final`
-    
+
 ## v2.7.14
 
 ### Bug fixes
