@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
+use ApiPlatform\Api\FilterInterface as LegacyFilterInterface;
 use ApiPlatform\Api\FilterLocatorTrait;
+use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\FilterInterface;
@@ -40,7 +42,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * @param ContainerInterface $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
+    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
     {
         $this->setFilterLocator($filterLocator);
     }
@@ -142,7 +144,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * Returns the content of the Hydra search property.
      *
-     * @param FilterInterface[] $filters
+     * @param LegacyFilterInterface[]|FilterInterface[] $filters
      */
     private function getSearch(string $resourceClass, array $parts, array $filters): array
     {

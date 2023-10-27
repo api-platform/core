@@ -127,6 +127,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $errorFormats['json'] = ['application/problem+json', 'application/json'];
         }
 
+        if (!isset($errorFormats['jsonproblem'])) {
+            $errorFormats['jsonproblem'] = ['application/problem+json'];
+        }
+
+        if ($this->isConfigEnabled($container, $config['graphql']) && !isset($formats['json'])) {
+            trigger_deprecation('api-platform/core', '3.2', 'Add the "json" format to the configuration to use GraphQL.');
+            $formats['json'] = ['application/json'];
+        }
+
         // Backward Compatibility layer
         if (isset($formats['jsonapi']) && !isset($patchFormats['jsonapi'])) {
             $patchFormats['jsonapi'] = ['application/vnd.api+json'];
@@ -578,13 +587,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(ErrorHandlerInterface::class)
             ->addTag('api_platform.graphql.error_handler');
 
-        if (!$container->getParameter('kernel.debug')) {
-            return;
-        }
-
         /* TODO: remove these in 4.x only one resolver factory is used and we're using providers/processors */
         if ($config['event_listeners_backward_compatibility_layer'] ?? true) {
+            // @TODO: API Platform 3.3 trigger_deprecation('api-platform/core', '3.3', 'In API Platform 4 only one factory "api_platform.graphql.resolver.factory.item" will remain. Stages are deprecated in favor of using a provider/processor.');
+            // + deprecate every service from legacy/graphql.xml
             $loader->load('legacy/graphql.xml');
+
+            if (!$container->getParameter('kernel.debug')) {
+                return;
+            }
+
             $requestStack = new Reference('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE);
             $collectionDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
                 ->setDecoratedService('api_platform.graphql.resolver.factory.collection')

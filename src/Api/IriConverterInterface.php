@@ -13,15 +13,33 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-class_exists(\ApiPlatform\Metadata\IriConverterInterface::class);
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\Operation;
 
-class_alias(
-    \ApiPlatform\Metadata\IriConverterInterface::class,
-    __NAMESPACE__.'\IriConverterInterface'
-);
+/**
+ * Converts item and resources to IRI and vice versa.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+interface IriConverterInterface
+{
+    /**
+     * Retrieves an item from its IRI.
+     *
+     * @throws InvalidArgumentException
+     * @throws ItemNotFoundException
+     */
+    public function getResourceFromIri(string $iri, array $context = [], Operation $operation = null): object;
 
-if (false) { // @phpstan-ignore-line
-    interface IriConverterInterface extends \ApiPlatform\Metadata\IriConverterInterface
-    {
-    }
+    /**
+     * Gets the IRI associated with the given item.
+     *
+     * @param object|class-string $resource
+     *
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
+    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string;
 }

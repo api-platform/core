@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -37,12 +38,22 @@ class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCo
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
-        foreach ($resourceMetadataCollection as $resourceMetadata) {
-            foreach ($resourceMetadata->getOperations() as $operation) {
-                if ($operation instanceof Put && null === ($operation->getExtraProperties()['standard_put'] ?? null)) {
+        foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
+            $newOperations = [];
+            foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+                $extraProperties = $operation->getExtraProperties();
+                if ($operation instanceof Put && null === ($extraProperties['standard_put'] ?? null)) {
                     $this->triggerDeprecationOnce($operation, 'extraProperties["standard_put"]', 'In API Platform 4 PUT will always replace the data, use extraProperties["standard_put"] to "true" on every operation to avoid breaking PUT\'s behavior. Use PATCH to use the old behavior.');
                 }
+
+                if (null === ($extraProperties['skip_deprecated_exception_normalizers'] ?? null)) {
+                    $operation = $operation->withExtraProperties(['skip_deprecated_exception_normalizers' => false] + $extraProperties);
+                }
+
+                $newOperations[$operationName] = $operation;
             }
+
+            $resourceMetadataCollection[$i] = $resourceMetadata->withOperations(new Operations($newOperations));
         }
 
         return $resourceMetadataCollection;

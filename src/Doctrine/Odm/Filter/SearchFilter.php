@@ -149,7 +149,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    protected function getIriConverter(): IriConverterInterface
+    protected function getIriConverter(): LegacyIriConverterInterface|IriConverterInterface
     {
         return $this->iriConverter;
     }

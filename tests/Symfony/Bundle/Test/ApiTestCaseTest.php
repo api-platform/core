@@ -24,9 +24,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 class ApiTestCaseTest extends ApiTestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testAssertJsonContains(): void
     {
         self::createClient()->request('GET', '/');
@@ -266,6 +269,24 @@ JSON;
 }
 JSON
         );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testExceptionNormalizer(): void
+    {
+        $this->expectDeprecation('Since api-platform 3.2: The class "ApiPlatform\Problem\Serializer\ErrorNormalizer" is deprecated in favor of using an Error resource. We fallback on "api_platform.serializer.normalizer.item".');
+
+        $response = self::createClient()->request('GET', '/issue5921', [
+            'headers' => [
+                'accept' => 'application/json',
+            ],
+        ]);
+
+        $data = $response->toArray(false);
+        $this->assertArrayHasKey('hello', $data);
+        $this->assertEquals($data['hello'], 'world');
     }
 
     private function recreateSchema(array $options = []): void

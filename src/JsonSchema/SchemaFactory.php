@@ -37,7 +37,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 {
     use ResourceClassInfoTrait;
     private array $distinctFormats = [];
-
+    private ?TypeFactoryInterface $typeFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
     public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
@@ -45,7 +45,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     public function __construct(?TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         if ($typeFactory) {
-            trigger_deprecation('api-platform/core', '3.2', sprintf('The "%s" is not needed anymore and will not be used anymore.', TypeFactoryInterface::class));
+            $this->typeFactory = $typeFactory;
         }
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -198,6 +198,12 @@ final class SchemaFactory implements SchemaFactoryInterface
         $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
 
         foreach ($types as $type) {
+            // TODO: in 3.3 add trigger_deprecation() as type factories are not used anymore, we moved this logic to SchemaPropertyMetadataFactory so that it gets cached
+            if ($typeFromFactory = $this->typeFactory?->getType($type, 'jsonschema', $propertyMetadata->isReadableLink(), $serializerContext)) {
+                $propertySchema = $typeFromFactory;
+                break;
+            }
+
             $isCollection = $type->isCollection();
             if ($isCollection) {
                 $valueType = $type->getCollectionValueTypes()[0] ?? null;
