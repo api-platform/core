@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.1.22
+
+### Bug fixes
+
+* [157faafd5](https://github.com/api-platform/core/commit/157faafd54db75214b39fc8c7c6a97a171513c67) fix(state): wrong variable name
+* [b2d9ce40c](https://github.com/api-platform/core/commit/b2d9ce40cf27ee9743aafff4f163e195ae47b880) fix(serializer): pass $context to IriConverter (#5908)
+
 ## v3.1.21
 
 ### Bug fixes
