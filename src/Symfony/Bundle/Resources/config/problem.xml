@@ -22,6 +22,8 @@
         <!-- deprecated -->
         <service id="api_platform.problem.normalizer.error" class="ApiPlatform\Problem\Serializer\ErrorNormalizer" public="false">
             <argument>%kernel.debug%</argument>
+            <argument type="collection"></argument>
+            <argument type="service" id="api_platform.serializer.normalizer.item" on-invalid="null" />
 
             <tag name="serializer.normalizer" priority="-810" />
         </service>

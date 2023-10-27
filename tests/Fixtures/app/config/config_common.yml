@@ -462,3 +462,7 @@ services:
       decorates: 'api_platform.json_schema.type_factory'
       arguments:
         $decorated: '@.inner'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Serializer\ErrorNormalizer:
+        decorates: 'api_platform.problem.normalizer.error'
+        arguments: [ '@.inner' ]

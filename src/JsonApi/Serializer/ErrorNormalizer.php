@@ -22,6 +22,8 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Converts {@see \Exception} or {@see FlattenException} or to a JSON API error representation.
  *
+ * @deprecated we use ItemNormalizer instead
+ *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
 final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
@@ -34,7 +36,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         self::TITLE => 'An error occurred',
     ];
 
-    public function __construct(private readonly bool $debug = false, array $defaultContext = [])
+    public function __construct(private readonly bool $debug = false, array $defaultContext = [], private readonly ?NormalizerInterface $itemNormalizer = null)
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -44,7 +46,12 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
-        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated in favor of using an Error resource.', __CLASS__));
+        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated in favor of using an Error resource. We fallback on "api_platform.serializer.normalizer.item".', __CLASS__));
+
+        if ($this->itemNormalizer) {
+            return $this->itemNormalizer->normalize($object, $format, $context);
+        }
+
         $data = [
             'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],
             'description' => $this->getErrorMessage($object, $context, $this->debug),
