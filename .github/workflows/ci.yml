@@ -156,6 +156,10 @@ jobs:
           composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle
+      # https://github.com/doctrine/dbal/issues/5570
+      - name: Fix Doctrine dependencies
+        if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2') || startsWith(matrix.php, '7.3'))
+        run: composer require "doctrine/orm:<2.13" -W --dev --no-interaction --no-progress --ansi
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
@@ -250,6 +254,10 @@ jobs:
             doctrine/mongodb-odm-bundle
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
+      # https://github.com/doctrine/dbal/issues/5570
+      - name: Fix Doctrine dependencies
+        if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2') || startsWith(matrix.php, '7.3'))
+        run: composer require "doctrine/orm:<2.13" -W --dev --no-interaction --no-progress --ansi
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
         run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
@@ -701,9 +709,6 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      # Fix lexer deprecations https://github.com/doctrine/orm/pull/10736
-      - name: Fix Doctrine dependencies
-        run: composer require "doctrine/annotations:^2.0" "doctrine/mongodb-odm:^2.4" -W --dev --no-interaction --no-progress --ansi
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
@@ -752,9 +757,6 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Remove cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
-      # Fix lexer deprecations https://github.com/doctrine/orm/pull/10736
-      - name: Fix Doctrine dependencies
-        run: composer require "doctrine/annotations:^2.0" "doctrine/mongodb-odm:^2.4" -W --dev --no-interaction --no-progress --ansi
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
