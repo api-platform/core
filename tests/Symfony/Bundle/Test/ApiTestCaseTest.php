@@ -271,6 +271,20 @@ JSON
         );
     }
 
+    private function recreateSchema(array $options = []): void
+    {
+        self::bootKernel($options);
+
+        /** @var EntityManagerInterface $manager */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        /** @var ClassMetadata[] $classes */
+        $classes = $manager->getMetadataFactory()->getAllMetadata();
+        $schemaTool = new SchemaTool($manager);
+
+        @$schemaTool->dropSchema($classes);
+        @$schemaTool->createSchema($classes);
+    }
+
     /**
      * @group legacy
      */
@@ -289,17 +303,9 @@ JSON
         $this->assertEquals($data['hello'], 'world');
     }
 
-    private function recreateSchema(array $options = []): void
+    public function testMissingMethod(): void
     {
-        self::bootKernel($options);
-
-        /** @var EntityManagerInterface $manager */
-        $manager = static::getContainer()->get('doctrine')->getManager();
-        /** @var ClassMetadata[] $classes */
-        $classes = $manager->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($manager);
-
-        @$schemaTool->dropSchema($classes);
-        @$schemaTool->createSchema($classes);
+        $response = self::createClient([], ['headers' => ['accept' => 'application/json']])->request('DELETE', '/something/that/does/not/exist/ever');
+        $this->assertResponseStatusCodeSame(404);
     }
 }
