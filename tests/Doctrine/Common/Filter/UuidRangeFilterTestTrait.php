@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
 
 trait UuidRangeFilterTestTrait
 {
-    private function provideApplyTestArguments(): array
+    private static function provideApplyTestArguments(): array
     {
         return [
             'between' => [

@@ -13,36 +13,28 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Nonstandard\UuidV6;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV6;
 
-/**
- * @ApiResource(attributes={
- *     "filters"={
- *         "my_dummy.uuid_range",
- *     }
- * })
- * @ORM\Entity
- */
+#[ApiResource(filters: ['my_dummy.uuid_range'])]
+#[ORM\Entity]
 class DummyUuidV6
 {
-    /**
-     * @ORM\Column(type="uuid", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+
+    #[ORM\Column(type: UuidType::NAME)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private Uuid $id;
 
     public function __construct()
     {
-        $this->id = UuidV6::uuid6();
+        $this->id = UuidV6::v6();
     }
 
-    /**
-     * @return \Ramsey\Uuid\UuidInterface
-     */
-    public function getId()
+    public function getId(): Uuid
     {
         return $this->id;
     }

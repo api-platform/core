@@ -13,42 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Ramsey\Uuid\Nonstandard\UuidV6;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV6;
 
-/**
- * @ApiResource(attributes={
- *     "doctrine_mongodb"={
- *         "execute_options"={
- *             "allowDiskUse"=true
- *         }
- *     },
- *     "filters"={
- *         "my_dummy.mongodb.uuid_range",
- *     }
- * })
- * @ODM\Document
- */
+
+#[ApiResource(extraProperties: ['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]], filters: ['my_dummy.mongodb.uuid_range'])]
+#[ODM\Document]
 class DummyUuidV6
 {
-    /**
-     * @var string|null The id
-     *
-     * @ODM\Id(strategy="NONE", type="string", nullable=true)
-     */
-    private $id;
+    #[ODM\Id(strategy: 'NONE', type: 'string', nullable: true)]
+    private ?Uuid $id = null;
 
     public function __construct()
     {
-        $this->id = UuidV6::uuid6();
+        $this->id = UuidV6::v6();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getId()
+    public function getId(): ?Uuid
     {
-        return $this->id->toString();
+        return $this->id;
     }
 }

@@ -27,10 +27,10 @@ class UuidRangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use UuidRangeFilterTestTrait;
 
-    protected $filterClass = UuidRangeFilter::class;
-    protected $resourceClass = DummyUuidV6::class;
+    protected string $filterClass = UuidRangeFilter::class;
+    protected string $resourceClass = DummyUuidV6::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -63,10 +63,10 @@ class UuidRangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'between' => [
                     [

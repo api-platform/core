@@ -23,12 +23,13 @@ class UuidRangeFilterTest extends DoctrineOrmFilterTestCase
 {
     use UuidRangeFilterTestTrait;
 
-    protected $filterClass = UuidRangeFilter::class;
-    protected $resourceClass = DummyUuidV6::class;
+    protected string $filterClass = UuidRangeFilter::class;
+    protected string $resourceClass = DummyUuidV6::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
+
         $this->assertEquals([
             'id[between]' => [
                 'property' => 'id',
@@ -58,10 +59,10 @@ class UuidRangeFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'between' => [
                     sprintf('SELECT o FROM %s o WHERE o.id BETWEEN :id_p1_1 AND :id_p1_2', Dummy::class),
