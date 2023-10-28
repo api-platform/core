@@ -15,23 +15,21 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Uid\UuidV6;
 
 #[ApiResource(filters: ['my_dummy.uuid_range'])]
 #[ORM\Entity]
 class DummyUuidV6
 {
 
-    #[ORM\Column(type: UuidType::NAME)]
+    #[ORM\Column(type: 'symfony_uuid')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private Uuid $id;
 
     public function __construct()
     {
-        $this->id = UuidV6::v6();
+        $this->id = Uuid::v7();
     }
 
     public function getId(): Uuid

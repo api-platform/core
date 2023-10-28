@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Common\Filter;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * Trait for filtering the collection by range using UUIDs (UUID v6).
@@ -37,7 +38,7 @@ trait UuidRangeFilterTrait
             return null;
         }
 
-        if (!$this->isValidUid($values[0]) || !$this->isValidUid($values[1])) {
+        if (!Uuid::isValid($values[0]) || !Uuid::isValid($values[1])) {
             $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid values for "[%s]" range, expected uuids', self::PARAMETER_BETWEEN)),
             ]);
@@ -53,7 +54,7 @@ trait UuidRangeFilterTrait
      */
     protected function normalizeValue(string $value, string $operator): string | null
     {
-        if (!$this->isValidUid($value)) {
+        if (!Uuid::isValid($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected uuid', $operator)),
             ]);
@@ -62,10 +63,5 @@ trait UuidRangeFilterTrait
         }
 
         return $value;
-    }
-
-    private function isValidUid($potentialUid): bool
-    {
-        return \is_string($potentialUid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $potentialUid);
     }
 }

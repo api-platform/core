@@ -18,9 +18,7 @@ use ApiPlatform\Doctrine\Orm\Filter\UuidRangeFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Uid\UuidV6;
 
 #[ORM\Entity]
 #[ApiResource(
@@ -31,10 +29,10 @@ use Symfony\Component\Uid\UuidV6;
 )]
 #[ApiFilter(UuidRangeFilter::class, properties: ['id'])]
 #[ApiFilter(OrderFilter::class, properties: ["id" => "DESC"])]
-class SoManyUids
+class SoManyUid
 {
     #[ORM\Id]
-    #[ORM\Column(type: UuidType::NAME)]
+    #[ORM\Column(type: 'symfony_uuid')]
     public Uuid $id;
 
     #[ORM\Column(nullable: true)]
@@ -43,9 +41,9 @@ class SoManyUids
     public function __construct($id)
     {
         if ($id) {
-            $this->id = UuidV6::fromString($id);
+            $this->id = Uuid::fromString($id);
         } else {
-            $this->id = UuidV6::v6();
+            $this->id = Uuid::v7();
         }
     }
 }

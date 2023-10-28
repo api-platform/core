@@ -602,7 +602,7 @@ Feature: Collections support
   @createSchema
   Scenario: Cursor-based pagination with ranged items on uids
     Given there are 10 of these so many uid objects
-    When I send a "GET" request to "/so_many_uids?order%5Bid%5D=desc&id%5Blt%5D=1ec5c128-f3d4-62d0-b528-68fef707f0bd"
+    When I send a "GET" request to "/so_many_uids?order%5Bid%5D=desc&id%5Blt%5D=018b7743-c432-76ad-bb16-66151bb60a8a"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -611,16 +611,16 @@ Feature: Collections support
      {
        "type": "object",
        "properties": {
-         "@context": {"pattern": "^/contexts/SoManyUids"},
-         "@id": {"pattern": "^/so_many_uids"},
+         "@context": {"pattern": "^/contexts/SoManyUid"},
+         "@id": {"pattern": "^/so_many_uid"},
          "@type": {"pattern": "^hydra:Collection"},
          "hydra:view": {
            "type": "object",
            "properties": {
-             "@id": {"pattern": "^/so_many_uids\\?order%5Bid%5D=desc&id%5Blt%5D=1ec5c128-f3d4-62d0-b528-68fef707f0bd$"},
+             "@id": {"pattern": "^/so_many_uids\\?order%5Bid%5D=desc&id%5Blt%5D=018b7743-c432-76ad-bb16-66151bb60a8a$"},
              "@type": {"pattern": "^hydra:PartialCollectionView$"},
-             "hydra:previous": {"pattern": "^/so_many_uids\\?order%5Bid%5D=desc&id%5Bgt%5D=1ec5c128-f3d4-61ae-bb3c-68fef707f0bd$"},
-             "hydra:next": {"pattern": "^/so_many_uids\\?order%5Bid%5D=desc&id%5Blt%5D=1ec5c128-f3d3-6fc4-8b52-68fef707f0bd$"}
+             "hydra:previous": {"pattern": "^/so_many_uids\\?order%5Bid%5D=desc&id%5Bgt%5D=018b7743-a62c-7be8-8e4c-67c363fd5a01$"},
+             "hydra:next": {"pattern": "^/so_many_uids\\?order%5Bid%5D=desc&id%5Blt%5D=018b7743-6a9f-72af-9587-c7e06f11c33e$"}
            },
            "additionalProperties": false
          },
