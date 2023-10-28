@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\RangeFilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -23,7 +24,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Lee Siong Chan <ahlee2326@me.com>
  * @author Kai Dederichs <kai.dederichs@protonmail.com>
  */
-abstract class AbstractRangeFilter extends AbstractContextAwareFilter implements RangeFilterInterface
+abstract class AbstractRangeFilter extends AbstractFilter implements RangeFilterInterface
 {
     abstract protected function normalizeValue(string $value, string $operator);
 
@@ -34,12 +35,12 @@ abstract class AbstractRangeFilter extends AbstractContextAwareFilter implements
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (
-            !\is_array($values) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass)
+            !\is_array($values)
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }
@@ -53,7 +54,7 @@ abstract class AbstractRangeFilter extends AbstractContextAwareFilter implements
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
         }
 
         foreach ($values as $operator => $value) {
@@ -70,19 +71,14 @@ abstract class AbstractRangeFilter extends AbstractContextAwareFilter implements
 
     /**
      * Adds the where clause according to the operator.
-     *
-     * @param string $alias
-     * @param string $field
-     * @param string $operator
-     * @param string $value
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value): void
     {
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
         switch ($operator) {
             case self::PARAMETER_BETWEEN:
-                $rangeValue = explode('..', $value);
+                $rangeValue = explode('..', $value, 2);
 
                 $rangeValue = $this->normalizeBetweenValues($rangeValue);
                 if (null === $rangeValue) {
