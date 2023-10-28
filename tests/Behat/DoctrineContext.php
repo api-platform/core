@@ -205,9 +205,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Ramsey\Uuid\Nonstandard\UuidV6;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Uuid as SymfonyUuid;
+use Symfony\Component\Uid\UuidV6;
 
 /**
  * Defines application features from the specific context.
@@ -326,7 +326,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb of these so many uid objects
      */
-    public function thereAreOfTheseSoManyUidObjects(int $nb)
+    public function thereAreOfTheseSoManyUidObjects(int $nb): void
     {
         $ids = [
             '1ec5c128-f3d2-643a-8b17-68fef707f0bd', // 1
@@ -342,7 +342,7 @@ final class DoctrineContext implements Context
         ];
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $ids[] = UuidV6::uuid6()->toString();
+            $ids[] = UuidV6::v6()->toRfc4122();
             $id = $ids[$i - 1] ?? null;
             $dummy = new SoManyUids($id);
             $dummy->content = 'Many #'.$i;

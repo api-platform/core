@@ -13,36 +13,31 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\UuidRangeFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Nonstandard\UuidV6;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV6;
 
-/**
- * @ORM\Entity
- * @ApiResource(attributes={
- *     "pagination_partial"=true,
- *     "pagination_via_cursor"={
- *         {"field"="id", "direction"="DESC"}
- *     }
- * })
- *
- * @ApiFilter(UuidRangeFilter::class, properties={"id"})
- * @ApiFilter(OrderFilter::class, properties={"id"="DESC"})
- */
+#[ORM\Entity]
+#[ApiResource(
+    paginationViaCursor: [
+        ['field' => 'id', 'direction' => 'DESC']
+    ],
+    paginationPartial: true
+)]
+#[ApiFilter(UuidRangeFilter::class, properties: ['id'])]
+#[ApiFilter(OrderFilter::class, properties: ["id" => "DESC"])]
 class SoManyUids
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid")
-     */
-    public $id;
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME)]
+    public Uuid $id;
 
-    /**
-     * @ORM\Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     public $content;
 
     public function __construct($id)
@@ -50,7 +45,7 @@ class SoManyUids
         if ($id) {
             $this->id = UuidV6::fromString($id);
         } else {
-            $this->id = UuidV6::uuid6();
+            $this->id = UuidV6::v6();
         }
     }
 }
