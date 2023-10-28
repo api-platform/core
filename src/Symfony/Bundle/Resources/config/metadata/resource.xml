@@ -6,7 +6,6 @@
     <services>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory" alias="api_platform.metadata.resource.metadata_collection_factory.attributes" />
-        <service id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" alias="api_platform.metadata.resource.metadata_collection_factory" />
 
         <service id="ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface" alias="api_platform.metadata.resource.metadata_collection_factory" />
 
@@ -21,6 +20,13 @@
             <argument type="service" id="api_platform.metadata.resource_extractor.xml" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.xml.inner" />
             <argument>%api_platform.defaults%</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+            <argument>%api_platform.graphql.enabled%</argument>
+        </service>
+
+        <service id="api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation" class="ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="700" public="false">
+            <argument type="service" id="api_platform.metadata.resource.link_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation.inner" />
         </service>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.uri_template" class="ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="500" public="false">
@@ -28,6 +34,12 @@
             <argument type="service" id="api_platform.path_segment_name_generator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.uri_template.inner" />
         </service>
+
+        <service id="api_platform.metadata.resource.metadata_collection_factory.main_controller" class="ApiPlatform\Metadata\Resource\Factory\MainControllerResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="500" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.main_controller.inner" />
+            <argument>%api_platform.event_listeners_backward_compatibility_layer%</argument>
+        </service>
+
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.link" class="ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="500" public="false">
             <argument type="service" id="api_platform.metadata.resource.link_factory" />
@@ -47,15 +59,19 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.formats.inner" />
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.patch_formats%</argument>
+            <argument>%api_platform.error_formats%</argument>
         </service>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.filters" class="ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="200" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.filters.inner" />
-            <argument type="service" id="annotation_reader" />
         </service>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.alternate_uri" class="ApiPlatform\Metadata\Resource\Factory\AlternateUriResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="200" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.alternate_uri.inner" />
+        </service>
+
+        <service id="api_platform.metadata.resource.metadata_collection_factory.deprecations" class="ApiPlatform\Metadata\Resource\Factory\DeprecationResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" public="false" decoration-priority="1000">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.deprecations.inner" />
         </service>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.cached" class="ApiPlatform\Metadata\Resource\Factory\CachedResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="-10" public="false">

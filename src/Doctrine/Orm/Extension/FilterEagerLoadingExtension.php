@@ -13,16 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -30,27 +27,16 @@ use Doctrine\ORM\QueryBuilder;
  * Fixes filters on OneToMany associations
  * https://github.com/api-platform/core/issues/944.
  */
-final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionExtensionInterface
+final class FilterEagerLoadingExtension implements QueryCollectionExtensionInterface
 {
-    use EagerLoadingTrait;
-
-    private $resourceClassResolver;
-
-    public function __construct($resourceMetadataFactory, bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(private readonly bool $forceEager = true, private readonly ?ResourceClassResolverInterface $resourceClassResolver = null)
     {
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->forceEager = $forceEager;
-        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, Operation $operation = null, array $context = []): void
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
@@ -58,27 +44,11 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
         $em = $queryBuilder->getEntityManager();
         $classMetadata = $em->getClassMetadata($resourceClass);
-        /** @var HttpOperation|GraphQlOperation|null */
-        $operation = null;
-        $forceEager = $this->forceEager;
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
-            try {
-                $operation = $resourceMetadataCollection->getOperation($operationName);
-                $forceEager = $operation->getForceEager() ?? $this->forceEager;
-            } catch (OperationNotFoundException $e) {
-                // In some cases the operation may not exist
-            }
+        $forceEager = $operation?->getForceEager() ?? $this->forceEager;
 
-            if (!$forceEager && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
-                return;
-            }
-        } else {
-            // TODO: remove in 3.0
-            if (!$this->shouldOperationForceEager($resourceClass, ['collection_operation_name' => $operationName]) && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
-                return;
-            }
+        if (!$forceEager && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
+            return;
         }
 
         // If no where part, nothing to do
@@ -137,6 +107,34 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
     }
 
     /**
+     * Checks if the class has an associationMapping with FETCH=EAGER.
+     *
+     * @param array $checked array cache of tested metadata classes
+     */
+    private function hasFetchEagerAssociation(EntityManagerInterface $em, ClassMetadataInfo $classMetadata, array &$checked = []): bool
+    {
+        $checked[] = $classMetadata->name;
+
+        foreach ($classMetadata->getAssociationMappings() as $mapping) {
+            if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
+                return true;
+            }
+
+            $related = $em->getClassMetadata($mapping['targetEntity']);
+
+            if (\in_array($related->name, $checked, true)) {
+                continue;
+            }
+
+            if (true === $this->hasFetchEagerAssociation($em, $related, $checked)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns a clone of the given query builder where everything gets re-aliased.
      *
      * @param string $originAlias the base alias
@@ -169,15 +167,15 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
             /** @var Join $joinPart */
             $joinString = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getJoin());
             $pos = strpos($joinString, '.');
+            $joinCondition = (string) $joinPart->getCondition();
             if (false === $pos) {
-                if (null !== $joinPart->getCondition() && null !== $this->resourceClassResolver && $this->resourceClassResolver->isResourceClass($joinString)) {
+                if ($joinCondition && $this->resourceClassResolver?->isResourceClass($joinString)) {
                     $newAlias = $queryNameGenerator->generateJoinAlias($joinPart->getAlias());
                     $aliases[] = "{$joinPart->getAlias()}.";
                     $replacements[] = "$newAlias.";
-                    $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getCondition());
+                    $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinCondition);
                     $join = new Join($joinPart->getJoinType(), $joinPart->getJoin(), $newAlias, $joinPart->getConditionType(), $condition);
-                    /* @phpstan-ignore-next-line */
-                    $queryBuilderClone->add('join', [$replacement => $join], true);
+                    $queryBuilderClone->add('join', [$replacement => $join], true); // @phpstan-ignore-line
                 }
 
                 continue;
@@ -187,7 +185,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
             $newAlias = $queryNameGenerator->generateJoinAlias($association);
             $aliases[] = "{$joinPart->getAlias()}.";
             $replacements[] = "$newAlias.";
-            $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getCondition() ?? '');
+            $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinCondition);
             QueryBuilderHelper::addJoinOnce($queryBuilderClone, $queryNameGenerator, $alias, $association, $joinPart->getJoinType(), $joinPart->getConditionType(), $condition, $originAlias, $newAlias);
         }
 
@@ -198,10 +196,6 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
     private function buildReplacePatterns(array $aliases): array
     {
-        return array_map(static function (string $alias): string {
-            return '/\b'.preg_quote($alias, '/').'/';
-        }, $aliases);
+        return array_map(static fn (string $alias): string => '/\b'.preg_quote($alias, '/').'/', $aliases);
     }
 }
-
-class_alias(FilterEagerLoadingExtension::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension::class);

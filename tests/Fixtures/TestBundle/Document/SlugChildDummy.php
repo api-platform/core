@@ -13,41 +13,34 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ApiResource
- * @ODM\Document
- */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies{._format}', uriVariables: ['slug' => new Link(fromClass: SlugParentDummy::class, identifiers: ['slug'], toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy/child_dummies{._format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], fromProperty: 'parentDummy'), 'parentDummy' => new Link(fromClass: SlugParentDummy::class, identifiers: [], expandedValue: 'parent_dummy', toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
+#[ODM\Document]
 class SlugChildDummy
 {
     /**
      * @var int The identifier
-     *
-     * @ApiProperty(identifier=false)
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    #[ApiProperty(identifier: false)]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
 
     /**
      * @var string The slug used as API identifier
-     *
-     * @ApiProperty(identifier=true)
-     *
-     * @ODM\Field
      */
-    private $slug;
+    #[ApiProperty(identifier: true)]
+    #[ODM\Field]
+    private ?string $slug = null;
 
-    /**
-     * @ODM\ReferenceOne(targetDocument=SlugParentDummy::class, inversedBy="childDummies", storeAs="id")
-     *
-     * @ApiSubresource
-     */
-    private $parentDummy;
+    #[ODM\ReferenceOne(targetDocument: SlugParentDummy::class, inversedBy: 'childDummies', storeAs: 'id')]
+    private SlugParentDummy $parentDummy;
 
     public function getId(): ?int
     {
@@ -59,7 +52,7 @@ class SlugChildDummy
         return $this->slug;
     }
 
-    public function setSlug(string $slug)
+    public function setSlug(string $slug): void
     {
         $this->slug = $slug;
     }
@@ -69,7 +62,7 @@ class SlugChildDummy
         return $this->parentDummy;
     }
 
-    public function setParentDummy(?SlugParentDummy $parentDummy = null): self
+    public function setParentDummy(SlugParentDummy $parentDummy = null): self
     {
         $this->parentDummy = $parentDummy;
 

@@ -21,19 +21,19 @@ use PHPUnit\Framework\TestCase;
  */
 class EventPrioritiesTest extends TestCase
 {
-    public function testConstants()
+    public function testConstants(): void
     {
-        $this->assertEquals(5, EventPriorities::PRE_READ);
-        $this->assertEquals(3, EventPriorities::POST_READ);
-        $this->assertEquals(3, EventPriorities::PRE_DESERIALIZE);
-        $this->assertEquals(1, EventPriorities::POST_DESERIALIZE);
-        $this->assertEquals(65, EventPriorities::PRE_VALIDATE);
-        $this->assertEquals(63, EventPriorities::POST_VALIDATE);
-        $this->assertEquals(33, EventPriorities::PRE_WRITE);
-        $this->assertEquals(31, EventPriorities::POST_WRITE);
-        $this->assertEquals(17, EventPriorities::PRE_SERIALIZE);
-        $this->assertEquals(15, EventPriorities::POST_SERIALIZE);
-        $this->assertEquals(9, EventPriorities::PRE_RESPOND);
-        $this->assertEquals(0, EventPriorities::POST_RESPOND);
+        $this->assertSame(5, EventPriorities::PRE_READ);
+        $this->assertSame(3, EventPriorities::POST_READ);
+        $this->assertSame(3, EventPriorities::PRE_DESERIALIZE);
+        $this->assertSame(1, EventPriorities::POST_DESERIALIZE);
+        $this->assertSame(65, EventPriorities::PRE_VALIDATE);
+        $this->assertSame(63, EventPriorities::POST_VALIDATE);
+        $this->assertSame(33, EventPriorities::PRE_WRITE);
+        $this->assertSame(31, EventPriorities::POST_WRITE);
+        $this->assertSame(17, EventPriorities::PRE_SERIALIZE);
+        $this->assertSame(15, EventPriorities::POST_SERIALIZE);
+        $this->assertSame(9, EventPriorities::PRE_RESPOND);
+        $this->assertSame(0, EventPriorities::POST_RESPOND);
     }
 }

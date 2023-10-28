@@ -13,7 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -22,56 +27,40 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Embedded Dummy.
  *
  * @author Jordan Samouh <jordan.samouh@gmail.com>
- *
- * @ApiResource(
- *     attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}},
- *     itemOperations={"get", "put", "delete", "groups"={"method"="GET", "path"="/embedded_dummies_groups/{id}", "normalization_context"={"groups"={"embed"}}}}
- * )
- * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(), new Put(), new Delete(), new Get(uriTemplate: '/embedded_dummies_groups/{id}', normalizationContext: ['groups' => ['embed']]), new Post(), new GetCollection()], filters: ['my_dummy.search', 'my_dummy.order', 'my_dummy.date', 'my_dummy.range', 'my_dummy.boolean', 'my_dummy.numeric'])]
+#[ORM\Entity]
 class EmbeddedDummy
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ORM\Column(nullable=true)
-     * @Groups({"embed"})
      */
-    private $name;
-
+    #[ORM\Column(nullable: true)]
+    #[Groups(['embed'])]
+    private ?string $name = null;
     /**
      * @var \DateTime|null A dummy date
-     *
-     * @ORM\Column(type="datetime", nullable=true)
-     * @Assert\DateTime
      */
-    public $dummyDate;
-
-    /**
-     * @var EmbeddableDummy
-     *
-     * @ORM\Embedded(class="EmbeddableDummy")
-     * @Groups({"embed"})
-     */
-    public $embeddedDummy;
-
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Assert\DateTime]
+    public ?\DateTime $dummyDate = null;
+    #[ORM\Embedded(class: EmbeddableDummy::class)]
+    #[Groups(['embed'])]
+    public ?EmbeddableDummy $embeddedDummy = null;
     /**
      * @var RelatedDummy|null A related dummy
-     *
-     * @ORM\ManyToOne(targetEntity="RelatedDummy")
      */
-    public $relatedDummy;
+    #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
+    public ?RelatedDummy $relatedDummy = null;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -80,7 +69,7 @@ class EmbeddedDummy
         $this->embeddedDummy = new EmbeddableDummy();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -90,7 +79,7 @@ class EmbeddedDummy
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -100,7 +89,7 @@ class EmbeddedDummy
         return $this->embeddedDummy;
     }
 
-    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
+    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy): void
     {
         $this->embeddedDummy = $embeddedDummy;
     }
@@ -110,7 +99,7 @@ class EmbeddedDummy
         return $this->dummyDate;
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate): void
     {
         $this->dummyDate = $dummyDate;
     }
@@ -120,7 +109,7 @@ class EmbeddedDummy
         return $this->relatedDummy;
     }
 
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }

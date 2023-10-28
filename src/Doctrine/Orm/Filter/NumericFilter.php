@@ -15,23 +15,96 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\NumericFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Filters the collection by numeric values.
+ * The numeric filter allows you to search on numeric fields and values.
  *
- * Filters collection by equality of numeric properties.
+ * Syntax: `?property=<int|bigint|decimal...>`.
  *
- * For each property passed, if the resource does not have such property or if
- * the value is not numeric, the property is ignored.
+ * <CodeSelector>
+ * ```php
+ * <?php
+ * // api/src/Entity/Book.php
+ * use ApiPlatform\Metadata\ApiFilter;
+ * use ApiPlatform\Metadata\ApiResource;
+ * use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
+ *
+ * #[ApiResource]
+ * #[ApiFilter(NumericFilter::class, properties: ['price'])]
+ * class Book
+ * {
+ *     // ...
+ * }
+ * ```
+ *
+ * ```yaml
+ * # config/services.yaml
+ * services:
+ *     book.numeric_filter:
+ *         parent: 'api_platform.doctrine.orm.numeric_filter'
+ *         arguments: [ { price: ~ } ]
+ *         tags:  [ 'api_platform.filter' ]
+ *         # The following are mandatory only if a _defaults section is defined with inverted values.
+ *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
+ *         autowire: false
+ *         autoconfigure: false
+ *         public: false
+ *
+ * # api/config/api_platform/resources.yaml
+ * resources:
+ *     App\Entity\Book:
+ *         - operations:
+ *               ApiPlatform\Metadata\GetCollection:
+ *                   filters: ['book.numeric_filter']
+ * ```
+ *
+ * ```xml
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <!-- api/config/services.xml -->
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <container
+ *         xmlns="http://symfony.com/schema/dic/services"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="http://symfony.com/schema/dic/services
+ *         https://symfony.com/schema/dic/services/services-1.0.xsd">
+ *     <services>
+ *         <service id="book.numeric_filter" parent="api_platform.doctrine.orm.numeric_filter">
+ *             <argument type="collection">
+ *                 <argument key="price"/>
+ *             </argument>
+ *             <tag name="api_platform.filter"/>
+ *         </service>
+ *     </services>
+ * </container>
+ * <!-- api/config/api_platform/resources.xml -->
+ * <resources
+ *         xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+ *         https://api-platform.com/schema/metadata/resources-3.0.xsd">
+ *     <resource class="App\Entity\Book">
+ *         <operations>
+ *             <operation class="ApiPlatform\Metadata\GetCollection">
+ *                 <filters>
+ *                     <filter>book.numeric_filter</filter>
+ *                 </filters>
+ *             </operation>
+ *         </operations>
+ *     </resource>
+ * </resources>
+ * ```
+ * </CodeSelector>
+ *
+ * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?price=10`.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
- *
- * @final
  */
-class NumericFilter extends AbstractContextAwareFilter
+final class NumericFilter extends AbstractFilter
 {
     use NumericFilterTrait;
 
@@ -51,12 +124,12 @@ class NumericFilter extends AbstractContextAwareFilter
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isNumericField($property, $resourceClass)
+            !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
+            || !$this->isNumericField($property, $resourceClass)
         ) {
             return;
         }
@@ -70,7 +143,7 @@ class NumericFilter extends AbstractContextAwareFilter
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
         }
 
         $valueParameter = $queryNameGenerator->generateParameterName($field);
@@ -102,5 +175,3 @@ class NumericFilter extends AbstractContextAwareFilter
         return 'int';
     }
 }
-
-class_alias(NumericFilter::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter::class);

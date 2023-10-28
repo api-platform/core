@@ -16,7 +16,10 @@ namespace ApiPlatform\Doctrine\Orm;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use Doctrine\ORM\Mapping\ClassMetadata as ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 
 /**
  * Helper trait regarding a property in an entity using the resource metadata.
@@ -26,10 +29,28 @@ use Doctrine\ORM\QueryBuilder;
  */
 trait PropertyHelperTrait
 {
+    abstract protected function getManagerRegistry(): ManagerRegistry;
+
     /**
      * Splits the given property into parts.
      */
-    abstract protected function splitPropertyParts(string $property/* , string $resourceClass */): array;
+    abstract protected function splitPropertyParts(string $property, string $resourceClass): array;
+
+    /**
+     * Gets class metadata for the given resource.
+     */
+    protected function getClassMetadata(string $resourceClass): ClassMetadata
+    {
+        $manager = $this
+            ->getManagerRegistry()
+            ->getManagerForClass($resourceClass);
+
+        if ($manager) {
+            return $manager->getClassMetadata($resourceClass);
+        }
+
+        return new ClassMetadataInfo($resourceClass);
+    }
 
     /**
      * Adds the necessary joins for a nested property.
@@ -40,32 +61,8 @@ trait PropertyHelperTrait
      *               the second element is the $field name
      *               the third element is the $associations array
      */
-    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator/* , string $resourceClass, string $joinType */): array
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $joinType): array
     {
-        if (\func_num_args() > 4) {
-            $resourceClass = func_get_arg(4);
-        } else {
-            if (__CLASS__ !== static::class) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a fifth `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), \E_USER_DEPRECATED);
-                }
-            }
-            $resourceClass = null;
-        }
-
-        if (\func_num_args() > 5) {
-            $joinType = func_get_arg(5);
-        } else {
-            if (__CLASS__ !== static::class) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a sixth `$joinType` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.3.', __FUNCTION__), \E_USER_DEPRECATED);
-                }
-            }
-            $joinType = null;
-        }
-
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $parentAlias = $rootAlias;
         $alias = null;
@@ -82,5 +79,3 @@ trait PropertyHelperTrait
         return [$alias, $propertyParts['field'], $propertyParts['associations']];
     }
 }
-
-class_alias(PropertyHelperTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\PropertyHelperTrait::class);

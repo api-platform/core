@@ -18,8 +18,6 @@ namespace ApiPlatform\Exception;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class InvalidIdentifierException extends \Exception implements ExceptionInterface
+class InvalidIdentifierException extends \Exception implements ExceptionInterface
 {
 }
-
-class_alias(InvalidIdentifierException::class, \ApiPlatform\Core\Exception\InvalidIdentifierException::class);

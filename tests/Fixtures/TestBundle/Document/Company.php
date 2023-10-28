@@ -15,40 +15,34 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[GetCollection]
 #[Get]
 #[Post]
 #[ApiResource(uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}', uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']])]
 #[Get]
 #[ApiResource(uriTemplate: '/employees/{employeeId}/company', uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']])]
+#[ODM\Document]
 class Company
 {
-    /**
-     * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
 
-    /**
-     * @var string The dummy name
-     *
-     * @ODM\Field
-     */
-    public $name;
+    #[ODM\Field]
+    #[Groups(['company_employees_read'])]
+    public ?string $name = null;
 
     /** @var Employee[] */
     #[Link(toProperty: 'company')]
-    public $employees = []; // only used to set metadata
+    public array $employees = []; // only used to set metadata
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

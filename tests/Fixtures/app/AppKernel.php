@@ -11,18 +11,18 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Core\Tests\Behat\DoctrineContext;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
+use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\Command\TailCursorDoctrineODMCommand;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
-use Nelmio\ApiDocBundle\NelmioApiDocBundle;
-use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MakerBundle\MakerBundle;
@@ -31,15 +31,16 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\User\User as SymfonyCoreUser;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Uid\Uuid;
 
 /**
  * AppKernel for tests.
@@ -82,10 +83,6 @@ class AppKernel extends Kernel
             $bundles[] = new DoctrineMongoDBBundle();
         }
 
-        if (class_exists(NelmioApiDocBundle::class)) {
-            $bundles[] = new NelmioApiDocBundle();
-        }
-
         $bundles[] = new TestBundle();
 
         return $bundles;
@@ -96,25 +93,16 @@ class AppKernel extends Kernel
         return __DIR__;
     }
 
-    protected function configureRoutes($routes)
+    protected function configureRoutes($routes): void
     {
         $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
-
-        if (class_exists(NelmioApiDocBundle::class)) {
-            $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
-        }
     }
 
-    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
+    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->setParameter('kernel.project_dir', __DIR__);
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
-
-        /* @TODO remove this check in 3.0 */
-        if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidType::class)) {
-            $loader->load(__DIR__.'/config/config_symfony_uid.yml');
-        }
 
         $c->getDefinition(DoctrineContext::class)->setArgument('$passwordHasher', class_exists(NativePasswordHasher::class) ? 'security.user_password_encoder' : 'security.user_password_hasher');
 
@@ -125,23 +113,45 @@ class AppKernel extends Kernel
             ],
         ];
 
-        // Symfony 5.4+
-        if (class_exists(SessionFactory::class)) {
-            $messengerConfig['reset_on_message'] = true;
+        // This class is introduced in Symfony 6.4 just using it to use the new configuration and to avoid unnecessary deprecations
+        if (class_exists(PingWebhookMessageHandler::class)) {
+            $config = [
+                'secret' => 'dunglas.fr',
+                'validation' => ['enable_attributes' => true, 'email_validation_mode' => 'html5'],
+                'serializer' => ['enable_attributes' => true],
+                'test' => null,
+                'session' => ['cookie_secure' => true, 'cookie_samesite' => 'lax', 'handler_id' => 'session.handler.native_file'],
+                'profiler' => [
+                    'enabled' => true,
+                    'collect' => false,
+                ],
+                'php_errors' => ['log' => true],
+                'messenger' => $messengerConfig,
+                'router' => ['utf8' => true],
+                'http_method_override' => false,
+                'annotations' => false,
+                'handle_all_throwables' => true,
+                'uid' => ['default_uuid_version' => 7, 'time_based_uuid_version' => 7],
+            ];
+        } else {
+            $config = [
+                'secret' => 'dunglas.fr',
+                'validation' => ['enable_annotations' => true],
+                'serializer' => ['enable_annotations' => true],
+                'test' => null,
+                'session' => class_exists(SessionFactory::class) ? ['storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
+                'profiler' => [
+                    'enabled' => true,
+                    'collect' => false,
+                ],
+                'messenger' => $messengerConfig,
+                'router' => ['utf8' => true],
+                'http_method_override' => false,
+                'annotations' => false,
+            ];
         }
-        $c->prependExtensionConfig('framework', [
-            'secret' => 'dunglas.fr',
-            'validation' => ['enable_annotations' => true],
-            'serializer' => ['enable_annotations' => true],
-            'test' => null,
-            'session' => class_exists(SessionFactory::class) ? ['storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
-            'profiler' => [
-                'enabled' => true,
-                'collect' => false,
-            ],
-            'messenger' => $messengerConfig,
-            'router' => ['utf8' => true],
-        ]);
+
+        $c->prependExtensionConfig('framework', $config);
 
         $alg = class_exists(NativePasswordHasher::class, false) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';
         $securityConfig = [
@@ -201,7 +211,6 @@ class AppKernel extends Kernel
         }
 
         if (class_exists(NativePasswordHasher::class)) {
-            $securityConfig['enable_authenticator_manager'] = true;
             unset($securityConfig['firewalls']['default']['anonymous']);
         }
 
@@ -225,63 +234,33 @@ class AppKernel extends Kernel
             $twigConfig['exception_controller'] = null;
         }
         $c->prependExtensionConfig('twig', $twigConfig);
-
-        if (class_exists(NelmioApiDocBundle::class)) {
-            $c->prependExtensionConfig('nelmio_api_doc', [
-                'sandbox' => [
-                    'accept_type' => 'application/json',
-                    'body_format' => [
-                        'formats' => ['json'],
-                        'default_format' => 'json',
-                    ],
-                    'request_format' => [
-                        'formats' => ['json' => 'application/json'],
-                    ],
-                ],
-            ]);
-            $c->prependExtensionConfig('api_platform', ['enable_nelmio_api_doc' => true]);
-        }
-
-        $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['METADATA_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
-        $c->prependExtensionConfig('api_platform', ['metadata_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer]);
-        if ($metadataBackwardCompatibilityLayer) {
-            $loader->load(__DIR__.'/config/config_metadata_backward_compatibility_layer.yml');
-            $c->prependExtensionConfig('api_platform', [
-                'mapping' => [
-                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_legacy'],
-                ],
-            ]);
-
-            if ('mongodb' === $this->environment) {
-                $c->prependExtensionConfig('api_platform', [
-                    'mapping' => [
-                        'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_legacy_odm'],
-                    ],
-                ]);
-
-                return;
-            }
-
-            $c->prependExtensionConfig('api_platform', [
-                'mapping' => [
-                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_legacy_orm'],
-                ],
-            ]);
-
-            return;
-        }
-
-        $loader->load(__DIR__.'/config/config_v3.yml');
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
-                'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3'],
+                'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
+            ],
+            'graphql' => [
+                'graphql_playground' => false,
             ],
         ]);
+
+        // TODO: remove this check and move this config in config_common.yml when dropping support for DoctrineBundle <2.10
+        if (defined(ConnectionFactory::class.'::DEFAULT_SCHEME_MAP')) {
+            $c->prependExtensionConfig('doctrine', [
+                'orm' => [
+                    'report_fields_where_declared' => true,
+                ],
+            ]);
+        }
+
+        $loader->load(__DIR__.'/config/config_swagger.php');
+
+        $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
+        $c->prependExtensionConfig('api_platform', ['event_listeners_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer]);
 
         if ('mongodb' === $this->environment) {
             $c->prependExtensionConfig('api_platform', [
                 'mapping' => [
-                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3_odm'],
+                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_odm'],
                 ],
             ]);
 
@@ -290,8 +269,19 @@ class AppKernel extends Kernel
 
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
-                'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3_orm'],
+                'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_orm'],
             ],
         ]);
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new class() implements CompilerPassInterface {
+            public function process(ContainerBuilder $container): void
+            {
+                // Deprecated command triggering a Symfony depreciation
+                $container->removeDefinition(TailCursorDoctrineODMCommand::class);
+            }
+        });
     }
 }

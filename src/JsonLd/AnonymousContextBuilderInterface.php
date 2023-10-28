@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 
 /**
  * JSON-LD context builder with Input Output DTO support interface.
@@ -25,8 +25,6 @@ interface AnonymousContextBuilderInterface extends ContextBuilderInterface
     /**
      * Creates a JSON-LD context based on the given object.
      * Usually this is used with an Input or Output DTO object.
-     *
-     * @param mixed $object
      */
-    public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array;
+    public function getAnonymousResourceContext(object $object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array;
 }

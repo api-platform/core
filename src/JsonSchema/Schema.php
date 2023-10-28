@@ -21,8 +21,6 @@ namespace ApiPlatform\JsonSchema;
  * @see https://json-schema.org/latest/json-schema-core.html
  * @see https://github.com/OAI/OpenAPI-Specification
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Schema extends \ArrayObject
@@ -32,13 +30,10 @@ final class Schema extends \ArrayObject
     public const VERSION_JSON_SCHEMA = 'json-schema';
     public const VERSION_OPENAPI = 'openapi';
     public const VERSION_SWAGGER = 'swagger';
+    public const UNKNOWN_TYPE = 'unknown_type';
 
-    private $version;
-
-    public function __construct(string $version = self::VERSION_JSON_SCHEMA)
+    public function __construct(private readonly string $version = self::VERSION_JSON_SCHEMA)
     {
-        $this->version = $version;
-
         parent::__construct(self::VERSION_JSON_SCHEMA === $this->version ? ['$schema' => 'http://json-schema.org/draft-07/schema#'] : []);
     }
 
@@ -133,5 +128,3 @@ final class Schema extends \ArrayObject
         return substr($definitionKey, $prefix);
     }
 }
-
-class_alias(Schema::class, \ApiPlatform\Core\JsonSchema\Schema::class);

@@ -13,25 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -39,23 +27,16 @@ use Psr\Log\NullLogger;
  * Creates a resource metadata from {@see ApiResource} annotations.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @experimental
  */
 final class AttributesResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    use DeprecationMetadataTrait;
+    use OperationDefaultsTrait;
 
-    private $defaults;
-    private $decorated;
-    private $logger;
-    private $graphQlEnabled;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, LoggerInterface $logger = null, array $defaults = [], bool $graphQlEnabled = false)
+    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, LoggerInterface $logger = null, array $defaults = [], private readonly bool $graphQlEnabled = false)
     {
-        $this->defaults = $defaults + ['attributes' => []];
-        $this->decorated = $decorated;
         $this->logger = $logger ?? new NullLogger();
-        $this->graphQlEnabled = $graphQlEnabled;
+        $this->defaults = $defaults;
+        $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
     /**
@@ -70,12 +51,12 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
-        if (\PHP_VERSION_ID >= 80000 && $this->hasResourceAttributes($reflectionClass)) {
-            foreach ($this->buildResourceOperations($reflectionClass->getAttributes(), $resourceClass) as $i => $resource) {
+        if ($this->hasResourceAttributes($reflectionClass)) {
+            foreach ($this->buildResourceOperations($reflectionClass->getAttributes(), $resourceClass) as $resource) {
                 $resourceMetadataCollection[] = $resource;
             }
         }
@@ -101,10 +82,21 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         $resources = [];
         $index = -1;
         $operationPriority = 0;
+        $hasApiResource = false;
 
         foreach ($attributes as $attribute) {
-            if (ApiResource::class === $attribute->getName()) {
-                $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, $attribute->newInstance());
+            if (is_a($attribute->getName(), ApiResource::class, true)) {
+                $hasApiResource = true;
+                $resource = $this->getResourceWithDefaults($resourceClass, $shortName, $attribute->newInstance());
+                $operations = [];
+                foreach ($resource->getOperations() ?? new Operations() as $operation) {
+                    [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
+                    $operations[$key] = $operation;
+                }
+                if ($operations) {
+                    $resource = $resource->withOperations(new Operations($operations));
+                }
+                $resources[++$index] = $resource;
                 continue;
             }
 
@@ -134,29 +126,39 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         // Loop again and set default operations if none where found
         foreach ($resources as $index => $resource) {
-            $operations = [];
-            foreach ($resource->getOperations() ?? [new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $i => $operation) {
-                [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
-                $operations[$key] = $operation;
+            if (null === $resource->getOperations()) {
+                $operations = [];
+                foreach ($this->getDefaultHttpOperations($resource) as $operation) {
+                    [$key, $operation] = $this->getOperationWithDefaults($resource, $operation, true);
+                    $operations[$key] = $operation;
+                }
+                $resources[$index] = $resource->withOperations(new Operations($operations));
             }
 
-            $resources[$index] = $resources[$index]->withOperations(new Operations($operations));
             $graphQlOperations = $resource->getGraphQlOperations();
 
-            if ([] === $graphQlOperations) {
+            if (!$this->graphQlEnabled) {
                 continue;
             }
 
             if (null === $graphQlOperations) {
-                // Add default graphql operations on the first resource
+                if (!$hasApiResource) {
+                    $resources[$index] = $resources[$index]->withGraphQlOperations([]);
+                    continue;
+                }
+
+                // Add default GraphQL operations on the first resource
                 if (0 === $index) {
                     $resources[$index] = $this->addDefaultGraphQlOperations($resources[$index]);
                 }
                 continue;
             }
 
+            $resources[$index] = $this->completeGraphQlOperations($resources[$index]);
+            $graphQlOperations = $resources[$index]->getGraphQlOperations();
+
             $graphQlOperationsWithDefaults = [];
-            foreach ($graphQlOperations as $i => $operation) {
+            foreach ($graphQlOperations as $operation) {
                 [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
                 $graphQlOperationsWithDefaults[$key] = $operation;
             }
@@ -167,103 +169,10 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         return $resources;
     }
 
-    /**
-     * @param HttpOperation|GraphQlOperation $operation
-     */
-    private function getOperationWithDefaults(ApiResource $resource, $operation): array
-    {
-        // Inherit from resource defaults
-        foreach (get_class_methods($resource) as $methodName) {
-            if (0 !== strpos($methodName, 'get')) {
-                continue;
-            }
-
-            if (!method_exists($operation, $methodName) || null !== $operation->{$methodName}()) {
-                continue;
-            }
-
-            if (null === ($value = $resource->{$methodName}())) {
-                continue;
-            }
-
-            // TODO: remove in 3.0
-            if ($operation instanceof HttpOperation && 'getUriVariables' === $methodName && !$operation->getUriTemplate() && $operation instanceof CollectionOperationInterface && !$operation->getUriVariables()) {
-                trigger_deprecation('api-platform', '2.7', 'Identifiers are declared on the default #[ApiResource] but you did not specify identifiers on the collection operation. In 3.0 the collection operations can have identifiers, you should specify identifiers on the operation not on the resource to avoid unwanted behavior.');
-                continue;
-            }
-
-            $operation = $operation->{'with'.substr($methodName, 3)}($value);
-        }
-
-        // Add global defaults attributes to the operation
-        $operation = $this->addGlobalDefaults($operation);
-
-        if ($operation instanceof GraphQlOperation) {
-            if (!$operation->getName()) {
-                throw new RuntimeException('No GraphQL operation name.');
-            }
-
-            if ($operation instanceof Mutation) {
-                $operation = $operation->withDescription(ucfirst("{$operation->getName()}s a {$resource->getShortName()}."));
-            }
-
-            // if ('delete' === $operation->getName()) {
-            //     $operation = $operation->withDelete(true);
-            // }
-
-            return [$operation->getName(), $operation];
-        }
-
-        if ($operation->getRouteName()) {
-            $operation = $operation->withName($operation->getRouteName());
-        }
-
-        // Check for name conflict
-        if ($operation->getName()) {
-            if (null !== $resource->getOperations() && !$resource->getOperations()->has($operation->getName())) {
-                return [$operation->getName(), $operation];
-            }
-
-            $this->logger->warning(sprintf('The operation "%s" already exists on the resource "%s", pick a different name or leave it empty. In the meantime we will generate a unique name.', $operation->getName(), $resource->getClass()));
-            $operation = $operation->withName('');
-        }
-
-        return [
-            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof GetCollection ? '_collection' : ''),
-            $operation,
-        ];
-    }
-
-    /**
-     * @param ApiResource|HttpOperation|GraphQlOperation $operation
-     */
-    private function addGlobalDefaults($operation)
-    {
-        foreach ($this->defaults['attributes'] as $key => $value) {
-            [$key, $value] = $this->getKeyValue($key, $value);
-            $upperKey = ucfirst($key);
-            $getter = 'get'.$upperKey;
-            if (method_exists($operation, $getter) && null === $operation->{$getter}()) {
-                $operation = $operation->{'with'.$upperKey}($value);
-            }
-        }
-
-        return $operation;
-    }
-
-    private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource): ApiResource
-    {
-        $resource = $resource
-            ->withShortName($resource->getShortName() ?? $shortName)
-            ->withClass($resourceClass);
-
-        return $this->addGlobalDefaults($resource);
-    }
-
     private function hasResourceAttributes(\ReflectionClass $reflectionClass): bool
     {
         foreach ($reflectionClass->getAttributes() as $attribute) {
-            if (ApiResource::class === $attribute->getName() || is_subclass_of($attribute->getName(), HttpOperation::class) || is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
+            if (is_a($attribute->getName(), ApiResource::class, true) || is_subclass_of($attribute->getName(), HttpOperation::class) || is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
                 return true;
             }
         }
@@ -288,21 +197,5 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         }
 
         return false;
-    }
-
-    private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource
-    {
-        $graphQlOperations = [];
-        foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new Mutation())->withName('delete'), (new Mutation())->withName('create')] as $i => $operation) {
-            [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
-            $graphQlOperations[$key] = $operation;
-        }
-
-        if ($resource->getMercure()) {
-            [$key, $operation] = $this->getOperationWithDefaults($resource, (new Subscription())->withDescription("Subscribes to the update event of a {$operation->getShortName()}."));
-            $graphQlOperations[$key] = $operation;
-        }
-
-        return $resource->withGraphQlOperations($graphQlOperations);
     }
 }

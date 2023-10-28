@@ -38,7 +38,7 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -47,8 +47,7 @@ Feature: JSON-LD DTO input and output
         "foo": "CustomOutputDto/foo",
         "bar": "CustomOutputDto/bar"
       },
-      "@type": "DummyDtoCustom",
-      "@id": "/dummy_dto_customs/1",
+      "@type": "CustomOutputDto",
       "foo": "test",
       "bar": 1
     }
@@ -61,65 +60,25 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": "/contexts/DummyDtoCustom",
-      "@id": "/dummy_dto_customs",
+      "@id": "/dummy_dto_custom_output",
       "@type": "hydra:Collection",
       "hydra:member": [
         {
-          "@type": "DummyDtoCustom",
-          "@id": "/dummy_dto_customs/1",
+          "@type": "CustomOutputDto",
           "foo": "test",
           "bar": 1
         },
         {
-          "@type": "DummyDtoCustom",
-          "@id": "/dummy_dto_customs/2",
+          "@type": "CustomOutputDto",
           "foo": "test",
           "bar": 2
         }
       ],
       "hydra:totalItems": 2
-    }
-    """
-
-  @createSchema
-  Scenario: Get an item with same class as custom output
-    Given there is a DummyDtoOutputSameClass
-    When I send a "GET" request to "/dummy_dto_output_same_classes/1"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/DummyDtoOutputSameClass",
-      "@id": "/dummy_dto_output_same_classes/1",
-      "@type": "DummyDtoOutputSameClass",
-      "lorem": "test",
-      "ipsum": "modified",
-      "id": 1
-    }
-    """
-
-  @createSchema
-  Scenario: Get an item with a data transformer that will return the original class as a fallback
-    Given there is a DummyDtoOutputFallbackToSameClass
-    When I send a "GET" request to "/dummy_dto_output_fallback_to_same_classes/1"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/DummyDtoOutputFallbackToSameClass",
-      "@id": "/dummy_dto_output_fallback_to_same_classes/1",
-      "@type": "DummyDtoOutputFallbackToSameClass",
-      "lorem": "test",
-      "ipsum": "modified",
-      "id": 1
     }
     """
 
@@ -145,7 +104,7 @@ Feature: JSON-LD DTO input and output
     }
     """
     Then the response status code should be 201
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -156,8 +115,7 @@ Feature: JSON-LD DTO input and output
         "bat": "OutputDto/bat",
         "relatedDummies": "OutputDto/relatedDummies"
       },
-      "@type": "DummyDtoInputOutput",
-      "@id": "/dummy_dto_input_outputs/1",
+      "@type": "OutputDto",
       "id": 1,
       "baz": 1,
       "bat": "test",
@@ -174,7 +132,7 @@ Feature: JSON-LD DTO input and output
     }
     """
     Then the response status code should be 200
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -185,8 +143,7 @@ Feature: JSON-LD DTO input and output
         "bat": "OutputDto/bat",
         "relatedDummies": "OutputDto/relatedDummies"
       },
-      "@type": "DummyDtoInputOutput",
-      "@id": "/dummy_dto_input_outputs/1",
+      "@type": "OutputDto",
       "id": 1,
       "baz": 2,
       "bat": "test",
@@ -215,7 +172,7 @@ Feature: JSON-LD DTO input and output
     }
     """
     Then the response status code should be 200
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -223,8 +180,7 @@ Feature: JSON-LD DTO input and output
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "dummy": "RecoverPasswordOutput/dummy"
       },
-      "@type": "User",
-      "@id": "/users/1",
+      "@type": "RecoverPasswordOutput",
       "dummy": "/dummies/1"
     }
     """
@@ -235,7 +191,7 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -246,8 +202,7 @@ Feature: JSON-LD DTO input and output
         "bat": "OutputDto/bat",
         "relatedDummies": "OutputDto/relatedDummies"
       },
-      "@type": "DummyDtoNoInput",
-      "@id": "/dummy_dto_no_inputs/1",
+      "@type": "OutputDto",
       "id": 1,
       "baz": 1,
       "bat": "test",
@@ -260,7 +215,7 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -271,8 +226,7 @@ Feature: JSON-LD DTO input and output
         "bat": "OutputDto/bat",
         "relatedDummies": "OutputDto/relatedDummies"
       },
-      "@type": "DummyDtoNoInput",
-      "@id": "/dummy_dto_no_inputs/1",
+      "@type": "OutputDto",
       "id": 1,
       "baz": 1,
       "bat": "testtest",
@@ -321,7 +275,7 @@ Feature: JSON-LD DTO input and output
     """
 
   @createSchema
-  Scenario: Initialize input data with a DataTransformerInitializer 
+  Scenario: Initialize input data with a DataTransformerInitializer
     Given there is an InitializeInput object with id 1
     When I send a "PUT" request to "/initialize_inputs/1" with body:
     """
@@ -348,7 +302,7 @@ Feature: JSON-LD DTO input and output
     """
     {
       "foo": "test",
-      "bar": "test" 
+      "bar": "test"
     }
     """
     Then the response status code should be 400
@@ -356,7 +310,7 @@ Feature: JSON-LD DTO input and output
     And the JSON node "hydra:description" should be equal to "The input data is misformatted."
 
   @!mongodb
-  Scenario: Reset password through an input DTO without DataTransformer 
+  Scenario: Reset password through an input DTO without DataTransformer
     When I send a "POST" request to "/user-reset-password" with body:
     """
     {
@@ -369,7 +323,7 @@ Feature: JSON-LD DTO input and output
     And the JSON node "email" should be equal to "user@example.com"
 
   @!mongodb
-  Scenario: Reset password with an invalid payload through an input DTO without DataTransformer 
+  Scenario: Reset password with an invalid payload through an input DTO without DataTransformer
     And I send a "POST" request to "/user-reset-password" with body:
     """
     {
@@ -378,3 +332,122 @@ Feature: JSON-LD DTO input and output
     """
     Then the response status code should be 422
     And the response should be in JSON
+
+  @v3
+  Scenario: Get a collection with a custom output and without item operations, from a resource without identifier
+    When I send a "GET" request to "/dummy_collection_dtos"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["@context", "@id", "@type", "hydra:member", "hydra:totalItems"],
+      "properties": {
+        "@context": {"pattern": "^/contexts/DummyCollectionDto$"},
+        "@id": {"pattern": "^/dummy_collection_dtos$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["@id", "@type", "foo", "bar"],
+            "properties": {
+              "@id": {"pattern": "^/.well-known/genid/.+$"},
+              "@type": {"pattern": "^DummyCollectionDtoOutput$"},
+              "foo": {"type": "string"},
+              "bar": {"type": "integer"}
+            }
+          }
+        },
+        "hydra:totalItems": {"type": "integer", "minimum": 2, "maximum": 2}
+      }
+    }
+    """
+
+  @v3
+  # Cannot generate proper IRI because DTO does not support resource yet
+  # todo Change member IRI to `/dummy_foos/bar` once DTO support resource
+  Scenario: Get a collection with a custom output and itemUriTemplate, from a resource without identifier
+    When I send a "GET" request to "/dummy_foo_collection_dtos"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["@context", "@id", "@type", "hydra:member", "hydra:totalItems"],
+      "properties": {
+        "@context": {"pattern": "^/contexts/DummyFooCollectionDto$"},
+        "@id": {"pattern": "^/dummy_foo_collection_dtos$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["@id", "@type", "foo", "bar"],
+            "properties": {
+              "@id": {"pattern": "^/.well-known/genid/.+$"},
+              "@type": {"pattern": "^DummyCollectionDtoOutput$"},
+              "foo": {"type": "string"},
+              "bar": {"type": "integer"}
+            }
+          }
+        },
+        "hydra:totalItems": {"type": "integer", "minimum": 2, "maximum": 2}
+      }
+    }
+    """
+
+  @v3
+  # Cannot generate proper IRI because DTO does not support output yet
+  # todo Change member IRI to `/dummy_id_collection_dtos/.+` once DTO support @ApiProperty
+  Scenario: Get a collection with a custom output and without item operations, from a resource with an identifier
+    When I send a "GET" request to "/dummy_id_collection_dtos"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["@context", "@id", "@type", "hydra:member", "hydra:totalItems"],
+      "properties": {
+        "@context": {"pattern": "^/contexts/DummyIdCollectionDto$"},
+        "@id": {"pattern": "^/dummy_id_collection_dtos$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["@id", "@type", "id", "foo", "bar"],
+            "properties": {
+              "@id": {"pattern": "^/.well-known/genid/.+$"},
+              "@type": {"pattern": "^DummyIdCollectionDtoOutput$"},
+              "id": {"type": "integer"},
+              "foo": {"type": "string"},
+              "bar": {"type": "integer"}
+            }
+          }
+        },
+        "hydra:totalItems": {"type": "integer", "minimum": 2, "maximum": 2}
+      }
+    }
+    """

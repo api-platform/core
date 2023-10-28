@@ -15,22 +15,17 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class DummyTableInheritanceNotApiResourceChild extends DummyTableInheritance
 {
     /**
      * @var bool The dummy swagg
-     *
-     * @ORM\Column(type="boolean")
      */
-    private $swaggerThanParent;
+    #[ORM\Column(type: 'boolean')]
+    private bool $swaggerThanParent = true;
 
     public function __construct()
     {
-        // Definitely always swagger than parents
-        $this->swaggerThanParent = true;
     }
 
     public function isSwaggerThanParent(): bool
@@ -38,7 +33,7 @@ class DummyTableInheritanceNotApiResourceChild extends DummyTableInheritance
         return $this->swaggerThanParent;
     }
 
-    public function setSwaggerThanParent(bool $swaggerThanParent)
+    public function setSwaggerThanParent(bool $swaggerThanParent): void
     {
         $this->swaggerThanParent = $swaggerThanParent;
     }

@@ -1,7 +1,7 @@
-Feature: Using custom parent identifier for subresources
+Feature: Using custom parent identifier for resources
   In order to use an hypermedia API
   As a client software developer
-  I need to be able to use custom identifiers and query subresources
+  I need to be able to use custom identifiers and query resources
 
   @createSchema
   Scenario: Create a parent dummy
@@ -84,7 +84,7 @@ Feature: Using custom parent identifier for subresources
     """
     {
       "@context": "/contexts/SlugParentDummy",
-      "@id": "/slug_parent_dummies/parent-dummy",
+      "@id": "/slug_child_dummies/child-dummy/parent_dummy",
       "@type": "SlugParentDummy",
       "id": 1,
       "slug": "parent-dummy",

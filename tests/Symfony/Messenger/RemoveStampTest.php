@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  */
 class RemoveStampTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(StampInterface::class, new RemoveStamp());
     }

@@ -13,22 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
+use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
-use ApiPlatform\Metadata\Operation as AbstractOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\Pagination\Pagination;
-use ApiPlatform\Util\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\ListOfType;
+use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use GraphQL\Type\Definition\WrappingType;
@@ -43,41 +45,16 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class FieldsBuilder implements FieldsBuilderInterface
+final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumInterface
 {
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-    private $resourceMetadataCollectionFactory;
-    private $resourceClassResolver;
-    private $typesContainer;
-    private $typeBuilder;
-    private $typeConverter;
-    private $itemResolverFactory;
-    private $collectionResolverFactory;
-    private $itemMutationResolverFactory;
-    private $itemSubscriptionResolverFactory;
-    private $filterLocator;
-    private $pagination;
-    private $nameConverter;
-    private $nestingSeparator;
+    private readonly TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ResolverFactoryInterface $itemSubscriptionResolverFactory, ContainerInterface $filterLocator, Pagination $pagination, ?NameConverterInterface $nameConverter, string $nestingSeparator)
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ?ResolverFactoryInterface $collectionResolverFactory, private readonly ?ResolverFactoryInterface $itemMutationResolverFactory, private readonly ?ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator)
     {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->resourceClassResolver = $resourceClassResolver;
-        $this->typesContainer = $typesContainer;
+        if ($typeBuilder instanceof TypeBuilderInterface) {
+            @trigger_error(sprintf('$typeBuilder argument of FieldsBuilder implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', TypeBuilderInterface::class, TypeBuilderEnumInterface::class), \E_USER_DEPRECATED);
+        }
         $this->typeBuilder = $typeBuilder;
-        $this->typeConverter = $typeConverter;
-        $this->itemResolverFactory = $itemResolverFactory;
-        $this->collectionResolverFactory = $collectionResolverFactory;
-        $this->itemMutationResolverFactory = $itemMutationResolverFactory;
-        $this->itemSubscriptionResolverFactory = $itemSubscriptionResolverFactory;
-        $this->filterLocator = $filterLocator;
-        $this->pagination = $pagination;
-        $this->nameConverter = $nameConverter;
-        $this->nestingSeparator = $nestingSeparator;
     }
 
     /**
@@ -99,11 +76,16 @@ final class FieldsBuilder implements FieldsBuilderInterface
      */
     public function getItemQueryFields(string $resourceClass, Operation $operation, array $configuration): array
     {
+        if ($operation instanceof Query && $operation->getNested()) {
+            return [];
+        }
+
         $fieldName = lcfirst('item_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
-            $configuration['args'] = $args ?: $configuration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]];
+            $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
+            $configuration['args'] = $args ?: $configuration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]] + $extraArgs;
 
             return [$fieldName => array_merge($fieldConfiguration, $configuration)];
         }
@@ -116,11 +98,16 @@ final class FieldsBuilder implements FieldsBuilderInterface
      */
     public function getCollectionQueryFields(string $resourceClass, Operation $operation, array $configuration): array
     {
+        if ($operation instanceof Query && $operation->getNested()) {
+            return [];
+        }
+
         $fieldName = lcfirst('collection_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
-            $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'];
+            $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
+            $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'] + $extraArgs;
 
             return [Inflector::pluralize($fieldName) => array_merge($fieldConfiguration, $configuration)];
         }
@@ -177,7 +164,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, ?array $ioMetadata = null): array
+    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, array $ioMetadata = null): array
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
@@ -212,7 +199,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             return $fields;
         }
 
-        if (!$input || 'create' !== $operation->getName()) {
+        if (!$input || (!$operation->getResolver() && 'create' !== $operation->getName())) {
             $fields['id'] = $idField;
         }
         if ($input && $depth >= 1) {
@@ -228,17 +215,23 @@ final class FieldsBuilder implements FieldsBuilderInterface
                     'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null,
                 ];
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $context);
+                $propertyTypes = $propertyMetadata->getBuiltinTypes();
 
                 if (
-                    null === ($propertyType = $propertyMetadata->getBuiltinTypes()[0] ?? null)
+                    !$propertyTypes
                     || (!$input && false === $propertyMetadata->isReadable())
                     || ($input && $operation instanceof Mutation && false === $propertyMetadata->isWritable())
                 ) {
                     continue;
                 }
 
-                if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
-                    $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
+                // guess union/intersect types: check each type until finding a valid one
+                foreach ($propertyTypes as $propertyType) {
+                    if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
+                        $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
+                        // stop at the first valid type
+                        break;
+                    }
                 }
             }
         }
@@ -248,6 +241,26 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         return $fields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEnumFields(string $enumClass): array
+    {
+        $rEnum = new \ReflectionEnum($enumClass);
+
+        $enumCases = [];
+        foreach ($rEnum->getCases() as $rCase) {
+            $enumCase = ['value' => $rCase->getBackingValue()];
+            $propertyMetadata = $this->propertyMetadataFactory->create($enumClass, $rCase->getName());
+            if ($enumCaseDescription = $propertyMetadata->getDescription()) {
+                $enumCase['description'] = $enumCaseDescription;
+            }
+            $enumCases[$rCase->getName()] = $enumCase;
+        }
+
+        return $enumCases;
     }
 
     /**
@@ -277,19 +290,34 @@ final class FieldsBuilder implements FieldsBuilderInterface
             $isCollectionType = $this->typeBuilder->isCollection($type);
 
             if (
-                $isCollectionType &&
-                $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+                $isCollectionType
+                && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
             ) {
                 $resourceClass = $collectionValueType->getClassName();
             } else {
                 $resourceClass = $type->getClassName();
             }
 
-            if (null === $graphqlType = $this->convertType($type, $input, $rootOperation, $resourceClass ?? '', $rootResource, $property, $depth, $forceNullable)) {
-                return null;
+            $resourceOperation = $rootOperation;
+            if ($resourceClass && $depth >= 1 && $this->resourceClassResolver->isResourceClass($resourceClass)) {
+                $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+                $resourceOperation = $resourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
             }
 
-            $graphqlWrappedType = $graphqlType instanceof WrappingType ? $graphqlType->getWrappedType(true) : $graphqlType;
+            if (!$resourceOperation instanceof Operation) {
+                throw new \LogicException('The resource operation should be a GraphQL operation.');
+            }
+
+            $graphqlType = $this->convertType($type, $input, $resourceOperation, $rootOperation, $resourceClass ?? '', $rootResource, $property, $depth, $forceNullable);
+
+            $graphqlWrappedType = $graphqlType;
+            if ($graphqlType instanceof WrappingType) {
+                if (method_exists($graphqlType, 'getInnermostType')) {
+                    $graphqlWrappedType = $graphqlType->getInnermostType();
+                } else {
+                    $graphqlWrappedType = $graphqlType->getWrappedType(true);
+                }
+            }
             $isStandardGraphqlType = \in_array($graphqlWrappedType, GraphQLType::getStandardTypes(), true);
             if ($isStandardGraphqlType) {
                 $resourceClass = '';
@@ -302,43 +330,30 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
             $args = [];
 
-            $resolverOperation = $rootOperation;
-
-            if ($resourceClass && $this->resourceClassResolver->isResourceClass($resourceClass) && $rootOperation->getClass() !== $resourceClass) {
-                $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-                $resolverOperation = $resourceMetadataCollection->getOperation(null, $isCollectionType);
-
-                if (!$resolverOperation instanceof Operation) {
-                    $resolverOperation = ($isCollectionType ? new QueryCollection() : new Query())->withOperation($resolverOperation);
-                }
-            }
-
             if (!$input && !$rootOperation instanceof Mutation && !$rootOperation instanceof Subscription && !$isStandardGraphqlType && $isCollectionType) {
-                if ($this->pagination->isGraphQlEnabled($resourceClass, $rootOperation->getName())) {
-                    $args = $this->getGraphQlPaginationArgs($resourceClass, $rootOperation->getName());
+                if ($this->pagination->isGraphQlEnabled($resourceOperation)) {
+                    $args = $this->getGraphQlPaginationArgs($resourceOperation);
                 }
 
-                // Find the collection operation to get filters, there might be a smarter way to do this
-                $operation = null;
-                if (!empty($resourceClass)) {
-                    $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-                    try {
-                        $operation = $resourceMetadataCollection->getOperation(null, true);
-                    } catch (OperationNotFoundException $e) {
-                    }
-                }
-
-                $args = $this->getFilterArgs($args, $resourceClass, $rootResource, $rootOperation, $property, $depth, $operation);
+                $args = $this->getFilterArgs($args, $resourceClass, $rootResource, $resourceOperation, $rootOperation, $property, $depth);
             }
 
-            if ($isStandardGraphqlType || $input) {
-                $resolve = null;
-            } elseif (($rootOperation instanceof Mutation || $rootOperation instanceof Subscription) && $depth <= 0) {
-                $resolve = $rootOperation instanceof Mutation ? ($this->itemMutationResolverFactory)($resourceClass, $rootResource, $resolverOperation) : ($this->itemSubscriptionResolverFactory)($resourceClass, $rootResource, $resolverOperation);
-            } elseif ($this->typeBuilder->isCollection($type)) {
-                $resolve = ($this->collectionResolverFactory)($resourceClass, $rootResource, $resolverOperation);
+            if ($this->itemResolverFactory instanceof ResolverFactory) {
+                if ($isStandardGraphqlType || $input) {
+                    $resolve = null;
+                } else {
+                    $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resourceOperation);
+                }
             } else {
-                $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resolverOperation);
+                if ($isStandardGraphqlType || $input) {
+                    $resolve = null;
+                } elseif (($rootOperation instanceof Mutation || $rootOperation instanceof Subscription) && $depth <= 0) {
+                    $resolve = $rootOperation instanceof Mutation ? ($this->itemMutationResolverFactory)($resourceClass, $rootResource, $resourceOperation) : ($this->itemSubscriptionResolverFactory)($resourceClass, $rootResource, $resourceOperation);
+                } elseif ($this->typeBuilder->isCollection($type)) {
+                    $resolve = ($this->collectionResolverFactory)($resourceClass, $rootResource, $resourceOperation);
+                } else {
+                    $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resourceOperation);
+                }
             }
 
             return [
@@ -348,16 +363,16 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 'resolve' => $resolve,
                 'deprecationReason' => $deprecationReason,
             ];
-        } catch (InvalidTypeException $e) {
+        } catch (InvalidTypeException) {
             // just ignore invalid types
         }
 
         return null;
     }
 
-    private function getGraphQlPaginationArgs(string $resourceClass, string $queryName): array
+    private function getGraphQlPaginationArgs(Operation $queryOperation): array
     {
-        $paginationType = $this->pagination->getGraphQlPaginationType($resourceClass, $queryName);
+        $paginationType = $this->pagination->getGraphQlPaginationType($queryOperation);
 
         if ('cursor' === $paginationType) {
             return [
@@ -399,23 +414,34 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $args;
     }
 
-    private function getFilterArgs(array $args, ?string $resourceClass, string $rootResource, Operation $rootOperation, ?string $property, int $depth, ?AbstractOperation $operation = null): array
+    private function getFilterArgs(array $args, ?string $resourceClass, string $rootResource, Operation $resourceOperation, Operation $rootOperation, ?string $property, int $depth): array
     {
-        if (null === $operation || null === $resourceClass) {
+        if (null === $resourceClass) {
             return $args;
         }
 
-        foreach ($operation->getFilters() ?? [] as $filterId) {
-            if (null === $this->filterLocator || !$this->filterLocator->has($filterId)) {
+        foreach ($resourceOperation->getFilters() ?? [] as $filterId) {
+            if (!$this->filterLocator->has($filterId)) {
                 continue;
             }
 
-            foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $value) {
+            $entityClass = $resourceClass;
+            if ($options = $resourceOperation->getStateOptions()) {
+                if ($options instanceof Options && $options->getEntityClass()) {
+                    $entityClass = $options->getEntityClass();
+                }
+
+                if ($options instanceof ODMOptions && $options->getDocumentClass()) {
+                    $entityClass = $options->getDocumentClass();
+                }
+            }
+
+            foreach ($this->filterLocator->get($filterId)->getDescription($entityClass) as $key => $value) {
                 $nullable = isset($value['required']) ? !$value['required'] : true;
                 $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
-                $graphqlFilterType = $this->convertType($filterType, false, $rootOperation, $resourceClass, $rootResource, $property, $depth);
+                $graphqlFilterType = $this->convertType($filterType, false, $resourceOperation, $rootOperation, $resourceClass, $rootResource, $property, $depth);
 
-                if ('[]' === substr($key, -2)) {
+                if (str_ends_with($key, '[]')) {
                     $graphqlFilterType = GraphQLType::listOf($graphqlFilterType);
                     $key = substr($key, 0, -2).'_list';
                 }
@@ -427,21 +453,17 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 if (\array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
                     $parsed = [$key => ''];
                 }
-                array_walk_recursive($parsed, static function (&$value) use ($graphqlFilterType) {
+                array_walk_recursive($parsed, static function (&$value) use ($graphqlFilterType): void {
                     $value = $graphqlFilterType;
                 });
-                $args = $this->mergeFilterArgs($args, $parsed, $operation, $key);
+                $args = $this->mergeFilterArgs($args, $parsed, $resourceOperation, $key);
             }
         }
 
         return $this->convertFilterArgsToTypes($args);
     }
 
-    /**
-     * @param AbstractOperation|null $operation
-     * @param mixed                  $original
-     */
-    private function mergeFilterArgs(array $args, array $parsed, $operation = null, $original = ''): array
+    private function mergeFilterArgs(array $args, array $parsed, Operation $operation = null, string $original = ''): array
     {
         foreach ($parsed as $key => $value) {
             // Never override keys that cannot be merged
@@ -505,7 +527,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
      *
      * @throws InvalidTypeException
      */
-    private function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth, bool $forceNullable = false)
+    private function convertType(Type $type, bool $input, Operation $resourceOperation, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth, bool $forceNullable = false): GraphQLType|ListOfType|NonNull
     {
         $graphqlType = $this->typeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
 
@@ -522,7 +544,16 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         if ($this->typeBuilder->isCollection($type)) {
-            return $this->pagination->isGraphQlEnabled($resourceClass, $rootOperation->getName()) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $rootOperation->getName()) : GraphQLType::listOf($graphqlType);
+            if (!$input && $this->pagination->isGraphQlEnabled($resourceOperation)) {
+                // Deprecated path, to remove in API Platform 4.
+                if ($this->typeBuilder instanceof TypeBuilderInterface) {
+                    return $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $resourceOperation);
+                }
+
+                return $this->typeBuilder->getPaginatedCollectionType($graphqlType, $resourceOperation);
+            }
+
+            return GraphQLType::listOf($graphqlType);
         }
 
         return $forceNullable || !$graphqlType instanceof NullableType || $type->isNullable() || ($rootOperation instanceof Mutation && 'update' === $rootOperation->getName())

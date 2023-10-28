@@ -21,20 +21,20 @@ use PHPUnit\Framework\TestCase;
  */
 class ReflectionTest extends TestCase
 {
-    public function testWithGoodMethodName()
+    public function testWithGoodMethodName(): void
     {
         $methodName = 'addGerard';
         $reflection = new Reflection();
         $return = $reflection->getProperty($methodName);
-        $this->assertEquals($return, 'Gerard');
+        $this->assertSame($return, 'Gerard');
     }
 
-    public function testWithBadMethodName()
+    public function testWithBadMethodName(): void
     {
         $methodName = 'delGerard';
         $reflection = new Reflection();
         $return = $reflection->getProperty($methodName);
         $this->assertNotEquals($return, 'Gerard');
-        $this->assertEquals($return, null);
+        $this->assertSame($return, null);
     }
 }

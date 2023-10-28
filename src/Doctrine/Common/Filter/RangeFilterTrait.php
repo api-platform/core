@@ -58,7 +58,7 @@ trait RangeFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName(string $property): string;
 
     /**
      * Gets filter description.
@@ -123,10 +123,8 @@ trait RangeFilterTrait
 
     /**
      * Normalize the value.
-     *
-     * @return int|float|null
      */
-    protected function normalizeValue(string $value, string $operator)
+    protected function normalizeValue(string $value, string $operator): float|int|null
     {
         if (!is_numeric($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
@@ -139,5 +137,3 @@ trait RangeFilterTrait
         return $value + 0; // coerce $value to the right type.
     }
 }
-
-class_alias(RangeFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class);

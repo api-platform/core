@@ -21,19 +21,14 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class TaxonItemProvider implements ProviderInterface
 {
-    private $managerRegistry;
-    private $orm;
-
-    public function __construct(ManagerRegistry $managerRegistry, bool $orm = true)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly bool $orm = true)
     {
-        $this->managerRegistry = $managerRegistry;
-        $this->orm = $orm;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): Taxon|TaxonDocument|null
     {
         return $this->managerRegistry->getRepository($this->orm ? Taxon::class : TaxonDocument::class)->findOneBy([
             'code' => $uriVariables['code'],

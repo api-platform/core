@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanOrEqualRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
@@ -30,7 +30,7 @@ final class PropertySchemaGreaterThanOrEqualRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaGreaterThanOrEqualRestriction;
+    private PropertySchemaGreaterThanOrEqualRestriction $propertySchemaGreaterThanOrEqualRestriction;
 
     protected function setUp(): void
     {
@@ -45,8 +45,9 @@ final class PropertySchemaGreaterThanOrEqualRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaGreaterThanOrEqualRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
+        yield 'supported int/float with union types' => [new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT)]), true];
         yield 'supported int' => [new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), true];
         yield 'supported float' => [new GreaterThanOrEqual(['value' => 10.99]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_FLOAT)]), true];
         yield 'supported positive or zero' => [new PositiveOrZero(), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), true];
@@ -56,6 +57,6 @@ final class PropertySchemaGreaterThanOrEqualRestrictionTest extends TestCase
 
     public function testCreate(): void
     {
-        self::assertSame(['minimum' => 10], $this->propertySchemaGreaterThanOrEqualRestriction->create(new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));
+        self::assertEquals(['minimum' => 10], $this->propertySchemaGreaterThanOrEqualRestriction->create(new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));
     }
 }

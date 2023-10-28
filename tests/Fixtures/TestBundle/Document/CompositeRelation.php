@@ -13,40 +13,28 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Relation.
- *
- * @ApiResource
- * @ODM\Document
  */
+#[ApiResource]
+#[ODM\Document]
 class CompositeRelation
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
-
-    /**
-     * @ODM\Field(type="string", nullable=true)
-     * @Groups({"default"})
-     */
-    private $value;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=CompositeItem::class, inversedBy="compositeValues")
-     * @Groups({"default"})
-     */
-    private $compositeItem;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=CompositeLabel::class)
-     * @Groups({"default"})
-     */
-    private $compositeLabel;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[Groups(['default'])]
+    #[ODM\Field(type: 'string', nullable: true)]
+    private ?string $value = null;
+    #[Groups(['default'])]
+    #[ODM\ReferenceOne(targetDocument: CompositeItem::class, inversedBy: 'compositeValues')]
+    private ?CompositeItem $compositeItem = null;
+    #[Groups(['default'])]
+    #[ODM\ReferenceOne(targetDocument: CompositeLabel::class)]
+    private ?CompositeLabel $compositeLabel = null;
 
     /**
      * Gets id.
@@ -69,7 +57,7 @@ class CompositeRelation
      *
      * @param string|null $value the value to set
      */
-    public function setValue($value = null)
+    public function setValue($value = null): void
     {
         $this->value = $value;
     }
@@ -87,7 +75,7 @@ class CompositeRelation
      *
      * @param CompositeItem $compositeItem the value to set
      */
-    public function setCompositeItem(CompositeItem $compositeItem)
+    public function setCompositeItem(CompositeItem $compositeItem): void
     {
         $this->compositeItem = $compositeItem;
     }
@@ -105,7 +93,7 @@ class CompositeRelation
      *
      * @param CompositeLabel $compositeLabel the value to set
      */
-    public function setCompositeLabel(CompositeLabel $compositeLabel)
+    public function setCompositeLabel(CompositeLabel $compositeLabel): void
     {
         $this->compositeLabel = $compositeLabel;
     }

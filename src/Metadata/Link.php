@@ -16,31 +16,12 @@ namespace ApiPlatform\Metadata;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
 final class Link
 {
-    private $parameterName;
-    private $fromProperty;
-    private $toProperty;
-    private $fromClass;
-    private $toClass;
-    private $identifiers;
-    private $compositeIdentifier;
-    private $expandedValue;
-
-    public function __construct(?string $parameterName = null, ?string $fromProperty = null, ?string $toProperty = null, ?string $fromClass = null, ?string $toClass = null, ?array $identifiers = null, ?bool $compositeIdentifier = null, ?string $expandedValue = null)
+    public function __construct(private ?string $parameterName = null, private ?string $fromProperty = null, private ?string $toProperty = null, private ?string $fromClass = null, private ?string $toClass = null, private ?array $identifiers = null, private ?bool $compositeIdentifier = null, private ?string $expandedValue = null)
     {
         // For the inverse property shortcut
-        if ($parameterName && class_exists($parameterName)) {
-            $this->fromClass = $parameterName;
-        } else {
-            $this->parameterName = $parameterName;
+        if ($this->parameterName && class_exists($this->parameterName)) {
+            $this->fromClass = $this->parameterName;
         }
-
-        $this->fromClass = $fromClass;
-        $this->toClass = $toClass;
-        $this->fromProperty = $fromProperty;
-        $this->toProperty = $toProperty;
-        $this->identifiers = $identifiers;
-        $this->compositeIdentifier = $compositeIdentifier;
-        $this->expandedValue = $expandedValue;
     }
 
     public function getParameterName(): ?string

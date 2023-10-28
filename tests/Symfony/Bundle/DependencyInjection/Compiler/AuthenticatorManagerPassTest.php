@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -24,8 +25,8 @@ final class AuthenticatorManagerPassTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $containerBuilderProphecy;
-    private $authenticatorManagerPass;
+    private ObjectProphecy $containerBuilderProphecy;
+    private AuthenticatorManagerPass $authenticatorManagerPass;
 
     protected function setUp(): void
     {

@@ -69,7 +69,7 @@ Feature: Using custom writable identifier on resource
     """
 
   @!mongodb
-  Scenario: Update a resource
+  Scenario: Update a resource (legacy non-standard PUT)
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/custom_writable_identifier_dummies/my_slug" with body:
     """

@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Util;
 
+/**
+ * @deprecated use ApiPlatform\GraphQl\ArrayTrait
+ */
 trait ArrayTrait
 {
     public function isSequentialArrayOfArrays(array $array): bool
@@ -30,15 +33,11 @@ trait ArrayTrait
             return false;
         }
 
-        return array_keys($array) === range(0, \count($array) - 1);
+        return array_is_list($array);
     }
 
     public function arrayContainsOnly(array $array, string $type): bool
     {
-        return $array === array_filter($array, static function ($item) use ($type): bool {
-            return $type === \gettype($item);
-        });
+        return $array === array_filter($array, static fn ($item): bool => $type === \gettype($item));
     }
 }
-
-class_alias(ArrayTrait::class, \ApiPlatform\Core\Util\ArrayTrait::class);

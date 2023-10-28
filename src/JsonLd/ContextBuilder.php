@@ -13,23 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * {@inheritdoc}
- * TODO: 3.0 simplify or remove the class.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -39,38 +35,8 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
 
     public const FORMAT = 'jsonld';
 
-    private $resourceNameCollectionFactory;
-    /**
-     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
-     */
-    private $resourceMetadataFactory;
-    /**
-     * @var LegacyPropertyNameCollectionFactoryInterface|PropertyNameCollectionFactoryInterface
-     */
-    private $propertyNameCollectionFactory;
-    /**
-     * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
-     */
-    private $propertyMetadataFactory;
-    private $urlGenerator;
-
-    /**
-     * @var NameConverterInterface|null
-     */
-    private $nameConverter;
-
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->urlGenerator = $urlGenerator;
-        $this->nameConverter = $nameConverter;
-
-        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
     }
 
     /**
@@ -92,13 +58,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $context = $this->getBaseContext($referenceType);
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            // TODO: remove in 3.0
-            if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-                $shortName = $this->resourceMetadataFactory->create($resourceClass)->getShortName();
-            } else {
-                $shortName = $this->resourceMetadataFactory->create($resourceClass)[0]->getShortName();
-            }
-
+            $shortName = $this->resourceMetadataFactory->create($resourceClass)[0]->getShortName();
             $resourceName = lcfirst($shortName);
 
             $context[$resourceName] = [
@@ -115,24 +75,8 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
      */
     public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
-        // TODO: Remove in 3.0
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            if (null === $shortName = $resourceMetadata->getShortName()) {
-                return [];
-            }
-
-            if ($resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false) {
-                $context = $this->getBaseContext($referenceType);
-                $context['hydra:member']['@type'] = '@id';
-
-                return $context;
-            }
-
-            return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName);
-        }
-
-        $operation = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
+        /** @var HttpOperation $operation */
+        $operation = $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
         if (null === $shortName = $operation->getShortName()) {
             return [];
         }
@@ -152,31 +96,22 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
      */
     public function getResourceContextUri(string $resourceClass, int $referenceType = null): string
     {
-        // TODO: remove in 3.0
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            if (null === $referenceType) {
-                $referenceType = $resourceMetadata->getAttribute('url_generation_strategy');
-            }
-
-            return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], $referenceType);
-        }
-
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass)[0];
         if (null === $referenceType) {
             $referenceType = $resourceMetadata->getUrlGenerationStrategy();
         }
 
-        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], $referenceType);
+        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], $referenceType ?? UrlGeneratorInterface::ABS_PATH);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array
+    public function getAnonymousResourceContext(object $object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
         $outputClass = $this->getObjectClass($object);
-        $shortName = (new \ReflectionClass($outputClass))->getShortName();
+        $operation = $context['operation'] ?? new Get(shortName: (new \ReflectionClass($outputClass))->getShortName());
+        $shortName = $operation->getShortName();
 
         $jsonLdContext = [
             '@context' => $this->getResourceContextWithShortname(
@@ -185,8 +120,13 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
                 $shortName
             ),
             '@type' => $shortName,
-            '@id' => $context['iri'] ?? '_:'.(\function_exists('spl_object_id') ? spl_object_id($object) : spl_object_hash($object)),
         ];
+
+        if (isset($context['iri'])) {
+            $jsonLdContext['@id'] = $context['iri'];
+        } elseif (true === ($context['gen_id'] ?? true) && $this->iriConverter) {
+            $jsonLdContext['@id'] = $this->iriConverter->getIriFromResource($object);
+        }
 
         if ($context['has_context'] ?? false) {
             unset($jsonLdContext['@context']);
@@ -194,27 +134,18 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
 
         // here the object can be different from the resource given by the $context['api_resource'] value
         if (isset($context['api_resource'])) {
-            if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-                $jsonLdContext['@type'] = $this->resourceMetadataFactory->create($this->getObjectClass($context['api_resource']))->getShortName();
-            } else {
-                $jsonLdContext['@type'] = $this->resourceMetadataFactory->create($this->getObjectClass($context['api_resource']))[0]->getShortName();
-            }
+            $jsonLdContext['@type'] = $this->resourceMetadataFactory->create($this->getObjectClass($context['api_resource']))[0]->getShortName();
         }
 
         return $jsonLdContext;
     }
 
-    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?HttpOperation $operation = null): array
+    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, HttpOperation $operation = null): array
     {
         $context = $this->getBaseContext($referenceType);
-        if ($this->propertyMetadataFactory instanceof LegacyPropertyMetadataFactoryInterface) {
-            $propertyContext = [];
-        } else {
-            $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
-        }
+        $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
-            /** @var PropertyMetadata|ApiProperty */
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $propertyContext);
 
             if ($propertyMetadata->isIdentifier() && true !== $propertyMetadata->isWritable()) {
@@ -222,12 +153,10 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             }
 
             $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT) : $propertyName;
-            if ($propertyMetadata instanceof PropertyMetadata) {
-                $jsonldContext = ($propertyMetadata->getAttributes() ?? [])['jsonld_context'] ?? [];
-                $id = $propertyMetadata->getIri();
-            } else {
-                $jsonldContext = $propertyMetadata->getJsonldContext() ?? [];
-                $id = $propertyMetadata->getTypes()[0] ?? null;
+            $jsonldContext = $propertyMetadata->getJsonldContext() ?? [];
+
+            if ($id = $propertyMetadata->getIris()) {
+                $id = 1 === (is_countable($id) ? \count($id) : 0) ? $id[0] : $id;
             }
 
             if (!$id) {
@@ -253,5 +182,3 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         return $context;
     }
 }
-
-class_alias(ContextBuilder::class, \ApiPlatform\Core\JsonLd\ContextBuilder::class);

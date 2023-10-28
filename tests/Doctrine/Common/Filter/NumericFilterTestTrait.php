@@ -18,7 +18,7 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait NumericFilterTestTrait
 {
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = $this->buildFilter([
             'id' => null,
@@ -43,7 +43,7 @@ trait NumericFilterTestTrait
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -87,7 +87,7 @@ trait NumericFilterTestTrait
         ], $filter->getDescription($this->resourceClass));
     }
 
-    private function provideApplyTestArguments(): array
+    private static function provideApplyTestArguments(): array
     {
         return [
             'numeric string (positive integer)' => [

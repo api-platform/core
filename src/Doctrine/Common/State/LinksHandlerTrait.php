@@ -14,37 +14,50 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Common\State;
 
 use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use Psr\Container\ContainerInterface;
 
 trait LinksHandlerTrait
 {
+    private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    private ?ContainerInterface $handleLinksLocator;
+
     /**
-     * @param HttpOperation|GraphQlOperation $operation
-     *
      * @return Link[]
      */
     private function getLinks(string $resourceClass, Operation $operation, array $context): array
     {
-        $links = ($operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables()) ?? [];
+        $links = $this->getOperationLinks($operation);
 
         if (!($linkClass = $context['linkClass'] ?? false)) {
             return $links;
         }
 
-        $newLinks = [];
+        $newLink = null;
+        $linkProperty = $context['linkProperty'] ?? null;
 
         foreach ($links as $link) {
-            if ($linkClass === $link->getFromClass()) {
-                $newLinks[] = $link;
+            if ($linkClass === $link->getFromClass() && $linkProperty === $link->getFromProperty()) {
+                $newLink = $link;
+                break;
             }
         }
 
-        // Using graphql, it's possible that we won't find a graphql operation of the same type (eg it is disabled).
+        if ($newLink) {
+            return [$newLink];
+        }
+
+        if (!$this->resourceMetadataCollectionFactory) {
+            return [];
+        }
+
+        // Using GraphQL, it's possible that we won't find a GraphQL Operation of the same type (e.g. it is disabled).
         try {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($linkClass);
             $linkedOperation = $resourceMetadataCollection->getOperation($operation->getName());
@@ -53,30 +66,31 @@ trait LinksHandlerTrait
                 throw $e;
             }
 
-            // Instead we'll look for the first Query available
+            // Instead, we'll look for the first Query available.
             foreach ($resourceMetadataCollection as $resourceMetadata) {
-                foreach ($resourceMetadata->getGraphQlOperations() as $operation) {
-                    if ($operation instanceof Query) {
-                        $linkedOperation = $operation;
+                foreach ($resourceMetadata->getGraphQlOperations() as $op) {
+                    if ($op instanceof Query) {
+                        $linkedOperation = $op;
                     }
                 }
             }
         }
 
-        foreach ($linkedOperation instanceof GraphQlOperation ? $linkedOperation->getLinks() : $linkedOperation->getUriVariables() as $link) {
-            if ($resourceClass === $link->getToClass()) {
-                $newLinks[] = $link;
+        foreach ($this->getOperationLinks($linkedOperation ?? null) as $link) {
+            if ($resourceClass === $link->getToClass() && $linkProperty === $link->getFromProperty()) {
+                $newLink = $link;
+                break;
             }
         }
 
-        if (!$newLinks) {
+        if (!$newLink) {
             throw new RuntimeException(sprintf('The class "%s" cannot be retrieved from "%s".', $resourceClass, $linkClass));
         }
 
-        return $newLinks;
+        return [$newLink];
     }
 
-    private function getIdentifierValue(array &$identifiers, string $name = null)
+    private function getIdentifierValue(array &$identifiers, string $name = null): mixed
     {
         if (isset($identifiers[$name])) {
             $value = $identifiers[$name];
@@ -86,5 +100,36 @@ trait LinksHandlerTrait
         }
 
         return array_shift($identifiers);
+    }
+
+    private function getOperationLinks(Operation $operation = null): array
+    {
+        if ($operation instanceof GraphQlOperation) {
+            return $operation->getLinks() ?? [];
+        }
+
+        if ($operation instanceof HttpOperation) {
+            return $operation->getUriVariables() ?? [];
+        }
+
+        return [];
+    }
+
+    private function getLinksHandler(Operation $operation): ?callable
+    {
+        if (!($options = $operation->getStateOptions()) || !method_exists($options, 'getHandleLinks') || null === $options->getHandleLinks()) {
+            return null;
+        }
+
+        $handleLinks = $options->getHandleLinks(); // @phpstan-ignore-line method_exists called above
+        if (\is_callable($handleLinks)) {
+            return $handleLinks;
+        }
+
+        if ($this->handleLinksLocator && \is_string($handleLinks) && $this->handleLinksLocator->has($handleLinks)) {
+            return [$this->handleLinksLocator->get($handleLinks), 'handleLinks'];
+        }
+
+        throw new RuntimeException(sprintf('Could not find handleLinks service "%s"', $handleLinks));
     }
 }

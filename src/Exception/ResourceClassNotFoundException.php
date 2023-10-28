@@ -21,5 +21,3 @@ namespace ApiPlatform\Exception;
 class ResourceClassNotFoundException extends \Exception implements ExceptionInterface
 {
 }
-
-class_alias(ResourceClassNotFoundException::class, \ApiPlatform\Core\Exception\ResourceClassNotFoundException::class);

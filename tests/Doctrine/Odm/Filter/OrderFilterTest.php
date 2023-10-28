@@ -30,10 +30,10 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use OrderFilterTestTrait;
 
-    protected $filterClass = OrderFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = OrderFilter::class;
+    protected string $resourceClass = Dummy::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -233,17 +233,13 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
-        $orderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter {
-            return new OrderFilter($managerRegistry, 'order', null, $properties);
-        };
-        $customOrderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter {
-            return new OrderFilter($managerRegistry, 'customOrder', null, $properties);
-        };
+        $orderFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'order', null, $properties);
+        $customOrderFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'customOrder', null, $properties);
 
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'valid values' => [
                     [
@@ -347,7 +343,10 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
-                            '$unwind' => '$relatedDummy_lkup',
+                            '$unwind' => [
+                                'path' => '$relatedDummy_lkup',
+                                'preserveNullAndEmptyArrays' => true,
+                            ],
                         ],
                         [
                             '$sort' => [
@@ -518,7 +517,10 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
-                            '$unwind' => '$relatedDummy_lkup',
+                            '$unwind' => [
+                                'path' => '$relatedDummy_lkup',
+                                'preserveNullAndEmptyArrays' => true,
+                            ],
                         ],
                         [
                             '$sort' => [
@@ -550,11 +552,35 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     $orderFilterFactory,
                     EmbeddedDummy::class,
                 ],
+                'nullable field in relation will be a LEFT JOIN' => [
+                    [
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$unwind' => [
+                                'path' => '$relatedDummy_lkup',
+                                'preserveNullAndEmptyArrays' => true,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'relatedDummy_lkup.name' => 1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                ],
             ]
         );
     }
 
-    protected function buildFilter(?array $properties = null)
+    protected function buildFilter(array $properties = null)
     {
         return new $this->filterClass($this->managerRegistry, 'order', null, $properties, new CustomConverter());
     }

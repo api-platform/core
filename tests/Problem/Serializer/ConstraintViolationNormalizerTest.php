@@ -13,23 +13,31 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Problem\Serializer;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ConstraintViolationNormalizerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    public function testSupportNormalization()
+    /**
+     * @group legacy
+     */
+    public function testSupportNormalization(): void
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $normalizer = new ConstraintViolationListNormalizer([], $nameConverterProphecy->reveal());
@@ -37,17 +45,23 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new ConstraintViolationList(), ConstraintViolationListNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new ConstraintViolationList(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ConstraintViolationListNormalizer::FORMAT));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertEmpty($normalizer->getSupportedTypes('json'));
+        $this->assertSame([ConstraintViolationListInterface::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
-    public function testNormalize()
+    /**
+     * @group legacy
+     *
+     * @dataProvider nameConverterProvider
+     */
+    public function testNormalize(callable $nameConverterFactory, array $expected): void
     {
-        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterProphecy->reveal());
-
-        $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(function ($args) {
-            return '_'.$args[0];
-        });
+        $this->expectDeprecation('Since api-platform 3.2: "ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer::ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer::getMessagesAndViolations" will be removed in 4.0, use "ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer::getViolations');
+        $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterFactory($this));
 
         // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
         $constraint = new NotNull();
@@ -57,6 +71,11 @@ class ConstraintViolationNormalizerTest extends TestCase
             new ConstraintViolation('1', '2', [], '3', '4', '5'),
         ]);
 
+        $this->assertSame($expected, $normalizer->normalize($list));
+    }
+
+    public static function nameConverterProvider(): iterable
+    {
         $expected = [
             'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
             'title' => 'An error occurred',
@@ -77,6 +96,45 @@ class ConstraintViolationNormalizerTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($list));
+
+        $nameConverterFactory = function (self $that): NameConverterInterface {
+            $nameConverterProphecy = $that->prophesize(NameConverterInterface::class);
+            $nameConverterProphecy->normalize(Argument::type('string'))->will(fn ($args) => '_'.$args[0]);
+
+            return $nameConverterProphecy->reveal();
+        };
+        yield [$nameConverterFactory, $expected];
+
+        $nameConverterFactory = function (self $that): NameConverterInterface {
+            $nameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
+            $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(
+                fn ($args) => '_'.$args[0]
+            );
+
+            return $nameConverterProphecy->reveal();
+        };
+        yield [$nameConverterFactory, $expected];
+
+        $expected = [
+            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+            'title' => 'An error occurred',
+            'detail' => "d: a\n4: 1",
+            'violations' => [
+                [
+                    'propertyPath' => 'd',
+                    'message' => 'a',
+                    'code' => 'f24bdbad0becef97a6887238aa58221c',
+                    'payload' => [
+                        'severity' => 'warning',
+                    ],
+                ],
+                [
+                    'propertyPath' => '4',
+                    'message' => '1',
+                    'code' => null,
+                ],
+            ],
+        ];
+        yield [fn () => null, $expected];
     }
 }

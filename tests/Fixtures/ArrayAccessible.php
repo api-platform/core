@@ -15,26 +15,16 @@ namespace ApiPlatform\Tests\Fixtures;
 
 class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
 {
-    private $array;
-
-    public function __construct(array $array = [])
+    public function __construct(private array $array = [])
     {
-        $this->array = $array;
     }
 
-    #[\ReturnTypeWillChange]
     public function offsetExists($offset): bool
     {
         return \array_key_exists($offset, $this->array);
     }
 
-    /**
-     * @param mixed $offset
-     *
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->array[$offset];
     }
@@ -53,7 +43,6 @@ class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
         unset($this->array[$offset]);
     }
 
-    #[\ReturnTypeWillChange]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->array);

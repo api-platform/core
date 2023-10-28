@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class EnumTest extends TestCase
 {
-    public function testNonDefinedFilter()
+    public function testNonDefinedFilter(): void
     {
         $filter = new Enum();
 
@@ -30,7 +30,7 @@ class EnumTest extends TestCase
         );
     }
 
-    public function testEmptyQueryParameter()
+    public function testEmptyQueryParameter(): void
     {
         $filter = new Enum();
 
@@ -39,7 +39,10 @@ class EnumTest extends TestCase
         );
     }
 
-    public function testNonMatchingParameter()
+    /**
+     * @group legacy
+     */
+    public function testNonMatchingParameter(): void
     {
         $filter = new Enum();
 
@@ -55,12 +58,46 @@ class EnumTest extends TestCase
         );
     }
 
-    public function testMatchingParameter()
+    public function testNonMatchingParameterOpenApi(): void
+    {
+        $filter = new Enum();
+
+        $filterDefinition = [
+            'openapi' => [
+                'enum' => ['foo', 'bar'],
+            ],
+        ];
+
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be one of "foo, bar"'],
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foobar'])
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testMatchingParameter(): void
     {
         $filter = new Enum();
 
         $filterDefinition = [
             'swagger' => [
+                'enum' => ['foo', 'bar'],
+            ],
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foo'])
+        );
+    }
+
+    public function testMatchingParameterOpenApi(): void
+    {
+        $filter = new Enum();
+
+        $filterDefinition = [
+            'openapi' => [
                 'enum' => ['foo', 'bar'],
             ],
         ];

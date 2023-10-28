@@ -13,46 +13,35 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource
- * @ORM\Entity
- */
+#[ApiResource]
+#[ORM\Entity]
 class Customer
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"order_read"})
-     */
-    private $id;
-
-    /**
-     * @ORM\Column(type="string")
-     * @Groups({"order_read"})
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['order_read'])]
+    private ?int $id = null;
+    #[ORM\Column(type: 'string')]
+    #[Groups(['order_read'])]
     public $name;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Address")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"order_read"})
-     */
-    public $addresses;
+    #[ORM\ManyToMany(targetEntity: Address::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order_read'])]
+    public Collection|iterable $addresses;
 
     public function __construct()
     {
         $this->addresses = new ArrayCollection();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

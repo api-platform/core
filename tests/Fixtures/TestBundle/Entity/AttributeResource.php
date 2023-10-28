@@ -31,7 +31,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
 #[Put]
 #[Delete]
 #[ApiResource(
-    '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
+    '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
     inputFormats: ['json' => ['application/merge-patch+json']],
     status: 301,
     provider: AttributeResourceProvider::class,
@@ -41,32 +41,22 @@ use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
 #[Patch]
 final class AttributeResource
 {
-    #[ApiProperty(identifier: true)]
-    private $identifier;
-
     /**
      * @var ?Dummy
      */
     #[Link('dummyId')]
-    public $dummy = null;
+    public $dummy;
 
-    /**
-     * @var string
-     */
-    public $name;
-
-    public function __construct(int $identifier, string $name)
+    public function __construct(#[ApiProperty(identifier: true)] private int $identifier, public string $name)
     {
-        $this->identifier = $identifier;
-        $this->name = $name;
     }
 
-    public function getIdentifier()
+    public function getIdentifier(): int
     {
         return $this->identifier;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
@@ -26,24 +24,24 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConvert
 use Doctrine\Persistence\ManagerRegistry;
 use MongoDB\BSON\Regex;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @group mongodb
- * @group legacy
  */
 class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use ProphecyTrait;
     use SearchFilterTestTrait;
 
-    protected $filterClass = SearchFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = SearchFilter::class;
+    protected string $resourceClass = Dummy::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
-        $filter = $this->buildSearchFilter($this->managerRegistry);
+        $filter = self::buildSearchFilter($this, $this->managerRegistry);
 
         $this->assertEquals([
             'id' => [
@@ -118,14 +116,14 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
             ],
             'dummyDate' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
             'dummyDate[]' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => true,
@@ -273,12 +271,12 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
-        $filterFactory = [$this, 'buildSearchFilter'];
+        $filterFactory = self::buildSearchFilter(...);
 
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'exact' => [
                     [
@@ -421,6 +419,21 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                     '$in' => [
                                         new Regex('CaSE', 'i'),
                                         new Regex('inSENSitive', 'i'),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                ],
+                'partial (multiple almost same values; case insensitive)' => [
+                    [
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('blue car', 'i'),
+                                        new Regex('Blue Car', 'i'),
                                     ],
                                 ],
                             ],
@@ -740,13 +753,13 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         );
     }
 
-    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)
+    protected static function buildSearchFilter(self $that, ManagerRegistry $managerRegistry, array $properties = null): SearchFilter
     {
-        $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $relatedDummyProphecy = $that->prophesize(RelatedDummy::class);
+        $iriConverterProphecy = $that->prophesize(IriConverterInterface::class);
 
-        $iriConverterProphecy->getItemFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
-            if (false !== strpos($args[0], '/related_dummies')) {
+        $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
+            if (str_contains((string) $args[0], '/related_dummies')) {
                 $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
 
                 return $relatedDummyProphecy->reveal();
@@ -758,9 +771,6 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         $iriConverter = $iriConverterProphecy->reveal();
         $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
-
-        return new SearchFilter($managerRegistry, $iriConverter, $identifierExtractorProphecy->reveal(), $propertyAccessor, null, $properties, new CustomConverter());
+        return new SearchFilter($managerRegistry, $iriConverter, null, $propertyAccessor, null, $properties, new CustomConverter());
     }
 }

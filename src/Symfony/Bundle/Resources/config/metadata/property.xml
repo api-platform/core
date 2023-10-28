@@ -5,6 +5,8 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.xml" />
+        <service id="ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface" alias="api_platform.metadata.property.metadata_factory" />
         <!-- The PropertyInfo decorator must always be the first decorator, it will create the metadata if it doesn't exist -->
         <service id="api_platform.metadata.property.metadata_factory.property_info" class="ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="api_platform.property_info" />
@@ -30,34 +32,15 @@
             <argument type="service" id="api_platform.metadata.property.metadata_factory.default_property.inner" />
         </service>
 
+        <service id="api_platform.metadata.property.metadata_factory.identifier" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="30" class="ApiPlatform\Metadata\Property\Factory\IdentifierPropertyMetadataFactory" public="false">
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.identifier.inner" />
+        </service>
+
         <!-- XML -->
         <service id="api_platform.metadata.property.metadata_factory.xml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" public="false">
             <argument type="service" id="api_platform.metadata.property_extractor.xml" />
         </service>
-
-        <!-- Property metadata used to compute identifiers, we want to avoid using the serializer property metadata factory -->
-        <!-- TODO: in 3.0 the serializer property metadata factory doesn't need the resource metadata anymore so these will be removed -->
-        <service id="api_platform.metadata.property.identifier_metadata_factory" alias="api_platform.metadata.property.identifier_metadata_factory.property_info" />
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.property_info" class="ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory" public="false">
-            <argument type="service" id="api_platform.property_info" />
-        </service>
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.attribute" class="ApiPlatform\Metadata\Property\Factory\AttributePropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" public="false" decoration-priority="20">
-            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.attribute.inner" />
-        </service>
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.xml" decorates="api_platform.metadata.property.identifier_metadata_factory" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" public="false" decoration-priority="10">
-            <argument type="service" id="api_platform.metadata.property_extractor.xml" />
-            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.xml.inner" />
-        </service>
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.legacy_property_metadata" class="ApiPlatform\Metadata\Property\Factory\LegacyPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="1000" public="false">
-            <argument type="service" id="api_platform.metadata.property.metadata_factory.legacy" />
-            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.legacy_property_metadata.inner" />
-        </service>
-
-        <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.xml" />
 
         <!-- Cache -->
         <service id="api_platform.cache.metadata.property" parent="cache.system" public="false">

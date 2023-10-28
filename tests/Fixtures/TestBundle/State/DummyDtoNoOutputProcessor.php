@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\InputDto as InputDtoDocument;
@@ -22,17 +23,14 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class DummyDtoNoOutputProcessor implements ProcessorInterface
 {
-    private $registry;
-
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(private readonly ManagerRegistry $registry)
     {
-        $this->registry = $registry;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = [])
+    public function process(mixed $data, Operation $operation = null, array $uriVariables = [], array $context = [])
     {
         $isOrm = true;
         $em = $this->registry->getManagerForClass(DummyDtoNoOutput::class);
@@ -54,7 +52,7 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports($data, array $identifiers = [], string $operationName = null, array $context = []): bool
     {
         return $data instanceof InputDto || $data instanceof InputDtoDocument;
     }

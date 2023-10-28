@@ -24,10 +24,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
  */
 class DummyCustomQueryNoReadAndSerializeItemResolver implements QueryItemResolverInterface
 {
-    /**
-     * @param DummyCustomQuery|null $item
-     */
-    public function __invoke($item, array $context): DummyCustomQuery
+    public function __invoke(?object $item, array $context): DummyCustomQuery
     {
         if (null !== $item) {
             throw new RuntimeException('Item should be null');

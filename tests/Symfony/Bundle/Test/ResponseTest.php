@@ -55,7 +55,7 @@ class ResponseTest extends TestCase
         $response->getContent();
     }
 
-    public function errorProvider(): iterable
+    public static function errorProvider(): iterable
     {
         yield [ServerException::class, 500];
         yield [ClientException::class, 400];
@@ -68,8 +68,8 @@ class ResponseTest extends TestCase
         $httpFoundationResponse = new HttpFoundationResponse('{"foo": "bar"}', 200, ['content-type' => 'application/ld+json']);
 
         $response = new Response($httpFoundationResponse, $browserKitResponse, []);
-        $this->assertSame(['foo' => 'bar'], $response->toArray());
-        $this->assertSame(['foo' => 'bar'], $response->toArray()); // Trigger the cache
+        $this->assertEquals(['foo' => 'bar'], $response->toArray());
+        $this->assertEquals(['foo' => 'bar'], $response->toArray()); // Trigger the cache
     }
 
     public function testToArrayTransportException(): void

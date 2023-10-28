@@ -17,8 +17,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class UserResetPasswordDto
 {
-    /**
-     * @Assert\Email
-     */
+    #[Assert\Email]
     public $email;
 }

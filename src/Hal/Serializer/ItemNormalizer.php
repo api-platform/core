@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hal\Serializer;
 
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
-use ApiPlatform\Util\ClassInfoTrait;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
@@ -37,39 +35,48 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public const FORMAT = 'jsonhal';
 
-    private $componentsCache = [];
-    private $attributesMetadataCache = [];
+    private array $componentsCache = [];
+    private array $attributesMetadataCache = [];
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
+    }
+
+    public function getSupportedTypes($format): array
+    {
+        return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        if (null !== $this->getOutputClass($this->getObjectClass($object), $context)) {
+        $resourceClass = $this->getObjectClass($object);
+        if ($this->getOutputClass($context)) {
             return parent::normalize($object, $format, $context);
         }
+
+        if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
+        }
+
+        $context = $this->initContext($resourceClass, $context);
+        $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
+
+        $context['iri'] = $iri;
+        $context['api_normalize'] = true;
 
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
-        $context = $this->initContext($resourceClass, $context);
-        $iri = $this->iriConverter->getIriFromItem($object);
-        $context['iri'] = $iri;
-        $context['api_normalize'] = true;
-
         $data = parent::normalize($object, $format, $context);
+
         if (!\is_array($data)) {
             return $data;
         }
@@ -91,7 +98,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
         return self::FORMAT === $format;
@@ -101,10 +108,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * {@inheritdoc}
      *
      * @throws LogicException
-     *
-     * @return mixed
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): never
     {
         throw new LogicException(sprintf('%s is a read-only format.', self::FORMAT));
     }
@@ -119,10 +124,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * Gets HAL components of the resource: states, links and embedded.
-     *
-     * @param object $object
      */
-    private function getComponents($object, ?string $format, array $context): array
+    private function getComponents(object $object, ?string $format, array $context): array
     {
         $cacheKey = $this->getObjectClass($object).'-'.$context['cache_key'];
 
@@ -140,34 +143,60 @@ final class ItemNormalizer extends AbstractItemNormalizer
         ];
 
         foreach ($attributes as $attribute) {
-            /** @var ApiProperty|PropertyMetadata */
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
 
-            // TODO: 3.0 support multiple types, default value of types will be [] instead of null
-            $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
-            $isOne = $isMany = false;
+            $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-            if (null !== $type) {
-                if ($type->isCollection()) {
-                    $valueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
-                    $isMany = null !== $valueType && ($className = $valueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
-                } else {
-                    $className = $type->getClassName();
-                    $isOne = $className && $this->resourceClassResolver->isResourceClass($className);
+            // prevent declaring $attribute as attribute if it's already declared as relationship
+            $isRelationship = false;
+
+            foreach ($types as $type) {
+                $isOne = $isMany = false;
+
+                if (null !== $type) {
+                    if ($type->isCollection()) {
+                        $valueType = $type->getCollectionValueTypes()[0] ?? null;
+                        $isMany = null !== $valueType && ($className = $valueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
+                    } else {
+                        $className = $type->getClassName();
+                        $isOne = $className && $this->resourceClassResolver->isResourceClass($className);
+                    }
                 }
+
+                if (!$isOne && !$isMany) {
+                    // don't declare it as an attribute too quick: maybe the next type is a valid resource
+                    continue;
+                }
+
+                $relation = ['name' => $attribute, 'cardinality' => $isOne ? 'one' : 'many', 'iri' => null, 'operation' => null];
+
+                // if we specify the uriTemplate, generates its value for link definition
+                // @see ApiPlatform\Serializer\AbstractItemNormalizer:getAttributeValue logic for intentional duplicate content
+                if (($className ?? false) && $uriTemplate = $propertyMetadata->getUriTemplate()) {
+                    $childContext = $this->createChildContext($context, $attribute, $format);
+                    unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation'], $childContext['operation_name']);
+
+                    $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
+                        operationName: $uriTemplate,
+                        httpOperation: true
+                    );
+
+                    $relation['iri'] = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
+                    $relation['operation'] = $operation;
+                }
+
+                if ($propertyMetadata->isReadableLink()) {
+                    $components['embedded'][] = $relation;
+                }
+
+                $components['links'][] = $relation;
+                $isRelationship = true;
             }
 
-            if (!$isOne && !$isMany) {
+            // if all types are not relationships, declare it as an attribute
+            if (!$isRelationship) {
                 $components['states'][] = $attribute;
-                continue;
             }
-
-            $relation = ['name' => $attribute, 'cardinality' => $isOne ? 'one' : 'many'];
-            if ($propertyMetadata->isReadableLink()) {
-                $components['embedded'][] = $relation;
-            }
-
-            $components['links'][] = $relation;
         }
 
         if (false !== $context['cache_key']) {
@@ -179,10 +208,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * Populates _links and _embedded keys.
-     *
-     * @param object $object
      */
-    private function populateRelation(array $data, $object, ?string $format, array $context, array $components, string $type): array
+    private function populateRelation(array $data, object $object, ?string $format, array $context, array $components, string $type): array
     {
         $class = $this->getObjectClass($object);
 
@@ -196,14 +223,29 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 continue;
             }
 
-            $attributeValue = $this->getAttributeValue($object, $relation['name'], $format, $context);
-            if (empty($attributeValue)) {
-                continue;
-            }
-
             $relationName = $relation['name'];
             if ($this->nameConverter) {
                 $relationName = $this->nameConverter->normalize($relationName, $class, $format, $context);
+            }
+
+            // if we specify the uriTemplate, then the link takes the uriTemplate defined.
+            if ('links' === $type && $iri = $relation['iri']) {
+                $data[$key][$relationName]['href'] = $iri;
+                continue;
+            }
+
+            $childContext = $this->createChildContext($context, $relationName, $format);
+            unset($childContext['iri'], $childContext['uri_variables'], $childContext['operation'], $childContext['operation_name']);
+
+            if ($operation = $relation['operation']) {
+                $childContext['operation'] = $operation;
+                $childContext['operation_name'] = $operation->getName();
+            }
+
+            $attributeValue = $this->getAttributeValue($object, $relation['name'], $format, $childContext);
+
+            if (empty($attributeValue)) {
+                continue;
             }
 
             if ('one' === $relation['cardinality']) {
@@ -233,11 +275,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets the IRI of the given relation.
      *
-     * @param mixed $rel
-     *
      * @throws UnexpectedValueException
      */
-    private function getRelationIri($rel): string
+    private function getRelationIri(mixed $rel): string
     {
         if (!(\is_array($rel) || \is_string($rel))) {
             throw new UnexpectedValueException('Expected relation to be an IRI or array');
@@ -254,9 +294,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
     {
         if (
-            !($context[self::ENABLE_MAX_DEPTH] ?? false) ||
-            !isset($attributesMetadata[$attribute]) ||
-            null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
+            !($context[self::ENABLE_MAX_DEPTH] ?? false)
+            || !isset($attributesMetadata[$attribute])
+            || null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
         ) {
             return false;
         }
@@ -277,5 +317,3 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return false;
     }
 }
-
-class_alias(ItemNormalizer::class, \ApiPlatform\Core\Hal\Serializer\ItemNormalizer::class);

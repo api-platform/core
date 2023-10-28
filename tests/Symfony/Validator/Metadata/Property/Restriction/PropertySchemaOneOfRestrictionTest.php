@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
@@ -32,7 +32,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaOneOfRestriction;
+    private PropertySchemaOneOfRestriction $propertySchemaOneOfRestriction;
 
     protected function setUp(): void
     {
@@ -50,7 +50,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
         if (!class_exists(AtLeastOneOf::class)) {
             return;
@@ -65,14 +65,10 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
      */
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
-        if (!class_exists(AtLeastOneOf::class)) {
-            self::markTestSkipped();
-        }
-
         self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
     }
 
-    public function createProvider(): \Generator
+    public static function createProvider(): \Generator
     {
         yield 'empty' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), []];
 

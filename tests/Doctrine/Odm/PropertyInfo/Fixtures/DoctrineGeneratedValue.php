@@ -18,20 +18,15 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\Field;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
 
 /**
- * @Document
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
+#[Document]
 class DoctrineGeneratedValue
 {
-    /**
-     * @Id(strategy="INCREMENT", type="int")
-     */
+    #[Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
 
-    /**
-     * @Field
-     */
+    #[Field]
     public $foo;
 }

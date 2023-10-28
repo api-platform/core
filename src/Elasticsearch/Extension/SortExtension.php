@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Extension;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
+use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -32,30 +33,22 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
 {
     use FieldDatatypeTrait;
 
-    private $defaultDirection;
-    private $identifierExtractor;
-    private $resourceMetadataFactory;
-    private $nameConverter;
-
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IdentifierExtractorInterface $identifierExtractor, $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?string $defaultDirection = null)
+    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, private readonly ?NameConverterInterface $nameConverter = null, private readonly ?string $defaultDirection = null)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->identifierExtractor = $identifierExtractor;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->nameConverter = $nameConverter;
-        $this->defaultDirection = $defaultDirection;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(array $requestBody, string $resourceClass, ?string $operationName = null, array $context = []): array
+    public function applyToCollection(array $requestBody, string $resourceClass, Operation $operation = null, array $context = []): array
     {
         $orders = [];
 
         if (
-            null !== ($defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order'))
+            $operation
+            && null !== ($defaultOrder = $operation->getOrder())
             && \is_array($defaultOrder)
         ) {
             foreach ($defaultOrder as $property => $direction) {
@@ -67,9 +60,15 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
                 $orders[] = $this->getOrder($resourceClass, $property, $direction);
             }
         } elseif (null !== $this->defaultDirection) {
+            $property = 'id';
+            if ($operation instanceof HttpOperation) {
+                $uriVariables = $operation->getUriVariables()[0] ?? null;
+                $property = $uriVariables ? $uriVariables->getIdentifiers()[0] ?? 'id' : 'id';
+            }
+
             $orders[] = $this->getOrder(
                 $resourceClass,
-                $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass),
+                $property,
                 $this->defaultDirection
             );
         }
@@ -97,5 +96,3 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
         return [$property => $order];
     }
 }
-
-class_alias(SortExtension::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortExtension::class);

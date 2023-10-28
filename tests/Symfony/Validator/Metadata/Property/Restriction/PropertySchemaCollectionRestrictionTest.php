@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCollectionRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Type;
 
 /**
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>
@@ -38,7 +39,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaCollectionRestriction;
+    private PropertySchemaCollectionRestriction $propertySchemaCollectionRestriction;
 
     protected function setUp(): void
     {
@@ -58,7 +59,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
         yield 'supported' => [new Collection(['fields' => []]), new ApiProperty(), true];
 
@@ -73,7 +74,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));
     }
 
-    public function createProvider(): \Generator
+    public static function createProvider(): \Generator
     {
         yield 'empty' => [new Collection(['fields' => []]), new ApiProperty(), ['type' => 'object', 'properties' => [], 'additionalProperties' => false]];
 
@@ -84,14 +85,14 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             'email' => [
                 new NotNull(),
                 new Length(['min' => 2, 'max' => 255]),
-                new Email(['mode' => Email::VALIDATION_MODE_LOOSE]),
+                new Email(['mode' => Email::VALIDATION_MODE_HTML5]),
             ],
             'phone' => new Optional([
-                new \Symfony\Component\Validator\Constraints\Type(['type' => 'string']),
+                new Type(['type' => 'string']),
                 new Regex(['pattern' => '/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/']),
             ]),
             'age' => new Optional([
-                new \Symfony\Component\Validator\Constraints\Type(['type' => 'int']),
+                new Type(['type' => 'int']),
             ]),
             'social' => new Collection([
                 'fields' => [

@@ -17,33 +17,27 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaContextDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Runner\Version;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
-/**
- * @group legacy
- */
 class ApiTestCaseTest extends ApiTestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testAssertJsonContains(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         self::createClient()->request('GET', '/');
         $this->assertJsonContains(['@context' => '/contexts/Entrypoint']);
     }
 
     public function testAssertJsonContainsWithJsonObjectString(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         self::createClient()->request('GET', '/');
         $this->assertJsonContains(<<<JSON
 {
@@ -55,10 +49,6 @@ JSON
 
     public function testAssertJsonContainsWithJsonScalarString(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$subset must be array or string (JSON array or JSON object)');
 
@@ -124,7 +114,7 @@ JSON
 }
 JSON;
 
-        $res = self::createClient()->request('GET', '/');
+        self::createClient()->request('GET', '/');
         $this->assertMatchesJsonSchema($jsonSchema);
         $this->assertMatchesJsonSchema(json_decode($jsonSchema, true));
     }
@@ -141,12 +131,26 @@ JSON;
         $this->assertMatchesResourceItemJsonSchema(ResourceInterface::class);
     }
 
+    public function testAssertMatchesResourceItemJsonSchemaWithCustomJson(): void
+    {
+        $this->recreateSchema();
+
+        /** @var EntityManagerInterface $manager */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        $jsonSchemaContextDummy = new JsonSchemaContextDummy();
+        $manager->persist($jsonSchemaContextDummy);
+        $manager->flush();
+
+        self::createClient()->request('GET', '/json_schema_context_dummies/1');
+        $this->assertMatchesResourceItemJsonSchema(JsonSchemaContextDummy::class);
+    }
+
     public function testAssertMatchesResourceItemJsonSchemaOutput(): void
     {
         $this->recreateSchema();
 
         /** @var EntityManagerInterface $manager */
-        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager();
+        $manager = static::getContainer()->get('doctrine')->getManager();
         $dummyDtoInputOutput = new DummyDtoInputOutput();
         $dummyDtoInputOutput->str = 'lorem';
         $dummyDtoInputOutput->num = 54;
@@ -156,24 +160,36 @@ JSON;
         $this->assertMatchesResourceItemJsonSchema(DummyDtoInputOutput::class);
     }
 
+    public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithContext(): void
+    {
+        $this->recreateSchema();
+
+        /** @var EntityManagerInterface $manager */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        $user = new User();
+        $user->setFullname('Grégoire');
+        $user->setPlainPassword('password');
+
+        $manager->persist($user);
+        $manager->flush();
+
+        self::createClient()->request('GET', "/users-with-groups/{$user->getId()}");
+        $this->assertMatchesResourceItemJsonSchema(User::class, null, 'jsonld', ['groups' => ['api-test-case-group']]);
+
+        self::createClient()->request('GET', '/users-with-groups');
+        $this->assertMatchesResourceCollectionJsonSchema(User::class, null, 'jsonld', ['groups' => ['api-test-case-group']]);
+    }
+
     // Next tests have been imported from dms/phpunit-arraysubset-asserts, because the original constraint has been deprecated.
 
     public function testAssertArraySubsetPassesStrictConfig(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         $this->expectException(ExpectationFailedException::class);
         $this->assertArraySubset(['bar' => 0], ['bar' => '0'], true);
     }
 
     public function testAssertArraySubsetDoesNothingForValidScenario(): void
     {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-
         $this->assertArraySubset([1, 2], [1, 2, 3]);
     }
 
@@ -190,23 +206,100 @@ JSON;
         ]);
         $this->assertResponseIsSuccessful();
 
-        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container;
+        $container = static::getContainer();
         $resource = 'mongodb' === $container->getParameter('kernel.environment') ? DummyDocument::class : Dummy::class;
         $this->assertMatchesRegularExpression('~^/dummies/\d+~', self::findIriBy($resource, ['name' => 'Kevin']));
         $this->assertNull(self::findIriBy($resource, ['name' => 'not-exist']));
     }
 
-    private function recreateSchema(): void
+    /**
+     * @group mercure
+     */
+    public function testGetMercureMessages(): void
     {
-        self::bootKernel();
+        // debug mode is required to get Mercure TraceableHub
+        $this->recreateSchema(['debug' => true, 'environment' => 'mercure']);
+
+        self::createClient()->request('POST', '/direct_mercures', [
+            'headers' => [
+                'content-type' => 'application/ld+json',
+                'accept' => 'application/ld+json',
+            ],
+            'body' => '{"name": "Hello World!"}',
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, self::getMercureMessages());
+        self::assertMercureUpdateMatchesJsonSchema(
+            update: self::getMercureMessage(),
+            topics: ['http://localhost/direct_mercures/1'],
+            jsonSchema: <<<JSON
+{
+    "\$schema": "https:\/\/json-schema.org\/draft-07\/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "@context": {
+            "readOnly": true,
+            "type": "string",
+            "pattern": "^/contexts/DirectMercure$"
+        },
+        "@id": {
+            "readOnly": true,
+            "type": "string",
+            "pattern": "^/direct_mercures/.+$"
+        },
+        "@type": {
+            "readOnly": true,
+            "type": "string"
+        },
+        "id": {
+            "type": "number"
+        },
+        "name": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "@context",
+        "@id",
+        "@type",
+        "id",
+        "name"
+    ]
+}
+JSON
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testExceptionNormalizer(): void
+    {
+        $this->expectDeprecation('Since api-platform 3.2: The class "ApiPlatform\Problem\Serializer\ErrorNormalizer" is deprecated in favor of using an Error resource. We fallback on "api_platform.serializer.normalizer.item".');
+
+        $response = self::createClient()->request('GET', '/issue5921', [
+            'headers' => [
+                'accept' => 'application/json',
+            ],
+        ]);
+
+        $data = $response->toArray(false);
+        $this->assertArrayHasKey('hello', $data);
+        $this->assertEquals($data['hello'], 'world');
+    }
+
+    private function recreateSchema(array $options = []): void
+    {
+        self::bootKernel($options);
 
         /** @var EntityManagerInterface $manager */
-        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager();
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        /** @var ClassMetadata[] $classes */
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);
 
-        $schemaTool->dropSchema($classes);
-        $schemaTool->createSchema($classes);
+        @$schemaTool->dropSchema($classes);
+        @$schemaTool->createSchema($classes);
     }
 }

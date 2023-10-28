@@ -21,32 +21,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * ProcessorEntity.
- *
- * @ODM\Document
  */
 #[ApiResource]
 #[Get]
 #[Post]
+#[ODM\Document]
 class ProcessorEntity
 {
-    /**
-     * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     * @Assert\NotBlank
-     */
-    private $foo;
+    #[Assert\NotBlank]
+    #[ODM\Field]
+    private ?string $foo = null;
 
-    /**
-     * @return int
-     */
     public function getId(): ?int
     {
         return $this->id;

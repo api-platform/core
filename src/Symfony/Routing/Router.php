@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Routing;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * Symfony router decorator.
  *
- * Kévin Dunglas <dunglas@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Router implements RouterInterface, UrlGeneratorInterface
 {
@@ -35,19 +35,14 @@ final class Router implements RouterInterface, UrlGeneratorInterface
         UrlGeneratorInterface::NET_PATH => RouterInterface::NETWORK_PATH,
     ];
 
-    private $router;
-    private $urlGenerationStrategy;
-
-    public function __construct(RouterInterface $router, int $urlGenerationStrategy = self::ABS_PATH)
+    public function __construct(private readonly RouterInterface $router, private readonly int $urlGenerationStrategy = self::ABS_PATH)
     {
-        $this->router = $router;
-        $this->urlGenerationStrategy = $urlGenerationStrategy;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->router->setContext($context);
     }
@@ -71,18 +66,18 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function match($pathInfo): array
+    public function match(string $pathInfo): array
     {
         $baseContext = $this->router->getContext();
         $baseUrl = $baseContext->getBaseUrl();
-        if ($baseUrl === substr($pathInfo, 0, \strlen($baseUrl))) {
+        if (str_starts_with($pathInfo, $baseUrl)) {
             $pathInfo = substr($pathInfo, \strlen($baseUrl));
         }
 
-        $request = Request::create($pathInfo, 'GET', [], [], [], ['HTTP_HOST' => $baseContext->getHost()]);
+        $request = Request::create($pathInfo, Request::METHOD_GET, [], [], [], ['HTTP_HOST' => $baseContext->getHost()]);
         try {
             $context = (new RequestContext())->fromRequest($request);
-        } catch (RequestExceptionInterface $e) {
+        } catch (RequestExceptionInterface) {
             throw new ResourceNotFoundException('Invalid request context.');
         }
 
@@ -102,10 +97,8 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = [], $referenceType = null): string
+    public function generate(string $name, array $parameters = [], int $referenceType = null): string
     {
         return $this->router->generate($name, $parameters, self::CONST_MAP[$referenceType ?? $this->urlGenerationStrategy]);
     }
 }
-
-class_alias(Router::class, \ApiPlatform\Core\Bridge\Symfony\Routing\Router::class);

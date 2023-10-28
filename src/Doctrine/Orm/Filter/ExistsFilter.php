@@ -17,36 +17,104 @@ use ApiPlatform\Doctrine\Common\Filter\ExistsFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
- * Filters the collection by whether a property value exists or not.
+ * The exists filter allows you to select items based on a nullable field value. It will also check the emptiness of a collection association.
  *
- * For each property passed, if the resource does not have such property or if
- * the value is not one of ( "true" | "false" | "1" | "0" ) the property is ignored.
+ * Syntax: `?exists[property]=<true|false|1|0>`.
  *
- * A query parameter with key but no value is treated as `true`, e.g.:
- * Request: GET /products?exists[brand]
- * Interpretation: filter products which have a brand
+ * <CodeSelector>
+ * ```php
+ * <?php
+ * // api/src/Entity/Book.php
+ * use ApiPlatform\Metadata\ApiFilter;
+ * use ApiPlatform\Metadata\ApiResource;
+ * use ApiPlatform\Doctrine\Orm\Filter\ExistFilter;
+ *
+ * #[ApiResource]
+ * #[ApiFilter(ExistFilter::class, properties: ['comment'])]
+ * class Book
+ * {
+ *     // ...
+ * }
+ * ```
+ *
+ * ```yaml
+ * # config/services.yaml
+ * services:
+ *     book.exist_filter:
+ *         parent: 'api_platform.doctrine.orm.exist_filter'
+ *         arguments: [ { comment: ~ } ]
+ *         tags:  [ 'api_platform.filter' ]
+ *         # The following are mandatory only if a _defaults section is defined with inverted values.
+ *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
+ *         autowire: false
+ *         autoconfigure: false
+ *         public: false
+ *
+ * # api/config/api_platform/resources.yaml
+ * resources:
+ *     App\Entity\Book:
+ *         - operations:
+ *               ApiPlatform\Metadata\GetCollection:
+ *                   filters: ['book.exist_filter']
+ * ```
+ *
+ * ```xml
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <!-- api/config/services.xml -->
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <container
+ *         xmlns="http://symfony.com/schema/dic/services"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="http://symfony.com/schema/dic/services
+ *         https://symfony.com/schema/dic/services/services-1.0.xsd">
+ *     <services>
+ *         <service id="book.exist_filter" parent="api_platform.doctrine.orm.exist_filter">
+ *             <argument type="collection">
+ *                 <argument key="comment"/>
+ *             </argument>
+ *             <tag name="api_platform.filter"/>
+ *         </service>
+ *     </services>
+ * </container>
+ * <!-- api/config/api_platform/resources.xml -->
+ * <resources
+ *         xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+ *         https://api-platform.com/schema/metadata/resources-3.0.xsd">
+ *     <resource class="App\Entity\Book">
+ *         <operations>
+ *             <operation class="ApiPlatform\Metadata\GetCollection">
+ *                 <filters>
+ *                     <filter>book.exist_filter</filter>
+ *                 </filters>
+ *             </operation>
+ *         </operations>
+ *     </resource>
+ * </resources>
+ * ```
+ * </CodeSelector>
+ *
+ * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?exists[comment]=true`.
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
- *
- * @final
  */
-class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInterface
+final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 {
     use ExistsFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, NameConverterInterface $nameConverter = null)
     {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->existsParameterName = $existsParameterName;
     }
@@ -54,42 +122,22 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-        if (!\is_array($context['filters'][$this->existsParameterName] ?? null)) {
-            $context['exists_deprecated_syntax'] = true;
-            parent::apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
-
-            return;
-        }
-
-        foreach ($context['filters'][$this->existsParameterName] as $property => $value) {
-            $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+        foreach ($context['filters'][$this->existsParameterName] ?? [] as $property => $value) {
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/* , array $context = [] */)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-        if (\func_num_args() > 6) {
-            $context = func_get_arg(6);
-        } else {
-            if (__CLASS__ !== static::class) { /** @phpstan-ignore-line The class was not final before */
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a seventh `$context` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.5.', __FUNCTION__), \E_USER_DEPRECATED);
-                }
-            }
-            $context = [];
-        }
-
         if (
-            (($context['exists_deprecated_syntax'] ?? false) && !isset($value[self::QUERY_PARAMETER_KEY])) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true) ||
-            !$this->isNullableField($property, $resourceClass)
+            !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass, true)
+            || !$this->isNullableField($property, $resourceClass)
         ) {
             return;
         }
@@ -104,7 +152,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
 
         $associations = [];
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
         }
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
@@ -192,24 +240,4 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
 
         return true;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function extractProperties(Request $request/* , string $resourceClass */): array
-    {
-        if (!$request->query->has($this->existsParameterName)) {
-            $resourceClass = \func_num_args() > 1 ? (string) func_get_arg(1) : null;
-
-            return parent::extractProperties($request, $resourceClass);
-        }
-
-        @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), \E_USER_DEPRECATED);
-
-        $properties = $request->query->all()[$this->existsParameterName];
-
-        return \is_array($properties) ? $properties : [];
-    }
 }
-
-class_alias(ExistsFilter::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter::class);

@@ -24,25 +24,20 @@ use ApiPlatform\State\ProcessorInterface;
  */
 final class WriteStage implements WriteStageInterface
 {
-    private $processor;
-    private $serializerContextBuilder;
-
-    public function __construct(ProcessorInterface $processor, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(private readonly ProcessorInterface $processor, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
     {
-        $this->processor = $processor;
-        $this->serializerContextBuilder = $serializerContextBuilder;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function __invoke($data, string $resourceClass, Operation $operation, array $context)
+    public function __invoke(?object $data, string $resourceClass, Operation $operation, array $context): ?object
     {
         if (null === $data || !($operation->canWrite() ?? true)) {
             return $data;
         }
 
-        $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation->getName(), $context, false);
+        $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation, $context, false);
 
         return $this->processor->process($data, $operation, [], ['operation' => $operation] + $denormalizationContext);
     }

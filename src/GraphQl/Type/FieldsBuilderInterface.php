@@ -19,6 +19,8 @@ use ApiPlatform\Metadata\GraphQl\Operation;
  * Interface implemented to build GraphQL fields.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated Since API Platform 3.1. Use @see FieldsBuilderEnumInterface instead.
  */
 interface FieldsBuilderInterface
 {
@@ -50,7 +52,7 @@ interface FieldsBuilderInterface
     /**
      * Gets the fields of the type of the given resource.
      */
-    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, ?array $ioMetadata = null): array;
+    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, array $ioMetadata = null): array;
 
     /**
      * Resolve the args of a resource by resolving its types.

@@ -17,31 +17,28 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
-use ArrayIterator;
-use IteratorAggregate;
-use Traversable;
 
 #[ApiResource(
-    '/attribute_resources.{_format}',
+    '/attribute_resources{._format}',
     normalizationContext: ['skip_null_values' => true],
     provider: AttributeResourceProvider::class
 )]
 #[GetCollection]
 #[Post]
-final class AttributeResources implements IteratorAggregate
+final class AttributeResources implements \IteratorAggregate
 {
     /**
      * @var AttributeResource[]
      */
-    private $collection;
+    private array $collection;
 
     public function __construct(AttributeResource ...$collection)
     {
         $this->collection = $collection;
     }
 
-    public function getIterator(): Traversable
+    public function getIterator(): \Traversable
     {
-        return new ArrayIterator($this->collection);
+        return new \ArrayIterator($this->collection);
     }
 }

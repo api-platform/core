@@ -13,50 +13,61 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hydra\Serializer;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\Tests\Fixtures\Foo;
-use ApiPlatform\Tests\Fixtures\NotAResource;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class CollectionNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportsNormalize()
+    /**
+     * @group legacy
+     */
+    public function testSupportsNormalize(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $iriConvert = $this->prophesize(IriConverterInterface::class);
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
-        $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foos');
+        $iriConvert->getIriFromResource('Foo', UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
 
         $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $iriConvert->reveal());
 
-        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT));
-        $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
-        $this->assertFalse($normalizer->supportsNormalization([], 'xml'));
-        $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml'));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
+        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo', 'api_sub_level' => true]));
+        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, []));
+        $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization([], 'xml', ['resource_class' => 'Foo']));
+        $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml', ['resource_class' => 'Foo']));
+        $this->assertEmpty($normalizer->getSupportedTypes('xml'));
+        $this->assertSame([
+            'native-array' => true,
+            '\Traversable' => true,
+        ], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
-    public function testNormalizeResourceCollection()
+    public function testNormalizeResourceCollection(): void
     {
         $fooOne = new Foo();
         $fooOne->id = 1;
@@ -87,7 +98,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
@@ -103,8 +114,7 @@ class CollectionNormalizerTest extends TestCase
         $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
 
         $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'collection_operation_name' => 'get',
-            'operation_type' => OperationType::COLLECTION,
+            'operation_name' => 'get',
             'resource_class' => Foo::class,
         ]);
 
@@ -120,143 +130,7 @@ class CollectionNormalizerTest extends TestCase
         ], $actual);
     }
 
-    public function testNormalizeNonResourceCollection()
-    {
-        $notAResourceA = new NotAResource('A', 'buzz');
-        $notAResourceB = new NotAResource('B', 'bzzt');
-
-        $data = [$notAResourceA, $notAResourceB];
-
-        $normalizedNotAResourceA = [
-            'foo' => 'A',
-            'bar' => 'buzz',
-        ];
-
-        $normalizedNotAResourceB = [
-            'foo' => 'B',
-            'bar' => 'bzzt',
-        ];
-
-        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($data, null)->willThrow(InvalidArgumentException::class);
-
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-
-        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $delegateNormalizerProphecy->normalize($notAResourceA, CollectionNormalizer::FORMAT, Argument::any())->willReturn($normalizedNotAResourceA);
-        $delegateNormalizerProphecy->normalize($notAResourceB, CollectionNormalizer::FORMAT, Argument::any())->willReturn($normalizedNotAResourceB);
-
-        $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
-        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
-
-        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-        ]);
-
-        $this->assertEquals([
-            $normalizedNotAResourceA,
-            $normalizedNotAResourceB,
-        ], $actual);
-    }
-
-    public function testNormalizeSubLevelResourceCollection()
-    {
-        $fooOne = new Foo();
-        $fooOne->id = 1;
-        $fooOne->bar = 'baz';
-
-        $fooThree = new Foo();
-        $fooThree->id = 3;
-        $fooThree->bar = 'bzz';
-
-        $data = [$fooOne, $fooThree];
-
-        $normalizedFooOne = [
-            '@id' => '/foos/1',
-            '@type' => 'Foo',
-            'bar' => 'baz',
-        ];
-
-        $normalizedFooThree = [
-            '@id' => '/foos/3',
-            '@type' => 'Foo',
-            'bar' => 'bzz',
-        ];
-
-        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-
-        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
-            Argument::withEntry('resource_class', Foo::class),
-            Argument::withEntry('api_sub_level', true)
-        ))->willReturn($normalizedFooOne);
-        $delegateNormalizerProphecy->normalize($fooThree, CollectionNormalizer::FORMAT, Argument::allOf(
-            Argument::withEntry('resource_class', Foo::class),
-            Argument::withEntry('api_sub_level', true)
-        ))->willReturn($normalizedFooThree);
-
-        $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
-        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
-
-        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'collection_operation_name' => 'get',
-            'operation_type' => OperationType::COLLECTION,
-            'resource_class' => Foo::class,
-            'api_sub_level' => true,
-        ]);
-
-        $this->assertEquals([
-            $normalizedFooOne,
-            $normalizedFooThree,
-        ], $actual);
-    }
-
-    public function testNormalizeSubLevelNonResourceCollection()
-    {
-        $notAResourceA = new NotAResource('A', 'buzz');
-        $notAResourceB = new NotAResource('B', 'bzzt');
-
-        $data = [$notAResourceA, $notAResourceB];
-
-        $normalizedNotAResourceA = [
-            'foo' => 'A',
-            'bar' => 'buzz',
-        ];
-
-        $normalizedNotAResourceB = [
-            'foo' => 'B',
-            'bar' => 'bzzt',
-        ];
-
-        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-
-        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $delegateNormalizerProphecy->normalize($notAResourceA, CollectionNormalizer::FORMAT, Argument::any())->willReturn($normalizedNotAResourceA);
-        $delegateNormalizerProphecy->normalize($notAResourceB, CollectionNormalizer::FORMAT, Argument::any())->willReturn($normalizedNotAResourceB);
-
-        $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
-        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
-
-        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'api_sub_level' => true,
-        ]);
-
-        $this->assertEquals([
-            $normalizedNotAResourceA,
-            $normalizedNotAResourceB,
-        ], $actual);
-    }
-
-    public function testNormalizePaginator()
+    public function testNormalizePaginator(): void
     {
         $this->assertEquals(
             [
@@ -275,7 +149,7 @@ class CollectionNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizePartialPaginator()
+    public function testNormalizePartialPaginator(): void
     {
         $this->assertEquals(
             [
@@ -293,7 +167,7 @@ class CollectionNormalizerTest extends TestCase
         );
     }
 
-    private function normalizePaginator($partial = false)
+    private function normalizePaginator(bool $partial = false): array
     {
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
         if ($partial) {
@@ -304,10 +178,10 @@ class CollectionNormalizerTest extends TestCase
             $paginatorProphecy->getTotalItems()->willReturn(1312);
         }
 
-        $paginatorProphecy->rewind()->will(function () {});
+        $paginatorProphecy->rewind()->will(function (): void {});
         $paginatorProphecy->valid()->willReturn(true, false);
         $paginatorProphecy->current()->willReturn('foo');
-        $paginatorProphecy->next()->will(function () {});
+        $paginatorProphecy->next()->will(function (): void {});
 
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->willImplement(NormalizerInterface::class);
@@ -316,7 +190,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($paginatorProphecy, 'Foo')->willReturn('Foo');
 
         $iriConvert = $this->prophesize(IriConverterInterface::class);
-        $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foo/1');
+        $iriConvert->getIriFromResource('Foo', UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foo/1');
 
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
@@ -326,6 +200,7 @@ class CollectionNormalizerTest extends TestCase
             'jsonld_has_context' => true,
             'api_sub_level' => true,
             'resource_class' => 'Foo',
+            'api_collection_sub_level' => true,
         ])->willReturn(['name' => 'Kévin', 'friend' => 'Smail']);
 
         $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $iriConvert->reveal());
@@ -355,9 +230,9 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
-        $iriConverterProphecy->getIriFromItem($fooOne)->willReturn('/foos/1');
-        $iriConverterProphecy->getIriFromItem($fooThree)->willReturn('/foos/3');
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+        $iriConverterProphecy->getIriFromResource($fooOne)->willReturn('/foos/1');
+        $iriConverterProphecy->getIriFromResource($fooThree)->willReturn('/foos/3');
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
@@ -365,12 +240,12 @@ class CollectionNormalizerTest extends TestCase
         $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
 
         $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'collection_operation_name' => 'get',
+            'operation_name' => 'get',
             'iri_only' => true,
             'resource_class' => Foo::class,
         ]);
 
-        $this->assertSame([
+        $this->assertEquals([
             '@context' => '/contexts/Foo',
             '@id' => '/foos',
             '@type' => 'hydra:Collection',
@@ -407,9 +282,9 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
-        $iriConverterProphecy->getIriFromItem($fooOne)->willReturn('/foos/1');
-        $iriConverterProphecy->getIriFromItem($fooThree)->willReturn('/foos/3');
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+        $iriConverterProphecy->getIriFromResource($fooOne)->willReturn('/foos/1');
+        $iriConverterProphecy->getIriFromResource($fooThree)->willReturn('/foos/3');
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
@@ -417,13 +292,13 @@ class CollectionNormalizerTest extends TestCase
         $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
 
         $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'collection_operation_name' => 'get',
+            'operation_name' => 'get',
             'iri_only' => true,
             'jsonld_embed_context' => true,
             'resource_class' => Foo::class,
         ]);
 
-        $this->assertSame([
+        $this->assertEquals([
             '@context' => [
                 '@vocab' => 'http://localhost:8080/docs.jsonld#',
                 'hydra' => 'http://www.w3.org/ns/hydra/core#',

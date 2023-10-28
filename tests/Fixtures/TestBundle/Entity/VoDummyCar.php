@@ -13,69 +13,40 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"car_read"}},
- *     "denormalization_context"={"groups"={"car_write"}}
- * })
- * @ORM\Entity
- */
+#[ApiResource(normalizationContext: ['groups' => ['car_read']], denormalizationContext: ['groups' => ['car_write']])]
+#[ORM\Entity]
 class VoDummyCar extends VoDummyVehicle
 {
     /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @Groups({"car_read", "car_write"})
+     * @var Collection<VoDummyInspection>
      */
-    private $mileage;
+    #[ORM\OneToMany(targetEntity: VoDummyInspection::class, mappedBy: 'car', cascade: ['persist'])]
+    #[Groups(['car_read', 'car_write'])]
+    private Collection|iterable $inspections;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column
-     * @Groups({"car_read", "car_write"})
-     */
-    private $bodyType;
-
-    /**
-     * @var VoDummyInspection[]|Collection
-     *
-     * @ORM\OneToMany(targetEntity="VoDummyInspection", mappedBy="car", cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
-     */
-    private $inspections;
-
-    public function __construct(
-        string $make,
-        VoDummyInsuranceCompany $insuranceCompany,
-        array $drivers,
-        int $mileage,
-        string $bodyType = 'coupe'
-    ) {
+    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, #[ORM\Column(type: 'integer')] #[Groups(['car_read', 'car_write'])] private int $mileage, #[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $bodyType = 'coupe')
+    {
         parent::__construct($make, $insuranceCompany, $drivers);
-        $this->mileage = $mileage;
-        $this->bodyType = $bodyType;
         $this->inspections = new ArrayCollection();
     }
 
-    public function getMileage()
+    public function getMileage(): int
     {
         return $this->mileage;
     }
 
-    public function getBodyType()
+    public function getBodyType(): string
     {
         return $this->bodyType;
     }
 
-    public function getInspections()
+    public function getInspections(): Collection|iterable
     {
         return $this->inspections;
     }

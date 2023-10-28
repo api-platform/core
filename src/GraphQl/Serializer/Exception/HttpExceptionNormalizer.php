@@ -28,14 +28,17 @@ final class HttpExceptionNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         /** @var HttpExceptionInterface */
         $httpException = $object->getPrevious();
         $error = FormattedError::createFromException($object);
         $error['message'] = $httpException->getMessage();
         $error['extensions']['status'] = $statusCode = $httpException->getStatusCode();
-        $error['extensions']['category'] = $statusCode < 500 ? 'user' : Error::CATEGORY_INTERNAL;
+        // graphql-php < 15
+        if (\defined(Error::class.'::CATEGORY_INTERNAL')) {
+            $error['extensions']['category'] = $statusCode < 500 ? 'user' : Error::CATEGORY_INTERNAL;
+        }
 
         return $error;
     }
@@ -43,8 +46,15 @@ final class HttpExceptionNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof Error && $data->getPrevious() instanceof HttpExceptionInterface;
+    }
+
+    public function getSupportedTypes($format): array
+    {
+        return [
+            Error::class => false,
+        ];
     }
 }

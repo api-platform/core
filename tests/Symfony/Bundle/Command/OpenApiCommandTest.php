@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\Command;
 
 use ApiPlatform\OpenApi\OpenApi;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -23,15 +24,15 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  *
+ * TODO Remove group legacy in 4.0
+ *
  * @group legacy
  */
 class OpenApiCommandTest extends KernelTestCase
 {
-    /**
-     * @var ApplicationTester
-     */
-    private $tester;
-    private $legacy;
+    use ExpectDeprecationTrait;
+
+    private ApplicationTester $tester;
 
     protected function setUp(): void
     {
@@ -40,30 +41,26 @@ class OpenApiCommandTest extends KernelTestCase
         $application = new Application(static::$kernel);
         $application->setCatchExceptions(false);
         $application->setAutoExit(false);
-
-        $this->legacy = static::$kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
         $this->tester = new ApplicationTester($application);
+
+        $this->handleDeprecations();
     }
 
-    /**
-     * TODO: change this once we support #[Resource].
-     *
-     * @group legacy
-     */
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->tester->run(['command' => 'api:openapi:export']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
-    public function testExecuteWithYaml()
+    public function testExecuteWithYaml(): void
     {
         $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
 
         $result = $this->tester->getDisplay();
+
         $this->assertYaml($result);
-        $operationId = $this->legacy ? 'getDummyCarCollection' : 'api_dummy_cars_get_collection';
+        $operationId = 'api_dummy_cars_get_collection';
 
         $expected = <<<YAML
   /dummy_cars:
@@ -75,7 +72,7 @@ YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
 
-        $operationId = $this->legacy ? 'getDummyCarItem' : 'api_dummy_cars_get_item';
+        $operationId = 'api_dummy_cars_id_get';
         $expected = <<<YAML
   '/dummy_cars/{id}':
     get:
@@ -99,9 +96,17 @@ YAML;
 YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
+
+        $expected = <<<YAML
+      security:
+        -
+          JWT:
+            - CURRENCY_READ
+YAML;
+        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
     }
 
-    public function testWriteToFile()
+    public function testWriteToFile(): void
     {
         /** @var string $tmpFile */
         $tmpFile = tempnam(sys_get_temp_dir(), 'test_write_to_file');
@@ -112,10 +117,7 @@ YAML;
         @unlink($tmpFile);
     }
 
-    /**
-     * @param string $data
-     */
-    private function assertYaml($data)
+    private function assertYaml(string $data): void
     {
         try {
             Yaml::parse($data);
@@ -123,5 +125,13 @@ YAML;
             $this->fail('Is not valid YAML: '.$exception->getMessage());
         }
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * TODO Remove in 4.0.
+     */
+    private function handleDeprecations(): void
+    {
+        $this->expectDeprecation('Since api-platform/core 3.1: The "%s" option is deprecated, use "openapi" instead.');
     }
 }

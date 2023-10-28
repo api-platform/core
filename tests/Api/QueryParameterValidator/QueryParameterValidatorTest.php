@@ -15,10 +15,11 @@ namespace ApiPlatform\Tests\Api\QueryParameterValidator;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -30,8 +31,8 @@ class QueryParameterValidatorTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $testedInstance;
-    private $filterLocatorProphecy;
+    private QueryParameterValidator $testedInstance;
+    private ObjectProphecy $filterLocatorProphecy;
 
     /**
      * {@inheritdoc}
@@ -47,32 +48,33 @@ class QueryParameterValidatorTest extends TestCase
 
     /**
      * unsafe method should not use filter validations.
+     *
+     * @doesNotPerformAssertions
      */
-    public function testOnKernelRequestWithUnsafeMethod()
+    public function testOnKernelRequestWithUnsafeMethod(): void
     {
         $request = [];
 
-        $this->assertNull(
-            $this->testedInstance->validateFilters(Dummy::class, [], $request)
-        );
+        $this->testedInstance->validateFilters(Dummy::class, [], $request);
     }
 
     /**
-     * If the tested filter is non-existant, then nothing should append.
+     * If the tested filter is non-existent, then nothing should append.
+     *
+     * @doesNotPerformAssertions
      */
-    public function testOnKernelRequestWithWrongFilter()
+    public function testOnKernelRequestWithWrongFilter(): void
     {
         $request = [];
 
-        $this->assertNull(
-            $this->testedInstance->validateFilters(Dummy::class, ['some_inexistent_filter'], $request)
-        );
+        $this->filterLocatorProphecy->has('some_inexistent_filter')->willReturn(false);
+        $this->testedInstance->validateFilters(Dummy::class, ['some_inexistent_filter'], $request);
     }
 
     /**
      * if the required parameter is not set, throw an FilterValidationException.
      */
-    public function testOnKernelRequestWithRequiredFilterNotSet()
+    public function testOnKernelRequestWithRequiredFilterNotSet(): void
     {
         $request = [];
 
@@ -102,7 +104,7 @@ class QueryParameterValidatorTest extends TestCase
     /**
      * if the required parameter is set, no exception should be throwned.
      */
-    public function testOnKernelRequestWithRequiredFilter()
+    public function testOnKernelRequestWithRequiredFilter(): void
     {
         $request = ['required' => 'foo'];
 
@@ -124,8 +126,6 @@ class QueryParameterValidatorTest extends TestCase
             ->shouldBeCalled()
             ->willReturn($filterProphecy->reveal());
 
-        $this->assertNull(
-            $this->testedInstance->validateFilters(Dummy::class, ['some_filter'], $request)
-        );
+        $this->testedInstance->validateFilters(Dummy::class, ['some_filter'], $request);
     }
 }

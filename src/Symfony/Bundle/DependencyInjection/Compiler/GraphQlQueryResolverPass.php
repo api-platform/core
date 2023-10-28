@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  *
+ * @deprecated prefer GraphQlResolverPass
+ *
  * @author Lukas Lücke <lukas@luecke.me>
  */
 final class GraphQlQueryResolverPass implements CompilerPassInterface
@@ -29,7 +31,7 @@ final class GraphQlQueryResolverPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->getParameter('api_platform.graphql.enabled')) {
             return;
@@ -45,5 +47,3 @@ final class GraphQlQueryResolverPass implements CompilerPassInterface
         $container->getDefinition('api_platform.graphql.query_resolver_locator')->addArgument($resolvers);
     }
 }
-
-class_alias(GraphQlQueryResolverPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass::class);

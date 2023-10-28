@@ -24,9 +24,7 @@ use GraphQL\Error\Error;
 interface ValidateStageInterface
 {
     /**
-     * @param object $object
-     *
      * @throws Error
      */
-    public function __invoke($object, string $resourceClass, Operation $operation, array $context): void;
+    public function __invoke(object $object, string $resourceClass, Operation $operation, array $context): void;
 }

@@ -92,36 +92,20 @@ final class QueryChecker
     public static function hasOrderByOnFetchJoinedToManyAssociation(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         if (
-            0 === \count($selectParts = $queryBuilder->getDQLPart('select')) ||
-            0 === \count($queryBuilder->getDQLPart('join')) ||
-            0 === \count($orderByParts = $queryBuilder->getDQLPart('orderBy'))
+            0 === \count($queryBuilder->getDQLPart('join'))
+            || 0 === \count($orderByParts = $queryBuilder->getDQLPart('orderBy'))
         ) {
             return false;
         }
 
         $rootAliases = $queryBuilder->getRootAliases();
 
-        $selectAliases = [];
-
-        foreach ($selectParts as $select) {
-            foreach ($select->getParts() as $part) {
-                [$alias] = explode('.', $part);
-
-                $selectAliases[] = $alias;
-            }
-        }
-
-        $selectAliases = array_diff($selectAliases, $rootAliases);
-        if (0 === \count($selectAliases)) {
-            return false;
-        }
-
         $orderByAliases = [];
 
         foreach ($orderByParts as $orderBy) {
             foreach ($orderBy->getParts() as $part) {
-                if (false !== strpos($part, '.')) {
-                    [$alias] = explode('.', $part);
+                if (str_contains((string) $part, '.')) {
+                    [$alias] = explode('.', (string) $part);
 
                     $orderByAliases[] = $alias;
                 }
@@ -133,11 +117,13 @@ final class QueryChecker
             return false;
         }
 
+        $allAliases = $queryBuilder->getAllAliases();
+
         foreach ($orderByAliases as $orderByAlias) {
             $inToManyContext = false;
 
             foreach (QueryBuilderHelper::traverseJoins($orderByAlias, $queryBuilder, $managerRegistry) as $alias => [$metadata, $association]) {
-                if ($inToManyContext && \in_array($alias, $selectAliases, true)) {
+                if ($inToManyContext && \in_array($alias, $allAliases, true)) {
                     return true;
                 }
 
@@ -148,18 +134,6 @@ final class QueryChecker
         }
 
         return false;
-    }
-
-    /**
-     * Determines whether the QueryBuilder has ORDER BY on a column from a fetch joined to-many association.
-     *
-     * @deprecated
-     */
-    public static function hasOrderByOnToManyJoin(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
-    {
-        @trigger_error(sprintf('The use of "%s::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "%1$s::hasOrderByOnFetchJoinedToManyAssociation()" instead.', __CLASS__), \E_USER_DEPRECATED);
-
-        return self::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistry);
     }
 
     /**
@@ -184,7 +158,7 @@ final class QueryChecker
     public static function hasJoinedToManyAssociation(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         if (
-            0 === \count($queryBuilder->getDQLPart('join'))
+            0 === (is_countable($queryBuilder->getDQLPart('join')) ? \count($queryBuilder->getDQLPart('join')) : 0)
         ) {
             return false;
         }
@@ -205,5 +179,3 @@ final class QueryChecker
         return false;
     }
 }
-
-class_alias(QueryChecker::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::class);

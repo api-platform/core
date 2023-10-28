@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} the API Problem spec (RFC 7807).
  *
  * @see https://tools.ietf.org/html/rfc7807
+ * @deprecated this is not used anymore internally and will be removed in 4.0
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -29,7 +30,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     public const TYPE = 'type';
     public const TITLE = 'title';
 
-    private $defaultContext = [
+    private array $defaultContext = [
         self::TYPE => 'https://tools.ietf.org/html/rfc2616#section-10',
         self::TITLE => 'An error occurred',
     ];
@@ -44,7 +45,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         [$messages, $violations] = $this->getMessagesAndViolations($object);
 
@@ -56,5 +57,3 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
         ];
     }
 }
-
-class_alias(ConstraintViolationListNormalizer::class, \ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer::class);

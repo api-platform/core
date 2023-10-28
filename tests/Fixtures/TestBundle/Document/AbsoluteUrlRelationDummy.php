@@ -14,27 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ApiResource(urlGenerationStrategy=UrlGeneratorInterface::ABS_URL)
- * @ODM\Document
- */
+#[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::ABS_URL)]
+#[ODM\Document]
 class AbsoluteUrlRelationDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
-    /**
-     * @ODM\ReferenceMany(targetDocument=AbsoluteUrlDummy::class, mappedBy="absoluteUrlRelationDummy")
-     * @ApiSubresource
-     */
-    public $absoluteUrlDummies;
+    #[ODM\ReferenceMany(targetDocument: AbsoluteUrlDummy::class, mappedBy: 'absoluteUrlRelationDummy')]
+    public Collection|iterable $absoluteUrlDummies;
 
     public function __construct()
     {

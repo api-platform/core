@@ -13,11 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
+use ApiPlatform\Metadata\Error;
 use ApiPlatform\Util\RequestAttributesExtractor;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
-use Symfony\Component\HttpKernel\EventListener\ExceptionListener as LegacyExceptionListener;
 
 /**
  * Handles requests errors.
@@ -27,14 +26,8 @@ use Symfony\Component\HttpKernel\EventListener\ExceptionListener as LegacyExcept
  */
 final class ExceptionListener
 {
-    /**
-     * @var ErrorListener
-     */
-    private $exceptionListener;
-
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false, ErrorListener $errorListener = null)
+    public function __construct(private readonly ErrorListener $errorListener)
     {
-        $this->exceptionListener = $errorListener ? new ErrorListener($controller, $logger, $debug) : new LegacyExceptionListener($controller, $logger, $debug); // @phpstan-ignore-line
     }
 
     public function onKernelException(ExceptionEvent $event): void
@@ -42,14 +35,16 @@ final class ExceptionListener
         $request = $event->getRequest();
         // Normalize exceptions only for routes managed by API Platform
         if (
-            'html' === $request->getRequestFormat('') ||
             !((RequestAttributesExtractor::extractAttributes($request)['respond'] ?? $request->attributes->getBoolean('_api_respond', false)) || $request->attributes->getBoolean('_graphql', false))
         ) {
             return;
         }
 
-        $this->exceptionListener->onKernelException($event);
+        // Don't loop on errors leave it to Symfony as we could not handle this properly
+        if (($operation = $request->attributes->get('_api_operation')) && $operation instanceof Error) {
+            return;
+        }
+
+        $this->errorListener->onKernelException($event);
     }
 }
-
-class_alias(ExceptionListener::class, \ApiPlatform\Core\EventListener\ExceptionListener::class);

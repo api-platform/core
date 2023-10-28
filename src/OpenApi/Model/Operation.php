@@ -17,33 +17,8 @@ final class Operation
 {
     use ExtensionTrait;
 
-    private $tags;
-    private $summary;
-    private $description;
-    private $operationId;
-    private $parameters;
-    private $requestBody;
-    private $responses;
-    private $callbacks;
-    private $deprecated;
-    private $security;
-    private $servers;
-    private $externalDocs;
-
-    public function __construct(string $operationId = null, array $tags = [], array $responses = [], string $summary = '', string $description = '', ExternalDocumentation $externalDocs = null, array $parameters = [], RequestBody $requestBody = null, \ArrayObject $callbacks = null, bool $deprecated = false, ?array $security = null, ?array $servers = null, array $extensionProperties = [])
+    public function __construct(private ?string $operationId = null, private ?array $tags = null, private ?array $responses = null, private ?string $summary = null, private ?string $description = null, private ?ExternalDocumentation $externalDocs = null, private ?array $parameters = null, private ?RequestBody $requestBody = null, private ?\ArrayObject $callbacks = null, private ?bool $deprecated = null, private ?array $security = null, private ?array $servers = null, array $extensionProperties = [])
     {
-        $this->tags = $tags;
-        $this->summary = $summary;
-        $this->description = $description;
-        $this->operationId = $operationId;
-        $this->parameters = $parameters;
-        $this->requestBody = $requestBody;
-        $this->responses = $responses;
-        $this->callbacks = $callbacks;
-        $this->deprecated = $deprecated;
-        $this->security = $security;
-        $this->servers = $servers;
-        $this->externalDocs = $externalDocs;
         $this->extensionProperties = $extensionProperties;
     }
 
@@ -54,27 +29,27 @@ final class Operation
         return $this;
     }
 
-    public function getOperationId(): string
+    public function getOperationId(): ?string
     {
         return $this->operationId;
     }
 
-    public function getTags(): array
+    public function getTags(): ?array
     {
         return $this->tags;
     }
 
-    public function getResponses(): array
+    public function getResponses(): ?array
     {
         return $this->responses;
     }
 
-    public function getSummary(): string
+    public function getSummary(): ?string
     {
         return $this->summary;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -84,7 +59,7 @@ final class Operation
         return $this->externalDocs;
     }
 
-    public function getParameters(): array
+    public function getParameters(): ?array
     {
         return $this->parameters;
     }
@@ -99,7 +74,7 @@ final class Operation
         return $this->callbacks;
     }
 
-    public function getDeprecated(): bool
+    public function getDeprecated(): ?bool
     {
         return $this->deprecated;
     }
@@ -138,6 +113,17 @@ final class Operation
         return $clone;
     }
 
+    public function withResponse(int|string $status, Response $response): self
+    {
+        $clone = clone $this;
+        if (!\is_array($clone->responses)) {
+            $clone->responses = [];
+        }
+        $clone->responses[(string) $status] = $response;
+
+        return $clone;
+    }
+
     public function withSummary(string $summary): self
     {
         $clone = clone $this;
@@ -170,7 +156,18 @@ final class Operation
         return $clone;
     }
 
-    public function withRequestBody(?RequestBody $requestBody = null): self
+    public function withParameter(Parameter $parameter): self
+    {
+        $clone = clone $this;
+        if (!\is_array($clone->parameters)) {
+            $clone->parameters = [];
+        }
+        $clone->parameters[] = $parameter;
+
+        return $clone;
+    }
+
+    public function withRequestBody(RequestBody $requestBody = null): self
     {
         $clone = clone $this;
         $clone->requestBody = $requestBody;
@@ -194,7 +191,7 @@ final class Operation
         return $clone;
     }
 
-    public function withSecurity(?array $security = null): self
+    public function withSecurity(array $security = null): self
     {
         $clone = clone $this;
         $clone->security = $security;
@@ -202,7 +199,7 @@ final class Operation
         return $clone;
     }
 
-    public function withServers(?array $servers = null): self
+    public function withServers(array $servers = null): self
     {
         $clone = clone $this;
         $clone->servers = $servers;
@@ -210,5 +207,3 @@ final class Operation
         return $clone;
     }
 }
-
-class_alias(Operation::class, \ApiPlatform\Core\OpenApi\Model\Operation::class);

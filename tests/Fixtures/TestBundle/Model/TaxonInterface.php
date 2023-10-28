@@ -13,38 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ApiResource(
- *     attributes={"identifiers"="code"},
- *     shortName="Taxon",
- *     normalizationContext={
- *         "groups"={"taxon_read"},
- *     },
- *     denormalizationContext={
- *         "groups"={"taxon_write"},
- *     },
- * )
- */
+#[ApiResource(shortName: 'Taxon', uriVariables: 'code', normalizationContext: ['groups' => ['taxon_read']], denormalizationContext: ['groups' => ['taxon_write']])]
 interface TaxonInterface
 {
     public function getId();
 
-    /**
-     * @ApiProperty(identifier=true)
-     *
-     * @Groups({"product_read", "taxon_read"})
-     *
-     * @Assert\NotBlank
-     */
+    #[ApiProperty(identifier: true)]
+    #[Groups(['product_read', 'taxon_read'])]
+    #[Assert\NotBlank]
     public function getCode(): ?string;
 
-    /**
-     * @Groups({"taxon_write"})
-     */
+    #[Groups(['taxon_write'])]
     public function setCode(?string $code): void;
 }

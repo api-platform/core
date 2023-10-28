@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Metadata\Resource;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
-use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmResourceCollectionMetadataFactory;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
@@ -31,6 +28,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
 {
@@ -51,7 +49,7 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
         return $resourceMetadataCollectionFactory->reveal();
     }
 
-    public function testWithoutManager()
+    public function testWithoutManager(): void
     {
         $operation = (new Get())->withClass(Dummy::class)->withName('get');
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
@@ -67,26 +65,26 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
     /**
      * @dataProvider operationProvider
      */
-    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null)
+    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null): void
     {
         $objectManager = $this->prophesize(EntityManagerInterface::class);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
         $managerRegistry->getManagerForClass($operation->getClass())->willReturn($objectManager->reveal());
         $resourceMetadataCollectionFactory = new DoctrineOrmResourceCollectionMetadataFactory($managerRegistry->reveal(), $this->getResourceMetadataCollectionFactory($operation));
         $resourceMetadataCollection = $resourceMetadataCollectionFactory->create($operation->getClass());
-        $this->assertEquals($expectedProvider, $resourceMetadataCollection->getOperation($operation->getName())->getProvider());
-        $this->assertEquals($expectedProvider, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProvider());
-        $this->assertEquals($expectedProcessor, $resourceMetadataCollection->getOperation($operation->getName())->getProcessor());
-        $this->assertEquals($expectedProcessor, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProcessor());
+        $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation($operation->getName())->getProvider());
+        $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProvider());
+        $this->assertSame($expectedProcessor, $resourceMetadataCollection->getOperation($operation->getName())->getProcessor());
+        $this->assertSame($expectedProcessor, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProcessor());
     }
 
-    public function operationProvider(): iterable
+    public static function operationProvider(): iterable
     {
         $default = (new Get())->withName('get')->withClass(Dummy::class);
 
         yield [(new Get())->withProvider('has a provider')->withProcessor('and a processor')->withOperation($default), 'has a provider', 'and a processor'];
-        yield [(new Get())->withOperation($default), ItemProvider::class, PersistProcessor::class];
-        yield [(new GetCollection())->withOperation($default), CollectionProvider::class, PersistProcessor::class];
-        yield [(new Delete())->withOperation($default), ItemProvider::class, RemoveProcessor::class];
+        yield [(new Get())->withOperation($default), ItemProvider::class, 'api_platform.doctrine.orm.state.persist_processor'];
+        yield [(new GetCollection())->withOperation($default), CollectionProvider::class, 'api_platform.doctrine.orm.state.persist_processor'];
+        yield [(new Delete())->withOperation($default), ItemProvider::class, 'api_platform.doctrine.orm.state.remove_processor'];
     }
 }

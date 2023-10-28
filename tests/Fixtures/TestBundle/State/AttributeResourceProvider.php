@@ -21,14 +21,14 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 class AttributeResourceProvider implements ProviderInterface
 {
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): AttributeResources|AttributeResource
     {
         if (isset($uriVariables['identifier'])) {
-            $resource = new AttributeResource($uriVariables['identifier'], 'Foo');
+            $resource = new AttributeResource((int) $uriVariables['identifier'], 'Foo');
 
             if ($uriVariables['dummyId'] ?? false) {
                 $resource->dummy = new Dummy();
-                $resource->dummy->setId($uriVariables['dummyId']);
+                $resource->dummy->setId((int) $uriVariables['dummyId']);
             }
 
             return $resource;

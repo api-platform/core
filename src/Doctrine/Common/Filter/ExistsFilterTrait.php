@@ -30,7 +30,7 @@ trait ExistsFilterTrait
     /**
      * @var string Keyword used to retrieve the value
      */
-    private $existsParameterName;
+    private readonly string $existsParameterName;
 
     /**
      * {@inheritdoc}
@@ -68,18 +68,10 @@ trait ExistsFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName(string $property): string;
 
     private function normalizeValue($value, string $property): ?bool
     {
-        if (\is_array($value) && isset($value[self::QUERY_PARAMETER_KEY])) {
-            @trigger_error(
-                sprintf('The ExistsFilter syntax "%s[exists]=true/false" is deprecated since 2.5. Use the syntax "%s[%s]=true/false" instead.', $property, $this->existsParameterName, $property),
-                \E_USER_DEPRECATED
-            );
-            $value = $value[self::QUERY_PARAMETER_KEY];
-        }
-
         if (\in_array($value, [true, 'true', '1', '', null], true)) {
             return true;
         }
@@ -100,5 +92,3 @@ trait ExistsFilterTrait
         return null;
     }
 }
-
-class_alias(ExistsFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class);

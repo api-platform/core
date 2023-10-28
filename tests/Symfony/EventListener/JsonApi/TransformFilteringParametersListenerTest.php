@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\EventListener\JsonApi;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\EventListener\JsonApi\TransformFilteringParametersListener;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -26,14 +26,14 @@ class TransformFilteringParametersListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $listener;
+    private TransformFilteringParametersListener $listener;
 
     protected function setUp(): void
     {
         $this->listener = new TransformFilteringParametersListener();
     }
 
-    public function testOnKernelRequestWithInvalidFormat()
+    public function testOnKernelRequestWithInvalidFormat(): void
     {
         $expectedRequest = new Request();
         $expectedRequest->setRequestFormat('badformat');
@@ -48,7 +48,7 @@ class TransformFilteringParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidFilter()
+    public function testOnKernelRequestWithInvalidFilter(): void
     {
         $eventProphecy = $this->prophesize(RequestEvent::class);
 
@@ -70,7 +70,7 @@ class TransformFilteringParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $request = new Request(['filter' => ['foo' => 'bar', 'baz' => 'qux']]);
         $request->setRequestFormat('jsonapi');

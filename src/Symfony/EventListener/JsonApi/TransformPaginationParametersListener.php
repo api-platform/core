@@ -27,21 +27,20 @@ final class TransformPaginationParametersListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+        if (($operation = $request->attributes->get('_api_operation')) && 'api_platform.symfony.main_controller' === $operation->getController()) {
+            return;
+        }
+
         $pageParameter = $request->query->all()['page'] ?? null;
 
         if (
-            !\is_array($pageParameter) ||
-            'jsonapi' !== $request->getRequestFormat()
+            !\is_array($pageParameter)
+            || 'jsonapi' !== $request->getRequestFormat()
         ) {
             return;
         }
 
         $filters = $request->attributes->get('_api_filters', []);
         $request->attributes->set('_api_filters', array_merge($pageParameter, $filters));
-
-        /* @TODO remove the `_api_pagination` attribute in 3.0 (@meyerbaptiste) */
-        $request->attributes->set('_api_pagination', $pageParameter);
     }
 }
-
-class_alias(TransformPaginationParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener::class);

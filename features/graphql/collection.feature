@@ -1,4 +1,5 @@
 Feature: GraphQL collection support
+
   @createSchema
   Scenario: Retrieve a collection through a GraphQL query
     Given there are 4 dummy objects with relatedDummy and its thirdLevel
@@ -88,6 +89,36 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges[2].node.name" should be equal to "Dummy #3"
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges[1].node.name" should be equal to "RelatedDummy23"
+
+  @createSchema
+  Scenario: Retrieve a collection with a nested collection (inverse side) through a GraphQL query
+    Given there is a video game with music groups
+    When I send the following GraphQL request:
+    """
+    {
+      musicGroups {
+        edges {
+          node {
+            name
+            videoGames {
+              edges {
+                node {
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.musicGroups.edges[0].node.name" should be equal to "Sum 41"
+    And the JSON node "data.musicGroups.edges[0].node.videoGames.edges[0].node.name" should be equal to "Guitar Hero"
+    And the JSON node "data.musicGroups.edges[1].node.name" should be equal to "Franz Ferdinand"
+    And the JSON node "data.musicGroups.edges[1].node.videoGames.edges[0].node.name" should be equal to "Guitar Hero"
 
   @createSchema
   Scenario: Retrieve a collection and an item through a GraphQL query
@@ -909,3 +940,49 @@ Feature: GraphQL collection support
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON node "data.fooDummies.collection" should have 1 element
+
+  @createSchema
+  Scenario: Retrieve paginated collections using mixed pagination
+    Given there are 5 fooDummy objects with fake names
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 1) {
+        collection {
+          id
+          name
+          soManies(first: 2) {
+            edges {
+              node {
+                content
+              }
+              cursor
+            }
+            pageInfo {
+              startCursor
+              endCursor
+              hasNextPage
+              hasPreviousPage
+            }
+          }
+        }
+        paginationInfo {
+          itemsPerPage
+          lastPage
+          totalCount
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 3 elements
+    And the JSON node "data.fooDummies.collection[2].id" should exist
+    And the JSON node "data.fooDummies.collection[2].name" should exist
+    And the JSON node "data.fooDummies.collection[2].soManies" should exist
+    And the JSON node "data.fooDummies.collection[2].soManies.edges" should have 2 elements
+    And the JSON node "data.fooDummies.collection[2].soManies.edges[1].node.content" should be equal to "So many 1"
+    And the JSON node "data.fooDummies.collection[2].soManies.pageInfo.startCursor" should be equal to "MA=="
+    And the JSON node "data.fooDummies.paginationInfo.itemsPerPage" should be equal to the number 3
+    And the JSON node "data.fooDummies.paginationInfo.lastPage" should be equal to the number 2
+    And the JSON node "data.fooDummies.paginationInfo.totalCount" should be equal to the number 5

@@ -13,36 +13,32 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom Writable Identifier Dummy.
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource(extraProperties: ['standard_put' => false])]
+#[ORM\Entity]
 class CustomWritableIdentifierDummy
 {
     /**
      * @var string The special identifier
-     *
-     * @ORM\Column(name="slug", type="string", length=30)
-     * @ORM\Id
      */
-    private $slug;
-
+    #[ORM\Column(name: 'slug', type: 'string', length: 30)]
+    #[ORM\Id]
+    private string $slug;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(name="name", type="string", length=30)
      */
-    private $name;
+    #[ORM\Column(name: 'name', type: 'string', length: 30)]
+    private string $name;
 
     /**
      * @param string $slug
      */
-    public function setSlug($slug)
+    public function setSlug($slug): void
     {
         $this->slug = $slug;
     }
@@ -60,7 +56,7 @@ class CustomWritableIdentifierDummy
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

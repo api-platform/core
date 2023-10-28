@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\LessThan;
@@ -30,7 +30,7 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaLessThanRestriction;
+    private PropertySchemaLessThanRestriction $propertySchemaLessThanRestriction;
 
     protected function setUp(): void
     {
@@ -45,8 +45,9 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaLessThanRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
+        yield 'supported int/float with union types' => [new LessThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT)]), true];
         yield 'supported int' => [new LessThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), true];
         yield 'supported float' => [new LessThan(['value' => 10.99]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_FLOAT)]), true];
         yield 'supported negative' => [new Negative(), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), true];
@@ -56,7 +57,7 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
 
     public function testCreate(): void
     {
-        self::assertSame([
+        self::assertEquals([
             'maximum' => 10,
             'exclusiveMaximum' => true,
         ], $this->propertySchemaLessThanRestriction->create(new LessThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));

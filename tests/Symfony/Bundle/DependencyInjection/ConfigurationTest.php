@@ -18,6 +18,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -32,15 +33,11 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  */
 class ConfigurationTest extends TestCase
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    use ExpectDeprecationTrait;
 
-    /**
-     * @var Processor
-     */
-    private $processor;
+    private Configuration $configuration;
+
+    private Processor $processor;
 
     protected function setUp(): void
     {
@@ -48,7 +45,7 @@ class ConfigurationTest extends TestCase
         $this->processor = new Processor();
     }
 
-    public function testDefaultConfig()
+    public function testDefaultConfig(): void
     {
         $this->runDefaultConfigTests();
     }
@@ -56,12 +53,12 @@ class ConfigurationTest extends TestCase
     /**
      * @group mongodb
      */
-    public function testDefaultConfigWithMongoDbOdm()
+    public function testDefaultConfigWithMongoDbOdm(): void
     {
         $this->runDefaultConfigTests(['orm', 'odm']);
     }
 
-    private function runDefaultConfigTests(array $doctrineIntegrationsToLoad = ['orm'])
+    private function runDefaultConfigTests(array $doctrineIntegrationsToLoad = ['orm']): void
     {
         $treeBuilder = $this->configuration->getConfigTreeBuilder();
         $config = $this->processor->processConfiguration($this->configuration, [
@@ -83,15 +80,19 @@ class ConfigurationTest extends TestCase
         $this->assertEquals([
             'title' => 'title',
             'description' => 'description',
-            'metadata_backward_compatibility_layer' => true,
             'version' => '1.0.0',
             'show_webby' => true,
-            'formats' => [
-                'jsonld' => ['mime_types' => ['application/ld+json']],
+            'formats' => [],
+            'docs_formats' => [
+                'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
+                'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']],
                 'json' => ['mime_types' => ['application/json']],
+                'jsonld' => ['mime_types' => ['application/ld+json']],
                 'html' => ['mime_types' => ['text/html']],
             ],
-            'patch_formats' => [],
+            'patch_formats' => [
+                'json' => ['mime_types' => ['application/merge-patch+json']],
+            ],
             'error_formats' => [
                 'jsonproblem' => ['mime_types' => ['application/problem+json']],
                 'jsonld' => ['mime_types' => ['application/ld+json']],
@@ -102,15 +103,12 @@ class ConfigurationTest extends TestCase
                 FilterValidationException::class => Response::HTTP_BAD_REQUEST,
                 OptimisticLockException::class => Response::HTTP_CONFLICT,
             ],
-            'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
-            'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
+            'path_segment_name_generator' => 'api_platform.metadata.path_segment_name_generator.underscore',
             'validator' => [
                 'serialize_payload_fields' => [],
                 'query_parameter_validation' => true,
             ],
             'name_converter' => null,
-            'enable_fos_user' => false,
-            'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
             'enable_entrypoint' => true,
@@ -124,6 +122,9 @@ class ConfigurationTest extends TestCase
                     'enabled' => true,
                 ],
                 'graphiql' => [
+                    'enabled' => true,
+                ],
+                'introspection' => [
                     'enabled' => true,
                 ],
                 'nesting_separator' => '_',
@@ -151,7 +152,7 @@ class ConfigurationTest extends TestCase
                 'pkce' => false,
             ],
             'swagger' => [
-                'versions' => [2, 3],
+                'versions' => [3],
                 'api_keys' => [],
                 'swagger_ui_extra_configuration' => [],
             ],
@@ -168,16 +169,10 @@ class ConfigurationTest extends TestCase
                 'order_nulls_comparison' => null,
                 'pagination' => [
                     'enabled' => true,
-                    'partial' => false,
-                    'client_enabled' => false,
-                    'client_items_per_page' => false,
-                    'client_partial' => false,
-                    'items_per_page' => 30,
                     'page_parameter_name' => 'page',
                     'enabled_parameter_name' => 'pagination',
                     'items_per_page_parameter_name' => 'itemsPerPage',
                     'partial_parameter_name' => 'partial',
-                    'maximum_items_per_page' => null,
                 ],
             ],
             'mapping' => [
@@ -191,11 +186,9 @@ class ConfigurationTest extends TestCase
                     'max_header_length' => 7500,
                     'purger' => 'api_platform.http_cache.purger.varnish',
                     'xkey' => ['glue' => ' '],
+                    'urls' => [],
+                    'scoped_clients' => [],
                 ],
-                'etag' => true,
-                'max_age' => null,
-                'shared_max_age' => null,
-                'vary' => ['Accept'],
                 'public' => null,
             ],
             'doctrine' => [
@@ -210,8 +203,8 @@ class ConfigurationTest extends TestCase
             'mercure' => [
                 'enabled' => true,
                 'hub_url' => null,
+                'include_type' => false,
             ],
-            'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
             'asset_package' => null,
             'openapi' => [
@@ -225,52 +218,17 @@ class ConfigurationTest extends TestCase
                     'name' => null,
                     'url' => null,
                 ],
-                'backward_compatibility_layer' => true,
                 'swagger_ui_extra_configuration' => [],
             ],
             'maker' => [
                 'enabled' => true,
             ],
+            'keep_legacy_inflector' => true,
+            'event_listeners_backward_compatibility_layer' => true,
         ], $config);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR").
-     */
-    public function testLegacyExceptionToStatusConfig()
-    {
-        $config = $this->processor->processConfiguration($this->configuration, [
-            'api_platform' => [
-                'exception_to_status' => [
-                    \InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                    \RuntimeException::class => 'HTTP_INTERNAL_SERVER_ERROR',
-                ],
-            ],
-        ]);
-
-        $this->assertTrue(isset($config['exception_to_status']));
-        $this->assertSame([
-            \InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-            \RuntimeException::class => Response::HTTP_INTERNAL_SERVER_ERROR,
-        ], $config['exception_to_status']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyDefaultOperationPathResolver()
-    {
-        $config = $this->processor->processConfiguration($this->configuration, [
-            'api_platform' => [
-                'default_operation_path_resolver' => 'api_platform.operation_path_resolver.dash',
-            ],
-        ]);
-
-        $this->assertTrue(isset($config['default_operation_path_resolver']));
-    }
-
-    public function invalidHttpStatusCodeProvider()
+    public static function invalidHttpStatusCodeProvider(): array
     {
         return [
             [0],
@@ -282,10 +240,8 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeProvider
-     *
-     * @param mixed $invalidHttpStatusCode
      */
-    public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode)
+    public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches('/The HTTP status code ".+" is not valid\\./');
@@ -299,7 +255,7 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
-    public function invalidHttpStatusCodeValueProvider()
+    public static function invalidHttpStatusCodeValueProvider(): array
     {
         return [
             [true],
@@ -313,10 +269,8 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeValueProvider
-     *
-     * @param mixed $invalidHttpStatusCodeValue
      */
-    public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue)
+    public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue): void
     {
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessageMatches('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected "?int"?, but got .+\\./');
@@ -333,7 +287,27 @@ class ConfigurationTest extends TestCase
     /**
      * Test config for api keys.
      */
-    public function testApiKeysConfig()
+    public function testInvalidApiKeysConfig(): void
+    {
+        $this->expectExceptionMessage('The api keys "key" is not valid according to the pattern enforced by OpenAPI 3.1 ^[a-zA-Z0-9._-]+$.');
+        $exampleConfig = [
+            'name' => 'Authorization',
+            'type' => 'query',
+        ];
+
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'swagger' => [
+                    'api_keys' => ['Some Authorization name, like JWT' => $exampleConfig, 'Another-Auth' => $exampleConfig],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Test config for api keys.
+     */
+    public function testApiKeysConfig(): void
     {
         $exampleConfig = [
             'name' => 'Authorization',
@@ -343,19 +317,19 @@ class ConfigurationTest extends TestCase
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'api_keys' => [$exampleConfig],
+                    'api_keys' => ['authorization_name_like_JWT' => $exampleConfig],
                 ],
             ],
         ]);
 
         $this->assertArrayHasKey('api_keys', $config['swagger']);
-        $this->assertSame($exampleConfig, $config['swagger']['api_keys'][0]);
+        $this->assertSame($exampleConfig, $config['swagger']['api_keys']['authorization_name_like_JWT']);
     }
 
     /**
      * Test config for disabled swagger versions.
      */
-    public function testDisabledSwaggerVersionConfig()
+    public function testDisabledSwaggerVersionConfig(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -373,7 +347,7 @@ class ConfigurationTest extends TestCase
     /**
      * Test config for swagger versions.
      */
-    public function testSwaggerVersionConfig()
+    public function testSwaggerVersionConfig(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -384,18 +358,7 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertArrayHasKey('versions', $config['swagger']);
-        $this->assertSame([3], $config['swagger']['versions']);
-
-        $config = $this->processor->processConfiguration($this->configuration, [
-            'api_platform' => [
-                'swagger' => [
-                    'versions' => 2,
-                ],
-            ],
-        ]);
-
-        $this->assertArrayHasKey('versions', $config['swagger']);
-        $this->assertSame([2], $config['swagger']['versions']);
+        $this->assertEquals([3], $config['swagger']['versions']);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches('/Only the versions .+ are supported. Got .+./');
@@ -412,7 +375,7 @@ class ConfigurationTest extends TestCase
     /**
      * Test config for empty title and description.
      */
-    public function testEmptyTitleDescriptionConfig()
+    public function testEmptyTitleDescriptionConfig(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [],
@@ -422,10 +385,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame('', $config['description']);
     }
 
-    /**
-     * @requires PHP >= 7.4
-     */
-    public function testEnableElasticsearch()
+    public function testEnableElasticsearch(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [

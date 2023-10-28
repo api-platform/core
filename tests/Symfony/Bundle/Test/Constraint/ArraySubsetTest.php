@@ -18,8 +18,6 @@ use ApiPlatform\Tests\Fixtures\ArrayAccessible;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\SelfDescribing;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Runner\Version;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * Imported from dms/phpunit-arraysubset-asserts, because the original constraint has been deprecated.
@@ -31,16 +29,6 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  */
 class ArraySubsetTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (version_compare(Version::id(), '8.0.0', '<')) {
-            $this->markTestSkipped('Requires PHPUnit 8');
-        }
-    }
-
-    /**
-     * @return mixed[]
-     */
     public static function evaluateDataProvider(): array
     {
         return [
@@ -72,15 +60,9 @@ class ArraySubsetTest extends TestCase
     }
 
     /**
-     * @param array|\Traversable|mixed[] $subset
-     * @param array|\Traversable|mixed[] $other
-     * @param bool                       $strict
-     *
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(bool $expected, $subset, $other, $strict): void
+    public function testEvaluate(bool $expected, iterable $subset, iterable $other, bool $strict): void
     {
         $constraint = new ArraySubset($subset, $strict);
 

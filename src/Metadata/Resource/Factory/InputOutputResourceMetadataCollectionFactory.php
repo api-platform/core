@@ -22,15 +22,11 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  * Transforms the given input/output metadata to a normalized one.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @experimental
  */
 final class InputOutputResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $decorated;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated)
     {
-        $this->decorated = $decorated;
     }
 
     /**
@@ -58,12 +54,7 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
         return $resourceMetadataCollection;
     }
 
-    /**
-     * @param Operations|array $operations
-     *
-     * @return Operations|array
-     */
-    private function getTransformedOperations($operations, ApiResource $resourceMetadata)
+    private function getTransformedOperations(Operations|array $operations, ApiResource $resourceMetadata): Operations|array
     {
         foreach ($operations as $key => $operation) {
             $operation = $operation->withInput(null !== $operation->getInput() ? $this->transformInputOutput($operation->getInput()) : $resourceMetadata->getInput());
@@ -93,7 +84,7 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
         return $operations;
     }
 
-    private function transformInputOutput($attribute): ?array
+    private function transformInputOutput(mixed $attribute): ?array
     {
         if (false === $attribute) {
             return ['class' => null];

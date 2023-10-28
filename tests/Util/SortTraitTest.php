@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SortTraitTest extends TestCase
 {
-    private function getSortTraitImplementation()
+    private function getSortTraitImplementation(): object
     {
         return new class() {
             use SortTrait {
@@ -45,7 +45,7 @@ class SortTraitTest extends TestCase
 
         $sortTrait->arrayRecursiveSort($array, 'sort');
 
-        $this->assertSame([
+        $this->assertEquals([
             'first',
             'second',
             [

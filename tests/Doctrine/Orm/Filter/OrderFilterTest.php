@@ -20,7 +20,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Théo FIDRY <theo.fidry@gmail.com>
@@ -30,9 +29,9 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
 {
     use OrderFilterTestTrait;
 
-    protected $filterClass = OrderFilter::class;
+    protected string $filterClass = OrderFilter::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -295,17 +294,13 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription(EmbeddedDummy::class));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
-        $orderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): OrderFilter {
-            return new OrderFilter($managerRegistry, $requestStack, 'order', null, $properties);
-        };
-        $customOrderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): OrderFilter {
-            return new OrderFilter($managerRegistry, $requestStack, 'customOrder', null, $properties);
-        };
+        $orderFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'order', null, $properties);
+        $customOrderFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'customOrder', null, $properties);
 
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'valid values' => [
                     sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name DESC', Dummy::class),
@@ -419,12 +414,17 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
                     $orderFilterFactory,
                     EmbeddedDummy::class,
                 ],
+                'nullable field in relation will be a LEFT JOIN' => [
+                    sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_a1 ORDER BY relatedDummy_a1.name ASC', Dummy::class),
+                    null,
+                    $orderFilterFactory,
+                ],
             ]
         );
     }
 
-    protected function buildFilter(?array $properties = null)
+    protected function buildFilter(array $properties = null)
     {
-        return new $this->filterClass($this->managerRegistry, null, 'order', null, $properties, new CustomConverter());
+        return new $this->filterClass($this->managerRegistry, 'order', null, $properties, new CustomConverter());
     }
 }

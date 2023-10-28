@@ -29,7 +29,7 @@ final class GraphQlTypePass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->getParameter('api_platform.graphql.enabled')) {
             return;
@@ -46,5 +46,3 @@ final class GraphQlTypePass implements CompilerPassInterface
         $container->getDefinition('api_platform.graphql.types_factory')->addArgument(array_keys($types));
     }
 }
-
-class_alias(GraphQlTypePass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass::class);

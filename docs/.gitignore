@@ -1,0 +1,16 @@
+pages/guide/**/*.mdx
+pages/reference/**/*.mdx
+pages/tutorial/**/*.mdx
+pages/core
+pages/create-client
+pages/deployment
+pages/distribution
+pages/extra
+pages/schema-generator
+pages/sidebar.mdx
+.next
+node_modules
+composer.lock
+vendor
+var
+.php-cs-fixer.cache

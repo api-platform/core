@@ -14,17 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Api\Entrypoint;
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
+use ApiPlatform\Api\UrlGeneratorInterface as LegacyUrlGeneratorInterface;
+use ApiPlatform\Documentation\Entrypoint as DocumentationEntrypoint;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Normalizes the API entrypoint.
@@ -36,59 +37,30 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 {
     public const FORMAT = 'jsonapi';
 
-    private $resourceMetadataFactory;
-    private $iriConverter;
-    private $urlGenerator;
-
-    public function __construct($resourceMetadataFactory, $iriConverter, UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly IriConverterInterface|LegacyIriConverterInterface $iriConverter, private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->iriConverter = $iriConverter;
-        $this->urlGenerator = $urlGenerator;
-
-        if ($iriConverter instanceof LegacyIriConverterInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
-        }
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $entrypoint = ['links' => ['self' => $this->urlGenerator->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)]];
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
-            /** @var ResourceMetadata|ResourceMetadataCollection */
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if ($resourceMetadata instanceof ResourceMetadata) {
-                if (!$resourceMetadata->getCollectionOperations()) {
-                    continue;
-                }
-
-                try {
-                    $entrypoint['links'][lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_URL);
-                } catch (InvalidArgumentException $ex) {
-                    // Ignore resources without GET operations
-                }
-            }
-
             foreach ($resourceMetadata as $resource) {
-                foreach ($resource->getOperations() as $operationName => $operation) {
-                    if (!$operation instanceof CollectionOperationInterface || $operation->getUriVariables()) {
+                foreach ($resource->getOperations() as $operation) {
+                    if (!$operation instanceof CollectionOperationInterface || ($operation instanceof HttpOperation && $operation->getUriVariables())) {
                         continue;
                     }
 
                     try {
-                        $entrypoint['links'][lcfirst($resource->getShortName())] = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass, $operationName, UrlGeneratorInterface::ABS_URL) : $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_URL);
-                    } catch (InvalidArgumentException $ex) {
+                        $iri = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_URL, $operation); // @phpstan-ignore-line phpstan issue as type is CollectionOperationInterface & Operation
+                        $entrypoint['links'][lcfirst($resource->getShortName())] = $iri;
+                    } catch (InvalidArgumentException) {
                         // Ignore resources without GET operations
                     }
                 }
@@ -101,18 +73,27 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && $data instanceof Entrypoint;
+        return self::FORMAT === $format && ($data instanceof Entrypoint || $data instanceof DocumentationEntrypoint);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function getSupportedTypes($format): array
+    {
+        return self::FORMAT === $format ? [Entrypoint::class => true, DocumentationEntrypoint::class => true] : [];
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
         return true;
     }
 }
-
-class_alias(EntrypointNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer::class);

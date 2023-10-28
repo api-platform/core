@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Decorates the output with JSON-LD metadata when appropriate, but otherwise just
@@ -30,43 +32,48 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     public const FORMAT = 'jsonld';
 
-    private $decorated;
-    private $iriConverter;
-    private $anonymousContextBuilder;
-
-    public function __construct(NormalizerInterface $decorated, $iriConverter, AnonymousContextBuilderInterface $anonymousContextBuilder)
+    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface|LegacyIriConverterInterface $iriConverter, private AnonymousContextBuilderInterface $anonymousContextBuilder)
     {
-        $this->decorated = $decorated;
-        $this->iriConverter = $iriConverter;
-        $this->anonymousContextBuilder = $anonymousContextBuilder;
-
-        if ($iriConverter instanceof LegacyIriConverterInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $this->decorated->supportsNormalization($data, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function getSupportedTypes($format): array
+    {
+        // @deprecated remove condition when support for symfony versions under 6.3 is dropped
+        if (!method_exists($this->decorated, 'getSupportedTypes')) {
+            return [
+                '*' => $this->decorated instanceof BaseCacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod(),
+            ];
+        }
+
+        return self::FORMAT === $format ? $this->decorated->getSupportedTypes($format) : [];
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
-        return $this->decorated instanceof CacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod();
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
+        return $this->decorated instanceof BaseCacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod();
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];
@@ -78,9 +85,9 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
          * normalized data array is empty.
          *
          * This is useful when traversing from a non-resource towards an attribute
-         * which is a resource, as we do not have the benefit of {@see PropertyMetadata::isReadableLink}.
+         * which is a resource, as we do not have the benefit of {@see ApiProperty::isReadableLink}.
          *
-         * It must not be propagated to subresources, as {@see PropertyMetadata::isReadableLink}
+         * It must not be propagated to resources, as {@see ApiProperty::isReadableLink}
          * should take effect.
          */
         $context['api_empty_resource_as_iri'] = true;
@@ -92,8 +99,8 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
         if (isset($originalResource)) {
             try {
-                $context['output']['iri'] = $this->iriConverter->getIriFromItem($originalResource);
-            } catch (InvalidArgumentException $e) {
+                $context['output']['iri'] = $this->iriConverter->getIriFromResource($originalResource);
+            } catch (InvalidArgumentException) {
                 // The original resource has no identifiers
             }
             $context['api_resource'] = $originalResource;
@@ -104,5 +111,3 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         return $metadata + $data;
     }
 }
-
-class_alias(ObjectNormalizer::class, \ApiPlatform\Core\JsonLd\Serializer\ObjectNormalizer::class);

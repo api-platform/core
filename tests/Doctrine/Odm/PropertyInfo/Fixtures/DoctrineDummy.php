@@ -20,130 +20,81 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\ReferenceMany;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\ReferenceOne;
 
 /**
- * @Document
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
+#[Document]
 class DoctrineDummy
 {
-    /**
-     * @Id
-     */
+    #[Id]
     public $id;
 
-    /**
-     * @ReferenceOne(targetDocument=DoctrineRelation::class)
-     */
+    #[ReferenceOne(targetDocument: DoctrineRelation::class)]
     public $foo;
 
-    /**
-     * @ReferenceMany(targetDocument=DoctrineRelation::class)
-     */
+    #[ReferenceMany(targetDocument: DoctrineRelation::class)]
     public $bar;
 
-    /**
-     * @ReferenceMany(targetDocument=DoctrineRelation::class, mappedBy="foo", storeAs="id")
-     */
+    #[ReferenceMany(targetDocument: DoctrineRelation::class, mappedBy: 'foo', storeAs: 'id')]
     protected $indexedFoo;
 
-    /**
-     * @Field(type="bin")
-     */
+    #[Field(type: 'bin')]
     protected $bin;
 
-    /**
-     * @Field(type="bin_bytearray")
-     */
+    #[Field(type: 'bin_bytearray')]
     protected $binByteArray;
 
-    /**
-     * @Field(type="bin_custom")
-     */
+    #[Field(type: 'bin_custom')]
     protected $binCustom;
 
-    /**
-     * @Field(type="bin_func")
-     */
+    #[Field(type: 'bin_func')]
     protected $binFunc;
 
-    /**
-     * @Field(type="bin_md5")
-     */
+    #[Field(type: 'bin_md5')]
     protected $binMd5;
 
-    /**
-     * @Field(type="bin_uuid")
-     */
+    #[Field(type: 'bin_uuid')]
     protected $binUuid;
 
-    /**
-     * @Field(type="bin_uuid_rfc4122")
-     */
+    #[Field(type: 'bin_uuid_rfc4122')]
     protected $binUuidRfc4122;
 
-    /**
-     * @Field(type="timestamp")
-     */
+    #[Field(type: 'timestamp')]
     private $timestamp;
 
-    /**
-     * @Field(type="date")
-     */
+    #[Field(type: 'date')]
     private $date;
 
-    /**
-     * @Field(type="date_immutable")
-     */
+    #[Field(type: 'date_immutable')]
     private $dateImmutable;
 
-    /**
-     * @Field(type="float")
-     */
+    #[Field(type: 'float')]
     private $float;
 
-    /**
-     * @Field(type="bool")
-     */
+    #[Field(type: 'bool')]
     private $bool;
 
-    /**
-     * @Field(type="custom_foo")
-     */
+    #[Field(type: 'custom_foo')]
     private $customFoo;
 
-    /**
-     * @Field(type="int")
-     */
+    #[Field(type: 'int')]
     private $int;
 
-    /**
-     * @Field(type="string")
-     */
+    #[Field(type: 'string')]
     private $string;
 
-    /**
-     * @Field(type="key")
-     */
+    #[Field(type: 'key')]
     private $key;
 
-    /**
-     * @Field(type="hash")
-     */
+    #[Field(type: 'hash')]
     private $hash;
 
-    /**
-     * @Field(type="collection")
-     */
+    #[Field(type: 'collection')]
     private $collection;
 
-    /**
-     * @Field(type="object_id")
-     */
+    #[Field(type: 'object_id')]
     private $objectId;
 
-    /**
-     * @Field(type="raw")
-     */
+    #[Field(type: 'raw')]
     private $raw;
 
     public $notMapped;

@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Interface of Doctrine MongoDB ODM aggregation extensions for item aggregations.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface AggregationItemExtensionInterface
 {
-    public function applyToItem(Builder $aggregationBuilder, string $resourceClass, array $identifiers, string $operationName = null, array &$context = []);
+    public function applyToItem(Builder $aggregationBuilder, string $resourceClass, array $identifiers, Operation $operation = null, array &$context = []): void;
 }

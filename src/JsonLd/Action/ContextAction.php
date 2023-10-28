@@ -13,14 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Action;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Generates JSON-LD contexts.
@@ -34,58 +37,74 @@ final class ContextAction
         'Error' => true,
     ];
 
-    private $contextBuilder;
-    private $resourceNameCollectionFactory;
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|null
-     */
-    private $resourceMetadataFactory;
-
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory)
-    {
-        $this->contextBuilder = $contextBuilder;
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
+    public function __construct(
+        private readonly ContextBuilderInterface $contextBuilder,
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ?ProviderInterface $provider = null,
+        private readonly ?ProcessorInterface $processor = null,
+        private readonly ?SerializerInterface $serializer = null
+    ) {
     }
 
     /**
      * Generates a context according to the type requested.
      *
      * @throws NotFoundHttpException
+     *
+     * @return array{'@context': array<string, mixed>}|Response
      */
-    public function __invoke(string $shortName): array
+    public function __invoke(string $shortName = 'Entrypoint', Request $request = null): array|Response
+    {
+        if (null !== $request && $this->provider && $this->processor && $this->serializer) {
+            $operation = new Get(
+                outputFormats: ['jsonld' => ['application/ld+json']],
+                validate: false,
+                provider: fn () => $this->getContext($shortName),
+                serialize: false,
+                read: true
+            );
+            $context = ['request' => $request];
+            $jsonLdContext = $this->provider->provide($operation, [], $context);
+
+            return $this->processor->process($this->serializer->serialize($jsonLdContext, 'json'), $operation, [], $context);
+        }
+
+        if (!$context = $this->getContext($shortName)) {
+            throw new NotFoundHttpException();
+        }
+
+        return $context;
+    }
+
+    /**
+     * @return array{'@context': array<string, mixed>}|null
+     */
+    private function getContext(string $shortName): ?array
     {
         if ('Entrypoint' === $shortName) {
             return ['@context' => $this->contextBuilder->getEntrypointContext()];
         }
 
+        // TODO: remove this, exceptions are resources since 3.2
         if (isset(self::RESERVED_SHORT_NAMES[$shortName])) {
             return ['@context' => $this->contextBuilder->getBaseContext()];
         }
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            /** @var ResourceMetadata|ResourceMetadataCollection */
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
 
-            if ($resourceMetadata instanceof ResourceMetadataCollection) {
-                try {
-                    $resourceMetadata = $resourceMetadata->getOperation();
-                } catch (OperationNotFoundException $e) {
-                    continue;
-                }
+            try {
+                $resourceMetadataCollection = $resourceMetadataCollection->getOperation();
+            } catch (OperationNotFoundException) {
+                continue;
             }
 
-            if ($shortName === $resourceMetadata->getShortName()) {
+            if ($shortName === $resourceMetadataCollection->getShortName()) {
                 return ['@context' => $this->contextBuilder->getResourceContext($resourceClass)];
             }
         }
 
-        throw new NotFoundHttpException();
+        return null;
     }
 }
-
-class_alias(ContextAction::class, \ApiPlatform\Core\JsonLd\Action\ContextAction::class);

@@ -13,15 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Filter;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
-use ApiPlatform\Exception\PropertyNotFoundException;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -36,22 +33,10 @@ abstract class AbstractFilter implements FilterInterface
 {
     use FieldDatatypeTrait { getNestedFieldPath as protected; }
 
-    protected $properties;
-    protected $propertyNameCollectionFactory;
-    protected $nameConverter;
-
-    /**
-     * @var PropertyMetadataFactoryInterface|LegacyPropertyMetadataFactoryInterface
-     *
-     * @param mixed $propertyMetadataFactory
-     */
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
+    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected ?NameConverterInterface $nameConverter = null, protected ?array $properties = null)
     {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->nameConverter = $nameConverter;
-        $this->properties = $properties;
     }
 
     /**
@@ -65,7 +50,7 @@ abstract class AbstractFilter implements FilterInterface
 
         try {
             yield from $this->propertyNameCollectionFactory->create($resourceClass);
-        } catch (ResourceClassNotFoundException $e) {
+        } catch (ResourceClassNotFoundException) {
         }
     }
 
@@ -103,57 +88,77 @@ abstract class AbstractFilter implements FilterInterface
 
         foreach ($properties as $index => $currentProperty) {
             try {
-                /** @var ApiProperty|PropertyMetadata */
                 $propertyMetadata = $this->propertyMetadataFactory->create($currentResourceClass, $currentProperty);
-            } catch (PropertyNotFoundException $e) {
+            } catch (PropertyNotFoundException) {
                 return $noop;
             }
 
-            // TODO: 3.0 this is the default + allow multiple types
-            $type = $propertyMetadata instanceof ApiProperty ? ($propertyMetadata->getBuiltinTypes()[0] ?? null) : $propertyMetadata->getType();
+            $types = $propertyMetadata->getBuiltinTypes();
 
-            if (null === $type) {
+            if (null === $types) {
                 return $noop;
             }
 
             ++$index;
-            $builtinType = $type->getBuiltinType();
 
-            if (Type::BUILTIN_TYPE_OBJECT !== $builtinType && Type::BUILTIN_TYPE_ARRAY !== $builtinType) {
-                if ($totalProperties === $index) {
-                    break;
+            // check each type before deciding if it's noop or not
+            // e.g: maybe the first type is noop, but the second is valid
+            $isNoop = false;
+
+            foreach ($types as $type) {
+                $builtinType = $type->getBuiltinType();
+
+                if (Type::BUILTIN_TYPE_OBJECT !== $builtinType && Type::BUILTIN_TYPE_ARRAY !== $builtinType) {
+                    if ($totalProperties === $index) {
+                        break 2;
+                    }
+
+                    $isNoop = true;
+
+                    continue;
                 }
 
-                return $noop;
-            }
+                if ($type->isCollection() && null === $type = $type->getCollectionValueTypes()[0] ?? null) {
+                    $isNoop = true;
 
-            if ($type->isCollection() && null === $type = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) {
-                return $noop;
-            }
-
-            if (Type::BUILTIN_TYPE_ARRAY === $builtinType && Type::BUILTIN_TYPE_OBJECT !== $type->getBuiltinType()) {
-                if ($totalProperties === $index) {
-                    break;
+                    continue;
                 }
 
-                return $noop;
+                if (Type::BUILTIN_TYPE_ARRAY === $builtinType && Type::BUILTIN_TYPE_OBJECT !== $type->getBuiltinType()) {
+                    if ($totalProperties === $index) {
+                        break 2;
+                    }
+
+                    $isNoop = true;
+
+                    continue;
+                }
+
+                if (null === $className = $type->getClassName()) {
+                    $isNoop = true;
+
+                    continue;
+                }
+
+                if ($isResourceClass = $this->resourceClassResolver->isResourceClass($className)) {
+                    $currentResourceClass = $className;
+                } elseif ($totalProperties !== $index) {
+                    $isNoop = true;
+
+                    continue;
+                }
+
+                $hasAssociation = $totalProperties === $index && $isResourceClass;
+                $isNoop = false;
+
+                break;
             }
 
-            if (null === $className = $type->getClassName()) {
+            if ($isNoop) {
                 return $noop;
             }
-
-            if ($isResourceClass = $this->resourceClassResolver->isResourceClass($className)) {
-                $currentResourceClass = $className;
-            } elseif ($totalProperties !== $index) {
-                return $noop;
-            }
-
-            $hasAssociation = $totalProperties === $index && $isResourceClass;
         }
 
         return [$type, $hasAssociation, $currentResourceClass, $currentProperty];
     }
 }
-
-class_alias(AbstractFilter::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractFilter::class);

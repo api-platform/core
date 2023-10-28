@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -22,43 +21,32 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource(iri="https://schema.org/Product")
- * @ODM\Document
  */
+#[ApiResource(types: ['https://schema.org/Product'])]
+#[ODM\Document]
 class RelatedOwnedDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
     /**
      * @var string|null A name
-     *
-     * @ODM\Field(type="string")
      */
+    #[ODM\Field(type: 'string')]
     public $name;
-
-    /**
-     * @var Dummy|null
-     *
-     * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, inversedBy="relatedOwnedDummy", storeAs="id")
-     * @ApiSubresource
-     */
-    public $owningDummy;
+    #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], inversedBy: 'relatedOwnedDummy', storeAs: 'id')]
+    public ?Dummy $owningDummy = null;
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

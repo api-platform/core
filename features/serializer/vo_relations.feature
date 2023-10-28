@@ -80,7 +80,7 @@ Feature: Value object as ApiResource
     }
     """
 
-  Scenario: Update Value object with writable and non writable property
+  Scenario: Update Value object with writable and non writable property (legacy non-standard PUT)
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/vo_dummy_inspections/1" with body:
     """
@@ -102,6 +102,29 @@ Feature: Value object as ApiResource
     }
     """
 
+  Scenario: Update Value object with writable and non writable property
+    When I add "Content-Type" header equal to "application/merge-patch+json"
+    And I send a "PATCH" request to "/vo_dummy_inspections/1" with body:
+    """
+    {
+        "performed": "2018-08-24 00:00:00",
+        "accepted": false
+    }
+    """
+    Then the response status code should be 200
+    And the JSON should be equal to:
+    """
+    {
+        "@context": "/contexts/VoDummyInspection",
+        "@id": "/vo_dummy_inspections/1",
+        "@type": "VoDummyInspection",
+        "accepted": true,
+        "car": "/vo_dummy_cars/1",
+        "performed": "2018-08-24T00:00:00+00:00"
+    }
+    """
+
+
   @createSchema
   Scenario: Create Value object without required params
     When I add "Content-Type" header equal to "application/ld+json"
@@ -116,16 +139,13 @@ Feature: Value object as ApiResource
     }
     """
     Then the response status code should be 400
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+    And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
     And the JSON should be valid according to this schema:
     """
     {
       "type": "object",
       "properties": {
-        "@context": {
-          "type": "string",
-          "pattern": "^/contexts/Error$"
-        },
         "@type": {
           "type": "string",
           "pattern": "^hydra:Error$"
@@ -135,11 +155,10 @@ Feature: Value object as ApiResource
           "pattern": "^An error occurred$"
         },
         "hydra:description": {
-          "pattern": "^Cannot create an instance of ApiPlatform\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\VoDummyCar from serialized data because its constructor requires parameter \"drivers\" to be present.$"
+          "pattern": "^Cannot create an instance of \"ApiPlatform\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\VoDummyCar\" from serialized data because its constructor requires parameter \"drivers\" to be present.$"
         }
       },
       "required": [
-        "@context",
         "@type",
         "hydra:title",
         "hydra:description"

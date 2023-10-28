@@ -13,11 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\Filter\FilterInterface;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -28,19 +27,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class SerializerFilterContextBuilder implements SerializerContextBuilderInterface
 {
-    private $decorated;
-    private $filterLocator;
-    private $resourceMetadataFactory;
-
-    public function __construct($resourceMetadataFactory, ContainerInterface $filterLocator, SerializerContextBuilderInterface $decorated)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ContainerInterface $filterLocator, private readonly SerializerContextBuilderInterface $decorated)
     {
-        $this->decorated = $decorated;
-        $this->filterLocator = $filterLocator;
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -54,13 +42,11 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
 
         $context = $this->decorated->createFromRequest($request, $normalization, $attributes);
 
-        // TODO: remove in 3.0
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-            $resourceFilters = $resourceMetadata->getOperationAttribute($attributes, 'filters', [], true);
-        } else {
-            $resourceFilters = $this->resourceMetadataFactory->create($attributes['resource_class'])->getOperation($attributes['operation_name'] ?? null)->getFilters();
+        if (!($operation = $context['operation'] ?? null)) {
+            $operation = $this->resourceMetadataCollectionFactory->create($attributes['resource_class'])->getOperation($attributes['operation_name'] ?? null);
         }
+
+        $resourceFilters = $operation->getFilters();
 
         if (!$resourceFilters) {
             return $context;
@@ -75,5 +61,3 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
         return $context;
     }
 }
-
-class_alias(SerializerFilterContextBuilder::class, \ApiPlatform\Core\Serializer\SerializerFilterContextBuilder::class);

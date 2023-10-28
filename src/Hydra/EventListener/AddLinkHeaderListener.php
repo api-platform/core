@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\EventListener;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface as LegacyUrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
-use ApiPlatform\Util\CorsTrait;
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\State\Util\CorsTrait;
+use Psr\Link\EvolvableLinkProviderInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\Link;
 
 /**
  * Adds the HTTP Link header pointing to the Hydra documentation.
@@ -29,11 +31,8 @@ final class AddLinkHeaderListener
 {
     use CorsTrait;
 
-    private $urlGenerator;
-
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator)
     {
-        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -42,21 +41,29 @@ final class AddLinkHeaderListener
     public function onKernelResponse(ResponseEvent $event): void
     {
         $request = $event->getRequest();
+        if (($operation = $request->attributes->get('_api_operation')) && 'api_platform.symfony.main_controller' === $operation->getController()) {
+            return;
+        }
+
         // Prevent issues with NelmioCorsBundle
         if ($this->isPreflightRequest($request)) {
             return;
         }
 
         $apiDocUrl = $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL);
-        $link = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);
+        $apiDocLink = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);
+        $linkProvider = $request->attributes->get('_api_platform_links', new GenericLinkProvider());
 
-        if (null === $linkProvider = $request->attributes->get('_links')) {
-            $request->attributes->set('_links', new GenericLinkProvider([$link]));
-
+        if (!$linkProvider instanceof EvolvableLinkProviderInterface) {
             return;
         }
-        $request->attributes->set('_links', $linkProvider->withLink($link));
+
+        foreach ($linkProvider->getLinks() as $link) {
+            if ($link->getHref() === $apiDocUrl) {
+                return;
+            }
+        }
+
+        $request->attributes->set('_api_platform_links', $linkProvider->withLink($apiDocLink));
     }
 }
-
-class_alias(AddLinkHeaderListener::class, \ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener::class);

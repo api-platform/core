@@ -13,92 +13,98 @@
         }
     ],
     "require": {
-        "php": ">=7.1",
+        "php": ">=8.1",
         "doctrine/inflector": "^1.0 || ^2.0",
-        "fig/link-util": "^1.0",
         "psr/cache": "^1.0 || ^2.0 || ^3.0",
         "psr/container": "^1.0 || ^2.0",
-        "symfony/http-foundation": "^4.4 || ^5.1 || ^6.0",
-        "symfony/http-kernel": "^4.4 || ^5.1 || ^6.0",
-        "symfony/property-access": "^3.4.19 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/property-info": "^3.4 || ^4.4 || ^5.2.1 || ^6.0",
-        "symfony/serializer": "^4.4 || ^5.1 || ^6.0",
-        "symfony/web-link": "^4.4 || ^5.1 || ^6.0",
-        "willdurand/negotiation": "^2.0.3 || ^3.0"
+        "symfony/deprecation-contracts": "^3.1",
+        "symfony/http-foundation": "^6.1",
+        "symfony/http-kernel": "^6.1",
+        "symfony/property-access": "^6.1",
+        "symfony/property-info": "^6.1",
+        "symfony/serializer": "^6.1",
+        "symfony/translation-contracts": "^3.3",
+        "symfony/web-link": "^6.1",
+        "willdurand/negotiation": "^3.0"
     },
     "require-dev": {
-        "behat/behat": "^3.1",
-        "behat/mink": "^1.9@dev",
-        "doctrine/annotations": "^1.7",
+        "behat/behat": "^3.11",
+        "behat/mink": "^1.9",
         "doctrine/cache": "^1.11 || ^2.1",
-        "doctrine/common": "^2.11 || ^3.0",
-        "doctrine/data-fixtures": "^1.2.2",
-        "doctrine/dbal": "^2.6 || ^3.0",
+        "doctrine/common": "^3.2.2",
+        "doctrine/dbal": "^3.4.0",
         "doctrine/doctrine-bundle": "^1.12 || ^2.0",
         "doctrine/mongodb-odm": "^2.2",
         "doctrine/mongodb-odm-bundle": "^4.0",
-        "doctrine/orm": "^2.6.4",
-        "elasticsearch/elasticsearch": "^7.11.0",
+        "doctrine/orm": "^2.14",
+        "elasticsearch/elasticsearch": "^7.11 || ^8.4",
         "friends-of-behat/mink-browserkit-driver": "^1.3.1",
         "friends-of-behat/mink-extension": "^2.2",
         "friends-of-behat/symfony-extension": "^2.1",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "jangregor/phpstan-prophecy": "^1.0",
         "justinrainbow/json-schema": "^5.2.1",
-        "phpdocumentor/reflection-docblock": "^3.0 || ^4.0 || ^5.1",
-        "phpdocumentor/type-resolver": "^0.3 || ^0.4 || ^1.4",
+        "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/extension-installer": "^1.1",
+        "phpstan/phpdoc-parser": "^1.13",
         "phpstan/phpstan": "^1.1",
         "phpstan/phpstan-doctrine": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpstan/phpstan-symfony": "^1.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
-        "ramsey/uuid": "^3.7 || ^4.0",
-        "ramsey/uuid-doctrine": "^1.4",
-        "soyuka/contexts": "dev-main",
+        "ramsey/uuid": "^3.9.7 || ^4.0",
+        "ramsey/uuid-doctrine": "^1.4 || ^2.0",
+        "soyuka/contexts": "v3.3.9",
         "soyuka/stubs-mongodb": "^1.0",
-        "symfony/asset": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/browser-kit": "^4.4 || ^5.1 || ^6.0",
-        "symfony/cache": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/config": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/console": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/css-selector": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/debug": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/dependency-injection": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/doctrine-bridge": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/dom-crawler": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/event-dispatcher": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/expression-language": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/finder": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/form": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/framework-bundle": "^4.4 || ^5.1 || ^6.0",
-        "symfony/http-client": "^4.4 || ^5.1 || ^6.0",
-        "symfony/intl": "^4.4 || ^5.3 || ^6.0",
+        "symfony/asset": "^6.1",
+        "symfony/browser-kit": "^6.1",
+        "symfony/cache": "^6.1",
+        "symfony/config": "^6.1",
+        "symfony/console": "^6.1",
+        "symfony/css-selector": "^6.1",
+        "symfony/dependency-injection": "^6.1.12",
+        "symfony/doctrine-bridge": "^6.1",
+        "symfony/dom-crawler": "^6.1",
+        "symfony/error-handler": "^6.1",
+        "symfony/event-dispatcher": "^6.1",
+        "symfony/expression-language": "^6.1",
+        "symfony/finder": "^6.1",
+        "symfony/form": "^6.1",
+        "symfony/framework-bundle": "^6.1",
+        "symfony/http-client": "^6.1",
+        "symfony/intl": "^6.1",
         "symfony/maker-bundle": "^1.24",
         "symfony/mercure-bundle": "*",
-        "symfony/messenger": "^4.4 || ^5.1 || ^6.0",
-        "symfony/phpunit-bridge": "^5.4 || ^6.0",
-        "symfony/routing": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/security-bundle": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/security-core": "^4.4 || ^5.1 || ^6.0",
-        "symfony/twig-bundle": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/validator": "^3.4 || ^4.4 || ^5.1 || ^6.0",
-        "symfony/web-profiler-bundle": "^4.4 || ^5.1 || ^6.0",
-        "symfony/yaml": "^3.4 || ^4.4 || ^5.1 || ^6.0",
+        "symfony/messenger": "^6.1",
+        "symfony/phpunit-bridge": "^6.1",
+        "symfony/routing": "^6.1",
+        "symfony/security-bundle": "^6.1",
+        "symfony/security-core": "^6.1",
+        "symfony/stopwatch": "^6.1",
+        "symfony/twig-bundle": "^6.1",
+        "symfony/uid": "^6.1",
+        "symfony/validator": "^6.1",
+        "symfony/web-profiler-bundle": "^6.1",
+        "symfony/yaml": "^6.1",
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
-        "webonyx/graphql-php": "^14.0"
+        "webonyx/graphql-php": "^14.0 || ^15.0"
     },
     "conflict": {
-        "doctrine/common": "<2.7",
+        "doctrine/common": "<3.2.2",
         "doctrine/dbal": "<2.10",
-        "doctrine/mongodb-odm": "<2.2",
-        "doctrine/persistence": "<1.3"
+        "doctrine/orm": "<2.14.0",
+        "doctrine/mongodb-odm": "<2.4",
+        "doctrine/persistence": "<1.3",
+        "symfony/var-exporter" : "<6.1.1",
+        "phpunit/phpunit": "<9.5",
+        "phpspec/prophecy": "<1.15",
+        "elasticsearch/elasticsearch": ">=8.0,<8.4"
     },
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
         "ocramius/package-versions": "To display the API Platform's version in the debug bar.",
-        "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
+        "phpstan/phpdoc-parser": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
         "ramsey/uuid": "To support Ramsey's UUID identifiers.",
         "symfony/cache": "To have metadata caching when using Symfony integration.",
@@ -115,14 +121,10 @@
     "autoload": {
         "psr-4": {
             "ApiPlatform\\": "src/"
-        },
-        "files": [
-            "src/deprecation.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "ApiPlatform\\Core\\Tests\\": "tests/Core/",
             "ApiPlatform\\Tests\\": "tests/",
             "App\\": "tests/Fixtures/app/var/tmp/src/"
         }
@@ -134,15 +136,16 @@
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "php-http/discovery": true
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "2.7.x-dev"
+            "dev-main": "3.3.x-dev"
         },
         "symfony": {
-            "require": "^3.4 || ^4.4 || ^5.1 || ^6.0"
+            "require": "^6.1"
         }
     }
 }

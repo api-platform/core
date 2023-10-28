@@ -1,5 +1,7 @@
 imports:
-    - { resource: config_test.yml }
+    - { resource: config_common.yml }
+    - { resource: config_doctrine.yml }
+    - { resource: config_behat_orm.yml }
 
 parameters:
     env(DATABASE_URL): postgres://postgres:@localhost/api_platform_test
@@ -9,7 +11,7 @@ doctrine:
     dbal:
         driver: pdo_pgsql
         url: '%env(resolve:DATABASE_URL)%'
-        path: ~
         server_version: '%env(POSTGRES_VERSION)%'
         types:
             uuid: Ramsey\Uuid\Doctrine\UuidType
+            symfony_uuid: Symfony\Bridge\Doctrine\Types\UuidType

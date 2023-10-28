@@ -13,34 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource
- * @ORM\Entity
- */
+#[ApiResource]
+#[ORM\Entity]
 class Site
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-    /**
-     * @ORM\Column
-     */
-    private $title;
-    /**
-     * @ORM\Column
-     */
-    private $description;
-    /**
-     * @ORM\OneToOne(targetEntity="AbstractUser", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $owner;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column]
+    private ?string $title = null;
+    #[ORM\Column]
+    private ?string $description = null;
+    #[ORM\OneToOne(targetEntity: AbstractUser::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?AbstractUser $owner = null;
 
     public function getId(): ?int
     {

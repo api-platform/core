@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Messenger;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Messenger\ContextStamp;
 use ApiPlatform\Symfony\Messenger\Processor;
 use ApiPlatform\Symfony\Messenger\RemoveStamp;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -31,43 +30,37 @@ class ProcessorTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testPersist()
+    public function testPersist(): void
     {
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
-            return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
-        }))->willReturn(new Envelope($dummy))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
-        $processor = new Processor($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $messageBus->reveal());
+        $processor = new Processor($messageBus->reveal());
         $this->assertSame($dummy, $processor->process($dummy, new Get()));
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
 
-        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
-            return $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class);
-        }))->willReturn(new Envelope($dummy))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class)))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
-        $processor = new Processor($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $messageBus->reveal());
+        $processor = new Processor($messageBus->reveal());
         $processor->process($dummy, new Delete());
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
-            return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
-        }))->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
 
-        $processor = new Processor($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $messageBus->reveal());
+        $processor = new Processor($messageBus->reveal());
         $this->assertSame($dummy, $processor->process($dummy, new Get()));
     }
 }

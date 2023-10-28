@@ -21,11 +21,10 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 trait CachedTrait
 {
-    /** @var CacheItemPoolInterface */
-    private $cacheItemPool;
-    private $localCache = [];
+    private CacheItemPoolInterface $cacheItemPool;
+    private array $localCache = [];
 
-    private function getCached(string $cacheKey, callable $getValue)
+    private function getCached(string $cacheKey, callable $getValue): mixed
     {
         if (\array_key_exists($cacheKey, $this->localCache)) {
             return $this->localCache[$cacheKey];
@@ -33,7 +32,7 @@ trait CachedTrait
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-        } catch (CacheException $e) {
+        } catch (CacheException) {
             return $this->localCache[$cacheKey] = $getValue();
         }
 
@@ -49,5 +48,3 @@ trait CachedTrait
         return $this->localCache[$cacheKey] = $value;
     }
 }
-
-class_alias(CachedTrait::class, \ApiPlatform\Core\Cache\CachedTrait::class);

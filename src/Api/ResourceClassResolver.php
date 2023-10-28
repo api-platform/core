@@ -15,10 +15,12 @@ namespace ApiPlatform\Api;
 
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 
 /**
  * {@inheritdoc}
+ *
+ * @deprecated replaced by ApiPlatform\Metadata\ResourceClassResolver
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
@@ -26,20 +28,17 @@ use ApiPlatform\Util\ClassInfoTrait;
 final class ResourceClassResolver implements ResourceClassResolverInterface
 {
     use ClassInfoTrait;
+    private array $localIsResourceClassCache = [];
+    private array $localMostSpecificResourceClassCache = [];
 
-    private $resourceNameCollectionFactory;
-    private $localIsResourceClassCache = [];
-    private $localMostSpecificResourceClassCache = [];
-
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string
+    public function getResourceClass(mixed $value, string $resourceClass = null, bool $strict = false): string
     {
         if ($strict && null === $resourceClass) {
             throw new InvalidArgumentException('Strict checking is only possible when resource class is specified.');
@@ -109,5 +108,3 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         return $this->localIsResourceClassCache[$type] = false;
     }
 }
-
-class_alias(ResourceClassResolver::class, \ApiPlatform\Core\Api\ResourceClassResolver::class);

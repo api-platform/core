@@ -1,0 +1,49 @@
+{
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "library": {
+        "properties": {
+          "id": {
+            "type": "keyword"
+          },
+          "gender": {
+            "type": "keyword"
+          },
+          "age": {
+            "type": "integer"
+          },
+          "firstName": {
+            "type": "text"
+          },
+          "lastName": {
+            "type": "text"
+          },
+          "relatedGenres": {
+            "type": "nested",
+            "properties": {
+              "id": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "text"
+              }
+            },
+            "dynamic": "strict"
+          }
+        },
+        "dynamic": "strict"
+      },
+      "date": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      "message": {
+        "type": "text"
+      }
+    },
+    "dynamic": "strict"
+  }
+}

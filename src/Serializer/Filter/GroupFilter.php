@@ -17,27 +17,107 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
- * Group filter.
+ * The group filter allows you to filter by serialization groups.
+ *
+ * Syntax: `?groups[]=<group>`.
+ *
+ * You can add as many groups as you need.
+ *
+ * Three arguments are available to configure the filter:
+ * - `parameterName` is the query parameter name (default: `groups`)
+ * - `overrideDefaultGroups` allows to override the default serialization groups (default: `false`)
+ * - `whitelist` groups whitelist to avoid uncontrolled data exposure (default: `null` to allow all groups)
+ *
+ * <CodeSelector>
+ * ```php
+ * <?php
+ * // api/src/Entity/Book.php
+ * use ApiPlatform\Metadata\ApiFilter;
+ * use ApiPlatform\Metadata\ApiResource;
+ * use ApiPlatform\Serializer\Filter\GroupFilter;
+ *
+ * #[ApiResource]
+ * #[ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, 'whitelist' => ['allowed_group']])]
+ * class Book
+ * {
+ *     // ...
+ * }
+ * ```
+ *
+ * ```yaml
+ * # config/services.yaml
+ * services:
+ *     book.group_filter:
+ *         parent: 'api_platform.serializer.group_filter'
+ *         arguments: [ $parameterName: 'groups', $overrideDefaultGroups: false, $whitelist: ['allowed_group'] ]
+ *         tags:  [ 'api_platform.filter' ]
+ *         # The following are mandatory only if a _defaults section is defined with inverted values.
+ *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
+ *         autowire: false
+ *         autoconfigure: false
+ *         public: false
+ *
+ * # api/config/api_platform/resources.yaml
+ * resources:
+ *     App\Entity\Book:
+ *         - operations:
+ *               ApiPlatform\Metadata\GetCollection:
+ *                   filters: ['book.group_filter']
+ * ```
+ *
+ * ```xml
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <!-- api/config/services.xml -->
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <container
+ *         xmlns="http://symfony.com/schema/dic/services"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="http://symfony.com/schema/dic/services
+ *         https://symfony.com/schema/dic/services/services-1.0.xsd">
+ *     <services>
+ *         <service id="book.group_filter" parent="api_platform.serializer.group_filter">
+ *             <argument key="parameterName">groups</argument>
+ *             <argument key="overrideDefaultGroups">false</argument>
+ *             <argument key="whitelist" type="collection">
+ *                 <argument>allowed_group</argument>
+ *             </argument>
+ *             <tag name="api_platform.filter"/>
+ *         </service>
+ *     </services>
+ * </container>
+ * <!-- api/config/api_platform/resources.xml -->
+ * <resources
+ *         xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+ *         https://api-platform.com/schema/metadata/resources-3.0.xsd">
+ *     <resource class="App\Entity\Book">
+ *         <operations>
+ *             <operation class="ApiPlatform\Metadata\GetCollection">
+ *                 <filters>
+ *                     <filter>book.group_filter</filter>
+ *                 </filters>
+ *             </operation>
+ *         </operations>
+ *     </resource>
+ * </resources>
+ * ```
+ * </CodeSelector>
+ *
+ * Given that the collection endpoint is `/books`, you can filter books by serialization groups with the following query: `/books?groups[]=read&groups[]=write`.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class GroupFilter implements FilterInterface
 {
-    private $overrideDefaultGroups;
-    private $parameterName;
-    private $whitelist;
-
-    public function __construct(string $parameterName = 'groups', bool $overrideDefaultGroups = false, array $whitelist = null)
+    public function __construct(private readonly string $parameterName = 'groups', private readonly bool $overrideDefaultGroups = false, private readonly ?array $whitelist = null)
     {
-        $this->overrideDefaultGroups = $overrideDefaultGroups;
-        $this->parameterName = $parameterName;
-        $this->whitelist = $whitelist;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(Request $request, bool $normalization, array $attributes, array &$context)
+    public function apply(Request $request, bool $normalization, array $attributes, array &$context): void
     {
         if (\array_key_exists($this->parameterName, $commonAttribute = $request->attributes->get('_api_filters', []))) {
             $groups = $commonAttribute[$this->parameterName];
@@ -65,15 +145,23 @@ final class GroupFilter implements FilterInterface
      */
     public function getDescription(string $resourceClass): array
     {
-        return [
-            "$this->parameterName[]" => [
-                'property' => null,
-                'type' => 'string',
-                'is_collection' => true,
-                'required' => false,
-            ],
+        $description = [
+            'property' => null,
+            'type' => 'string',
+            'is_collection' => true,
+            'required' => false,
         ];
+
+        if ($this->whitelist) {
+            $description['schema'] = [
+                'type' => 'array',
+                'items' => [
+                    'type' => 'string',
+                    'enum' => $this->whitelist,
+                ],
+            ];
+        }
+
+        return ["$this->parameterName[]" => $description];
     }
 }
-
-class_alias(GroupFilter::class, \ApiPlatform\Core\Serializer\Filter\GroupFilter::class);

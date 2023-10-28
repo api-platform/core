@@ -21,55 +21,42 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Embeddable Dummy.
  *
  * @author Jordan Samouh <jordan.samouh@gmail.com>
- *
- * @ORM\Embeddable
  */
+#[ORM\Embeddable]
 class EmbeddableDummy
 {
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(nullable=true)
-     * @Groups({"embed"})
      */
-    private $dummyName;
-
+    #[ORM\Column(nullable: true)]
+    #[Groups(['embed'])]
+    private ?string $dummyName = null;
     /**
      * @var bool|null A dummy boolean
-     *
-     * @ORM\Column(type="boolean", nullable=true)
      */
-    public $dummyBoolean;
-
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    public ?bool $dummyBoolean = null;
     /**
      * @var \DateTime|null A dummy date
-     *
-     * @ORM\Column(type="datetime", nullable=true)
-     * @Assert\DateTime
      */
-    public $dummyDate;
-
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Assert\DateTime]
+    public ?\DateTime $dummyDate = null;
     /**
      * @var float|null A dummy float
-     *
-     * @ORM\Column(type="float", nullable=true)
      */
-    public $dummyFloat;
-
+    #[ORM\Column(type: 'float', nullable: true)]
+    public ?float $dummyFloat = null;
     /**
      * @var string|null A dummy price
-     *
-     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
-    public $dummyPrice;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Groups({"barcelona", "chicago"})
-     */
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    public ?string $dummyPrice = null;
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Groups(['barcelona', 'chicago'])]
     protected $symfony;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -82,7 +69,7 @@ class EmbeddableDummy
         return $this->dummyName;
     }
 
-    public function setDummyName(string $dummyName)
+    public function setDummyName(string $dummyName): void
     {
         $this->dummyName = $dummyName;
     }
@@ -92,7 +79,7 @@ class EmbeddableDummy
         return $this->dummyBoolean;
     }
 
-    public function setDummyBoolean(bool $dummyBoolean)
+    public function setDummyBoolean(bool $dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }
@@ -102,7 +89,7 @@ class EmbeddableDummy
         return $this->dummyDate;
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate): void
     {
         $this->dummyDate = $dummyDate;
     }
@@ -112,7 +99,7 @@ class EmbeddableDummy
         return $this->dummyFloat;
     }
 
-    public function setDummyFloat(float $dummyFloat)
+    public function setDummyFloat(float $dummyFloat): void
     {
         $this->dummyFloat = $dummyFloat;
     }
@@ -122,7 +109,7 @@ class EmbeddableDummy
         return $this->dummyPrice;
     }
 
-    public function setDummyPrice(string $dummyPrice)
+    public function setDummyPrice(string $dummyPrice): void
     {
         $this->dummyPrice = $dummyPrice;
     }
@@ -132,7 +119,7 @@ class EmbeddableDummy
         return $this->symfony;
     }
 
-    public function setSymfony($symfony)
+    public function setSymfony($symfony): void
     {
         $this->symfony = $symfony;
     }

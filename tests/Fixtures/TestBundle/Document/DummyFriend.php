@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,28 +24,24 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource
- * @ODM\Document
  */
-class DummyFriend
+#[ApiResource]
+#[ODM\Document]
+class DummyFriend implements \Stringable
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field(type="string")
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"fakemanytomany", "friends"})
      */
-    private $name;
+    #[Assert\NotBlank]
+    #[ApiProperty(types: ['https://schema.org/name'])]
+    #[Groups(['fakemanytomany', 'friends'])]
+    #[ODM\Field(type: 'string')]
+    private ?string $name = null;
 
     /**
      * Get id.
@@ -60,7 +56,7 @@ class DummyFriend
      *
      * @param int $id the value to set
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -78,8 +74,13 @@ class DummyFriend
      *
      * @param string $name the value to set
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

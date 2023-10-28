@@ -13,20 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RPCOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\RPCProcessor;
 
 /**
  * RPC-like resource.
- *
- * @ApiResource(
- *     itemOperations={},
- *     collectionOperations={
- *         "post"={"status"=202, "messenger"=true, "path"="rpc", "output"=false},
- *         "post_output"={"method"="POST", "status"=200, "path"="rpc_output", "output"=RPCOutput::class}
- *     },
- * )
  */
+#[ApiResource(operations: [new Post(status: 202, messenger: true, uriTemplate: 'rpc', output: false), new Post(status: 200, uriTemplate: 'rpc_output', output: RPCOutput::class, processor: RPCProcessor::class)])]
 class RPC
 {
     /**

@@ -13,11 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
-use Elasticsearch\ClientBuilder;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -30,23 +29,38 @@ class ElasticsearchClientPassTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(CompilerPassInterface::class, new ElasticsearchClientPass());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
+        if (class_exists(\Elasticsearch\ClientBuilder::class)) {
+            $clientBuilder = \Elasticsearch\ClientBuilder::class;
+
+            $expectedArguments = [
+                Argument::withEntry('hosts', ['http://localhost:9200']),
+                Argument::withEntry('logger', Argument::type(Reference::class)),
+                Argument::withEntry('tracer', Argument::type(Reference::class)),
+                Argument::size(3),
+            ];
+        } else {
+            $clientBuilder = \Elastic\Elasticsearch\ClientBuilder::class;
+
+            $expectedArguments = [
+                Argument::withEntry('hosts', ['http://localhost:9200']),
+                Argument::withEntry('logger', Argument::type(Reference::class)),
+                Argument::size(2),
+            ];
+        }
+
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
-        $clientDefinitionProphecy->setFactory([ClientBuilder::class, 'fromConfig'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
+        // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
+        $clientDefinitionProphecy->setFactory([$clientBuilder, 'fromConfig'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
         $clientDefinitionProphecy->setArguments(
             Argument::allOf(
-                Argument::withEntry(0, Argument::allOf(
-                    Argument::withEntry('hosts', ['http://localhost:9200']),
-                    Argument::withEntry('logger', Argument::type(Reference::class)),
-                    Argument::withEntry('tracer', Argument::type(Reference::class)),
-                    Argument::size(3)
-                )),
+                Argument::withEntry(0, Argument::allOf(...$expectedArguments)),
                 Argument::size(1)
             )
         )->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
@@ -60,10 +74,13 @@ class ElasticsearchClientPassTest extends TestCase
         (new ElasticsearchClientPass())->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessWithoutConfiguration()
+    public function testProcessWithoutConfiguration(): void
     {
+        $clientBuilder = class_exists(\Elasticsearch\ClientBuilder::class) ? \Elasticsearch\ClientBuilder::class : \Elastic\Elasticsearch\ClientBuilder::class;
+
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
-        $clientDefinitionProphecy->setFactory([ClientBuilder::class, 'build'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
+        // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
+        $clientDefinitionProphecy->setFactory([$clientBuilder, 'build'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(true)->shouldBeCalled();
@@ -74,7 +91,7 @@ class ElasticsearchClientPassTest extends TestCase
         (new ElasticsearchClientPass())->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessWithElasticsearchDisabled()
+    public function testProcessWithElasticsearchDisabled(): void
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(false)->shouldBeCalled();

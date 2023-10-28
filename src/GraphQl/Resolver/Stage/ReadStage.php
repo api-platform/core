@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Util\ArrayTrait;
-use ApiPlatform\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -32,34 +30,23 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class ReadStage implements ReadStageInterface
 {
-    use ArrayTrait;
-    use ClassInfoTrait;
     use IdentifierTrait;
 
-    private $iriConverter;
-    private $provider;
-    private $serializerContextBuilder;
-    private $nestingSeparator;
-
-    public function __construct(IriConverterInterface $iriConverter, ProviderInterface $provider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
+    public function __construct(private readonly IriConverterInterface $iriConverter, private readonly ProviderInterface $provider, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private readonly string $nestingSeparator)
     {
-        $this->iriConverter = $iriConverter;
-        $this->provider = $provider;
-        $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->nestingSeparator = $nestingSeparator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context)
+    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context): object|array|null
     {
         if (!($operation->canRead() ?? true)) {
             return $context['is_collection'] ? [] : null;
         }
 
         $args = $context['args'];
-        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation->getName(), $context, true);
+        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation, $context, true);
 
         if (!$context['is_collection']) {
             $identifier = $this->getIdentifierFromContext($context);
@@ -92,23 +79,21 @@ final class ReadStage implements ReadStageInterface
         if (isset($source[$info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
             $uriVariables = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
             $normalizationContext['linkClass'] = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
+            $normalizationContext['linkProperty'] = $info->fieldName;
         }
 
         return $this->provider->provide($operation, $uriVariables, $normalizationContext);
     }
 
-    /**
-     * @return object|null
-     */
-    private function getItem(?string $identifier, array $normalizationContext)
+    private function getItem(?string $identifier, array $normalizationContext): ?object
     {
         if (null === $identifier) {
             return null;
         }
 
         try {
-            $item = $this->iriConverter->getItemFromIri($identifier, $normalizationContext);
-        } catch (ItemNotFoundException $e) {
+            $item = $this->iriConverter->getResourceFromIri($identifier, $normalizationContext);
+        } catch (ItemNotFoundException) {
             return null;
         }
 
@@ -127,17 +112,6 @@ final class ReadStage implements ReadStageInterface
 
                 // If the value contains arrays, we need to merge them for the filters to understand this syntax, proper to GraphQL to preserve the order of the arguments.
                 if ($this->isSequentialArrayOfArrays($value)) {
-                    if (\count($value[0]) > 1) {
-                        $deprecationMessage = "The filter syntax \"$name: {";
-                        $filterArgsOld = [];
-                        $filterArgsNew = [];
-                        foreach ($value[0] as $filterArgName => $filterArgValue) {
-                            $filterArgsOld[] = "$filterArgName: \"$filterArgValue\"";
-                            $filterArgsNew[] = sprintf('{%s: "%s"}', $filterArgName, $filterArgValue);
-                        }
-                        $deprecationMessage .= sprintf('%s}" is deprecated since API Platform 2.6, use the following syntax instead: "%s: [%s]".', implode(', ', $filterArgsOld), $name, implode(', ', $filterArgsNew));
-                        @trigger_error($deprecationMessage, \E_USER_DEPRECATED);
-                    }
                     $value = array_merge(...$value);
                 }
                 $filters[$name] = $this->getNormalizedFilters($value);
@@ -154,5 +128,63 @@ final class ReadStage implements ReadStageInterface
         }
 
         return $filters;
+    }
+
+    public function isSequentialArrayOfArrays(array $array): bool
+    {
+        if (!$this->isSequentialArray($array)) {
+            return false;
+        }
+
+        return $this->arrayContainsOnly($array, 'array');
+    }
+
+    public function isSequentialArray(array $array): bool
+    {
+        if ([] === $array) {
+            return false;
+        }
+
+        return array_is_list($array);
+    }
+
+    public function arrayContainsOnly(array $array, string $type): bool
+    {
+        return $array === array_filter($array, static fn ($item): bool => $type === \gettype($item));
+    }
+
+    /**
+     * Get class name of the given object.
+     */
+    private function getObjectClass(object $object): string
+    {
+        return $this->getRealClassName($object::class);
+    }
+
+    /**
+     * Get the real class name of a class name that could be a proxy.
+     */
+    private function getRealClassName(string $className): string
+    {
+        // __CG__: Doctrine Common Marker for Proxy (ODM < 2.0 and ORM < 3.0)
+        // __PM__: Ocramius Proxy Manager (ODM >= 2.0)
+        $positionCg = strrpos($className, '\\__CG__\\');
+        $positionPm = strrpos($className, '\\__PM__\\');
+
+        if (false === $positionCg && false === $positionPm) {
+            return $className;
+        }
+
+        if (false !== $positionCg) {
+            return substr($className, $positionCg + 8);
+        }
+
+        $className = ltrim($className, '\\');
+
+        return substr(
+            $className,
+            8 + $positionPm,
+            strrpos($className, '\\') - ($positionPm + 8)
+        );
     }
 }

@@ -13,13 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 class RecoverPasswordOutput
 {
     /**
-     * @var \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy
-     * @Groups({"user"})
+     * @var Dummy
      */
+    /**
+     * @var Dummy
+     */
+    #[Groups(['user'])]
     public $dummy;
 }

@@ -13,102 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
-use ApiPlatform\Metadata\Property\DeprecationMetadataTrait;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * ApiProperty annotation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT)]
 final class ApiProperty
 {
-    use DeprecationMetadataTrait;
-
-    /**
-     * @var string
-     */
-    private $description;
-
-    /**
-     * @var bool
-     */
-    private $readable;
-
-    /**
-     * @var bool
-     */
-    private $writable;
-
-    /**
-     * @var bool
-     */
-    private $readableLink;
-
-    /**
-     * @var bool
-     */
-    private $writableLink;
-
-    /**
-     * @var bool
-     */
-    private $required;
-
-    /**
-     * @var bool
-     */
-    private $identifier;
-
-    /**
-     * @var string|int|float|bool|array|null
-     */
-    private $default;
-
-    /**
-     * @var string|int|float|bool|array|null
-     */
-    private $example;
-
-    private $deprecationReason;
-    private $fetchable;
-    private $fetchEager;
-    private $jsonldContext;
-    private $openapiContext;
-    private $push;
-    private $security;
-    private $securityPostDenormalize;
-
-    /**
-     * @var string[]
-     */
-    private $types;
-
-    /**
-     * The related php types.
-     *
-     * @var Type[]
-     */
-    private $builtinTypes;
-
-    private $schema;
-    private $initializable;
-
-    /**
-     * @var array
-     */
-    private $extraProperties;
-
     /**
      * @param bool|null   $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
      * @param bool|null   $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
      * @param bool|null   $required                https://api-platform.com/docs/admin/validation/#client-side-validation
      * @param bool|null   $identifier              https://api-platform.com/docs/core/identifiers/
      * @param string|null $default
-     * @param string|null $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param mixed       $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param string|null $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param bool|null   $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
      * @param array|null  $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
@@ -116,60 +37,89 @@ final class ApiProperty
      * @param bool|null   $push                    https://api-platform.com/docs/core/push-relations/
      * @param string|null $security                https://api-platform.com/docs/core/security
      * @param string|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param array|null  $types                   the RDF types of this property
+     * @param string[]    $types                   the RDF types of this property
+     * @param string[]    $iris
+     * @param Type[]      $builtinTypes
+     * @param string|null $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
      */
     public function __construct(
-        ?string $description = null,
-        ?bool $readable = null,
-        ?bool $writable = null,
-        ?bool $readableLink = null,
-        ?bool $writableLink = null,
-        ?bool $required = null,
-        ?bool $identifier = null,
-
-                $default = null,
-                $example = null,
-
-        ?string $deprecationReason = null,
-        ?bool $fetchable = null,
-        ?bool $fetchEager = null,
-        ?array $jsonldContext = null,
-        ?array $openapiContext = null,
-        ?bool $push = null,
-        ?string $security = null,
-        ?string $securityPostDenormalize = null,
-
-        ?array $types = null,
-        ?array $builtinTypes = null,
-        ?array $schema = null,
-        ?bool $initializable = null,
-
-        // attributes
-        array $extraProperties = []
+        private ?string $description = null,
+        private ?bool $readable = null,
+        private ?bool $writable = null,
+        private ?bool $readableLink = null,
+        private ?bool $writableLink = null,
+        private ?bool $required = null,
+        private ?bool $identifier = null,
+        private $default = null,
+        private mixed $example = null,
+        /**
+         * The `deprecationReason` option deprecates the current operation with a deprecation message.
+         *
+         * <CodeSelector>
+         * ```php
+         * <?php
+         * // api/src/Entity/Review.php
+         * use ApiPlatform\Metadata\ApiProperty;
+         * use ApiPlatform\Metadata\ApiResource;
+         *
+         * #[ApiResource]
+         * class Review
+         * {
+         *     #[ApiProperty(deprecationReason: "Use the rating property instead")]
+         *     public string $letter;
+         * }
+         * ```
+         *
+         * ```yaml
+         * # api/config/api_platform/properties.yaml
+         * properties:
+         *     App\Entity\Review:
+         *         letter:
+         *             deprecationReason: 'Create a Book instead'
+         * ```
+         *
+         * ```xml
+         * <?xml version="1.0" encoding="UTF-8" ?>
+         * <!-- api/config/api_platform/properties.xml -->
+         *
+         * <properties
+         *         xmlns="https://api-platform.com/schema/metadata/properties-3.0"
+         *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         *         xsi:schemaLocation="https://api-platform.com/schema/metadata/properties-3.0
+         *         https://api-platform.com/schema/metadata/properties-3.0.xsd">
+         *     <property resource="App\Entity\Review" name="letter" deprecationReason="Create a Book instead" />
+         * </properties>
+         * ```
+         * </CodeSelector>
+         *
+         * - With JSON-lD / Hydra, [an `owl:deprecated` annotation property](https://www.w3.org/TR/owl2-syntax/#Annotation_Properties) will be added to the appropriate data structure
+         * - With Swagger / OpenAPI, [a `deprecated` property](https://swagger.io/docs/specification/2-0/paths-and-operations/) will be added
+         * - With GraphQL, the [`isDeprecated` and `deprecationReason` properties](https://facebook.github.io/graphql/June2018/#sec-Deprecation) will be added to the schema
+         */
+        private ?string $deprecationReason = null,
+        private ?bool $fetchable = null,
+        private ?bool $fetchEager = null,
+        private ?array $jsonldContext = null,
+        private ?array $openapiContext = null,
+        private ?array $jsonSchemaContext = null,
+        private ?bool $push = null,
+        private ?string $security = null,
+        private ?string $securityPostDenormalize = null,
+        private array|string|null $types = null,
+        /*
+         * The related php types.
+         */
+        private ?array $builtinTypes = null,
+        private ?array $schema = null,
+        private ?bool $initializable = null,
+        private $iris = null,
+        private ?bool $genId = null,
+        private ?string $uriTemplate = null,
+        private array $extraProperties = [],
     ) {
-        $this->description = $description;
-        $this->readable = $readable;
-        $this->writable = $writable;
-        $this->readableLink = $readableLink;
-        $this->writableLink = $writableLink;
-        $this->required = $required;
-        $this->identifier = $identifier;
-        $this->default = $default;
-        $this->example = $example;
-        $this->deprecationReason = $deprecationReason;
-        $this->fetchable = $fetchable;
-        $this->fetchEager = $fetchEager;
-        $this->jsonldContext = $jsonldContext;
-        $this->openapiContext = $openapiContext;
-        $this->push = $push;
-        $this->security = $security;
-        $this->openapiContext = $openapiContext;
-        $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->types = $types;
-        $this->builtinTypes = $builtinTypes;
-        $this->schema = $schema;
-        $this->initializable = $initializable;
-        $this->extraProperties = $extraProperties;
+        if (\is_string($types)) {
+            $this->types = (array) $types;
+        }
     }
 
     public function getDescription(): ?string
@@ -276,12 +226,12 @@ final class ApiProperty
         return $self;
     }
 
-    public function getExample()
+    public function getExample(): mixed
     {
         return $this->example;
     }
 
-    public function withExample($example): self
+    public function withExample(mixed $example): self
     {
         $self = clone $this;
         $self->example = $example;
@@ -354,6 +304,19 @@ final class ApiProperty
         return $self;
     }
 
+    public function getJsonSchemaContext(): ?array
+    {
+        return $this->jsonSchemaContext;
+    }
+
+    public function withJsonSchemaContext($jsonSchemaContext): self
+    {
+        $self = clone $this;
+        $self->jsonSchemaContext = $jsonSchemaContext;
+
+        return $self;
+    }
+
     public function getPush(): ?bool
     {
         return $this->push;
@@ -401,7 +364,7 @@ final class ApiProperty
     /**
      * @param string[]|string $types
      */
-    public function withTypes($types = []): self
+    public function withTypes(array|string $types = []): self
     {
         $self = clone $this;
         $self->types = (array) $types;
@@ -468,168 +431,56 @@ final class ApiProperty
     }
 
     /**
-     * @deprecated since 2.7, to be removed in 3.0
-     */
-    public function withSubresource(SubresourceMetadata $subresourceMetadata): self
-    {
-        trigger_deprecation('api-platform/core', '2.7', 'Declaring a subresource on a property is deprecated, use alternate URLs instead.');
-        $self = clone $this;
-        $self->extraProperties['subresource'] = $subresourceMetadata;
-
-        return $self;
-    }
-
-    /**
-     * @deprecated since 2.7, to be removed in 3.0
-     */
-    public function getSubresource(): ?SubresourceMetadata
-    {
-        return $this->extraProperties['subresource'] ?? null;
-    }
-
-    /**
-     * Represents whether the property has a subresource.
-     *
-     * @deprecated since 2.7, to be removed in 3.0
-     */
-    public function hasSubresource(): bool
-    {
-        return isset($this->extraProperties['subresource']);
-    }
-
-    /**
-     * @deprecated since 2.6, to be removed in 3.0
-     */
-    public function getChildInherited(): ?string
-    {
-        return $this->extraProperties['childInherited'] ?? null;
-    }
-
-    /**
-     * @deprecated since 2.6, to be removed in 3.0
-     */
-    public function hasChildInherited(): bool
-    {
-        return isset($this->extraProperties['childInherited']);
-    }
-
-    /**
-     * @deprecated since 2.4, to be removed in 3.0
-     */
-    public function isChildInherited(): ?string
-    {
-        trigger_deprecation('api-platform/core', '2.4', sprintf('"%s::%s" is deprecated since 2.4 and will be removed in 3.0.', __CLASS__, __METHOD__));
-
-        return $this->getChildInherited();
-    }
-
-    /**
-     * @deprecated since 2.6, to be removed in 3.0
-     */
-    public function withChildInherited(string $childInherited): self
-    {
-        trigger_deprecation('api-platform/core', '2.6', sprintf('"%s::%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__, __METHOD__));
-
-        $metadata = clone $this;
-        $metadata->extraProperties['childInherited'] = $childInherited;
-
-        return $metadata;
-    }
-
-    /**
      * Gets IRI of this property.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, use getTypes instead
      */
-    public function getIri(): ?string
+    public function getIris()
     {
-        return $this->types[0] ?? null;
+        return $this->iris;
     }
 
     /**
      * Returns a new instance with the given IRI.
      *
-     * @deprecated since 2.7, to be removed in 3.0, use withTypes instead
+     * @param string|string[] $iris
      */
-    public function withIri(string $iri = null): self
+    public function withIris(string|array $iris): self
     {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0, use Type instead.', __CLASS__, __METHOD__));
-
         $metadata = clone $this;
-        $metadata->types = [$iri];
+        $metadata->iris = (array) $iris;
 
         return $metadata;
     }
 
     /**
-     * Gets an attribute.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, use getExtraProperties instead
-     *
-     * @param mixed|null $defaultValue
+     * Whether to generate a skolem iri on anonymous resources.
      */
-    public function getAttribute(string $key, $defaultValue = null)
+    public function getGenId()
     {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0.', __CLASS__, __METHOD__));
-
-        if (!$this->camelCaseToSnakeCaseNameConverter) {
-            $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
-        }
-
-        $propertyName = $this->camelCaseToSnakeCaseNameConverter->denormalize($key);
-
-        if (isset($this->{$propertyName})) {
-            return $this->{$propertyName} ?? $defaultValue;
-        }
-
-        return $this->extraProperties[$key] ?? $defaultValue;
+        return $this->genId;
     }
 
-    /**
-     * Gets attributes.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, renamed as getExtraProperties
-     */
-    public function getAttributes(): ?array
+    public function withGenId(bool $genId): self
     {
-        return $this->extraProperties;
-    }
-
-    /**
-     * Returns a new instance with the given attribute.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, renamed as withExtraProperties
-     */
-    public function withAttributes(array $attributes): self
-    {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0.', __CLASS__, __METHOD__));
-
         $metadata = clone $this;
+        $metadata->genId = $genId;
 
-        return $this->withDeprecatedAttributes($metadata, $attributes);
+        return $metadata;
     }
 
     /**
-     * Gets type.
+     * Whether to return the subRessource collection IRI instead of an iterable of IRI.
      *
-     * @deprecated since 2.7, to be removed in 3.0, renamed as getBuiltinTypes
+     * @experimental
      */
-    public function getType(): ?Type
+    public function getUriTemplate(): ?string
     {
-        return $this->builtinTypes[0] ?? null;
+        return $this->uriTemplate;
     }
 
-    /**
-     * Returns a new instance with the given type.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, renamed as withBuiltinTypes
-     */
-    public function withType(Type $type): self
+    public function withUriTemplate(?string $uriTemplate): self
     {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0, use builtinTypes instead.', __CLASS__, __METHOD__));
-
         $metadata = clone $this;
-        $metadata->builtinTypes = [$type];
+        $metadata->uriTemplate = $uriTemplate;
 
         return $metadata;
     }

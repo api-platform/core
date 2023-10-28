@@ -13,13 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 class RecoverPasswordInput
 {
     /**
-     * @var \ApiPlatform\Tests\Fixtures\TestBundle\Entity\User
-     * @Groups({"user"})
+     * @var User
      */
+    /**
+     * @var User
+     */
+    #[Groups(['user'])]
     public $user;
 }

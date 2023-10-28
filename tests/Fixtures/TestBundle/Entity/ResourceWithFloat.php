@@ -13,32 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource
- * @ORM\Entity
- */
+#[ApiResource]
+#[ORM\Entity]
 class ResourceWithFloat
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column(type: 'float')]
+    private float $myFloatField = 0.0;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(type="float")
-     */
-    private $myFloatField = 0.0;
-
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

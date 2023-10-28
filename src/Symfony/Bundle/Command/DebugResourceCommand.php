@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Bundle\Command;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,18 +24,9 @@ use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 
 final class DebugResourceCommand extends Command
 {
-    protected static $defaultName = 'debug:api-resource';
-
-    private $resourceMetadataCollectionFactory;
-    private $cloner;
-    private $dumper;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ClonerInterface $cloner, $dumper)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ClonerInterface $cloner, private $dumper)
     {
         parent::__construct();
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->cloner = $cloner;
-        $this->dumper = $dumper;
     }
 
     /**
@@ -59,11 +51,12 @@ final class DebugResourceCommand extends Command
         if (0 === \count($resourceCollection)) {
             $output->writeln(sprintf('<error>No resources found for class %s</error>', $resourceClass));
 
-            return Command::INVALID;
+            return \defined(Command::class.'::INVALID') ? Command::INVALID : 2;
         }
 
         $shortName = (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
 
+        /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
 
         $resources = [];
@@ -110,12 +103,17 @@ final class DebugResourceCommand extends Command
             $this->dumper->dump($this->cloner->cloneVar($selectedResource));
             $output->writeln('Successfully dumped the selected resource');
 
-            return Command::SUCCESS;
+            return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
         }
 
         $this->dumper->dump($this->cloner->cloneVar($resourceCollection->getOperation($answerOperation)));
         $output->writeln('Successfully dumped the selected operation');
 
-        return Command::SUCCESS;
+        return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
+    }
+
+    public static function getDefaultName(): string
+    {
+        return 'debug:api-resource';
     }
 }

@@ -13,53 +13,41 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Related Owning Dummy.
  *
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
- *
- * @ApiResource(iri="https://schema.org/Product")
- * @ORM\Entity
  */
+#[ApiResource(types: ['https://schema.org/Product'])]
+#[ORM\Entity]
 class RelatedOwningDummy
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-
     /**
      * @var string|null A name
-     *
-     * @ORM\Column(nullable=true)
      */
+    #[ORM\Column(nullable: true)]
     public $name;
-
-    /**
-     * @var Dummy|null
-     *
-     * @ORM\OneToOne(targetEntity="Dummy", cascade={"persist"}, mappedBy="relatedOwningDummy")
-     * @ApiSubresource
-     */
-    public $ownedDummy;
+    #[ORM\OneToOne(targetEntity: Dummy::class, cascade: ['persist'], mappedBy: 'relatedOwningDummy')]
+    public ?Dummy $ownedDummy = null;
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -82,10 +70,9 @@ class RelatedOwningDummy
      *
      * @param Dummy $ownedDummy the value to set
      */
-    public function setOwnedDummy(Dummy $ownedDummy)
+    public function setOwnedDummy(Dummy $ownedDummy): void
     {
         $this->ownedDummy = $ownedDummy;
-
         if ($this !== $this->ownedDummy->getRelatedOwningDummy()) {
             $this->ownedDummy->setRelatedOwningDummy($this);
         }

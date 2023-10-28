@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Serializer;
 
+use ApiPlatform\Metadata\GraphQl\Operation;
+
 /**
  * Builds the context used by the Symfony Serializer.
  *
@@ -20,5 +22,5 @@ namespace ApiPlatform\GraphQl\Serializer;
  */
 interface SerializerContextBuilderInterface
 {
-    public function create(string $resourceClass, string $operationName, array $resolverContext, bool $normalization): array;
+    public function create(string $resourceClass, Operation $operation, array $resolverContext, bool $normalization): array;
 }

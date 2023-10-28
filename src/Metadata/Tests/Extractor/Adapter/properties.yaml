@@ -1,0 +1,41 @@
+properties:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment:
+        comment:
+            description: 'Comment message'
+            readable: true
+            writable: true
+            readableLink: true
+            writableLink: true
+            default: Plop
+            deprecationReason: Foo
+            schema:
+                - 'https://schema.org/Thing'
+            required: true
+            identifier: false
+            example: 'Lorem ipsum dolor sit amet'
+            fetchable: true
+            fetchEager: true
+            jsonldContext:
+                bar:
+                    foo:
+                        bar: baz
+            openapiContext:
+                foo: bar
+            jsonSchemaContext:
+                lorem: ipsum
+            push: true
+            security: "is_granted('IS_AUTHENTICATED_ANONYMOUSLY')"
+            securityPostDenormalize: "is_granted('ROLE_CUSTOM_ADMIN')"
+            types:
+                - someirischema
+                - anotheririschema
+            builtinTypes:
+                - string
+            initializable: true
+            extraProperties:
+                custom_property: 'Lorem ipsum dolor sit amet'
+                user_defined_schema: true
+            iris:
+                - 'https://schema.org/totalPrice'
+            genId: true
+            uriTemplate: /sub-resource-get-collection

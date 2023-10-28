@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -28,7 +28,7 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaRegexRestriction;
+    private PropertySchemaRegexRestriction $propertySchemaRegexRestriction;
 
     protected function setUp(): void
     {
@@ -43,7 +43,7 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaRegexRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
         yield 'supported' => [new Regex(['pattern' => '/^[0-9]+$/']), new ApiProperty(), true];
         yield 'supported too' => [new Regex(['pattern' => '/[0-9]/', 'match' => false]), new ApiProperty(), true];
@@ -58,7 +58,7 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaRegexRestriction->create($constraint, $propertyMetadata));
     }
 
-    public function createProvider(): \Generator
+    public static function createProvider(): \Generator
     {
         yield 'anchored' => [new Regex(['pattern' => '/^[0-9]+$/']), new ApiProperty(), ['pattern' => '^([0-9]+)$']];
         yield 'not anchored' => [new Regex(['pattern' => '/[0-9]/']), new ApiProperty(), ['pattern' => '^(.*[0-9].*)$']];

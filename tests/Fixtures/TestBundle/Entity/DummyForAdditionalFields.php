@@ -13,30 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource
- * @ORM\Entity
- */
+#[ApiResource]
+#[ORM\Entity]
 class DummyForAdditionalFields
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-    /** @ORM\Column */
-    private $name;
-    /** @ORM\Column */
-    private $slug;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    public function __construct(string $name, string $slug)
+    public function __construct(#[ORM\Column] private string $name, #[ORM\Column] private string $slug)
     {
-        $this->name = $name;
-        $this->slug = $slug;
     }
 
     public function getId(): ?int

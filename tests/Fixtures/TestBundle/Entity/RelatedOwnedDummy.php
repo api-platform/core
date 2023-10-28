@@ -13,42 +13,30 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Related Owned Dummy.
  *
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
- *
- * @ApiResource(iri="https://schema.org/Product")
- * @ORM\Entity
  */
+#[ApiResource(types: ['https://schema.org/Product'])]
+#[ORM\Entity]
 class RelatedOwnedDummy
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string|null A name
-     *
-     * @ORM\Column(nullable=true)
      */
-    public $name;
-
-    /**
-     * @var Dummy
-     *
-     * @ORM\OneToOne(targetEntity="Dummy", cascade={"persist"}, inversedBy="relatedOwnedDummy")
-     * @ORM\JoinColumn(nullable=false)
-     * @ApiSubresource
-     */
-    public $owningDummy;
+    #[ORM\Column(nullable: true)]
+    public ?string $name = null;
+    #[ORM\OneToOne(targetEntity: Dummy::class, cascade: ['persist'], inversedBy: 'relatedOwnedDummy')]
+    #[ORM\JoinColumn(nullable: false)]
+    public ?Dummy $owningDummy = null;
 
     public function getId(): ?int
     {

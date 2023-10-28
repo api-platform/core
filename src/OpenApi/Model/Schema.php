@@ -18,36 +18,16 @@ use ApiPlatform\JsonSchema\Schema as JsonSchema;
 final class Schema extends \ArrayObject
 {
     use ExtensionTrait;
+    private readonly JsonSchema $schema;
 
-    private $nullable;
-    private $discriminator;
-    private $readOnly;
-    private $writeOnly;
-    private $xml;
-    private $externalDocs;
-    private $example;
-    private $deprecated;
-    private $schema;
-
-    public function __construct(bool $nullable = null, $discriminator = null, bool $readOnly = false, bool $writeOnly = false, string $xml = null, $externalDocs = null, $example = null, bool $deprecated = false)
+    public function __construct(private $discriminator = null, private bool $readOnly = false, private bool $writeOnly = false, private ?string $xml = null, private $externalDocs = null, private $example = null, private bool $deprecated = false)
     {
-        if (null !== $nullable) {
-            @trigger_error('The nullable keyword has been removed from the Schema Object (null can be used as a type value). This behaviour will not be possible anymore in API Platform 3.0.', \E_USER_DEPRECATED);
-            $this->nullable = $nullable;
-        }
-        $this->discriminator = $discriminator;
-        $this->readOnly = $readOnly;
-        $this->writeOnly = $writeOnly;
-        $this->xml = $xml;
-        $this->externalDocs = $externalDocs;
-        $this->example = $example;
-        $this->deprecated = $deprecated;
         $this->schema = new JsonSchema();
 
         parent::__construct([]);
     }
 
-    public function setDefinitions(array $definitions)
+    public function setDefinitions(array $definitions): void
     {
         $this->schema->setDefinitions(new \ArrayObject($definitions));
     }
@@ -66,11 +46,6 @@ final class Schema extends \ArrayObject
     public function getDefinitions(): \ArrayObject
     {
         return new \ArrayObject(array_merge($this->schema->getArrayCopy(true), $this->getArrayCopy()));
-    }
-
-    public function getNullable(): bool
-    {
-        return $this->nullable;
     }
 
     public function getDiscriminator()
@@ -106,14 +81,6 @@ final class Schema extends \ArrayObject
     public function getDeprecated(): bool
     {
         return $this->deprecated;
-    }
-
-    public function withNullable(bool $nullable): self
-    {
-        $clone = clone $this;
-        $clone->nullable = $nullable;
-
-        return $clone;
     }
 
     public function withDiscriminator($discriminator): self
@@ -172,5 +139,3 @@ final class Schema extends \ArrayObject
         return $clone;
     }
 }
-
-class_alias(Schema::class, \ApiPlatform\Core\OpenApi\Model\Schema::class);

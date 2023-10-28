@@ -25,11 +25,8 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
  */
 final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
-    private $propertyInfo;
-
-    public function __construct(PropertyInfoExtractorInterface $propertyInfo)
+    public function __construct(private readonly PropertyInfoExtractorInterface $propertyInfo)
     {
-        $this->propertyInfo = $propertyInfo;
     }
 
     /**
@@ -42,5 +39,3 @@ final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCol
         return new PropertyNameCollection($properties ?? []);
     }
 }
-
-class_alias(PropertyInfoPropertyNameCollectionFactory::class, \ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class);

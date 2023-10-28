@@ -17,26 +17,38 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDbOdmClassMetadata;
 use Doctrine\ODM\MongoDB\Mapping\MappingException;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 
 /**
  * Helper trait regarding a property in a MongoDB document using the resource metadata.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 trait PropertyHelperTrait
 {
+    abstract protected function getManagerRegistry(): ManagerRegistry;
+
     /**
      * Splits the given property into parts.
      */
-    abstract protected function splitPropertyParts(string $property/* , string $resourceClass */): array;
+    abstract protected function splitPropertyParts(string $property, string $resourceClass): array;
 
     /**
      * Gets class metadata for the given resource.
      */
-    abstract protected function getClassMetadata(string $resourceClass): ClassMetadata;
+    protected function getClassMetadata(string $resourceClass): ClassMetadata
+    {
+        $manager = $this
+            ->getManagerRegistry()
+            ->getManagerForClass($resourceClass);
+
+        if ($manager) {
+            return $manager->getClassMetadata($resourceClass);
+        }
+
+        return new MongoDbOdmClassMetadata($resourceClass);
+    }
 
     /**
      * Adds the necessary lookups for a nested property.
@@ -48,7 +60,7 @@ trait PropertyHelperTrait
      *               the second element is the $field name
      *               the third element is the $associations array
      */
-    protected function addLookupsForNestedProperty(string $property, Builder $aggregationBuilder, string $resourceClass): array
+    protected function addLookupsForNestedProperty(string $property, Builder $aggregationBuilder, string $resourceClass, bool $preserveNullAndEmptyArrays = false): array
     {
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $alias = '';
@@ -61,7 +73,7 @@ trait PropertyHelperTrait
             }
 
             if ($classMetadata->hasReference($association)) {
-                $propertyAlias = "${association}_lkup";
+                $propertyAlias = "{$association}_lkup";
                 // previous_association_lkup.association
                 $localField = "$alias$association";
                 // previous_association_lkup.association_lkup
@@ -86,10 +98,11 @@ trait PropertyHelperTrait
                     ->localField($isOwningSide ? $localField : '_id')
                     ->foreignField($isOwningSide ? '_id' : $referenceMapping['mappedBy'])
                     ->alias($alias);
-                $aggregationBuilder->unwind("\$$alias");
+                $aggregationBuilder->unwind("\$$alias")
+                    ->preserveNullAndEmptyArrays($preserveNullAndEmptyArrays);
 
                 // association.property => association_lkup.property
-                $property = substr_replace($property, $propertyAlias, strpos($property, $association), \strlen($association));
+                $property = substr_replace($property, $propertyAlias, strpos($property, (string) $association), \strlen((string) $association));
                 $resourceClass = $classMetadata->getAssociationTargetClass($association);
                 $alias .= '.';
             } elseif ($classMetadata->hasEmbed($association)) {
@@ -105,5 +118,3 @@ trait PropertyHelperTrait
         return [$property, $propertyParts['field'], $propertyParts['associations']];
     }
 }
-
-class_alias(PropertyHelperTrait::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait::class);

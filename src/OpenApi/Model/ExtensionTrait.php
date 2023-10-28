@@ -15,11 +15,11 @@ namespace ApiPlatform\OpenApi\Model;
 
 trait ExtensionTrait
 {
-    private $extensionProperties = [];
+    private array $extensionProperties = [];
 
-    public function withExtensionProperty(string $key, $value)
+    public function withExtensionProperty(string $key, $value): mixed
     {
-        if (0 !== strpos($key, 'x-')) {
+        if (!str_starts_with($key, 'x-')) {
             $key = 'x-'.$key;
         }
 
@@ -34,5 +34,3 @@ trait ExtensionTrait
         return $this->extensionProperties;
     }
 }
-
-class_alias(ExtensionTrait::class, \ApiPlatform\Core\OpenApi\Model\ExtensionTrait::class);

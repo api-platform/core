@@ -13,56 +13,40 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Dummy Product.
+ *
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource
- * @ODM\Document
  */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products{._format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, operations: [new GetCollection()])]
+#[ODM\Document]
 class DummyProduct
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
-    /**
-     * @var Collection
-     *
-     * @ApiSubresource
-     * @ODM\ReferenceMany(targetDocument=DummyAggregateOffer::class, mappedBy="product", cascade={"persist"})
-     */
-    private $offers;
-
+    #[ODM\Id(strategy: 'None', type: 'int')]
+    private ?int $id = null;
+    #[ODM\ReferenceMany(targetDocument: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
+    private Collection|iterable $offers;
     /**
      * @var string The tour name
-     *
-     * @ODM\Field
      */
-    private $name;
-
-    /**
-     * @var Collection
-     *
-     * @ApiSubresource
-     * @ODM\ReferenceMany(targetDocument=DummyProduct::class, mappedBy="parent")
-     */
-    private $relatedProducts;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=DummyProduct::class, inversedBy="relatedProducts")
-     */
+    #[ODM\Field]
+    private string $name;
+    #[ODM\ReferenceMany(targetDocument: self::class, mappedBy: 'parent')]
+    private Collection|iterable $relatedProducts;
+    #[ODM\ReferenceOne(targetDocument: self::class, inversedBy: 'relatedProducts')]
     private $parent;
 
     public function __construct()
@@ -71,25 +55,30 @@ class DummyProduct
         $this->relatedProducts = new ArrayCollection();
     }
 
-    public function getOffers(): Collection
+    public function getOffers(): Collection|iterable
     {
         return $this->offers;
     }
 
-    public function setOffers($offers)
+    public function setOffers(Collection|iterable $offers): void
     {
         $this->offers = $offers;
     }
 
-    public function addOffer(DummyAggregateOffer $offer)
+    public function addOffer(DummyAggregateOffer $offer): void
     {
         $this->offers->add($offer);
         $offer->setProduct($this);
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getName(): string
@@ -97,22 +86,22 @@ class DummyProduct
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    public function getRelatedProducts(): Collection
+    public function getRelatedProducts(): Collection|iterable
     {
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(iterable $relatedProducts): void
+    public function setRelatedProducts(Collection|iterable $relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }
 
-    public function addRelatedProduct(self $relatedProduct)
+    public function addRelatedProduct(self $relatedProduct): void
     {
         $this->relatedProducts->add($relatedProduct);
         $relatedProduct->setParent($this);
@@ -123,7 +112,7 @@ class DummyProduct
         return $this->parent;
     }
 
-    public function setParent(self $product)
+    public function setParent(self $product): void
     {
         $this->parent = $product;
     }

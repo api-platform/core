@@ -18,15 +18,9 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
  */
 class ResourceInterfaceImplementation implements ResourceInterface, ResourceBarInterface
 {
-    /**
-     * @var string
-     */
-    private $foo;
+    private ?string $foo = null;
 
-    /**
-     * @var ?string
-     */
-    private $bar;
+    private ?string $bar = null;
 
     public function setFoo(string $foo)
     {

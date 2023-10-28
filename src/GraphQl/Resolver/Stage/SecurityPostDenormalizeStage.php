@@ -24,11 +24,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 final class SecurityPostDenormalizeStage implements SecurityPostDenormalizeStageInterface
 {
-    private $resourceAccessChecker;
-
-    public function __construct(?ResourceAccessCheckerInterface $resourceAccessChecker)
+    public function __construct(private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker)
     {
-        $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     /**

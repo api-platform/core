@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Security;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Symfony\Security\ExpressionLanguage;
 use ApiPlatform\Symfony\Security\ResourceAccessChecker;
 use ApiPlatform\Tests\Fixtures\Serializable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -35,7 +35,7 @@ class ResourceAccessCheckerTest extends TestCase
     /**
      * @dataProvider getGranted
      */
-    public function testIsGranted(bool $granted)
+    public function testIsGranted(bool $granted): void
     {
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);
         $expressionLanguageProphecy->evaluate('is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn($granted)->shouldBeCalled();
@@ -48,11 +48,7 @@ class ResourceAccessCheckerTest extends TestCase
         $token = $tokenProphecy->reveal();
         $tokenProphecy->getUser()->shouldBeCalled();
 
-        if (method_exists($token, 'getRoleNames')) {
-            $tokenProphecy->getRoleNames()->willReturn([])->shouldBeCalled();
-        } else {
-            $tokenProphecy->getRoles()->willReturn([])->shouldBeCalled();
-        }
+        $tokenProphecy->getRoleNames()->willReturn([])->shouldBeCalled();
 
         $tokenStorageProphecy->getToken()->willReturn($token);
 
@@ -60,12 +56,12 @@ class ResourceAccessCheckerTest extends TestCase
         $this->assertSame($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
     }
 
-    public function getGranted(): array
+    public static function getGranted(): array
     {
         return [[true], [false]];
     }
 
-    public function testSecurityComponentNotAvailable()
+    public function testSecurityComponentNotAvailable(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "symfony/security" library must be installed to use the "security" attribute.');
@@ -74,7 +70,7 @@ class ResourceAccessCheckerTest extends TestCase
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
-    public function testExpressionLanguageNotInstalled()
+    public function testExpressionLanguageNotInstalled(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "symfony/expression-language" library must be installed to use the "security" attribute.');
@@ -87,19 +83,7 @@ class ResourceAccessCheckerTest extends TestCase
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
     }
 
-    public function testNotBehindAFirewall()
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The current token must be set to use the "security" attribute (is the URL behind a firewall?).');
-
-        $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
-        $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
-
-        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
-        $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
-    }
-
-    public function testWithoutAuthenticationTokenAndExceptionOnNoTokenIsFalse()
+    public function testWithoutAuthenticationToken(): void
     {
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);
         $expressionLanguageProphecy->evaluate('is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(true)->shouldBeCalled();
@@ -110,7 +94,7 @@ class ResourceAccessCheckerTest extends TestCase
 
         $tokenStorageProphecy->getToken()->willReturn(null);
 
-        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), $authorizationCheckerProphecy->reveal(), false);
+        $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal(), $authorizationCheckerProphecy->reveal());
         self::assertTrue($checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
     }
 }

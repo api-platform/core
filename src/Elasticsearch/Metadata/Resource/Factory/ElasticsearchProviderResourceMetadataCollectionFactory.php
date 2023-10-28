@@ -15,30 +15,24 @@ namespace ApiPlatform\Elasticsearch\Metadata\Resource\Factory;
 
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Util\Inflector;
+use ApiPlatform\Metadata\Util\Inflector;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface
-     */
-    private $decorated;
-
-    private $client;
-
-    public function __construct(Client $client, ResourceMetadataCollectionFactoryInterface $decorated)
+    public function __construct(private readonly Client|null $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly bool $triggerDeprecation = true) // @phpstan-ignore-line
     {
-        $this->decorated = $decorated;
-        $this->client = $client;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
@@ -49,11 +43,22 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
             if ($operations) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if ($this->hasIndices($operation->getShortName())) {
-                        $operation = $operation->withElasticsearch(true);
+                    if ($operation->getProvider()) {
+                        continue;
                     }
 
-                    if (null !== $operation->getProvider() || false === ($operation->getElasticsearch() ?? false)) {
+                    if (null !== ($elasticsearch = $operation->getElasticsearch())) {
+                        trigger_deprecation('api-platform/core', '3.1', sprintf('The "elasticsearch" property is deprecated. Use a stateOptions: "%s" instead.', Options::class));
+                    }
+
+                    $hasElasticsearch = true === $elasticsearch || $operation->getStateOptions() instanceof Options;
+
+                    // Old behavior in ES < 8
+                    if ($this->client instanceof LegacyClient && $this->hasIndices($operation)) { // @phpstan-ignore-line
+                        $hasElasticsearch = true;
+                    }
+
+                    if (!$hasElasticsearch) {
                         continue;
                     }
 
@@ -67,11 +72,22 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
 
             if ($graphQlOperations) {
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
-                    if ($this->hasIndices($graphQlOperation->getShortName())) {
-                        $graphQlOperation = $graphQlOperation->withElasticsearch(true);
+                    if ($graphQlOperation->getProvider()) {
+                        continue;
                     }
 
-                    if (null !== $graphQlOperation->getProvider() || false === ($graphQlOperation->getElasticsearch() ?? false)) {
+                    if (null !== ($elasticsearch = $graphQlOperation->getElasticsearch())) {
+                        trigger_deprecation('api-platform/core', '3.1', sprintf('The "elasticsearch" property is deprecated. Use a stateOptions: "%s" instead.', Options::class));
+                    }
+
+                    $hasElasticsearch = true === $elasticsearch || $graphQlOperation->getStateOptions() instanceof Options;
+
+                    // Old behavior in ES < 8
+                    if ($this->client instanceof LegacyClient && $this->hasIndices($operation)) { // @phpstan-ignore-line
+                        $hasElasticsearch = true;
+                    }
+
+                    if (!$hasElasticsearch) {
                         continue;
                     }
 
@@ -87,15 +103,16 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
         return $resourceMetadataCollection;
     }
 
-    private function hasIndices(string $shortName): bool
+    private function hasIndices(Operation $operation): bool
     {
+        $shortName = $operation->getShortName();
         $index = Inflector::tableize($shortName);
 
         try {
-            $this->client->cat()->indices(['index' => $index]);
+            $this->client->cat()->indices(['index' => $index]); // @phpstan-ignore-line
 
             return true;
-        } catch (Missing404Exception $e) {
+        } catch (Missing404Exception|NoNodesAvailableException) { // @phpstan-ignore-line
             return false;
         }
     }

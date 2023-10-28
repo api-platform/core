@@ -18,9 +18,9 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait ExistsFilterTestTrait
 {
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
-        $filter = $filter = $this->buildFilter(['name' => null, 'description' => null]);
+        $filter = $this->buildFilter(['name' => null, 'description' => null]);
 
         $this->assertEquals([
             'exists[description]' => [
@@ -31,7 +31,7 @@ trait ExistsFilterTestTrait
         ], $filter->getDescription($this->resourceClass));
     }
 
-    private function provideApplyTestArguments(): array
+    private static function provideApplyTestArguments(): array
     {
         return [
             'valid values' => [

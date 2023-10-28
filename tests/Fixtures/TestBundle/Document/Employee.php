@@ -18,38 +18,30 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
 #[Post]
 #[ApiResource(uriTemplate: '/companies/{companyId}/employees/{id}', uriVariables: ['companyId' => ['from_class' => Company::class, 'to_property' => 'company'], 'id' => ['from_class' => Employee::class]])]
 #[Get]
-#[ApiResource(uriTemplate: '/companies/{companyId}/employees', uriVariables: ['companyId' => ['from_class' => Company::class, 'to_property' => 'company']])]
+#[ApiResource(uriTemplate: '/companies/{companyId}/employees', uriVariables: ['companyId' => ['from_class' => Company::class, 'to_property' => 'company']], normalizationContext: ['groups' => ['company_employees_read']])]
 #[GetCollection]
+#[ODM\Document]
 class Employee
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
 
-    /**
-     * @var string The dummy name
-     *
-     * @ODM\Field
-     */
-    public $name;
+    #[ODM\Field]
+    #[Groups(['company_employees_read'])]
+    public ?string $name = null;
 
-    /**
-     * @var ?Company
-     *
-     * @ODM\ReferenceOne(targetDocument=Company::class, storeAs="id")
-     */
-    public $company;
+    #[ODM\ReferenceOne(targetDocument: Company::class, storeAs: 'id')]
+    #[Groups(['company_employees_read'])]
+    public ?Company $company = null;
 
     public function getId()
     {

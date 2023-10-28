@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test;
 
+use ApiPlatform\Metadata\IriConverterInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -20,8 +21,6 @@ use Symfony\Component\HttpClient\HttpClientTrait;
 
 /**
  * Base class for functional API tests.
- *
- * @experimental
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -54,7 +53,7 @@ abstract class ApiTestCase extends KernelTestCase
              * @var Client
              */
             $client = $kernel->getContainer()->get('test.api_platform.client');
-        } catch (ServiceNotFoundException $e) {
+        } catch (ServiceNotFoundException) {
             if (!class_exists(AbstractBrowser::class) || !trait_exists(HttpClientTrait::class)) {
                 throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit and HttpClient components are not available. Try running "composer require --dev symfony/browser-kit symfony/http-client".');
             }
@@ -75,21 +74,16 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected function findIriBy(string $resourceClass, array $criteria): ?string
     {
-        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container;
-
-        // @phpstan-ignore-next-line
-        if (!isset(static::$container) && !method_exists(static::class, 'getContainer')) {
-            throw new \RuntimeException(sprintf('The container is not available. You must call "bootKernel()" or "createClient()" before calling "%s".', __METHOD__));
-        }
+        $container = static::getContainer();
 
         if (
             (
-                !$container->has('doctrine') ||
-                null === $objectManager = $container->get('doctrine')->getManagerForClass($resourceClass)
-            ) &&
-            (
-                !$container->has('doctrine_mongodb') ||
-                null === $objectManager = $container->get('doctrine_mongodb')->getManagerForClass($resourceClass)
+                !$container->has('doctrine')
+                || null === $objectManager = $container->get('doctrine')->getManagerForClass($resourceClass)
+            )
+            && (
+                !$container->has('doctrine_mongodb')
+                || null === $objectManager = $container->get('doctrine_mongodb')->getManagerForClass($resourceClass)
             )
         ) {
             throw new \RuntimeException(sprintf('"%s" only supports classes managed by Doctrine ORM or Doctrine MongoDB ODM. Override this method to implement your own retrieval logic if you don\'t use those libraries.', __METHOD__));
@@ -100,8 +94,17 @@ abstract class ApiTestCase extends KernelTestCase
             return null;
         }
 
-        return $container->get('api_platform.iri_converter')->getIriFromItem($item);
+        return $this->getIriFromResource($item);
+    }
+
+    /**
+     * Generate the IRI of a resource item.
+     */
+    protected function getIriFromResource(object $resource): ?string
+    {
+        /** @var IriConverterInterface $iriConverter */
+        $iriConverter = static::getContainer()->get('api_platform.iri_converter');
+
+        return $iriConverter->getIriFromResource($resource);
     }
 }
-
-class_alias(ApiTestCase::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class);

@@ -13,123 +13,73 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
-/**
- * @ApiResource(
- *     itemOperations={"get"={"swagger_context"={"tags"={}}, "openapi_context"={"tags"={}}}, "put", "delete"},
- *     attributes={
- *         "sunset"="2050-01-01",
- *         "normalization_context"={"groups"={"colors"}}
- *     }
- * )
- * @ORM\Entity
- * @ApiFilter(DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
- * @ApiFilter(BooleanFilter::class)
- * @ApiFilter(PropertyFilter::class, arguments={"parameterName"="foobar"})
- * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups"})
- * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups_override"}, id="override")
- */
+#[ApiFilter(DateFilter::class, strategy: DateFilter::EXCLUDE_NULL)]
+#[ApiFilter(BooleanFilter::class)]
+#[ApiFilter(PropertyFilter::class, arguments: ['parameterName' => 'foobar'])]
+#[ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'foobargroups'])]
+#[ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'foobargroups_override'], id: 'override')]
+#[ApiResource(operations: [new Get(openapi: new OpenApiOperation(tags: [])), new Put(), new Delete(), new Post(), new GetCollection()], sunset: '2050-01-01', normalizationContext: ['groups' => ['colors']])]
+#[ORM\Entity]
 class DummyCar
 {
     /**
      * @var DummyCarIdentifier The entity Id
-     *
-     * @ORM\Id
-     * @ORM\OneToOne(targetEntity="DummyCarIdentifier", cascade={"persist"})
      */
-    private $id;
+    #[ORM\Id]
+    #[ORM\OneToOne(targetEntity: DummyCarIdentifier::class, cascade: ['persist'])]
+    private DummyCarIdentifier $id;
+    #[ApiFilter(SearchFilter::class, properties: ['colors.prop' => 'ipartial', 'colors' => 'exact'])]
+    #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
+    #[Serializer\Groups(['colors'])]
+    private Collection|iterable $colors;
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
+    #[Serializer\Groups(['colors'])]
+    private Collection|iterable|null $secondColors = null;
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
+    #[Serializer\Groups(['colors'])]
+    private Collection|iterable|null $thirdColors = null;
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[ORM\ManyToMany(targetEntity: UuidIdentifierDummy::class, indexBy: 'uuid')]
+    #[ORM\JoinColumn(name: 'car_id', referencedColumnName: 'id_id')]
+    #[ORM\InverseJoinColumn(name: 'uuid_uuid', referencedColumnName: 'uuid')]
+    #[ORM\JoinTable(name: 'uuid_cars')]
+    #[Serializer\Groups(['colors'])]
+    private Collection|iterable|null $uuid = null;
 
-    /**
-     * @var mixed Something else
-     *
-     * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
-     *
-     * @Serializer\Groups({"colors"})
-     * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
-     */
-    private $colors;
-
-    /**
-     * @var mixed Something else
-     *
-     * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
-     *
-     * @Serializer\Groups({"colors"})
-     * @ApiFilter(SearchFilter::class, strategy="exact")
-     */
-    private $secondColors;
-
-    /**
-     * @var mixed Something else
-     *
-     * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
-     *
-     * @Serializer\Groups({"colors"})
-     * @ApiFilter(SearchFilter::class, strategy="exact")
-     */
-    private $thirdColors;
-
-    /**
-     * @var mixed Something else
-     *
-     * @ORM\ManyToMany(targetEntity="UuidIdentifierDummy", indexBy="uuid")
-     * * @ORM\JoinTable(name="uuid_cars",
-     *     joinColumns={@ORM\JoinColumn(name="car_id", referencedColumnName="id_id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="uuid_uuid", referencedColumnName="uuid")}
-     * )
-     * @Serializer\Groups({"colors"})
-     * @ApiFilter(SearchFilter::class, strategy="exact")
-     */
-    private $uuid;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     * @ApiFilter(SearchFilter::class, strategy="partial")
-     */
-    private $name;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean")
-     */
-    private $canSell;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(type="datetime")
-     */
-    private $availableAt;
-
-    /**
-     * @var string
-     *
-     * @Serializer\Groups({"colors"})
-     * @Serializer\SerializedName("carBrand")
-     *
-     * @ORM\Column
-     */
-    private $brand = 'DummyBrand';
-
-    /**
-     * @var DummyCarInfo
-     *
-     * @ORM\Embedded(class="DummyCarInfo")
-     */
-    private $info;
+    #[ApiFilter(SearchFilter::class, strategy: 'partial')]
+    #[ORM\Column(type: 'string')]
+    private string $name;
+    #[ORM\Column(type: 'boolean')]
+    private bool $canSell;
+    #[ORM\Column(type: 'datetime')]
+    private \DateTime $availableAt;
+    #[ApiFilter(SearchFilter::class, strategy: SearchFilter::STRATEGY_IEXACT)]
+    #[Serializer\Groups(['colors'])]
+    #[Serializer\SerializedName('carBrand')]
+    #[ORM\Column]
+    private string $brand = 'DummyBrand';
+    #[ORM\Embedded(class: 'DummyCarInfo')]
+    private DummyCarInfo $info;
 
     public function __construct()
     {
@@ -138,49 +88,49 @@ class DummyCar
         $this->info = new DummyCarInfo();
     }
 
-    public function getId()
+    public function getId(): DummyCarIdentifier
     {
         return $this->id;
     }
 
-    public function getColors()
+    public function getColors(): Collection|iterable
     {
         return $this->colors;
     }
 
-    public function setColors($colors): self
+    public function setColors(Collection|iterable $colors): self
     {
         $this->colors = $colors;
 
         return $this;
     }
 
-    public function getSecondColors()
+    public function getSecondColors(): ?iterable
     {
         return $this->secondColors;
     }
 
-    public function setSecondColors($secondColors)
+    public function setSecondColors($secondColors): void
     {
         $this->secondColors = $secondColors;
     }
 
-    public function getThirdColors()
+    public function getThirdColors(): ?iterable
     {
         return $this->thirdColors;
     }
 
-    public function setThirdColors($thirdColors)
+    public function setThirdColors($thirdColors): void
     {
         $this->thirdColors = $thirdColors;
     }
 
-    public function getUuid()
+    public function getUuid(): ?iterable
     {
         return $this->uuid;
     }
 
-    public function setUuid($uuid)
+    public function setUuid($uuid): void
     {
         $this->uuid = $uuid;
     }
@@ -193,7 +143,7 @@ class DummyCar
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -203,7 +153,7 @@ class DummyCar
         return $this->canSell;
     }
 
-    public function setCanSell(bool $canSell)
+    public function setCanSell(bool $canSell): void
     {
         $this->canSell = $canSell;
     }
@@ -213,7 +163,7 @@ class DummyCar
         return $this->availableAt;
     }
 
-    public function setAvailableAt(\DateTime $availableAt)
+    public function setAvailableAt(\DateTime $availableAt): void
     {
         $this->availableAt = $availableAt;
     }

@@ -29,7 +29,7 @@ trait OrderFilterTrait
     /**
      * @var string Keyword used to retrieve the value
      */
-    protected $orderParameterName;
+    protected string $orderParameterName;
 
     /**
      * {@inheritdoc}
@@ -39,8 +39,8 @@ trait OrderFilterTrait
         $description = [];
 
         $properties = $this->getProperties();
-        if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
+        if (null === $properties && $fieldNames = $this->getClassMetadata($resourceClass)->getFieldNames()) {
+            $properties = array_fill_keys($fieldNames, null);
         }
 
         foreach ($properties as $property => $propertyOptions) {
@@ -67,7 +67,7 @@ trait OrderFilterTrait
 
     abstract protected function getProperties(): ?array;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName(string $property): string;
 
     private function normalizeValue($value, string $property): ?string
     {
@@ -84,5 +84,3 @@ trait OrderFilterTrait
         return $value;
     }
 }
-
-class_alias(OrderFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class);

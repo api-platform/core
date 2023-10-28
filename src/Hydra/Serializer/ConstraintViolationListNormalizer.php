@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface as LegacyUrlGeneratorInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -26,32 +27,17 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 {
     public const FORMAT = 'jsonld';
 
-    private $urlGenerator;
-
-    public function __construct(UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
+    // @phpstan-ignore-next-line prevent BC break (can't remove this useless argument)
+    public function __construct(private readonly null|LegacyUrlGeneratorInterface|UrlGeneratorInterface $urlGenerator = null, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
     {
         parent::__construct($serializePayloadFields, $nameConverter);
-
-        $this->urlGenerator = $urlGenerator;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        [$messages, $violations] = $this->getMessagesAndViolations($object);
-
-        return [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']),
-            '@type' => 'ConstraintViolationList',
-            'hydra:title' => $context['title'] ?? 'An error occurred',
-            'hydra:description' => $messages ? implode("\n", $messages) : (string) $object,
-            'violations' => $violations,
-        ];
+        return $this->getViolations($object);
     }
 }
-
-class_alias(ConstraintViolationListNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer::class);

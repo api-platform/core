@@ -24,14 +24,16 @@ final class SwaggerUiListener
     {
         $request = $event->getRequest();
         if (
-            'html' !== $request->getRequestFormat('') ||
-            !($request->attributes->has('_api_resource_class') || $request->attributes->getBoolean('_api_respond', false))
+            'html' !== $request->getRequestFormat('')
+            || !($request->attributes->has('_api_resource_class') || $request->attributes->getBoolean('_api_respond', false))
         ) {
             return;
         }
 
-        $request->attributes->set('_controller', 'api_platform.swagger.action.ui');
+        if (($operation = $request->attributes->get('_api_operation')) && 'api_platform.symfony.main_controller' === $operation->getController()) {
+            return;
+        }
+
+        $request->attributes->set('_controller', 'api_platform.swagger_ui.action');
     }
 }
-
-class_alias(SwaggerUiListener::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener::class);

@@ -13,15 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
+use ApiPlatform\Api\UriVariablesConverterInterface as LegacyUriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UriVariablesConverterInterface;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
-use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -34,24 +38,19 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class WriteListener
 {
+    use ClassInfoTrait;
     use OperationRequestInitiatorTrait;
-    use ResourceClassInfoTrait;
-
     use UriVariablesResolverTrait;
 
-    public const OPERATION_ATTRIBUTE_KEY = 'write';
-
-    private $processor;
-    private $iriConverter;
-
-    public function __construct(ProcessorInterface $processor, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver)
-    {
-        $this->processor = $processor;
-        $this->iriConverter = $iriConverter;
+    public function __construct(
+        private readonly ProcessorInterface $processor,
+        private readonly LegacyIriConverterInterface|IriConverterInterface $iriConverter,
+        private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        LegacyUriVariablesConverterInterface|UriVariablesConverterInterface $uriVariablesConverter = null,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        // TODO 3.0: see ResourceClassInfoTrait
-        $this->resourceMetadataFactory = $resourceMetadataCollectionFactory;
-        $this->resourceClassResolver = $resourceClassResolver;
+        $this->uriVariablesConverter = $uriVariablesConverter;
     }
 
     /**
@@ -63,6 +62,11 @@ final class WriteListener
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
 
+        // API Platform 3.2 has a MainController where everything is handled by processors/providers
+        if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
+            return;
+        }
+
         if (
             $controllerResult instanceof Response
             || $request->isMethodSafe()
@@ -71,15 +75,20 @@ final class WriteListener
             return;
         }
 
-        if (!$operation || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || !($operation->canWrite() ?? true) || !$attributes['persist']) {
+        if (!$attributes['persist'] || !($operation?->canWrite() ?? true)) {
             return;
         }
 
-        if (!$operation->getProcessor()) {
+        if (!$operation?->getProcessor()) {
             return;
         }
 
-        $context = ['operation' => $operation, 'resource_class' => $attributes['resource_class']];
+        $context = [
+            'operation' => $operation,
+            'resource_class' => $attributes['resource_class'],
+            'previous_data' => $attributes['previous_data'] ?? null,
+        ];
+
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
         } catch (InvalidIdentifierException $e) {
@@ -107,8 +116,8 @@ final class WriteListener
                     break;
                 }
 
-                if ($this->isResourceClass($this->getObjectClass($controllerResult))) {
-                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
+                if ($this->resourceClassResolver->isResourceClass($this->getObjectClass($controllerResult))) {
+                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromResource($controllerResult));
                 }
 
                 break;

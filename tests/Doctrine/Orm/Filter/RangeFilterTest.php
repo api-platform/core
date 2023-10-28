@@ -25,9 +25,9 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
 {
     use RangeFilterTestTrait;
 
-    protected $filterClass = RangeFilter::class;
+    protected string $filterClass = RangeFilter::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -335,10 +335,10 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'between' => [
                     sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyPrice_p1_1 AND :dummyPrice_p1_2', Dummy::class),

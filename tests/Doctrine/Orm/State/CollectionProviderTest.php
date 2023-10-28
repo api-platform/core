@@ -13,19 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\State;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
@@ -34,18 +32,14 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class CollectionProviderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @requires PHP 8.0
-     */
-    public function testGetCollection()
+    public function testGetCollection(): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
         $queryProphecy = $this->prophesize(AbstractQuery::class);
         $queryProphecy->getResult()->willReturn([])->shouldBeCalled();
 
@@ -64,23 +58,17 @@ class CollectionProviderTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(OperationResource::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
-        $resourceMetadataFactoryProphecy->create(OperationResource::class)->willReturn(new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations(['getCollection' => new GetCollection()]))]));
+        $operation = (new GetCollection())->withClass(OperationResource::class)->withName('getCollection');
 
         $extensionProphecy = $this->prophesize(QueryCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, 'getCollection', [])->shouldBeCalled();
+        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, $operation, [])->shouldBeCalled();
 
-        $operation = (new GetCollection())->withClass(OperationResource::class)->withName('getCollection');
-        $dataProvider = new CollectionProvider($resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $dataProvider = new CollectionProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
         $this->assertEquals([], $dataProvider->provide($operation));
     }
 
-    /**
-     * @requires PHP 8.0
-     */
-    public function testQueryResultExtension()
+    public function testQueryResultExtension(): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getRootAliases()->willReturn(['alias']);
         $queryBuilder = $queryBuilderProphecy->reveal();
@@ -95,25 +83,19 @@ class CollectionProviderTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(OperationResource::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
-        $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, null, [])->shouldBeCalled();
-        $extensionProphecy->supportsResult(OperationResource::class, null, [])->willReturn(true)->shouldBeCalled();
-        $extensionProphecy->getResult($queryBuilder, OperationResource::class, null, [])->willReturn([])->shouldBeCalled();
-
-        $resourceMetadataFactoryProphecy->create(OperationResource::class)->willReturn(new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations(['' => new GetCollection()]))]));
-
-        $dataProvider = new CollectionProvider($resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
         $operation = (new GetCollection())->withClass(OperationResource::class);
+
+        $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
+        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, $operation, [])->shouldBeCalled();
+        $extensionProphecy->supportsResult(OperationResource::class, $operation, [])->willReturn(true)->shouldBeCalled();
+        $extensionProphecy->getResult($queryBuilder, OperationResource::class, $operation, [])->willReturn([])->shouldBeCalled();
+
+        $dataProvider = new CollectionProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
         $this->assertEquals([], $dataProvider->provide($operation));
     }
 
-    /**
-     * @requires PHP 8.0
-     */
-    public function testCannotCreateQueryBuilder()
+    public function testCannotCreateQueryBuilder(): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The repository class must have a "createQueryBuilder" method.');
 
@@ -125,8 +107,27 @@ class CollectionProviderTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(OperationResource::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
-        $dataProvider = new CollectionProvider($resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal());
+        $dataProvider = new CollectionProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal());
         $operation = (new GetCollection())->withClass(OperationResource::class)->withName('getCollection');
         $this->assertEquals([], $dataProvider->provide($operation));
+    }
+
+    public function testHandleLinksCallable(): void
+    {
+        $class = 'foo';
+        $resourceMetadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $query = $this->createStub(AbstractQuery::class);
+        $query->method('getResult')->willReturn([]);
+        $qb = $this->createStub(QueryBuilder::class);
+        $qb->method('getQuery')->willReturn($query);
+        $repository = $this->createStub(EntityRepository::class);
+        $repository->method('createQueryBuilder')->willReturn($qb);
+        $manager = $this->createStub(EntityManagerInterface::class);
+        $manager->method('getRepository')->willReturn($repository);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($manager);
+        $operation = new GetCollection(class: $class, stateOptions: new Options(handleLinks: fn () => $this->assertTrue(true)));
+        $dataProvider = new CollectionProvider($resourceMetadata, $managerRegistry);
+        $dataProvider->provide($operation, ['id' => 1]);
     }
 }

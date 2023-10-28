@@ -13,15 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\NonNull;
@@ -35,19 +36,13 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class TypeBuilder implements TypeBuilderInterface
+final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterface
 {
-    private $typesContainer;
     private $defaultFieldResolver;
-    private $fieldsBuilderLocator;
-    private $pagination;
 
-    public function __construct(TypesContainerInterface $typesContainer, callable $defaultFieldResolver, ContainerInterface $fieldsBuilderLocator, Pagination $pagination)
+    public function __construct(private readonly TypesContainerInterface $typesContainer, callable $defaultFieldResolver, private readonly ContainerInterface $fieldsBuilderLocator, private readonly Pagination $pagination)
     {
-        $this->typesContainer = $typesContainer;
         $this->defaultFieldResolver = $defaultFieldResolver;
-        $this->fieldsBuilderLocator = $fieldsBuilderLocator;
-        $this->pagination = $pagination;
     }
 
     /**
@@ -79,12 +74,9 @@ final class TypeBuilder implements TypeBuilderInterface
         }
 
         if ('item_query' === $operationName || 'collection_query' === $operationName) {
-            // Test if the collection/item operation exists and it has different groups
-            try {
-                if ($resourceMetadataCollection->getOperation($operation instanceof CollectionOperationInterface ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
-                    $shortName .= $operation instanceof CollectionOperationInterface ? 'Collection' : 'Item';
-                }
-            } catch (OperationNotFoundException $e) {
+            // Test if the collection/item has different groups
+            if ($resourceMetadataCollection->getOperation($operation instanceof CollectionOperationInterface ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
+                $shortName .= $operation instanceof CollectionOperationInterface ? 'Collection' : 'Item';
             }
         }
 
@@ -114,15 +106,11 @@ final class TypeBuilder implements TypeBuilderInterface
             'resolveField' => $this->defaultFieldResolver,
             'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
-                    try {
-                        $queryNormalizationContext = $operation instanceof Query ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
-                    } catch (OperationNotFoundException $e) {
-                        $queryNormalizationContext = [];
-                    }
+                    $queryNormalizationContext = $this->getQueryOperation($resourceMetadataCollection)?->getNormalizationContext() ?? [];
 
                     try {
                         $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
-                    } catch (OperationNotFoundException $e) {
+                    } catch (OperationNotFoundException) {
                         $mutationNormalizationContext = [];
                     }
                     // Use a new type for the wrapped object only if there is a specific normalization context for the mutation or the subscription.
@@ -135,16 +123,10 @@ final class TypeBuilder implements TypeBuilderInterface
                         $wrappedOperationName = $operation instanceof Query ? $operationName : 'item_query';
                     }
 
-                    try {
-                        $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
-                    } catch (OperationNotFoundException $e) {
-                        $wrappedOperation = ('collection_query' === $wrappedOperationName ? new QueryCollection() : new Query())
-                            ->withResource($resourceMetadataCollection[0])
-                            ->withName($wrappedOperationName);
-                    }
+                    $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
 
                     $fields = [
-                        lcfirst($wrappedOperation->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadataCollection, $wrappedOperation, $input, true, $depth),
+                        lcfirst($wrappedOperation->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadataCollection, $wrappedOperation instanceof Operation ? $wrappedOperation : null, $input, true, $depth),
                     ];
 
                     if ($operation instanceof Subscription) {
@@ -164,6 +146,9 @@ final class TypeBuilder implements TypeBuilderInterface
 
                 if ($input && $operation instanceof Mutation && null !== $mutationArgs = $operation->getArgs()) {
                     return $fieldsBuilder->resolveResourceArgs($mutationArgs, $operation) + ['clientMutationId' => $fields['clientMutationId']];
+                }
+                if ($input && $operation instanceof Mutation && null !== $extraMutationArgs = $operation->getExtraArgs()) {
+                    return $fields + $fieldsBuilder->resolveResourceArgs($extraMutationArgs, $operation);
                 }
 
                 return $fields;
@@ -200,7 +185,7 @@ final class TypeBuilder implements TypeBuilderInterface
                     'description' => 'The id of this node.',
                 ],
             ],
-            'resolveType' => function ($value) {
+            'resolveType' => function ($value): ?GraphQLType {
                 if (!isset($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
                     return null;
                 }
@@ -219,10 +204,22 @@ final class TypeBuilder implements TypeBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, string $operationName): GraphQLType
+    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, Operation $operation): GraphQLType
     {
-        $shortName = $resourceType->name;
-        $paginationType = $this->pagination->getGraphQlPaginationType($resourceClass, $operationName);
+        @trigger_error('Using getResourcePaginatedCollectionType method of TypeBuilder is deprecated since API Platform 3.1. Use getPaginatedCollectionType method instead.', \E_USER_DEPRECATED);
+
+        return $this->getPaginatedCollectionType($resourceType, $operation);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaginatedCollectionType(GraphQLType $resourceType, Operation $operation): GraphQLType
+    {
+        $namedType = GraphQLType::getNamedType($resourceType);
+        // graphql-php 15: name() exists
+        $shortName = method_exists($namedType, 'name') ? $namedType->name() : $namedType->name;
+        $paginationType = $this->pagination->getGraphQlPaginationType($operation);
 
         $connectionTypeKey = sprintf('%s%sConnection', $shortName, ucfirst($paginationType));
         if ($this->typesContainer->has($connectionTypeKey)) {
@@ -245,17 +242,54 @@ final class TypeBuilder implements TypeBuilderInterface
         return $resourcePaginatedCollectionType;
     }
 
+    public function getEnumType(Operation $operation): GraphQLType
+    {
+        $enumName = $operation->getShortName();
+        if (!str_ends_with($enumName, 'Enum')) {
+            $enumName = sprintf('%sEnum', $enumName);
+        }
+
+        if ($this->typesContainer->has($enumName)) {
+            return $this->typesContainer->get($enumName);
+        }
+
+        /** @var FieldsBuilderEnumInterface|FieldsBuilderInterface $fieldsBuilder */
+        $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
+        $enumCases = [];
+        // Remove the condition in API Platform 4.
+        if ($fieldsBuilder instanceof FieldsBuilderEnumInterface) {
+            $enumCases = $fieldsBuilder->getEnumFields($operation->getClass());
+        } else {
+            @trigger_error(sprintf('api_platform.graphql.fields_builder service implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', FieldsBuilderInterface::class, FieldsBuilderEnumInterface::class), \E_USER_DEPRECATED);
+        }
+
+        $enumConfig = [
+            'name' => $enumName,
+            'values' => $enumCases,
+        ];
+        if ($enumDescription = $operation->getDescription()) {
+            $enumConfig['description'] = $enumDescription;
+        }
+
+        $enumType = new EnumType($enumConfig);
+        $this->typesContainer->set($enumName, $enumType);
+
+        return $enumType;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function isCollection(Type $type): bool
     {
-        return $type->isCollection() && ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) && null !== $collectionValueType->getClassName();
+        return $type->isCollection() && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) && null !== $collectionValueType->getClassName();
     }
 
     private function getCursorBasedPaginationFields(GraphQLType $resourceType): array
     {
-        $shortName = $resourceType->name;
+        $namedType = GraphQLType::getNamedType($resourceType);
+        // graphql-php 15: name() exists
+        $shortName = method_exists($namedType, 'name') ? $namedType->name() : $namedType->name;
 
         $edgeObjectTypeConfiguration = [
             'name' => "{$shortName}Edge",
@@ -290,7 +324,9 @@ final class TypeBuilder implements TypeBuilderInterface
 
     private function getPageBasedPaginationFields(GraphQLType $resourceType): array
     {
-        $shortName = $resourceType->name;
+        $namedType = GraphQLType::getNamedType($resourceType);
+        // graphql-php 15: name() exists
+        $shortName = method_exists($namedType, 'name') ? $namedType->name() : $namedType->name;
 
         $paginationInfoObjectTypeConfiguration = [
             'name' => "{$shortName}PaginationInfo",
@@ -308,5 +344,19 @@ final class TypeBuilder implements TypeBuilderInterface
             'collection' => GraphQLType::listOf($resourceType),
             'paginationInfo' => GraphQLType::nonNull($paginationInfoObjectType),
         ];
+    }
+
+    private function getQueryOperation(ResourceMetadataCollection $resourceMetadataCollection): ?Operation
+    {
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            foreach ($resourceMetadata->getGraphQlOperations() as $operation) {
+                // Filter the custom queries.
+                if ($operation instanceof Query && !$operation->getResolver()) {
+                    return $operation;
+                }
+            }
+        }
+
+        return null;
     }
 }

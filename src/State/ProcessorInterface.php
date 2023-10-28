@@ -18,17 +18,19 @@ use ApiPlatform\Metadata\Operation;
 /**
  * Process data: send an email, persist to storage, add to queue etc.
  *
+ * @template T
+ *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @experimental
  */
 interface ProcessorInterface
 {
     /**
      * Handle the state.
      *
-     * @param mixed $data
+     * @param array<string, mixed>                                                                                                                                   $uriVariables
+     * @param array<string, mixed>&array{request?: \Symfony\Component\HttpFoundation\Request, previous_data?: mixed, resource_class?: string, original_data?: mixed} $context
      *
-     * @return mixed
+     * @return T
      */
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = []);
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []);
 }

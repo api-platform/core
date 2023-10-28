@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\OpenApi\Serializer;
 
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Removes features unsupported by Amazon API Gateway.
@@ -29,15 +30,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     public const API_GATEWAY = 'api_gateway';
-
-    private $documentationNormalizer;
-    private $defaultContext = [
+    private array $defaultContext = [
         self::API_GATEWAY => false,
     ];
 
-    public function __construct(NormalizerInterface $documentationNormalizer, $defaultContext = [])
+    public function __construct(private readonly NormalizerInterface $documentationNormalizer, $defaultContext = [])
     {
-        $this->documentationNormalizer = $documentationNormalizer;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
@@ -45,10 +43,8 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
      * {@inheritdoc}
      *
      * @throws UnexpectedValueException
-     *
-     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
         if (!\is_array($data)) {
@@ -67,7 +63,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
             foreach ($operations as $operation => $options) {
                 if (isset($options['parameters'])) {
                     foreach ($options['parameters'] as $key => $parameter) {
-                        if (!preg_match('/^[a-zA-Z0-9._$-]+$/', $parameter['name'])) {
+                        if (!preg_match('/^[a-zA-Z0-9._$-]+$/', (string) $parameter['name'])) {
                             unset($data['paths'][$path][$operation]['parameters'][$key]);
                         }
                         if (isset($parameter['schema']['$ref']) && $this->isLocalRef($parameter['schema']['$ref'])) {
@@ -89,28 +85,28 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
             }
         }
 
-        foreach ($data['definitions'] as $definition => $options) {
+        foreach ($data['components']['schemas'] as $definition => $options) {
             if (!isset($options['properties'])) {
                 continue;
             }
             foreach ($options['properties'] as $property => $propertyOptions) {
                 if (isset($propertyOptions['readOnly'])) {
-                    unset($data['definitions'][$definition]['properties'][$property]['readOnly']);
+                    unset($data['components']['schemas'][$definition]['properties'][$property]['readOnly']);
                 }
                 if (isset($propertyOptions['$ref']) && $this->isLocalRef($propertyOptions['$ref'])) {
-                    $data['definitions'][$definition]['properties'][$property]['$ref'] = $this->normalizeRef($propertyOptions['$ref']);
+                    $data['components']['schemas'][$definition]['properties'][$property]['$ref'] = $this->normalizeRef($propertyOptions['$ref']);
                 }
                 if (isset($propertyOptions['items']['$ref']) && $this->isLocalRef($propertyOptions['items']['$ref'])) {
-                    $data['definitions'][$definition]['properties'][$property]['items']['$ref'] = $this->normalizeRef($propertyOptions['items']['$ref']);
+                    $data['components']['schemas'][$definition]['properties'][$property]['items']['$ref'] = $this->normalizeRef($propertyOptions['items']['$ref']);
                 }
             }
         }
 
         // $data['definitions'] is an instance of \ArrayObject
-        foreach (array_keys($data['definitions']->getArrayCopy()) as $definition) {
+        foreach (array_keys($data['components']['schemas']) as $definition) {
             if (!preg_match('/^[0-9A-Za-z]+$/', (string) $definition)) {
-                $data['definitions'][preg_replace('/[^0-9A-Za-z]/', '', (string) $definition)] = $data['definitions'][$definition];
-                unset($data['definitions'][$definition]);
+                $data['components']['schemas'][preg_replace('/[^0-9A-Za-z]/', '', (string) $definition)] = $data['components']['schemas'][$definition];
+                unset($data['components']['schemas'][$definition]);
             }
         }
 
@@ -120,9 +116,19 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $this->documentationNormalizer->supportsNormalization($data, $format);
+    }
+
+    public function getSupportedTypes($format): array
+    {
+        // @deprecated remove condition when support for symfony versions under 6.3 is dropped
+        if (!method_exists($this->documentationNormalizer, 'getSupportedTypes')) {
+            return ['*' => $this->documentationNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod()];
+        }
+
+        return $this->documentationNormalizer->getSupportedTypes($format);
     }
 
     /**
@@ -130,12 +136,21 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return $this->documentationNormalizer instanceof CacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod();
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
+        return $this->documentationNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod();
     }
 
     private function isLocalRef(string $ref): bool
     {
-        return '#/' === substr($ref, 0, 2);
+        return str_starts_with($ref, '#/');
     }
 
     private function normalizeRef(string $ref): string
@@ -149,5 +164,3 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
         return implode('/', $refParts);
     }
 }
-
-class_alias(ApiGatewayNormalizer::class, \ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer::class);

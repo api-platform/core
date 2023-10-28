@@ -17,15 +17,11 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @experimental
  */
 final class AlternateUriResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $decorated;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
-        $this->decorated = $decorated;
     }
 
     /**
@@ -39,7 +35,7 @@ final class AlternateUriResourceMetadataCollectionFactory implements ResourceMet
         }
 
         foreach ($resourceMetadataCollection as $i => $resource) {
-            if (0 === $i || ($resource->getExtraProperties()['is_legacy_subresource'] ?? false) || ($resource->getExtraProperties()['is_legacy_resource_metadata'] ?? false)) {
+            if (0 === $i) {
                 continue;
             }
 

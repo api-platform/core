@@ -13,53 +13,44 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV4;
 
-/* @TODO remove this check in 3.0 */
-if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidType::class)) {
-    /**
-     * @ORM\Entity
-     * @ApiResource
-     *
-     * @author Vincent Chalamon <vincentchalamon@gmail.com>
-     */
-    class SymfonyUuidDummy
+/**
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ */
+#[ApiResource]
+#[ORM\Entity]
+class SymfonyUuidDummy
+{
+    #[ORM\Id]
+    #[ORM\Column(type: 'symfony_uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
+    private Uuid|UuidV4 $id;
+    #[ORM\Column(nullable: true)]
+    private ?string $number = null;
+
+    public function __construct(Uuid $id = null)
     {
-        /**
-         * @ORM\Id
-         * @ORM\Column(type="symfony_uuid", unique=true)
-         * @ORM\GeneratedValue(strategy="NONE")
-         */
-        private $id;
+        $this->id = $id ?? Uuid::v4();
+    }
 
-        /**
-         * @ORM\Column(nullable=true)
-         */
-        private $number;
+    public function getId(): Uuid
+    {
+        return $this->id;
+    }
 
-        public function __construct(?Uuid $id = null)
-        {
-            $this->id = $id ?? Uuid::v4();
-        }
+    public function getNumber(): ?string
+    {
+        return $this->number;
+    }
 
-        public function getId(): Uuid
-        {
-            return $this->id;
-        }
+    public function setNumber(?string $number): self
+    {
+        $this->number = $number;
 
-        public function getNumber(): ?string
-        {
-            return $this->number;
-        }
-
-        public function setNumber(?string $number): self
-        {
-            $this->number = $number;
-
-            return $this;
-        }
+        return $this;
     }
 }

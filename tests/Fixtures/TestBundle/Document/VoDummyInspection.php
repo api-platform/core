@@ -13,75 +13,43 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use DateTime;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"inspection_read"}},
- *         "denormalization_context"={"groups"={"inspection_write"}}
- *     },
- *     graphql={}
- * )
- * @ODM\Document
- */
+#[ApiResource(graphQlOperations: [], normalizationContext: ['groups' => ['inspection_read']], denormalizationContext: ['groups' => ['inspection_write']], extraProperties: ['standard_put' => false])]
+#[ODM\Document]
 class VoDummyInspection
 {
     use VoDummyIdAwareTrait;
-
-    /**
-     * @var bool
-     *
-     * @ODM\Field(type="bool")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
-     */
-    private $accepted;
-
-    /**
-     * @var VoDummyCar
-     *
-     * @ODM\ReferenceOne(targetDocument=VoDummyCar::class, inversedBy="inspections")
-     * @Groups({"inspection_read", "inspection_write"})
-     */
-    private $car;
-
-    /**
-     * @var DateTime
-     *
-     * @ODM\Field(type="date")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
-     */
-    private $performed;
+    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
+    #[ODM\Field(type: 'date')]
+    private \DateTime $performed;
 
     private $attributeWithoutConstructorEquivalent;
 
-    public function __construct(bool $accepted, VoDummyCar $car, DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
+    public function __construct(#[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] #[ODM\Field(type: 'bool')] private bool $accepted, #[Groups(['inspection_read', 'inspection_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyCar::class, inversedBy: 'inspections')] private VoDummyCar $car, \DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
     {
-        $this->accepted = $accepted;
-        $this->car = $car;
-        $this->performed = $performed ?: new DateTime();
+        $this->performed = $performed ?: new \DateTime();
         $this->attributeWithoutConstructorEquivalent = $parameterWhichIsNotClassAttribute;
     }
 
-    public function isAccepted()
+    public function isAccepted(): bool
     {
         return $this->accepted;
     }
 
-    public function getCar()
+    public function getCar(): VoDummyCar
     {
         return $this->car;
     }
 
-    public function getPerformed()
+    public function getPerformed(): \DateTime
     {
         return $this->performed;
     }
 
-    public function setPerformed(DateTime $performed)
+    public function setPerformed(\DateTime $performed)
     {
         $this->performed = $performed;
 

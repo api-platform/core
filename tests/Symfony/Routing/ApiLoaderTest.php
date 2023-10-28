@@ -13,12 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Routing;
 
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -26,19 +20,21 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\PathResolver\CustomOperationPathResolver;
-use ApiPlatform\PathResolver\OperationPathResolver;
 use ApiPlatform\Symfony\Routing\ApiLoader;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Tests\Fixtures\RelatedDummyEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
@@ -46,15 +42,12 @@ use Symfony\Component\Routing\Route;
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- *
- * TODO: in 3.0 just remove the IdentifiersExtractor
- * @group legacy
  */
 class ApiLoaderTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testApiLoader()
+    public function testApiLoader(): void
     {
         $path = '/dummies/{id}.{_format}';
 
@@ -71,6 +64,7 @@ class ApiLoaderTest extends TestCase
                 'api_dummies_my_path_op_collection' => (new GetCollection())->withUriTemplate('some/custom/path'),
                 // Custom path
                 'api_dummies_my_stateless_op_collection' => (new GetCollection())->withUriTemplate('/dummies.{_format}')->withStateless(true),
+                'api_dummies_my_controller_method_item' => (new Get())->withUriTemplate('/foo')->withController('Foo\\Bar\\MyController::method'),
             ])),
         ]);
 
@@ -187,9 +181,24 @@ class ApiLoaderTest extends TestCase
             ),
             $routeCollection->get('api_dummies_my_stateless_op_collection')
         );
+
+        $this->assertEquals(
+            $this->getRoute(
+                '/foo',
+                'Foo\\Bar\\MyController::method',
+                null,
+                RelatedDummyEntity::class,
+                [],
+                'api_dummies_my_controller_method_item',
+                [],
+                ['GET'],
+                []
+            ),
+            $routeCollection->get('api_dummies_my_controller_method_item')
+        );
     }
 
-    public function testApiLoaderWithPrefix()
+    public function testApiLoaderWithPrefix(): void
     {
         $prefix = '/foobar-prefix';
         $path = '/dummies/{id}.{_format}';
@@ -248,6 +257,20 @@ class ApiLoaderTest extends TestCase
         );
     }
 
+    public function testApiLoaderWithUndefinedControllerService(): void
+    {
+        $this->expectExceptionObject(new \RuntimeException('Operation "api_dummies_my_undefined_controller_method_item" is defining an unknown service as controller "Foo\\Bar\\MyUndefinedController". Make sure it is properly registered in the dependency injection container.'));
+
+        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+                'api_dummies_my_undefined_controller_method_item' => (new Get())->withUriTemplate('/foo')->withController('Foo\\Bar\\MyUndefinedController::method'),
+            ])),
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null);
+        $routeCollection->get('api_dummies_my_undefined_controller_method_item');
+    }
+
     private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection): ApiLoader
     {
         $routingConfig = __DIR__.'/../../../src/Symfony/Bundle/Resources/config/routing';
@@ -255,17 +278,20 @@ class ApiLoaderTest extends TestCase
         $kernelProphecy = $this->prophesize(KernelInterface::class);
         $kernelProphecy->locateResource(Argument::any())->willReturn($routingConfig);
         $possibleArguments = [
+            'some.service.name',
             'api_platform.action.get_collection',
             'api_platform.action.post_collection',
             'api_platform.action.get_item',
             'api_platform.action.put_item',
             'api_platform.action.delete_item',
+            'Foo\\Bar\\MyController',
         ];
         $containerProphecy = $this->prophesize(ContainerInterface::class);
 
         foreach ($possibleArguments as $possibleArgument) {
             $containerProphecy->has($possibleArgument)->willReturn(true);
         }
+        $containerProphecy->has('Foo\\Bar\\MyUndefinedController')->willReturn(false);
 
         $containerProphecy->has(Argument::type('string'))->willReturn(false);
 
@@ -284,21 +310,13 @@ class ApiLoaderTest extends TestCase
         $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'id')->willReturn(new ApiProperty());
         $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'id')->willReturn(new ApiProperty());
 
-        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
-
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
-        $identifiersExtractor = $identifiersExtractorProphecy->reveal();
-
-        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $operationPathResolver, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], null, false, true, true, false, false, $identifiersExtractor);
+        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], false, true, true, false, false);
     }
 
     private function getRoute(string $path, string $controller, ?bool $stateless, string $resourceClass, array $identifiers, string $operationName, array $extraDefaults = [], array $methods = [], array $requirements = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
     {
-        $isCollection = false !== strpos($operationName, 'collection');
-
         return new Route(
             $path,
             [

@@ -13,32 +13,43 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @internal
  */
-final class LinkFactory implements LinkFactoryInterface
+final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInterface
 {
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-    private $resourceClassResolver;
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver)
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface $resourceClassResolver)
     {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromIdentifiers($operation): array
+    public function createLinkFromProperty(Metadata $operation, string $property): Link
+    {
+        $metadata = $this->propertyMetadataFactory->create($resourceClass = $operation->getClass(), $property);
+        $relationClass = $this->getPropertyClassType($metadata->getBuiltinTypes());
+        if (!$relationClass) {
+            throw new RuntimeException(sprintf('We could not find a class matching the uriVariable "%s" on "%s".', $property, $resourceClass));
+        }
+
+        $identifiers = $this->resourceClassResolver->isResourceClass($relationClass) ? $this->getIdentifiersFromResourceClass($relationClass) : ['id'];
+
+        return new Link(fromClass: $relationClass, toProperty: $property, identifiers: $identifiers, parameterName: $property);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createLinksFromIdentifiers(Metadata $operation): array
     {
         $identifiers = $this->getIdentifiersFromResourceClass($resourceClass = $operation->getClass());
 
@@ -60,7 +71,7 @@ final class LinkFactory implements LinkFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromRelations($operation): array
+    public function createLinksFromRelations(Metadata $operation): array
     {
         $links = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass = $operation->getClass()) as $property) {
@@ -81,12 +92,8 @@ final class LinkFactory implements LinkFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createLinksFromAttributes($operation): array
+    public function createLinksFromAttributes(Metadata $operation): array
     {
-        if (\PHP_VERSION_ID < 80000) {
-            return [];
-        }
-
         $links = [];
         try {
             $reflectionClass = new \ReflectionClass($resourceClass = $operation->getClass());
@@ -106,7 +113,7 @@ final class LinkFactory implements LinkFactoryInterface
                     $links[] = $attributeLink;
                 }
             }
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
         }
 
         return $links;
@@ -121,7 +128,7 @@ final class LinkFactory implements LinkFactoryInterface
             $link = $link->withIdentifiers($this->getIdentifiersFromResourceClass($link->getFromClass()));
         }
 
-        if (1 < \count($link->getIdentifiers())) {
+        if (1 < \count((array) $link->getIdentifiers())) {
             $link = $link->withCompositeIdentifier(true);
         }
 
@@ -133,11 +140,13 @@ final class LinkFactory implements LinkFactoryInterface
         $hasIdProperty = false;
         $identifiers = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            if (!$hasIdProperty) {
+            $isIdentifier = $this->propertyMetadataFactory->create($resourceClass, $property)->isIdentifier();
+
+            if (!$hasIdProperty && null === $isIdentifier) {
                 $hasIdProperty = 'id' === $property;
             }
 
-            if ($this->propertyMetadataFactory->create($resourceClass, $property)->isIdentifier() ?? false) {
+            if ($isIdentifier) {
                 $identifiers[] = $property;
             }
         }
@@ -156,7 +165,7 @@ final class LinkFactory implements LinkFactoryInterface
     {
         foreach ($types ?? [] as $type) {
             if ($type->isCollection()) {
-                return $this->getPropertyClassType(method_exists(Type::class, 'getCollectionValueTypes') ? $type->getCollectionValueTypes() : ($type->getCollectionValueType() ? [$type->getCollectionValueType()] : null));
+                return $this->getPropertyClassType($type->getCollectionValueTypes());
             }
 
             if ($class = $type->getClassName()) {

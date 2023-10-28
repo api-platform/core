@@ -26,19 +26,8 @@ use Twig\Environment as TwigEnvironment;
  */
 final class GraphiQlAction
 {
-    private $twig;
-    private $router;
-    private $graphiqlEnabled;
-    private $title;
-    private $assetPackage;
-
-    public function __construct(TwigEnvironment $twig, RouterInterface $router, bool $graphiqlEnabled = false, string $title = '', $assetPackage = null)
+    public function __construct(private readonly TwigEnvironment $twig, private readonly RouterInterface $router, private readonly bool $graphiqlEnabled = false, private readonly string $title = '', private $assetPackage = null)
     {
-        $this->twig = $twig;
-        $this->router = $router;
-        $this->graphiqlEnabled = $graphiqlEnabled;
-        $this->title = $title;
-        $this->assetPackage = $assetPackage;
     }
 
     public function __invoke(Request $request): Response
@@ -48,11 +37,9 @@ final class GraphiQlAction
                 'title' => $this->title,
                 'graphiql_data' => ['entrypoint' => $this->router->generate('api_graphql_entrypoint')],
                 'assetPackage' => $this->assetPackage,
-            ]));
+            ]), 200, ['content-type' => 'text/html']);
         }
 
         throw new BadRequestHttpException('GraphiQL is not enabled.');
     }
 }
-
-class_alias(GraphiQlAction::class, \ApiPlatform\Core\GraphQl\Action\GraphiQlAction::class);

@@ -21,5 +21,3 @@ namespace ApiPlatform\Exception;
 class PropertyNotFoundException extends \Exception implements ExceptionInterface
 {
 }
-
-class_alias(PropertyNotFoundException::class, \ApiPlatform\Core\Exception\PropertyNotFoundException::class);

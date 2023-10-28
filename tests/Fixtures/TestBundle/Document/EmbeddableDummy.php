@@ -22,53 +22,40 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jordan Samouh <jordan.samouh@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
- *
- * @ODM\EmbeddedDocument
  */
+#[ODM\EmbeddedDocument]
 class EmbeddableDummy
 {
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field(type="string")
-     * @Groups({"embed"})
      */
-    private $dummyName;
-
+    #[Groups(['embed'])]
+    #[ODM\Field(type: 'string')]
+    private ?string $dummyName = null;
     /**
      * @var bool|null A dummy boolean
-     *
-     * @ODM\Field(type="bool")
      */
-    public $dummyBoolean;
-
+    #[ODM\Field(type: 'bool')]
+    public ?bool $dummyBoolean = null;
     /**
      * @var \DateTime|null A dummy date
-     *
-     * @ODM\Field(type="date")
-     * @Assert\DateTime
      */
-    public $dummyDate;
-
+    #[Assert\DateTime]
+    #[ODM\Field(type: 'date')]
+    public ?\DateTime $dummyDate = null;
     /**
      * @var float|null A dummy float
-     *
-     * @ODM\Field(type="float")
      */
-    public $dummyFloat;
-
+    #[ODM\Field(type: 'float')]
+    public ?float $dummyFloat = null;
     /**
      * @var float|null A dummy price
-     *
-     * @ODM\Field(type="float")
      */
-    public $dummyPrice;
-
-    /**
-     * @ODM\Field(type="string")
-     * @Groups({"barcelona", "chicago"})
-     */
-    protected $symfony;
+    #[ODM\Field(type: 'float')]
+    public ?float $dummyPrice = null;
+    #[Groups(['barcelona', 'chicago'])]
+    #[ODM\Field(type: 'string')]
+    protected ?string $symfony = null;
 
     public static function staticMethod(): void
     {

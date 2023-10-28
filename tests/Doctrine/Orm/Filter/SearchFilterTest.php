@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Filter;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -26,25 +25,23 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
 use Prophecy\Argument;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
  * @author Vincent CHALAMON <vincentchalamon@gmail.com>
- * @group legacy
  */
 class SearchFilterTest extends DoctrineOrmFilterTestCase
 {
     use ProphecyTrait;
     use SearchFilterTestTrait;
 
-    protected $alias = 'oo';
-    protected $filterClass = SearchFilter::class;
+    protected const ALIAS = 'oo';
+    protected string $filterClass = SearchFilter::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
-        $filter = $this->buildSearchFilter($this->managerRegistry);
+        $filter = self::buildSearchFilter($this, $this->managerRegistry);
 
         $this->assertEquals([
             'id' => [
@@ -119,14 +116,14 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
             ],
             'dummyDate' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
             'dummyDate[]' => [
                 'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => true,
@@ -218,180 +215,89 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function testDoubleJoin()
-    {
-        $this->doTestDoubleJoin(false);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRequestDoubleJoin()
-    {
-        $this->doTestDoubleJoin(true);
-    }
-
-    private function doTestDoubleJoin(bool $request)
+    public function testDoubleJoin(): void
     {
         $filters = ['relatedDummy.symfony' => 'foo'];
 
-        $requestStack = null;
-        if ($request) {
-            $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummies', 'GET', $filters));
-        }
+        $queryBuilder = $this->repository->createQueryBuilder(static::ALIAS);
+        $filter = self::buildSearchFilter($this, $this->managerRegistry, ['relatedDummy.symfony' => null]);
 
-        $queryBuilder = $this->repository->createQueryBuilder($this->alias);
-        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null], $requestStack);
-
-        $queryBuilder->innerJoin(sprintf('%s.relatedDummy', $this->alias), 'relateddummy_a1');
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
+        $queryBuilder->innerJoin(sprintf('%s.relatedDummy', static::ALIAS), 'relateddummy_a1');
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 WHERE relateddummy_a1.symfony = :symfony_p1', $this->alias, Dummy::class));
-        $this->assertEquals($actual, $expected);
+        $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 WHERE relateddummy_a1.symfony = :symfony_p1', static::ALIAS, Dummy::class));
+        $this->assertSame($actual, $expected);
     }
 
-    public function testTripleJoin()
-    {
-        $this->doTestTripleJoin(false);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRequestTripleJoin()
-    {
-        $this->doTestTripleJoin(true);
-    }
-
-    private function doTestTripleJoin(bool $request)
+    public function testTripleJoin(): void
     {
         $filters = ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '2'];
 
-        $requestStack = null;
-        if ($request) {
-            $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummies', 'GET', $filters));
-        }
+        $queryBuilder = $this->repository->createQueryBuilder(static::ALIAS);
+        $filter = self::buildSearchFilter($this, $this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]);
 
-        $queryBuilder = $this->repository->createQueryBuilder($this->alias);
-        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null], $requestStack);
-
-        $queryBuilder->innerJoin(sprintf('%s.relatedDummy', $this->alias), 'relateddummy_a1');
+        $queryBuilder->innerJoin(sprintf('%s.relatedDummy', static::ALIAS), 'relateddummy_a1');
         $queryBuilder->innerJoin('relateddummy_a1.thirdLevel', 'thirdLevel_a1');
 
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 inner join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', $this->alias, Dummy::class));
-        $this->assertEquals($actual, $expected);
+        $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 inner join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', static::ALIAS, Dummy::class));
+        $this->assertSame($actual, $expected);
     }
 
-    public function testJoinLeft()
-    {
-        $this->doTestJoinLeft(false);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRequestJoinLeft()
-    {
-        $this->doTestJoinLeft(true);
-    }
-
-    private function doTestJoinLeft(bool $request)
+    public function testJoinLeft(): void
     {
         $filters = ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '3'];
 
-        $requestStack = null;
-        if ($request) {
-            $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummies', 'GET', $filters));
-        }
+        $queryBuilder = $this->repository->createQueryBuilder(static::ALIAS);
+        $queryBuilder->leftJoin(sprintf('%s.relatedDummy', static::ALIAS), 'relateddummy_a1');
 
-        $queryBuilder = $this->repository->createQueryBuilder($this->alias);
-        $queryBuilder->leftJoin(sprintf('%s.relatedDummy', $this->alias), 'relateddummy_a1');
-
-        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null], $requestStack);
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
+        $filter = self::buildSearchFilter($this, $this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower(sprintf('SELECT %s FROM %s %1$s left join %1$s.relatedDummy relateddummy_a1 left join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', $this->alias, Dummy::class));
-        $this->assertEquals($actual, $expected);
+        $expected = strtolower(sprintf('SELECT %s FROM %s %1$s left join %1$s.relatedDummy relateddummy_a1 left join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', static::ALIAS, Dummy::class));
+        $this->assertSame($actual, $expected);
     }
 
-    public function testApplyWithAnotherAlias()
-    {
-        $this->doTestApplyWithAnotherAlias(false);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRequestApplyWithAnotherAlias()
-    {
-        $this->doTestApplyWithAnotherAlias(true);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.5 and can lead to unexpected behaviors, it will not be possible anymore in API Platform 3.0.
-     */
-    public function testNotPassingIdentifiersExtractor()
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push(Request::create('/api/dummies', 'GET', []));
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverter = $iriConverterProphecy->reveal();
-        $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
-
-        return new SearchFilter($this->managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, null, null);
-    }
-
-    private function doTestApplyWithAnotherAlias(bool $request)
+    public function testApplyWithAnotherAlias(): void
     {
         $filters = ['name' => 'exact'];
 
-        $requestStack = null;
-        if ($request) {
-            $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummies', 'GET', $filters));
-        }
-
         $queryBuilder = $this->repository->createQueryBuilder('somealias');
 
-        $filter = $this->buildSearchFilter($this->managerRegistry, ['id' => null, 'name' => null], $requestStack);
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
+        $filter = self::buildSearchFilter($this, $this->managerRegistry, ['id' => null, 'name' => null]);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
 
         $expectedDql = sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', 'somealias', Dummy::class);
-        $this->assertEquals($expectedDql, $queryBuilder->getQuery()->getDQL());
+        $this->assertSame($expectedDql, $queryBuilder->getQuery()->getDQL());
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
-        $filterFactory = [$this, 'buildSearchFilter'];
+        $filterFactory = self::buildSearchFilter(...);
 
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'exact' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', static::ALIAS, Dummy::class),
                     ['name_p1' => 'exact'],
                     $filterFactory,
                 ],
                 'exact (case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) = LOWER(:name_p1)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) = LOWER(:name_p1)', static::ALIAS, Dummy::class),
                     ['name_p1' => 'exact'],
                     $filterFactory,
                 ],
                 'exact (case insensitive, with special characters)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) = LOWER(:name_p1)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) = LOWER(:name_p1)', static::ALIAS, Dummy::class),
                     ['name_p1' => 'exact (special)'],
                     $filterFactory,
                 ],
                 'exact (multiple values)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN(:name_p1)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN(:name_p1)', static::ALIAS, Dummy::class),
                     [
                         'name_p1' => [
                             'CaSE',
@@ -401,7 +307,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'exact (multiple values; case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN(:name_p1)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN(:name_p1)', static::ALIAS, Dummy::class),
                     [
                         'name_p1' => [
                             'case',
@@ -411,27 +317,27 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'invalid property' => [
-                    sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s', static::ALIAS, Dummy::class),
                     [],
                     $filterFactory,
                 ],
                 'invalid values for relations' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', static::ALIAS, Dummy::class),
                     [],
                     $filterFactory,
                 ],
                 'partial' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0, \'%%\')', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0, \'%%\')', static::ALIAS, Dummy::class),
                     ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'partial (case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0, \'%%\'))', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0, \'%%\'))', static::ALIAS, Dummy::class),
                     ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'partial (multiple values)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%%\', :name_p1_1, \'%%\')', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%%\', :name_p1_1, \'%%\')', static::ALIAS, Dummy::class),
                     [
                         'name_p1_0' => 'CaSE',
                         'name_p1_1' => 'SENSitive',
@@ -439,25 +345,33 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'partial (multiple values; case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_1, \'%%\'))', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_1, \'%%\'))', static::ALIAS, Dummy::class),
                     [
                         'name_p1_0' => 'case',
                         'name_p1_1' => 'insensitive',
                     ],
                     $filterFactory,
                 ],
+                'partial (multiple almost same values; case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_1, \'%%\'))', static::ALIAS, Dummy::class),
+                    [
+                        'name_p1_0' => 'blue car',
+                        'name_p1_1' => 'blue car',
+                    ],
+                    $filterFactory,
+                ],
                 'start' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1_0, \'%%\')', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1_0, \'%%\')', static::ALIAS, Dummy::class),
                     ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'start (case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\'))', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\'))', static::ALIAS, Dummy::class),
                     ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'start (multiple values)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(:name_p1_1, \'%%\')', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(:name_p1_1, \'%%\')', static::ALIAS, Dummy::class),
                     [
                         'name_p1_0' => 'CaSE',
                         'name_p1_1' => 'SENSitive',
@@ -465,7 +379,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'start (multiple values; case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_1, \'%%\'))', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_1, \'%%\'))', static::ALIAS, Dummy::class),
                     [
                         'name_p1_0' => 'case',
                         'name_p1_1' => 'insensitive',
@@ -473,17 +387,17 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'end' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0)', static::ALIAS, Dummy::class),
                     ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'end (case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0))', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0))', static::ALIAS, Dummy::class),
                     ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'end (multiple values)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0) OR %1$s.name LIKE CONCAT(\'%%\', :name_p1_1)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0) OR %1$s.name LIKE CONCAT(\'%%\', :name_p1_1)', static::ALIAS, Dummy::class),
                     [
                         'name_p1_0' => 'CaSE',
                         'name_p1_1' => 'SENSitive',
@@ -491,7 +405,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'end (multiple values; case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0)) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_1))', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0)) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_1))', static::ALIAS, Dummy::class),
                     [
                         'name_p1_0' => 'case',
                         'name_p1_1' => 'insensitive',
@@ -499,17 +413,17 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'word_start' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1_0, \'%%\')', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1_0, \'%%\')', static::ALIAS, Dummy::class),
                     ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'word_start (case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1_0, \'%%\'))', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1_0, \'%%\'))', static::ALIAS, Dummy::class),
                     ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'word_start (multiple values)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE (%1$s.name LIKE CONCAT(:name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1_0, \'%%\')) OR (%1$s.name LIKE CONCAT(:name_p1_1, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1_1, \'%%\'))', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE (%1$s.name LIKE CONCAT(:name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1_0, \'%%\')) OR (%1$s.name LIKE CONCAT(:name_p1_1, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1_1, \'%%\'))', static::ALIAS, Dummy::class),
                     [
                         'name_p1_0' => 'CaSE',
                         'name_p1_1' => 'SENSitive',
@@ -517,7 +431,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'word_start (multiple values; case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE (LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1_0, \'%%\'))) OR (LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_1, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1_1, \'%%\')))', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE (LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1_0, \'%%\'))) OR (LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_1, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1_1, \'%%\')))', static::ALIAS, Dummy::class),
                     [
                         'name_p1_0' => 'case',
                         'name_p1_1' => 'insensitive',
@@ -525,7 +439,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'invalid value for relation' => [
-                    sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s', static::ALIAS, Dummy::class),
                     [],
                     $filterFactory,
                 ],
@@ -538,17 +452,17 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     [
                         'relatedDummy' => '/related_dummie/1',
                     ],
-                    sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s', static::ALIAS, Dummy::class),
                     [],
                     $filterFactory,
                 ],
                 'IRI value for relation' => [
-                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', static::ALIAS, Dummy::class),
                     ['id_p1' => 1],
                     $filterFactory,
                 ],
                 'mixed IRI and entity ID values for relations' => [
-                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN(:relatedDummy_p1) AND relatedDummies_a1.id = :id_p2', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN(:relatedDummy_p1) AND relatedDummies_a1.id = :id_p2', static::ALIAS, Dummy::class),
                     [
                         'relatedDummy_p1' => [1, 2],
                         'id_p2' => 1,
@@ -556,7 +470,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'nested property' => [
-                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE %1$s.name = :name_p1 AND relatedDummy_a1.symfony = :symfony_p2', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE %1$s.name = :name_p1 AND relatedDummy_a1.symfony = :symfony_p2', static::ALIAS, Dummy::class),
                     [
                         'name_p1' => 'exact',
                         'symfony_p2' => 'exact',
@@ -564,24 +478,24 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'empty nested property' => [
-                    sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s', static::ALIAS, Dummy::class),
                     [],
                     $filterFactory,
                 ],
                 'integer value' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.age = :age_p1', $this->alias, RelatedDummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.age = :age_p1', static::ALIAS, RelatedDummy::class),
                     ['age_p1' => 46],
                     $filterFactory,
                     RelatedDummy::class,
                 ],
                 'related owned one-to-one association' => [
-                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1.id = :id_p1', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1.id = :id_p1', static::ALIAS, Dummy::class),
                     ['id_p1' => 1],
                     $filterFactory,
                     Dummy::class,
                 ],
                 'related owning one-to-one association' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.relatedOwningDummy = :relatedOwningDummy_p1', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.relatedOwningDummy = :relatedOwningDummy_p1', static::ALIAS, Dummy::class),
                     ['relatedOwningDummy_p1' => 1],
                     $filterFactory,
                     Dummy::class,
@@ -590,13 +504,13 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         );
     }
 
-    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null, RequestStack $requestStack = null)
+    protected static function buildSearchFilter(self $that, ManagerRegistry $managerRegistry, array $properties = null): SearchFilter
     {
-        $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $relatedDummyProphecy = $that->prophesize(RelatedDummy::class);
+        $iriConverterProphecy = $that->prophesize(IriConverterInterface::class);
 
-        $iriConverterProphecy->getItemFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
-            if (false !== strpos($args[0], '/related_dummies')) {
+        $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
+            if (str_contains((string) $args[0], '/related_dummies')) {
                 $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
 
                 return $relatedDummyProphecy->reveal();
@@ -608,9 +522,6 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $iriConverter = $iriConverterProphecy->reveal();
         $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
-
-        return new SearchFilter($managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, $properties, $identifierExtractorProphecy->reveal(), new CustomConverter());
+        return new SearchFilter($managerRegistry, $iriConverter, $propertyAccessor, null, $properties, null, new CustomConverter());
     }
 }

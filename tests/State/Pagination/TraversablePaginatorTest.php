@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\State\Pagination;
 
 use ApiPlatform\State\Pagination\TraversablePaginator;
-use ArrayIterator;
 use PHPUnit\Framework\TestCase;
 
 class TraversablePaginatorTest extends TestCase
@@ -28,22 +27,22 @@ class TraversablePaginatorTest extends TestCase
         float $perPage,
         float $totalItems,
         float $lastPage,
-        float $currentItems
+        int $currentItems
     ): void {
-        $traversable = new ArrayIterator($results);
+        $traversable = new \ArrayIterator($results);
 
         $paginator = new TraversablePaginator($traversable, $currentPage, $perPage, $totalItems);
 
-        self::assertEquals($totalItems, $paginator->getTotalItems());
-        self::assertEquals($currentPage, $paginator->getCurrentPage());
-        self::assertEquals($lastPage, $paginator->getLastPage());
-        self::assertEquals($perPage, $paginator->getItemsPerPage());
-        self::assertEquals($currentItems, $paginator->count());
+        self::assertSame($totalItems, $paginator->getTotalItems());
+        self::assertSame($currentPage, $paginator->getCurrentPage());
+        self::assertSame($lastPage, $paginator->getLastPage());
+        self::assertSame($perPage, $paginator->getItemsPerPage());
+        self::assertCount($currentItems, $paginator);
 
         self::assertSame($results, iterator_to_array($paginator));
     }
 
-    public function initializeProvider(): array
+    public static function initializeProvider(): array
     {
         return [
             'First of three pages of 3 items each' => [[0, 1, 2, 3, 4, 5, 6], 1, 3, 7, 3, 3],

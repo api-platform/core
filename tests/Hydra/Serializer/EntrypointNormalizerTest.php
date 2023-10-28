@@ -14,31 +14,34 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Hydra\Serializer;
 
 use ApiPlatform\Api\Entrypoint;
-use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Documentation\Entrypoint as DocumentationEntrypoint;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class EntrypointNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testSupportNormalization()
+    /**
+     * @group legacy
+     */
+    public function testSupportNormalization(): void
     {
         $collection = new ResourceNameCollection();
         $entrypoint = new Entrypoint($collection);
@@ -52,21 +55,34 @@ class EntrypointNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization($entrypoint, EntrypointNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization($entrypoint, 'json'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), EntrypointNormalizer::FORMAT));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertEmpty($normalizer->getSupportedTypes('json'));
+        $this->assertSame([Entrypoint::class => true, DocumentationEntrypoint::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
-    public function testNormalizeWithResourceMetadata()
+    public function testNormalizeWithResourceMetadata(): void
     {
         $collection = new ResourceNameCollection([FooDummy::class, Dummy::class]);
         $entrypoint = new Entrypoint($collection);
 
-        $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
-        $factoryProphecy->create(FooDummy::class)->willReturn(new ResourceMetadata('FooDummy', null, null, null, ['get']))->shouldBeCalled();
+        $factoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withShortName('Dummy')->withUriTemplate('/api/dummies')->withOperations(new Operations([
+                'get' => new GetCollection(),
+            ])),
+        ]))->shouldBeCalled();
+        $factoryProphecy->create(FooDummy::class)->willReturn(new ResourceMetadataCollection(FooDummy::class, [
+            (new ApiResource())->withShortName('FooDummy')->withUriTemplate('/api/foo_dummies')->withOperations(new Operations([
+                'get' => new GetCollection(),
+            ])),
+        ]))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/api/dummies')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResourceClass(FooDummy::class)->willReturn('/api/foo_dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/api/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(FooDummy::class, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/api/foo_dummies')->shouldBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/api')->shouldBeCalled();
@@ -81,10 +97,10 @@ class EntrypointNormalizerTest extends TestCase
             'dummy' => '/api/dummies',
             'fooDummy' => '/api/foo_dummies',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }
 
-    public function testNormalizeWithResourceCollection()
+    public function testNormalizeWithResourceCollection(): void
     {
         $collection = new ResourceNameCollection([FooDummy::class, Dummy::class]);
         $entrypoint = new Entrypoint($collection);
@@ -103,8 +119,8 @@ class EntrypointNormalizerTest extends TestCase
         )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/api/dummies')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResourceClass(FooDummy::class)->willReturn('/api/foo_dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/api/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(FooDummy::class, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/api/foo_dummies')->shouldBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/api')->shouldBeCalled();
@@ -119,6 +135,6 @@ class EntrypointNormalizerTest extends TestCase
             'dummy' => '/api/dummies',
             'fooDummy' => '/api/foo_dummies',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }
 }

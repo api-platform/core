@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Filter;
 
-use ApiPlatform\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Metadata\FilterInterface as BaseFilterInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -26,5 +26,5 @@ interface FilterInterface extends BaseFilterInterface
     /**
      * Apply a filter to the serializer context.
      */
-    public function apply(Request $request, bool $normalization, array $attributes, array &$context);
+    public function apply(Request $request, bool $normalization, array $attributes, array &$context): void;
 }

@@ -15,52 +15,45 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[GetCollection]
 #[Get]
 #[Post]
-#[ApiResource(
-    uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}',
-    uriVariables: [
-        'employeeId' => ['from_class' => Employee::class, 'from_property' => 'company'],
-    ],
-)]
-#[Get]
 #[ApiResource(
     uriTemplate: '/employees/{employeeId}/company',
     uriVariables: [
         'employeeId' => ['from_class' => Employee::class, 'from_property' => 'company'],
     ],
 )]
+#[ORM\Entity]
 class Company
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
+    #[Groups(['company_employees_read'])]
     public string $name;
 
     /** @var Employee[] */
     #[Link(toProperty: 'company')]
     public $employees = []; // only used to set metadata
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

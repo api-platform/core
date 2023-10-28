@@ -2,21 +2,21 @@ default:
   suites:
     default:
       contexts:
-        - 'ApiPlatform\Core\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Core\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Core\Tests\Behat\GraphqlContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonContext'
-        - 'ApiPlatform\Core\Tests\Behat\HydraContext'
-        - 'ApiPlatform\Core\Tests\Behat\OpenApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\HttpCacheContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonHalContext'
-        - 'ApiPlatform\Core\Tests\Behat\MercureContext'
-        - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\DoctrineContext'
+        - 'ApiPlatform\Tests\Behat\GraphqlContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\HydraContext'
+        - 'ApiPlatform\Tests\Behat\OpenApiContext'
+        - 'ApiPlatform\Tests\Behat\HttpCacheContext'
+        - 'ApiPlatform\Tests\Behat\JsonApiContext'
+        - 'ApiPlatform\Tests\Behat\JsonHalContext'
+        - 'ApiPlatform\Tests\Behat\MercureContext'
+        - 'ApiPlatform\Tests\Behat\XmlContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@controller&&~@mercure'
   extensions:
     'FriendsOfBehat\SymfonyExtension':
       bootstrap: 'tests/Fixtures/app/bootstrap.php'
@@ -38,42 +38,63 @@ postgres:
     default: false
     postgres: &postgres-suite
       contexts:
-        - 'ApiPlatform\Core\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Core\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Core\Tests\Behat\GraphqlContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonContext'
-        - 'ApiPlatform\Core\Tests\Behat\HydraContext'
-        - 'ApiPlatform\Core\Tests\Behat\OpenApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\HttpCacheContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonHalContext'
-        - 'ApiPlatform\Core\Tests\Behat\MercureContext'
-        - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\DoctrineContext'
+        - 'ApiPlatform\Tests\Behat\GraphqlContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\HydraContext'
+        - 'ApiPlatform\Tests\Behat\OpenApiContext'
+        - 'ApiPlatform\Tests\Behat\HttpCacheContext'
+        - 'ApiPlatform\Tests\Behat\JsonApiContext'
+        - 'ApiPlatform\Tests\Behat\JsonHalContext'
+        - 'ApiPlatform\Tests\Behat\MercureContext'
+        - 'ApiPlatform\Tests\Behat\XmlContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
+        tags: '~@sqlite&&~@mongodb&&~@elasticsearch&&~@controller&&~@mercure'
 
 mongodb:
   suites:
     default: false
     mongodb: &mongodb-suite
       contexts:
-        - 'ApiPlatform\Core\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Core\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Core\Tests\Behat\GraphqlContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonContext'
-        - 'ApiPlatform\Core\Tests\Behat\HydraContext'
-        - 'ApiPlatform\Core\Tests\Behat\OpenApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\HttpCacheContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonHalContext'
-        - 'ApiPlatform\Core\Tests\Behat\MercureContext'
-        - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\DoctrineContext'
+        - 'ApiPlatform\Tests\Behat\GraphqlContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\HydraContext'
+        - 'ApiPlatform\Tests\Behat\OpenApiContext'
+        - 'ApiPlatform\Tests\Behat\HttpCacheContext'
+        - 'ApiPlatform\Tests\Behat\JsonApiContext'
+        - 'ApiPlatform\Tests\Behat\JsonHalContext'
+        - 'ApiPlatform\Tests\Behat\MercureContext'
+        - 'ApiPlatform\Tests\Behat\XmlContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&~@mercure'
+
+mercure:
+  suites:
+    default: false
+    mercure: &mercure-suite
+      contexts:
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\DoctrineContext'
+        - 'ApiPlatform\Tests\Behat\GraphqlContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\HydraContext'
+        - 'ApiPlatform\Tests\Behat\OpenApiContext'
+        - 'ApiPlatform\Tests\Behat\HttpCacheContext'
+        - 'ApiPlatform\Tests\Behat\JsonApiContext'
+        - 'ApiPlatform\Tests\Behat\JsonHalContext'
+        - 'ApiPlatform\Tests\Behat\MercureContext'
+        - 'ApiPlatform\Tests\Behat\XmlContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'behatch:context:rest'
+      filters:
+        tags: '@mercure'
 
 elasticsearch:
   suites:
@@ -82,30 +103,30 @@ elasticsearch:
       paths:
         - '%paths.base%/features/elasticsearch'
       contexts:
-        - 'ApiPlatform\Core\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Core\Tests\Behat\ElasticsearchContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\ElasticsearchContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '@elasticsearch'
+        tags: '@elasticsearch&&~@mercure'
 
 default-coverage:
   suites:
     default: &default-coverage-suite
       contexts:
-        - 'ApiPlatform\Core\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Core\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Core\Tests\Behat\GraphqlContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonContext'
-        - 'ApiPlatform\Core\Tests\Behat\HydraContext'
-        - 'ApiPlatform\Core\Tests\Behat\OpenApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\HttpCacheContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonHalContext'
-        - 'ApiPlatform\Core\Tests\Behat\MercureContext'
-        - 'ApiPlatform\Core\Tests\Behat\CoverageContext'
-        - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\DoctrineContext'
+        - 'ApiPlatform\Tests\Behat\GraphqlContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\HydraContext'
+        - 'ApiPlatform\Tests\Behat\OpenApiContext'
+        - 'ApiPlatform\Tests\Behat\HttpCacheContext'
+        - 'ApiPlatform\Tests\Behat\JsonApiContext'
+        - 'ApiPlatform\Tests\Behat\JsonHalContext'
+        - 'ApiPlatform\Tests\Behat\MercureContext'
+        - 'ApiPlatform\Tests\Behat\CoverageContext'
+        - 'ApiPlatform\Tests\Behat\XmlContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
 
@@ -115,18 +136,39 @@ mongodb-coverage:
     mongodb: &mongodb-coverage-suite
       <<: *mongodb-suite
       contexts:
-        - 'ApiPlatform\Core\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Core\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Core\Tests\Behat\GraphqlContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonContext'
-        - 'ApiPlatform\Core\Tests\Behat\HydraContext'
-        - 'ApiPlatform\Core\Tests\Behat\OpenApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\HttpCacheContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonApiContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonHalContext'
-        - 'ApiPlatform\Core\Tests\Behat\MercureContext'
-        - 'ApiPlatform\Core\Tests\Behat\CoverageContext'
-        - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\DoctrineContext'
+        - 'ApiPlatform\Tests\Behat\GraphqlContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\HydraContext'
+        - 'ApiPlatform\Tests\Behat\OpenApiContext'
+        - 'ApiPlatform\Tests\Behat\HttpCacheContext'
+        - 'ApiPlatform\Tests\Behat\JsonApiContext'
+        - 'ApiPlatform\Tests\Behat\JsonHalContext'
+        - 'ApiPlatform\Tests\Behat\MercureContext'
+        - 'ApiPlatform\Tests\Behat\CoverageContext'
+        - 'ApiPlatform\Tests\Behat\XmlContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'behatch:context:rest'
+
+mercure-coverage:
+  suites:
+    default: false
+    mongodb: &mercure-coverage-suite
+      <<: *mercure-suite
+      contexts:
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\DoctrineContext'
+        - 'ApiPlatform\Tests\Behat\GraphqlContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\HydraContext'
+        - 'ApiPlatform\Tests\Behat\OpenApiContext'
+        - 'ApiPlatform\Tests\Behat\HttpCacheContext'
+        - 'ApiPlatform\Tests\Behat\JsonApiContext'
+        - 'ApiPlatform\Tests\Behat\JsonHalContext'
+        - 'ApiPlatform\Tests\Behat\MercureContext'
+        - 'ApiPlatform\Tests\Behat\CoverageContext'
+        - 'ApiPlatform\Tests\Behat\XmlContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
 
@@ -136,9 +178,45 @@ elasticsearch-coverage:
     elasticsearch: &elasticsearch-coverage-suite
       <<: *elasticsearch-suite
       contexts:
-        - 'ApiPlatform\Core\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Core\Tests\Behat\ElasticsearchContext'
-        - 'ApiPlatform\Core\Tests\Behat\JsonContext'
-        - 'ApiPlatform\Core\Tests\Behat\CoverageContext'
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\ElasticsearchContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
+
+legacy:
+  suites:
+    default:
+      contexts:
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\DoctrineContext'
+        - 'ApiPlatform\Tests\Behat\GraphqlContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'ApiPlatform\Tests\Behat\HydraContext'
+        - 'ApiPlatform\Tests\Behat\OpenApiContext'
+        - 'ApiPlatform\Tests\Behat\HttpCacheContext'
+        - 'ApiPlatform\Tests\Behat\JsonApiContext'
+        - 'ApiPlatform\Tests\Behat\JsonHalContext'
+        - 'ApiPlatform\Tests\Behat\MercureContext'
+        - 'ApiPlatform\Tests\Behat\XmlContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'behatch:context:rest'
+      filters:
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+  extensions:
+    'FriendsOfBehat\SymfonyExtension':
+      bootstrap: 'tests/Fixtures/app/bootstrap.php'
+      kernel:
+        environment: 'test'
+        debug: true
+        class: AppKernel
+        path: 'tests/Fixtures/app/AppKernel.php'
+    'Behat\MinkExtension':
+      base_url: 'http://example.com/'
+      files_path: 'features/files'
+      sessions:
+        default:
+          symfony: ~
+    'Behatch\Extension': ~
+

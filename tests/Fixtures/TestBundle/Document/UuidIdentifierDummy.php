@@ -13,37 +13,33 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom identifier dummy.
- *
- * @ApiResource
- * @ODM\Document
  */
+#[ApiResource]
+#[ODM\Document]
 class UuidIdentifierDummy
 {
     /**
      * @var string The custom identifier
-     *
-     * @ODM\Id(strategy="UUID")
      */
-    private $uuid;
-
+    #[ODM\Id(strategy: 'none', type: 'string')]
+    private ?string $uuid = null;
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
-    private $name;
+    #[ODM\Field]
+    private ?string $name = null;
 
     public function getUuid(): string
     {
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid)
+    public function setUuid(string $uuid): void
     {
         $this->uuid = $uuid;
     }
@@ -53,7 +49,7 @@ class UuidIdentifierDummy
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }

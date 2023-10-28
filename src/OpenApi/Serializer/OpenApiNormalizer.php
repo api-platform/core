@@ -15,9 +15,10 @@ namespace ApiPlatform\OpenApi\Serializer;
 
 use ApiPlatform\OpenApi\Model\Paths;
 use ApiPlatform\OpenApi\OpenApi;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Generates an OpenAPI v3 specification.
@@ -25,33 +26,30 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     public const FORMAT = 'json';
+    public const JSON_FORMAT = 'jsonopenapi';
+    public const YAML_FORMAT = 'yamlopenapi';
     private const EXTENSION_PROPERTIES_KEY = 'extensionProperties';
 
-    private $decorated;
-
-    public function __construct(NormalizerInterface $decorated)
+    public function __construct(private readonly NormalizerInterface $decorated)
     {
-        $this->decorated = $decorated;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
-        $pathsCallback = static function ($innerObject) {
-            return $innerObject instanceof Paths ? $innerObject->getPaths() : [];
-        };
+        $pathsCallback = static fn ($decoratedObject): array => $decoratedObject instanceof Paths ? $decoratedObject->getPaths() : [];
         $context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] = true;
         $context[AbstractObjectNormalizer::SKIP_NULL_VALUES] = true;
-        $context[AbstractObjectNormalizer::CALLBACKS] = [
+        $context[AbstractNormalizer::CALLBACKS] = [
             'paths' => $pathsCallback,
         ];
 
         return $this->recursiveClean($this->decorated->normalize($object, $format, $context));
     }
 
-    private function recursiveClean($data): array
+    private function recursiveClean(array $data): array
     {
         foreach ($data as $key => $value) {
             if (self::EXTENSION_PROPERTIES_KEY === $key) {
@@ -74,18 +72,27 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && $data instanceof OpenApi;
+        return (self::FORMAT === $format || self::JSON_FORMAT === $format || self::YAML_FORMAT === $format) && $data instanceof OpenApi;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function getSupportedTypes($format): array
+    {
+        return (self::FORMAT === $format || self::JSON_FORMAT === $format || self::YAML_FORMAT === $format) ? [OpenApi::class => true] : [];
+    }
+
     public function hasCacheableSupportsMethod(): bool
     {
+        if (method_exists(Serializer::class, 'getSupportedTypes')) {
+            trigger_deprecation(
+                'api-platform/core',
+                '3.1',
+                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
+                __METHOD__
+            );
+        }
+
         return true;
     }
 }
-
-class_alias(OpenApiNormalizer::class, \ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer::class);

@@ -18,7 +18,7 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait RangeFilterTestTrait
 {
-    private function provideApplyTestArguments(): array
+    private static function provideApplyTestArguments(): array
     {
         return [
             'between' => [

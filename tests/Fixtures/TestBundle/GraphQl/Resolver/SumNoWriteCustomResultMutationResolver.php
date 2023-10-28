@@ -24,10 +24,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomMutation;
  */
 class SumNoWriteCustomResultMutationResolver implements MutationResolverInterface
 {
-    /**
-     * @param DummyCustomMutation|DummyCustomMutationDocument|null $item
-     */
-    public function __invoke($item, array $context)
+    public function __invoke(?object $item, array $context): DummyCustomMutation|DummyCustomMutationDocument|null
     {
         // Side-effect.
 

@@ -17,17 +17,14 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
- * @experimental
+ * Prepares graphql links.
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private $linkFactory;
-    private $decorated;
-
-    public function __construct(LinkFactoryInterface $linkFactory, ResourceMetadataCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly LinkFactoryInterface $linkFactory, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
-        $this->linkFactory = $linkFactory;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -71,16 +68,16 @@ final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCol
     {
         $classLinks = [];
         foreach ($links as $link) {
-            $classLinks[$link->getToClass()] = $link;
+            $classLinks[$link->getToClass().'#'.$link->getFromProperty()] = $link;
         }
 
         foreach ($toMergeLinks as $link) {
-            if (isset($classLinks[$link->getToClass()])) {
-                $classLinks[$link->getToClass()] = $classLinks[$link->getToClass()]->withLink($link);
+            if (null !== $prevLink = $classLinks[$link->getToClass().'#'.$link->getFromProperty()] ?? null) {
+                $classLinks[$link->getToClass().'#'.$link->getFromProperty()] = $prevLink->withLink($link);
 
                 continue;
             }
-            $classLinks[$link->getToClass()] = $link;
+            $classLinks[$link->getToClass().'#'.$link->getFromProperty()] = $link;
         }
 
         return array_values($classLinks);

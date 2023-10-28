@@ -21,18 +21,12 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @author Jacques Lefebvre <jacques@les-tilleuls.coop>
- *
- * @group legacy
  */
 class JsonSchemaGenerateCommandTest extends KernelTestCase
 {
-    /**
-     * @var ApplicationTester
-     */
-    private $tester;
+    private ApplicationTester $tester;
 
-    private $entityClass;
-    private $legacy;
+    private string $entityClass;
 
     protected function setUp(): void
     {
@@ -44,44 +38,104 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
         $this->entityClass = 'mongodb' === $kernel->getEnvironment() ? DocumentDummy::class : Dummy::class;
         $this->tester = new ApplicationTester($application);
-        $this->legacy = $kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
     }
 
-    public function testExecuteWithoutOption()
+    public function testExecuteWithoutOption(): void
     {
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass]);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
-    public function testExecuteWithItemOperationGet()
+    public function testExecuteWithItemOperationGet(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--itemOperation' => 'api_dummies_get_item', '--type' => 'output']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies/{id}{._format}_get', '--type' => 'output']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
-    public function testExecuteWithCollectionOperationGet()
+    public function testExecuteWithCollectionOperationGet(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'api_dummies_get_collection', '--type' => 'output']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies{._format}_get_collection', '--type' => 'output']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
-    public function testExecuteWithTooManyOptions()
+    public function testExecuteWithJsonldFormatOption(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => '_api_/dummies.{_format}_get', '--itemOperation' => '_api_/dummies/{id}.{_format}_get', '--type' => 'output']);
-
-        $this->assertStringStartsWith('[ERROR] You can only use one of "--itemOperation" and "--collectionOperation" options at the same time.', trim(preg_replace('/\s+/', ' ', $this->tester->getDisplay())));
-    }
-
-    public function testExecuteWithJsonldFormatOption()
-    {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => $this->legacy ? 'post' : 'api_dummies_post_collection', '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies{._format}_post', '--format' => 'jsonld', '--type' => 'output']);
         $result = $this->tester->getDisplay();
 
         $this->assertStringContainsString('@id', $result);
         $this->assertStringContainsString('@context', $result);
         $this->assertStringContainsString('@type', $result);
+    }
+
+    public function testExecuteWithJsonldTypeInput(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies{._format}_post', '--format' => 'jsonld', '--type' => 'input']);
+        $result = $this->tester->getDisplay();
+
+        $this->assertStringNotContainsString('@id', $result);
+        $this->assertStringNotContainsString('@context', $result);
+        $this->assertStringNotContainsString('@type', $result);
+    }
+
+    /**
+     * Test issue #5501, the locations relation inside BrokenDocs is a Resource (named Related) but its only operation is a NotExposed.
+     * Still, serializer groups are set, and therefore it is a "readableLink" so we actually want to compute the schema, even if it's not accessible
+     * directly, it is accessible through that relation.
+     */
+    public function testExecuteWithNotExposedResourceAndReadableLink(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs', '--type' => 'output']);
+        $result = $this->tester->getDisplay();
+
+        $this->assertStringContainsString('Related.jsonld-location.read_collection', $result);
+    }
+
+    /**
+     * When serializer groups are present the Schema should have an embed resource. #5470 breaks array references when serializer groups are present.
+     */
+    public function testArraySchemaWithReference(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\BagOfTests', '--type' => 'input']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['tests'], [
+            'type' => 'string',
+            'foo' => 'bar',
+        ]);
+
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['nonResourceTests'], [
+            'type' => 'array',
+            'items' => [
+                '$ref' => '#/definitions/NonResourceTestEntity.jsonld-write',
+            ],
+        ]);
+
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['description'], [
+            'maxLength' => 255,
+        ]);
+
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['type'], [
+            'owl:maxCardinality' => 1,
+            '$ref' => '#/definitions/TestEntity.jsonld-write',
+        ]);
+    }
+
+    /**
+     * TODO: add deprecation (TypeFactory will be deprecated in api platform 3.3).
+     *
+     * @group legacy
+     */
+    public function testArraySchemaWithTypeFactory(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\Foo', '--type' => 'output']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals($json['definitions']['Foo.jsonld']['properties']['expiration'], ['type' => 'string', 'format' => 'date']);
     }
 }

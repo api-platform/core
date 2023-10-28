@@ -19,8 +19,7 @@ class DummyValidatedUlidEntity
 {
     /**
      * @var string
-     *
-     * @Assert\Ulid
      */
+    #[Assert\Ulid]
     public $dummyUlid;
 }

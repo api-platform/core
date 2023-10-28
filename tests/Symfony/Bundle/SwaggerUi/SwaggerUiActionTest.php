@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\SwaggerUi;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Documentation\DocumentationInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Paths;
@@ -26,6 +27,7 @@ use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiAction;
 use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiContext;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -33,13 +35,12 @@ use Twig\Environment as TwigEnvironment;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @group legacy
  */
 class SwaggerUiActionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public const SPEC = [
+    final public const SPEC = [
         'paths' => [
             '/fs' => ['get' => ['operationId' => 'getFCollection']],
             '/fs/{id}' => ['get' => ['operationId' => 'getFItem']],
@@ -48,16 +49,19 @@ class SwaggerUiActionTest extends TestCase
 
     /**
      * @dataProvider getInvokeParameters
-     *
-     * @param mixed $twigProphecy
      */
-    public function testInvoke(Request $request, $twigProphecy)
+    public function testInvoke(Request $request, callable $twigFactory): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata('F'))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
+            new ApiResource(operations: [
+                'getFItem' => new Get(shortName: 'F', name: 'getFItem'),
+                'getFCollection' => new GetCollection(shortName: 'F', name: 'getFCollection'),
+            ]),
+        ]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::any(), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
@@ -67,7 +71,7 @@ class SwaggerUiActionTest extends TestCase
 
         $action = new SwaggerUiAction(
             $resourceMetadataFactoryProphecy->reveal(),
-            $twigProphecy->reveal(),
+            $twigFactory($this),
             $urlGeneratorProphecy->reveal(),
             $normalizerProphecy->reveal(),
             $openApiFactoryProphecy->reveal(),
@@ -78,97 +82,111 @@ class SwaggerUiActionTest extends TestCase
         $action($request);
     }
 
-    public function getInvokeParameters()
+    public static function getInvokeParameters(): iterable
     {
-        $twigCollectionProphecy = $this->prophesize(TwigEnvironment::class);
-        $twigCollectionProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
-            'title' => 'title',
-            'description' => '',
-            'formats' => ['jsonld' => ['application/ld+json']],
-            'showWebby' => true,
-            'swaggerUiEnabled' => false,
-            'reDocEnabled' => false,
-            'graphqlEnabled' => false,
-            'graphiQlEnabled' => false,
-            'graphQlPlaygroundEnabled' => false,
-            'assetPackage' => null,
-            'swagger_data' => [
-                'url' => '/url',
-                'spec' => self::SPEC,
-                'oauth' => [
-                    'enabled' => false,
-                    'clientId' => '',
-                    'clientSecret' => '',
-                    'type' => '',
-                    'flow' => '',
-                    'tokenUrl' => '',
-                    'authorizationUrl' => '',
-                    'scopes' => [],
-                    'pkce' => false,
+        $twigCollectionFactory = function (self $that): TwigEnvironment {
+            $twigCollectionProphecy = $that->prophesize(TwigEnvironment::class);
+            $twigCollectionProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
+                'title' => 'title',
+                'description' => '',
+                'formats' => ['jsonld' => ['application/ld+json']],
+                'showWebby' => true,
+                'swaggerUiEnabled' => false,
+                'reDocEnabled' => false,
+                'graphQlEnabled' => false,
+                'graphiQlEnabled' => false,
+                'graphQlPlaygroundEnabled' => false,
+                'assetPackage' => null,
+                'originalRoute' => null,
+                'originalRouteParams' => [],
+                'swagger_data' => [
+                    'url' => '/url',
+                    'spec' => self::SPEC,
+                    'oauth' => [
+                        'enabled' => false,
+                        'clientId' => '',
+                        'clientSecret' => '',
+                        'type' => '',
+                        'flow' => '',
+                        'tokenUrl' => '',
+                        'authorizationUrl' => '',
+                        'scopes' => [],
+                        'pkce' => false,
+                    ],
+                    'extraConfiguration' => [],
+                    'shortName' => 'F',
+                    'operationId' => 'getFCollection',
+                    'id' => null,
+                    'queryParameters' => [],
+                    'path' => '/fs',
+                    'method' => 'get',
                 ],
-                'extraConfiguration' => [],
-                'shortName' => 'F',
-                'operationId' => 'getFCollection',
-                'id' => null,
-                'queryParameters' => [],
-                'path' => '/fs',
-                'method' => 'get',
-            ],
-        ])->shouldBeCalled()->willReturn('');
+            ])->shouldBeCalled()->willReturn('');
 
-        $twigItemProphecy = $this->prophesize(TwigEnvironment::class);
-        $twigItemProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
-            'title' => 'title',
-            'description' => '',
-            'formats' => ['jsonld' => ['application/ld+json']],
-            'swaggerUiEnabled' => false,
-            'showWebby' => true,
-            'reDocEnabled' => false,
-            'graphqlEnabled' => false,
-            'graphiQlEnabled' => false,
-            'graphQlPlaygroundEnabled' => false,
-            'assetPackage' => null,
-            'swagger_data' => [
-                'url' => '/url',
-                'spec' => self::SPEC,
-                'oauth' => [
-                    'enabled' => false,
-                    'clientId' => null,
-                    'clientSecret' => null,
-                    'type' => '',
-                    'flow' => '',
-                    'tokenUrl' => '',
-                    'authorizationUrl' => '',
-                    'scopes' => [],
-                    'pkce' => false,
+            return $twigCollectionProphecy->reveal();
+        };
+
+        $twigItemFactory = function (self $that): TwigEnvironment {
+            $twigItemProphecy = $that->prophesize(TwigEnvironment::class);
+            $twigItemProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
+                'title' => 'title',
+                'description' => '',
+                'formats' => ['jsonld' => ['application/ld+json']],
+                'swaggerUiEnabled' => false,
+                'showWebby' => true,
+                'reDocEnabled' => false,
+                'graphQlEnabled' => false,
+                'graphiQlEnabled' => false,
+                'graphQlPlaygroundEnabled' => false,
+                'assetPackage' => null,
+                'originalRoute' => null,
+                'originalRouteParams' => [],
+                'swagger_data' => [
+                    'url' => '/url',
+                    'spec' => self::SPEC,
+                    'oauth' => [
+                        'enabled' => false,
+                        'clientId' => null,
+                        'clientSecret' => null,
+                        'type' => '',
+                        'flow' => '',
+                        'tokenUrl' => '',
+                        'authorizationUrl' => '',
+                        'scopes' => [],
+                        'pkce' => false,
+                    ],
+                    'extraConfiguration' => [],
+                    'shortName' => 'F',
+                    'operationId' => 'getFItem',
+                    'id' => null,
+                    'queryParameters' => [],
+                    'path' => '/fs/{id}',
+                    'method' => 'get',
                 ],
-                'extraConfiguration' => [],
-                'shortName' => 'F',
-                'operationId' => 'getFItem',
-                'id' => null,
-                'queryParameters' => [],
-                'path' => '/fs/{id}',
-                'method' => 'get',
-            ],
-        ])->shouldBeCalled()->willReturn('');
+            ])->shouldBeCalled()->willReturn('');
 
-        return [
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']), $twigCollectionProphecy],
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']), $twigItemProphecy],
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get'], [], [], ['REQUEST_URI' => '/docs', 'SCRIPT_FILENAME' => '/docs']), $twigItemProphecy],
-        ];
+            return $twigItemProphecy->reveal();
+        };
+
+        yield [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'getFCollection']), $twigCollectionFactory];
+        yield [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'getFItem']), $twigItemFactory];
+        yield [new Request([], [], ['_api_resource_class' => 'Foo'], [], [], ['REQUEST_URI' => '/docs', 'SCRIPT_FILENAME' => '/docs']), $twigItemFactory];
     }
 
     /**
      * @dataProvider getDoNotRunCurrentRequestParameters
      */
-    public function testDoNotRunCurrentRequest(Request $request)
+    public function testDoNotRunCurrentRequest(Request $request): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
+            new ApiResource(operations: [
+                'get' => new Get(),
+            ]),
+        ]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::any(), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
         $twigProphecy = $this->prophesize(TwigEnvironment::class);
         $twigProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
@@ -178,10 +196,12 @@ class SwaggerUiActionTest extends TestCase
             'showWebby' => true,
             'swaggerUiEnabled' => false,
             'reDocEnabled' => false,
-            'graphqlEnabled' => false,
+            'graphQlEnabled' => false,
             'graphiQlEnabled' => false,
             'graphQlPlaygroundEnabled' => false,
             'assetPackage' => null,
+            'originalRoute' => null,
+            'originalRouteParams' => [],
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
@@ -219,9 +239,9 @@ class SwaggerUiActionTest extends TestCase
         $action($request);
     }
 
-    public function getDoNotRunCurrentRequestParameters(): iterable
+    public static function getDoNotRunCurrentRequestParameters(): iterable
     {
-        $nonSafeRequest = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post']);
+        $nonSafeRequest = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'post']);
         $nonSafeRequest->setMethod('POST');
         yield [$nonSafeRequest];
         yield [new Request()];

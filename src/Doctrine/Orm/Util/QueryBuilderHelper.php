@@ -113,7 +113,7 @@ final class QueryBuilderHelper
 
         $joinAliasMap = self::mapJoinAliases($joinParts[$rootAlias]);
 
-        $aliasMap = array_merge($rootAliasMap, $joinAliasMap);
+        $aliasMap = [...$rootAliasMap, ...$joinAliasMap];
 
         $apexEntityClass = null;
         $associationStack = [];
@@ -208,8 +208,8 @@ final class QueryBuilderHelper
             $alias = $join->getAlias();
             $relationship = $join->getJoin();
 
-            if (false !== strpos($relationship, '.')) {
-                $aliasMap[$alias] = explode('.', $relationship);
+            if (str_contains((string) $relationship, '.')) {
+                $aliasMap[$alias] = explode('.', (string) $relationship);
             } else {
                 $aliasMap[$alias] = $relationship;
             }
@@ -218,5 +218,3 @@ final class QueryBuilderHelper
         return $aliasMap;
     }
 }
-
-class_alias(QueryBuilderHelper::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper::class);

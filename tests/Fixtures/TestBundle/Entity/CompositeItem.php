@@ -13,37 +13,34 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Item.
- *
- * @ApiResource
- * @ORM\Entity
  */
-class CompositeItem
+#[ApiResource]
+#[ORM\Entity]
+class CompositeItem implements \Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Groups(['default'])]
+    private ?string $field1 = null;
+    #[ORM\OneToMany(targetEntity: CompositeRelation::class, mappedBy: 'compositeItem', fetch: 'EAGER')]
+    #[Groups(['default'])]
+    private Collection|iterable $compositeValues; // @phpstan-ignore-line
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Groups({"default"})
-     */
-    private $field1;
-
-    /**
-     * @ORM\OneToMany(targetEntity="CompositeRelation", mappedBy="compositeItem", fetch="EAGER")
-     * @Groups({"default"})
-     */
-    private $compositeValues;
+    public function __construct()
+    {
+        $this->compositeValues = new ArrayCollection();
+    }
 
     /**
      * Gets id.
@@ -66,7 +63,7 @@ class CompositeItem
      *
      * @param string|null $field1 the value to set
      */
-    public function setField1($field1 = null)
+    public function setField1($field1 = null): void
     {
         $this->field1 = $field1;
     }
@@ -74,7 +71,7 @@ class CompositeItem
     /**
      * Gets compositeValues.
      */
-    public function getCompositeValues(): ?Collection
+    public function getCompositeValues(): Collection|iterable
     {
         return $this->compositeValues;
     }

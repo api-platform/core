@@ -13,14 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Documentation\Action;
 
-use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface as LegacyOpenApiFactoryInterface;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Documentation\DocumentationInterface;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\OpenApi\OpenApi;
+use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
+use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
+use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ProviderInterface;
+use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Generates the API documentation.
@@ -29,70 +35,83 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class DocumentationAction
 {
-    private $resourceNameCollectionFactory;
-    private $title;
-    private $description;
-    private $version;
-    private $formats;
-    private $formatsProvider;
-    private $swaggerVersions;
-    private $openApiFactory;
+    use ContentNegotiationTrait;
+
+    public function __construct(
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        private readonly string $title = '',
+        private readonly string $description = '',
+        private readonly string $version = '',
+        private readonly ?OpenApiFactoryInterface $openApiFactory = null,
+        private readonly ?ProviderInterface $provider = null,
+        private readonly ?ProcessorInterface $processor = null,
+        Negotiator $negotiator = null,
+        private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']]
+    ) {
+        $this->negotiator = $negotiator ?? new Negotiator();
+    }
 
     /**
-     * @param int[]                                                 $swaggerVersions
-     * @param mixed|array|FormatsProviderInterface                  $formatsProvider
-     * @param LegacyOpenApiFactoryInterface|OpenApiFactoryInterface $openApiFactory
+     * @return DocumentationInterface|OpenApi|Response
      */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', $formatsProvider = null, array $swaggerVersions = [2, 3], $openApiFactory = null)
+    public function __invoke(Request $request = null)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->title = $title;
-        $this->description = $description;
-        $this->version = $version;
-        $this->swaggerVersions = $swaggerVersions;
-        $this->openApiFactory = $openApiFactory;
-
-        if (null === $openApiFactory) {
-            @trigger_error(sprintf('Not passing an instance of "%s" as 7th parameter of the constructor of "%s" is deprecated since API Platform 2.6', OpenApiFactoryInterface::class, __CLASS__), \E_USER_DEPRECATED);
+        if (null === $request) {
+            return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);
         }
 
-        if (null === $formatsProvider) {
-            return;
+        $context = ['api_gateway' => $request->query->getBoolean(ApiGatewayNormalizer::API_GATEWAY), 'base_url' => $request->getBaseUrl()];
+        $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
+        $format = $this->getRequestFormat($request, $this->documentationFormats);
+
+        if (null !== $this->openApiFactory && ('html' === $format || OpenApiNormalizer::FORMAT === $format || OpenApiNormalizer::JSON_FORMAT === $format || OpenApiNormalizer::YAML_FORMAT === $format)) {
+            return $this->getOpenApiDocumentation($context, $format, $request);
         }
 
-        @trigger_error(sprintf('Passing an array or an instance of "%s" as 5th parameter of the constructor of "%s" is deprecated since API Platform 2.5', FormatsProviderInterface::class, __CLASS__), \E_USER_DEPRECATED);
-        if (\is_array($formatsProvider)) {
-            $this->formats = $formatsProvider;
-
-            return;
-        }
-
-        $this->formatsProvider = $formatsProvider;
+        return $this->getHydraDocumentation($context, $request);
     }
 
-    public function __invoke(Request $request = null): DocumentationInterface
+    /**
+     * @param array<string,mixed> $context
+     */
+    private function getOpenApiDocumentation(array $context, string $format, Request $request): OpenApi|Response
     {
-        if (null !== $request) {
-            $context = ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', $this->swaggerVersions[0] ?? 3)];
-            if ($request->query->getBoolean('api_gateway')) {
-                $context['api_gateway'] = true;
+        if ($this->provider && $this->processor) {
+            $context['request'] = $request;
+            $operation = new Get(class: OpenApi::class, read: true, serialize: true, provider: fn () => $this->openApiFactory->__invoke($context), normalizationContext: [ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null], outputFormats: $this->documentationFormats);
+            if ('html' === $format) {
+                $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
             }
-            $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
+            if ('json' === $format) {
+                trigger_deprecation('api-platform/core', '3.2', 'The "json" format is too broad, use "jsonopenapi" instead.');
+            }
 
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
+            return $this->processor->process($this->provider->provide($operation, [], $context), $operation, [], $context);
         }
 
-        // BC check to be removed in 3.0
-        if (null !== $this->formatsProvider) {
-            $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes ?? []);
+        return $this->openApiFactory->__invoke($context);
+    }
+
+    /**
+     * TODO: the logic behind the Hydra Documentation is done in a ApiPlatform\Hydra\Serializer\DocumentationNormalizer.
+     * We should transform this to a provider, it'd improve performances also by a bit.
+     *
+     * @param array<string,mixed> $context
+     */
+    private function getHydraDocumentation(array $context, Request $request): DocumentationInterface|Response
+    {
+        if ($this->provider && $this->processor) {
+            $context['request'] = $request;
+            $operation = new Get(
+                class: Documentation::class,
+                read: true,
+                serialize: true,
+                provider: fn () => new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version)
+            );
+
+            return $this->processor->process($this->provider->provide($operation, [], $context), $operation, [], $context);
         }
 
-        if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory && 3 === ($context['spec_version'] ?? null)) {
-            return $this->openApiFactory->__invoke($context ?? []);
-        }
-
-        return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
+        return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);
     }
 }
-
-class_alias(DocumentationAction::class, \ApiPlatform\Core\Documentation\Action\DocumentationAction::class);

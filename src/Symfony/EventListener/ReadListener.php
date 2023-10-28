@@ -13,17 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\UriVariablesConverterInterface;
+use ApiPlatform\Api\UriVariablesConverterInterface as LegacyUriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\UriVariablesConverterInterface;
+use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
-use ApiPlatform\Util\CloneTrait;
-use ApiPlatform\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Util\RequestAttributesExtractor;
-use ApiPlatform\Util\RequestParser;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\State\Util\RequestParser;
+use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -38,16 +41,13 @@ final class ReadListener
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
-    public const OPERATION_ATTRIBUTE_KEY = 'read';
-
-    private $serializerContextBuilder;
-    private $provider;
-
-    public function __construct(ProviderInterface $provider, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, SerializerContextBuilderInterface $serializerContextBuilder = null, UriVariablesConverterInterface $uriVariablesConverter = null)
-    {
-        $this->provider = $provider;
+    public function __construct(
+        private readonly ProviderInterface $provider,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
+        LegacyUriVariablesConverterInterface|UriVariablesConverterInterface $uriVariablesConverter = null,
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->serializerContextBuilder = $serializerContextBuilder;
         $this->uriVariablesConverter = $uriVariablesConverter;
     }
 
@@ -61,11 +61,15 @@ final class ReadListener
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
 
+        if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
+            return;
+        }
+
         if (!($attributes = RequestAttributesExtractor::extractAttributes($request))) {
             return;
         }
 
-        if (!$operation || !($operation->canRead() ?? true) || !$attributes['receive'] || (!$operation->getUriVariables() && !$request->isMethodSafe()) || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || ($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
+        if (!$attributes['receive'] || !$operation || !($operation->canRead() ?? true) || (!$operation->getUriVariables() && !$request->isMethodSafe())) {
             return;
         }
 
@@ -90,14 +94,26 @@ final class ReadListener
         $resourceClass = $operation->getClass() ?? $attributes['resource_class'];
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $parameters, $resourceClass);
-            $data = $this->provider->provide($operation, $uriVariables, $context);
-        } catch (InvalidIdentifierException $e) {
+            if ($request->attributes->get('_api_error', false)) {
+                $exception = $request->attributes->get('data');
+                $data = $operation->getProvider() ? $this->provider->provide($operation, $uriVariables, $context + ['previous_data' => $exception]) : $exception;
+            } else {
+                $data = $this->provider->provide($operation, $uriVariables, $context);
+            }
+        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
-        } catch (InvalidUriVariableException $e) {
-            throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+        } catch (ProviderNotFoundException $e) {
+            $data = null;
         }
 
-        if (null === $data) {
+        if (
+            null === $data
+            && 'POST' !== $operation->getMethod()
+            && (
+                'PUT' !== $operation->getMethod()
+                || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
+            )
+        ) {
             throw new NotFoundHttpException('Not Found');
         }
 

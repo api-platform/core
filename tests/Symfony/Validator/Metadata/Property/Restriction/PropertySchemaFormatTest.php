@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Hostname;
@@ -30,7 +30,7 @@ final class PropertySchemaFormatTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $propertySchemaFormatRestriction;
+    private PropertySchemaFormat $propertySchemaFormatRestriction;
 
     protected function setUp(): void
     {
@@ -45,7 +45,7 @@ final class PropertySchemaFormatTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->supports($constraint, $propertyMetadata));
     }
 
-    public function supportsProvider(): \Generator
+    public static function supportsProvider(): \Generator
     {
         yield 'email' => [new Email(), new ApiProperty(), true];
         yield 'url' => [new Url(), new ApiProperty(), true];
@@ -68,7 +68,7 @@ final class PropertySchemaFormatTest extends TestCase
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->create($constraint, $propertyMetadata));
     }
 
-    public function createProvider(): \Generator
+    public static function createProvider(): \Generator
     {
         yield 'email' => [new Email(), new ApiProperty(), ['format' => 'email']];
         yield 'url' => [new Url(), new ApiProperty(), ['format' => 'uri']];

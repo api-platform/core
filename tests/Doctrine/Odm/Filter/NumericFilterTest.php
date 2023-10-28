@@ -27,10 +27,10 @@ class NumericFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use NumericFilterTestTrait;
 
-    protected $filterClass = NumericFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = NumericFilter::class;
+    protected string $resourceClass = Dummy::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -74,10 +74,10 @@ class NumericFilterTest extends DoctrineMongoDbOdmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'numeric string (positive integer)' => [
                     [

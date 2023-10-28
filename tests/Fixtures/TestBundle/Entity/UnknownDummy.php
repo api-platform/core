@@ -17,21 +17,19 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Unknown dummy.
- *
- * @ORM\Entity
  */
+#[ORM\Entity]
 class UnknownDummy
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

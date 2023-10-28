@@ -26,46 +26,6 @@ use GraphQL\Language\AST\ValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
 
-if (\PHP_VERSION_ID >= 70200) {
-    trait IterableTypeParseLiteralTrait
-    {
-        /**
-         * {@inheritdoc}
-         *
-         * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
-         *
-         * @return mixed
-         */
-        public function parseLiteral(/* Node */ $valueNode, ?array $variables = null)
-        {
-            if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
-                return $this->parseIterableLiteral($valueNode);
-            }
-
-            // Intentionally without message, as all information already in wrapped Exception
-            throw new \Exception();
-        }
-    }
-} else {
-    trait IterableTypeParseLiteralTrait
-    {
-        /**
-         * {@inheritdoc}
-         *
-         * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
-         */
-        public function parseLiteral(Node $valueNode, ?array $variables = null)
-        {
-            if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
-                return $this->parseIterableLiteral($valueNode);
-            }
-
-            // Intentionally without message, as all information already in wrapped Exception
-            throw new \Exception();
-        }
-    }
-}
-
 /**
  * Represents an iterable type.
  *
@@ -73,8 +33,6 @@ if (\PHP_VERSION_ID >= 70200) {
  */
 final class IterableType extends ScalarType implements TypeInterface
 {
-    use IterableTypeParseLiteralTrait;
-
     public function __construct()
     {
         $this->name = 'Iterable';
@@ -90,10 +48,8 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function serialize($value)
+    public function serialize(mixed $value): iterable
     {
         if (!is_iterable($value)) {
             throw new Error(sprintf('`Iterable` cannot represent non iterable value: %s', Utils::printSafe($value)));
@@ -104,10 +60,8 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function parseValue($value)
+    public function parseValue(mixed $value): iterable
     {
         if (!is_iterable($value)) {
             throw new Error(sprintf('`Iterable` cannot represent non iterable value: %s', Utils::printSafeJson($value)));
@@ -117,9 +71,21 @@ final class IterableType extends ScalarType implements TypeInterface
     }
 
     /**
-     * @param StringValueNode|BooleanValueNode|IntValueNode|FloatValueNode|ObjectValueNode|ListValueNode|ValueNode $valueNode
+     * {@inheritdoc}
+     *
+     * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
      */
-    private function parseIterableLiteral($valueNode)
+    public function parseLiteral(Node $valueNode, array $variables = null): float|array|bool|int|string|null
+    {
+        if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
+            return $this->parseIterableLiteral($valueNode);
+        }
+
+        // Intentionally without message, as all information already in wrapped Exception
+        throw new \Exception();
+    }
+
+    private function parseIterableLiteral(StringValueNode|BooleanValueNode|IntValueNode|FloatValueNode|ObjectValueNode|ListValueNode|ValueNode $valueNode): float|array|bool|int|string|null
     {
         switch ($valueNode) {
             case $valueNode instanceof StringValueNode:
@@ -148,5 +114,3 @@ final class IterableType extends ScalarType implements TypeInterface
         }
     }
 }
-
-class_alias(IterableType::class, \ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class);

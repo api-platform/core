@@ -19,7 +19,7 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait OrderFilterTestTrait
 {
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = $this->buildFilter(['id' => null, 'name' => null, 'foo' => null]);
 
@@ -51,7 +51,7 @@ trait OrderFilterTestTrait
         ], $filter->getDescription($this->resourceClass));
     }
 
-    private function provideApplyTestArguments(): array
+    private static function provideApplyTestArguments(): array
     {
         return [
             'valid values' => [
@@ -323,6 +323,14 @@ trait OrderFilterTestTrait
                     'order' => [
                         'embeddedDummy.dummyName' => 'ASC',
                     ],
+                ],
+            ],
+            'nullable field in relation will be a LEFT JOIN' => [
+                [
+                    'relatedDummy.name' => null,
+                ],
+                [
+                    'order' => ['relatedDummy.name' => 'ASC'],
                 ],
             ],
         ];

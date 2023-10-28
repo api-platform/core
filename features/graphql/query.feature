@@ -1,4 +1,5 @@
 Feature: GraphQL query support
+
   @createSchema
   Scenario: Execute a basic GraphQL query
     Given there are 2 dummy objects with relatedDummy
@@ -18,6 +19,81 @@ Feature: GraphQL query support
     And the JSON node "data.dummy.id" should be equal to "/dummies/1"
     And the JSON node "data.dummy.name" should be equal to "Dummy #1"
     And the JSON node "data.dummy.name_converted" should be equal to "Converted 1"
+
+  @createSchema
+  Scenario: Retrieve an item with different relations to the same resource
+    Given there are 2 multiRelationsDummy objects having each a manyToOneRelation, 2 manyToManyRelations and 3 oneToManyRelations
+    When I send the following GraphQL request:
+    """
+    {
+      multiRelationsDummy(id: "/multi_relations_dummies/2") {
+        id
+        name
+        manyToOneRelation {
+          id
+          name
+        }
+        manyToManyRelations {
+          edges{
+            node {
+             id
+              name
+            }
+          }
+        }
+        oneToManyRelations {
+          edges{
+            node {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.multiRelationsDummy.id" should be equal to "/multi_relations_dummies/2"
+    And the JSON node "data.multiRelationsDummy.name" should be equal to "Dummy #2"
+    And the JSON node "data.multiRelationsDummy.manyToOneRelation.id" should not be null
+    And the JSON node "data.multiRelationsDummy.manyToOneRelation.name" should be equal to "RelatedManyToOneDummy #2"
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges" should have 2 element
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.id" should not be null
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[0].node.name" should match "#RelatedManyToManyDummy(1|2)2#"
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.name" should match "#RelatedManyToManyDummy(1|2)2#"
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges" should have 3 element
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[1].node.id" should not be null
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[0].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[2].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
+
+  @createSchema @!mongodb
+  Scenario: Retrieve an item with child relation to the same resource
+    Given there are tree dummies
+    When I send the following GraphQL request:
+    """
+    {
+      treeDummies {
+        edges {
+          node {
+            id
+            children {
+              totalCount
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors" should not exist
+    And the JSON node "data.treeDummies.edges[0].node.id" should be equal to "/tree_dummies/1"
+    And the JSON node "data.treeDummies.edges[0].node.children.totalCount" should be equal to "1"
+    And the JSON node "data.treeDummies.edges[1].node.id" should be equal to "/tree_dummies/2"
+    And the JSON node "data.treeDummies.edges[1].node.children.totalCount" should be equal to "0"
 
   @createSchema
   Scenario: Retrieve a Relay Node
@@ -202,7 +278,7 @@ Feature: GraphQL query support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "errors[0].debugMessage" should be equal to 'No route matches "/foo/1".'
+    And the GraphQL debug message should be equal to 'No route matches "/foo/1".'
     And the JSON should be valid according to this schema:
     """
     {
@@ -213,35 +289,38 @@ Feature: GraphQL query support
           "items": {
             "type": "object",
             "properties": {
-              "debugMessage": {"type": "string"},
               "message": {"type": "string"},
-              "extensions": {"type": "object"},
+              "extensions": {
+                "type": "object",
+                "properties": {
+                  "debugMessage": {"type": "string"},
+                  "file": {"type": "string"},
+                  "line": {"type": "integer"},
+                  "trace": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "file": {"type": "string"},
+                        "line": {"type": "integer"},
+                        "call": {"type": ["string", "null"]},
+                        "function": {"type": ["string", "null"]}
+                      },
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  }
+                }
+              },
               "locations": {"type": "array"},
-              "path": {"type": "array"},
-              "trace": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "file": {"type": "string"},
-                    "line": {"type": "integer"},
-                    "call": {"type": ["string", "null"]},
-                    "function": {"type": ["string", "null"]}
-                  },
-                  "additionalProperties": false
-                },
-                "minItems": 1
-              }
+              "path": {"type": "array"}
             },
             "required": [
-              "debugMessage",
               "message",
               "extensions",
               "locations",
-              "path",
-              "trace"
-            ],
-            "additionalProperties": false
+              "path"
+            ]
           },
           "minItems": 1,
           "maxItems": 1

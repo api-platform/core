@@ -28,7 +28,7 @@ interface FilterInterface
      *   - type: the type of the filter
      *   - required: if this filter is required
      *   - strategy (optional): the used strategy
-     *   - is_collection (optional): is this filter is collection
+     *   - is_collection (optional): if this filter is for collection
      *   - swagger (optional): additional parameters for the path operation,
      *     e.g. 'swagger' => [
      *       'description' => 'My Description',
@@ -43,9 +43,14 @@ interface FilterInterface
      *          'type' => 'integer',
      *       ]
      *     ]
+     *   - schema (optional): schema definition,
+     *     e.g. 'schema' => [
+     *       'type' => 'string',
+     *       'enum' => ['value_1', 'value_2'],
+     *     ]
      * The description can contain additional data specific to a filter.
      *
-     * @see \ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::getFiltersParameters
+     * @see \ApiPlatform\OpenApi\Factory\OpenApiFactory::getFiltersParameters
      */
     public function getDescription(string $resourceClass): array;
 }

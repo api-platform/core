@@ -13,18 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonApi\Serializer;
 
-use ApiPlatform\Core\Tests\Mock\Exception\ErrorCodeSerializable;
 use ApiPlatform\JsonApi\Serializer\ErrorNormalizer;
+use ApiPlatform\Tests\Mock\Exception\ErrorCodeSerializable;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 class ErrorNormalizerTest extends TestCase
 {
-    public function testSupportsNormalization()
+    /**
+     * @group legacy
+     */
+    public function testSupportsNormalization(): void
     {
         $normalizer = new ErrorNormalizer();
 
@@ -35,17 +39,27 @@ class ErrorNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new FlattenException(), ErrorNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new FlattenException(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertEmpty($normalizer->getSupportedTypes('json'));
+        $this->assertSame([
+            \Exception::class => false,
+            FlattenException::class => false,
+        ], $normalizer->getSupportedTypes($normalizer::FORMAT));
+
+        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
+            $this->assertFalse($normalizer->hasCacheableSupportsMethod());
+        }
     }
 
     /**
      * @dataProvider errorProvider
      *
+     * @group legacy
+     *
      * @param int    $status          http status code of the Exception
      * @param string $originalMessage original message of the Exception
      * @param bool   $debug           simulates kernel debug variable
      */
-    public function testNormalize($status, $originalMessage, $debug)
+    public function testNormalize(int $status, string $originalMessage, bool $debug): void
     {
         $normalizer = new ErrorNormalizer($debug);
         $exception = FlattenException::create(new \Exception($originalMessage), $status);
@@ -59,9 +73,12 @@ class ErrorNormalizerTest extends TestCase
             $expected['trace'] = $exception->getTrace();
         }
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
+    /**
+     * @group legacy
+     */
     public function testNormalizeAnExceptionWithCustomErrorCode(): void
     {
         $status = Response::HTTP_BAD_REQUEST;
@@ -77,9 +94,12 @@ class ErrorNormalizerTest extends TestCase
             'code' => ErrorCodeSerializable::getErrorCode(),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
+    /**
+     * @group legacy
+     */
     public function testNormalizeAFlattenExceptionWithCustomErrorCode(): void
     {
         $status = Response::HTTP_BAD_REQUEST;
@@ -95,10 +115,10 @@ class ErrorNormalizerTest extends TestCase
             'code' => ErrorCodeSerializable::getErrorCode(),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+        $this->assertSame($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }
 
-    public function errorProvider()
+    public static function errorProvider(): array
     {
         return [
             [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', false],

@@ -18,61 +18,39 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\MappedSuperclass
- */
+#[ORM\MappedSuperclass]
 abstract class VoDummyVehicle
 {
     use VoDummyIdAwareTrait;
-
     /**
-     * @var string
-     *
-     * @ORM\Column
-     * @Groups({"car_read", "car_write"})
+     * @var Collection<VoDummyDriver>
      */
-    private $make;
-
-    /**
-     * @var VoDummyInsuranceCompany|null
-     *
-     * @ORM\ManyToOne(targetEntity="VoDummyInsuranceCompany", cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
-     */
-    private $insuranceCompany;
-
-    /**
-     * @var VoDummyDriver[]|Collection
-     *
-     * @ORM\ManyToMany(targetEntity="VoDummyDriver", cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
-     */
-    private $drivers;
+    #[ORM\ManyToMany(targetEntity: VoDummyDriver::class, cascade: ['persist'])]
+    #[Groups(['car_read', 'car_write'])]
+    private Collection|iterable $drivers;
 
     public function __construct(
-        string $make,
-        VoDummyInsuranceCompany $insuranceCompany,
+        #[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $make,
+        #[ORM\ManyToOne(targetEntity: VoDummyInsuranceCompany::class, cascade: ['persist'])] #[Groups(['car_read', 'car_write'])] private ?VoDummyInsuranceCompany $insuranceCompany,
         array $drivers
     ) {
-        $this->make = $make;
-        $this->insuranceCompany = $insuranceCompany;
         $this->drivers = new ArrayCollection($drivers);
     }
 
-    public function getMake()
+    public function getMake(): string
     {
         return $this->make;
     }
 
-    public function getInsuranceCompany()
+    public function getInsuranceCompany(): ?VoDummyInsuranceCompany
     {
         return $this->insuranceCompany;
     }
 
     /**
-     * @return VoDummyDriver[]|Collection
+     * @return Collection<VoDummyDriver>
      */
-    public function getDrivers()
+    public function getDrivers(): Collection|iterable
     {
         return $this->drivers;
     }

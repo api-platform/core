@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Exception;
 
-use ApiPlatform\Exception\ExceptionInterface;
-
 /**
  * Index not found exception.
  *
@@ -25,5 +23,3 @@ use ApiPlatform\Exception\ExceptionInterface;
 final class IndexNotFoundException extends \Exception implements ExceptionInterface
 {
 }
-
-class_alias(IndexNotFoundException::class, \ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException::class);

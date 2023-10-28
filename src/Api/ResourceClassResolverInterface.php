@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 
 /**
  * Guesses which resource is associated with a given object.
@@ -27,11 +27,10 @@ interface ResourceClassResolverInterface
      *
      * @param string $resourceClass The expected resource class
      * @param bool   $strict        If true, value must match the expected resource class
-     * @param mixed  $value
      *
      * @throws InvalidArgumentException
      */
-    public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string;
+    public function getResourceClass(mixed $value, string $resourceClass = null, bool $strict = false): string;
 
     /**
      * Is the given class a resource class?

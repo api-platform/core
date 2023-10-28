@@ -31,12 +31,12 @@ Feature: XML Deserialization
     Then the response status code should be 201
     And the response should be in XML
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
-  Examples:
-    | value |
-    | true  |
-    | false |
-    | 1     |
-    | 0     |
+    Examples:
+      | value |
+      | true  |
+      | false |
+      | 1     |
+      | 0     |
 
   Scenario Outline: Posting an XML resource with an integer value
     When I send a "POST" request to "/resource_with_integers" with body:
@@ -49,12 +49,12 @@ Feature: XML Deserialization
     Then the response status code should be 201
     And the response should be in XML
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
-  Examples:
-    | value |
-    | 42    |
-    | -6    |
-    | 1     |
-    | 0     |
+    Examples:
+      | value |
+      | 42    |
+      | -6    |
+      | 1     |
+      | 0     |
 
   @!mysql
   Scenario Outline: Posting an XML resource with a float value
@@ -68,12 +68,12 @@ Feature: XML Deserialization
     Then the response status code should be 201
     And the response should be in XML
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
-  Examples:
-    | value |
-    | 3.14  |
-    | NaN   |
-    | INF   |
-    | -INF  |
+    Examples:
+      | value |
+      | 3.14  |
+      | NaN   |
+      | INF   |
+      | -INF  |
 
   Scenario: Posting an XML resource with a collection with only one element
     When I send a "POST" request to "/dummy_properties" with body:

@@ -18,12 +18,12 @@ use PHPUnit\Framework\TestCase;
 
 class IntegerUriVariableTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $this->assertSame(2, (new IntegerUriVariableTransformer())->transform('2', ['int']));
     }
 
-    public function testSupportsTransformation()
+    public function testSupportsTransformation(): void
     {
         $normalizer = new IntegerUriVariableTransformer();
         $this->assertTrue($normalizer->supportsTransformation('1', ['int']));

@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\EventListener;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Tests\Fixtures\NotAResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyNoGetOperation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -30,17 +33,17 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class PurgeHttpCacheListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testOnFlush()
+    public function testOnFlush(): void
     {
         $toInsert1 = new Dummy();
         $toInsert2 = new Dummy();
@@ -62,16 +65,17 @@ class PurgeHttpCacheListenerTest extends TestCase
         $purgerProphecy->purge(['/dummies', '/dummies/1', '/dummies/2', '/dummies/3', '/dummies/4'])->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResourceClass(DummyNoGetOperation::class)->willThrow(new InvalidArgumentException())->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toUpdate1)->willReturn('/dummies/1')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toUpdate2)->willReturn('/dummies/2')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDelete1)->willReturn('/dummies/3')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDelete2)->willReturn('/dummies/4')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDeleteNoPurge)->shouldNotBeCalled();
-        $iriConverterProphecy->getIriFromItem(Argument::any())->willThrow(new ItemNotFoundException());
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(DummyNoGetOperation::class, UrlGeneratorInterface::ABS_PATH, new GetCollection())->willThrow(new InvalidArgumentException())->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toUpdate1)->willReturn('/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toUpdate2)->willReturn('/dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete1)->willReturn('/dummies/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete2)->willReturn('/dummies/4')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDeleteNoPurge)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource(Argument::any())->willThrow(new ItemNotFoundException());
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true)->shouldBeCalled();
         $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class)->shouldBeCalled();
         $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyNoGetOperation::class))->willReturn(DummyNoGetOperation::class)->shouldBeCalled();
 
@@ -83,6 +87,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $emProphecy = $this->prophesize(EntityManagerInterface::class);
         $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
         $dummyClassMetadata = new ClassMetadata(Dummy::class);
+        // @phpstan-ignore-next-line
         $dummyClassMetadata->associationMappings = [
             'relatedDummy' => [],
             'relatedOwningDummy' => [],
@@ -94,15 +99,15 @@ class PurgeHttpCacheListenerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->isReadable(Argument::type(Dummy::class), 'relatedDummy')->willReturn(true);
         $propertyAccessorProphecy->isReadable(Argument::type(Dummy::class), 'relatedOwningDummy')->willReturn(false);
-        $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedDummy')->shouldBeCalled();
-        $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedOwningDummy')->shouldNotBeCalled();
+        $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedDummy')->willReturn(null)->shouldBeCalled();
+        $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedOwningDummy')->willReturn(null)->shouldNotBeCalled();
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
         $listener->onFlush($eventArgs);
         $listener->postFlush();
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $oldRelatedDummy = new RelatedDummy();
         $oldRelatedDummy->setId(1);
@@ -117,12 +122,13 @@ class PurgeHttpCacheListenerTest extends TestCase
         $purgerProphecy->purge(['/dummies', '/dummies/1', '/related_dummies/old', '/related_dummies/new'])->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($oldRelatedDummy)->willReturn('/related_dummies/old')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($newRelatedDummy)->willReturn('/related_dummies/new')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($oldRelatedDummy)->willReturn('/related_dummies/old')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($newRelatedDummy)->willReturn('/related_dummies/new')->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true)->shouldBeCalled();
         $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class)->shouldBeCalled();
 
         $emProphecy = $this->prophesize(EntityManagerInterface::class);
@@ -139,7 +145,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener->postFlush();
     }
 
-    public function testNothingToPurge()
+    public function testNothingToPurge(): void
     {
         $dummyNoGetOperation = new DummyNoGetOperation();
         $dummyNoGetOperation->setId(1);
@@ -148,8 +154,8 @@ class PurgeHttpCacheListenerTest extends TestCase
         $purgerProphecy->purge([])->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(DummyNoGetOperation::class)->willThrow(new InvalidArgumentException())->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($dummyNoGetOperation)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource(DummyNoGetOperation::class, UrlGeneratorInterface::ABS_PATH, new GetCollection())->willThrow(new InvalidArgumentException())->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummyNoGetOperation)->shouldNotBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyNoGetOperation::class))->willReturn(DummyNoGetOperation::class)->shouldBeCalled();
@@ -165,5 +171,48 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal());
         $listener->preUpdate($eventArgs);
         $listener->postFlush();
+    }
+
+    public function testNotAResourceClass(): void
+    {
+        $containNonResource = new ContainNonResource();
+        $nonResource = new NotAResource('foo', 'bar');
+
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->purge([])->shouldNotBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(ContainNonResource::class, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/dummies/1');
+        $iriConverterProphecy->getIriFromResource($nonResource)->shouldNotBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(ContainNonResource::class))->willReturn(ContainNonResource::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false)->shouldBeCalled();
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$containNonResource])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+
+        $dummyClassMetadata = new ClassMetadata(ContainNonResource::class);
+        // @phpstan-ignore-next-line
+        $dummyClassMetadata->associationMappings = [
+            'notAResource' => [],
+            'collectionOfNotAResource' => ['targetEntity' => NotAResource::class],
+        ];
+        $emProphecy->getClassMetadata(ContainNonResource::class)->willReturn($dummyClassMetadata);
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->isReadable(Argument::type(ContainNonResource::class), 'notAResource')->willReturn(true);
+        $propertyAccessorProphecy->isReadable(Argument::type(ContainNonResource::class), 'collectionOfNotAResource')->shouldNotBeCalled();
+        $propertyAccessorProphecy->getValue(Argument::type(ContainNonResource::class), 'notAResource')->shouldBeCalled()->willReturn($nonResource);
+        $propertyAccessorProphecy->getValue(Argument::type(ContainNonResource::class), 'collectionOfNotAResource')->shouldNotBeCalled();
+
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
+        $listener->onFlush($eventArgs);
     }
 }

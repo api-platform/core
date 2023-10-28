@@ -15,11 +15,10 @@ namespace ApiPlatform\Hal\JsonSchema;
 
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Metadata\Operation;
 
 /**
  * Decorator factory which adds HAL properties to the JSON Schema document.
- *
- * @experimental
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Jachim Coudenys <jachimcoudenys@gmail.com>
@@ -44,21 +43,17 @@ final class SchemaFactory implements SchemaFactoryInterface
         ],
     ];
 
-    private $schemaFactory;
-
-    public function __construct(SchemaFactoryInterface $schemaFactory)
+    public function __construct(private readonly SchemaFactoryInterface $schemaFactory)
     {
-        $this->schemaFactory = $schemaFactory;
-
         $this->addDistinctFormat('jsonhal');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildSchema(string $className, string $format = 'jsonhal', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
+    public function buildSchema(string $className, string $format = 'jsonhal', string $type = Schema::TYPE_OUTPUT, Operation $operation = null, Schema $schema = null, array $serializerContext = null, bool $forceCollection = false): Schema
     {
-        $schema = $this->schemaFactory->buildSchema($className, $format, $type, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
+        $schema = $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         if ('jsonhal' !== $format) {
             return $schema;
         }
@@ -135,5 +130,3 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
     }
 }
-
-class_alias(SchemaFactory::class, \ApiPlatform\Core\Hal\JsonSchema\SchemaFactory::class);

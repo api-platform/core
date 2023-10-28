@@ -9,7 +9,7 @@ window.onload = function() {
 
         self.disconnect();
 
-        op.querySelector('.opblock-summary').click();
+        op.querySelector('.opblock-summary-control').click();
         const tryOutObserver = new MutationObserver(function (mutations, self) {
             const tryOut = op.querySelector('.try-out__btn');
             if (!tryOut) return;

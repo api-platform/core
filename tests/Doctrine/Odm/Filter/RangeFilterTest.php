@@ -27,10 +27,10 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use RangeFilterTestTrait;
 
-    protected $filterClass = RangeFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = RangeFilter::class;
+    protected string $resourceClass = Dummy::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -438,10 +438,10 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function provideApplyTestData(): array
+    public static function provideApplyTestData(): array
     {
         return array_merge_recursive(
-            $this->provideApplyTestArguments(),
+            self::provideApplyTestArguments(),
             [
                 'between' => [
                     [

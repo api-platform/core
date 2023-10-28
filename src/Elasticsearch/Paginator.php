@@ -27,22 +27,10 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class Paginator implements \IteratorAggregate, PaginatorInterface
 {
-    private $denormalizer;
-    private $documents;
-    private $resourceClass;
-    private $limit;
-    private $offset;
-    private $cachedDenormalizedDocuments = [];
-    private $denormalizationContext = [];
+    private array $cachedDenormalizedDocuments = [];
 
-    public function __construct(DenormalizerInterface $denormalizer, array $documents, string $resourceClass, int $limit, int $offset, array $denormalizationContext = [])
+    public function __construct(private readonly DenormalizerInterface $denormalizer, private readonly array $documents, private readonly string $resourceClass, private readonly int $limit, private readonly int $offset, private readonly array $denormalizationContext = [])
     {
-        $this->denormalizer = $denormalizer;
-        $this->documents = $documents;
-        $this->resourceClass = $resourceClass;
-        $this->limit = $limit;
-        $this->offset = $offset;
-        $this->denormalizationContext = $denormalizationContext;
     }
 
     /**
@@ -107,7 +95,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         $denormalizationContext = array_merge([AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true], $this->denormalizationContext);
 
         foreach ($this->documents['hits']['hits'] ?? [] as $document) {
-            $cacheKey = isset($document['_index'], $document['_type'], $document['_id']) ? md5("${document['_index']}_${document['_type']}_${document['_id']}") : null;
+            $cacheKey = isset($document['_index'], $document['_id']) ? md5("{$document['_index']}_{$document['_id']}") : null;
 
             if ($cacheKey && \array_key_exists($cacheKey, $this->cachedDenormalizedDocuments)) {
                 $object = $this->cachedDenormalizedDocuments[$cacheKey];
@@ -128,5 +116,3 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         }
     }
 }
-
-class_alias(Paginator::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator::class);

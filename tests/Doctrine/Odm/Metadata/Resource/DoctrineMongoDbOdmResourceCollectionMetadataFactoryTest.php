@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\Metadata\Resource;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
-use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Metadata\Resource\DoctrineMongoDbOdmResourceCollectionMetadataFactory;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider;
@@ -31,6 +28,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends TestCase
 {
@@ -55,7 +53,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         return $resourceMetadataCollectionFactory->reveal();
     }
 
-    public function testWithoutManager()
+    public function testWithoutManager(): void
     {
         if (!class_exists(DocumentManager::class)) {
             $this->markTestSkipped('ODM not installed');
@@ -75,7 +73,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
     /**
      * @dataProvider operationProvider
      */
-    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null)
+    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null): void
     {
         if (!class_exists(DocumentManager::class)) {
             $this->markTestSkipped('ODM not installed');
@@ -86,19 +84,19 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         $managerRegistry->getManagerForClass($operation->getClass())->willReturn($objectManager->reveal());
         $resourceMetadataCollectionFactory = new DoctrineMongoDbOdmResourceCollectionMetadataFactory($managerRegistry->reveal(), $this->getResourceMetadataCollectionFactory($operation));
         $resourceMetadataCollection = $resourceMetadataCollectionFactory->create($operation->getClass());
-        $this->assertEquals($expectedProvider, $resourceMetadataCollection->getOperation($operation->getName())->getProvider());
-        $this->assertEquals($expectedProvider, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProvider());
-        $this->assertEquals($expectedProcessor, $resourceMetadataCollection->getOperation($operation->getName())->getProcessor());
-        $this->assertEquals($expectedProcessor, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProcessor());
+        $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation($operation->getName())->getProvider());
+        $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProvider());
+        $this->assertSame($expectedProcessor, $resourceMetadataCollection->getOperation($operation->getName())->getProcessor());
+        $this->assertSame($expectedProcessor, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProcessor());
     }
 
-    public function operationProvider(): iterable
+    public static function operationProvider(): iterable
     {
         $default = (new Get())->withName('get')->withClass(Dummy::class);
 
         yield [(new Get())->withProvider('has a provider')->withProcessor('and a processor')->withOperation($default), 'has a provider', 'and a processor'];
-        yield [(new Get())->withOperation($default), ItemProvider::class, PersistProcessor::class];
-        yield [(new GetCollection())->withOperation($default), CollectionProvider::class, PersistProcessor::class];
-        yield [(new Delete())->withOperation($default), ItemProvider::class, RemoveProcessor::class];
+        yield [(new Get())->withOperation($default), ItemProvider::class, 'api_platform.doctrine_mongodb.odm.state.persist_processor'];
+        yield [(new GetCollection())->withOperation($default), CollectionProvider::class, 'api_platform.doctrine_mongodb.odm.state.persist_processor'];
+        yield [(new Delete())->withOperation($default), ItemProvider::class, 'api_platform.doctrine_mongodb.odm.state.remove_processor'];
     }
 }

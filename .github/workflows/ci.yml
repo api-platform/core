@@ -4,29 +4,50 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  COVERAGE: '0'
-  SYMFONY_DEPRECATIONS_HELPER: disabled=1
 
 jobs:
+  commitlint:
+    if: github.event_name == 'pull_request'
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Run commitlint
+        run: | 
+            commit=$(gh api \
+              /repos/${{ github.repository }}/pulls/${{github.event.number}}/commits \
+              | jq -r '.[0].commit.message' \
+              | head -n 1)
+            # we can't use npx see https://github.com/conventional-changelog/commitlint/issues/613
+            echo '{}' > package.json
+            npm install --no-fund --no-audit @commitlint/config-conventional @commitlint/cli
+            echo $commit | ./node_modules/.bin/commitlint -g .commitlintrc
   php-cs-fixer:
-    name: PHP-cs-fixer (PHP ${{ matrix.php }})
+    name: PHP CS Fixer (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '8.1'
+          - '8.2'
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: intl, bcmath, curl, openssl, mbstring 
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           ini-values: memory_limit=-1
           tools: pecl, composer, php-cs-fixer
           coverage: none
@@ -40,41 +61,37 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
       SYMFONY_PHPUNIT_VERSION: '9.5'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Allow unstable project dependencies
-        run: composer config minimum-stability dev
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Cache PHPStan results
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /tmp/phpstan
           key: phpstan-php${{ matrix.php }}-${{ github.sha }}
@@ -89,7 +106,7 @@ jobs:
       - name: Run PHPStan analysis
         env:
           SYMFONY_PHPUNIT_VERSION: '9.5'
-        run: 
+        run: |
           ./vendor/bin/phpstan --version
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
 
@@ -100,73 +117,54 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.1'
-          - '7.2'
-          - '7.3'
-          - '7.4'
-          - '8.0'
           - '8.1'
+          - '8.2'
         include:
           - php: '8.1'
+            coverage: true
+          - php: '8.2'
             coverage: true
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Enable code coverage
-        if: matrix.coverage
-        run: echo "COVERAGE=1" >> $GITHUB_ENV
-      - name: Remove Doctrine MongoDB ODM
-        if: (startsWith(matrix.php, '7.1'))
-        run: |
-          composer remove --dev --no-interaction --no-progress --no-update --ansi \
-            doctrine/mongodb-odm \
-            doctrine/mongodb-odm-bundle
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: |
-          mkdir -p build/logs/phpunit
-          if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml
-          else
-            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
-          fi
+        run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: phpunit-logs-php${{ matrix.php }}
           path: build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
+          directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
           fail_ci_if_error: true
@@ -181,6 +179,41 @@ jobs:
           php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
+  phpunit-components:
+    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.1'
+          - '8.2'
+        component:
+          - JsonSchema
+          - OpenApi
+          - Metadata
+          - Elasticsearch
+          - HttpCache
+          - RamseyUuid
+          - GraphQl
+          - Serializer
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: latest
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          ini-values: memory_limit=-1
+      - name: Run ${{ matrix.component }} tests
+        working-directory: src/${{ matrix.component }}
+        run: |
+            composer update
+            vendor/bin/simple-phpunit
+
   behat:
     name: Behat (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -188,80 +221,44 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.1'
-          - '7.2'
-          - '7.3'
-          - '7.4'
-          - '8.0'
           - '8.1'
+          - '8.2'
         include:
           - php: '8.1'
+            coverage: true
+          - php: '8.2'
             coverage: true
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Enable code coverage
-        if: matrix.coverage
-        run: echo "COVERAGE=1" >> $GITHUB_ENV
-      - name: Remove Doctrine MongoDB ODM
-        if: startsWith(matrix.php, '7.1')
-        run: |
-          composer remove --dev --no-interaction --no-progress --no-update --ansi \
-            doctrine/mongodb-odm \
-            doctrine/mongodb-odm-bundle
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
-        if: (!startsWith(matrix.php, '8.'))
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Clear test app cache (php 8.0)
-        if: (startsWith(matrix.php, '8.'))
-        run: rm -Rf tests/Fixtures/app/var/cache/*
-      - name: Run Behat tests (PHP < 8)
-        if: (!startsWith(matrix.php, '8.'))
+      - name: Run Behat tests (PHP ${{ matrix.php }})
         run: |
           mkdir -p build/logs/behat
-          if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default-coverage --no-interaction --tags='~@php8'
-          else
-            if [ "${{ matrix.php }}" = '7.1' ]; then
-              vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction --tags='~@symfony/uid&&~@php8&&~@uuid/v6'
-            else
-              vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction --tags='~@php8'
-            fi
-          fi
-      - name: Run Behat tests (PHP 8)
-        if: (startsWith(matrix.php, '8.'))
-        run: |
-          mkdir -p build/logs/behat
-          if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default-coverage --no-interaction
-          else
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction
-          fi
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --no-interaction ${{ matrix.coverage && '--profile=default-coverage' || '--profile=default' }}
       - name: Merge code coverage reports
         if: matrix.coverage
         run: |
@@ -272,15 +269,16 @@ jobs:
         continue-on-error: true
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: behat-logs-php${{ matrix.php }}
           path: build/logs/behat
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
+          directory: build/logs/behat
           name: behat-php${{ matrix.php }}
           flags: behat
           fail_ci_if_error: true
@@ -297,108 +295,23 @@ jobs:
       - name: Export OpenAPI documents
         run: |
           mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
-          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
-          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
-          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+          tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '14'
       - name: Validate OpenAPI documents
         run: |
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
           npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
           npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: openapi-docs-php${{ matrix.php }}
           path: build/out/openapi
         continue-on-error: true
-
-  phpunit-lowest:
-    name: PHPUnit (PHP ${{ matrix.php }} lowest)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '7.4'
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring 
-          coverage: none
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi --no-update
-      - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi --prefer-lowest
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
-      - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit
-
-  behat-lowest:
-    name: Behat (PHP ${{ matrix.php }} lowest)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '7.4'
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
-          coverage: none
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi --no-update
-      - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi --prefer-lowest
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        # @TODO remove the tag "@symfony/uid" in 3.0
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags='~@symfony/uid&&~php8&&~@uuid/v6'
 
   postgresql:
     name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
@@ -407,7 +320,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.4'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: postgres
@@ -415,7 +328,7 @@ jobs:
       PGPASSWORD: apiplatformrocks
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup postgres
         run: |
           sudo systemctl start postgresql
@@ -427,29 +340,27 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: | 
-          vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv --tags='~php8'
+        run: |
+          vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv
 
   mysql:
     name: Behat (PHP ${{ matrix.php }}) (MySQL)
@@ -458,7 +369,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.4'
+          - '8.2'
       fail-fast: false
     services:
       mysql:
@@ -473,34 +384,32 @@ jobs:
       DATABASE_URL: mysql://root:root@127.0.0.1/api_platform_test
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags '~@!mysql&&~@php8'
+        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags '~@!mysql'
 
   mongodb:
     name: PHPUnit + Behat (PHP ${{ matrix.php }}) (MongoDB)
@@ -509,17 +418,24 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8'
+          - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: mongodb
       MONGODB_URL: mongodb://localhost:27017
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Check
+        uses: actions/checkout@v3
+      - name: Setup MongoDB
         run: |
-          sudo systemctl start mongod.service
+          sudo apt update
+          sudo apt install -y wget gnupg
+          wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          sudo apt update
+          sudo apt install -y mongodb-org
+          sudo systemctl start mongod
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -528,13 +444,11 @@ jobs:
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
-      - name: Enable code coverage
-        run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -542,8 +456,6 @@ jobs:
       - name: Update project dependencies
         run: |
           composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -553,11 +465,7 @@ jobs:
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
-          if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction --tags='~@php8&&~@uuid/v6'
-          else
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction --tags='~@php8&&~@uuid/v6'
-          fi
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction
       - name: Merge code coverage reports
         run: |
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
@@ -567,14 +475,105 @@ jobs:
         continue-on-error: true
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: behat-logs-php${{ matrix.php }}
           path: build/logs/behat
         continue-on-error: true
       - name: Upload coverage results to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
+          directory: build/logs/behat
+          name: behat-php${{ matrix.php }}
+          flags: behat
+          fail_ci_if_error: true
+        continue-on-error: true
+      - name: Upload coverage results to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          php-coveralls --coverage_clover=build/logs/behat/clover.xml
+        continue-on-error: true
+
+  mercure:
+    name: PHPUnit + Behat (PHP ${{ matrix.php }}) (Mercure)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.1'
+          - '8.2'
+      fail-fast: false
+    env:
+      APP_ENV: mercure
+      MERCURE_URL: 'http://localhost:1337/.well-known/mercure'
+      MERCURE_JWT_SECRET: 'eyJhbGciOiJIUzI1NiJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOlsiKiJdLCJzdWJzY3JpYmUiOlsiaHR0cHM6Ly9leGFtcGxlLmNvbS9teS1wcml2YXRlLXRvcGljIiwie3NjaGVtZX06Ly97K2hvc3R9L2RlbW8vYm9va3Mve2lkfS5qc29ubGQiLCIvLndlbGwta25vd24vbWVyY3VyZS9zdWJzY3JpcHRpb25zey90b3BpY317L3N1YnNjcmliZXJ9Il0sInBheWxvYWQiOnsidXNlciI6Imh0dHBzOi8vZXhhbXBsZS5jb20vdXNlcnMvZHVuZ2xhcyIsInJlbW90ZUFkZHIiOiIxMjcuMC4wLjEifX19.KKPIikwUzRuB3DTpVw6ajzwSChwFw5omBMmMcWKiDcM'
+    services:
+      mercure:
+        image: dunglas/mercure
+        env:
+          SERVER_NAME: :1337
+          MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+          MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+          MERCURE_EXTRA_DIRECTIVES: |
+            # Custom directives, see https://mercure.rocks/docs/hub/config
+            anonymous
+            cors_origins *
+        ports:
+          - 1337:1337
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          coverage: pcov
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: composer update --no-interaction --no-progress --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --group mercure
+      - name: Run Behat tests
+        run: |
+          mkdir -p build/logs/behat
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mercure-coverage --no-interaction
+      - name: Merge code coverage reports
+        run: |
+          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
+          chmod +x /usr/local/bin/phpcov
+          mkdir -p build/coverage
+          phpcov merge --clover build/logs/behat/clover.xml build/coverage
+        continue-on-error: true
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: behat-logs-php${{ matrix.php }}
+          path: build/logs/behat
+        continue-on-error: true
+      - name: Upload coverage results to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: build/logs/behat
           name: behat-php${{ matrix.php }}
           flags: behat
           fail_ci_if_error: true
@@ -595,15 +594,64 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.4'
-          - '8.0'
-          - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: elasticsearch
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      - name: Configure sysctl limits
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+      - name: Runs Elasticsearch
+        uses: elastic/elastic-github-actions/elasticsearch@master
+        with:
+          stack-version: '8.4.0'
+          security-enabled: false
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: composer update --no-interaction --no-progress --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run Behat tests
+        run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
+
+  elasticsearch-lowest:
+    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch 7) (Symfony lowest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.2'
+      fail-fast: false
+    env:
+      APP_ENV: elasticsearch
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Configure sysctl limits
         run: |
           sudo swapoff -a
@@ -624,17 +672,15 @@ jobs:
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer update --prefer-lowest --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -649,34 +695,30 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.4'
+          - '8.2'
       fail-fast: false
-    env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=0
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring 
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -691,30 +733,26 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
+          - '8.2'
       fail-fast: false
-    env:
-      # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
-      #SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
-      SYMFONY_DEPRECATIONS_HELPER: max[self]=0
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring 
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Allow unstable project dependencies
         run: composer config minimum-stability dev
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -723,14 +761,13 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit
+        # The PHPUnit Bridge doesn't support PHPUnit 10 yet: https://github.com/symfony/symfony/issues/49069
+        run: vendor/bin/phpunit -c phpunit10.xml.dist
 
   behat-symfony-next:
     name: Behat (PHP ${{ matrix.php }}) (Symfony dev)
@@ -739,28 +776,28 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
+          - '8.2'
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring 
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages
-        run: sudo apt-get install moreutils 
+        run: sudo apt-get install moreutils
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Allow unstable project dependencies
         run: composer config minimum-stability dev
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -769,150 +806,12 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
-
-  behat-rector-upgrade:
-    name: Behat (PHP ${{ matrix.php }}) (upgrade script)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '8.1'
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
-      - name: Clear test app cache
-        run: rm -Rf tests/Fixtures/app/var/cache/*
-      - name: Convert metadata to API Platform 3
-        run: |
-            tests/Fixtures/app/console api:upgrade-resource -f
-      - name: Clear test app cache
-        run: rm -Rf tests/Fixtures/app/var/cache/*
-      - name: Run Behat tests
-        run: |
-          mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction
-      - name: Upload test artifacts
-        if: always()
-        uses: actions/upload-artifact@v1
-        with:
-          name: behat-logs-php${{ matrix.php }}
-          path: build/logs/behat
-        continue-on-error: true
-      - name: Export OpenAPI documents
-        run: |
-          mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
-          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
-          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
-          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
-      - name: Setup node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - name: Validate OpenAPI documents
-        run: |
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
-      - name: Upload OpenAPI artifacts
-        if: always()
-        uses: actions/upload-artifact@v1
-        with:
-          name: openapi-docs-php${{ matrix.php }}
-          path: build/out/openapi
-        continue-on-error: true
-
-  behat-rector-upgrade-mongodb:
-    name: Behat (PHP ${{ matrix.php }}) (upgrade script / MongoDB)
-    runs-on: ubuntu-latest
-    env:
-      APP_ENV: mongodb
-      MONGODB_URL: mongodb://localhost:27017
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '8.1'
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Check
-        run: |
-          sudo systemctl start mongod.service
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
-      - name: Clear test app cache
-        run: rm -Rf tests/Fixtures/app/var/cache/*
-      - name: Convert metadata to API Platform 3
-        run: |
-            tests/Fixtures/app/console api:upgrade-resource -f
-      - name: Clear test app cache
-        run: rm -Rf tests/Fixtures/app/var/cache/*
-      - name: Run Behat tests
-        run: |
-          mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction --tags='~@uuid/v6'
-      - name: Upload test artifacts
-        if: always()
-        uses: actions/upload-artifact@v1
-        with:
-          name: behat-logs-php${{ matrix.php }}
-          path: build/logs/behat
-        continue-on-error: true
 
   windows-phpunit:
     name: Windows PHPUnit (PHP ${{ matrix.php }}) (SQLite)
@@ -921,47 +820,42 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.4'
-          - '8.0'
-          - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: sqlite
       DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       - name: Setup PHP with pre-release PECL extension
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        shell: bash
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Set Composer platform config
-        if: (startsWith(matrix.php, '8.'))
-        run: |
-            composer config platform.php 7.4.99
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&ignoreFile=./tests/.ignored-deprecations
 
   windows-behat:
     name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
@@ -970,67 +864,142 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.4'
-          - '8.0'
-          - '8.1'
+          - '8.2'
       fail-fast: false
     env:
       APP_ENV: sqlite
       DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       - name: Setup PHP with pre-release PECL extension
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        shell: bash
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Set Composer platform config
-        if: (startsWith(matrix.php, '8.'))
-        run: |
-            composer config platform.php 7.4.99
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: |
-            if ( "${{ matrix.php }}" -eq '7.4' ) {
-                vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags='~@php8'
-            } else {
-                vendor/bin/behat --out=std --format=progress --profile=default --no-interaction 
-            }
+        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
-  phpunit_legacy_metadata:
-    name: PHPUnit (PHP ${{ matrix.php }}) 2.7 BC layer
-    env:
-      METADATA_BACKWARD_COMPATIBILITY_LAYER: 1
+  phpunit-symfony-lowest:
+    name: PHPUnit (PHP ${{ matrix.php }}) (Symfony lowest)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '7.4'
+          - '8.2'
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Remove cache
+        run: rm -Rf tests/Fixtures/app/var/cache/*
+      - name: Update project dependencies
+        run: composer update --prefer-lowest --no-interaction --no-progress --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/simple-phpunit
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: max[self]=0&ignoreFile=./tests/.ignored-deprecations
+
+  behat-symfony-lowest:
+    name: Behat (PHP ${{ matrix.php }}) (Symfony lowest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.2'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Install additional packages
+        run: sudo apt-get install moreutils
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Remove cache
+        run: rm -Rf tests/Fixtures/app/var/cache/*
+      - name: Update project dependencies
+        run: composer update --prefer-lowest --no-interaction --no-progress --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run Behat tests
+        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
+
+  phpunit_legacy:
+    name: PHPUnit Legacy event listeners (PHP ${{ matrix.php }})
+    env:
+      EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER: 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.2'
+        include:
+          - php: '8.2'
+            coverage: true
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -1041,17 +1010,18 @@ jobs:
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -1059,22 +1029,51 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml
+          else
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
+          fi
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: phpunit-logs-php${{ matrix.php }}
+          path: build/logs/phpunit
+        continue-on-error: true
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v3
+        with:
+          directory: build/logs/phpunit
+          name: phpunit-php${{ matrix.php }}
+          flags: phpunit
+          fail_ci_if_error: true
+        continue-on-error: true
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
+        continue-on-error: true
 
-  behat_legacy_metadata:
-    name: Behat (PHP ${{ matrix.php }}) 2.7 BC layer
+  behat_legacy:
+    name: Behat Legacy event listeners (PHP ${{ matrix.php }})
     env:
-      METADATA_BACKWARD_COMPATIBILITY_LAYER: 1
+      EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER: 1
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '7.4'
+          - '8.2'
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -1085,44 +1084,48 @@ jobs:
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony components
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: |
-          mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction --tags='~@php8' --tags='~@v3'
       - name: Run Behat tests (PHP 8)
-        if: (startsWith(matrix.php, '8.'))
         run: |
           mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=legacy --no-interaction
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: behat-logs-php${{ matrix.php }}
+          path: build/logs/behat
+        continue-on-error: true
       - name: Export OpenAPI documents
         run: |
           mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
-          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
-          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
-          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+          tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '14'
       - name: Validate OpenAPI documents
         run: |
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: openapi-docs-php${{ matrix.php }}
+          path: build/out/openapi
+        continue-on-error: true
+
