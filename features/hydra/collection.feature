@@ -604,6 +604,7 @@ Feature: Collections support
     Given there are 10 of these so many uid objects
     When I send a "GET" request to "/so_many_uids?order%5Bid%5D=desc&id%5Blt%5D=018b7743-c432-76ad-bb16-66151bb60a8a"
     Then the response status code should be 200
+    Then print last JSON response
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:

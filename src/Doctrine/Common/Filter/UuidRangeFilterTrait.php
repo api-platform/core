@@ -46,13 +46,13 @@ trait UuidRangeFilterTrait
             return null;
         }
 
-        return [$values[0], $values[1]];
+        return [Uuid::fromString($values[0]), Uuid::fromString($values[1])];
     }
 
     /**
      * Normalize the value.
      */
-    protected function normalizeValue(string $value, string $operator): string | null
+    protected function normalizeValue(string $value, string $operator): Uuid | null
     {
         if (!Uuid::isValid($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
@@ -62,6 +62,6 @@ trait UuidRangeFilterTrait
             return null;
         }
 
-        return $value;
+        return Uuid::fromString($value);
     }
 }
