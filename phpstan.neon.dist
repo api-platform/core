@@ -258,7 +258,6 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
 		# Imported code (temporary)
 		- src/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
-		- tests/Symfony/Bundle/Test/WebTestCaseTest.php
 		- tests/Core/ProphecyTrait.php
 		- tests/Core/Behat/CoverageContext.php
 		- tests/Core/Behat/DoctrineContext.php

@@ -15,18 +15,37 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MessengerResponseInput;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class MessengerWithResponseHandler implements MessageHandlerInterface
-{
-    public function __invoke(MessengerResponseInput $data)
+if (\PHP_VERSION_ID >= 80000 && class_exists(AsMessageHandler::class)) {
+    #[AsMessageHandler]
+    class MessengerWithResponseHandler
     {
-        $response = new Response();
-        $response->setContent(json_encode([
-            'data' => 123,
-        ]));
-        $response->headers->set('Content-Type', 'application/json');
+        public function __invoke(MessengerResponseInput $data)
+        {
+            $response = new Response();
+            $response->setContent(json_encode([
+                'data' => 123,
+            ]));
+            $response->headers->set('Content-Type', 'application/json');
 
-        return $response;
+            return $response;
+        }
     }
+} else {
+    class MessengerWithResponseHandler implements MessageHandlerInterface
+    {
+        public function __invoke(MessengerResponseInput $data)
+        {
+            $response = new Response();
+            $response->setContent(json_encode([
+                'data' => 123,
+            ]));
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        }
+    }
+
 }

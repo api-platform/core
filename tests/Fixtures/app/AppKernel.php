@@ -16,10 +16,12 @@ use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
+use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
+use Doctrine\ORM\Mapping\Driver\ReflectionBasedDriver;
 use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -33,6 +35,7 @@ use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
@@ -40,6 +43,8 @@ use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrateg
 use Symfony\Component\Security\Core\User\User as SymfonyCoreUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Config\Doctrine\Orm\EntityManagerConfig;
+use Symfony\Config\Doctrine\OrmConfig;
 
 /**
  * AppKernel for tests.
@@ -130,22 +135,46 @@ class AppKernel extends Kernel
         ];
 
         // Symfony 5.4+
-        if (class_exists(SessionFactory::class)) {
+        if (class_exists(SessionFactory::class) && !class_exists(PingWebhookMessageHandler::class)) {
             $messengerConfig['reset_on_message'] = true;
         }
-        $c->prependExtensionConfig('framework', [
-            'secret' => 'dunglas.fr',
-            'validation' => ['enable_annotations' => true],
-            'serializer' => ['enable_annotations' => true],
-            'test' => null,
-            'session' => class_exists(SessionFactory::class) ? ['storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
-            'profiler' => [
-                'enabled' => true,
-                'collect' => false,
-            ],
-            'messenger' => $messengerConfig,
-            'router' => ['utf8' => true],
-        ]);
+
+        // This class is introduced in Symfony 6.4 just using it to use the new configuration and to avoid unnecessary deprecations
+        // Fixes framework configuration for 2.7
+        if (class_exists(PingWebhookMessageHandler::class)) {
+            $config = [
+                'secret' => 'dunglas.fr',
+                'validation' => ['enable_attributes' => true, 'email_validation_mode' => 'html5'],
+                'serializer' => ['enable_attributes' => true],
+                'test' => null,
+                'session' => ['cookie_secure' => true, 'cookie_samesite' => 'lax', 'handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file'],
+                'profiler' => [
+                    'enabled' => true,
+                    'collect' => false,
+                ],
+                'php_errors' => ['log' => true],
+                'messenger' => $messengerConfig,
+                'router' => ['utf8' => true],
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'uid' => ['default_uuid_version' => 7, 'time_based_uuid_version' => 7],
+            ];
+        } else {
+            $config = [
+                'secret' => 'dunglas.fr',
+                'validation' => ['enable_annotations' => true],
+                'serializer' => ['enable_annotations' => true],
+                'test' => null,
+                'session' => class_exists(SessionFactory::class) ? ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
+                'profiler' => [
+                    'enabled' => true,
+                    'collect' => false,
+                ],
+                'messenger' => $messengerConfig,
+                'router' => ['utf8' => true],
+            ];
+        }
+        $c->prependExtensionConfig('framework', $config);
 
         $alg = class_exists(NativePasswordHasher::class, false) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';
         $securityConfig = [
@@ -204,7 +233,7 @@ class AppKernel extends Kernel
             ];
         }
 
-        if (class_exists(NativePasswordHasher::class)) {
+        if (class_exists(NativePasswordHasher::class) && !class_exists(PingWebhookMessageHandler::class)) {
             $securityConfig['enable_authenticator_manager'] = true;
             unset($securityConfig['firewalls']['default']['anonymous']);
         }
@@ -229,6 +258,17 @@ class AppKernel extends Kernel
             $twigConfig['exception_controller'] = null;
         }
         $c->prependExtensionConfig('twig', $twigConfig);
+
+        $doctrineConfig = [];
+        if (method_exists(EntityManagerConfig::class, 'getReportFieldsWhereDeclared')) {
+            $doctrineConfig['orm']['report_fields_where_declared'] = true;
+        }
+        if (method_exists(OrmConfig::class, 'enableLazyGhostObjects')) {
+            $doctrineConfig['orm']['enable_lazy_ghost_objects'] = true;
+        }
+        if (!empty($doctrineConfig)) {
+            $c->prependExtensionConfig('doctrine', $doctrineConfig);
+        }
 
         if (class_exists(NelmioApiDocBundle::class)) {
             $c->prependExtensionConfig('nelmio_api_doc', [

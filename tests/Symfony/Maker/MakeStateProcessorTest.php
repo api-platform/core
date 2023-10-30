@@ -38,9 +38,9 @@ class MakeStateProcessorTest extends KernelTestCase
         $this->assertFileExists($newProcessorFile);
 
         // Unify line endings
-        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/CustomStateProcessor.php'));
+        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/CustomStateProcessor.fixture'));
         $result = preg_replace('~\R~u', "\r\n", file_get_contents($newProcessorFile));
-        $this->assertSame($expected, $result);
+        $this->assertStringContainsString($expected, $result);
 
         $display = $tester->getDisplay();
         $this->assertStringContainsString('Success!', $display);

@@ -28,6 +28,8 @@ $phpunitLoader->register();
 $loader = require __DIR__.'/../../../vendor/autoload.php';
 require __DIR__.'/AppKernel.php';
 
-AnnotationRegistry::registerLoader('class_exists');
+if (method_exists(AnnotationRegistry::class, 'registerLoader')) {
+    AnnotationRegistry::registerLoader('class_exists');
+}
 
 return $loader;

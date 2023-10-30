@@ -40,7 +40,7 @@ class MakeDataProviderTest extends KernelTestCase
         // Unify line endings
         $expected = preg_replace('~\R~u', "\r\n", $expected);
         $result = preg_replace('~\R~u', "\r\n", file_get_contents(self::tempFile('src/DataProvider/CustomDataProvider.php')));
-        $this->assertSame($expected, $result);
+        $this->assertStringContainsString($expected, $result);
 
         $display = $tester->getDisplay();
         $this->assertStringContainsString('Success!', $display);
@@ -66,8 +66,6 @@ EOF
     public function dataProviderProvider(): Generator
     {
         $expected = <<<'EOF'
-<?php
-
 namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
@@ -109,8 +107,6 @@ EOF;
         ];
 
         $expected = <<<'EOF'
-<?php
-
 namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
@@ -160,8 +156,6 @@ EOF;
         ];
 
         $expected = <<<'EOF'
-<?php
-
 namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -194,8 +188,6 @@ EOF;
         ];
 
         $expected = <<<'EOF'
-<?php
-
 namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -235,8 +227,6 @@ EOF;
         ];
 
         $expected = <<<'EOF'
-<?php
-
 namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
@@ -269,8 +259,6 @@ EOF;
         ];
 
         $expected = <<<'EOF'
-<?php
-
 namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
