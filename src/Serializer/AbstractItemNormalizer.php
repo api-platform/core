@@ -710,8 +710,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             );
 
             // Anonymous resources
-            if ($type->getClassName()) {
-                $childContext = $this->createChildContext($this->createOperationContext($context, null), $attribute, $format);
+            if ($className) {
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
                 $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
 
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
