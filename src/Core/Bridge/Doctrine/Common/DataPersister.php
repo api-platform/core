@@ -38,17 +38,11 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($data, array $context = []): bool
     {
         return null !== $this->getManager($data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function persist($data, array $context = [])
     {
         if (!$manager = $this->getManager($data)) {
@@ -65,9 +59,6 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove($data, array $context = [])
     {
         if (!$manager = $this->getManager($data)) {
@@ -80,8 +71,6 @@ final class DataPersister implements ContextAwareDataPersisterInterface
 
     /**
      * Gets the Doctrine object manager associated with given data.
-     *
-     * @param mixed $data
      */
     private function getManager($data): ?DoctrineObjectManager
     {
@@ -90,8 +79,6 @@ final class DataPersister implements ContextAwareDataPersisterInterface
 
     /**
      * Checks if doctrine does not manage data automatically.
-     *
-     * @param mixed $data
      */
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {

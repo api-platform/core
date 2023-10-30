@@ -34,9 +34,6 @@ class DeserializeStageTest extends TestCase
     private $denormalizerProphecy;
     private $serializerContextBuilderProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);

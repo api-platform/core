@@ -30,7 +30,7 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
     private $decorated;
     private $reader;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, ?Reader $reader = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, Reader $reader = null)
     {
         $this->decorated = $decorated;
         if ($reader) {
@@ -38,9 +38,6 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = new ResourceMetadataCollection($resourceClass);

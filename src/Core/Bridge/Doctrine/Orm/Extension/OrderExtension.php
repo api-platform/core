@@ -37,9 +37,6 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
         $this->order = $order;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
     {
         if (null === $resourceClass) {

@@ -32,9 +32,6 @@ final class InheritedPropertyNameCollectionFactory implements PropertyNameCollec
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
         @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), \E_USER_DEPRECATED);

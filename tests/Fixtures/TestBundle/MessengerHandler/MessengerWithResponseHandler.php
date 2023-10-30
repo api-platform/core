@@ -47,5 +47,4 @@ if (\PHP_VERSION_ID >= 80000 && class_exists(AsMessageHandler::class)) {
             return $response;
         }
     }
-
 }

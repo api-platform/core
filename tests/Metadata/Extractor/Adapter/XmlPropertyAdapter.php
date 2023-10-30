@@ -45,9 +45,6 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
         'genId',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(string $resourceClass, string $propertyName, array $parameters, array $fixtures): array
     {
         $xml = new \SimpleXMLElement(<<<XML

@@ -49,8 +49,6 @@ final class Schema extends \ArrayObject
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $includeDefinitions if set to false, definitions will not be included in the resulting array
      */
     public function getArrayCopy(bool $includeDefinitions = true): array

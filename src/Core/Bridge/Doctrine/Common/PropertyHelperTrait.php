@@ -74,7 +74,7 @@ trait PropertyHelperTrait
      */
     protected function isPropertyEmbedded(string $property, string $resourceClass): bool
     {
-        return false !== strpos($property, '.') && $this->getClassMetadata($resourceClass)->hasField($property);
+        return str_contains($property, '.') && $this->getClassMetadata($resourceClass)->hasField($property);
     }
 
     /**

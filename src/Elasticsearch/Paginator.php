@@ -45,17 +45,11 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         $this->denormalizationContext = $denormalizationContext;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return isset($this->documents['hits']['hits']) ? \count($this->documents['hits']['hits']) : 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLastPage(): float
     {
         if (0 >= $this->limit) {
@@ -65,9 +59,6 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         return ceil($this->getTotalItems() / $this->limit) ?: 1.;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTotalItems(): float
     {
         // for elastic search version > 7.0.0
@@ -79,9 +70,6 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         return (float) ($this->documents['hits']['total'] ?? 0.);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCurrentPage(): float
     {
         if (0 >= $this->limit) {
@@ -91,17 +79,11 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         return floor($this->offset / $this->limit) + 1.;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItemsPerPage(): float
     {
         return (float) $this->limit;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         $denormalizationContext = array_merge([AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true], $this->denormalizationContext);

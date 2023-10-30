@@ -86,8 +86,6 @@ final class JsonApiContext implements Context
 
     /**
      * @Then the JSON node :node should be an empty array
-     *
-     * @param mixed $node
      */
     public function theJsonNodeShouldBeAnEmptyArray($node)
     {
@@ -99,8 +97,6 @@ final class JsonApiContext implements Context
 
     /**
      * @Then the JSON node :node should be a number
-     *
-     * @param mixed $node
      */
     public function theJsonNodeShouldBeANumber($node)
     {
@@ -111,8 +107,6 @@ final class JsonApiContext implements Context
 
     /**
      * @Then the JSON node :node should not be an empty string
-     *
-     * @param mixed $node
      */
     public function theJsonNodeShouldNotBeAnEmptyString($node)
     {
@@ -124,8 +118,6 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON node :node should be sorted
      * @Then the JSON should be sorted
-     *
-     * @param mixed $node
      */
     public function theJsonNodeShouldBeSorted($node = '')
     {

@@ -24,9 +24,6 @@ class ErrorNormalizerTest extends TestCase
 {
     private $errorNormalizer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

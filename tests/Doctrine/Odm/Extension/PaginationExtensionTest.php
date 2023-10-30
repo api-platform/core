@@ -45,9 +45,6 @@ class PaginationExtensionTest extends TestCase
 
     private $managerRegistryProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

@@ -22,9 +22,6 @@ use ApiPlatform\Tests\Fixtures\NotAResource;
  */
 class ContainNonResourceProvider implements ProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         $id = $uriVariables['id'] ?? null;

@@ -227,7 +227,7 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
         );
     }
 
-    protected function buildFilter(?array $properties = null)
+    protected function buildFilter(array $properties = null)
     {
         return new $this->filterClass($this->managerRegistry, null, $properties, 'exists', new CustomConverter());
     }

@@ -22,8 +22,6 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * {@inheritdoc}
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class SerializerFilterContextBuilder implements SerializerContextBuilderInterface
@@ -43,9 +41,6 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createFromRequest(Request $request, bool $normalization, array $attributes = null): array
     {
         if (null === $attributes && !$attributes = RequestAttributesExtractor::extractAttributes($request)) {

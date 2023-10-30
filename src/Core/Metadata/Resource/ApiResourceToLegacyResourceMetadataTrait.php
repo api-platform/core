@@ -72,7 +72,7 @@ trait ApiResourceToLegacyResourceMetadataTrait
 
         $arr = [];
         foreach (get_class_methods($object) as $methodName) {
-            if ('getOperations' === $methodName || 0 !== strpos($methodName, 'get')) {
+            if ('getOperations' === $methodName || !str_starts_with($methodName, 'get')) {
                 continue;
             }
 

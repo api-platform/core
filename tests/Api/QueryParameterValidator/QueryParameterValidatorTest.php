@@ -33,9 +33,6 @@ class QueryParameterValidatorTest extends TestCase
     private $testedInstance;
     private $filterLocatorProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->filterLocatorProphecy = $this->prophesize(ContainerInterface::class);

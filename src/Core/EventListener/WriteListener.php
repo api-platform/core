@@ -47,7 +47,7 @@ final class WriteListener
     private $iriConverter;
     private $metadataBackwardCompatibilityLayer;
 
-    public function __construct(DataPersisterInterface $dataPersister, $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?bool $metadataBackwardCompatibilityLayer = null)
+    public function __construct(DataPersisterInterface $dataPersister, $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, bool $metadataBackwardCompatibilityLayer = null)
     {
         $this->dataPersister = $dataPersister;
         $this->iriConverter = $iriConverter;

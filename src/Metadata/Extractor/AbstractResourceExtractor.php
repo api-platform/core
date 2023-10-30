@@ -37,9 +37,6 @@ abstract class AbstractResourceExtractor implements ResourceExtractorInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResources(): array
     {
         if (null !== $this->resources) {

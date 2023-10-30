@@ -89,11 +89,6 @@ class Field implements \JsonSerializable
         $this->value = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {

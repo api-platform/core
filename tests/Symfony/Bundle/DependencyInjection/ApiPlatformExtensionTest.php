@@ -320,9 +320,6 @@ class ApiPlatformExtensionTest extends TestCase
 
     /**
      * @dataProvider dataProviderCommonConfigurationAliasNameConverter
-     *
-     * @param mixed $nameConverterConfig
-     * @param mixed $aliasIsExected
      */
     public function testCommonConfigurationAliasNameConverter($nameConverterConfig, $aliasIsExected)
     {

@@ -67,17 +67,11 @@ trait ArraySubsetTrait
         $this->fail($other, $description, $f);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return 'has the subset '.$this->exporter()->export($this->subset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function failureDescription($other): string
     {
         return 'an array '.$this->toString();

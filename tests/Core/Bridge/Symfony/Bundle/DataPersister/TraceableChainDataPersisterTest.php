@@ -40,7 +40,7 @@ class TraceableChainDataPersisterTest extends TestCase
                 return !str_starts_with($key, DataPersisterInterface::class.'@anonymous');
             }
 
-            return 0 !== strpos($key, 'class@anonymous');
+            return !str_starts_with($key, 'class@anonymous');
         }, \ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));
     }
@@ -58,7 +58,7 @@ class TraceableChainDataPersisterTest extends TestCase
                 return !str_starts_with($key, DataPersisterInterface::class.'@anonymous');
             }
 
-            return 0 !== strpos($key, 'class@anonymous');
+            return !str_starts_with($key, 'class@anonymous');
         }, \ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));
     }

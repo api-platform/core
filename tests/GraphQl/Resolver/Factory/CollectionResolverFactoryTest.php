@@ -43,9 +43,6 @@ class CollectionResolverFactoryTest extends TestCase
     private $queryResolverLocatorProphecy;
     private $requestStackProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->readStageProphecy = $this->prophesize(ReadStageInterface::class);

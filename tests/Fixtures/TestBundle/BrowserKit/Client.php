@@ -22,9 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
 if (class_exists(AbstractBrowser::class)) {
     class Client extends KernelBrowser
     {
-        /**
-         * {@inheritdoc}
-         */
         protected function filterRequest(DomRequest $request): Request
         {
             $request = parent::filterRequest($request);
@@ -41,9 +38,6 @@ if (class_exists(AbstractBrowser::class)) {
 } else {
     class Client extends BaseClient
     {
-        /**
-         * {@inheritdoc}
-         */
         protected function filterRequest(DomRequest $request): Request
         {
             $request = parent::filterRequest($request);

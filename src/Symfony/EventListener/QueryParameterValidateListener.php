@@ -72,16 +72,16 @@ final class QueryParameterValidateListener
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !($operation->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface)
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface
+            && (!$operation || !($operation->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface)
         ) {
             return;
         }
 
         // TODO: remove in 3.0
         $operationName = $attributes['collection_operation_name'] ?? null;
-        if (!$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (
+        if (!$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface
+            && (
                 null === $operationName
                 || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY, !$this->enabled)
             )

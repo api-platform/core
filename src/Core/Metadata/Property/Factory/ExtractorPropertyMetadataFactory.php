@@ -39,9 +39,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $parentPropertyMetadata = null;
@@ -56,8 +53,8 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         $isInterface = interface_exists($resourceClass);
 
         if (
-            !property_exists($resourceClass, $property) && !$isInterface ||
-            null === ($propertyMetadata = $this->extractor->getResources()[$resourceClass]['properties'][$property] ?? null)
+            !property_exists($resourceClass, $property) && !$isInterface
+            || null === ($propertyMetadata = $this->extractor->getResources()[$resourceClass]['properties'][$property] ?? null)
         ) {
             return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
         }
@@ -145,8 +142,8 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         if (null !== $type) {
             $isCollection = $type->isCollection();
             if (
-                $isCollection &&
-                $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+                $isCollection
+                && $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
             ) {
                 $resourceClass = $collectionValueType->getClassName();
             } else {

@@ -38,10 +38,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
     protected $iriConverter;
     protected $propertyAccessor;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, IdentifierExtractorInterface $identifierExtractor, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, IdentifierExtractorInterface $identifierExtractor, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor, NameConverterInterface $nameConverter = null, array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
 
@@ -50,10 +47,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function apply(array $clauseBody, string $resourceClass, ?string $operationName = null, array $context = []): array
+    public function apply(array $clauseBody, string $resourceClass, string $operationName = null, array $context = []): array
     {
         $searches = [];
 
@@ -90,9 +84,6 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         $description = [];

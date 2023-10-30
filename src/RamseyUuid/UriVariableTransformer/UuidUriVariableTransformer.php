@@ -26,9 +26,6 @@ use Ramsey\Uuid\UuidInterface;
  */
 final class UuidUriVariableTransformer implements UriVariableTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function transform($value, array $types, array $context = [])
     {
         try {
@@ -38,9 +35,6 @@ final class UuidUriVariableTransformer implements UriVariableTransformerInterfac
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsTransformation($value, array $types, array $context = []): bool
     {
         return \is_string($value) && is_a($types[0], UuidInterface::class, true);

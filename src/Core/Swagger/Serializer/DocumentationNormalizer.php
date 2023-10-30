@@ -120,7 +120,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      * @param array|OperationAwareFormatsProviderInterface                                            $formats
      * @param mixed|null                                                                              $jsonSchemaTypeFactory
      * @param int[]                                                                                   $swaggerVersions
-     * @param mixed                                                                                   $resourceMetadataFactory
      */
     public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, NormalizerInterface $openApiNormalizer = null, bool $legacyMode = false)
     {
@@ -196,7 +195,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @return array|string|int|float|bool|\ArrayObject|null
      */
@@ -285,7 +284,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
             if (isset($operation['uri_template'])) {
                 $path = str_replace('.{_format}', '', $operation['uri_template']);
-                if (0 !== strpos($path, '/')) {
+                if (!str_starts_with($path, '/')) {
                     $path = '/'.$path;
                 }
             } else {
@@ -411,8 +410,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $pathOperation['responses'] ?? $pathOperation['responses'] = [$successStatus => $successResponse];
 
             if (
-                ($resourceMetadata->getAttributes()['extra_properties']['is_legacy_subresource'] ?? false) ||
-                ($resourceMetadata->getAttributes()['extra_properties']['is_alternate_resource_metadata'] ?? false)) {
+                ($resourceMetadata->getAttributes()['extra_properties']['is_legacy_subresource'] ?? false)
+                || ($resourceMetadata->getAttributes()['extra_properties']['is_alternate_resource_metadata'] ?? false)) {
                 // Avoid duplicates parameters when there is a filter on a subresource identifier
                 $parametersMemory = [];
                 $pathOperation['parameters'] = [];
@@ -562,7 +561,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $parametersMemory = [];
         $pathOperation['parameters'] = [];
         foreach ($subresourceOperation['identifiers'] as $parameterName => [$class, $identifier, $hasIdentifier]) {
-            if (false === strpos($subresourceOperation['path'], sprintf('{%s}', $parameterName))) {
+            if (!str_contains($subresourceOperation['path'], sprintf('{%s}', $parameterName))) {
                 continue;
             }
 
@@ -743,7 +742,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $pathOperation;
     }
 
-    private function getJsonSchema(bool $v3, \ArrayObject $definitions, string $resourceClass, string $type, ?string $operationType, ?string $operationName, string $format = 'json', ?array $serializerContext = null, bool $forceCollection = false): Schema
+    private function getJsonSchema(bool $v3, \ArrayObject $definitions, string $resourceClass, string $type, ?string $operationType, ?string $operationName, string $format = 'json', array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = new Schema($v3 ? Schema::VERSION_OPENAPI : Schema::VERSION_SWAGGER);
         $schema->setDefinitions($definitions);
@@ -909,17 +908,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && ($data instanceof Documentation || $this->openApiNormalizer && $data instanceof OpenApi);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

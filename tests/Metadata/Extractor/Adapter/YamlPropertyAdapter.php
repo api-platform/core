@@ -22,9 +22,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class YamlPropertyAdapter implements PropertyAdapterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(string $resourceClass, string $propertyName, array $parameters, array $fixtures): array
     {
         $filename = __DIR__.'/properties.yaml';

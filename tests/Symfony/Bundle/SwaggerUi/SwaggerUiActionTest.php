@@ -49,8 +49,6 @@ class SwaggerUiActionTest extends TestCase
 
     /**
      * @dataProvider getInvokeParameters
-     *
-     * @param mixed $twigProphecy
      */
     public function testInvoke(Request $request, $twigProphecy)
     {

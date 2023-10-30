@@ -87,8 +87,8 @@ final class SerializeListener
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            ($operation && !($operation->canSerialize() ?? true))
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface
+            && ($operation && !($operation->canSerialize() ?? true))
         ) {
             return;
         }
@@ -134,8 +134,6 @@ final class SerializeListener
 
     /**
      * Tries to serialize data that are not API resources (e.g. the entrypoint or data returned by a custom controller).
-     *
-     * @param mixed $controllerResult
      *
      * @throws RuntimeException
      */

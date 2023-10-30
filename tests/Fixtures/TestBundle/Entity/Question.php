@@ -77,8 +77,6 @@ class Question
 
     /**
      * Set answer.
-     *
-     * @param Answer $answer
      */
     public function setAnswer(Answer $answer = null): self
     {

@@ -52,10 +52,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         try {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -81,10 +78,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getItem(string $resourceClass, $id, ?string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         if (\is_array($id)) {
             $id = $id[$this->identifierExtractor->getIdentifierFromResourceClass($resourceClass)];

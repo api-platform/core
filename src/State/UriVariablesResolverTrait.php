@@ -23,12 +23,12 @@ use ApiPlatform\Metadata\HttpOperation;
 trait UriVariablesResolverTrait
 {
     /** @var ContextAwareIdentifierConverterInterface|IdentifierConverterInterface|UriVariablesConverterInterface|null */
-    private $uriVariablesConverter = null;
+    private $uriVariablesConverter;
 
     /**
      * Resolves an operation's UriVariables to their identifiers values.
      */
-    private function getOperationUriVariables(?HttpOperation $operation = null, array $parameters = [], ?string $resourceClass = null): array
+    private function getOperationUriVariables(HttpOperation $operation = null, array $parameters = [], string $resourceClass = null): array
     {
         $identifiers = [];
 

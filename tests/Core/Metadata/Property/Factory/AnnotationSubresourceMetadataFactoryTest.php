@@ -37,9 +37,6 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
 
     /**
      * @dataProvider dependenciesProvider
-     *
-     * @param mixed $reader
-     * @param mixed $decorated
      */
     public function testCreateProperty($reader, $decorated)
     {

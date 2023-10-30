@@ -36,8 +36,6 @@ final class PropertySchemaOneOfRestriction implements PropertySchemaRestrictionM
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param AtLeastOneOf $constraint
      */
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
@@ -60,9 +58,6 @@ final class PropertySchemaOneOfRestriction implements PropertySchemaRestrictionM
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
     {
         return $constraint instanceof AtLeastOneOf;

@@ -26,12 +26,6 @@ class PaginatorTest extends TestCase
 
     /**
      * @dataProvider initializeProvider
-     *
-     * @param mixed $firstResult
-     * @param mixed $maxResults
-     * @param mixed $totalItems
-     * @param mixed $currentPage
-     * @param mixed $lastPage
      */
     public function testInitialize($firstResult, $maxResults, $totalItems, $currentPage, $lastPage)
     {

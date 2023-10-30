@@ -32,9 +32,6 @@ trait ExistsFilterTrait
      */
     private $existsParameterName;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         $description = [];

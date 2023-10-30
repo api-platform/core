@@ -32,9 +32,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
 
     public const SCHEMA = __DIR__.'/schema/resources.xsd';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractPath(string $path)
     {
         try {

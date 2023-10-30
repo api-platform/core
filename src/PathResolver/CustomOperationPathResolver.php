@@ -29,9 +29,6 @@ final class CustomOperationPathResolver implements OperationPathResolverInterfac
         $this->deferred = $deferred;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/* , string $operationName = null */): string
     {
         if (\func_num_args() >= 4) {

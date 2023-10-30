@@ -19,8 +19,6 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * {@inheritdoc}
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class RouteNameResolver implements RouteNameResolverInterface
@@ -32,9 +30,6 @@ final class RouteNameResolver implements RouteNameResolverInterface
         $this->router = $router;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRouteName(string $resourceClass, $operationType /* , array $context = [] */): string
     {
         if (\func_num_args() > 2) {

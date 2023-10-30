@@ -26,17 +26,11 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\ConstantScoreFilte
  */
 final class ConstantScoreFilterExtension extends AbstractFilterExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getFilterInterface(): string
     {
         return ConstantScoreFilterInterface::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function alterRequestBody(array $requestBody, array $clauseBody): array
     {
         $requestBody['query'] = $requestBody['query'] ?? [];

@@ -34,9 +34,6 @@ final class ValidateStage implements ValidateStageInterface
         $this->validator = $validator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($object, string $resourceClass, string $operationName, array $context): void
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);

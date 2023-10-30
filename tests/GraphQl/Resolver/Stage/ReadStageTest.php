@@ -43,9 +43,6 @@ class ReadStageTest extends TestCase
     private $providerProphecy;
     private $serializerContextBuilderProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -136,7 +133,7 @@ class ReadStageTest extends TestCase
      * @param object|null $item
      * @param object|null $expectedResult
      */
-    public function testApplyMutationOrSubscription(bool $isMutation, bool $isSubscription, string $resourceClass, ?string $identifier, $item, bool $throwNotFound, $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
+    public function testApplyMutationOrSubscription(bool $isMutation, bool $isSubscription, string $resourceClass, ?string $identifier, $item, bool $throwNotFound, $expectedResult, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
     {
         $operationName = 'create';
         $info = $this->prophesize(ResolveInfo::class)->reveal();

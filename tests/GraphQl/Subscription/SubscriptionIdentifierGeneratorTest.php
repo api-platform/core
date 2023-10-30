@@ -23,9 +23,6 @@ class SubscriptionIdentifierGeneratorTest extends TestCase
 {
     private $subscriptionIdentifierGenerator;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->subscriptionIdentifierGenerator = new SubscriptionIdentifierGenerator();

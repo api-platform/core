@@ -38,9 +38,6 @@ final class AttributesResourceNameCollectionFactory implements ResourceNameColle
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): ResourceNameCollection
     {
         $classes = [];

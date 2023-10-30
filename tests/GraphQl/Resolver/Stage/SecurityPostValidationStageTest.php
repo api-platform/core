@@ -35,9 +35,6 @@ class SecurityPostValidationStageTest extends TestCase
     private $securityPostValidationStage;
     private $resourceAccessCheckerProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);

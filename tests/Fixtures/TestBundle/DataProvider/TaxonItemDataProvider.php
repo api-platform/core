@@ -31,17 +31,11 @@ class TaxonItemDataProvider implements ItemDataProviderInterface, RestrictedData
         $this->orm = $orm;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return is_a($resourceClass, TaxonInterface::class, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         return $this->managerRegistry->getRepository($this->orm ? Taxon::class : TaxonDocument::class)->findOneBy([

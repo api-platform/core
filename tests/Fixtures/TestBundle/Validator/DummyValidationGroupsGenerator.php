@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 
 final class DummyValidationGroupsGenerator implements ValidationGroupsGeneratorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($object): GroupSequence
     {
         return new GroupSequence(['b', 'a']);

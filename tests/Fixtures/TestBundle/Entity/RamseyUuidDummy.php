@@ -41,7 +41,7 @@ class RamseyUuidDummy
      */
     private $other;
 
-    public function __construct(?UuidInterface $id = null)
+    public function __construct(UuidInterface $id = null)
     {
         $this->id = $id ?? Uuid::uuid4();
     }

@@ -29,17 +29,11 @@ class DummyDtoNoOutputDataPersister implements DataPersisterInterface
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($data): bool
     {
         return $data instanceof InputDto || $data instanceof InputDtoDocument;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function persist($data)
     {
         $isOrm = true;
@@ -59,9 +53,6 @@ class DummyDtoNoOutputDataPersister implements DataPersisterInterface
         return $output;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove($data)
     {
         return null;

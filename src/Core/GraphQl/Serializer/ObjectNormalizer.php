@@ -43,24 +43,18 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         $this->identifiersExtractor = $identifiersExtractor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $this->decorated->supportsNormalization($data, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->decorated instanceof CacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod();
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @throws UnexpectedValueException
      *

@@ -36,9 +36,6 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         $this->defaults = $defaults + ['attributes' => []];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadata
     {
         $parentResourceMetadata = null;
@@ -122,8 +119,6 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
 
     /**
      * Creates a new instance of metadata if the property is not already set.
-     *
-     * @param mixed $value
      */
     private function createWith(ResourceMetadata $resourceMetadata, string $property, $value): ResourceMetadata
     {

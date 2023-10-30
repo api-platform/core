@@ -36,9 +36,6 @@ final class XmlExtractor extends AbstractResourceExtractor implements PropertyEx
 
     private $properties;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProperties(): array
     {
         if (null !== $this->properties) {
@@ -53,9 +50,6 @@ final class XmlExtractor extends AbstractResourceExtractor implements PropertyEx
         return $this->properties;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractPath(string $path)
     {
         try {

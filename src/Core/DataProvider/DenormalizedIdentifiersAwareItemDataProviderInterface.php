@@ -20,8 +20,5 @@ namespace ApiPlatform\Core\DataProvider;
  */
 interface DenormalizedIdentifiersAwareItemDataProviderInterface extends ItemDataProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getItem(string $resourceClass, /* array */ $id, string $operationName = null, array $context = []);
 }

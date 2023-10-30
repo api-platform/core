@@ -102,50 +102,34 @@ final class ApiProperty
 
     /**
      * @param string                           $description
-     * @param bool                             $readable
-     * @param bool                             $writable
-     * @param bool                             $readableLink
-     * @param bool                             $writableLink
-     * @param bool                             $required
-     * @param string                           $iri
-     * @param bool                             $identifier
      * @param string|int|float|bool|array      $default
      * @param string|int|float|bool|array|null $example
-     * @param string                           $deprecationReason
-     * @param bool                             $fetchable
-     * @param bool                             $fetchEager
-     * @param array                            $jsonldContext
-     * @param array                            $openapiContext
-     * @param bool                             $push
-     * @param string                           $security
-     * @param array                            $swaggerContext
-     * @param string                           $securityPostDenormalize
      *
      * @throws InvalidArgumentException
      */
     public function __construct(
         $description = null,
-        ?bool $readable = null,
-        ?bool $writable = null,
-        ?bool $readableLink = null,
-        ?bool $writableLink = null,
-        ?bool $required = null,
-        ?string $iri = null,
-        ?bool $identifier = null,
+        bool $readable = null,
+        bool $writable = null,
+        bool $readableLink = null,
+        bool $writableLink = null,
+        bool $required = null,
+        string $iri = null,
+        bool $identifier = null,
         $default = null,
         $example = null,
 
         // attributes
-        ?array $attributes = null,
-        ?string $deprecationReason = null,
-        ?bool $fetchable = null,
-        ?bool $fetchEager = null,
-        ?array $jsonldContext = null,
-        ?array $openapiContext = null,
-        ?bool $push = null,
-        ?string $security = null,
-        ?array $swaggerContext = null,
-        ?string $securityPostDenormalize = null,
+        array $attributes = null,
+        string $deprecationReason = null,
+        bool $fetchable = null,
+        bool $fetchEager = null,
+        array $jsonldContext = null,
+        array $openapiContext = null,
+        bool $push = null,
+        string $security = null,
+        array $swaggerContext = null,
+        string $securityPostDenormalize = null,
 
         ?array $types = [],
         ?array $builtinTypes = []

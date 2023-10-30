@@ -39,9 +39,6 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): DocumentMetadata
     {
         if (isset($this->localCache[$resourceClass])) {

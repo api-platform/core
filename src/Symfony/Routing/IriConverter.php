@@ -37,8 +37,6 @@ use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionIn
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * {@inheritdoc}
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class IriConverter implements IriConverterInterface
@@ -65,10 +63,7 @@ final class IriConverter implements IriConverterInterface
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null)
+    public function getResourceFromIri(string $iri, array $context = [], Operation $operation = null)
     {
         try {
             $parameters = $this->router->match($iri);
@@ -109,9 +104,6 @@ final class IriConverter implements IriConverterInterface
         throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
         try {

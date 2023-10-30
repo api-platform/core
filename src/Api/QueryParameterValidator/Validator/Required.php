@@ -17,9 +17,6 @@ use ApiPlatform\Util\RequestParser;
 
 final class Required implements ValidatorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function validate(string $name, array $filterDescription, array $queryParameters): array
     {
         // filter is not required, the `checkRequired` method can not break

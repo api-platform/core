@@ -27,9 +27,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class HttpExceptionNormalizer implements NormalizerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function normalize($object, $format = null, array $context = []): array
     {
         /** @var HttpExceptionInterface */
@@ -42,9 +39,6 @@ final class HttpExceptionNormalizer implements NormalizerInterface
         return $error;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof Error && $data->getPrevious() instanceof HttpExceptionInterface;

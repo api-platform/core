@@ -38,9 +38,6 @@ final class ReservedAttributeNameConverter implements AdvancedNameConverterInter
         $this->nameConverter = $nameConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize($propertyName, string $class = null, string $format = null, array $context = []): string
     {
         if (null !== $this->nameConverter) {
@@ -54,9 +51,6 @@ final class ReservedAttributeNameConverter implements AdvancedNameConverterInter
         return $propertyName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize($propertyName, string $class = null, string $format = null, array $context = []): string
     {
         if (\in_array($propertyName, self::JSON_API_RESERVED_ATTRIBUTES, true)) {

@@ -34,9 +34,6 @@ class ValidateStageTest extends TestCase
     private $validateStage;
     private $validatorProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->validatorProphecy = $this->prophesize(ValidatorInterface::class);

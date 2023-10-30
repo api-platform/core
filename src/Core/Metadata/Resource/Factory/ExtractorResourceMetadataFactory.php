@@ -36,9 +36,6 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
         $this->defaults = $defaults + ['attributes' => []];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadata
     {
         $parentResourceMetadata = null;

@@ -21,41 +21,26 @@ use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
  */
 class XmlExtractorTest extends ExtractorTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtractorClass(): string
     {
         return XmlExtractor::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getEmptyResourcesFile(): string
     {
         return __DIR__.'/../../../Fixtures/FileConfigurations/resources_empty.xml';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getEmptyOperationFile(): string
     {
         return __DIR__.'/../../../Fixtures/FileConfigurations/empty-operation.xml';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCorrectResourceFile(): string
     {
         return __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getResourceWithParametersFile(): string
     {
         return __DIR__.'/../../../Fixtures/FileConfigurations/resources_with_parameters.xml';

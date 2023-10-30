@@ -26,9 +26,6 @@ final class CallableProcessor implements ProcessorInterface
         $this->locator = $locator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if (!($processor = $operation->getProcessor())) {

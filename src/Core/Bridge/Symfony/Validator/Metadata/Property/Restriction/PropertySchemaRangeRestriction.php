@@ -23,9 +23,6 @@ use Symfony\Component\Validator\Constraints\Range;
  */
 final class PropertySchemaRangeRestriction implements PropertySchemaRestrictionMetadataInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
     {
         $restriction = [];
@@ -41,9 +38,6 @@ final class PropertySchemaRangeRestriction implements PropertySchemaRestrictionM
         return $restriction;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
     {
         return $constraint instanceof Range && null !== ($type = $propertyMetadata->getType() ?? null) && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true);

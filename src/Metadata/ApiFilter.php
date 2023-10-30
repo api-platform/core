@@ -51,13 +51,11 @@ final class ApiFilter
 
     /**
      * @param string $filterClass
-     * @param string $id
-     * @param string $strategy
      */
     public function __construct(
         $filterClass,
-        ?string $id = null,
-        ?string $strategy = null,
+        string $id = null,
+        string $strategy = null,
         array $properties = [],
         array $arguments = []
     ) {

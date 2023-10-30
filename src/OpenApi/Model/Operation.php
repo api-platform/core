@@ -30,7 +30,7 @@ final class Operation
     private $servers;
     private $externalDocs;
 
-    public function __construct(string $operationId = null, array $tags = [], array $responses = [], string $summary = '', string $description = '', ExternalDocumentation $externalDocs = null, array $parameters = [], RequestBody $requestBody = null, \ArrayObject $callbacks = null, bool $deprecated = false, ?array $security = null, ?array $servers = null, array $extensionProperties = [])
+    public function __construct(string $operationId = null, array $tags = [], array $responses = [], string $summary = '', string $description = '', ExternalDocumentation $externalDocs = null, array $parameters = [], RequestBody $requestBody = null, \ArrayObject $callbacks = null, bool $deprecated = false, array $security = null, array $servers = null, array $extensionProperties = [])
     {
         $this->tags = $tags;
         $this->summary = $summary;
@@ -170,7 +170,7 @@ final class Operation
         return $clone;
     }
 
-    public function withRequestBody(?RequestBody $requestBody = null): self
+    public function withRequestBody(RequestBody $requestBody = null): self
     {
         $clone = clone $this;
         $clone->requestBody = $requestBody;
@@ -194,7 +194,7 @@ final class Operation
         return $clone;
     }
 
-    public function withSecurity(?array $security = null): self
+    public function withSecurity(array $security = null): self
     {
         $clone = clone $this;
         $clone->security = $security;
@@ -202,7 +202,7 @@ final class Operation
         return $clone;
     }
 
-    public function withServers(?array $servers = null): self
+    public function withServers(array $servers = null): self
     {
         $clone = clone $this;
         $clone->servers = $servers;

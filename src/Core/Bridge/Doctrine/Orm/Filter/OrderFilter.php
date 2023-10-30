@@ -41,7 +41,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
 {
     use OrderFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {
         if (null !== $properties) {
             $properties = array_map(static function ($propertyOptions) {
@@ -61,9 +61,6 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         $this->orderParameterName = $orderParameterName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
@@ -81,9 +78,6 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $direction, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
@@ -114,9 +108,6 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         $queryBuilder->addOrderBy(sprintf('%s.%s', $alias, $field), $direction);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractProperties(Request $request/* , string $resourceClass */): array
     {
         @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), \E_USER_DEPRECATED);

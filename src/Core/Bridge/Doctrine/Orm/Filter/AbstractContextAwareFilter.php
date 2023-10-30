@@ -18,9 +18,6 @@ use Doctrine\ORM\QueryBuilder;
 
 abstract class AbstractContextAwareFilter extends AbstractFilter implements ContextAwareFilterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (!isset($context['filters']) || !\is_array($context['filters'])) {

@@ -29,9 +29,6 @@ class ContainNonResourceItemDataProvider implements ItemDataProviderInterface, R
         return \in_array($resourceClass, [ContainNonResource::class, ContainNonResourceDocument::class], true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         if (!\is_scalar($id)) {

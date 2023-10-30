@@ -37,18 +37,15 @@ class Validator implements ValidatorInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate($data, array $context = [])
     {
         if (null !== $validationGroups = $context['groups'] ?? null) {
             if (
-                $this->container &&
-                \is_string($validationGroups) &&
-                $this->container->has($validationGroups) &&
-                ($service = $this->container->get($validationGroups)) &&
-                \is_callable($service)
+                $this->container
+                && \is_string($validationGroups)
+                && $this->container->has($validationGroups)
+                && ($service = $this->container->get($validationGroups))
+                && \is_callable($service)
             ) {
                 if (!$service instanceof ValidationGroupsGeneratorInterface) {
                     @trigger_error(sprintf('Using a public validation groups generator service not implementing "%s" is deprecated since 2.6 and will be removed in 3.0.', ValidationGroupsGeneratorInterface::class), \E_USER_DEPRECATED);

@@ -42,9 +42,6 @@ class SerializeStageTest extends TestCase
     private $normalizerProphecy;
     private $serializerContextBuilderProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->normalizerProphecy = $this->prophesize(NormalizerInterface::class);
@@ -126,7 +123,7 @@ class SerializeStageTest extends TestCase
     /**
      * @dataProvider applyCollectionWithPaginationProvider
      */
-    public function testApplyCollectionWithPagination(iterable $collection, array $args, ?array $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
+    public function testApplyCollectionWithPagination(iterable $collection, array $args, ?array $expectedResult, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
     {
         $operationName = 'collection_query';
         $resourceClass = 'myResource';

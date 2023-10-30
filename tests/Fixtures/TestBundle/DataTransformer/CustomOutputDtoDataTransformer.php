@@ -21,8 +21,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 final class CustomOutputDtoDataTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     public function transform($object, string $to, array $context = [])
@@ -47,9 +45,6 @@ final class CustomOutputDtoDataTransformer implements DataTransformerInterface
         return $output;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsTransformation($object, string $to, array $context = []): bool
     {
         if ($object instanceof \IteratorAggregate) {

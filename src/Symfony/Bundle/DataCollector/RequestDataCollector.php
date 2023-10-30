@@ -70,9 +70,6 @@ final class RequestDataCollector extends DataCollector
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $resourceClass = $request->attributes->get('_api_resource_class');
@@ -208,17 +205,11 @@ final class RequestDataCollector extends DataCollector
         return $output[1] ?? strtok($version, '@');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'api_platform.data_collector.request';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->data = [];

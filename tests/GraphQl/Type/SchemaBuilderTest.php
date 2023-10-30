@@ -59,9 +59,6 @@ class SchemaBuilderTest extends TestCase
     /** @var SchemaBuilder */
     private $schemaBuilder;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);

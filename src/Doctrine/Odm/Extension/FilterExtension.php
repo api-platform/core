@@ -34,9 +34,6 @@ final class FilterExtension implements AggregationCollectionExtensionInterface
         $this->filterLocator = $filterLocator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         $resourceFilters = $operation ? $operation->getFilters() : null;

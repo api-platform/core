@@ -25,9 +25,6 @@ class SerializableProvider implements ProviderInterface, SerializerAwareProvider
 {
     use SerializerAwareProviderTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         return $this->getSerializer()->deserialize(<<<'JSON'

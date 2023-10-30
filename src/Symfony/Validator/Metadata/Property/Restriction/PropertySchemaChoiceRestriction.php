@@ -24,8 +24,6 @@ use Symfony\Component\Validator\Constraints\Choice;
 final class PropertySchemaChoiceRestriction implements PropertySchemaRestrictionMetadataInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @param Choice $constraint
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
@@ -68,9 +66,6 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
         return $restriction;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
         return $constraint instanceof Choice && null !== ($type = $propertyMetadata->getBuiltinTypes()[0] ?? null) && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true);

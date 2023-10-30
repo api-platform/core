@@ -24,17 +24,11 @@ use Symfony\Component\Validator\Constraints\Regex;
  */
 class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadataInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
     {
         return $constraint instanceof Regex && $constraint->getHtmlPattern() ? ['pattern' => '^('.$constraint->getHtmlPattern().')$'] : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
     {
         return $constraint instanceof Regex && $constraint->match;

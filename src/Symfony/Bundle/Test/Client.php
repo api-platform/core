@@ -83,9 +83,6 @@ final class Client implements HttpClientInterface
         [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, self::API_OPTIONS_DEFAULTS);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $basic = $options['auth_basic'] ?? null;
@@ -124,9 +121,6 @@ final class Client implements HttpClientInterface
         return $this->response = new Response($this->kernelBrowser->getResponse(), $this->kernelBrowser->getInternalResponse(), $info);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
         throw new \LogicException('Not implemented yet');

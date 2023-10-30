@@ -28,11 +28,6 @@ class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
         return \array_key_exists($offset, $this->array);
     }
 
-    /**
-     * @param mixed $offset
-     *
-     * @return mixed
-     */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {

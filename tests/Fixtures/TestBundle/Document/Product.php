@@ -43,41 +43,26 @@ class Product implements ProductInterface
      */
     private $mainTaxon;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCode(): ?string
     {
         return $this->code;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setCode(?string $code): void
     {
         $this->code = $code;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMainTaxon(): ?TaxonInterface
     {
         return $this->mainTaxon;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setMainTaxon(?TaxonInterface $mainTaxon): void
     {
         if (!$mainTaxon instanceof Taxon) {

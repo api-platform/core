@@ -62,8 +62,6 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws RuntimeException
      */
     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)

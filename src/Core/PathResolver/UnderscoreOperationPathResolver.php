@@ -30,9 +30,6 @@ final class UnderscoreOperationPathResolver implements OperationPathResolverInte
         @trigger_error(sprintf('The use of %s is deprecated since 2.1. Please use %s instead.', __CLASS__, UnderscorePathSegmentNameGenerator::class), \E_USER_DEPRECATED);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/* , string $operationName = null */): string
     {
         if (\func_num_args() >= 4) {

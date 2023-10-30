@@ -21,11 +21,6 @@ use Doctrine\ODM\MongoDB\Types\Type;
  */
 class DoctrineFooType extends Type
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value)
     {
         if (null === $value) {
@@ -38,11 +33,6 @@ class DoctrineFooType extends Type
         return $value->bar;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function convertToPHPValue($value)
     {
         if (null === $value) {

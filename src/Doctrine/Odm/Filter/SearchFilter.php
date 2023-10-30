@@ -61,15 +61,12 @@ class SearchFilter extends AbstractFilter implements SearchFilterInterface
         return $this->propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
+            null === $value
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
@@ -140,8 +137,6 @@ class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     /**
      * Add equality match stage according to the strategy.
-     *
-     * @param mixed $values
      */
     private function addEqualityMatchStrategy(string $strategy, Builder $aggregationBuilder, string $field, string $matchField, $values, bool $caseSensitive, ClassMetadata $metadata): void
     {
@@ -158,8 +153,6 @@ class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     /**
      * Get equality match value according to the strategy.
-     *
-     * @param mixed $value
      *
      * @throws InvalidArgumentException If strategy does not exist
      *
@@ -195,9 +188,6 @@ class SearchFilter extends AbstractFilter implements SearchFilterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getType(string $doctrineType): string
     {
         switch ($doctrineType) {

@@ -37,9 +37,6 @@ final class CachedResourceMetadataCollectionFactory implements ResourceMetadataC
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);

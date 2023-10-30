@@ -87,9 +87,6 @@ final class ApiLoader extends Loader
         $this->identifiersExtractor = $identifiersExtractor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load($data, $type = null): RouteCollection
     {
         $routeCollection = new RouteCollection();
@@ -174,9 +171,6 @@ final class ApiLoader extends Loader
         return $routeCollection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($resource, $type = null): bool
     {
         return 'api_platform' === $type;

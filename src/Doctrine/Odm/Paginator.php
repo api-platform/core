@@ -81,9 +81,6 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         $this->totalItems = $mongoDbOdmIterator->toArray()[0]['count'][0]['count'] ?? 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCurrentPage(): float
     {
         if (0 >= $this->maxResults) {
@@ -93,9 +90,6 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         return floor($this->firstResult / $this->maxResults) + 1.;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLastPage(): float
     {
         if (0 >= $this->maxResults) {
@@ -105,25 +99,16 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         return ceil($this->totalItems / $this->maxResults) ?: 1.;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItemsPerPage(): float
     {
         return (float) $this->maxResults;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTotalItems(): float
     {
         return (float) $this->totalItems;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         return $this->iterator ?? $this->iterator = new \ArrayIterator(array_map(function ($result) {
@@ -131,9 +116,6 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         }, $this->mongoDbOdmIterator->toArray()[0]['results']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return \count($this->mongoDbOdmIterator->toArray()[0]['results']);

@@ -81,9 +81,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $this->nestingSeparator = $nestingSeparator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNodeQueryFields(): array
     {
         return [
@@ -95,9 +92,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItemQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array
     {
         $shortName = $resourceMetadata->getShortName();
@@ -115,9 +109,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCollectionQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array
     {
         $shortName = $resourceMetadata->getShortName();
@@ -135,9 +126,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMutationFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $mutationName): array
     {
         $mutationFields = [];
@@ -155,9 +143,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $mutationFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubscriptionFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $subscriptionName): array
     {
         $subscriptionFields = [];
@@ -179,10 +164,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $subscriptionFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth = 0, ?array $ioMetadata = null): array
+    public function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth = 0, array $ioMetadata = null): array
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
@@ -250,9 +232,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveResourceArgs(array $args, string $operationName, string $shortName): array
     {
         foreach ($args as $id => $arg) {
@@ -275,8 +254,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
     {
         try {
             if (
-                $this->typeBuilder->isCollection($type) &&
-                $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+                $this->typeBuilder->isCollection($type)
+                && $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
             ) {
                 $resourceClass = $collectionValueType->getClassName();
             } else {

@@ -63,7 +63,7 @@ class CompositeLabel
      *
      * @param string|null $value the value to set
      */
-    public function setValue(?string $value = null)
+    public function setValue(string $value = null)
     {
         $this->value = $value;
     }

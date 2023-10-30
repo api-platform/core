@@ -27,9 +27,6 @@ class HttpExceptionNormalizerTest extends TestCase
 {
     private $httpExceptionNormalizer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

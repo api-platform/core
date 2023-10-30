@@ -66,11 +66,6 @@ final class ContentStatus implements \JsonSerializable
         return array_search($value, self::toArray(), true);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {

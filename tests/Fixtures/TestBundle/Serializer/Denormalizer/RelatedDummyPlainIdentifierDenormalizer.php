@@ -45,11 +45,6 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
         $this->iriConverter = $iriConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         if ($this->iriConverter instanceof LegacyIriConverterInterface) {
@@ -70,9 +65,6 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
         return $this->denormalizer->denormalize($data, $class, $format, $context + [__CLASS__ => true]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return 'json' === $format

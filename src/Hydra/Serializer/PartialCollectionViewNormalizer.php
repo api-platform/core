@@ -54,7 +54,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @return array|string|int|float|bool|\ArrayObject|null
      */
@@ -114,25 +114,16 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setNormalizer(NormalizerInterface $normalizer)
     {
         if ($this->collectionNormalizer instanceof NormalizerAwareInterface) {

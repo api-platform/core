@@ -67,9 +67,6 @@ final class UpgradeApiResourceCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -82,9 +79,6 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
             ->addArgument('class', InputArgument::OPTIONAL, 'A fully qualified class name.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$input->getOption('force') && \PHP_VERSION_ID < 80100) {

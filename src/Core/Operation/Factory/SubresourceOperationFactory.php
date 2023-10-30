@@ -45,9 +45,6 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
         $this->identifiersExtractor = $identifiersExtractor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): array
     {
         $tree = [];
@@ -67,7 +64,6 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
      * @param string $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
      * @param array  $parentOperation   the previous call operation
      * @param int    $depth             the number of visited
-     * @param int    $maxDepth
      */
     private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [], int $depth = 0, int $maxDepth = null): void
     {

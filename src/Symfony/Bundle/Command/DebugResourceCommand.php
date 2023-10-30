@@ -36,9 +36,6 @@ final class DebugResourceCommand extends Command
         $this->dumper = $dumper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -46,9 +43,6 @@ final class DebugResourceCommand extends Command
             ->addArgument('class', InputArgument::REQUIRED, 'The class you want to debug');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $resourceClass = $input->getArgument('class');

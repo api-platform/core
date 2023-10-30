@@ -47,21 +47,21 @@ class DummyExceptionToStatus
      *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id = null;
+    private $id;
 
     /**
      * @var string|null The dummy name
      *
      * @ORM\Column(nullable=true)
      */
-    private $name = null;
+    private $name;
 
     /**
      * @var string|null The dummy title
      *
      * @ORM\Column(nullable=true)
      */
-    private $title = null;
+    private $title;
 
     /**
      * @var string The dummy code

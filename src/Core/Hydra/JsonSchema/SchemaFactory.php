@@ -67,10 +67,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         $this->addDistinctFormat('jsonld');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
+    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, string $operationType = null, string $operationName = null, Schema $schema = null, array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = $this->schemaFactory->buildSchema($className, $format, $type, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
         if ('jsonld' !== $format) {

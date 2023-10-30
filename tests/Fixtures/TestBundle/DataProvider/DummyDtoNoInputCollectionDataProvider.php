@@ -34,17 +34,11 @@ final class DummyDtoNoInputCollectionDataProvider implements ContextAwareCollect
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return \in_array($resourceClass, [DummyDtoNoInput::class, DummyDtoNoInputDocument::class], true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
     {
         /** @var DummyDtoNoInput[]|DummyDtoNoInputDocument[] $dummyDtos */

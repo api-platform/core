@@ -52,9 +52,6 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($data, array $context = []): bool
     {
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
@@ -91,9 +88,6 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         return false !== $resourceMetadata->getAttribute('messenger', false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function persist($data, array $context = [])
     {
         $envelope = $this->dispatch(
@@ -109,9 +103,6 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         return $handledStamp->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove($data, array $context = [])
     {
         $this->dispatch(

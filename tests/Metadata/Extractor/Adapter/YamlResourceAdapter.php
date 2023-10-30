@@ -22,9 +22,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class YamlResourceAdapter implements ResourceAdapterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(string $resourceClass, array $parameters, array $fixtures): array
     {
         $yaml = ['resources' => [$resourceClass => []]];

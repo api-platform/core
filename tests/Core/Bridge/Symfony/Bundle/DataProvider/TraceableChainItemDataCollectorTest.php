@@ -39,7 +39,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
                 return !str_starts_with($key, ItemDataProviderInterface::class.'@anonymous');
             }
 
-            return 0 !== strpos($key, 'class@anonymous');
+            return !str_starts_with($key, 'class@anonymous');
         }, \ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));
         $this->assertSame($context, $dataProvider->getContext());
@@ -49,10 +49,6 @@ class TraceableChainItemDataCollectorTest extends TestCase
      * @dataProvider deprecatedDataProviderProvider
      *
      * @group legacy
-     *
-     * @param mixed $provider
-     * @param mixed $context
-     * @param mixed $expected
      */
     public function testDeprecatedGetItem($provider, $context, $expected)
     {
@@ -66,7 +62,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
                 return !str_starts_with($key, ItemDataProviderInterface::class.'@anonymous');
             }
 
-            return 0 !== strpos($key, 'class@anonymous');
+            return !str_starts_with($key, 'class@anonymous');
         }, \ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));
         $this->assertSame($context, $dataProvider->getContext());

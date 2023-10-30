@@ -24,8 +24,6 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 final class PropertySchemaGreaterThanOrEqualRestriction implements PropertySchemaRestrictionMetadataInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @param GreaterThanOrEqual $constraint
      */
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
@@ -35,9 +33,6 @@ final class PropertySchemaGreaterThanOrEqualRestriction implements PropertySchem
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
     {
         return $constraint instanceof GreaterThanOrEqual && is_numeric($constraint->value) && ($type = $propertyMetadata->getType() ?? null) && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true);

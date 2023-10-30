@@ -33,9 +33,6 @@ final class WriteStage implements WriteStageInterface
         $this->serializerContextBuilder = $serializerContextBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($data, string $resourceClass, Operation $operation, array $context)
     {
         if (null === $data || !($operation->canWrite() ?? true)) {

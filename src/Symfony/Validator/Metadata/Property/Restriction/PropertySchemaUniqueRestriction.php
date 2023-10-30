@@ -22,17 +22,11 @@ use Symfony\Component\Validator\Constraints\Unique;
  */
 final class PropertySchemaUniqueRestriction implements PropertySchemaRestrictionMetadataInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
         return ['uniqueItems' => true];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
         return $constraint instanceof Unique;

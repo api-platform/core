@@ -49,9 +49,6 @@ final class ReadStage implements ReadStageInterface
         $this->nestingSeparator = $nestingSeparator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context)
     {
         if (!($operation->canRead() ?? true)) {

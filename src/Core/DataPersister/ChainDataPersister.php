@@ -35,9 +35,6 @@ final class ChainDataPersister implements ContextAwareDataPersisterInterface
         $this->persisters = $persisters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($data, array $context = []): bool
     {
         foreach ($this->persisters as $persister) {
@@ -49,9 +46,6 @@ final class ChainDataPersister implements ContextAwareDataPersisterInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function persist($data, array $context = [])
     {
         foreach ($this->persisters as $persister) {
@@ -68,9 +62,6 @@ final class ChainDataPersister implements ContextAwareDataPersisterInterface
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove($data, array $context = [])
     {
         foreach ($this->persisters as $persister) {

@@ -44,9 +44,6 @@ class CollectionDataProviderTest extends TestCase
     private $managerRegistryProphecy;
     private $resourceMetadataFactoryProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

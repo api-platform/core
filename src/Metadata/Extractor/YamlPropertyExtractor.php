@@ -24,9 +24,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class YamlPropertyExtractor extends AbstractPropertyExtractor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function extractPath(string $path)
     {
         try {

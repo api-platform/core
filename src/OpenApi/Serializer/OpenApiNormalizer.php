@@ -34,9 +34,6 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize($object, $format = null, array $context = []): array
     {
         $pathsCallback = static function ($innerObject) {
@@ -71,17 +68,11 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof OpenApi;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

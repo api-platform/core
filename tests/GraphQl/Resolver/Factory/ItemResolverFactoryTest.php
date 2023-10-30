@@ -40,9 +40,6 @@ class ItemResolverFactoryTest extends TestCase
     private $serializeStageProphecy;
     private $queryResolverLocatorProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->readStageProphecy = $this->prophesize(ReadStageInterface::class);

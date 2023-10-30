@@ -73,9 +73,6 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
     {
         $this->apply(true, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
@@ -166,9 +163,9 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             if (
                 // Always skip extra lazy associations
-                ClassMetadataInfo::FETCH_EXTRA_LAZY === $mapping['fetch'] ||
+                ClassMetadataInfo::FETCH_EXTRA_LAZY === $mapping['fetch']
                 // We don't want to interfere with doctrine on this association
-                (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'])
+                || (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'])
             ) {
                 continue;
             }
@@ -185,8 +182,8 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             $fetchEager = null;
             if (
-                (null === $fetchEager = $propertyMetadata->getAttribute('fetch_eager')) &&
-                (null !== $fetchEager = $propertyMetadata->getAttribute('fetchEager'))
+                (null === $fetchEager = $propertyMetadata->getAttribute('fetch_eager'))
+                && (null !== $fetchEager = $propertyMetadata->getAttribute('fetchEager'))
             ) {
                 @trigger_error('The "fetchEager" attribute is deprecated since 2.3. Please use "fetch_eager" instead.', \E_USER_DEPRECATED);
             }
@@ -201,10 +198,10 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             // Avoid joining back to the parent that we just came from, but only on *ToOne relations
             if (
-                null !== $parentAssociation &&
-                isset($mapping['inversedBy']) &&
-                $mapping['inversedBy'] === $parentAssociation &&
-                $mapping['type'] & ClassMetadata::TO_ONE
+                null !== $parentAssociation
+                && isset($mapping['inversedBy'])
+                && $mapping['inversedBy'] === $parentAssociation
+                && $mapping['type'] & ClassMetadata::TO_ONE
             ) {
                 continue;
             }

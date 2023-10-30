@@ -24,9 +24,6 @@ final class NoPropertiesArgumentFilter implements FilterInterface
         $this->foo = $foo;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         return [

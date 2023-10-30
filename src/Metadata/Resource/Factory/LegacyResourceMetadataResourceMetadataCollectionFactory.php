@@ -118,8 +118,8 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
         $graphQlOperations = [];
         foreach ($resourceMetadata->getGraphql() as $operationName => $operation) {
-            if (false !== strpos($operationName, 'query') || isset($operation['item_query']) || isset($operation['collection_query'])) {
-                $graphQlOperation = isset($operation['collection_query']) || false !== strpos($operationName, 'collection') ? new QueryCollection() : new Query();
+            if (str_contains($operationName, 'query') || isset($operation['item_query']) || isset($operation['collection_query'])) {
+                $graphQlOperation = isset($operation['collection_query']) || str_contains($operationName, 'collection') ? new QueryCollection() : new Query();
                 /** @var GraphQlOperation $graphQlOperation */
                 $graphQlOperation = $graphQlOperation->withName($operationName);
             } else {
@@ -189,7 +189,6 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
     /**
      * @param HttpOperation|GraphQlOperation|ApiResource $operation
-     * @param mixed                                      $value
      *
      * @return HttpOperation|GraphQlOperation|ApiResource
      */

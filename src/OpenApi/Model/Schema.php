@@ -52,9 +52,6 @@ final class Schema extends \ArrayObject
         $this->schema->setDefinitions(new \ArrayObject($definitions));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getArrayCopy(): array
     {
         $schema = parent::getArrayCopy();

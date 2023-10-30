@@ -95,8 +95,8 @@ final class DeserializeListener
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !($operation->canDeserialize() ?? true) || !$attributes['receive'])
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface
+            && (!$operation || !($operation->canDeserialize() ?? true) || !$attributes['receive'])
         ) {
             return;
         }

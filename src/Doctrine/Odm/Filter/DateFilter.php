@@ -38,17 +38,14 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
         MongoDbType::DATE_IMMUTABLE => true,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (
-            !\is_array($values) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isDateField($property, $resourceClass)
+            !\is_array($values)
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
+            || !$this->isDateField($property, $resourceClass)
         ) {
             return;
         }
@@ -108,8 +105,6 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
 
     /**
      * Adds the match stage according to the chosen null management.
-     *
-     * @param mixed $value
      */
     private function addMatch(Builder $aggregationBuilder, string $field, string $operator, $value, string $nullManagement = null): void
     {
@@ -137,9 +132,9 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
             self::PARAMETER_STRICTLY_AFTER => '$gt',
         ];
 
-        if ((self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true)) ||
-            (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true)) ||
-            (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
+        if ((self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
+            || (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true))
+            || (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
         ) {
             $aggregationBuilder->match()->addOr(
                 $aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value),

@@ -34,10 +34,7 @@ abstract class AbstractFilterExtension implements RequestBodySearchCollectionExt
         $this->filterLocator = $filterLocator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToCollection(array $requestBody, string $resourceClass, ?string $operationName = null, array $context = []): array
+    public function applyToCollection(array $requestBody, string $resourceClass, string $operationName = null, array $context = []): array
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);

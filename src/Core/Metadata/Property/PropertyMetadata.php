@@ -342,8 +342,6 @@ final class PropertyMetadata
 
     /**
      * Returns a new instance with the given subresource.
-     *
-     * @param SubresourceMetadata $subresource
      */
     public function withSubresource(SubresourceMetadata $subresource = null): self
     {
@@ -382,8 +380,6 @@ final class PropertyMetadata
 
     /**
      * Returns a new instance with the given default value for the property.
-     *
-     * @param mixed $default
      */
     public function withDefault($default): self
     {
@@ -403,8 +399,6 @@ final class PropertyMetadata
 
     /**
      * Returns a new instance with the given example.
-     *
-     * @param mixed $example
      */
     public function withExample($example): self
     {
@@ -414,9 +408,6 @@ final class PropertyMetadata
         return $metadata;
     }
 
-    /**
-     * @return array
-     */
     public function getSchema(): ?array
     {
         return $this->schema;

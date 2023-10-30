@@ -31,9 +31,6 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
     private $registry;
     private $mercureSubscriptionIriGenerator;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         if (!class_exists(Hub::class)) {

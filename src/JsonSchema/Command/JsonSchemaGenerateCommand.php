@@ -47,9 +47,6 @@ final class JsonSchemaGenerateCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -61,9 +58,6 @@ final class JsonSchemaGenerateCommand extends Command
             ->addOption('type', null, InputOption::VALUE_REQUIRED, sprintf('The type of schema to generate (%s or %s)', Schema::TYPE_INPUT, Schema::TYPE_OUTPUT), Schema::TYPE_INPUT);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

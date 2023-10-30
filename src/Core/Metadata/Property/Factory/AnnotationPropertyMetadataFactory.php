@@ -35,9 +35,6 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         if (null === ($options['deprecate'] ?? null)) {

@@ -48,9 +48,6 @@ abstract class AbstractFilter implements FilterInterface
         $this->nameConverter = $nameConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         foreach ($context['filters'] as $property => $value) {
@@ -60,8 +57,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Passes a property through the filter.
-     *
-     * @param mixed $value
      */
     abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = []);
 

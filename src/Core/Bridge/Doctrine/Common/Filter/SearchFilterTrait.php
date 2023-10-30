@@ -33,9 +33,6 @@ trait SearchFilterTrait
     protected $propertyAccessor;
     protected $identifiersExtractor;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         $description = [];

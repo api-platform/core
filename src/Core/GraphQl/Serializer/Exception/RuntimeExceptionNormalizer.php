@@ -26,9 +26,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class RuntimeExceptionNormalizer implements NormalizerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function normalize($object, $format = null, array $context = []): array
     {
         /** @var \RuntimeException */
@@ -39,9 +36,6 @@ final class RuntimeExceptionNormalizer implements NormalizerInterface
         return $error;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof Error && $data->getPrevious() instanceof \RuntimeException;

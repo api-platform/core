@@ -45,9 +45,6 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
         $this->pagination = $pagination;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (null === $pagination = $this->getPagination($queryBuilder, $operation, $context)) {
@@ -61,9 +58,6 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             ->setMaxResults($limit);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsResult(string $resourceClass, Operation $operation = null, array $context = []): bool
     {
         if ($context['graphql_operation_name'] ?? false) {
@@ -73,9 +67,6 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
         return $this->pagination->isEnabled($operation, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, Operation $operation = null, array $context = []): iterable
     {
         $query = $queryBuilder->getQuery();

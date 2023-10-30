@@ -25,9 +25,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class ElasticsearchClientPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->getParameter('api_platform.elasticsearch.enabled')) {

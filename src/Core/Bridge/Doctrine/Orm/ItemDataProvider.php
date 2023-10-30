@@ -129,8 +129,6 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
 
     /**
      * Add WHERE conditions to the query for one or more identifiers (simple or composite).
-     *
-     * @param mixed $queryNameGenerator
      */
     private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata, $queryNameGenerator)
     {

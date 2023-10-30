@@ -85,9 +85,6 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
         $this->restrictionsMetadata = $restrictionsMetadata;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);

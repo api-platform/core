@@ -60,15 +60,12 @@ class SearchFilter extends AbstractFilter implements SearchFilterInterface
         return $this->propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (
-            null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
+            null === $value
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
@@ -146,8 +143,6 @@ class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     /**
      * Adds where clause according to the strategy.
-     *
-     * @param mixed $values
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
@@ -235,9 +230,6 @@ class SearchFilter extends AbstractFilter implements SearchFilterInterface
         };
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getType(string $doctrineType): string
     {
         switch ($doctrineType) {

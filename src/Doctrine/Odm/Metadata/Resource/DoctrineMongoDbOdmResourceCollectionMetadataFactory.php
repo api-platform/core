@@ -41,9 +41,6 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);

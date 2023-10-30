@@ -17,9 +17,6 @@ use ApiPlatform\Api\FilterInterface;
 
 final class NoConstructorFilter implements FilterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         return [

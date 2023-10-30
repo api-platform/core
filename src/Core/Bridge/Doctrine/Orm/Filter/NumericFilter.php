@@ -46,15 +46,12 @@ class NumericFilter extends AbstractContextAwareFilter
         Types::SMALLINT => true,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isNumericField($property, $resourceClass)
+            !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
+            || !$this->isNumericField($property, $resourceClass)
         ) {
             return;
         }
@@ -84,9 +81,6 @@ class NumericFilter extends AbstractContextAwareFilter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getType(string $doctrineType = null): string
     {
         if (null === $doctrineType || Types::DECIMAL === $doctrineType) {

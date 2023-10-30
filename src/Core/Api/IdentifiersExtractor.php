@@ -22,8 +22,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * {@inheritdoc}
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class IdentifiersExtractor implements IdentifiersExtractorInterface
@@ -50,9 +48,6 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIdentifiersFromResourceClass(string $resourceClass): array
     {
         $identifiers = [];
@@ -73,9 +68,6 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         return $identifiers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIdentifiersFromItem($item): array
     {
         $identifiers = [];

@@ -26,8 +26,6 @@ use Doctrine\ORM\Mapping as ORM;
 class CustomGeneratedIdentifier
 {
     /**
-     * @var mixed
-     *
      * @ORM\Id
      *
      * @ORM\Column(type="string")

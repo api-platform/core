@@ -38,9 +38,6 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
         $this->client = $client;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);

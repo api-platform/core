@@ -32,20 +32,14 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
 {
     private $orderParameterName;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, string $orderParameterName = 'order', ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, NameConverterInterface $nameConverter = null, string $orderParameterName = 'order', array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
 
         $this->orderParameterName = $orderParameterName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function apply(array $clauseBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
+    public function apply(array $clauseBody, string $resourceClass, Operation $operation = null, array $context = []): array
     {
         if (!\is_array($properties = $context['filters'][$this->orderParameterName] ?? [])) {
             return $clauseBody;
@@ -86,9 +80,6 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
         return array_merge_recursive($clauseBody, $orders);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         $description = [];

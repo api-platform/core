@@ -97,7 +97,7 @@ class UpgradeApiResourceCommandTest extends TestCase
 
         $display = $commandTester->getDisplay();
 
-        if ($entityClass !== DummyToUpgradeWithOnlyAttribute::class) {
+        if (DummyToUpgradeWithOnlyAttribute::class !== $entityClass) {
             $this->assertEmpty($display);
         } else {
             $this->assertStringContainsString('begin diff', $display);

@@ -31,9 +31,6 @@ trait OrderFilterTrait
      */
     protected $orderParameterName;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         $description = [];

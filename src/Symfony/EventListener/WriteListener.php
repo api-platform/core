@@ -45,7 +45,7 @@ final class WriteListener
     private $processor;
     private $iriConverter;
 
-    public function __construct(ProcessorInterface $processor, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver, ?UriVariablesConverterInterface $uriVariablesConverter = null)
+    public function __construct(ProcessorInterface $processor, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver, UriVariablesConverterInterface $uriVariablesConverter = null)
     {
         $this->processor = $processor;
         $this->iriConverter = $iriConverter;

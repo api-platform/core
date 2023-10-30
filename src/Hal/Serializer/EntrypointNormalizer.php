@@ -59,9 +59,6 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize($object, $format = null, array $context = []): array
     {
         $entrypoint = ['_links' => ['self' => ['href' => $this->urlGenerator->generate('api_entrypoint')]]];
@@ -102,17 +99,11 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
         return $entrypoint;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

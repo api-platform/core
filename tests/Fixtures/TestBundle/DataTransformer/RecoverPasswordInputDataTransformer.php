@@ -22,8 +22,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 final class RecoverPasswordInputDataTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     public function transform($data, string $to, array $context = [])
@@ -36,9 +34,6 @@ final class RecoverPasswordInputDataTransformer implements DataTransformerInterf
         return $resourceObject;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsTransformation($data, string $to, array $context = []): bool
     {
         return (User::class === $to || UserDocument::class === $to) && RecoverPasswordInput::class === ($context['input']['class'] ?? null);

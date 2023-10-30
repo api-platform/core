@@ -49,9 +49,6 @@ class ItemDataProviderTest extends TestCase
 
     private $resourceMetadataFactoryProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

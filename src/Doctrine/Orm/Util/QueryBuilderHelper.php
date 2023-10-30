@@ -208,7 +208,7 @@ final class QueryBuilderHelper
             $alias = $join->getAlias();
             $relationship = $join->getJoin();
 
-            if (false !== strpos($relationship, '.')) {
+            if (str_contains($relationship, '.')) {
                 $aliasMap[$alias] = explode('.', $relationship);
             } else {
                 $aliasMap[$alias] = $relationship;

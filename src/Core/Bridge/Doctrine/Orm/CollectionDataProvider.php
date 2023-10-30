@@ -52,8 +52,6 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws RuntimeException
      */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable

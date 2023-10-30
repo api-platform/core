@@ -41,9 +41,6 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);

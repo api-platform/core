@@ -22,11 +22,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 if (\PHP_VERSION_ID >= 70200) {
     trait UploadTypeParseLiteralTrait
     {
-        /**
-         * {@inheritdoc}
-         *
-         * @return mixed
-         */
         public function parseLiteral(/* Node */ $valueNode, array $variables = null)
         {
             throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification.', $valueNode);
@@ -35,9 +30,6 @@ if (\PHP_VERSION_ID >= 70200) {
 } else {
     trait UploadTypeParseLiteralTrait
     {
-        /**
-         * {@inheritdoc}
-         */
         public function parseLiteral(Node $valueNode, array $variables = null)
         {
             throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification.', $valueNode);
@@ -67,19 +59,11 @@ final class UploadType extends ScalarType implements TypeInterface
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function serialize($value)
     {
         throw new Error('`Upload` cannot be serialized.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function parseValue($value): UploadedFile
     {
         if (!$value instanceof UploadedFile) {

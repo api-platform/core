@@ -34,9 +34,6 @@ final class TypeConverter implements TypeConverterInterface
         $this->defaultTypeConverter = $defaultTypeConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth)
     {
         if ('dummyDate' === $property
@@ -50,9 +47,6 @@ final class TypeConverter implements TypeConverterInterface
         return $this->defaultTypeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveType(string $type): ?GraphQLType
     {
         return $this->defaultTypeConverter->resolveType($type);

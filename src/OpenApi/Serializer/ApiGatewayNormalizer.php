@@ -42,7 +42,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @throws UnexpectedValueException
      *
@@ -117,17 +117,11 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $this->documentationNormalizer->supportsNormalization($data, $format);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->documentationNormalizer instanceof CacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod();
