@@ -42,9 +42,6 @@ class ProviderResourceMetadatatCollectionFactory implements ResourceMetadataColl
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);

@@ -21,8 +21,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RPC;
 final class RPCOutputDataTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     public function transform($object, string $to, array $context = [])
@@ -30,9 +28,6 @@ final class RPCOutputDataTransformer implements DataTransformerInterface
         return new RPCOutput();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsTransformation($object, string $to, array $context = []): bool
     {
         return ($object instanceof RPC || $object instanceof RPCDocument) && RPCOutput::class === $to;

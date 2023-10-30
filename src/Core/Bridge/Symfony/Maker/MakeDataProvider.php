@@ -36,25 +36,16 @@ class MakeDataProvider extends AbstractMaker
         $this->resourceNameCollection = $resourceNameCollection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getCommandName(): string
     {
         return 'make:data-provider';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getCommandDescription(): string
     {
         return 'Creates an API Platform data provider';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
@@ -67,9 +58,6 @@ class MakeDataProvider extends AbstractMaker
         $inputConfig->setArgumentAsNonInteractive('resource-class');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureDependencies(DependencyBuilder $dependencies)
     {
     }
@@ -90,9 +78,6 @@ class MakeDataProvider extends AbstractMaker
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
         $dataProviderClassNameDetails = $generator->createClassNameDetails(

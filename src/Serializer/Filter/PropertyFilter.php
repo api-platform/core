@@ -37,9 +37,6 @@ final class PropertyFilter implements FilterInterface
         $this->nameConverter = $nameConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(Request $request, bool $normalization, array $attributes, array &$context)
     {
         if (null !== $propertyAttribute = $request->attributes->get('_api_filter_property')) {
@@ -67,9 +64,6 @@ final class PropertyFilter implements FilterInterface
         $context[AbstractNormalizer::ATTRIBUTES] = $properties;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         $example = sprintf('%1$s[]={propertyName}&%1$s[]={anotherPropertyName}&%1$s[{nestedPropertyParent}][]={nestedProperty}',

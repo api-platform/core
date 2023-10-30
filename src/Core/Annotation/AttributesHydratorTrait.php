@@ -57,7 +57,7 @@ trait AttributesHydratorTrait
     /**
      * @var array
      */
-    public $attributes = null;
+    public $attributes;
 
     /**
      * @throws InvalidArgumentException

@@ -35,9 +35,6 @@ final class OrderExtension implements QueryCollectionExtensionInterface
         $this->order = $order;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, Operation $operation = null, array $context = []): void
     {
         if (null === $resourceClass) {

@@ -23,8 +23,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
 final class OutputDtoDataTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     public function transform($object, string $to, array $context = [])
@@ -43,9 +41,6 @@ final class OutputDtoDataTransformer implements DataTransformerInterface
         return $output;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsTransformation($data, string $to, array $context = []): bool
     {
         return ($data instanceof DummyDtoInputOutput || $data instanceof DummyDtoInputOutputDocument) && \in_array($to, [OutputDto::class, OutputDtoDocument::class], true);

@@ -17,8 +17,6 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 
 /**
- * {@inheritdoc}
- *
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  *
  * @deprecated since API Platform 2.5, use the "formats" attribute instead
@@ -37,8 +35,6 @@ final class FormatsProvider implements FormatsProviderInterface, OperationAwareF
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws InvalidArgumentException
      */
     public function getFormatsFromAttributes(array $attributes): array
@@ -61,8 +57,6 @@ final class FormatsProvider implements FormatsProviderInterface, OperationAwareF
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws InvalidArgumentException
      */
     public function getFormatsFromOperation(string $resourceClass, string $operationName, string $operationType): array

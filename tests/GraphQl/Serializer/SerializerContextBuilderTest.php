@@ -34,20 +34,17 @@ class SerializerContextBuilderTest extends TestCase
 
     private $serializerContextBuilder;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->serializerContextBuilder = $this->buildSerializerContextBuilder();
     }
 
-    private function buildSerializerContextBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
+    private function buildSerializerContextBuilder(AdvancedNameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
     {
         return new SerializerContextBuilder($advancedNameConverter ?? new CustomConverter());
     }
 
-    private function buildOperationFromContext(bool $isMutation, bool $isSubscription, array $expectedContext, bool $isNormalization = true, ?string $resourceClass = null)
+    private function buildOperationFromContext(bool $isMutation, bool $isSubscription, array $expectedContext, bool $isNormalization = true, string $resourceClass = null)
     {
         $operation = !$isMutation && !$isSubscription ? new Query() : new Mutation();
         if ($isSubscription) {
@@ -83,7 +80,7 @@ class SerializerContextBuilderTest extends TestCase
     /**
      * @dataProvider createNormalizationContextProvider
      */
-    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, ?AdvancedNameConverterInterface $advancedNameConverter = null, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
+    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, AdvancedNameConverterInterface $advancedNameConverter = null, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
     {
         $resolverContext = [
             'is_mutation' => $isMutation,

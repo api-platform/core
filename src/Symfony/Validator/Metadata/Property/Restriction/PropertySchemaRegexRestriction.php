@@ -25,8 +25,6 @@ use Symfony\Component\Validator\Constraints\Regex;
 class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadataInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @param Regex $constraint
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
@@ -38,9 +36,6 @@ class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadat
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
         return $constraint instanceof Regex;

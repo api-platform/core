@@ -26,17 +26,15 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputSameClass;
 final class OutputDtoSameClassTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     public function transform($object, string $to, array $context = [])
     {
         if (
-            !$object instanceof DummyDtoOutputFallbackToSameClass &&
-            !$object instanceof DummyDtoOutputFallbackToSameClassDocument &&
-            !$object instanceof DummyDtoOutputSameClass &&
-            !$object instanceof DummyDtoOutputSameClassDocument
+            !$object instanceof DummyDtoOutputFallbackToSameClass
+            && !$object instanceof DummyDtoOutputFallbackToSameClassDocument
+            && !$object instanceof DummyDtoOutputSameClass
+            && !$object instanceof DummyDtoOutputSameClassDocument
         ) {
             throw new \InvalidArgumentException();
         }
@@ -45,12 +43,9 @@ final class OutputDtoSameClassTransformer implements DataTransformerInterface
         return $object;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsTransformation($data, string $to, array $context = []): bool
     {
-        return (($data instanceof DummyDtoOutputFallbackToSameClass || $data instanceof DummyDtoOutputFallbackToSameClassDocument) && OutputDtoDummy::class === $to) ||
-            (($data instanceof DummyDtoOutputSameClass || $data instanceof DummyDtoOutputSameClassDocument) && (DummyDtoOutputSameClass::class === $to || DummyDtoOutputSameClassDocument::class === $to));
+        return (($data instanceof DummyDtoOutputFallbackToSameClass || $data instanceof DummyDtoOutputFallbackToSameClassDocument) && OutputDtoDummy::class === $to)
+            || (($data instanceof DummyDtoOutputSameClass || $data instanceof DummyDtoOutputSameClassDocument) && (DummyDtoOutputSameClass::class === $to || DummyDtoOutputSameClassDocument::class === $to));
     }
 }

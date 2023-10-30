@@ -48,9 +48,6 @@ class ItemMutationResolverFactoryTest extends TestCase
     private $mutationResolverLocatorProphecy;
     private $securityPostValidationStageProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->readStageProphecy = $this->prophesize(ReadStageInterface::class);

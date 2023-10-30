@@ -22,8 +22,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 final class CustomInputDtoDataTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     public function transform($object, string $to, array $context = [])
@@ -42,9 +40,6 @@ final class CustomInputDtoDataTransformer implements DataTransformerInterface
         return $resourceObject;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsTransformation($object, string $to, array $context = []): bool
     {
         return (DummyDtoCustom::class === $to || DummyDtoCustomDocument::class === $to) && CustomInputDto::class === ($context['input']['class'] ?? null);

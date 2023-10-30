@@ -25,8 +25,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 
 /**
- * {@inheritdoc}
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
@@ -42,9 +40,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createFromRequest(Request $request, bool $normalization, array $attributes = null): array
     {
         if (null === $attributes && !$attributes = RequestAttributesExtractor::extractAttributes($request)) {

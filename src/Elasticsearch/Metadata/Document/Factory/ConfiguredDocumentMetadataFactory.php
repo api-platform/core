@@ -28,15 +28,12 @@ final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactory
     private $mapping;
     private $decorated;
 
-    public function __construct(array $mapping, ?DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct(array $mapping, DocumentMetadataFactoryInterface $decorated = null)
     {
         $this->mapping = $mapping;
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): DocumentMetadata
     {
         $documentMetadata = null;

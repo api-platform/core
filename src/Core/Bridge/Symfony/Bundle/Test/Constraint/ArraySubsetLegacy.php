@@ -24,9 +24,6 @@ final class ArraySubsetLegacy extends Constraint
 {
     use ArraySubsetTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function evaluate($other, $description = '', $returnResult = false)
     {
         return $this->_evaluate($other, $description, $returnResult);

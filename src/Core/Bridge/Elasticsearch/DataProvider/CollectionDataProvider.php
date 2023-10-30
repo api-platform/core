@@ -72,10 +72,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         $this->collectionExtensions = $collectionExtensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         try {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -109,10 +106,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCollection(string $resourceClass, ?string $operationName = null, array $context = []): iterable
+    public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
         $body = [];

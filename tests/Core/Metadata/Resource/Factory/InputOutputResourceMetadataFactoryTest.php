@@ -29,9 +29,6 @@ class InputOutputResourceMetadataFactoryTest extends TestCase
 
     /**
      * @dataProvider getAttributes
-     *
-     * @param mixed $attributes
-     * @param mixed $expected
      */
     public function testInputOutputMetadata($attributes, $expected)
     {
@@ -46,9 +43,6 @@ class InputOutputResourceMetadataFactoryTest extends TestCase
 
     /**
      * @dataProvider getAttributes
-     *
-     * @param mixed $attributes
-     * @param mixed $expected
      */
     public function testInputOutputViaGraphQlMetadata($attributes, $expected)
     {

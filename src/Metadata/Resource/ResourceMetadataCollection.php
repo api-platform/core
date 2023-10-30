@@ -33,7 +33,7 @@ final class ResourceMetadataCollection extends \ArrayObject
         parent::__construct($input);
     }
 
-    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
+    public function getOperation(string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
     {
         $operationName = $operationName ?? '';
         if (isset($this->operationCache[$operationName])) {

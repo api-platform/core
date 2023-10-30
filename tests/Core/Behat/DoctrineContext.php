@@ -207,8 +207,6 @@ final class DoctrineContext implements Context
      * Every scenario gets its own context instance.
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
-     *
-     * @param mixed $passwordHasher
      */
     public function __construct(ManagerRegistry $doctrine, $passwordHasher)
     {
@@ -339,8 +337,6 @@ final class DoctrineContext implements Context
 
     /**
      * @Given there are :nb fooDummy objects with fake names
-     *
-     * @param mixed $nb
      */
     public function thereAreFooDummyObjectsWithFakeNames($nb)
     {
@@ -1711,8 +1707,6 @@ final class DoctrineContext implements Context
 
     /**
      * @Given there are :nb DummyDtoCustom
-     *
-     * @param mixed $nb
      */
     public function thereAreNbDummyDtoCustom($nb)
     {

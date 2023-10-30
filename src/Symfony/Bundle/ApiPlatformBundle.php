@@ -36,9 +36,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 final class ApiPlatformBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

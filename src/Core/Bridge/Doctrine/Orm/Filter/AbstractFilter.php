@@ -44,7 +44,7 @@ abstract class AbstractFilter implements FilterInterface
     protected $properties;
     protected $nameConverter;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {
         if (null !== $requestStack) {
             @trigger_error(sprintf('Passing an instance of "%s" is deprecated since 2.2. Use "filters" context key instead.', RequestStack::class), \E_USER_DEPRECATED);
@@ -57,9 +57,6 @@ abstract class AbstractFilter implements FilterInterface
         $this->nameConverter = $nameConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/* , array $context = [] */)
     {
         @trigger_error(sprintf('Using "%s::apply()" is deprecated since 2.2. Use "%s::apply()" with the "filters" context key instead.', __CLASS__, AbstractContextAwareFilter::class), \E_USER_DEPRECATED);
@@ -75,8 +72,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Passes a property through the filter.
-     *
-     * @param mixed $value
      */
     abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/* , array $context = [] */);
 

@@ -30,8 +30,8 @@ final class TransformPaginationParametersListener
         $pageParameter = $request->query->all()['page'] ?? null;
 
         if (
-            !\is_array($pageParameter) ||
-            'jsonapi' !== $request->getRequestFormat()
+            !\is_array($pageParameter)
+            || 'jsonapi' !== $request->getRequestFormat()
         ) {
             return;
         }

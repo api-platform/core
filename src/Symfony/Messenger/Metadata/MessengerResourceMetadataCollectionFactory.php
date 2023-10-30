@@ -29,9 +29,6 @@ final class MessengerResourceMetadataCollectionFactory implements ResourceMetada
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);

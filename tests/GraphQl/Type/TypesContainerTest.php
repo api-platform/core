@@ -31,9 +31,6 @@ class TypesContainerTest extends TestCase
      */
     private $typesContainer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->typesContainer = new TypesContainer();

@@ -48,9 +48,6 @@ class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
         $this->existsParameterName = $existsParameterName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         foreach ($context['filters'][$this->existsParameterName] ?? [] as $property => $value) {
@@ -58,15 +55,12 @@ class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true) ||
-            !$this->isNullableField($property, $resourceClass)
+            !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass, true)
+            || !$this->isNullableField($property, $resourceClass)
         ) {
             return;
         }
@@ -85,9 +79,6 @@ class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
         $aggregationBuilder->match()->field($matchField)->{$value ? 'notEqual' : 'equals'}(null);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isNullableField(string $property, string $resourceClass): bool
     {
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);

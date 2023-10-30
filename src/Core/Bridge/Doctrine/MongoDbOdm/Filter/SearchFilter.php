@@ -62,15 +62,12 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         return $this->propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (
-            null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
+            null === $value
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
@@ -91,7 +88,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
         // prefixing the strategy with i makes it case insensitive
-        if (0 === strpos($strategy, 'i')) {
+        if (str_starts_with($strategy, 'i')) {
             $strategy = substr($strategy, 1);
             $caseSensitive = false;
         }
@@ -144,8 +141,6 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     /**
      * Add equality match stage according to the strategy.
-     *
-     * @param mixed $values
      */
     private function addEqualityMatchStrategy(string $strategy, Builder $aggregationBuilder, string $field, string $matchField, $values, bool $caseSensitive, ClassMetadata $metadata): void
     {
@@ -162,8 +157,6 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     /**
      * Get equality match value according to the strategy.
-     *
-     * @param mixed $value
      *
      * @throws InvalidArgumentException If strategy does not exist
      *
@@ -199,9 +192,6 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getType(string $doctrineType): string
     {
         switch ($doctrineType) {

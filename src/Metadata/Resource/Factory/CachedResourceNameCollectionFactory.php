@@ -36,9 +36,6 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): ResourceNameCollection
     {
         return $this->getCached(self::CACHE_KEY, function () {

@@ -20,18 +20,9 @@ namespace ApiPlatform\Core\DataPersister;
  */
 interface ContextAwareDataPersisterInterface extends DataPersisterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function supports($data, array $context = []): bool;
 
-    /**
-     * {@inheritdoc}
-     */
     public function persist($data, array $context = []);
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove($data, array $context = []);
 }

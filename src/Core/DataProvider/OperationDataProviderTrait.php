@@ -55,8 +55,6 @@ trait OperationDataProviderTrait
     /**
      * Gets data for an item operation.
      *
-     * @param mixed $identifiers
-     *
      * @return object|null
      */
     private function getItemData($identifiers, array $attributes, array $context)
@@ -66,8 +64,6 @@ trait OperationDataProviderTrait
 
     /**
      * Gets data for a nested operation.
-     *
-     * @param mixed $identifiers
      *
      * @throws RuntimeException
      *

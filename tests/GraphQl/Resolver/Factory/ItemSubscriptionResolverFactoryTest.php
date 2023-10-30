@@ -40,9 +40,6 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
     private $subscriptionManagerProphecy;
     private $mercureSubscriptionIriGeneratorProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->readStageProphecy = $this->prophesize(ReadStageInterface::class);

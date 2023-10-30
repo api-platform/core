@@ -24,10 +24,6 @@ interface ProcessorInterface
 {
     /**
      * Handle the state.
-     *
-     * @param mixed $data
-     *
-     * @return mixed
      */
     public function process($data, Operation $operation, array $uriVariables = [], array $context = []);
 }

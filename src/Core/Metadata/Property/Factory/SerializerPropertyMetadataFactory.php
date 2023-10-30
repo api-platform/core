@@ -43,9 +43,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
@@ -115,8 +112,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         if (
-            $type->isCollection() &&
-            $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+            $type->isCollection()
+            && $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
         ) {
             $relatedClass = $collectionValueType->getClassName();
         } else {

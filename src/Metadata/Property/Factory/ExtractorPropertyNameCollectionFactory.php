@@ -37,8 +37,6 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws InvalidArgumentException
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection

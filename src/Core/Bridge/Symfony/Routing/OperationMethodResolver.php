@@ -41,33 +41,21 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCollectionOperationMethod(string $resourceClass, string $operationName): string
     {
         return $this->getOperationMethod($resourceClass, $operationName, OperationType::COLLECTION);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItemOperationMethod(string $resourceClass, string $operationName): string
     {
         return $this->getOperationMethod($resourceClass, $operationName, OperationType::ITEM);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCollectionOperationRoute(string $resourceClass, string $operationName): Route
     {
         return $this->getOperationRoute($resourceClass, $operationName, OperationType::COLLECTION);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItemOperationRoute(string $resourceClass, string $operationName): Route
     {
         return $this->getOperationRoute($resourceClass, $operationName, OperationType::ITEM);

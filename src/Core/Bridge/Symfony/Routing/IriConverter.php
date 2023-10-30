@@ -39,8 +39,6 @@ use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionIn
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * {@inheritdoc}
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @deprecated Since Api Platform 2.7, use ApiPlatform\Symfony\Routing\IriConverter instead.
@@ -67,8 +65,6 @@ final class IriConverter implements IriConverterInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     public function getItemFromIri(string $iri, array $context = [])
@@ -114,9 +110,6 @@ final class IriConverter implements IriConverterInterface
         throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIriFromItem($item, int $referenceType = null): string
     {
         $resourceClass = $this->getResourceClass($item, true);
@@ -130,9 +123,6 @@ final class IriConverter implements IriConverterInterface
         return $this->getItemIriFromResourceClass($resourceClass, $identifiers, $this->getReferenceType($resourceClass, $referenceType));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIriFromResourceClass(string $resourceClass, int $referenceType = null): string
     {
         try {
@@ -142,9 +132,6 @@ final class IriConverter implements IriConverterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = null): string
     {
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
@@ -161,9 +148,6 @@ final class IriConverter implements IriConverterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubresourceIriFromResourceClass(string $resourceClass, array $context, int $referenceType = null): string
     {
         try {

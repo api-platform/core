@@ -43,7 +43,7 @@ if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidTy
          */
         private $number;
 
-        public function __construct(?Uuid $id = null)
+        public function __construct(Uuid $id = null)
         {
             $this->id = $id ?? Uuid::v4();
         }

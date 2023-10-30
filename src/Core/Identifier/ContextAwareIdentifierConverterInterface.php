@@ -20,8 +20,5 @@ namespace ApiPlatform\Core\Identifier;
  */
 interface ContextAwareIdentifierConverterInterface extends IdentifierConverterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function convert($data, string $class, array $context = []): array;
 }

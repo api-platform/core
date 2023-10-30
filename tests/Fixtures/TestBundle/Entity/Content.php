@@ -152,11 +152,6 @@ class Content implements \JsonSerializable
         return new ContentStatus($this->status);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {

@@ -37,9 +37,7 @@ class ItemNormalizer extends AbstractItemNormalizer
     private $logger;
 
     /**
-     * @param mixed                                             $propertyMetadataFactory
      * @param LegacyIriConverterInterface|IriConverterInterface $iriConverter
-     * @param mixed                                             $resourceClassResolver
      * @param mixed|null                                        $resourceMetadataFactory
      */
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, LoggerInterface $logger = null, iterable $dataTransformers = [], $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null, array $defaultContext = [])
@@ -50,11 +48,9 @@ class ItemNormalizer extends AbstractItemNormalizer
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @throws NotNormalizableValueException
-     *
-     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {

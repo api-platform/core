@@ -48,7 +48,7 @@ final class AttributeResource
      * @var ?Dummy
      */
     #[Link('dummyId')]
-    public $dummy = null;
+    public $dummy;
 
     /**
      * @var string

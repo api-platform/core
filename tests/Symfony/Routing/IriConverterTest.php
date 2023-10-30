@@ -32,7 +32,6 @@ use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Routing\IriConverter;
 use ApiPlatform\Symfony\Routing\SkolemIriConverter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Routing\RouterInterface;

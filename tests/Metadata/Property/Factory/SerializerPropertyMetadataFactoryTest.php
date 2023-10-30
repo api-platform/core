@@ -43,9 +43,6 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
 
     /**
      * @dataProvider groupsProvider
-     *
-     * @param mixed $readGroups
-     * @param mixed $writeGroups
      */
     public function testCreate($readGroups, $writeGroups)
     {

@@ -24,25 +24,16 @@ use Symfony\Component\Console\Input\InputInterface;
 
 final class MakeStateProcessor extends AbstractMaker
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getCommandName(): string
     {
         return 'make:state-processor';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getCommandDescription(): string
     {
         return 'Creates an API Platform state processor';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
@@ -50,16 +41,10 @@ final class MakeStateProcessor extends AbstractMaker
             ->setHelp(file_get_contents(__DIR__.'/Resources/help/MakeStateProcessor.txt'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureDependencies(DependencyBuilder $dependencies)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
         $stateProcessorClassNameDetails = $generator->createClassNameDetails(

@@ -34,25 +34,16 @@ final class MakeDataPersister extends AbstractMaker
         $this->resourceNameCollection = $resourceNameCollection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getCommandName(): string
     {
         return 'make:data-persister';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getCommandDescription(): string
     {
         return 'Creates an API Platform data persister';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
@@ -63,9 +54,6 @@ final class MakeDataPersister extends AbstractMaker
         $inputConfig->setArgumentAsNonInteractive('resource-class');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureDependencies(DependencyBuilder $dependencies)
     {
     }
@@ -86,9 +74,6 @@ final class MakeDataPersister extends AbstractMaker
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
         $dataPersisterClassNameDetails = $generator->createClassNameDetails(

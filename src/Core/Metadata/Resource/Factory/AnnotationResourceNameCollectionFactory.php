@@ -40,9 +40,6 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): ResourceNameCollection
     {
         $classes = [];
@@ -55,8 +52,8 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
 
         foreach (ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories($this->paths) as $className => $reflectionClass) {
             if (
-                (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(ApiResource::class)) ||
-                (null !== $this->reader && $this->reader->getClassAnnotation($reflectionClass, ApiResource::class))
+                (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(ApiResource::class))
+                || (null !== $this->reader && $this->reader->getClassAnnotation($reflectionClass, ApiResource::class))
             ) {
                 $classes[$className] = true;
             }

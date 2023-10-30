@@ -33,9 +33,6 @@ final class CachedSubresourceOperationFactory implements SubresourceOperationFac
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): array
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);

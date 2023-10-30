@@ -45,8 +45,6 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws RuntimeException
      */
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
@@ -91,9 +89,6 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         if ($context['graphql_operation_name'] ?? false) {
@@ -104,8 +99,6 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws RuntimeException
      */
     public function getResult(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])

@@ -76,9 +76,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(array $context = []): OpenApi
     {
         $baseUrl = $context[self::BASE_URL] ?? '/';
@@ -348,7 +345,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $path = substr($path, 0, -10);
         }
 
-        return 0 === strpos($path, '/') ? $path : '/'.$path;
+        return str_starts_with($path, '/') ? $path : '/'.$path;
     }
 
     private function getPathDescription(string $resourceShortName, string $method, string $operationType): string

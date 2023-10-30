@@ -28,7 +28,7 @@ final class LegacyComplexSubQueryFilter extends AbstractContextAwareFilter
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
-        ?string $operationName = null
+        string $operationName = null
     ) {
         if ('complex_sub_query_filter' !== $property) {
             return;

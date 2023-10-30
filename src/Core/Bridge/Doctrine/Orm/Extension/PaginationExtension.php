@@ -116,9 +116,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         $this->pagination = $pagination;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (null === $pagination = $this->getPagination($queryBuilder, $resourceClass, $operationName, $context)) {
@@ -132,9 +129,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             ->setMaxResults($limit);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         if ($context['graphql_operation_name'] ?? false) {
@@ -152,9 +146,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         return $this->isPaginationEnabled($request, $this->resourceMetadataFactory->create($resourceClass), $operationName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []): iterable
     {
         $query = $queryBuilder->getQuery();

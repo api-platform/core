@@ -25,7 +25,7 @@ final class Link
     private $compositeIdentifier;
     private $expandedValue;
 
-    public function __construct(?string $parameterName = null, ?string $fromProperty = null, ?string $toProperty = null, ?string $fromClass = null, ?string $toClass = null, ?array $identifiers = null, ?bool $compositeIdentifier = null, ?string $expandedValue = null)
+    public function __construct(string $parameterName = null, string $fromProperty = null, string $toProperty = null, string $fromClass = null, string $toClass = null, array $identifiers = null, bool $compositeIdentifier = null, string $expandedValue = null)
     {
         // For the inverse property shortcut
         if ($parameterName && class_exists($parameterName)) {

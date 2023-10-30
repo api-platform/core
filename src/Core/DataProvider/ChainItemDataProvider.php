@@ -32,9 +32,6 @@ final class ChainItemDataProvider implements ItemDataProviderInterface, Restrict
         $this->dataProviders = $dataProviders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         foreach ($this->dataProviders as $dataProvider) {

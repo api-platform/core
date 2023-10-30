@@ -72,8 +72,6 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws RuntimeException
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])

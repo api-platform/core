@@ -34,9 +34,6 @@ final class GroupFilter implements FilterInterface
         $this->whitelist = $whitelist;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(Request $request, bool $normalization, array $attributes, array &$context)
     {
         if (\array_key_exists($this->parameterName, $commonAttribute = $request->attributes->get('_api_filters', []))) {
@@ -60,9 +57,6 @@ final class GroupFilter implements FilterInterface
         $context[AbstractNormalizer::GROUPS] = $groups;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         return [

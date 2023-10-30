@@ -52,10 +52,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         $this->addDistinctFormat('jsonhal');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildSchema(string $className, string $format = 'jsonhal', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
+    public function buildSchema(string $className, string $format = 'jsonhal', string $type = Schema::TYPE_OUTPUT, Operation $operation = null, Schema $schema = null, array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         if ('jsonhal' !== $format) {

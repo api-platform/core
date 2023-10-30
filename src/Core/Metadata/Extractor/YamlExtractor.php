@@ -33,9 +33,6 @@ final class YamlExtractor extends AbstractResourceExtractor implements PropertyE
 {
     private $properties;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProperties(): array
     {
         if (null !== $this->properties) {
@@ -50,9 +47,6 @@ final class YamlExtractor extends AbstractResourceExtractor implements PropertyE
         return $this->properties;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractPath(string $path)
     {
         try {

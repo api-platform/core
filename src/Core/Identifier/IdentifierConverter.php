@@ -45,9 +45,6 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function convert($data, string $class, array $context = []): array
     {
         if (!\is_array($data)) {

@@ -22,8 +22,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 final class InitializeInputDataTransformer implements DataTransformerInitializerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     public function transform($object, string $to, array $context = [])
@@ -38,9 +36,6 @@ final class InitializeInputDataTransformer implements DataTransformerInitializer
         return $resourceObject;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function initialize(string $inputClass, array $context = [])
     {
         $currentResource = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? null;
@@ -54,9 +49,6 @@ final class InitializeInputDataTransformer implements DataTransformerInitializer
         return $dto;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsTransformation($data, string $to, array $context = []): bool
     {
         return (InitializeInput::class === $to || InitializeInputDocument::class === $to) && InitializeInputDto::class === ($context['input']['class'] ?? null);

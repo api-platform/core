@@ -17,9 +17,6 @@ use ApiPlatform\Exception\ErrorCodeSerializableInterface;
 
 class ErrorCodeSerializable extends \Exception implements ErrorCodeSerializableInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getErrorCode(): string
     {
         return '1234';

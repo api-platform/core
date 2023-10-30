@@ -37,9 +37,6 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
         $this->reflection = new Reflection();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
         $propertyNameCollection = null;
@@ -68,8 +65,8 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
         // Properties
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
             if (
-                (\PHP_VERSION_ID >= 80000 && $reflectionProperty->getAttributes(ApiProperty::class)) ||
-                (null !== $this->reader && null !== $this->reader->getPropertyAnnotation($reflectionProperty, ApiProperty::class))
+                (\PHP_VERSION_ID >= 80000 && $reflectionProperty->getAttributes(ApiProperty::class))
+                || (null !== $this->reader && null !== $this->reader->getPropertyAnnotation($reflectionProperty, ApiProperty::class))
             ) {
                 $propertyNames[$reflectionProperty->name] = $reflectionProperty->name;
             }
@@ -87,10 +84,10 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
             }
 
             if (
-                null !== $propertyName &&
-                (
-                    (\PHP_VERSION_ID >= 80000 && $reflectionMethod->getAttributes(ApiProperty::class)) ||
-                    (null !== $this->reader && null !== $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class))
+                null !== $propertyName
+                && (
+                    (\PHP_VERSION_ID >= 80000 && $reflectionMethod->getAttributes(ApiProperty::class))
+                    || (null !== $this->reader && null !== $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class))
                 )
             ) {
                 $propertyNames[$propertyName] = $propertyName;

@@ -29,9 +29,6 @@ use Symfony\Component\Validator\Constraints\Uuid;
  */
 class PropertySchemaFormat implements PropertySchemaRestrictionMetadataInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
         if ($constraint instanceof Email) {
@@ -65,9 +62,6 @@ class PropertySchemaFormat implements PropertySchemaRestrictionMetadataInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
         $schema = $propertyMetadata->getSchema();

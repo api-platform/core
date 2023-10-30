@@ -115,5 +115,6 @@ return (new PhpCsFixer\Config())
             ],
         ],
         'void_return' => false, // BC breaks; to be done in API Platform 3.0
+        'get_class_to_class_keyword' => false, // Breaks PHP<8.0
     ])
     ->setFinder($finder);

@@ -37,9 +37,6 @@ final class ChainSubresourceDataProvider implements SubresourceDataProviderInter
         $this->dataProviders = $dataProviders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
     {
         foreach ($this->dataProviders as $dataProvider) {

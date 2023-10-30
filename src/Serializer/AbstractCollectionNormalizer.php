@@ -15,10 +15,7 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -59,26 +56,19 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return static::FORMAT === $format && is_iterable($data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param iterable $object
+     * @param iterable   $object
+     * @param mixed|null $format
      *
      * @return array|string|int|float|bool|\ArrayObject|null
      */
@@ -103,7 +93,6 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      * Normalizes a raw collection (not API resources).
      *
      * @param string|null $format
-     * @param mixed       $object
      */
     protected function normalizeRawCollection($object, $format = null, array $context = []): array
     {

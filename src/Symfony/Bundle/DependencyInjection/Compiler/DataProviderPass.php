@@ -30,9 +30,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class DataProviderPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         foreach (OperationType::TYPES as $type) {

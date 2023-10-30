@@ -40,11 +40,6 @@ final class DateTimeType extends ScalarType implements TypeInterface
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function serialize($value)
     {
         // Already serialized.
@@ -60,11 +55,6 @@ final class DateTimeType extends ScalarType implements TypeInterface
         return $value->format(\DateTime::ATOM);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function parseValue($value)
     {
         if (!\is_string($value)) {
@@ -79,12 +69,7 @@ final class DateTimeType extends ScalarType implements TypeInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    public function parseLiteral(Node $valueNode, ?array $variables = null)
+    public function parseLiteral(Node $valueNode, array $variables = null)
     {
         if ($valueNode instanceof StringValueNode && false !== \DateTime::createFromFormat(\DateTime::ATOM, $valueNode->value)) {
             return $valueNode->value;

@@ -37,9 +37,6 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
@@ -106,8 +103,8 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
         $isCollection = $type->isCollection();
 
         if (
-            $isCollection &&
-            $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+            $isCollection
+            && $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
         ) {
             $resourceClass = $collectionValueType->getClassName();
         } else {

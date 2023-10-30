@@ -39,17 +39,11 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
         $this->serializePayloadFields = null === $serializePayloadFields ? null : array_flip($serializePayloadFields);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return static::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
@@ -69,11 +63,11 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
 
             $constraint = $violation instanceof ConstraintViolation ? $violation->getConstraint() : null;
             if (
-                [] !== $this->serializePayloadFields &&
-                $constraint &&
-                $constraint->payload &&
+                [] !== $this->serializePayloadFields
+                && $constraint
+                && $constraint->payload
                 // If some fields are whitelisted, only them are added
-                $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, $this->serializePayloadFields)
+                && $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, $this->serializePayloadFields)
             ) {
                 $violationData['payload'] = $payloadFields;
             }

@@ -26,9 +26,6 @@ class SerializableItemDataProvider implements ItemDataProviderInterface, Restric
 {
     use SerializerAwareDataProviderTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         return $this->getSerializer()->deserialize(<<<'JSON'
@@ -41,9 +38,6 @@ JSON
             , $resourceClass, 'json');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return SerializableResource::class === $resourceClass;

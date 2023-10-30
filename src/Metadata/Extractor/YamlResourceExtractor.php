@@ -36,9 +36,6 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
 {
     use ResourceExtractorTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractPath(string $path)
     {
         try {

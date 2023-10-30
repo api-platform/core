@@ -42,16 +42,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private $componentsCache = [];
     private $attributesMetadataCache = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @return array|string|int|float|bool|\ArrayObject|null
      */
@@ -94,9 +91,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return $metadata + $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
@@ -104,20 +98,15 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @throws LogicException
-     *
-     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         throw new LogicException(sprintf('%s is a read-only format.', self::FORMAT));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAttributes($object, $format = null, array $context = []): array
     {
         return $this->getComponents($object, $format, $context)['states'];
@@ -239,8 +228,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets the IRI of the given relation.
      *
-     * @param mixed $rel
-     *
      * @throws UnexpectedValueException
      */
     private function getRelationIri($rel): string
@@ -260,9 +247,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
     {
         if (
-            !($context[self::ENABLE_MAX_DEPTH] ?? false) ||
-            !isset($attributesMetadata[$attribute]) ||
-            null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
+            !($context[self::ENABLE_MAX_DEPTH] ?? false)
+            || !isset($attributesMetadata[$attribute])
+            || null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
         ) {
             return false;
         }

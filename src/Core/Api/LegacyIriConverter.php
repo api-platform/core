@@ -39,10 +39,7 @@ final class LegacyIriConverter implements IriConverterInterface
         $this->iriConverter = $iriConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null)
+    public function getResourceFromIri(string $iri, array $context = [], Operation $operation = null)
     {
         if (null === $this->iriConverter) {
             return $this->legacyIriConverter->getItemFromIri($iri, $context);
@@ -59,17 +56,13 @@ final class LegacyIriConverter implements IriConverterInterface
         return $this->legacyIriConverter->getItemFromIri($iri, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
         if (null === $this->iriConverter) {
             if ($identifiers = ($context['uri_variables'] ?? null)) {
                 try {
                     return $this->legacyIriConverter->getItemIriFromResourceClass($item, $identifiers, $referenceType);
-                }
-                catch (InvalidArgumentException $e) {
+                } catch (InvalidArgumentException $e) {
                 }
             }
 

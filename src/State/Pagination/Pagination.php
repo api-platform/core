@@ -180,7 +180,7 @@ final class Pagination
     /**
      * Is the pagination enabled for GraphQL?
      */
-    public function isGraphQlEnabled(?Operation $operation = null, array $context = []): bool
+    public function isGraphQlEnabled(Operation $operation = null, array $context = []): bool
     {
         return $this->getGraphQlEnabled($operation);
     }

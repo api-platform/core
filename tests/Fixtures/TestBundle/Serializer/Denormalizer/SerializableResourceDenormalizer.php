@@ -21,11 +21,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 class SerializableResourceDenormalizer implements DenormalizerInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $resource = new $class();
@@ -36,9 +31,6 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
         return $resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, $type, $format = null): bool
     {
         return 'json' === $format && SerializableResource::class === $type && \is_array($data);

@@ -35,8 +35,6 @@ final class ExtractorResourceNameCollectionFactory implements ResourceNameCollec
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws InvalidArgumentException
      */
     public function create(): ResourceNameCollection

@@ -35,7 +35,7 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
     private $defaultDirection;
     private $nameConverter;
 
-    public function __construct($propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?string $defaultDirection = null)
+    public function __construct($propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, NameConverterInterface $nameConverter = null, string $defaultDirection = null)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
@@ -43,16 +43,13 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
         $this->defaultDirection = $defaultDirection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToCollection(array $requestBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
+    public function applyToCollection(array $requestBody, string $resourceClass, Operation $operation = null, array $context = []): array
     {
         $orders = [];
 
         if (
-            $operation &&
-            null !== ($defaultOrder = $operation->getOrder())
+            $operation
+            && null !== ($defaultOrder = $operation->getOrder())
             && \is_array($defaultOrder)
         ) {
             foreach ($defaultOrder as $property => $direction) {

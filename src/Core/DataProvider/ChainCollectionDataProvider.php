@@ -32,9 +32,6 @@ final class ChainCollectionDataProvider implements ContextAwareCollectionDataPro
         $this->dataProviders = $dataProviders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         foreach ($this->dataProviders as $dataProvider) {

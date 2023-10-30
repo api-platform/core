@@ -37,9 +37,9 @@ final class TransformSortingParametersListener
         $orderParameter = $request->query->all()['sort'] ?? null;
 
         if (
-            null === $orderParameter ||
-            \is_array($orderParameter) ||
-            'jsonapi' !== $request->getRequestFormat()
+            null === $orderParameter
+            || \is_array($orderParameter)
+            || 'jsonapi' !== $request->getRequestFormat()
         ) {
             return;
         }

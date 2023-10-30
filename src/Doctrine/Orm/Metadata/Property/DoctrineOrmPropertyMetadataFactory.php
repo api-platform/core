@@ -34,9 +34,6 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);

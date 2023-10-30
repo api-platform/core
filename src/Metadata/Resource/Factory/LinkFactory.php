@@ -35,9 +35,6 @@ final class LinkFactory implements LinkFactoryInterface
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createLinksFromIdentifiers($operation): array
     {
         $identifiers = $this->getIdentifiersFromResourceClass($resourceClass = $operation->getClass());
@@ -57,9 +54,6 @@ final class LinkFactory implements LinkFactoryInterface
         return [$link->withParameterName($parameterName)];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createLinksFromRelations($operation): array
     {
         $links = [];
@@ -78,9 +72,6 @@ final class LinkFactory implements LinkFactoryInterface
         return $links;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createLinksFromAttributes($operation): array
     {
         if (\PHP_VERSION_ID < 80000) {
@@ -112,9 +103,6 @@ final class LinkFactory implements LinkFactoryInterface
         return $links;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function completeLink(Link $link): Link
     {
         if (!$link->getIdentifiers()) {

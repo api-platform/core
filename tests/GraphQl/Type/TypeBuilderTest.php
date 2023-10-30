@@ -59,9 +59,6 @@ class TypeBuilderTest extends TestCase
     /** @var TypeBuilder */
     private $typeBuilder;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);

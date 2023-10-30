@@ -137,9 +137,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         if (!\is_object($data) || is_iterable($data)) {
@@ -154,16 +151,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $this->resourceClassResolver->isResourceClass($class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @throws LogicException
      *
@@ -257,7 +251,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @return bool
      */
@@ -270,11 +264,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $this->localCache[$type] ?? $this->localCache[$type] = $this->resourceClassResolver->isResourceClass($type);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $resourceClass = $class;
@@ -405,8 +394,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Method copy-pasted from symfony/serializer.
      * Remove it after symfony/serializer version update @see https://github.com/symfony/symfony/pull/28263.
      *
-     * {@inheritdoc}
-     *
      * @internal
      *
      * @return object
@@ -483,9 +470,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $mappedClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createConstructorArgument($parameterData, string $key, \ReflectionParameter $constructorParameter, array &$context, string $format = null)
     {
         return $this->createAttributeValue($constructorParameter->name, $parameterData, $format, $context);
@@ -504,8 +488,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array|bool
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
@@ -523,10 +505,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
 
             if (
-                $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
-                (
-                    isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
-                    isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
+                $this->isAllowedAttribute($classOrObject, $propertyName, null, $context)
+                && (
+                    isset($context['api_normalize']) && $propertyMetadata->isReadable()
+                    || isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
                 )
             ) {
                 $allowedAttributes[] = $propertyName;
@@ -537,7 +519,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @return bool
      */
@@ -596,9 +578,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
         $this->setValue($object, $attribute, $this->createAttributeValue($attribute, $value, $format, $context));
@@ -607,14 +586,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Validates the type of the value. Allows using integers as floats for JSON formats.
      *
-     * @param mixed $value
-     *
      * @throws InvalidArgumentException
      */
     protected function validateType(string $attribute, Type $type, $value, string $format = null)
     {
         $builtinType = $type->getBuiltinType();
-        if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && false !== strpos($format, 'json')) {
+        if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && str_contains($format, 'json')) {
             $isValid = \is_float($value) || \is_int($value);
         } else {
             $isValid = \call_user_func('is_'.$builtinType, $value);
@@ -629,7 +606,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Denormalizes a collection of objects.
      *
      * @param ApiProperty|PropertyMetadata $propertyMetadata
-     * @param mixed                        $value
      *
      * @throws InvalidArgumentException
      */
@@ -659,7 +635,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Denormalizes a relation.
      *
      * @param ApiProperty|PropertyMetadata $propertyMetadata
-     * @param mixed                        $value
      *
      * @throws LogicException
      * @throws UnexpectedValueException
@@ -771,12 +746,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @throws UnexpectedValueException
      * @throws LogicException
-     *
-     * @return mixed
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
@@ -805,11 +778,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
 
         if (
-            $type &&
-            $type->isCollection() &&
-            ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) &&
-            ($className = $collectionValueType->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $type
+            && $type->isCollection()
+            && ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType())
+            && ($className = $collectionValueType->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             if (!is_iterable($attributeValue)) {
                 throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
@@ -822,9 +795,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $type &&
-            ($className = $type->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $type
+            && ($className = $type->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             if (!\is_object($attributeValue) && null !== $attributeValue) {
                 throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
@@ -940,8 +913,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * For a given resource, it returns an output representation if any
      * If not, the resource is returned.
-     *
-     * @param mixed $object
      */
     protected function transformOutput($object, array $context = [], string $outputClass = null)
     {
@@ -976,10 +947,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $type->isCollection() &&
-            null !== $collectionValueType &&
-            null !== ($className = $collectionValueType->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $type->isCollection()
+            && null !== $collectionValueType
+            && null !== ($className = $collectionValueType->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $context['resource_class'] = $resourceClass;
@@ -988,8 +959,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            null !== ($className = $type->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            null !== ($className = $type->getClassName())
+            && $this->resourceClassResolver->isResourceClass($className)
         ) {
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
@@ -998,9 +969,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $type->isCollection() &&
-            null !== $collectionValueType &&
-            null !== ($className = $collectionValueType->getClassName())
+            $type->isCollection()
+            && null !== $collectionValueType
+            && null !== ($className = $collectionValueType->getClassName())
         ) {
             if (!$this->serializer instanceof DenormalizerInterface) {
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
@@ -1079,7 +1050,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Sets a value of the object using the PropertyAccess component.
      *
      * @param object $object
-     * @param mixed  $value
      */
     private function setValue($object, string $attributeName, $value)
     {

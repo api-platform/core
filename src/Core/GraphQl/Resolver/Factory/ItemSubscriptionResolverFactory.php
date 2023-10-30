@@ -52,7 +52,7 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
         $this->mercureSubscriptionIriGenerator = $mercureSubscriptionIriGenerator;
     }
 
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
+    public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
             if (null === $resourceClass || null === $operationName) {

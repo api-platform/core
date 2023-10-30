@@ -30,9 +30,6 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function process($data, Operation $operation = null, array $uriVariables = [], array $context = [])
     {
         $isOrm = true;
@@ -52,10 +49,7 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
         return $output;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports($data, array $identifiers = [], string $operationName = null, array $context = []): bool
     {
         return $data instanceof InputDto || $data instanceof InputDtoDocument;
     }

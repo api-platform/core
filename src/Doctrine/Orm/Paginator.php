@@ -28,9 +28,6 @@ final class Paginator extends AbstractPaginator implements PaginatorInterface, Q
      */
     private $totalItems;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLastPage(): float
     {
         if (0 >= $this->maxResults) {
@@ -40,17 +37,11 @@ final class Paginator extends AbstractPaginator implements PaginatorInterface, Q
         return ceil($this->getTotalItems() / $this->maxResults) ?: 1.;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTotalItems(): float
     {
         return (float) ($this->totalItems ?? $this->totalItems = \count($this->paginator));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getQuery(): Query
     {
         return $this->paginator->getQuery();

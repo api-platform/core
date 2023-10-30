@@ -26,9 +26,6 @@ trait DateFilterTrait
 {
     use PropertyHelperTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         $description = [];

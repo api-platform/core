@@ -24,9 +24,6 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter;
  */
 final class MatchFilter extends AbstractSearchFilter
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getQuery(string $property, array $values, ?string $nestedPath): array
     {
         $matches = [];

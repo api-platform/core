@@ -554,7 +554,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
         );
     }
 
-    protected function buildFilter(?array $properties = null)
+    protected function buildFilter(array $properties = null)
     {
         return new $this->filterClass($this->managerRegistry, 'order', null, $properties, new CustomConverter());
     }

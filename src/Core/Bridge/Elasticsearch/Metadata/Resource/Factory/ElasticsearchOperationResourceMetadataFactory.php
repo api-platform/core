@@ -32,9 +32,6 @@ final class ElasticsearchOperationResourceMetadataFactory implements ResourceMet
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadata
     {
         $resourceMetadata = $this->decorated->create($resourceClass);

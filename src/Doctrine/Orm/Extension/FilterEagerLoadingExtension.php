@@ -38,9 +38,6 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, Operation $operation = null, array $context = []): void
     {
         if (null === $resourceClass) {

@@ -41,9 +41,6 @@ final class AnnotationFilterPass implements CompilerPassInterface
      */
     private $reader;
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container): void
     {
         $resourceClassDirectories = $container->getParameter('api_platform.resource_class_directories');

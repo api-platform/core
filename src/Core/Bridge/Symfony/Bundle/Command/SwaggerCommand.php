@@ -63,9 +63,6 @@ final class SwaggerCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -76,9 +73,6 @@ final class SwaggerCommand extends Command
             ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'API Gateway compatibility');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

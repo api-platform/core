@@ -102,8 +102,6 @@ class Answer
 
     /**
      * Set question.
-     *
-     * @param Question $question
      */
     public function setQuestion(Question $question = null): self
     {

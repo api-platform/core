@@ -73,9 +73,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class ApiPlatformExtension extends Extension implements PrependExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function prepend(ContainerBuilder $container): void
     {
         if (isset($container->getExtensions()['framework'])) {
@@ -92,9 +89,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -280,7 +274,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $paginationOptions = [];
 
         foreach ($defaults as $key => $value) {
-            if (0 !== strpos($key, 'pagination_')) {
+            if (!str_starts_with($key, 'pagination_')) {
                 continue;
             }
 

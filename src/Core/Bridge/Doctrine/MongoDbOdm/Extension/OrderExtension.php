@@ -46,9 +46,6 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         // Do not apply order if already defined on $aggregationBuilder

@@ -29,9 +29,6 @@ final class InputOutputResourceMetadataFactory implements ResourceMetadataFactor
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadata
     {
         $resourceMetadata = $this->decorated->create($resourceClass);

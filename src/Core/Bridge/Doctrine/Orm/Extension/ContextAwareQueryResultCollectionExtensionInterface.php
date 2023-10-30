@@ -22,13 +22,7 @@ use Doctrine\ORM\QueryBuilder;
  */
 interface ContextAwareQueryResultCollectionExtensionInterface extends QueryResultCollectionExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []);
 }

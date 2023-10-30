@@ -59,8 +59,6 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws RuntimeException
      */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable

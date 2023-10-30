@@ -61,9 +61,6 @@ class OrderFilter extends AbstractFilter implements OrderFilterInterface
         $this->orderParameterName = $orderParameterName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
@@ -81,9 +78,6 @@ class OrderFilter extends AbstractFilter implements OrderFilterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $direction, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {

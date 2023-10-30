@@ -35,9 +35,6 @@ class SecurityStageTest extends TestCase
     private $securityStage;
     private $resourceAccessCheckerProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);

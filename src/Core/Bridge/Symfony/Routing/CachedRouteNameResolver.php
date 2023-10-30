@@ -17,8 +17,6 @@ use ApiPlatform\Util\CachedTrait;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * {@inheritdoc}
- *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
 final class CachedRouteNameResolver implements RouteNameResolverInterface
@@ -35,9 +33,6 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRouteName(string $resourceClass, $operationType /* , array $context = [] */): string
     {
         $context = \func_num_args() > 2 ? func_get_arg(2) : [];

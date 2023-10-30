@@ -44,8 +44,6 @@ final class DataTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     public function transform($object, string $to, array $context = [])
@@ -53,15 +51,11 @@ final class DataTransformer implements DataTransformerInterface
         return $object;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsTransformation($data, string $to, array $context = []): bool
     {
         if (
             \is_object($data) // data is not normalized yet, it should be an array
-            ||
-            null === ($context['input']['class'] ?? null)
+            || null === ($context['input']['class'] ?? null)
         ) {
             return false;
         }

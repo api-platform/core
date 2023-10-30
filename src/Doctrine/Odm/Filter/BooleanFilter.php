@@ -42,15 +42,12 @@ class BooleanFilter extends AbstractFilter
         MongoDbType::BOOLEAN => true,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isBooleanField($property, $resourceClass)
+            !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
+            || !$this->isBooleanField($property, $resourceClass)
         ) {
             return;
         }

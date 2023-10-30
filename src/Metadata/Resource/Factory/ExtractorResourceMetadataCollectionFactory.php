@@ -51,9 +51,6 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         $this->logger = $logger ?? new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = new ResourceMetadataCollection($resourceClass);
@@ -189,7 +186,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
     {
         // Inherit from resource defaults
         foreach (get_class_methods($resource) as $methodName) {
-            if (0 !== strpos($methodName, 'get')) {
+            if (!str_starts_with($methodName, 'get')) {
                 continue;
             }
 

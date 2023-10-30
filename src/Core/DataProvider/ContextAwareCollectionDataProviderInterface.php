@@ -20,8 +20,5 @@ namespace ApiPlatform\Core\DataProvider;
  */
 interface ContextAwareCollectionDataProviderInterface extends CollectionDataProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []);
 }

@@ -63,15 +63,12 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         return $this->propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
-            null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
+            null === $value
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
@@ -93,7 +90,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
         // prefixing the strategy with i makes it case insensitive
-        if (0 === strpos($strategy, 'i')) {
+        if (str_starts_with($strategy, 'i')) {
             $strategy = substr($strategy, 1);
             $caseSensitive = false;
         }
@@ -153,8 +150,6 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
     /**
      * Adds where clause according to the strategy.
-     *
-     * @param mixed $values
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
@@ -242,9 +237,6 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         };
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getType(string $doctrineType): string
     {
         switch ($doctrineType) {

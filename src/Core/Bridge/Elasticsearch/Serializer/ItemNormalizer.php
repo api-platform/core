@@ -42,19 +42,11 @@ final class ItemNormalizer extends ObjectNormalizer
         $this->identifierExtractor = $identifierExtractor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, $type, $format = null): bool
     {
         return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (\is_string($data['_id'] ?? null) && \is_array($data['_source'] ?? null)) {
@@ -64,9 +56,6 @@ final class ItemNormalizer extends ObjectNormalizer
         return parent::denormalize($data, $class, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null): bool
     {
         // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
@@ -74,11 +63,9 @@ final class ItemNormalizer extends ObjectNormalizer
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|null $format
      *
      * @throws LogicException
-     *
-     * @return mixed
      */
     public function normalize($object, $format = null, array $context = [])
     {

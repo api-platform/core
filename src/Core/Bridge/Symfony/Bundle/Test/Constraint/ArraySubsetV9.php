@@ -24,9 +24,6 @@ final class ArraySubsetV9 extends Constraint
 {
     use ArraySubsetTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
     {
         return $this->_evaluate($other, $description, $returnResult);

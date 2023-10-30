@@ -42,9 +42,6 @@ final class SerializeStage implements SerializeStageInterface
         $this->pagination = $pagination;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($itemOrCollection, string $resourceClass, Operation $operation, array $context): ?array
     {
         // TODO: replace by $operation->isCollection and $operation instanceof CollectionOperationInterface

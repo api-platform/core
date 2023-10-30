@@ -24,8 +24,6 @@ use Symfony\Component\Validator\Constraints\LessThan;
 final class PropertySchemaLessThanRestriction implements PropertySchemaRestrictionMetadataInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @param LessThan $constraint
      */
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
@@ -36,9 +34,6 @@ final class PropertySchemaLessThanRestriction implements PropertySchemaRestricti
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
     {
         return $constraint instanceof LessThan && is_numeric($constraint->value) && null !== ($type = $propertyMetadata->getType() ?? null) && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true);

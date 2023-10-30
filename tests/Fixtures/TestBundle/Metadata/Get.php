@@ -18,9 +18,6 @@ use ApiPlatform\Metadata\HttpOperation;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Get extends HttpOperation
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(...$args)
     {
         parent::__construct(self::METHOD_GET, ...$args);

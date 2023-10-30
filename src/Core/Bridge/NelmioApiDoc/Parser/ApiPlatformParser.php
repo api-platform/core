@@ -62,9 +62,6 @@ if (interface_exists(ParserInterface::class)) {
             $this->nameConverter = $nameConverter;
         }
 
-        /**
-         * {@inheritdoc}
-         */
         public function supports(array $item)
         {
             $data = explode(':', $item['class'], 3);
@@ -86,9 +83,6 @@ if (interface_exists(ParserInterface::class)) {
             return false;
         }
 
-        /**
-         * {@inheritdoc}
-         */
         public function parse(array $item): array
         {
             [$io, $resourceClass, $operationName] = explode(':', $item['class'], 3);
@@ -179,8 +173,8 @@ if (interface_exists(ParserInterface::class)) {
             foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
                 if (
-                    ($propertyMetadata->isReadable() && self::OUT_PREFIX === $io) ||
-                    ($propertyMetadata->isWritable() && self::IN_PREFIX === $io)
+                    ($propertyMetadata->isReadable() && self::OUT_PREFIX === $io)
+                    || ($propertyMetadata->isWritable() && self::IN_PREFIX === $io)
                 ) {
                     $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass) : $propertyName;
                     $data[$normalizedPropertyName] = $this->parseProperty($resourceMetadata, $propertyMetadata, $io, null, $visited);
@@ -256,8 +250,8 @@ if (interface_exists(ParserInterface::class)) {
                 }
 
                 if (
-                    (self::OUT_PREFIX === $io && true !== $propertyMetadata->isReadableLink()) ||
-                    (self::IN_PREFIX === $io && true !== $propertyMetadata->isWritableLink())
+                    (self::OUT_PREFIX === $io && true !== $propertyMetadata->isReadableLink())
+                    || (self::IN_PREFIX === $io && true !== $propertyMetadata->isWritableLink())
                 ) {
                     $data['dataType'] = self::TYPE_IRI;
                     $data['actualType'] = DataTypes::STRING;

@@ -80,9 +80,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $this->nestingSeparator = $nestingSeparator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNodeQueryFields(): array
     {
         return [
@@ -94,9 +91,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItemQueryFields(string $resourceClass, Operation $operation, array $configuration): array
     {
         $fieldName = lcfirst('item_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
@@ -111,9 +105,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCollectionQueryFields(string $resourceClass, Operation $operation, array $configuration): array
     {
         $fieldName = lcfirst('collection_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
@@ -128,9 +119,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMutationFields(string $resourceClass, Operation $operation): array
     {
         $mutationFields = [];
@@ -146,9 +134,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $mutationFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubscriptionFields(string $resourceClass, Operation $operation): array
     {
         $subscriptionFields = [];
@@ -174,10 +159,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $subscriptionFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, ?array $ioMetadata = null): array
+    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, array $ioMetadata = null): array
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
@@ -250,9 +232,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveResourceArgs(array $args, Operation $operation): array
     {
         foreach ($args as $id => $arg) {
@@ -277,8 +256,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
             $isCollectionType = $this->typeBuilder->isCollection($type);
 
             if (
-                $isCollectionType &&
-                $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+                $isCollectionType
+                && $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
             ) {
                 $resourceClass = $collectionValueType->getClassName();
             } else {
@@ -399,7 +378,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $args;
     }
 
-    private function getFilterArgs(array $args, ?string $resourceClass, string $rootResource, Operation $rootOperation, ?string $property, int $depth, ?AbstractOperation $operation = null): array
+    private function getFilterArgs(array $args, ?string $resourceClass, string $rootResource, Operation $rootOperation, ?string $property, int $depth, AbstractOperation $operation = null): array
     {
         if (null === $operation || null === $resourceClass) {
             return $args;
@@ -439,7 +418,6 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
     /**
      * @param AbstractOperation|null $operation
-     * @param mixed                  $original
      */
     private function mergeFilterArgs(array $args, array $parsed, $operation = null, $original = ''): array
     {

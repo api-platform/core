@@ -29,15 +29,12 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
 {
     use RangeFilterTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (
-            !\is_array($values) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass)
+            !\is_array($values)
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }

@@ -18,9 +18,6 @@ use ApiPlatform\State\ProcessorInterface;
 
 class CarProcessor implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $data->id = (string) random_int(1, 10);

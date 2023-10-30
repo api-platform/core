@@ -27,15 +27,12 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
 {
     use RangeFilterTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
-            !\is_array($values) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass)
+            !\is_array($values)
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }

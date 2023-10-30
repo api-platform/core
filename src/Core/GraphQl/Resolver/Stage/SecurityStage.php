@@ -35,9 +35,6 @@ final class SecurityStage implements SecurityStageInterface
         $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(string $resourceClass, string $operationName, array $context): void
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);

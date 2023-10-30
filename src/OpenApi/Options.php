@@ -33,7 +33,7 @@ final class Options
     private $licenseName;
     private $licenseUrl;
 
-    public function __construct(string $title, string $description = '', string $version = '', bool $oAuthEnabled = false, ?string $oAuthType = null, ?string $oAuthFlow = null, ?string $oAuthTokenUrl = null, ?string $oAuthAuthorizationUrl = null, ?string $oAuthRefreshUrl = null, array $oAuthScopes = [], array $apiKeys = [], string $contactName = null, string $contactUrl = null, string $contactEmail = null, string $termsOfService = null, string $licenseName = null, string $licenseUrl = null)
+    public function __construct(string $title, string $description = '', string $version = '', bool $oAuthEnabled = false, string $oAuthType = null, string $oAuthFlow = null, string $oAuthTokenUrl = null, string $oAuthAuthorizationUrl = null, string $oAuthRefreshUrl = null, array $oAuthScopes = [], array $apiKeys = [], string $contactName = null, string $contactUrl = null, string $contactEmail = null, string $termsOfService = null, string $licenseName = null, string $licenseUrl = null)
     {
         $this->title = $title;
         $this->description = $description;

@@ -42,16 +42,13 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
 {
     use ExistsFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, NameConverterInterface $nameConverter = null)
     {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
 
         $this->existsParameterName = $existsParameterName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (!\is_array($context['filters'][$this->existsParameterName] ?? null)) {
@@ -66,9 +63,6 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/* , array $context = [] */)
     {
         if (\func_num_args() > 6) {
@@ -84,10 +78,10 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
         }
 
         if (
-            (($context['exists_deprecated_syntax'] ?? false) && !isset($value[self::QUERY_PARAMETER_KEY])) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true) ||
-            !$this->isNullableField($property, $resourceClass)
+            (($context['exists_deprecated_syntax'] ?? false) && !isset($value[self::QUERY_PARAMETER_KEY]))
+            || !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass, true)
+            || !$this->isNullableField($property, $resourceClass)
         ) {
             return;
         }
@@ -135,9 +129,6 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isNullableField(string $property, string $resourceClass): bool
     {
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
@@ -191,9 +182,6 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractProperties(Request $request/* , string $resourceClass */): array
     {
         if (!$request->query->has($this->existsParameterName)) {

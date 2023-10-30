@@ -43,9 +43,6 @@ final class OpenApiCommand extends Command
         $this->normalizer = $normalizer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -56,9 +53,6 @@ final class OpenApiCommand extends Command
             ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'Enable the Amazon API Gateway compatibility mode');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Backwards compatibility

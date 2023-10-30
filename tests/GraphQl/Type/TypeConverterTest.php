@@ -55,9 +55,6 @@ class TypeConverterTest extends TestCase
     /** @var TypeConverter */
     private $typeConverter;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->typeBuilderProphecy = $this->prophesize(TypeBuilderInterface::class);

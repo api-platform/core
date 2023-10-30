@@ -38,8 +38,6 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Collection $constraint
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
@@ -67,9 +65,6 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
         return $restriction;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
         return $constraint instanceof Collection;

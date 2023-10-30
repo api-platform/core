@@ -26,9 +26,9 @@ final class TestClientPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         if (
-            !class_exists(AbstractBrowser::class) ||
-            !trait_exists(HttpClientTrait::class) ||
-            !$container->hasParameter('test.client.parameters')
+            !class_exists(AbstractBrowser::class)
+            || !trait_exists(HttpClientTrait::class)
+            || !$container->hasParameter('test.client.parameters')
         ) {
             return;
         }

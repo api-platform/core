@@ -43,8 +43,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider resourceMetadataProvider
-     *
-     * @param mixed $expectedResourceMetadata
      */
     public function testXmlCreateResourceMetadata($expectedResourceMetadata)
     {
@@ -72,8 +70,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider optionalResourceMetadataProvider
-     *
-     * @param mixed $expectedResourceMetadata
      */
     public function testXmlOptionalResourceMetadata($expectedResourceMetadata)
     {
@@ -91,8 +87,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
      * @group legacy
      *
      * @dataProvider legacyOperationsResourceMetadataProvider
-     *
-     * @param mixed $expectedResourceMetadata
      */
     public function testLegacyOperationsResourceMetadata($expectedResourceMetadata)
     {
@@ -106,8 +100,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider noCollectionOperationsResourceMetadataProvider
-     *
-     * @param mixed $expectedResourceMetadata
      */
     public function testXmlNoCollectionOperationsResourceMetadata($expectedResourceMetadata)
     {
@@ -121,8 +113,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider noItemOperationsResourceMetadataProvider
-     *
-     * @param mixed $expectedResourceMetadata
      */
     public function testXmlNoItemOperationsResourceMetadata($expectedResourceMetadata)
     {
@@ -208,8 +198,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider optionalResourceMetadataProvider
-     *
-     * @param mixed $expectedResourceMetadata
      */
     public function testYamlOptionalResourceMetadata($expectedResourceMetadata)
     {

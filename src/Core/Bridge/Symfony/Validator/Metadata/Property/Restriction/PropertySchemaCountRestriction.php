@@ -23,8 +23,6 @@ use Symfony\Component\Validator\Constraints\Count;
 class PropertySchemaCountRestriction implements PropertySchemaRestrictionMetadataInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @param Count $constraint
      */
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
@@ -42,9 +40,6 @@ class PropertySchemaCountRestriction implements PropertySchemaRestrictionMetadat
         return $restriction;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
     {
         return $constraint instanceof Count;

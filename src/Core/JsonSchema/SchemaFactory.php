@@ -35,8 +35,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
- * {@inheritdoc}
- *
  * @experimental
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -59,9 +57,6 @@ final class SchemaFactory implements SchemaFactoryInterface
 
     /**
      * @param TypeFactoryInterface $typeFactory
-     * @param mixed                $resourceMetadataFactory
-     * @param mixed                $propertyNameCollectionFactory
-     * @param mixed                $propertyMetadataFactory
      */
     public function __construct($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
@@ -86,10 +81,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         $this->distinctFormats[$format] = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
+    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, string $operationType = null, string $operationName = null, Schema $schema = null, array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = $schema ? clone $schema : new Schema();
         if (null === $metadata = $this->getMetadata($className, $type, $operationType, $operationName, $serializerContext)) {
@@ -155,8 +147,8 @@ final class SchemaFactory implements SchemaFactoryInterface
         if (
             Schema::VERSION_SWAGGER !== $version
         ) {
-            if (($resourceMetadata instanceof ResourceMetadata &&
-                    ($operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true) : $resourceMetadata->getAttribute('deprecation_reason', null))
+            if (($resourceMetadata instanceof ResourceMetadata
+                    && ($operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true) : $resourceMetadata->getAttribute('deprecation_reason', null))
             ) || ($operation && $operation->getDeprecationReason())
             ) {
                 $definition['deprecated'] = true;
@@ -284,7 +276,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = $propertySchema;
     }
 
-    private function buildDefinitionName(string $className, string $format = 'json', ?string $inputOrOutputClass = null, $resourceMetadata = null, ?array $serializerContext = null): string
+    private function buildDefinitionName(string $className, string $format = 'json', string $inputOrOutputClass = null, $resourceMetadata = null, array $serializerContext = null): string
     {
         if ($resourceMetadata) {
             $prefix = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getShortName() : $resourceMetadata->getShortName();
@@ -321,7 +313,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         return preg_replace('/[^a-zA-Z0-9.\-_]/', '.', $name);
     }
 
-    private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?array $serializerContext = null): ?array
+    private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, string $operationType = null, string $operationName = null, array $serializerContext = null): ?array
     {
         if (!$this->isResourceClass($className)) {
             return [
@@ -362,7 +354,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         ];
     }
 
-    private function getSerializerContext($resourceMetadata, string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null): array
+    private function getSerializerContext($resourceMetadata, string $type = Schema::TYPE_OUTPUT, string $operationType = null, string $operationName = null): array
     {
         if ($resourceMetadata instanceof ResourceMetadata) {
             $attribute = Schema::TYPE_OUTPUT === $type ? 'normalization_context' : 'denormalization_context';
@@ -408,7 +400,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     /**
      * Gets the options for the property name collection / property metadata factories.
      */
-    private function getFactoryOptions(array $serializerContext, array $validationGroups, ?string $operationType, ?string $operationName, ?HttpOperation $operation = null): array
+    private function getFactoryOptions(array $serializerContext, array $validationGroups, ?string $operationType, ?string $operationName, HttpOperation $operation = null): array
     {
         $options = [
             /* @see https://github.com/symfony/symfony/blob/v5.1.0/src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php */

@@ -609,7 +609,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     {
         // Inherit from resource defaults
         foreach (get_class_methods($resource) as $methodName) {
-            if (0 !== strpos($methodName, 'get')) {
+            if (!str_starts_with($methodName, 'get')) {
                 continue;
             }
 

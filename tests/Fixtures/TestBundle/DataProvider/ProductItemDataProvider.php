@@ -31,17 +31,11 @@ class ProductItemDataProvider implements ItemDataProviderInterface, RestrictedDa
         $this->orm = $orm;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return is_a($resourceClass, ProductInterface::class, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         return $this->managerRegistry->getRepository($this->orm ? Product::class : ProductDocument::class)->findOneBy([

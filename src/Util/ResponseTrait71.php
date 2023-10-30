@@ -15,9 +15,6 @@ namespace ApiPlatform\Util;
 
 trait ResponseTrait71
 {
-    /**
-     * @return mixed
-     */
     public function getInfo(string $type = null)
     {
         if ($type) {

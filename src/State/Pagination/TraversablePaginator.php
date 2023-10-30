@@ -28,17 +28,11 @@ final class TraversablePaginator implements \IteratorAggregate, PaginatorInterfa
         $this->totalItems = $totalItems;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCurrentPage(): float
     {
         return $this->currentPage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLastPage(): float
     {
         if (0. >= $this->itemsPerPage) {
@@ -48,25 +42,16 @@ final class TraversablePaginator implements \IteratorAggregate, PaginatorInterfa
         return max(ceil($this->totalItems / $this->itemsPerPage) ?: 1., 1.);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItemsPerPage(): float
     {
         return $this->itemsPerPage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTotalItems(): float
     {
         return $this->totalItems;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         if ($this->getCurrentPage() < $this->getLastPage()) {
@@ -80,9 +65,6 @@ final class TraversablePaginator implements \IteratorAggregate, PaginatorInterfa
         return $this->totalItems % $this->itemsPerPage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         return $this->traversable;

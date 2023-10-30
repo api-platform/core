@@ -22,8 +22,6 @@ use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * {@inheritdoc}
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class TypeFactory implements TypeFactoryInterface
@@ -42,18 +40,13 @@ final class TypeFactory implements TypeFactoryInterface
 
     /**
      * SchemaFactoryInterface|LegacySchemaFactoryInterface.
-     *
-     * @param mixed $schemaFactory
      */
     public function setSchemaFactory($schemaFactory): void
     {
         $this->schemaFactory = $schemaFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
+    public function getType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array
     {
         if ($type->isCollection()) {
             $keyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
@@ -75,7 +68,7 @@ final class TypeFactory implements TypeFactoryInterface
         return $this->addNullabilityToTypeDefinition($this->makeBasicType($type, $format, $readableLink, $serializerContext, $schema), $type, $schema);
     }
 
-    private function makeBasicType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
+    private function makeBasicType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array
     {
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_INT:

@@ -56,9 +56,6 @@ final class ReadStage implements ReadStageInterface
         $this->nestingSeparator = $nestingSeparator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(?string $resourceClass, ?string $rootClass, string $operationName, array $context)
     {
         $resourceMetadata = $resourceClass ? $this->resourceMetadataFactory->create($resourceClass) : null;

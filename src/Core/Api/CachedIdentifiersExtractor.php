@@ -20,8 +20,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * {@inheritdoc}
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
@@ -48,9 +46,6 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIdentifiersFromResourceClass(string $resourceClass): array
     {
         if (isset($this->localResourceCache[$resourceClass])) {
@@ -60,9 +55,6 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
         return $this->localResourceCache[$resourceClass] = $this->decorated->getIdentifiersFromResourceClass($resourceClass);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIdentifiersFromItem($item): array
     {
         $keys = $this->getKeys($item, function ($item) use (&$identifiers) {

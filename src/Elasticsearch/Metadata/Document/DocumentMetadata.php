@@ -29,7 +29,7 @@ final class DocumentMetadata
     private $index;
     private $type;
 
-    public function __construct(?string $index = null, string $type = self::DEFAULT_TYPE)
+    public function __construct(string $index = null, string $type = self::DEFAULT_TYPE)
     {
         $this->index = $index;
         $this->type = $type;

@@ -39,9 +39,6 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
     {
         if (null === $resourceClass) {

@@ -33,9 +33,6 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         if (null === $this->decorated) {

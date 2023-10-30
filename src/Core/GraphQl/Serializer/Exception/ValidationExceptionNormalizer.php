@@ -37,9 +37,6 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
         $this->exceptionToStatus = $exceptionToStatus;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize($object, $format = null, array $context = []): array
     {
         /** @var ValidationException */
@@ -72,9 +69,6 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
         return $error;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof Error && $data->getPrevious() instanceof ValidationException;

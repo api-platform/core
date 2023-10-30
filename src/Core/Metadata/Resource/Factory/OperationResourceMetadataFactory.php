@@ -49,9 +49,6 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         $this->patchFormats = $patchFormats;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadata
     {
         $resourceMetadata = $this->decorated->create($resourceClass);

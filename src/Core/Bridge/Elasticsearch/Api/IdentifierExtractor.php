@@ -17,8 +17,6 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Elasticsearch\Exception\NonUniqueIdentifierException;
 
 /**
- * {@inheritdoc}
- *
  * @experimental
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
@@ -32,9 +30,6 @@ final class IdentifierExtractor implements IdentifierExtractorInterface
         $this->identifiersExtractor = $identifiersExtractor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIdentifierFromResourceClass(string $resourceClass): string
     {
         $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass);

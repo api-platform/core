@@ -77,9 +77,6 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_URL): array
     {
         return [
@@ -88,9 +85,6 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntrypointContext(int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
         $context = $this->getBaseContext($referenceType);
@@ -114,9 +108,6 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         return $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
         // TODO: Remove in 3.0
@@ -151,9 +142,6 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName, $operation);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResourceContextUri(string $resourceClass, int $referenceType = null): string
     {
         // TODO: remove in 3.0
@@ -174,9 +162,6 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], $referenceType);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
         $outputClass = $this->getObjectClass($object);
@@ -224,7 +209,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         return $jsonLdContext;
     }
 
-    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?HttpOperation $operation = null): array
+    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, HttpOperation $operation = null): array
     {
         $context = $this->getBaseContext($referenceType);
         if ($this->propertyMetadataFactory instanceof LegacyPropertyMetadataFactoryInterface) {

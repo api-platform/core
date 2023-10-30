@@ -36,7 +36,6 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
 
     /**
      * @param iterable<UriVariableTransformerInterface> $uriVariableTransformers
-     * @param mixed                                     $propertyMetadataFactory
      */
     public function __construct($propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, iterable $uriVariableTransformers)
     {
@@ -45,13 +44,10 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function convert(array $uriVariables, string $class, array $context = []): array
     {
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($class)->getOperation();
-        $context = $context + ['operation' => $operation];
+        $context += ['operation' => $operation];
         $uriVariablesDefinitions = $operation->getUriVariables() ?? [];
 
         foreach ($uriVariables as $parameterName => $value) {

@@ -50,11 +50,11 @@ final class TransformFieldsetsParametersListener
         $fieldsParameter = $queryParameters['fields'] ?? null;
 
         if (
-            (!$fieldsParameter && !$includeParameter) ||
-            ($fieldsParameter && !\is_array($fieldsParameter)) ||
-            (!\is_string($includeParameter)) ||
-            'jsonapi' !== $request->getRequestFormat() ||
-            !($resourceClass = $request->attributes->get('_api_resource_class'))
+            (!$fieldsParameter && !$includeParameter)
+            || ($fieldsParameter && !\is_array($fieldsParameter))
+            || (!\is_string($includeParameter))
+            || 'jsonapi' !== $request->getRequestFormat()
+            || !($resourceClass = $request->attributes->get('_api_resource_class'))
         ) {
             return;
         }

@@ -58,9 +58,9 @@ final class TestClientPassTest extends TestCase
                     Argument::type(Definition::class),
                     Argument::that(function (Definition $testClientDefinition) {
                         return
-                            Client::class === $testClientDefinition->getClass() &&
-                            !$testClientDefinition->isShared() &&
-                            $testClientDefinition->isPublic();
+                            Client::class === $testClientDefinition->getClass()
+                            && !$testClientDefinition->isShared()
+                            && $testClientDefinition->isPublic();
                     })
                 )
             )

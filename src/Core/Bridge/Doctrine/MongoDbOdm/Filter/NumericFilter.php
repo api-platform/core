@@ -44,15 +44,12 @@ final class NumericFilter extends AbstractFilter
         MongoDbType::FLOAT => true,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isNumericField($property, $resourceClass)
+            !$this->isPropertyEnabled($property, $resourceClass)
+            || !$this->isPropertyMapped($property, $resourceClass)
+            || !$this->isNumericField($property, $resourceClass)
         ) {
             return;
         }
@@ -75,9 +72,6 @@ final class NumericFilter extends AbstractFilter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getType(string $doctrineType = null): string
     {
         if (null === $doctrineType) {

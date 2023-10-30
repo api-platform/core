@@ -73,8 +73,6 @@ class ResourceMetadataTest extends TestCase
 
     /**
      * @dataProvider getWithMethods
-     *
-     * @param mixed $value
      */
     public function testWithMethods(string $name, $value)
     {

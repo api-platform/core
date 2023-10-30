@@ -24,5 +24,5 @@ use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
  */
 interface FilterInterface extends BaseFilterInterface
 {
-    public function apply(array $clauseBody, string $resourceClass, ?string $operationName = null, array $context = []): array;
+    public function apply(array $clauseBody, string $resourceClass, string $operationName = null, array $context = []): array;
 }

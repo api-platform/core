@@ -59,9 +59,6 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         $this->graphQlEnabled = $graphQlEnabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = new ResourceMetadataCollection($resourceClass);
@@ -172,7 +169,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     {
         // Inherit from resource defaults
         foreach (get_class_methods($resource) as $methodName) {
-            if (0 !== strpos($methodName, 'get')) {
+            if (!str_starts_with($methodName, 'get')) {
                 continue;
             }
 

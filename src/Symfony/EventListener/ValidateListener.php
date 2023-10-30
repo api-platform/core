@@ -70,8 +70,8 @@ final class ValidateListener
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !($operation->canValidate() ?? true))
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface
+            && (!$operation || !($operation->canValidate() ?? true))
         ) {
             return;
         }

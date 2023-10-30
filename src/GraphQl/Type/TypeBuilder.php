@@ -51,9 +51,6 @@ final class TypeBuilder implements TypeBuilderInterface
         $this->pagination = $pagination;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResourceObjectType(?string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, bool $input, bool $wrapped = false, int $depth = 0): GraphQLType
     {
         $shortName = $operation->getShortName();
@@ -175,9 +172,6 @@ final class TypeBuilder implements TypeBuilderInterface
         return $resourceObjectType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNodeInterface(): InterfaceType
     {
         if ($this->typesContainer->has('Node')) {
@@ -214,9 +208,6 @@ final class TypeBuilder implements TypeBuilderInterface
         return $nodeInterface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, Operation $operation): GraphQLType
     {
         $shortName = $resourceType->name;
@@ -243,9 +234,6 @@ final class TypeBuilder implements TypeBuilderInterface
         return $resourcePaginatedCollectionType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCollection(Type $type): bool
     {
         return $type->isCollection() && ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) && null !== $collectionValueType->getClassName();

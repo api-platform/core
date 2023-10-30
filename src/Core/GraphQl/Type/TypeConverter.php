@@ -56,9 +56,6 @@ final class TypeConverter implements TypeConverterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function convertType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, string $resourceClass, string $rootResource, ?string $property, int $depth)
     {
         switch ($type->getBuiltinType()) {
@@ -88,9 +85,6 @@ final class TypeConverter implements TypeConverterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveType(string $type): ?GraphQLType
     {
         try {
@@ -109,8 +103,8 @@ final class TypeConverter implements TypeConverterInterface
     private function getResourceType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, string $rootResource, ?string $property, int $depth): ?GraphQLType
     {
         if (
-            $this->typeBuilder->isCollection($type) &&
-            $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+            $this->typeBuilder->isCollection($type)
+            && $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
         ) {
             $resourceClass = $collectionValueType->getClassName();
         } else {

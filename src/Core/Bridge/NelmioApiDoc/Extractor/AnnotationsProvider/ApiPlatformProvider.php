@@ -59,9 +59,6 @@ if (interface_exists(AnnotationsProviderInterface::class)) {
             $this->operationMethodResolver = $operationMethodResolver;
         }
 
-        /**
-         * {@inheritdoc}
-         */
         public function getAnnotations(): array
         {
             $resourceNameCollection = $this->resourceNameCollectionFactory->create();

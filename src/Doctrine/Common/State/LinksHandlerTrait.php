@@ -86,7 +86,7 @@ trait LinksHandlerTrait
         return array_shift($identifiers);
     }
 
-    private function getOperationLinks(?Operation $operation = null): array
+    private function getOperationLinks(Operation $operation = null): array
     {
         if ($operation instanceof GraphQlOperation) {
             return $operation->getLinks() ?? [];

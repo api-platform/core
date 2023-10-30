@@ -31,9 +31,6 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         $parentPropertyMetadata = null;
@@ -102,14 +99,14 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
         foreach (get_class_methods(ApiProperty::class) as $method) {
             if (
                 // TODO: remove these checks for deprecated methods in 3.0
-                'getAttribute' !== $method &&
-                'isChildInherited' !== $method &&
-                'getSubresource' !== $method &&
-                'getAttributes' !== $method &&
+                'getAttribute' !== $method
+                && 'isChildInherited' !== $method
+                && 'getSubresource' !== $method
+                && 'getAttributes' !== $method
                 // end of deprecated methods
 
-                preg_match('/^(?:get|is)(.*)/', $method, $matches) &&
-                null !== $val = $attribute->{$method}()
+                && preg_match('/^(?:get|is)(.*)/', $method, $matches)
+                && null !== $val = $attribute->{$method}()
             ) {
                 $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
             }

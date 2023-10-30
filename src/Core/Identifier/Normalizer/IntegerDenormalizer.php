@@ -19,25 +19,16 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class IntegerDenormalizer implements DenormalizerInterface, CacheableSupportsMethodInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize($data, $class, $format = null, array $context = []): int
     {
         return (int) $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return Type::BUILTIN_TYPE_INT === $type && \is_string($data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

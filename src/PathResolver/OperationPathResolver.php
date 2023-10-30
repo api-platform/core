@@ -32,9 +32,6 @@ final class OperationPathResolver implements OperationPathResolverInterface
         $this->pathSegmentNameGenerator = $pathSegmentNameGenerator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/* , string $operationName = null */): string
     {
         if (\func_num_args() < 4) {

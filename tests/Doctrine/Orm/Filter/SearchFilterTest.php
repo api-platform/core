@@ -496,13 +496,13 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         );
     }
 
-    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)
+    protected function buildSearchFilter(ManagerRegistry $managerRegistry, array $properties = null)
     {
         $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
         $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
-            if (false !== strpos($args[0], '/related_dummies')) {
+            if (str_contains($args[0], '/related_dummies')) {
                 $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
 
                 return $relatedDummyProphecy->reveal();

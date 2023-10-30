@@ -28,11 +28,6 @@ final class UlidNormalizer implements DenormalizerInterface
         trigger_deprecation('api-platform/core', '2.7', sprintf('The class "%s" will be replaced by "%s".', self::class, UlidUriVariableTransformer::class));
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         try {
@@ -42,9 +37,6 @@ final class UlidNormalizer implements DenormalizerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return \is_string($data) && is_a($type, Ulid::class, true);

@@ -29,12 +29,9 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param mixed      $object
      * @param mixed|null $format
      *
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
-     *
-     * @return mixed
      */
     public function normalize($object, $format = null, array $context = [])
     {
@@ -54,7 +51,6 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
 
     /**
      * @param mixed|null $format
-     * @param mixed      $data
      */
     public function supportsNormalization($data, $format = null): bool
     {

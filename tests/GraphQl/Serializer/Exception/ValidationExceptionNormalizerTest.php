@@ -27,9 +27,6 @@ class ValidationExceptionNormalizerTest extends TestCase
 {
     private $validationExceptionNormalizer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

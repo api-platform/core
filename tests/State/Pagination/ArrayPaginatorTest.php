@@ -23,13 +23,6 @@ class ArrayPaginatorTest extends TestCase
 {
     /**
      * @dataProvider initializeProvider
-     *
-     * @param mixed $firstResult
-     * @param mixed $maxResults
-     * @param mixed $currentItems
-     * @param mixed $totalItems
-     * @param mixed $currentPage
-     * @param mixed $lastPage
      */
     public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage)
     {

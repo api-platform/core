@@ -18,8 +18,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
 use ApiPlatform\Util\ClassInfoTrait;
 
 /**
- * {@inheritdoc}
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
@@ -36,9 +34,6 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string
     {
         if ($strict && null === $resourceClass) {
@@ -91,9 +86,6 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         return $mostSpecificResourceClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isResourceClass(string $type): bool
     {
         if (isset($this->localIsResourceClassCache[$type])) {

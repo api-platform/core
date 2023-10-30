@@ -32,23 +32,17 @@ final class MatchesJsonSchema extends Constraint
     /**
      * @param object|array|string $schema
      */
-    public function __construct($schema, ?int $checkMode = null)
+    public function __construct($schema, int $checkMode = null)
     {
         $this->schema = \is_string($schema) ? json_decode($schema) : $schema;
         $this->checkMode = $checkMode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return 'matches the provided JSON Schema';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function matches($other): bool
     {
         if (!class_exists(Validator::class)) {
@@ -63,9 +57,6 @@ final class MatchesJsonSchema extends Constraint
         return $validator->isValid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function additionalFailureDescription($other): string
     {
         $other = $this->normalizeJson($other);
@@ -87,8 +78,6 @@ final class MatchesJsonSchema extends Constraint
      *
      * Specifically, we should ensure that:
      * 1. a JSON object is represented as a PHP object, not as an associative array.
-     *
-     * @param mixed $document
      */
     private function normalizeJson($document)
     {

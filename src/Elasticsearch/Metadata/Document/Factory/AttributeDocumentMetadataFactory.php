@@ -38,15 +38,12 @@ final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryI
     /**
      * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
      */
-    public function __construct($resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct($resourceMetadataFactory, DocumentMetadataFactoryInterface $decorated = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): DocumentMetadata
     {
         $documentMetadata = null;

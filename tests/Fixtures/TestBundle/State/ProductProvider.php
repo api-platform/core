@@ -31,9 +31,6 @@ class ProductProvider implements ProviderInterface
         $this->orm = $orm;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         if ($operation instanceof CollectionOperationInterface) {

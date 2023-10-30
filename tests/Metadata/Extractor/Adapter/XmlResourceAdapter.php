@@ -64,9 +64,6 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'queryParameterValidationEnabled',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(string $resourceClass, array $parameters, array $fixtures): array
     {
         $xml = new \SimpleXMLElement(<<<XML

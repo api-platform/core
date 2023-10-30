@@ -20,7 +20,6 @@ use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\JsonLdContextTrait;
-use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Serializer\OperationContextTrait;
@@ -55,7 +54,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         self::IRI_ONLY => false,
     ];
 
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, $iriConverter, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $defaultContext = [])
+    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $defaultContext = [])
     {
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
@@ -68,18 +67,14 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && is_iterable($data);
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param iterable $object
+     * @param iterable   $object
+     * @param mixed|null $format
      */
     public function normalize($object, $format = null, array $context = []): array
     {
@@ -122,9 +117,6 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

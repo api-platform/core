@@ -66,7 +66,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
             $operationName = key($operations);
 
             foreach (get_class_methods($defaults) as $methodName) {
-                if (0 !== strpos($methodName, 'get')) {
+                if (!str_starts_with($methodName, 'get')) {
                     continue;
                 }
 
@@ -172,7 +172,6 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
 
     /**
      * @param HttpOperation|GraphQlOperation|ApiResource $operation
-     * @param mixed                                      $value
      *
      * @return HttpOperation|GraphQlOperation|ApiResource
      */

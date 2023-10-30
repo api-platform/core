@@ -20,8 +20,6 @@ use ApiPlatform\Metadata\Operation;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * {@inheritdoc}
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class SkolemIriConverter implements IriConverterInterface
@@ -38,17 +36,11 @@ final class SkolemIriConverter implements IriConverterInterface
         $this->objectHashMap = new \SplObjectStorage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null)
+    public function getResourceFromIri(string $iri, array $context = [], Operation $operation = null)
     {
         throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
         $referenceType = $operation ? ($operation->getUrlGenerationStrategy() ?? $referenceType) : $referenceType;

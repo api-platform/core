@@ -31,9 +31,6 @@ final class SecurityPostDenormalizeStage implements SecurityPostDenormalizeStage
         $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(string $resourceClass, Operation $operation, array $context): void
     {
         $isGranted = $operation->getSecurityPostDenormalize();

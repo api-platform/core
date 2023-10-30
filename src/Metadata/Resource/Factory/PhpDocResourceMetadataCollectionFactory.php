@@ -37,9 +37,6 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
         $this->contextFactory = new ContextFactory();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);

@@ -78,41 +78,26 @@ class YamlExtractorTest extends ExtractorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtractorClass(): string
     {
         return YamlExtractor::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getEmptyResourcesFile(): string
     {
         return __DIR__.'/../../../Fixtures/FileConfigurations/resources_empty.yml';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getEmptyOperationFile(): string
     {
         return __DIR__.'/../../../Fixtures/FileConfigurations/empty-operation.yml';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCorrectResourceFile(): string
     {
         return __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getResourceWithParametersFile(): string
     {
         return __DIR__.'/../../../Fixtures/FileConfigurations/resources_with_parameters.yml';

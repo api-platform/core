@@ -72,9 +72,6 @@ class IdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider itemProvider
-     *
-     * @param mixed $item
-     * @param mixed $expected
      */
     public function testGetIdentifiersFromItem($item, $expected)
     {
@@ -104,9 +101,6 @@ class IdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider itemProviderComposite
-     *
-     * @param mixed $item
-     * @param mixed $expected
      */
     public function testGetCompositeIdentifiersFromItem($item, $expected)
     {
@@ -144,9 +138,6 @@ class IdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider itemProviderRelated
-     *
-     * @param mixed $item
-     * @param mixed $expected
      */
     public function testGetRelatedIdentifiersFromItem($item, $expected)
     {

@@ -34,9 +34,6 @@ trait BooleanFilterTrait
 {
     use PropertyHelperTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         $description = [];

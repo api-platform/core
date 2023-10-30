@@ -32,9 +32,6 @@ final class LegacyPropertyMetadataFactory implements PropertyMetadataFactoryInte
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         if (null === $this->decorated) {
@@ -54,7 +51,7 @@ final class LegacyPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         foreach (get_class_methods($legacyPropertyMetadata) as $method) {
-            if (0 !== strpos($method, 'get') && 0 !== strpos($method, 'is')) {
+            if (!str_starts_with($method, 'get') && !str_starts_with($method, 'is')) {
                 continue;
             }
 

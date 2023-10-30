@@ -27,9 +27,6 @@ class Issue5094RelationDataProvider implements ItemDataProviderInterface, Restri
         return Issue5094Relation::class === $resourceClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         return new Issue5094Relation((int) $id);

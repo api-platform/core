@@ -44,9 +44,6 @@ class SubscriptionManagerTest extends TestCase
     private $subscriptionManager;
     private $resourceMetadataCollectionFactory;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->subscriptionsCacheProphecy = $this->prophesize(CacheItemPoolInterface::class);

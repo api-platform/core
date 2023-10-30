@@ -24,9 +24,6 @@ class RuntimeExceptionNormalizerTest extends TestCase
 {
     private $runtimeExceptionNormalizer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

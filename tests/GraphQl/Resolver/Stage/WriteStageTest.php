@@ -34,9 +34,6 @@ class WriteStageTest extends TestCase
     private $processorProphecy;
     private $serializerContextBuilderProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->processorProphecy = $this->prophesize(ProcessorInterface::class);

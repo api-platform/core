@@ -35,9 +35,6 @@ class SecurityPostDenormalizeStageTest extends TestCase
     private $securityPostDenormalizeStage;
     private $resourceAccessCheckerProphecy;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);

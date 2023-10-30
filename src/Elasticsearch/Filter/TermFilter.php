@@ -25,9 +25,6 @@ namespace ApiPlatform\Elasticsearch\Filter;
  */
 final class TermFilter extends AbstractSearchFilter
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getQuery(string $property, array $values, ?string $nestedPath): array
     {
         if (1 === \count($values)) {

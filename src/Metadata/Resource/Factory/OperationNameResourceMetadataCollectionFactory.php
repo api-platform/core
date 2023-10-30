@@ -31,9 +31,6 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = new ResourceMetadataCollection($resourceClass);

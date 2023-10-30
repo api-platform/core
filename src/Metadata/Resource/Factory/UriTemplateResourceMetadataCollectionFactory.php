@@ -38,9 +38,6 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = new ResourceMetadataCollection($resourceClass);
@@ -122,8 +119,8 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     {
         // We will generate the collection route, don't initialize variables here
         if ($operation instanceof HttpOperation && (
-            [] === $operation->getUriVariables() ||
-            ($operation instanceof CollectionOperationInterface && null === $operation->getUriTemplate())
+            [] === $operation->getUriVariables()
+            || ($operation instanceof CollectionOperationInterface && null === $operation->getUriTemplate())
         )) {
             if (null === $operation->getUriVariables()) {
                 return $operation;

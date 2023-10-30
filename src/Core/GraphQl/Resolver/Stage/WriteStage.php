@@ -38,9 +38,6 @@ final class WriteStage implements WriteStageInterface
         $this->serializerContextBuilder = $serializerContextBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($data, string $resourceClass, string $operationName, array $context)
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);

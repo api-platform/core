@@ -27,8 +27,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * {@inheritdoc}
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class IdentifiersExtractor implements IdentifiersExtractorInterface
@@ -89,8 +87,6 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
 
     /**
      * Gets the value of the given class property.
-     *
-     * @param mixed $item
      */
     private function getIdentifierValue($item, string $class, string $property, string $parameterName)
     {

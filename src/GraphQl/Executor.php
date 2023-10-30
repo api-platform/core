@@ -24,9 +24,6 @@ use GraphQL\Type\Schema;
  */
 final class Executor implements ExecutorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function executeQuery(Schema $schema, $source, $rootValue = null, $context = null, array $variableValues = null, string $operationName = null, callable $fieldResolver = null, array $validationRules = null): ExecutionResult
     {
         return GraphQL::executeQuery($schema, $source, $rootValue, $context, $variableValues, $operationName, $fieldResolver, $validationRules);

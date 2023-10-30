@@ -25,9 +25,6 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
 {
     public const SCHEMA = __DIR__.'/schema/properties.xsd';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractPath(string $path)
     {
         try {

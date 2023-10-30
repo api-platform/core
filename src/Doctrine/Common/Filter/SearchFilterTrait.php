@@ -32,9 +32,6 @@ trait SearchFilterTrait
     protected $iriConverter;
     protected $propertyAccessor;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(string $resourceClass): array
     {
         $description = [];
