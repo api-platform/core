@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.2.3
+
+### Bug fixes
+
+* [0f015214c](https://github.com/api-platform/core/commit/0f015214c311c31f4065d3c4b3c171c3152a4e64) fix(symfony): 404 wrongly normalized (#5936)
+* [495f75f81](https://github.com/api-platform/core/commit/495f75f811aedee491e3e419ca9d7040aea7355c) fix(serializer): json non-resource intermitent class (#5937)
+
 ## v3.2.2
 
 ### Bug fixes
