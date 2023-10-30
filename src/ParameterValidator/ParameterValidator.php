@@ -95,16 +95,12 @@ class ParameterValidator
      */
     private static function iterateValue(string $name, array $queryParameters, string $collectionFormat = 'csv'): \Generator
     {
-        $candidates = array_filter(
-            $queryParameters,
-            static fn (string $key) => $key === $name || "{$key}[]" === $name,
-            \ARRAY_FILTER_USE_KEY
-        );
-
-        foreach ($candidates as $key => $value) {
-            $values = self::getValue($value, $collectionFormat);
-            foreach ($values as $v) {
-                yield [$key => $v];
+        foreach ($queryParameters as $key => $value) {
+            if ($key === $name || "{$key}[]" === $name) {
+                $values = self::getValue($value, $collectionFormat);
+                foreach ($values as $v) {
+                    yield [$key => $v];
+                }
             }
         }
     }
