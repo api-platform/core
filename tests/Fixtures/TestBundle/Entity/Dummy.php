@@ -151,7 +151,7 @@ class Dummy
     public $jsonData;
 
     /**
-     * @var array|null
+     * @var array<string>|null
      *
      * @ORM\Column(type="simple_array", nullable=true)
      */
