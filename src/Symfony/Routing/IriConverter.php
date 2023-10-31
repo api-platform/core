@@ -112,7 +112,7 @@ final class IriConverter implements IriConverterInterface
             return null;
         }
 
-        if (isset($context['item_uri_template'])) {
+        if ($this->resourceMetadataCollectionFactory && isset($context['item_uri_template'])) {
             $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['item_uri_template']);
         }
 
