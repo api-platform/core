@@ -258,9 +258,11 @@ class AppKernel extends Kernel
         $c->prependExtensionConfig('twig', $twigConfig);
 
         $doctrineConfig = [];
+        // @phpstan-ignore-next-line
         if (method_exists(EntityManagerConfig::class, 'getReportFieldsWhereDeclared')) {
             $doctrineConfig['orm']['report_fields_where_declared'] = true;
         }
+        // @phpstan-ignore-next-line
         if (method_exists(OrmConfig::class, 'enableLazyGhostObjects')) {
             $doctrineConfig['orm']['enable_lazy_ghost_objects'] = true;
         }
