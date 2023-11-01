@@ -157,3 +157,33 @@ Feature: Using validations groups
       ]
     }
     """
+
+  Scenario: Get violations constraints
+    When I add "Accept" header equal to "application/json"
+    And I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/issue5912s" with body:
+    """
+    {
+      "title": ""
+    }
+    """
+    Then the response status code should be 422
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "status": 422,
+      "violations": [
+        {
+          "propertyPath": "title",
+          "message": "This value should not be blank.",
+          "code": "c1051bb4-d103-4f74-8988-acbcafc7fdc3"
+        }
+      ],
+      "detail": "title: This value should not be blank.",
+      "type": "/validation_errors/c1051bb4-d103-4f74-8988-acbcafc7fdc3",
+      "title": "An error occurred"
+    }
+    """
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+
