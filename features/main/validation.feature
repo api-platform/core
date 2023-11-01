@@ -158,6 +158,7 @@ Feature: Using validations groups
     }
     """
 
+  @!mongodb
   Scenario: Get violations constraints
     When I add "Accept" header equal to "application/json"
     And I add "Content-Type" header equal to "application/json"
