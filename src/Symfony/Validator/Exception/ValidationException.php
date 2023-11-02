@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use ApiPlatform\Validator\Exception\ValidationException as BaseValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -50,7 +51,7 @@ use Symfony\Component\WebLink\Link;
     ],
     graphQlOperations: []
 )]
-final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface
+final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface, HttpExceptionInterface
 {
     private int $status = 422;
 
@@ -153,5 +154,15 @@ final class ValidationException extends BaseValidationException implements Const
         }
 
         return $message;
+    }
+
+    public function getStatusCode(): int
+    {
+        return $this->status;
+    }
+
+    public function getHeaders(): array
+    {
+        return [];
     }
 }
