@@ -260,6 +260,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return [
                 'type' => 'string',
                 'format' => 'iri-reference',
+                'example' => 'string',
             ];
         }
 
