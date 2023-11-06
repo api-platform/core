@@ -24,7 +24,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * Syntax: `?order[property]=<asc|desc>`.
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -97,6 +98,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *     </resource>
  * </resources>
  * ```
+ *
  * </CodeSelector>
  *
  * Given that the collection endpoint is `/books`, you can filter books by ID and date in ascending or descending order: `/books?order[id]=asc&order[date]=desc`.

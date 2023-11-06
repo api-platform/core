@@ -193,7 +193,7 @@ class ApiResource
         /**
          * The `sunset` option indicates when a deprecated operation will be removed.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
          *
          * ```php
          * <?php
@@ -243,7 +243,8 @@ class ApiResource
          *
          * See: [UrlGeneratorInterface::class](/reference/Api/UrlGeneratorInterface)
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -275,13 +276,15 @@ class ApiResource
          *     <resource class="App\Entity\Book" urlGenerationStrategy="0" />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          */
         protected ?int $urlGenerationStrategy = null,
         /**
          * The `deprecationReason` option deprecates the current resource with a deprecation message.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Parchment.php
@@ -313,6 +316,7 @@ class ApiResource
          *     <resource class="App\Entity\Parchment" deprecationReason="Create a Book instead" />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          *
          * - With JSON-lD / Hydra, [an `owl:deprecated` annotation property](https://www.w3.org/TR/owl2-syntax/#Annotation_Properties) will be added to the appropriate data structure
@@ -341,7 +345,8 @@ class ApiResource
         /**
          * The `filters` option configures the filters (declared as services) available on the collection routes for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -376,6 +381,7 @@ class ApiResource
          *     </resource>
          * </resources>
          * ```
+         *
          * </CodeSelector>
          */
         protected ?array $filters = null,
@@ -384,7 +390,8 @@ class ApiResource
         /**
          * The `messenger` option dispatches the current resource through the Message Bus.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -416,6 +423,7 @@ class ApiResource
          *     <resource class="App\Entity\Book" messenger=true />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          *
          * Note: when using `messenger=true` on a Doctrine entity, the Doctrine Processor is not called. If you want it
@@ -436,7 +444,7 @@ class ApiResource
          * By default, items in the collection are ordered in ascending (ASC) order by their resource identifier(s). If you want to
          * customize this order, you must add an `order` attribute on your ApiResource annotation:
          *
-         * <CodeSelector>
+         * <div data-code-selector>
          *
          * ```php
          * <?php
@@ -469,7 +477,8 @@ class ApiResource
         /**
          * The `paginationClientEnabled` option allows (or disallows) the client to enable (or disable) the pagination for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -501,6 +510,7 @@ class ApiResource
          *     <resource class="App\Entity\Book" paginationClientEnabled=true />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          *
          * The pagination can now be enabled (or disabled) by adding a query parameter named `pagination`:
@@ -511,7 +521,8 @@ class ApiResource
         /**
          * The `paginationClientItemsPerPage` option allows (or disallows) the client to set the number of items per page for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -543,6 +554,7 @@ class ApiResource
          *     <resource class="App\Entity\Book" paginationClientItemsPerPage=true />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          *
          * The number of items can now be set by adding a query parameter named `itemsPerPage`:
@@ -552,7 +564,7 @@ class ApiResource
         /**
          * The `paginationClientPartial` option allows (or disallows) the client to enable (or disable) the partial pagination for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
          *
          * ```php
          * <?php
@@ -585,6 +597,7 @@ class ApiResource
          *     <resource class="App\Entity\Book" paginationClientPartial=true />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          *
          * The partial pagination can now be enabled (or disabled) by adding a query parameter named `partial`:
@@ -597,7 +610,8 @@ class ApiResource
          * Select your unique sorted field as well as the direction you'll like the pagination to go via filters.
          * Note that for now you have to declare a `RangeFilter` and an `OrderFilter` on the property used for the cursor-based pagination:.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -645,6 +659,7 @@ class ApiResource
          *     </resource>
          * </resources>
          * ```
+         *
          * </CodeSelector>
          *
          * To know more about cursor-based pagination take a look at [this blog post on medium (draft)](https://medium.com/@sroze/74fd1d324723).
@@ -653,7 +668,8 @@ class ApiResource
         /**
          * The `paginationEnabled` option enables (or disables) the pagination for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -685,6 +701,7 @@ class ApiResource
          *     <resource class="App\Entity\Book" paginationEnabled=true />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          */
         protected ?bool $paginationEnabled = null,
@@ -696,7 +713,8 @@ class ApiResource
          * When set to `true`, the Doctrine ORM Paginator will perform an additional query, in order to get the
          * correct number of results. You can configure this using the `paginationFetchJoinCollection` option:
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -728,6 +746,7 @@ class ApiResource
          *     <resource class="App\Entity\Book" paginationFetchJoinCollection=false />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
@@ -741,7 +760,8 @@ class ApiResource
          * When set to `true`, the Doctrine ORM Paginator will use output walkers, which are compulsory for some types
          * of queries. You can configure this using the `paginationUseOutputWalkers` option:
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -772,6 +792,7 @@ class ApiResource
          *     <resource class="App\Entity\Book" paginationUseOutputWalkers=false />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
@@ -780,7 +801,8 @@ class ApiResource
         /**
          * The `paginationItemsPerPage` option defines the number of items per page for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -811,13 +833,15 @@ class ApiResource
          *     <resource class="App\Entity\Book" paginationItemsPerPage=30 />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          */
         protected ?int $paginationItemsPerPage = null,
         /**
          * The `paginationMaximumItemsPerPage` option defines the maximum number of items per page for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -855,7 +879,8 @@ class ApiResource
         /**
          * The `paginationPartial` option enables (or disables) the partial pagination for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -886,13 +911,15 @@ class ApiResource
          *     <resource class="App\Entity\Book" paginationPartial=true />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          */
         protected ?bool $paginationPartial = null,
         /**
          * The `paginationType` option defines the type of pagination (`page` or `cursor`) to use for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -923,6 +950,7 @@ class ApiResource
          *     <resource class="App\Entity\Book" paginationType="page" />
          * </resources>
          * ```
+         *
          * </CodeSelector>
          */
         protected ?string $paginationType = null,

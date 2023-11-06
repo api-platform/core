@@ -23,7 +23,8 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  *
  * Syntax: `?property[<lt|gt|lte|gte|between>]=value`.
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -95,6 +96,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  *     </resource>
  * </resources>
  * ```
+ *
  * </CodeSelector>
  *
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?price[between]=12.99..15.99`.

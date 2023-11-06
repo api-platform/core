@@ -92,7 +92,8 @@ class HttpOperation extends Operation
         /**
          * The `sunset` option indicates when a deprecated operation will be removed.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Parchment.php
@@ -131,6 +132,7 @@ class HttpOperation extends Operation
          *     </resource>
          * </resources>
          * ```
+         *
          * </CodeSelector>
          */
         protected ?string $sunset = null,

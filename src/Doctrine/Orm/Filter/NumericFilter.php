@@ -25,7 +25,8 @@ use Doctrine\ORM\QueryBuilder;
  *
  * Syntax: `?property=<int|bigint|decimal...>`.
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -97,6 +98,7 @@ use Doctrine\ORM\QueryBuilder;
  *     </resource>
  * </resources>
  * ```
+ *
  * </CodeSelector>
  *
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?price=10`.

@@ -25,7 +25,8 @@ use Doctrine\ORM\QueryBuilder;
  *
  * Syntax: `?property=<true|false|1|0>`.
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -97,6 +98,7 @@ use Doctrine\ORM\QueryBuilder;
  *     </resource>
  * </resources>
  * ```
+ *
  * </CodeSelector>
  *
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?published=true`.

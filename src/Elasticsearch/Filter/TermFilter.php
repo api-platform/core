@@ -18,7 +18,8 @@ namespace ApiPlatform\Elasticsearch\Filter;
  *
  * Syntax: `?property[]=value`.
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -89,6 +90,7 @@ namespace ApiPlatform\Elasticsearch\Filter;
  *     </resource>
  * </resources>
  * ```
+ *
  * </CodeSelector>
  *
  * Given that the collection endpoint is `/books`, you can filter books by title with the following query: `/books?title=Foundation`.

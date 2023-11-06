@@ -28,7 +28,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  * - `overrideDefaultGroups` allows to override the default serialization groups (default: `false`)
  * - `whitelist` groups whitelist to avoid uncontrolled data exposure (default: `null` to allow all groups)
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -102,6 +103,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  *     </resource>
  * </resources>
  * ```
+ *
  * </CodeSelector>
  *
  * Given that the collection endpoint is `/books`, you can filter books by serialization groups with the following query: `/books?groups[]=read&groups[]=write`.

@@ -54,7 +54,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * Syntax: `?property[]=foo&property[]=bar`.
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -127,6 +128,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *     </resource>
  * </resources>
  * ```
+ *
  * </CodeSelector>
  *
  * @author Kévin Dunglas <dunglas@gmail.com>

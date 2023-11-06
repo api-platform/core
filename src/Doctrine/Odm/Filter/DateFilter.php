@@ -36,7 +36,8 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * - Consider items as youngest: use `ApiPlatform\Doctrine\Odm\Filter\DateFilter::INCLUDE_NULL_AFTER` (`include_null_after`) strategy
  * - Always include items: use `ApiPlatform\Doctrine\Odm\Filter\DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER` (`include_null_before_and_after`) strategy
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -107,6 +108,7 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  *     </resource>
  * </resources>
  * ```
+ *
  * </CodeSelector>
  *
  * Given that the collection endpoint is `/books`, you can filter books by date with the following query: `/books?createdAt[after]=2018-03-19`.

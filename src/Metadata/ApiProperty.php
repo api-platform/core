@@ -54,7 +54,8 @@ final class ApiProperty
         /**
          * The `deprecationReason` option deprecates the current operation with a deprecation message.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Review.php
@@ -89,6 +90,7 @@ final class ApiProperty
          *     <property resource="App\Entity\Review" name="letter" deprecationReason="Create a Book instead" />
          * </properties>
          * ```
+         *
          * </CodeSelector>
          *
          * - With JSON-lD / Hydra, [an `owl:deprecated` annotation property](https://www.w3.org/TR/owl2-syntax/#Annotation_Properties) will be added to the appropriate data structure
