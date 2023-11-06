@@ -66,7 +66,8 @@ abstract class Operation extends Metadata
         /**
          * The `paginationEnabled` option enables (or disables) the pagination for the current collection operation.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -104,13 +105,15 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?bool $paginationEnabled = null,
         /**
          * The `paginationType` option defines the type of pagination (`page` or `cursor`) to use for the current collection operation.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -148,13 +151,15 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?string $paginationType = null,
         /**
          * The `paginationItemsPerPage` option defines the number of items per page for the current collection operation.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -191,13 +196,15 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?int $paginationItemsPerPage = null,
         /**
          * The `paginationMaximumItemsPerPage` option defines the maximum number of items per page for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -234,13 +241,15 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?int $paginationMaximumItemsPerPage = null,
         /**
          * The `paginationPartial` option enables (or disables) the partial pagination for the current collection operation.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -277,13 +286,15 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?bool $paginationPartial = null,
         /**
          * The `paginationClientEnabled` option allows (or disallows) the client to enable (or disable) the pagination for the current collection operation.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -320,7 +331,8 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * The pagination can now be enabled (or disabled) by adding a query parameter named `pagination`:
          * - `GET /books?pagination=false`: disabled
@@ -330,7 +342,8 @@ abstract class Operation extends Metadata
         /**
          * The `paginationClientItemsPerPage` option allows (or disallows) the client to set the number of items per page for the current collection operation.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -367,7 +380,8 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * The number of items can now be set by adding a query parameter named `itemsPerPage`:
          * - `GET /books?itemsPerPage=50`
@@ -376,7 +390,8 @@ abstract class Operation extends Metadata
         /**
          * The `paginationClientPartial` option allows (or disallows) the client to enable (or disable) the partial pagination for the current collection operation.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -413,7 +428,8 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * The partial pagination can now be enabled (or disabled) by adding a query parameter named `partial`:
          * - `GET /books?partial=false`: disabled
@@ -428,7 +444,8 @@ abstract class Operation extends Metadata
          * When set to `true`, the Doctrine ORM Paginator will perform an additional query, in order to get the
          * correct number of results. You can configure this using the `paginationFetchJoinCollection` option:
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -465,7 +482,8 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
          */
@@ -478,7 +496,8 @@ abstract class Operation extends Metadata
          * When set to `true`, the Doctrine ORM Paginator will use output walkers, which are compulsory for some types
          * of queries. You can configure this using the `paginationUseOutputWalkers` option:
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -515,7 +534,8 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
          */
@@ -525,7 +545,8 @@ abstract class Operation extends Metadata
          * Select your unique sorted field as well as the direction you'll like the pagination to go via filters.
          * Note that for now you have to declare a `RangeFilter` and an `OrderFilter` on the property used for the cursor-based pagination:.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -579,7 +600,8 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * To know more about cursor-based pagination take a look at [this blog post on medium (draft)](https://medium.com/@sroze/74fd1d324723).
          */
@@ -598,7 +620,8 @@ abstract class Operation extends Metadata
         /**
          * The `deprecationReason` option deprecates the current operation with a deprecation message.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Parchment.php
@@ -636,7 +659,8 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * - With JSON-lD / Hydra, [an `owl:deprecated` annotation property](https://www.w3.org/TR/owl2-syntax/#Annotation_Properties) will be added to the appropriate data structure
          * - With Swagger / OpenAPI, [a `deprecated` property](https://swagger.io/docs/specification/2-0/paths-and-operations/) will be added
@@ -646,7 +670,8 @@ abstract class Operation extends Metadata
         /**
          * The `filters` option configures the filters (declared as services) available on the collection routes for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -687,7 +712,8 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?array $filters = null,
         /**
@@ -708,7 +734,8 @@ abstract class Operation extends Metadata
         /**
          * The `messenger` option dispatches the current resource through the Message Bus.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -746,7 +773,8 @@ abstract class Operation extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * Note: when using `messenger=true` on a Doctrine entity, the Doctrine Processor is not called. If you want it
          * to be called, you should [decorate a built-in state processor](/docs/guide/hook-a-persistence-layer-with-a-processor)

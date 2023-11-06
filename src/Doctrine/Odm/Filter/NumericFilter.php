@@ -23,7 +23,8 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  *
  * Syntax: `?property=<int|bigint|decimal...>`.
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -94,7 +95,8 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  *     </resource>
  * </resources>
  * ```
- * </CodeSelector>
+ *
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?price=10`.
  *

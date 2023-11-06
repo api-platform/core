@@ -39,7 +39,8 @@ use Doctrine\ORM\QueryBuilder;
  * - Consider items as youngest: use `ApiPlatform\Doctrine\Orm\Filter\DateFilter::INCLUDE_NULL_AFTER` (`include_null_after`) strategy
  * - Always include items: use `ApiPlatform\Doctrine\Orm\Filter\DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER` (`include_null_before_and_after`) strategy
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -111,7 +112,8 @@ use Doctrine\ORM\QueryBuilder;
  *     </resource>
  * </resources>
  * ```
- * </CodeSelector>
+ *
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books by date with the following query: `/books?createdAt[after]=2018-03-19`.
  *

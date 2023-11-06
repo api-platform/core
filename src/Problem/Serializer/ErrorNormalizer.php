@@ -75,7 +75,9 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
             return false;
         }
 
-        return (self::FORMAT === $format || 'json' === $format) && ($data instanceof \Exception || $data instanceof FlattenException);
+        $decoration = $this->itemNormalizer ? $this->itemNormalizer->supportsNormalization($data, $format, $context) : true;
+
+        return (self::FORMAT === $format || 'json' === $format) && ($data instanceof \Exception || $data instanceof FlattenException) && $decoration;
     }
 
     public function getSupportedTypes($format): array
