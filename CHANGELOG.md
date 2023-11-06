@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.2.4
+
+### Bug fixes
+
+* [436921f3b](https://github.com/api-platform/core/commit/436921f3bfb15f77f3d6f9c7462df7882120cd37) fix(serializer): json violation list normalizer (#5941)
+
 ## v3.2.3
 
 ### Bug fixes
