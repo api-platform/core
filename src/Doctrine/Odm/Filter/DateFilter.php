@@ -109,7 +109,7 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books by date with the following query: `/books?createdAt[after]=2018-03-19`.
  *

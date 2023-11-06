@@ -129,7 +129,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>

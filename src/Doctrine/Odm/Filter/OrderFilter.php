@@ -102,7 +102,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books by title in ascending order and then by ID in descending order with the following query: `/books?order[title]=desc&order[id]=asc`.
  *
@@ -183,7 +183,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * When the property used for ordering can contain `null` values, you may want to specify how `null` values are treated in the comparison:
  * - Use the default behavior of the DBMS: use `null` strategy

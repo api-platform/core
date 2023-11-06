@@ -100,7 +100,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?exists[comment]=true`.
  *

@@ -104,7 +104,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books by serialization groups with the following query: `/books?groups[]=read&groups[]=write`.
  *

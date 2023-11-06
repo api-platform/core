@@ -228,7 +228,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?string $sunset = null,
         protected ?string $acceptPatch = null,
@@ -277,7 +277,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?int $urlGenerationStrategy = null,
         /**
@@ -317,7 +317,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * - With JSON-lD / Hydra, [an `owl:deprecated` annotation property](https://www.w3.org/TR/owl2-syntax/#Annotation_Properties) will be added to the appropriate data structure
          * - With Swagger / OpenAPI, [a `deprecated` property](https://swagger.io/docs/specification/2-0/paths-and-operations/) will be added
@@ -382,7 +382,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?array $filters = null,
         protected ?bool $elasticsearch = null,
@@ -424,7 +424,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * Note: when using `messenger=true` on a Doctrine entity, the Doctrine Processor is not called. If you want it
          * to be called, you should [decorate a built-in state processor](/docs/guide/hook-a-persistence-layer-with-a-processor)
@@ -466,7 +466,7 @@ class ApiResource
          *         foo: ASC
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * This `order` attribute is used as an array: the key defines the order field, the values defines the direction.
          * If you only specify the key, `ASC` direction will be used as default.
@@ -511,7 +511,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * The pagination can now be enabled (or disabled) by adding a query parameter named `pagination`:
          * - `GET /books?pagination=false`: disabled
@@ -555,7 +555,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * The number of items can now be set by adding a query parameter named `itemsPerPage`:
          * - `GET /books?itemsPerPage=50`
@@ -598,7 +598,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * The partial pagination can now be enabled (or disabled) by adding a query parameter named `partial`:
          * - `GET /books?partial=false`: disabled
@@ -660,7 +660,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * To know more about cursor-based pagination take a look at [this blog post on medium (draft)](https://medium.com/@sroze/74fd1d324723).
          */
@@ -702,7 +702,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?bool $paginationEnabled = null,
         /**
@@ -747,7 +747,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
          */
@@ -793,7 +793,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
          */
@@ -834,7 +834,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?int $paginationItemsPerPage = null,
         /**
@@ -873,7 +873,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?int $paginationMaximumItemsPerPage = null,
         /**
@@ -912,7 +912,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?bool $paginationPartial = null,
         /**
@@ -951,7 +951,7 @@ class ApiResource
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?string $paginationType = null,
         protected ?string $security = null,

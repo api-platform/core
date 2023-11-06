@@ -91,7 +91,7 @@ final class ApiProperty
          * </properties>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * - With JSON-lD / Hydra, [an `owl:deprecated` annotation property](https://www.w3.org/TR/owl2-syntax/#Annotation_Properties) will be added to the appropriate data structure
          * - With Swagger / OpenAPI, [a `deprecated` property](https://swagger.io/docs/specification/2-0/paths-and-operations/) will be added

@@ -133,7 +133,7 @@ class HttpOperation extends Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?string $sunset = null,
         protected ?string $acceptPatch = null,

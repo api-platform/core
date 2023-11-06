@@ -99,7 +99,7 @@ use Doctrine\ORM\QueryBuilder;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?published=true`.
  *

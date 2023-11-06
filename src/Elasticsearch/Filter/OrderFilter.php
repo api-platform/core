@@ -99,7 +99,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books by ID and date in ascending or descending order: `/books?order[id]=asc&order[date]=desc`.
  *

@@ -92,7 +92,7 @@ namespace ApiPlatform\Elasticsearch\Filter;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books by title content with the following query: `/books?title=Foundation`.
  *

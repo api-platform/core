@@ -96,7 +96,7 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?published=true`.
  *

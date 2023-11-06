@@ -107,7 +107,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter the serialization properties with the following query: `/books?properties[]=title&properties[]=author`. If you want to include some properties of the nested "author" document, use: `/books?properties[]=title&properties[author][]=name`.
  *

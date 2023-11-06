@@ -106,7 +106,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?bool $paginationEnabled = null,
         /**
@@ -152,7 +152,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?string $paginationType = null,
         /**
@@ -197,7 +197,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?int $paginationItemsPerPage = null,
         /**
@@ -242,7 +242,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?int $paginationMaximumItemsPerPage = null,
         /**
@@ -287,7 +287,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?bool $paginationPartial = null,
         /**
@@ -332,7 +332,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * The pagination can now be enabled (or disabled) by adding a query parameter named `pagination`:
          * - `GET /books?pagination=false`: disabled
@@ -381,7 +381,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * The number of items can now be set by adding a query parameter named `itemsPerPage`:
          * - `GET /books?itemsPerPage=50`
@@ -429,7 +429,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * The partial pagination can now be enabled (or disabled) by adding a query parameter named `partial`:
          * - `GET /books?partial=false`: disabled
@@ -483,7 +483,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
          */
@@ -535,7 +535,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
          */
@@ -601,7 +601,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * To know more about cursor-based pagination take a look at [this blog post on medium (draft)](https://medium.com/@sroze/74fd1d324723).
          */
@@ -660,7 +660,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * - With JSON-lD / Hydra, [an `owl:deprecated` annotation property](https://www.w3.org/TR/owl2-syntax/#Annotation_Properties) will be added to the appropriate data structure
          * - With Swagger / OpenAPI, [a `deprecated` property](https://swagger.io/docs/specification/2-0/paths-and-operations/) will be added
@@ -713,7 +713,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?array $filters = null,
         /**
@@ -774,7 +774,7 @@ abstract class Operation
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * Note: when using `messenger=true` on a Doctrine entity, the Doctrine Processor is not called. If you want it
          * to be called, you should [decorate a built-in state processor](/docs/guide/hook-a-persistence-layer-with-a-processor)

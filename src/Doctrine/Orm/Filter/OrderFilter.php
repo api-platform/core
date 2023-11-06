@@ -104,7 +104,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books by title in ascending order and then by ID in descending order with the following query: `/books?order[title]=desc&order[id]=asc`.
  *

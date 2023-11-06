@@ -97,7 +97,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  * </resources>
  * ```
  *
- * </CodeSelector>
+ * </div>
  *
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?price[between]=12.99..15.99`.
  *
