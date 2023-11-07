@@ -46,4 +46,7 @@ class Library
     /** @var Book[] */
     #[Groups(['library:read'])]
     public array $books = [];
+
+    /** @var Genre[] */
+    public array $relatedGenres = [];
 }

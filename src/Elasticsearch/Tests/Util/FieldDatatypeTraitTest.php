@@ -32,6 +32,18 @@ class FieldDatatypeTraitTest extends TestCase
         $fieldDatatype = $this->getValidFieldDatatype();
 
         self::assertSame('foo.bar', $fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar.baz'));
+        self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.baz'));
+        self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'baz'));
+    }
+
+    public function testGetNestedFieldInNestedCollection(): void
+    {
+        $fieldDatatype = $this->getValidFieldDatatype();
+
+        self::assertSame('foo.foo.bar', $fieldDatatype->getNestedFieldPath(Foo::class, 'foo.foo.bar.baz'));
+        self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.foo.baz'));
+        self::assertSame('foo.bar', $fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar.foo.baz'));
+        self::assertSame('bar', $fieldDatatype->getNestedFieldPath(Foo::class, 'bar.foo'));
         self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'baz'));
     }
 
@@ -72,6 +84,7 @@ class FieldDatatypeTraitTest extends TestCase
         $fieldDatatype = $this->getValidFieldDatatype();
 
         self::assertTrue($fieldDatatype->isNestedField(Foo::class, 'foo.bar.baz'));
+        self::assertFalse($fieldDatatype->isNestedField(Foo::class, 'foo.baz'));
         self::assertFalse($fieldDatatype->isNestedField(Foo::class, 'baz'));
     }
 
@@ -79,10 +92,12 @@ class FieldDatatypeTraitTest extends TestCase
     {
         $fooType = new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class);
         $barType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
+        $bazType = new Type(Type::BUILTIN_TYPE_STRING, false, Foo::class);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([$fooType]))->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn((new ApiProperty())->withBuiltinTypes([$barType]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'baz')->willReturn((new ApiProperty())->withBuiltinTypes([$bazType]));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();
