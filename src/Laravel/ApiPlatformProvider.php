@@ -47,7 +47,6 @@ use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface;
@@ -86,6 +85,8 @@ use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
+use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
@@ -135,6 +136,8 @@ class ApiPlatformProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/config/api-platform.php', 'api-platform');
+
         // $debug = config('debug') ?? false;
         $defaultContext = [];
         $patchFormats = config('api-platform.patch_formats') ?? ['json' => ['application/merge-patch+json']];
@@ -148,15 +151,8 @@ class ApiPlatformProvider extends ServiceProvider
         $errorFormats = config('api-platform.error_formats') ?? [
             'jsonproblem' => ['application/problem+json'],
         ];
-
-        // $configuration = [
-        //     'collection' => [
-        //         'pagination' => [
-        //             'page_parameter_name' => 'page',
-        //             'enabled_parameter_name' => 'pagination'
-        //         ]
-        //     ]
-        // ];
+        $pagination = config('api-platform.collection.pagination');
+        $graphqlPagination = [];
 
         $this->app->singleton(PropertyInfoExtractorInterface::class, function () {
             $phpDocExtractor = class_exists(DocBlockFactory::class) ? new PhpDocExtractor() : null;
@@ -436,6 +432,26 @@ class ApiPlatformProvider extends ServiceProvider
             return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), ['jsonld' => ['application/ld+json']]);
         });
 
+        $this->app->singleton(Pagination::class, function () use ($pagination, $graphqlPagination) {
+            return new Pagination($pagination, $graphqlPagination);
+        });
+
+        $this->app->singleton(PaginationOptions::class, function () use ($pagination) {
+            return new PaginationOptions(
+                $pagination['enabled'],
+                $pagination['page_parameter_name'],
+                $pagination['client_items_per_page'],
+                $pagination['items_per_page_parameter_name'],
+                $pagination['client_enabled'],
+                $pagination['enabled_parameter_name'],
+                $pagination['items_per_page'],
+                $pagination['maximum_items_per_page'],
+                $pagination['partial'],
+                $pagination['client_partial'],
+                $pagination['partial_parameter_name'],
+            );
+        });
+
         $this->app->bind(OpenApiFactoryInterface::class, OpenApiFactory::class);
         $this->app->singleton(OpenApiFactory::class, function (Application $app) use ($formats) {
             return new OpenApiFactory(
@@ -447,9 +463,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(TypeFactoryInterface::class),
                 $app->make(FilterLocator::class),
                 $formats,
-                // array $formats = [],
-                // ?Options $openApiOptions = null,
-                // ?PaginationOptions $paginationOptions = null,
+                null, // ?Options $openApiOptions = null,
+                $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
                 // ?RouterInterface $router = null
             );
         });

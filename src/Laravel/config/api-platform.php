@@ -48,4 +48,20 @@ return [
     'error_formats' => [
         'jsonproblem' => ['application/problem+json'],
     ],
+
+    'collection' => [
+        'pagination' => [
+            'enabled' => true,
+            'partial' => false,
+            'client_enabled' => false,
+            'client_items_per_page' => false,
+            'client_partial' => false,
+            'items_per_page' => 30,
+            'maximum_items_per_page' => null,
+            'page_parameter_name' => 'page',
+            'enabled_parameter_name' => 'pagination',
+            'items_per_page_parameter_name' => 'itemsPerPage',
+            'partial_parameter_name' => 'partial',
+        ],
+    ],
 ];
