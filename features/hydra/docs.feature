@@ -4,6 +4,7 @@ Feature: Documentation support
   I need to know Hydra specifications of objects I send and receive
 
   Scenario: Checks that the Link pointing to the Hydra documentation is set
+    When I add "Accept" header equal to "application/ld+json"
     Given I send a "GET" request to "/"
     Then the header "Link" should be equal to '<http://example.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'
 

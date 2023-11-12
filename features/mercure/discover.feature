@@ -9,5 +9,6 @@ Feature: Mercure discovery support
     Then the header "Link" should contain '<https://demo.mercure.rocks>; rel="mercure"'
 
   Scenario: Checks that the Mercure Link is not added on endpoints where updates are not dispatched
+    When I add "Accept" header equal to "application/ld+json"
     Given I send a "GET" request to "/"
     Then the header "Link" should not contain '<https://demo.mercure.rocks/hub>; rel="mercure"'
