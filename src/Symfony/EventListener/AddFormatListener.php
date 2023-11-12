@@ -65,7 +65,7 @@ final class AddFormatListener
             return;
         }
 
-        $formats = $operation?->getOutputFormats() ?? ('api_doc' === $request->attributes->get('_route') ? $this->docsFormats : $this->formats);
+        $formats = $operation?->getOutputFormats() ?? (in_array($request->attributes->get('_route'), ['api_doc', 'api_entrypoint']) ? $this->docsFormats : $this->formats);
 
         $this->addRequestFormats($request, $formats);
 
