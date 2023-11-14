@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Converts {@see \Exception} or {@see FlattenException} to a Hydra error representation.
  *
- * @deprecated we use ItemNormalizer instead
+ * @deprecated we will use the ItemNormalizer in 4.x instead
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
@@ -47,8 +47,6 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated in favor of using an Error resource. We fallback on "api_platform.serializer.normalizer.item".', __CLASS__));
-
         if ($this->itemNormalizer) {
             return $this->itemNormalizer->normalize($object, $format, $context);
         }

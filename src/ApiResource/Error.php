@@ -58,13 +58,14 @@ use Symfony\Component\WebLink\Link;
 class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface
 {
     public function __construct(
-        private readonly string $title,
-        private readonly string $detail,
+        private string $title,
+        private string $detail,
         #[ApiProperty(identifier: true)] private int $status,
         array $originalTrace = null,
         private ?string $instance = null,
         private string $type = 'about:blank',
-        private array $headers = []
+        private array $headers = [],
+        private ?\Exception $previous = null
     ) {
         parent::__construct();
 
@@ -85,21 +86,21 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
 
     #[SerializedName('hydra:title')]
     #[Groups(['jsonld', 'legacy_jsonld'])]
-    public function getHydraTitle(): string
+    public function getHydraTitle(): ?string
     {
         return $this->title;
     }
 
     #[SerializedName('hydra:description')]
     #[Groups(['jsonld', 'legacy_jsonld'])]
-    public function getHydraDescription(): string
+    public function getHydraDescription(): ?string
     {
         return $this->detail;
     }
 
     #[SerializedName('description')]
     #[Groups(['jsonapi', 'legacy_jsonapi'])]
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->detail;
     }
@@ -108,7 +109,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     {
         $headers = ($exception instanceof SymfonyHttpExceptionInterface || $exception instanceof HttpExceptionInterface) ? $exception->getHeaders() : [];
 
-        return new self('An error occurred', $exception->getMessage(), $status, $exception->getTrace(), type: '/errors/'.$status, headers: $headers);
+        return new self('An error occurred', $exception->getMessage(), $status, $exception->getTrace(), type: '/errors/'.$status, headers: $headers, previous: $exception->getPrevious());
     }
 
     #[Ignore]
@@ -123,6 +124,9 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         return $this->status;
     }
 
+    /**
+     * @param array<string, string> $headers
+     */
     public function setHeaders(array $headers): void
     {
         $this->headers = $headers;
@@ -134,15 +138,20 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         return $this->type;
     }
 
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+
     #[Groups(['jsonld', 'legacy_jsonproblem', 'jsonproblem', 'jsonapi', 'legacy_jsonapi'])]
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setType(string $type): void
+    public function setTitle(string $title = null): void
     {
-        $this->type = $type;
+        $this->title = $title;
     }
 
     #[Groups(['jsonld', 'jsonproblem', 'legacy_jsonproblem'])]
@@ -162,9 +171,19 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         return $this->detail;
     }
 
+    public function setDetail(string $detail = null): void
+    {
+        $this->detail = $detail;
+    }
+
     #[Groups(['jsonld', 'jsonproblem', 'legacy_jsonproblem'])]
     public function getInstance(): ?string
     {
         return $this->instance;
+    }
+
+    public function setInstance(string $instance = null): void
+    {
+        $this->instance = $instance;
     }
 }

@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Converts {@see \Exception} or {@see FlattenException} or to a JSON API error representation.
  *
- * @deprecated we use ItemNormalizer instead
+ * @deprecated we will use the ItemNormalizer in 4.x instead
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
@@ -46,8 +46,6 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
-        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated in favor of using an Error resource. We fallback on "api_platform.serializer.normalizer.item".', __CLASS__));
-
         if ($this->itemNormalizer) {
             return $this->itemNormalizer->normalize($object, $format, $context);
         }

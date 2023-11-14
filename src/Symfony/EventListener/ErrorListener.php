@@ -57,7 +57,8 @@ final class ErrorListener extends SymfonyErrorListener
         private readonly array $exceptionToStatus = [],
         private readonly null|IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface $identifiersExtractor = null,
         private readonly null|ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver = null,
-        Negotiator $negotiator = null
+        Negotiator $negotiator = null,
+        private readonly bool $problemCompliantErrors = true
     ) {
         parent::__construct($controller, $logger, $debug, $exceptionsMapping);
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
@@ -66,9 +67,15 @@ final class ErrorListener extends SymfonyErrorListener
 
     protected function duplicateRequest(\Throwable $exception, Request $request): Request
     {
-        $dup = parent::duplicateRequest($exception, $request);
-
         $apiOperation = $this->initializeOperation($request);
+        if (false === $this->problemCompliantErrors) {
+            // TODO: deprecate in API Platform 3.3
+            $this->controller = 'api_platform.action.exception';
+            $dup = parent::duplicateRequest($exception, $request);
+            $dup->attributes->set('_api_operation', $apiOperation);
+
+            return $dup;
+        }
 
         if ($this->debug) {
             $this->logger?->error('An exception occured, transforming to an Error resource.', ['exception' => $exception, 'operation' => $apiOperation]);
@@ -76,6 +83,15 @@ final class ErrorListener extends SymfonyErrorListener
 
         $format = $this->getRequestFormat($request, $this->errorFormats, false);
 
+        // Let the error handler take this we don't handle HTML
+        if ('html' === $format) {
+            $this->controller = 'error_controller';
+            $dup = parent::duplicateRequest($exception, $request);
+
+            return $dup;
+        }
+
+        $dup = parent::duplicateRequest($exception, $request);
         if ($this->resourceMetadataCollectionFactory) {
             if ($this->resourceClassResolver?->isResourceClass($exception::class)) {
                 $resourceCollection = $this->resourceMetadataCollectionFactory->create($exception::class);
@@ -126,9 +142,8 @@ final class ErrorListener extends SymfonyErrorListener
             $operation = $operation->withProvider([self::class, 'provide']);
         }
 
-        // For our swagger Ui errors
-        if ('html' === $format) {
-            $operation = $operation->withOutputFormats(['html' => ['text/html']]);
+        if (!$this->debug && $operation->getStatus() >= 500) {
+            $errorResource->setDetail('Internal Server Error');
         }
 
         $identifiers = [];
@@ -144,7 +159,7 @@ final class ErrorListener extends SymfonyErrorListener
             ]);
         }
 
-        if ('jsonld' === $format && !($apiOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
+        if ($apiOperation && 'jsonld' === $format && !($apiOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
             $operation = $operation->withOutputFormats(['jsonld' => ['application/ld+json']])
                                    ->withLinks([])
                                    ->withExtraProperties(['rfc_7807_compliant_errors' => false] + $operation->getExtraProperties());
@@ -154,7 +169,7 @@ final class ErrorListener extends SymfonyErrorListener
         $dup->attributes->set('_api_previous_operation', $apiOperation);
         $dup->attributes->set('_api_operation', $operation);
         $dup->attributes->set('_api_operation_name', $operation->getName());
-        $dup->attributes->set('exception', $errorResource);
+        $dup->attributes->set('exception', $exception);
         // These are for swagger
         $dup->attributes->set('_api_original_route', $request->attributes->get('_route'));
         $dup->attributes->set('_api_original_route_params', $request->attributes->get('_route_params'));

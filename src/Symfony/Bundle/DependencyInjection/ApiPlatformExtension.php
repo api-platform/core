@@ -251,6 +251,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
         $container->setParameter('api_platform.asset_package', $config['asset_package']);
         $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
+        $container->setParameter('api_platform.rfc_7807_compliant_errors', $config['defaults']['extra_properties']['rfc_7807_compliant_errors'] ?? false);
 
         if ($container->getParameter('kernel.debug')) {
             $container->removeDefinition('api_platform.serializer.mapping.cache_class_metadata_factory');

@@ -198,6 +198,7 @@
             <argument key="$exceptionToStatus">%api_platform.exception_to_status%</argument>
             <argument key="$identifiersExtractor" type="service" id="api_platform.api.identifiers_extractor"/>
             <argument key="$resourceClassResolver" type="service" id="api_platform.resource_class_resolver"/>
+            <argument key="$problemCompliantErrors">%api_platform.rfc_7807_compliant_errors%</argument>
         </service>
     </services>
 </container>
