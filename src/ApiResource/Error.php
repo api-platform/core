@@ -65,9 +65,9 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         private ?string $instance = null,
         private string $type = 'about:blank',
         private array $headers = [],
-        private ?\Exception $previous = null
+        \Throwable $previous = null
     ) {
-        parent::__construct();
+        parent::__construct($title, $status, $previous);
 
         if (!$originalTrace) {
             return;

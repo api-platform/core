@@ -142,7 +142,8 @@ final class ErrorListener extends SymfonyErrorListener
             $operation = $operation->withProvider([self::class, 'provide']);
         }
 
-        if (!$this->debug && $operation->getStatus() >= 500) {
+        /** @var HttpOperation $operation */
+        if (!$this->debug && $operation->getStatus() >= 500 && $errorResource instanceof Error) {
             $errorResource->setDetail('Internal Server Error');
         }
 
@@ -159,7 +160,7 @@ final class ErrorListener extends SymfonyErrorListener
             ]);
         }
 
-        if ($apiOperation && 'jsonld' === $format && !($apiOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
+        if ($apiOperation && 'jsonld' === $format && !($apiOperation->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
             $operation = $operation->withOutputFormats(['jsonld' => ['application/ld+json']])
                                    ->withLinks([])
                                    ->withExtraProperties(['rfc_7807_compliant_errors' => false] + $operation->getExtraProperties());

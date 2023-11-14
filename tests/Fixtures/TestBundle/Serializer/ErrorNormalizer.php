@@ -46,7 +46,6 @@ final class ErrorNormalizer implements NormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
-        // @phpstan-ignore-next-line
         return $this->decorated->getSupportedTypes($format);
     }
 }
