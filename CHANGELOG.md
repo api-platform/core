@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.2.5
+
+### Bug fixes
+
+* [ba8a7e653](https://github.com/api-platform/core/commit/ba8a7e6538bccebf14c228e43a9339214c4d9201) fix: exception message leak
+
 ## v3.2.4
 
 ### Bug fixes
