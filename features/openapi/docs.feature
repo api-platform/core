@@ -319,3 +319,26 @@ Feature: Documentation support
       "nullable":true
     }
     """
+
+  @!mongodb
+  Scenario: Retrieve the OpenAPI documentation for Entity Dto Wrappers
+    Given I send a "GET" request to "/docs.json"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the OpenAPI class "WrappedResponseEntity-read" exists
+    And the "id" property exists for the OpenAPI class "WrappedResponseEntity-read"
+    And the "id" property for the OpenAPI class "WrappedResponseEntity-read" should be equal to:
+    """
+    {
+      "type": "string"
+    }
+    """
+    And the OpenAPI class "WrappedResponseEntity.CustomOutputEntityWrapperDto-read" exists
+    And the "data" property exists for the OpenAPI class "WrappedResponseEntity.CustomOutputEntityWrapperDto-read"
+    And the "data" property for the OpenAPI class "WrappedResponseEntity.CustomOutputEntityWrapperDto-read" should be equal to:
+    """
+    {
+      "$ref": "#\/components\/schemas\/WrappedResponseEntity-read"
+    }
+    """
