@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\ApiResource;
+namespace ApiPlatform\State\ApiResource;
 
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
@@ -28,6 +28,7 @@ use Symfony\Component\WebLink\Link;
 #[ErrorResource(
     types: ['hydra:Error'],
     openapi: false,
+    uriVariables: ['status'],
     uriTemplate: '/errors/{status}',
     operations: [
         new Operation(
@@ -36,6 +37,7 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonproblem'],
                 'skip_null_values' => true,
+                'rfc_7807_compliant_errors' => true,
             ],
         ),
         new Operation(
@@ -44,15 +46,21 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
+                'rfc_7807_compliant_errors' => true,
             ],
             links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')],
         ),
         new Operation(
             name: '_api_errors_jsonapi',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
-            normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true],
+            normalizationContext: [
+                'groups' => ['jsonapi'],
+                'skip_null_values' => true,
+                'rfc_7807_compliant_errors' => true,
+            ],
         ),
     ],
+    provider: 'api_platform.state.error_provider',
     graphQlOperations: []
 )]
 class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface
@@ -85,21 +93,20 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     public ?array $originalTrace = null;
 
     #[SerializedName('hydra:title')]
-    #[Groups(['jsonld', 'legacy_jsonld'])]
+    #[Groups(['jsonld'])]
     public function getHydraTitle(): ?string
     {
         return $this->title;
     }
 
     #[SerializedName('hydra:description')]
-    #[Groups(['jsonld', 'legacy_jsonld'])]
+    #[Groups(['jsonld'])]
     public function getHydraDescription(): ?string
     {
         return $this->detail;
     }
 
     #[SerializedName('description')]
-    #[Groups(['jsonapi', 'legacy_jsonapi'])]
     public function getDescription(): ?string
     {
         return $this->detail;
@@ -143,7 +150,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->type = $type;
     }
 
-    #[Groups(['jsonld', 'legacy_jsonproblem', 'jsonproblem', 'jsonapi', 'legacy_jsonapi'])]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
     public function getTitle(): ?string
     {
         return $this->title;
@@ -154,7 +161,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->title = $title;
     }
 
-    #[Groups(['jsonld', 'jsonproblem', 'legacy_jsonproblem'])]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
     public function getStatus(): ?int
     {
         return $this->status;
@@ -165,7 +172,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->status = $status;
     }
 
-    #[Groups(['jsonld', 'jsonproblem', 'legacy_jsonproblem'])]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
     public function getDetail(): ?string
     {
         return $this->detail;
@@ -176,7 +183,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->detail = $detail;
     }
 
-    #[Groups(['jsonld', 'jsonproblem', 'legacy_jsonproblem'])]
+    #[Groups(['jsonld', 'jsonproblem'])]
     public function getInstance(): ?string
     {
         return $this->instance;

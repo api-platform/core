@@ -290,8 +290,6 @@ JSON
      */
     public function testExceptionNormalizer(): void
     {
-        // $this->expectDeprecation('Since api-platform 3.2: The class "ApiPlatform\Problem\Serializer\ErrorNormalizer" is deprecated in favor of using an Error resource. We fallback on "api_platform.serializer.normalizer.item".');
-
         $response = self::createClient()->request('GET', '/issue5921', [
             'headers' => [
                 'accept' => 'application/json',

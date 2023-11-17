@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Exception\TestException;
 
-#[Get(uriTemplate: 'issue5921{._format}', read: true, provider: [ExceptionResource::class, 'provide'])]
+#[Get(uriTemplate: 'issue5921{._format}', read: true, provider: [ExceptionResource::class, 'provide'], extraProperties: ['rfc_7807_compliant_errors' => false])]
 class ExceptionResource
 {
     public static function provide(Operation $operation, array $uriVariables = [], array $context = []): void

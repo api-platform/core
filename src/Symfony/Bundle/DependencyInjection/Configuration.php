@@ -171,6 +171,7 @@ final class Configuration implements ConfigurationInterface
         $this->addFormatSection($rootNode, 'error_formats', [
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
             'jsonld' => ['mime_types' => ['application/ld+json']],
+            'json' => ['mime_types' => ['application/problem+json', 'application/json']],
         ]);
 
         $this->addDefaultsSection($rootNode);

@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
-use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\Symfony\EventListener\ErrorListener;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -53,8 +53,10 @@ final class ErrorListenerTest extends TestCase
 
             return true;
         }), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response());
-        $exceptionEvent = new ExceptionEvent($kernel->reveal(), Request::create('/'), HttpKernelInterface::SUB_REQUEST, $exception);
-        $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory->reveal(), ['jsonproblem' => ['application/problem+json']], [], null, $resourceClassResolver->reveal());
+        $request = Request::create('/');
+        $request->attributes->set('_api_operation', new Get(extraProperties: ['rfc_7807_compliant_errors' => true]));
+        $exceptionEvent = new ExceptionEvent($kernel->reveal(), $request, HttpKernelInterface::SUB_REQUEST, $exception);
+        $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory->reveal(), ['jsonproblem' => ['application/problem+json']], [], null, $resourceClassResolver->reveal(), problemCompliantErrors: true);
         $errorListener->onKernelException($exceptionEvent);
     }
 
@@ -77,7 +79,9 @@ final class ErrorListenerTest extends TestCase
 
             return true;
         }), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response());
-        $exceptionEvent = new ExceptionEvent($kernel->reveal(), Request::create('/'), HttpKernelInterface::SUB_REQUEST, $exception);
+        $request = Request::create('/');
+        $request->attributes->set('_api_operation', new Get(extraProperties: ['rfc_7807_compliant_errors' => true]));
+        $exceptionEvent = new ExceptionEvent($kernel->reveal(), $request, HttpKernelInterface::SUB_REQUEST, $exception);
         $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory->reveal(), ['jsonld' => ['application/ld+json']], [], null, $resourceClassResolver->reveal());
         $errorListener->onKernelException($exceptionEvent);
     }
@@ -98,11 +102,12 @@ final class ErrorListenerTest extends TestCase
             $this->assertTrue($request->attributes->has('_api_requested_operation'));
             $this->assertTrue($request->attributes->has('_api_previous_operation'));
             $this->assertEquals('_api_errors_hydra', $request->attributes->get('_api_operation_name'));
-            $this->assertEquals($request->attributes->get('id'), 1);
 
             return true;
         }), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response());
-        $exceptionEvent = new ExceptionEvent($kernel->reveal(), Request::create('/'), HttpKernelInterface::SUB_REQUEST, $exception);
+        $request = Request::create('/');
+        $request->attributes->set('_api_operation', new Get(extraProperties: ['rfc_7807_compliant_errors' => true]));
+        $exceptionEvent = new ExceptionEvent($kernel->reveal(), $request, HttpKernelInterface::SUB_REQUEST, $exception);
         $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractor->getIdentifiersFromItem($exception, Argument::any())->willReturn(['id' => 1]);
         $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory->reveal(), ['jsonld' => ['application/ld+json']], [], $identifiersExtractor->reveal(), $resourceClassResolver->reveal());
@@ -125,34 +130,6 @@ final class ErrorListenerTest extends TestCase
         $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractor->getIdentifiersFromItem($exception, Argument::any())->willReturn(['id' => 1]);
         $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory->reveal(), ['jsonld' => ['application/ld+json']], [], $identifiersExtractor->reveal(), $resourceClassResolver->reveal(), null, false);
-        $errorListener->onKernelException($exceptionEvent);
-    }
-
-    public function testDuplicateExceptionWithErrorResourceProduction(): void
-    {
-        $exception = new \Exception();
-        $operation = new Get(name: '_api_errors_hydra', priority: 0, outputFormats: ['jsonld' => ['application/ld+json']]);
-        $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->create(Error::class)
-                                          ->willReturn(new ResourceMetadataCollection(Error::class, [new ApiResource(operations: [$operation])]));
-        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolver->isResourceClass(\Exception::class)->willReturn(false);
-        $kernel = $this->prophesize(KernelInterface::class);
-        $kernel->handle(Argument::that(function ($request) {
-            $this->assertTrue($request->attributes->has('_api_original_route'));
-            $this->assertTrue($request->attributes->has('_api_original_route_params'));
-            $this->assertTrue($request->attributes->has('_api_requested_operation'));
-            $this->assertTrue($request->attributes->has('_api_previous_operation'));
-            $this->assertEquals('_api_errors_hydra', $request->attributes->get('_api_operation_name'));
-            $operation = $request->attributes->get('_api_operation');
-            $this->assertEquals(\call_user_func($operation->getProvider())->getDetail(), 'Internal Server Error');
-
-            return true;
-        }), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response());
-        $exceptionEvent = new ExceptionEvent($kernel->reveal(), Request::create('/'), HttpKernelInterface::SUB_REQUEST, $exception);
-        $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractor->getIdentifiersFromItem(Argument::cetera())->willThrow(new \Exception());
-        $errorListener = new ErrorListener('action', null, false, [], $resourceMetadataCollectionFactory->reveal(), ['jsonld' => ['application/ld+json']], [], $identifiersExtractor->reveal(), $resourceClassResolver->reveal());
         $errorListener->onKernelException($exceptionEvent);
     }
 }
