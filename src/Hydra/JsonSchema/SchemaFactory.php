@@ -92,12 +92,12 @@ final class SchemaFactory implements SchemaFactoryInterface
             unset($schema['items']);
 
             switch ($schema->getVersion()) {
-                // JSON Schema + OpenAPI 3.1
                 case Schema::VERSION_OPENAPI:
+                    $nullableStringDefinition = ['type' => 'string', 'nullable' => true];
+                    break;
                 case Schema::VERSION_JSON_SCHEMA:
                     $nullableStringDefinition = ['type' => ['string', 'null']];
                     break;
-                    // Swagger
                 default:
                     $nullableStringDefinition = ['type' => 'string'];
                     break;

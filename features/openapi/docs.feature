@@ -238,7 +238,8 @@ Feature: Documentation support
                                         "type": "string"
                                     },
                                     "property": {
-                                        "type": ["string", "null"]
+                                        "type": "string",
+                                        "nullable": true
                                     },
                                     "required": {
                                         "type": "boolean"
