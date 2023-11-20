@@ -182,7 +182,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
-        if (($context['input']['class'] ?? null) === $type) {
+        if (($context['input']['class'] ?? null) === $type || (($context['from_input'] ?? false) === true && ($context['resource_class'] ?? null) === $type)) {
             return true;
         }
 
@@ -203,6 +203,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             unset($context['input'], $context['operation'], $context['operation_name']);
             $context['resource_class'] = $inputClass;
+            $context['from_input'] = true;
+            if (false === isset($context['groups']) || [] === $context['groups']) {
+                $context['groups'][] = '*';
+            }
 
             try {
                 return $this->serializer->denormalize($data, $inputClass, $format, $context);
@@ -435,7 +439,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function canAccessAttribute(?object $object, string $attribute, array $context = []): bool
     {
-        if (!$this->resourceClassResolver->isResourceClass($context['resource_class'])) {
+        if (!$this->resourceClassResolver->isResourceClass($context['resource_class']) && ($context['from_input'] ?? false) === false) {
             return true;
         }
 
@@ -870,6 +874,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 }
 
                 unset($context['resource_class']);
+
+                if (($context['from_input'] ?? false) === true) {
+                    $context['resource_class'] = $className;
+                }
 
                 return $this->serializer->denormalize($value, $className.'[]', $format, $context);
             }

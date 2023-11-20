@@ -112,6 +112,12 @@ services:
             $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
         tags:
             - name: 'api_platform.state_processor'
+              
+    ApiPlatform\Tests\Fixtures\TestBundle\State\SecuredDummyDtoInputProcessor:
+        arguments:
+            $registry: '@doctrine'
+        tags:
+            - name: 'api_platform.state_processor'
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\EntityClassAndCustomProviderResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\EntityClassAndCustomProviderResourceProvider'

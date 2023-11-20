@@ -54,7 +54,7 @@ class ItemNormalizer extends AbstractItemNormalizer
     public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed
     {
         // Avoid issues with proxies if we populated the object
-        if (isset($data['id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
+        if (isset($data['id']) && !isset($context[self::OBJECT_TO_POPULATE]) && ($context['from_input'] ?? false) === false) {
             if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             }

@@ -217,3 +217,69 @@ Feature: Authorization checking
     And I send a "GET" request to "/secured_dummies"
     Then the response status code should be 200
     And the response should contain "ownerOnlyProperty"
+
+  Scenario: A standard user can create a resource and can not write secured property
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "POST" request to "/secured_dummies_with_input_dto" with body:
+    """
+    {
+        "title": "Title",
+        "description": "Description",
+        "adminOnlyProperty": "foo"
+    }
+    """
+    Then the response status code should be 201
+    And the response should contain "adminOnlyProperty"
+    And the JSON node "adminOnlyProperty" should be null
+
+  Scenario: A standard user can update only not secured properties
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "PUT" request to "/secured_dummies_with_input_dto/1" with body:
+    """
+    {
+        "title": "NewTitle",
+        "description": "NewDescription",
+        "adminOnlyProperty": "foo"
+    }
+    """
+    Then the response status code should be 200
+    And the JSON node "adminOnlyProperty" should be null
+    And the JSON node "title" should be equal to the string "NewTitle"
+    And the JSON node "description" should be equal to the string "NewDescription"
+
+  Scenario: An admin can create a resource and can write secured property
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send a "POST" request to "/secured_dummies_with_input_dto" with body:
+    """
+    {
+        "title": "Title",
+        "description": "Description",
+        "adminOnlyProperty": "foo"
+    }
+    """
+    Then the response status code should be 201
+    And the response should contain "adminOnlyProperty"
+    And the JSON node "adminOnlyProperty" should be equal to the string "foo"
+
+  Scenario: An admin can update secured properties
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send a "PUT" request to "/secured_dummies_with_input_dto/2" with body:
+    """
+    {
+        "title": "NewTitle",
+        "description": "NewDescription",
+        "adminOnlyProperty": "NewAdminOnlyProperty"
+    }
+    """
+    Then the response status code should be 200
+    And the JSON node "adminOnlyProperty" should be equal to the string "NewAdminOnlyProperty"
+    And the JSON node "title" should be equal to the string "NewTitle"
+    And the JSON node "description" should be equal to the string "NewDescription"
