@@ -728,6 +728,7 @@ jobs:
 
   phpunit-symfony-next:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony dev)
+    if: false # MongoDBBundle does not support Symfony 7 yet (https://github.com/doctrine/DoctrineMongoDBBundle/pull/784)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -771,6 +772,7 @@ jobs:
 
   behat-symfony-next:
     name: Behat (PHP ${{ matrix.php }}) (Symfony dev)
+    if: false # MongoDBBundle does not support Symfony 7 yet (https://github.com/doctrine/DoctrineMongoDBBundle/pull/784)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
