@@ -113,6 +113,7 @@ Examples:
     test(doctrine): mongodb disambiguation
 
 We strongly recommend the use of a scope on API Platform core.
+Only the first commit on a Pull Request need to use a conventional commit, other commits will be squashed. 
 
 ### Tests
 
@@ -121,6 +122,16 @@ On `api-platform/core` there are two kinds of tests: unit (`phpunit` through `si
 Note that we stopped using `prophesize` for new tests since 3.2, use `phpunit` stub system.
 
 Both `simple-phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
+
+Recommendations:
+    - don't change existing tests if possible
+    - always add a new `ApiResource` or a new `Entity/Document` to add a new test instead of changing an existing class
+    - as of API Platform 3 each component has it's own test directory, avoid the `tests/` directory except for functional tests
+    - dependencies between components must be kept at its minimal (`api-platform/metadata`, `api-platform/state`) except for bridges (Doctrine, Symfony, Laravel etc.)
+
+Note that in most of the testing, you don't need Doctrine take a look at how we write fixtures at: 
+
+https://github.com/api-platform/core/blob/002c8b25283c9c06a085945f6206052a99a5fb1e/tests/Fixtures/TestBundle/Entity/Issue5926/TestIssue5926.php#L20-L26
 
 #### PHPUnit and Coverage Generation
 
