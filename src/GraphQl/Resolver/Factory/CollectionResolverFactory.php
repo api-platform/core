@@ -46,6 +46,10 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 return null;
             }
 
+            if (is_a($resourceClass, \BackedEnum::class, true) && $source && \array_key_exists($info->fieldName, $source)) {
+                return $source[$info->fieldName];
+            }
+
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
             $collection = ($this->readStage)($resourceClass, $rootClass, $operation, $resolverContext);
