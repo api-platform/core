@@ -7,6 +7,12 @@
 // tags: design, state
 // ---
 
+// Note that we use the following configuration:
+// ```
+// api_platform:
+//    defaults:
+//            rfc_7807_compliant_errors: true
+// ```
 // To customize the API Platform response, replace the api_platform.state.error_provider with your own provider:
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ApiResource;
@@ -39,6 +45,7 @@ namespace App\State {
     use ApiPlatform\State\ApiResource\Error;
     use ApiPlatform\State\ProviderInterface;
 
+    // Note that we need to replace the "api_platform.state.error_provider" service, this is done later in this guide.
     final class ErrorProvider implements ProviderInterface
     {
         public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -66,6 +73,23 @@ namespace App\State {
     }
 }
 
+// This is replacing the service, the "key" is important as this is the provider we
+// will look for when handling an exception.
+namespace App\DependencyInjection {
+    use App\State\ErrorProvider;
+    use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+    function configure(ContainerConfigurator $configurator): void
+    {
+        $services = $configurator->services();
+        $services->set('api_platform.state.error_provider')
+            ->class(ErrorProvider::class)
+            ->tag('api_platform.state_provider', ['key' => 'api_platform.state.error_provider']);
+    }
+
+}
+
+
 namespace App\Tests {
     use ApiPlatform\Playground\Test\TestGuideTrait;
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
@@ -90,21 +114,6 @@ namespace App\Playground {
 
     function request(): Request
     {
-        return Request::create('/books.jsonld', 'GET');
+        return Request::create('/books/1.jsonld', 'GET');
     }
 }
-
-namespace App\DependencyInjection {
-    use App\State\ErrorProvider;
-    use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
-    function configure(ContainerConfigurator $configurator): void
-    {
-        $services = $configurator->services();
-        $services->set('api_platform.state.error_provider')
-            ->class(ErrorProvider::class)
-            ->tag('api_platform.state_provider', ['key' => 'api_platform.state.error_provider']);
-    }
-
-}
-
