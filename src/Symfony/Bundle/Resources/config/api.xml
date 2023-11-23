@@ -203,6 +203,7 @@
 
         <service id="api_platform.state.error_provider" class="ApiPlatform\State\ErrorProvider">
             <argument key="$debug">%kernel.debug%</argument>
+            <argument type="service" key="$resourceClassResolver" id="api_platform.resource_class_resolver" />
             <tag name="api_platform.state_provider" key="api_platform.state.error_provider" />
         </service>
 

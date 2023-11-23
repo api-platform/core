@@ -48,6 +48,7 @@ final class SerializeListener
         private readonly SerializerContextBuilderInterface $serializerContextBuilder,
         ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
         private readonly array $errorFormats = [],
+        // @phpstan-ignore-next-line we don't need this anymore
         private readonly bool $debug = false,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;

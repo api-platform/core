@@ -64,7 +64,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        if ($data instanceof Error) {
+        if ($context['api_error_resource'] ?? false) {
             return false;
         }
 

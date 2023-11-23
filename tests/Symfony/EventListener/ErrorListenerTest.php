@@ -103,6 +103,20 @@ final class ErrorListenerTest extends TestCase
             $this->assertTrue($request->attributes->has('_api_previous_operation'));
             $this->assertEquals('_api_errors_hydra', $request->attributes->get('_api_operation_name'));
 
+            $operation = $request->attributes->get('_api_operation');
+            $this->assertEquals($operation->getNormalizationContext(), [
+                // this flag is for bc layer on error normalizers
+                'api_error_resource' => true,
+                'ignored_attributes' => [
+                    'trace',
+                    'file',
+                    'line',
+                    'code',
+                    'message',
+                    'traceAsString',
+                ],
+            ]);
+
             return true;
         }), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response());
         $request = Request::create('/');

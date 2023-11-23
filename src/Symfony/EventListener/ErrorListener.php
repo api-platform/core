@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Metadata\Error as ErrorOperation;
+use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -32,6 +33,7 @@ use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener as SymfonyErrorListener;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 /**
  * This error listener extends the Symfony one in order to add
@@ -70,6 +72,11 @@ final class ErrorListener extends SymfonyErrorListener
         // Because ErrorFormatGuesser is buggy in some cases
         $request->setRequestFormat($format);
         $apiOperation = $this->initializeOperation($request);
+
+        // TODO: add configuration flag to:
+        //   - always use symfony error handler (skips this listener)
+        //   - use symfony error handler if it's not an api error, ie apiOperation is null
+        //   - use api platform to handle errors (the default behavior we handle firewall errors for example but they're out of our scope)
 
         // Let the error handler take this we don't handle HTML nor non-api platform requests
         if ('html' === $format) {
@@ -139,6 +146,17 @@ final class ErrorListener extends SymfonyErrorListener
             $operation = $operation->withProvider('api_platform.state.error_provider');
         }
 
+        $normalizationContext = $operation->getNormalizationContext() ?? [];
+        if (!($normalizationContext['_api_error_resource'] ?? false)) {
+            $normalizationContext = $normalizationContext + ['api_error_resource' => true];
+        }
+
+        if (!isset($normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES])) {
+            $normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES] = ['trace', 'file', 'line', 'code', 'message', 'traceAsString'];
+        }
+
+        $operation = $operation->withNormalizationContext($normalizationContext);
+
         $dup->attributes->set('_api_resource_class', $operation->getClass());
         $dup->attributes->set('_api_previous_operation', $apiOperation);
         $dup->attributes->set('_api_operation', $operation);
@@ -189,6 +207,14 @@ final class ErrorListener extends SymfonyErrorListener
         }
 
         if ($exception instanceof SymfonyHttpExceptionInterface) {
+            return $exception->getStatusCode();
+        }
+
+        if ($exception instanceof ProblemExceptionInterface && $status = $exception->getStatus()) {
+            return $status;
+        }
+
+        if ($exception instanceof HttpExceptionInterface) {
             return $exception->getStatusCode();
         }
 

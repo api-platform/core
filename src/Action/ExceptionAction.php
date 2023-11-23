@@ -81,6 +81,8 @@ final class ExceptionAction
             $error = $error->getConstraintViolationList();
         } elseif (method_exists($error, 'getViolations') && $error->getViolations() instanceof ConstraintViolationListInterface) {
             $error = $error->getViolations();
+        } else {
+            $error = $exception;
         }
 
         $serializerFormat = $format['key'];
