@@ -58,7 +58,7 @@ final class MakeDataPersister extends AbstractMaker
     {
     }
 
-    public function interact(InputInterface $input, ConsoleStyle $io, Command $command)
+    public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
         if (null === $input->getArgument('resource-class')) {
             $argument = $command->getDefinition()->getArgument('resource-class');

@@ -62,7 +62,7 @@ class MakeDataProvider extends AbstractMaker
     {
     }
 
-    public function interact(InputInterface $input, ConsoleStyle $io, Command $command)
+    public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
         if ($input->getOption('item-only') && $input->getOption('collection-only')) {
             throw new RuntimeCommandException('You should at least generate an item or a collection data provider');
