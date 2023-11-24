@@ -84,6 +84,7 @@ class Operation extends AbstractOperation
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
+        ?array $parameters = null,
         array $extraProperties = []
     ) {
         parent::__construct(
@@ -131,6 +132,7 @@ class Operation extends AbstractOperation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            parameters: $parameters,
             extraProperties: $extraProperties
         );
     }

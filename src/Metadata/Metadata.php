@@ -21,15 +21,16 @@ use ApiPlatform\State\OptionsInterface;
 abstract class Metadata
 {
     /**
-     * @param string|null             $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param string|null $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param string|\Stringable|null $security                https://api-platform.com/docs/core/security
      * @param string|\Stringable|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param mixed|null              $mercure
-     * @param mixed|null              $messenger
-     * @param mixed|null              $input
-     * @param mixed|null              $output
-     * @param mixed|null              $provider
-     * @param mixed|null              $processor
+     * @param mixed|null  $mercure
+     * @param mixed|null  $messenger
+     * @param mixed|null  $input
+     * @param mixed|null  $output
+     * @param mixed|null  $provider
+     * @param mixed|null  $processor
+     * @param array<string, Parameter> $parameters
      */
     public function __construct(
         protected ?string $shortName = null,
@@ -69,6 +70,7 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        protected ?array $parameters = [],
         protected array $extraProperties = []
     ) {
     }
@@ -562,6 +564,19 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->stateOptions = $stateOptions;
+
+        return $self;
+    }
+
+    public function getParameters(): ?array
+    {
+        return $this->parameters;
+    }
+
+    public function withParameters(array $parameters = []): static
+    {
+        $self = clone $this;
+        $self->parameters = $parameters;
 
         return $self;
     }

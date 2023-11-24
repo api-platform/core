@@ -59,6 +59,7 @@ abstract class Operation extends Metadata
      * @param bool|null              $forceEager    {@see https://api-platform.com/docs/core/performance/#force-eager}
      * @param string|callable|null   $provider      {@see https://api-platform.com/docs/core/state-providers/#state-providers}
      * @param string|callable|null   $processor     {@see https://api-platform.com/docs/core/state-processors/#state-processors}
+     * @param array<string, Parameter> $parameters
      */
     public function __construct(
         protected ?string $shortName = null,
@@ -805,6 +806,7 @@ abstract class Operation extends Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        protected ?array $parameters = [],
         protected array $extraProperties = [],
     ) {
         parent::__construct(
@@ -845,6 +847,7 @@ abstract class Operation extends Metadata
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            parameters: $parameters,
             extraProperties: $extraProperties,
         );
     }

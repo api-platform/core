@@ -69,6 +69,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         $provider = null,
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        ?array $parameters = null,
         array $extraProperties = [],
 
         ?bool $nested = null,
@@ -121,6 +122,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
             name: $name ?: 'collection_query',
             provider: $provider,
             processor: $processor,
+            parameters: $parameters,
             extraProperties: $extraProperties,
             nested: $nested,
         );
