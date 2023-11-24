@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiResourceDto;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
@@ -58,6 +59,10 @@ final class AttributesResourceNameCollectionFactory implements ResourceNameColle
     private function isResource(\ReflectionClass $reflectionClass): bool
     {
         if ($reflectionClass->getAttributes(ApiResource::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+            return true;
+        }
+
+        if ($reflectionClass->getAttributes(ApiResourceDto::class, \ReflectionAttribute::IS_INSTANCEOF)) {
             return true;
         }
 

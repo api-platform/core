@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiResourceDto;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
@@ -85,6 +86,14 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         $hasApiResource = false;
 
         foreach ($attributes as $attribute) {
+            if (is_a($attribute->getName(), ApiResourceDto::class, true)) {
+                $hasApiResource = true;
+                $resource = $this->getResourceWithDefaults($resourceClass, $shortName, new ApiResource())
+                    ->withOperations(new Operations());
+                $resources[++$index] = $resource;
+                continue;
+            }
+
             if (is_a($attribute->getName(), ApiResource::class, true)) {
                 $hasApiResource = true;
                 $resource = $this->getResourceWithDefaults($resourceClass, $shortName, $attribute->newInstance());
@@ -172,7 +181,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     private function hasResourceAttributes(\ReflectionClass $reflectionClass): bool
     {
         foreach ($reflectionClass->getAttributes() as $attribute) {
-            if (is_a($attribute->getName(), ApiResource::class, true) || is_subclass_of($attribute->getName(), HttpOperation::class) || is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
+            if (is_a($attribute->getName(), ApiResource::class, true) || is_a($attribute->getName(), ApiResourceDto::class, true) || is_subclass_of($attribute->getName(), HttpOperation::class) || is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
                 return true;
             }
         }

@@ -242,7 +242,10 @@ class AppKernel extends Kernel
 
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
-                'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
+                'paths' => [
+                    '%kernel.project_dir%/../TestBundle/Resources/config/api_resources',
+                    '%kernel.project_dir%/../TestBundle/Dto',
+                ],
             ],
             'graphql' => [
                 'graphql_playground' => false,
