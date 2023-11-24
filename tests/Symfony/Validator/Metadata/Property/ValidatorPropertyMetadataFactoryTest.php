@@ -675,7 +675,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]),
             'property' => 'greaterThanMe',
-            'expectedSchema' => ['minimum' => 10, 'exclusiveMinimum' => true],
+            'expectedSchema' => ['exclusiveMinimum' => 10],
         ];
 
         yield [
@@ -687,7 +687,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]),
             'property' => 'lessThanMe',
-            'expectedSchema' => ['maximum' => 99, 'exclusiveMaximum' => true],
+            'expectedSchema' => ['exclusiveMaximum' => 99],
         ];
 
         yield [
@@ -699,7 +699,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]),
             'property' => 'positive',
-            'expectedSchema' => ['minimum' => 0, 'exclusiveMinimum' => true],
+            'expectedSchema' => ['exclusiveMinimum' => 0],
         ];
 
         yield [
@@ -711,7 +711,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]),
             'property' => 'negative',
-            'expectedSchema' => ['maximum' => 0, 'exclusiveMaximum' => true],
+            'expectedSchema' => ['exclusiveMaximum' => 0],
         ];
 
         yield [
