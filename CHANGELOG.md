@@ -4,6 +4,17 @@
 
 ### Bug fixes
 
+To have errors backward compatible with 3.1, use: 
+
+```yaml
+api_platform:
+    defaults:
+         extra_properties:
+             rfc_7807_compliant_errors: false
+```
+
+New extension points are available using [Errors](https://api-platform.com/docs/v3.2/core/errors/) with `rfc_7807_compliant_errors: true` such as [Error provider](https://api-platform.com/docs/v3.2/guides/error-provider/) and [Error Resource](https://api-platform.com/docs/v3.2/guides/error-resource/)
+
 * [1b4289412](https://github.com/api-platform/core/commit/1b42894128545ad72b19b6be1c31ad25351c9138) fix: errors bc with rfc_7807_compliant_errors false (#5974)
 * [ce297e6f7](https://github.com/api-platform/core/commit/ce297e6f73e1797ede21312aa31af2b110e9e583) fix(jsonschema): child entity property schema generation (#5988) (#5989)
 
