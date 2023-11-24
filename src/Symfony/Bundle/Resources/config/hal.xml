@@ -57,13 +57,6 @@
             <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-995" />
         </service>
-
-        <service id="api_platform.hal.normalizer.constraint_violation_list" class="ApiPlatform\Hal\Serializer\ConstraintViolationListNormalizer" public="false">
-            <argument>%api_platform.validator.serialize_payload_fields%</argument>
-            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
-
-            <tag name="serializer.normalizer" priority="-780" />
-        </service>
     </services>
 
 </container>

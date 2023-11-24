@@ -204,7 +204,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: latest
+          php-version: ${{ matrix.php }}
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1

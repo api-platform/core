@@ -36,7 +36,7 @@ final class ErrorNormalizer implements NormalizerInterface
             return true;
         }
 
-        return $this->decorated->supportsNormalization($data, $format);
+        return $this->decorated->supportsNormalization($data, $format, $context);
     }
 
     public function hasCacheableSupportsMethod(): bool

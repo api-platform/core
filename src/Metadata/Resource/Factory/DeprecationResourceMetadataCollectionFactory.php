@@ -46,10 +46,6 @@ class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCo
                     $this->triggerDeprecationOnce($operation, 'extraProperties["standard_put"]', 'In API Platform 4 PUT will always replace the data, use extraProperties["standard_put"] to "true" on every operation to avoid breaking PUT\'s behavior. Use PATCH to use the old behavior.');
                 }
 
-                if (null === ($extraProperties['skip_deprecated_exception_normalizers'] ?? null)) {
-                    $operation = $operation->withExtraProperties(['skip_deprecated_exception_normalizers' => false] + $extraProperties);
-                }
-
                 $newOperations[$operationName] = $operation;
             }
 

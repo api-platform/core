@@ -20,7 +20,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} the API Problem spec (RFC 7807).
  *
  * @see https://tools.ietf.org/html/rfc7807
- * @deprecated this is not used anymore internally and will be removed in 4.0
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -48,6 +47,11 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         [$messages, $violations] = $this->getMessagesAndViolations($object);
+
+        // TODO: in api platform 4 this will be the default, as right now we serialize a ValidationException instead of a ConstraintViolationList
+        if ($context['rfc_7807_compliant_errors'] ?? false) {
+            return $violations;
+        }
 
         return [
             'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE],

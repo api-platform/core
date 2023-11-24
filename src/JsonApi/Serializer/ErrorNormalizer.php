@@ -15,14 +15,14 @@ namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
+use ApiPlatform\State\ApiResource\Error;
+use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
 /**
  * Converts {@see \Exception} or {@see FlattenException} or to a JSON API error representation.
- *
- * @deprecated we will use the ItemNormalizer in 4.x instead
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
@@ -36,7 +36,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         self::TITLE => 'An error occurred',
     ];
 
-    public function __construct(private readonly bool $debug = false, array $defaultContext = [], private readonly ?NormalizerInterface $itemNormalizer = null)
+    public function __construct(private readonly bool $debug = false, array $defaultContext = [], private ?NormalizerInterface $itemNormalizer = null, private ?NormalizerInterface $constraintViolationListNormalizer = null)
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -46,8 +46,18 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
-        if ($this->itemNormalizer) {
-            return $this->itemNormalizer->normalize($object, $format, $context);
+        // TODO: in api platform 4 this will be the default, note that JSON:API is close to Problem so we should use the same normalizer
+        if ($context['rfc_7807_compliant_errors'] ?? false) {
+            if ($object instanceof ConstraintViolationListAwareExceptionInterface) {
+                // TODO: return ['errors' => $this->constraintViolationListNormalizer(...)]
+                return $this->constraintViolationListNormalizer->normalize($object->getConstraintViolationList(), $format, $context);
+            }
+
+            $jsonApiObject = $this->itemNormalizer->normalize($object, $format, $context);
+            $error = $jsonApiObject['data']['attributes'];
+            $error['id'] = $jsonApiObject['data']['id'];
+
+            return ['errors' => [$error]];
         }
 
         $data = [
@@ -71,21 +81,15 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        if ($context['skip_deprecated_exception_normalizers'] ?? false) {
-            return false;
-        }
-
-        $decoration = $this->itemNormalizer ? $this->itemNormalizer->supportsNormalization($data, $format, $context) : true;
-
-        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException) && $decoration;
+        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 
     public function getSupportedTypes($format): array
     {
         if (self::FORMAT === $format) {
             return [
-                \Exception::class => false,
-                FlattenException::class => false,
+                \Exception::class => true,
+                FlattenException::class => true,
             ];
         }
 
@@ -103,6 +107,6 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
             );
         }
 
-        return false;
+        return true;
     }
 }

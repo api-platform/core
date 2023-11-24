@@ -51,7 +51,7 @@ class ValidationExceptionNormalizer implements NormalizerInterface, CacheableSup
 
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return $data instanceof ValidationException && $this->decorated->supportsNormalization($data, $format);
+        return $data instanceof ValidationException && $this->decorated->supportsNormalization($data, $format, $context);
     }
 
     public function hasCacheableSupportsMethod(): bool
@@ -65,11 +65,11 @@ class ValidationExceptionNormalizer implements NormalizerInterface, CacheableSup
             );
         }
 
-        return true;
+        return false;
     }
 
     public function getSupportedTypes($format): array
     {
-        return [ValidationException::class => true];
+        return [ValidationException::class => false];
     }
 }
