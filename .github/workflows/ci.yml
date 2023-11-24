@@ -298,7 +298,7 @@ jobs:
           tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
           tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Validate OpenAPI documents
@@ -1114,7 +1114,7 @@ jobs:
           tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
           tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Validate OpenAPI documents
