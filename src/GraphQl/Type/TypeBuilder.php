@@ -245,9 +245,6 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
     public function getEnumType(Operation $operation): GraphQLType
     {
         $enumName = $operation->getShortName();
-        if (!str_ends_with($enumName, 'Enum')) {
-            $enumName = sprintf('%sEnum', $enumName);
-        }
 
         if ($this->typesContainer->has($enumName)) {
             return $this->typesContainer->get($enumName);

@@ -70,28 +70,7 @@ final class TypeConverter implements TypeConverterInterface
                     return GraphQLType::string();
                 }
 
-                $resourceType = $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth);
-
-                if (!$resourceType && is_a($type->getClassName(), \BackedEnum::class, true)) {
-                    // Remove the condition in API Platform 4.
-                    if ($this->typeBuilder instanceof TypeBuilderEnumInterface) {
-                        $operation = null;
-                        try {
-                            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($type->getClassName());
-                            $operation = $resourceMetadataCollection->getOperation();
-                        } catch (ResourceClassNotFoundException|OperationNotFoundException) {
-                        }
-                        /** @var Query $enumOperation */
-                        $enumOperation = (new Query())
-                            ->withClass($type->getClassName())
-                            ->withShortName($operation?->getShortName() ?? (new \ReflectionClass($type->getClassName()))->getShortName())
-                            ->withDescription($operation?->getDescription());
-
-                        return $this->typeBuilder->getEnumType($enumOperation);
-                    }
-                }
-
-                return $resourceType;
+                return $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth);
             default:
                 return null;
         }
@@ -149,6 +128,25 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         if (!$hasGraphQl) {
+            if (is_a($resourceClass, \BackedEnum::class, true)) {
+                // Remove the condition in API Platform 4.
+                if ($this->typeBuilder instanceof TypeBuilderEnumInterface) {
+                    $operation = null;
+                    try {
+                        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+                        $operation = $resourceMetadataCollection->getOperation();
+                    } catch (ResourceClassNotFoundException|OperationNotFoundException) {
+                    }
+                    /** @var Query $enumOperation */
+                    $enumOperation = (new Query())
+                        ->withClass($resourceClass)
+                        ->withShortName($operation?->getShortName() ?? (new \ReflectionClass($resourceClass))->getShortName())
+                        ->withDescription($operation?->getDescription());
+
+                    return $this->typeBuilder->getEnumType($enumOperation);
+                }
+            }
+
             return null;
         }
 
