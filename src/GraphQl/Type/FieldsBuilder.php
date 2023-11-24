@@ -220,7 +220,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                 if (
                     !$propertyTypes
                     || (!$input && false === $propertyMetadata->isReadable())
-                    || ($input && $operation instanceof Mutation && false === $propertyMetadata->isWritable())
+                    || ($input && false === $propertyMetadata->isWritable())
                 ) {
                     continue;
                 }

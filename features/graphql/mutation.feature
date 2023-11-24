@@ -637,6 +637,79 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateDummy.dummy.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy11"
     And the JSON node "data.updateDummy.clientMutationId" should be equal to "myId"
 
+  @createSchema
+  @!mongodb
+  Scenario: Modify an item with embedded object through a mutation
+    Given there is a fooDummy objects with fake names and embeddable
+    When I send the following GraphQL request:
+    """
+    mutation {
+      updateFooDummy(input: {id: "/foo_dummies/1", name: "modifiedName", embeddedFoo: {dummyName: "Embedded name"}, clientMutationId: "myId"}) {
+        fooDummy {
+          id
+          name
+          embeddedFoo {
+            dummyName
+          }
+        }
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.updateFooDummy.fooDummy.name" should be equal to "modifiedName"
+    And the JSON node "data.updateFooDummy.fooDummy.embeddedFoo.dummyName" should be equal to "Embedded name"
+    And the JSON node "data.updateFooDummy.clientMutationId" should be equal to "myId"
+
+  @createSchema
+  Scenario: Try to modify a non writable property through a mutation
+    Given there is a fooDummy objects with fake names and embeddable
+    When I send the following GraphQL request:
+    """
+    mutation {
+      updateFooDummy(input: {id: "/foo_dummies/1", name: "modifiedName", nonWritableProp: "written", embeddedFoo: {dummyName: "Embedded name"}, clientMutationId: "myId"}) {
+        fooDummy {
+          id
+          name
+          embeddedFoo {
+            dummyName
+          }
+        }
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].message" should match '/^Field "nonWritableProp" is not defined by type "?updateFooDummyInput"?\.$/'
+
+  @createSchema
+  @!mongodb
+  Scenario: Try to modify a non writable embedded property through a mutation
+    Given there is a fooDummy objects with fake names and embeddable
+    When I send the following GraphQL request:
+    """
+    mutation {
+      updateFooDummy(input: {id: "/foo_dummies/1", name: "modifiedName", embeddedFoo: {dummyName: "Embedded name", nonWritableProp: "written"}, clientMutationId: "myId"}) {
+        fooDummy {
+          id
+          name
+          embeddedFoo {
+            dummyName
+          }
+        }
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].message" should match '/^Field "nonWritableProp" is not defined by type "?FooEmbeddableNestedInput"?\.$/'
+
   @!mongodb
   Scenario: Modify an item with composite identifiers through a mutation
     Given there are Composite identifier objects

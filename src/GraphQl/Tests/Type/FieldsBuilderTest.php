@@ -582,7 +582,8 @@ class FieldsBuilderTest extends TestCase
         yield 'query input' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(false),
+                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'nonWritableProperty' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(false)->withWritable(false),
             ],
             true, 0, null,
             [
@@ -671,6 +672,7 @@ class FieldsBuilderTest extends TestCase
                 'property' => new ApiProperty(),
                 'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
                 'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'nonWritableProperty' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(false)->withWritable(false),
                 'id' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(false)->withWritable(true),
             ],
             true, 0, null,

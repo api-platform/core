@@ -79,6 +79,8 @@ Feature: Default order
           "@type": "FooDummy",
           "id": 5,
           "name": "Balbo",
+          "nonWritableProp": "readonly",
+          "embeddedFoo": null,
           "dummy": "/dummies/5",
           "soManies": [
             "/so_manies/13",
@@ -92,6 +94,8 @@ Feature: Default order
           "@type": "FooDummy",
           "id": 3,
           "name": "Sthenelus",
+          "nonWritableProp": "readonly",
+          "embeddedFoo": null,
           "dummy": "/dummies/3",
           "soManies": [
             "/so_manies/7",
@@ -104,6 +108,8 @@ Feature: Default order
           "@type": "FooDummy",
           "id": 2,
           "name": "Ephesian",
+          "nonWritableProp": "readonly",
+          "embeddedFoo": null,
           "dummy": "/dummies/2",
           "soManies": [
             "/so_manies/4",
@@ -116,6 +122,8 @@ Feature: Default order
           "@type": "FooDummy",
           "id": 1,
           "name": "Hawsepipe",
+          "nonWritableProp": "readonly",
+          "embeddedFoo": null,
           "dummy": "/dummies/1",
           "soManies": [
             "/so_manies/1",
@@ -128,6 +136,8 @@ Feature: Default order
           "@type": "FooDummy",
           "id": 4,
           "name": "Separativeness",
+          "nonWritableProp": "readonly",
+          "embeddedFoo": null,
           "dummy": "/dummies/4",
           "soManies": [
             "/so_manies/10",
