@@ -36,7 +36,7 @@ final class ErrorNormalizer implements NormalizerInterface
             return true;
         }
 
-        return $this->decorated->supportsNormalization($data, $format);
+        return $this->decorated->supportsNormalization($data, $format, $context);
     }
 
     public function hasCacheableSupportsMethod(): bool
@@ -46,7 +46,6 @@ final class ErrorNormalizer implements NormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
-        // @phpstan-ignore-next-line
         return $this->decorated->getSupportedTypes($format);
     }
 }

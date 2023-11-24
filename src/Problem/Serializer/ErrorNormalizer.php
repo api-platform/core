@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Problem\Serializer;
 
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
+use ApiPlatform\State\ApiResource\Error;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -22,7 +23,6 @@ use Symfony\Component\Serializer\Serializer;
  * Normalizes errors according to the API Problem spec (RFC 7807).
  *
  * @see https://tools.ietf.org/html/rfc7807
- * @deprecated we use ItemNormalizer instead
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -37,7 +37,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         self::TITLE => 'An error occurred',
     ];
 
-    public function __construct(private readonly bool $debug = false, array $defaultContext = [], private readonly ?NormalizerInterface $itemNormalizer = null)
+    public function __construct(private readonly bool $debug = false, array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -47,12 +47,6 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
-        trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated in favor of using an Error resource. We fallback on "api_platform.serializer.normalizer.item".', __CLASS__));
-
-        if ($this->itemNormalizer) {
-            return $this->itemNormalizer->normalize($object, $format, $context);
-        }
-
         $data = [
             'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE],
             'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],
@@ -71,21 +65,20 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        if ($context['skip_deprecated_exception_normalizers'] ?? false) {
+        if ($context['api_error_resource'] ?? false) {
             return false;
         }
 
-        $decoration = $this->itemNormalizer ? $this->itemNormalizer->supportsNormalization($data, $format, $context) : true;
-
-        return (self::FORMAT === $format || 'json' === $format) && ($data instanceof \Exception || $data instanceof FlattenException) && $decoration;
+        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 
     public function getSupportedTypes($format): array
     {
-        if (self::FORMAT === $format || 'json' === $format) {
+        if (self::FORMAT === $format) {
             return [
-                \Exception::class => false,
-                FlattenException::class => false,
+                \Exception::class => true,
+                Error::class => false,
+                FlattenException::class => true,
             ];
         }
 
@@ -103,6 +96,6 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
             );
         }
 
-        return false;
+        return true;
     }
 }

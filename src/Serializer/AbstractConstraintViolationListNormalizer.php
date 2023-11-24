@@ -65,54 +65,8 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
         return true;
     }
 
-    /**
-     * return string[].
-     */
-    protected function getViolations(ConstraintViolationListInterface $constraintViolationList): array
-    {
-        $violations = [];
-
-        foreach ($constraintViolationList as $violation) {
-            $class = \is_object($root = $violation->getRoot()) ? $root::class : null;
-
-            if ($this->nameConverter instanceof AdvancedNameConverterInterface) {
-                $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath(), $class, static::FORMAT);
-            } elseif ($this->nameConverter instanceof NameConverterInterface) {
-                $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath());
-            } else {
-                $propertyPath = $violation->getPropertyPath();
-            }
-
-            $violationData = [
-                'propertyPath' => $propertyPath,
-                'message' => $violation->getMessage(),
-                'code' => $violation->getCode(),
-            ];
-
-            if ($hint = $violation->getParameters()['hint'] ?? false) {
-                $violationData['hint'] = $hint;
-            }
-
-            $constraint = $violation instanceof ConstraintViolation ? $violation->getConstraint() : null;
-            if (
-                [] !== $this->serializePayloadFields
-                && $constraint
-                && $constraint->payload
-                // If some fields are whitelisted, only them are added
-                && $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, $this->serializePayloadFields)
-            ) {
-                $violationData['payload'] = $payloadFields;
-            }
-
-            $violations[] = $violationData;
-        }
-
-        return $violations;
-    }
-
     protected function getMessagesAndViolations(ConstraintViolationListInterface $constraintViolationList): array
     {
-        trigger_deprecation('api-platform', '3.2', sprintf('"%s::%s" will be removed in 4.0, use "%1$s::%s', __CLASS__, __METHOD__, 'getViolations'));
         $violations = $messages = [];
 
         foreach ($constraintViolationList as $violation) {

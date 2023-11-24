@@ -48,6 +48,7 @@ final class SerializeListener
         private readonly SerializerContextBuilderInterface $serializerContextBuilder,
         ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
         private readonly array $errorFormats = [],
+        // @phpstan-ignore-next-line we don't need this anymore
         private readonly bool $debug = false,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
@@ -100,20 +101,6 @@ final class SerializeListener
             if (!($previousOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
                 $context['groups'] = ['legacy_'.$format['key']];
                 $context['force_iri_generation'] = false;
-            }
-        }
-
-        if ($request->get('_api_error', false)) {
-            $context['skip_deprecated_exception_normalizers'] = true;
-
-            if ($this->debug) {
-                $groups = $context['groups'] ?? [];
-                if (!\is_array($groups)) {
-                    $groups = [$groups];
-                }
-
-                $groups[] = 'trace';
-                $context['groups'] = $groups;
             }
         }
 

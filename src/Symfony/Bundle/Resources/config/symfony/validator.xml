@@ -25,19 +25,15 @@
             <argument type="service" id="api_platform.validator" />
         </service>
 
+        <service id="api_platform.validator.state.error_provider" class="ApiPlatform\Symfony\Validator\State\ErrorProvider">
+            <tag name="api_platform.state_provider" key="api_platform.validator.state.error_provider" />
+        </service>
+
         <service id="api_platform.serializer.normalizer.validation_exception" class="ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer" public="false">
             <argument type="service" id="api_platform.serializer.normalizer.item" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
             <tag name="serializer.normalizer" priority="-800" />
-        </service>
-
-        <service id="api_platform.serializer.normalizer.constraint_violation_list" class="ApiPlatform\Symfony\Validator\Serializer\ConstraintViolationListNormalizer" public="false">
-            <argument>%api_platform.validator.serialize_payload_fields%</argument>
-            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
-
-            <!-- serializer.normalizer.constraint_violation_list is at 915  -->
-            <tag name="serializer.normalizer" priority="-900" />
         </service>
     </services>
 

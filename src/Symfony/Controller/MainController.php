@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Controller;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
@@ -47,10 +48,13 @@ final class MainController
     {
         $operation = $this->initializeOperation($request);
         $uriVariables = [];
-        try {
-            $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
-        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
-            throw new NotFoundHttpException('Invalid uri variables.', $e);
+
+        if (!$operation instanceof Error) {
+            try {
+                $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+            } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
+                throw new NotFoundHttpException('Invalid uri variables.', $e);
+            }
         }
 
         $context = [

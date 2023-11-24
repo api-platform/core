@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-interface HttpExceptionInterface extends \Throwable
+interface HttpExceptionInterface
 {
     /**
      * Returns the status code.

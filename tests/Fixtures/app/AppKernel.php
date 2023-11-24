@@ -234,12 +234,36 @@ class AppKernel extends Kernel
             $twigConfig['exception_controller'] = null;
         }
         $c->prependExtensionConfig('twig', $twigConfig);
+
+        $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
+        $rfc7807CompliantErrors = (bool) ($_SERVER['RFC_7807_COMPLIANT_ERRORS'] ?? true);
+
+        extra_properties:
+
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
             ],
             'graphql' => [
                 'graphql_playground' => false,
+            ],
+            'event_listeners_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer,
+            'defaults' => [
+                'pagination_client_enabled' => true,
+                'pagination_client_items_per_page' => true,
+                'pagination_client_partial' => true,
+                'pagination_items_per_page' => 3,
+                'cache_headers' => [
+                    'max_age' => 60,
+                    'shared_max_age' => 3600,
+                    'vary' => ['Accept', 'Cookie'],
+                    'public' => true,
+                ],
+                'normalization_context' => ['skip_null_values' => false],
+                'extra_properties' => [
+                    'rfc_7807_compliant_errors' => $rfc7807CompliantErrors,
+                    'standard_put' => true,
+                ],
             ],
         ]);
 
@@ -248,14 +272,12 @@ class AppKernel extends Kernel
             $c->prependExtensionConfig('doctrine', [
                 'orm' => [
                     'report_fields_where_declared' => true,
+                    'enable_lazy_ghost_objects' => true,
                 ],
             ]);
         }
 
         $loader->load(__DIR__.'/config/config_swagger.php');
-
-        $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
-        $c->prependExtensionConfig('api_platform', ['event_listeners_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer]);
 
         if ('mongodb' === $this->environment) {
             $c->prependExtensionConfig('api_platform', [

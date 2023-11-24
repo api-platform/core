@@ -11,13 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\Validator\Serializer;
+namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} the API Problem spec (RFC 7807).
+ *
+ * @see https://tools.ietf.org/html/rfc7807
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -25,13 +26,9 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 {
     public const FORMAT = 'json';
 
-    private array $defaultContext = [];
-
-    public function __construct(array $serializePayloadFields = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
+    public function __construct(array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
     {
         parent::__construct($serializePayloadFields, $nameConverter);
-
-        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -39,6 +36,8 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
-        return $this->getViolations($object);
+        [$messages, $violations] = $this->getMessagesAndViolations($object);
+
+        return $violations;
     }
 }

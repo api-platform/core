@@ -28,8 +28,6 @@ interface ProblemExceptionInterface
 
     public function getStatus(): ?int;
 
-    public function setStatus(int $status): void;
-
     public function getDetail(): ?string;
 
     public function getInstance(): ?string;

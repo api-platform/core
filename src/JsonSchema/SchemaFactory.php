@@ -139,13 +139,13 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $definition['required'][] = $normalizedPropertyName;
             }
 
-            $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format);
+            $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
         }
 
         return $schema;
     }
 
-    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format): void
+    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, string $parentType): void
     {
         $version = $schema->getVersion();
         if (Schema::VERSION_SWAGGER === $version || Schema::VERSION_OPENAPI === $version) {
@@ -216,7 +216,7 @@ final class SchemaFactory implements SchemaFactoryInterface
                 continue;
             }
 
-            $subSchema = $this->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+            $subSchema = $this->buildSchema($className, $format, $parentType, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
             if ($isCollection) {
                 $propertySchema['items']['$ref'] = $subSchema['$ref'];
                 unset($propertySchema['items']['type']);

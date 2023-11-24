@@ -35,9 +35,16 @@ use Symfony\Component\WebLink\Link;
     status: 422,
     openapi: false,
     uriVariables: ['id'],
+    provider: 'api_platform.validator.state.error_provider',
     shortName: 'ConstraintViolationList',
     operations: [
-        new ErrorOperation(name: '_api_validation_errors_problem', outputFormats: ['json' => ['application/problem+json']], normalizationContext: ['groups' => ['json'], 'skip_null_values' => true]),
+        new ErrorOperation(
+            name: '_api_validation_errors_problem',
+            outputFormats: ['json' => ['application/problem+json']],
+            normalizationContext: ['groups' => ['json'],
+                'skip_null_values' => true,
+                'rfc_7807_compliant_errors' => true,
+            ]),
         new ErrorOperation(
             name: '_api_validation_errors_hydra',
             outputFormats: ['jsonld' => ['application/problem+json']],
@@ -45,9 +52,14 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
+                'rfc_7807_compliant_errors' => true,
             ]
         ),
-        new ErrorOperation(name: '_api_validation_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]),
+        new ErrorOperation(
+            name: '_api_validation_errors_jsonapi',
+            outputFormats: ['jsonapi' => ['application/vnd.api+json']],
+            normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true, 'rfc_7807_compliant_errors' => true]
+        ),
     ],
     graphQlOperations: []
 )]
@@ -77,32 +89,32 @@ final class ValidationException extends BaseValidationException implements Const
     }
 
     #[SerializedName('hydra:title')]
-    #[Groups(['jsonld', 'legacy_jsonld'])]
+    #[Groups(['jsonld'])]
     public function getHydraTitle(): string
     {
         return $this->errorTitle ?? 'An error occurred';
     }
 
-    #[Groups(['jsonld', 'legacy_jsonld'])]
+    #[Groups(['jsonld'])]
     #[SerializedName('hydra:description')]
     public function getHydraDescription(): string
     {
         return $this->detail;
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
+    #[Groups(['jsonld', 'json'])]
     public function getType(): string
     {
         return '/validation_errors/'.$this->getId();
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
+    #[Groups(['jsonld', 'json'])]
     public function getTitle(): ?string
     {
         return $this->errorTitle ?? 'An error occurred';
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
+    #[Groups(['jsonld', 'json'])]
     private string $detail;
 
     public function getDetail(): ?string
@@ -115,7 +127,7 @@ final class ValidationException extends BaseValidationException implements Const
         $this->detail = $detail;
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
+    #[Groups(['jsonld', 'json'])]
     public function getStatus(): ?int
     {
         return $this->status;
@@ -133,7 +145,7 @@ final class ValidationException extends BaseValidationException implements Const
     }
 
     #[SerializedName('violations')]
-    #[Groups(['json', 'jsonld', 'legacy_jsonld', 'legacy_jsonproblem', 'legacy_json'])]
+    #[Groups(['json', 'jsonld'])]
     public function getConstraintViolationList(): ConstraintViolationListInterface
     {
         return $this->constraintViolationList;
