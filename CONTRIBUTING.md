@@ -124,10 +124,11 @@ Note that we stopped using `prophesize` for new tests since 3.2, use `phpunit` s
 Both `simple-phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
 
 Recommendations:
-    - don't change existing tests if possible
-    - always add a new `ApiResource` or a new `Entity/Document` to add a new test instead of changing an existing class
-    - as of API Platform 3 each component has it's own test directory, avoid the `tests/` directory except for functional tests
-    - dependencies between components must be kept at its minimal (`api-platform/metadata`, `api-platform/state`) except for bridges (Doctrine, Symfony, Laravel etc.)
+
+* don't change existing tests if possible
+* always add a new `ApiResource` or a new `Entity/Document` to add a new test instead of changing an existing class
+* as of API Platform 3 each component has it's own test directory, avoid the `tests/` directory except for functional tests
+* dependencies between components must be kept at its minimal (`api-platform/metadata`, `api-platform/state`) except for bridges (Doctrine, Symfony, Laravel etc.)
 
 Note that in most of the testing, you don't need Doctrine take a look at how we write fixtures at: 
 
