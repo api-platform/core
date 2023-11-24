@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.2.6
+
+### Bug fixes
+
+* [1b4289412](https://github.com/api-platform/core/commit/1b42894128545ad72b19b6be1c31ad25351c9138) fix: errors bc with rfc_7807_compliant_errors false (#5974)
+* [ce297e6f7](https://github.com/api-platform/core/commit/ce297e6f73e1797ede21312aa31af2b110e9e583) fix(jsonschema): child entity property schema generation (#5988) (#5989)
+
 ## v3.2.5
 
 ### Bug fixes
