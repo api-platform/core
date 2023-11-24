@@ -31,8 +31,7 @@ final class PropertySchemaLessThanRestriction implements PropertySchemaRestricti
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
         return [
-            'maximum' => $constraint->value,
-            'exclusiveMaximum' => true,
+            'exclusiveMaximum' => $constraint->value,
         ];
     }
 

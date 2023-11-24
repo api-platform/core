@@ -58,8 +58,7 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
     public function testCreate(): void
     {
         self::assertEquals([
-            'maximum' => 10,
-            'exclusiveMaximum' => true,
+            'exclusiveMaximum' => 10,
         ], $this->propertySchemaLessThanRestriction->create(new LessThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));
     }
 }
