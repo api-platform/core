@@ -148,7 +148,7 @@ final class ErrorListener extends SymfonyErrorListener
 
         $normalizationContext = $operation->getNormalizationContext() ?? [];
         if (!($normalizationContext['_api_error_resource'] ?? false)) {
-            $normalizationContext = $normalizationContext + ['api_error_resource' => true];
+            $normalizationContext += ['api_error_resource' => true];
         }
 
         if (!isset($normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES])) {
