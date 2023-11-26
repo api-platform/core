@@ -31,6 +31,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * The search filter allows to filter a collection by given properties.
@@ -234,7 +235,13 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             try {
                 $item = $this->getIriConverter()->getResourceFromIri($value, ['fetch_data' => false]);
 
-                return $this->propertyAccessor->getValue($item, $associationFieldIdentifier);
+                $value = $this->propertyAccessor->getValue($item, $associationFieldIdentifier);
+
+                if ($value instanceof Uuid) {
+                    return $value->toBinary();
+                }
+
+                return $value;
             } catch (InvalidArgumentException) {
                 /*
                  * Can we do better? This is not the ApiResource the call was made on,
