@@ -233,8 +233,13 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             }
             try {
                 $item = $this->getIriConverter()->getResourceFromIri($value, ['fetch_data' => false]);
+                
+                $value = $this->propertyAccessor->getValue($item, $associationFieldIdentifier);
+                if ($value instanceof \Symfony\Component\Uid\Uuid) {
+                    $value = $value->toBinary();
+                }
 
-                return $this->propertyAccessor->getValue($item, $associationFieldIdentifier);
+                return $value;
             } catch (InvalidArgumentException) {
                 /*
                  * Can we do better? This is not the ApiResource the call was made on,
