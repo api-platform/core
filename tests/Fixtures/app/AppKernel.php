@@ -248,6 +248,7 @@ class AppKernel extends Kernel
             $c->prependExtensionConfig('doctrine', [
                 'orm' => [
                     'report_fields_where_declared' => true,
+                    'enable_lazy_ghost_objects' => true,
                 ],
             ]);
         }
