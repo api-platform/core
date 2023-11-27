@@ -86,7 +86,7 @@ class RelatedDummy extends ParentDummy implements \Stringable
     #[ApiFilter(filterClass: DateFilter::class)]
     public $dummyDate;
 
-    #[ORM\ManyToOne(targetEntity: ThirdLevel::class, cascade: ['persist'], inversedBy: 'relatedDummies')]
+    #[ORM\ManyToOne(targetEntity: ThirdLevel::class, cascade: ['persist'])]
     #[Groups(['barcelona', 'chicago', 'friends'])]
     public ?ThirdLevel $thirdLevel = null;
 

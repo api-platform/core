@@ -16,8 +16,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -52,14 +50,6 @@ class ThirdLevel
     public ?FourthLevel $fourthLevel = null;
     #[ORM\ManyToOne(targetEntity: FourthLevel::class, cascade: ['persist'])]
     public $badFourthLevel;
-
-    #[ORM\OneToMany(mappedBy: 'thirdLevel', targetEntity: RelatedDummy::class)]
-    public Collection|iterable $relatedDummies;
-
-    public function __construct()
-    {
-        $this->relatedDummies = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
