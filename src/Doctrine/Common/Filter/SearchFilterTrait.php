@@ -109,7 +109,7 @@ trait SearchFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function getIriConverter(): IriConverterInterface;
+    abstract protected function getIriConverter(): LegacyIriConverterInterface|IriConverterInterface;
 
     abstract protected function getPropertyAccessor(): PropertyAccessorInterface;
 
