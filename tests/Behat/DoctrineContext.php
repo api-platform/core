@@ -58,6 +58,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDumm
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FileConfigDummy as FileConfigDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Foo as FooDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FooDummy as FooDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\FooEmbeddable as FooEmbeddableDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
@@ -144,6 +145,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FooDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FooEmbeddable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;
@@ -354,7 +356,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb fooDummy objects with fake names
      */
-    public function thereAreFooDummyObjectsWithFakeNames($nb): void
+    public function thereAreFooDummyObjectsWithFakeNames(int $nb, $embedd = false): void
     {
         $names = ['Hawsepipe', 'Ephesian', 'Sthenelus', 'Separativeness', 'Balbo'];
         $dummies = ['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet'];
@@ -365,6 +367,11 @@ final class DoctrineContext implements Context
 
             $foo = $this->buildFooDummy();
             $foo->setName($names[$i]);
+            if ($embedd) {
+                $embeddedFoo = $this->buildFooEmbeddable();
+                $embeddedFoo->setDummyName('embedded'.$names[$i]);
+                $foo->setEmbeddedFoo($embeddedFoo);
+            }
             $foo->setDummy($dummy);
             for ($j = 0; $j < 3; ++$j) {
                 $soMany = $this->buildSoMany();
@@ -377,6 +384,14 @@ final class DoctrineContext implements Context
         }
 
         $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a fooDummy objects with fake names and embeddable
+     */
+    public function thereAreFooDummyObjectsWithFakeNamesAndEmbeddable(): void
+    {
+        $this->thereAreFooDummyObjectsWithFakeNames(1, true);
     }
 
     /**
@@ -2397,6 +2412,11 @@ final class DoctrineContext implements Context
     private function buildFooDummy(): FooDummy|FooDummyDocument
     {
         return $this->isOrm() ? new FooDummy() : new FooDummyDocument();
+    }
+
+    private function buildFooEmbeddable(): FooEmbeddable|FooEmbeddableDocument
+    {
+        return $this->isOrm() ? new FooEmbeddable() : new FooEmbeddableDocument();
     }
 
     private function buildFourthLevel(): FourthLevel|FourthLevelDocument

@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -24,7 +26,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-#[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page')], order: ['dummy.name'])]
+#[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page'), new Mutation(name: 'update')], order: ['dummy.name'])]
 #[ODM\Document]
 class FooDummy
 {
@@ -33,16 +35,25 @@ class FooDummy
      */
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
+
     /**
      * @var string The foo name
      */
     #[ODM\Field]
     private $name;
+
+    #[ODM\Field(nullable: true)]
+    private $nonWritableProp;
+
     /**
      * @var Dummy The foo dummy
      */
     #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], storeAs: 'id')]
     private ?Dummy $dummy = null;
+
+    #[ApiProperty(readableLink: true, writableLink: true)]
+    #[ODM\EmbedOne(targetDocument: FooEmbeddable::class)]
+    private ?FooEmbeddable $embeddedFoo = null;
 
     /**
      * @var Collection<SoMany>
@@ -52,6 +63,7 @@ class FooDummy
 
     public function __construct()
     {
+        $this->nonWritableProp = 'readonly';
         $this->soManies = new ArrayCollection();
     }
 
@@ -70,6 +82,11 @@ class FooDummy
         return $this->name;
     }
 
+    public function getNonWritableProp()
+    {
+        return $this->nonWritableProp;
+    }
+
     public function getDummy(): ?Dummy
     {
         return $this->dummy;
@@ -78,5 +95,17 @@ class FooDummy
     public function setDummy(Dummy $dummy): void
     {
         $this->dummy = $dummy;
+    }
+
+    public function getEmbeddedFoo(): ?FooEmbeddable
+    {
+        return $this->embeddedFoo && !$this->embeddedFoo->getDummyName() && !$this->embeddedFoo->getNonWritableProp() ? null : $this->embeddedFoo;
+    }
+
+    public function setEmbeddedFoo(?FooEmbeddable $embeddedFoo): self
+    {
+        $this->embeddedFoo = $embeddedFoo;
+
+        return $this;
     }
 }
