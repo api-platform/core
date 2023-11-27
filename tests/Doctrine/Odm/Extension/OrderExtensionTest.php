@@ -126,7 +126,7 @@ class OrderExtensionTest extends TestCase
         $lookupProphecy = $this->prophesize(Lookup::class);
         $lookupProphecy->localField('author')->shouldBeCalled()->willReturn($lookupProphecy);
         $lookupProphecy->foreignField('_id')->shouldBeCalled()->willReturn($lookupProphecy);
-        $lookupProphecy->alias('author_lkup')->shouldBeCalled();
+        $lookupProphecy->alias('author_lkup')->shouldBeCalled()->willReturn($lookupProphecy);
         $aggregationBuilderProphecy->lookup(Dummy::class)->shouldBeCalled()->willReturn($lookupProphecy->reveal());
         $aggregationBuilderProphecy->unwind('$author_lkup')->shouldBeCalled();
         $aggregationBuilderProphecy->getStage(0)->willThrow(new \OutOfRangeException('message'));
