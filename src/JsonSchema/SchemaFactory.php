@@ -83,7 +83,8 @@ final class SchemaFactory implements SchemaFactoryInterface
             $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
         }
 
-        if (Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
+        // In case of FORCE_SUBSCHEMA an object can be writable through another class eventhough it has no POST operation
+        if (!($serializerContext[self::FORCE_SUBSCHEMA] ?? false) && Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
             return $schema;
         }
 
@@ -217,6 +218,10 @@ final class SchemaFactory implements SchemaFactoryInterface
             }
 
             $subSchema = $this->buildSchema($className, $format, $parentType, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+            if (!isset($subSchema['$ref'])) {
+                continue;
+            }
+
             if ($isCollection) {
                 $propertySchema['items']['$ref'] = $subSchema['$ref'];
                 unset($propertySchema['items']['type']);
