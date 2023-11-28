@@ -23,7 +23,8 @@ Feature: Relations support
       "badFourthLevel": null,
       "id": 1,
       "level": 3,
-      "test": true
+      "test": true,
+      "relatedDummies": []
     }
     """
 
