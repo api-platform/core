@@ -16,6 +16,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -49,6 +51,13 @@ class ThirdLevel
     public ?FourthLevel $fourthLevel = null;
     #[ODM\ReferenceOne(targetDocument: FourthLevel::class, cascade: ['persist'])]
     public $badFourthLevel;
+    #[ODM\ReferenceMany(mappedBy: 'thirdLevel', targetDocument: RelatedDummy::class)]
+    public Collection|iterable $relatedDummies;
+
+    public function __construct()
+    {
+        $this->relatedDummies = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {

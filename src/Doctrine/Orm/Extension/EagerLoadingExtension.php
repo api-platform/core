@@ -168,6 +168,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             if (
                 null !== $parentAssociation
                 && isset($mapping['inversedBy'])
+                && $mapping['sourceEntity'] === $mapping['targetEntity']
                 && $mapping['inversedBy'] === $parentAssociation
                 && $mapping['type'] & ClassMetadata::TO_ONE
             ) {

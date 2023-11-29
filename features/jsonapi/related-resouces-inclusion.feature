@@ -483,6 +483,18 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "FourthLevel",
                             "id": "/fourth_levels/1"
                         }
+                    },
+                    "relatedDummies": {
+                        "data": [
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/1"
+                            },
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/2"
+                            }
+                        ]
                     }
                 }
             },
@@ -581,6 +593,16 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 1,
                     "level": 3,
                     "test": true
+                },
+                "relationships": {
+                    "relatedDummies": {
+                        "data": [
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/1"
+                            }
+                        ]
+                    }
                 }
             },
             {
@@ -618,6 +640,16 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 2,
                     "level": 3,
                     "test": true
+                },
+                "relationships": {
+                    "relatedDummies": {
+                        "data": [
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/2"
+                            }
+                        ]
+                    }
                 }
             },
             {
@@ -655,6 +687,16 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 3,
                     "level": 3,
                     "test": true
+                },
+                "relationships": {
+                    "relatedDummies": {
+                        "data": [
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/3"
+                            }
+                        ]
+                    }
                 }
             }
         ]
@@ -802,6 +844,24 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 1,
                     "level": 3,
                     "test": true
+                },
+                "relationships": {
+                    "relatedDummies": {
+                        "data": [
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/1"
+                            },
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/2"
+                            },
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/3"
+                            }
+                        ]
+                    }
                 }
             },
             {
@@ -1286,6 +1346,16 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 1,
                     "level": 3,
                     "test": true
+                },
+                "relationships": {
+                    "relatedDummies": {
+                        "data": [
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/1"
+                            }
+                        ]
+                    }
                 }
             },
             {
@@ -1323,6 +1393,16 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 2,
                     "level": 3,
                     "test": true
+                },
+                "relationships": {
+                    "relatedDummies": {
+                        "data": [
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/2"
+                            }
+                        ]
+                    }
                 }
             },
             {
@@ -1360,6 +1440,16 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 3,
                     "level": 3,
                     "test": true
+                },
+                "relationships": {
+                    "relatedDummies": {
+                        "data": [
+                            {
+                                "type": "RelatedDummy",
+                                "id": "/related_dummies/3"
+                            }
+                        ]
+                    }
                 }
             }
         ]
