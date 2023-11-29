@@ -29,6 +29,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -289,7 +290,7 @@ class ItemNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             null,
             null,
-            new ClassMetadataFactory(new AnnotationLoader())
+            new ClassMetadataFactory(class_exists(AttributeLoader::class) ? new AttributeLoader() : new AnnotationLoader())
         );
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);

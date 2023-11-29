@@ -19,13 +19,10 @@ class DummySequentiallyValidatedEntity
 {
     /**
      * @var string
-     *
-     * @Assert\Sequentially({
-     *
-     *     @Assert\Length(min=1, max=32),
-     *
-     *     @Assert\Regex(pattern="/^[a-z]$/")
-     * })
      */
+    #[Assert\Sequentially([
+        new Assert\Length(min: 1, max: 32),
+        new Assert\Regex(pattern: '/^[a-z]$/'),
+    ])]
     public $dummy;
 }
