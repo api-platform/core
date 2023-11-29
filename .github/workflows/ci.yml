@@ -451,6 +451,7 @@ jobs:
       - name: Update project dependencies
         run: |
           composer update --no-interaction --no-progress --ansi
+          composer require --dev doctrine/mongodb-odm-bundle
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache

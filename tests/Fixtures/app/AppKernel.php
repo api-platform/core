@@ -277,8 +277,10 @@ class AppKernel extends Kernel
         $container->addCompilerPass(new class() implements CompilerPassInterface {
             public function process(ContainerBuilder $container): void
             {
-                // Deprecated command triggering a Symfony depreciation
-                $container->removeDefinition(TailCursorDoctrineODMCommand::class);
+                if ($container->hasDefinition(TailCursorDoctrineODMCommand::class)) {
+                    // Deprecated command triggering a Symfony depreciation
+                    $container->removeDefinition(TailCursorDoctrineODMCommand::class);
+                }
             }
         });
     }
