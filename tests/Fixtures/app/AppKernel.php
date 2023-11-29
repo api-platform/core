@@ -113,6 +113,7 @@ class AppKernel extends Kernel
             ],
         ];
 
+        $cookie = ['cookie_secure' => true, 'cookie_samesite' => 'lax', 'handler_id' => 'session.handler.native_file'];
         // This class is introduced in Symfony 6.4 just using it to use the new configuration and to avoid unnecessary deprecations
         if (class_exists(PingWebhookMessageHandler::class)) {
             $config = [
@@ -120,7 +121,7 @@ class AppKernel extends Kernel
                 'validation' => ['enable_attributes' => true, 'email_validation_mode' => 'html5'],
                 'serializer' => ['enable_attributes' => true],
                 'test' => null,
-                'session' => ['cookie_secure' => true, 'cookie_samesite' => 'lax', 'handler_id' => 'session.handler.native_file'],
+                'session' => class_exists(SessionFactory::class) ? ['storage_factory_id' => 'session.storage.factory.mock_file'] + $cookie : ['storage_id' => 'session.storage.mock_file'] + $cookie,
                 'profiler' => [
                     'enabled' => true,
                     'collect' => false,

@@ -344,12 +344,12 @@ class CollectionFiltersNormalizerTest extends TestCase
         // TODO: use prophecy when getSupportedTypes() will be added to the interface
         $normalizer = new CollectionFiltersNormalizer(
             new class() implements NormalizerInterface {
-                public function normalize(mixed $object, string $format = null, array $context = [])
+                public function normalize(mixed $object, string $format = null, array $context = []): \ArrayObject|array|string|int|float|bool|null
                 {
                     return null;
                 }
 
-                public function supportsNormalization(mixed $data, string $format = null): bool
+                public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
                 {
                     return true;
                 }

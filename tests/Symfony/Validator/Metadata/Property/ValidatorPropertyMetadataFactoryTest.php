@@ -42,7 +42,6 @@ use ApiPlatform\Tests\Fixtures\DummyValidatedChoiceEntity;
 use ApiPlatform\Tests\Fixtures\DummyValidatedEntity;
 use ApiPlatform\Tests\Fixtures\DummyValidatedHostnameEntity;
 use ApiPlatform\Tests\Fixtures\DummyValidatedUlidEntity;
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
@@ -50,7 +49,7 @@ use Symfony\Component\Validator\Constraints\Hostname;
 use Symfony\Component\Validator\Constraints\Ulid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
@@ -64,7 +63,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->validatorClassMetadata = new ClassMetadata(DummyValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($this->validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($this->validatorClassMetadata);
     }
 
     public function testCreateWithPropertyWithRequiredConstraints(): void
@@ -218,7 +217,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithPropertyWithValidationConstraints(): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyIriWithValidationEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $types = [
             'dummyUrl' => 'https://schema.org/url',
@@ -260,7 +259,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithPropertyLengthRestriction(): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyValidatedEntity::class)
@@ -287,7 +286,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithPropertyRegexRestriction(): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyValidatedEntity::class)
@@ -316,7 +315,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithPropertyFormatRestriction(string $property, string $class, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata($class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor($class)
@@ -355,7 +354,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithSequentiallyConstraint(): void
     {
         $validatorClassMetadata = new ClassMetadata(DummySequentiallyValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummySequentiallyValidatedEntity::class)
@@ -382,7 +381,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithCompoundConstraint(): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyCompoundValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyCompoundValidatedEntity::class)
@@ -409,7 +408,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithAtLeastOneOfConstraint(): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyAtLeastOneOfValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyAtLeastOneOfValidatedEntity::class)
@@ -440,7 +439,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithPropertyUniqueRestriction(): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyUniqueValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyUniqueValidatedEntity::class)
@@ -469,7 +468,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithRangeConstraint(Type $type, string $property, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyRangeValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyRangeValidatedEntity::class)
@@ -506,7 +505,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithPropertyChoiceRestriction(ApiProperty $propertyMetadata, string $property, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyValidatedChoiceEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyValidatedChoiceEntity::class)
@@ -545,7 +544,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithPropertyCountRestriction(string $property, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyCountValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyCountValidatedEntity::class)
@@ -577,7 +576,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithPropertyCollectionRestriction(): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyCollectionValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyCollectionValidatedEntity::class)
@@ -643,7 +642,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
     public function testCreateWithPropertyNumericRestriction(ApiProperty $propertyMetadata, string $property, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyNumericValidatedEntity::class);
-        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
         $validatorMetadataFactory->getMetadataFor(DummyNumericValidatedEntity::class)
