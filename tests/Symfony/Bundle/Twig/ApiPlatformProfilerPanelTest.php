@@ -19,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -26,6 +27,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class ApiPlatformProfilerPanelTest extends WebTestCase
 {
+    use ExpectDeprecationTrait;
     private EntityManagerInterface $manager;
     private SchemaTool $schemaTool;
     private string $env;
@@ -81,6 +83,9 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('Not an API Platform resource', $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
+    /**
+     * @group legacy
+     */
     public function testDebugBarContent(): void
     {
         $client = static::createClient();
