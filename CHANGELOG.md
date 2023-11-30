@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.2.7
+
+Symfony 7 support.
+
+### Bug fixes
+
+* [183b4d637](https://github.com/api-platform/core/commit/183b4d6374a66ffaf33b3341b757a832d5a39799) fix(symfony): named arguments dependency injection
+* [3d32d5e12](https://github.com/api-platform/core/commit/3d32d5e12b1d93be72064e12979402487aa3e49a) fix(openapi): entrypoint access vnd+openapi (#6012)
+* [58f4a3dda](https://github.com/api-platform/core/commit/58f4a3dda820a0b61c7361f76a789f1560d8f8ab) fix: no boolean types for exclusive minimum and exclusive maximum open api (#5993)
+* [5e8f5eb99](https://github.com/api-platform/core/commit/5e8f5eb99152a8914b725ffe3f4beea72ce6e5b6) fix(graphql): consider writable flag also for nested input types (#5954)
+* [9848bd4d4](https://github.com/api-platform/core/commit/9848bd4d4917a97000119ee98a09916af469acd8) fix: missing eager joins on to-one relationships (#5992)
+* [aa44dd726](https://github.com/api-platform/core/commit/aa44dd7264e6264ec3ec569f9f4be081927a67cb) fix(openapi): max cardinality
+* [c2be40994](https://github.com/api-platform/core/commit/c2be40994ec08b51bf23b4b807eb3d4f984379ff) fix(symfony): error in provider without uri variables (#6005)
+* [d2f281eed](https://github.com/api-platform/core/commit/d2f281eedbd87a3c1a3377bb23a229e1b17a0f45) fix(jsonschema): fix recursive documentation when using a dto entity wrapper (#5973)
+* [e7bc2ab57](https://github.com/api-platform/core/commit/e7bc2ab5770fe673093596bc217516be61d582fc) fix(jsonschema): indirect resource input schema (#6001)
+
 ## v3.2.6
 
 ### Bug fixes
