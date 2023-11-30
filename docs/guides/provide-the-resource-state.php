@@ -7,7 +7,6 @@
 // tags: design, state
 // ---
 
-// # Provide the Resource State
 // Our model is the same then in the previous guide ([Declare a Resource](/playground/declare-a-resource). API Platform will declare
 // CRUD operations if we don't declare them.
 

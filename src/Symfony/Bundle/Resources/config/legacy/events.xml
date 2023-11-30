@@ -10,7 +10,7 @@
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.error_formats%</argument>
             <argument>%api_platform.docs_formats%</argument>
-            <argument>%api_platform.event_listeners_backward_compatibility_layer%</argument>
+            <argument>null</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="28" />
         </service>

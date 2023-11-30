@@ -87,7 +87,8 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer update --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Cache PHPStan results
@@ -456,6 +457,7 @@ jobs:
       - name: Update project dependencies
         run: |
           composer update --no-interaction --no-progress --ansi
+          composer require --dev doctrine/mongodb-odm-bundle
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache

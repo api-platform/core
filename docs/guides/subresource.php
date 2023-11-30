@@ -7,8 +7,6 @@
 // executable: true
 // ---
 
-// # Subresource
-//
 // In API Platform, a subresource is an alternate way to reach a Resource.
 
 namespace App\Entity {

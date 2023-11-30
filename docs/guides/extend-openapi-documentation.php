@@ -7,7 +7,6 @@
 // tags: openapi, expert
 // ---
 
-// # Extend OpenAPI Documentation
 namespace App\ApiResource {
     use ApiPlatform\Metadata\Post;
     use ApiPlatform\OpenApi\Model\Operation;

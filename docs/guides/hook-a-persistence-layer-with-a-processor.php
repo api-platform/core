@@ -7,8 +7,6 @@
 // tags: design
 // ---
 
-// # Hook a Persistence Layer with a Processor
-
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ApiResource;
     use App\State\BookProcessor;

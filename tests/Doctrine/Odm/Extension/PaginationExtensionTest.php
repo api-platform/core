@@ -414,8 +414,8 @@ class PaginationExtensionTest extends TestCase
             $skipProphecy->limit($expectedLimit)->shouldBeCalled();
         } else {
             $matchProphecy = $this->prophesize(AggregationMatch::class);
-            $matchProphecy->field(Paginator::LIMIT_ZERO_MARKER_FIELD)->shouldBeCalled()->willReturn($matchProphecy);
-            $matchProphecy->equals(Paginator::LIMIT_ZERO_MARKER)->shouldBeCalled();
+            $matchProphecy->field(Paginator::LIMIT_ZERO_MARKER_FIELD)->shouldBeCalled()->willReturn($matchProphecy->reveal());
+            $matchProphecy->equals(Paginator::LIMIT_ZERO_MARKER)->shouldBeCalled()->willReturn($matchProphecy->reveal());
             $skipProphecy->match()->shouldBeCalled()->willReturn($matchProphecy->reveal());
         }
 

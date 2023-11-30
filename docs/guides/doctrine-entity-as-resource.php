@@ -6,8 +6,6 @@
 // tags: doctrine
 // executable: true
 // ---
-
-// # API Resource on a Doctrine Entity.
 //
 // API Platform is compatible with [Doctrine ORM](https://www.doctrine-project.org), all we need is to declare an
 

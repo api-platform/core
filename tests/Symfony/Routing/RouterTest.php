@@ -115,7 +115,7 @@ class RouterTest extends TestCase
 
         $mockedRouter = $this->prophesize(RouterInterface::class);
         $mockedRouter->getContext()->willReturn($context);
-        $mockedRouter->setContext(Argument::type(RequestContext::class))->willReturn();
+        $mockedRouter->setContext(Argument::type(RequestContext::class))->shouldBeCalled();
         $mockedRouter->match('/api/app_crm/resource')->willReturn(['bar']);
 
         $router = new Router($mockedRouter->reveal());
@@ -129,7 +129,7 @@ class RouterTest extends TestCase
 
         $mockedRouter = $this->prophesize(RouterInterface::class);
         $mockedRouter->getContext()->willReturn($context);
-        $mockedRouter->setContext(Argument::type(RequestContext::class))->willReturn();
+        $mockedRouter->setContext(Argument::type(RequestContext::class))->shouldBeCalled();
         $mockedRouter->match('/foo')->willReturn(['bar']);
 
         $router = new Router($mockedRouter->reveal());

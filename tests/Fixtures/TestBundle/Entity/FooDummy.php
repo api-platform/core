@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -24,7 +26,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-#[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page')], order: ['dummy.name'])]
+#[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page'), new Mutation(name: 'update')], order: ['dummy.name'])]
 #[ORM\Entity]
 class FooDummy
 {
@@ -35,11 +37,20 @@ class FooDummy
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
+
     /**
      * @var string The foo name
      */
     #[ORM\Column]
     private $name;
+
+    #[ORM\Column(nullable: true)]
+    private $nonWritableProp;
+
+    #[ApiProperty(readableLink: true, writableLink: true)]
+    #[ORM\Embedded(class: FooEmbeddable::class)]
+    private ?FooEmbeddable $embeddedFoo = null;
+
     /**
      * @var Dummy|null The foo dummy
      */
@@ -54,6 +65,7 @@ class FooDummy
 
     public function __construct()
     {
+        $this->nonWritableProp = 'readonly';
         $this->soManies = new ArrayCollection();
     }
 
@@ -72,9 +84,26 @@ class FooDummy
         return $this->name;
     }
 
+    public function getNonWritableProp()
+    {
+        return $this->nonWritableProp;
+    }
+
     public function getDummy(): ?Dummy
     {
         return $this->dummy;
+    }
+
+    public function getEmbeddedFoo(): ?FooEmbeddable
+    {
+        return $this->embeddedFoo && !$this->embeddedFoo->getDummyName() && !$this->embeddedFoo->getNonWritableProp() ? null : $this->embeddedFoo;
+    }
+
+    public function setEmbeddedFoo(?FooEmbeddable $embeddedFoo): self
+    {
+        $this->embeddedFoo = $embeddedFoo;
+
+        return $this;
     }
 
     public function setDummy(Dummy $dummy): void

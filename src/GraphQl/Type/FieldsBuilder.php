@@ -220,7 +220,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                 if (
                     !$propertyTypes
                     || (!$input && false === $propertyMetadata->isReadable())
-                    || ($input && $operation instanceof Mutation && false === $propertyMetadata->isWritable())
+                    || ($input && false === $propertyMetadata->isWritable())
                 ) {
                     continue;
                 }
@@ -256,8 +256,14 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
         $rEnum = new \ReflectionEnum($enumClass);
 
         $enumCases = [];
+        /* @var \ReflectionEnumUnitCase|\ReflectionEnumBackedCase */
         foreach ($rEnum->getCases() as $rCase) {
-            $enumCase = ['value' => $rCase->getBackingValue()];
+            if ($rCase instanceof \ReflectionEnumBackedCase) {
+                $enumCase = ['value' => $rCase->getBackingValue()];
+            } else {
+                $enumCase = ['value' => $rCase->getValue()];
+            }
+
             $propertyMetadata = $this->propertyMetadataFactory->create($enumClass, $rCase->getName());
             if ($enumCaseDescription = $propertyMetadata->getDescription()) {
                 $enumCase['description'] = $enumCaseDescription;
