@@ -34,7 +34,7 @@ final class AddFormatListener
 {
     use OperationRequestInitiatorTrait;
 
-    public function __construct(private readonly Negotiator $negotiator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [], private readonly array $errorFormats = [], private readonly array $docsFormats = [], private readonly bool $eventsBackwardCompatibility = true)
+    public function __construct(private readonly Negotiator $negotiator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [], private readonly array $errorFormats = [], private readonly array $docsFormats = [], private readonly ?bool $eventsBackwardCompatibility = null) // @phpstan-ignore-line
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
@@ -50,7 +50,11 @@ final class AddFormatListener
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
 
-        if ('api_platform.symfony.main_controller' === $operation?->getController() || ($this->eventsBackwardCompatibility && 'api_platform.action.entrypoint' === $request->attributes->get('_controller')) || $request->attributes->get('_api_platform_disable_listeners')) {
+        if ('api_platform.action.entrypoint' === $request->attributes->get('_controller')) {
+            return;
+        }
+
+        if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
             return;
         }
 
