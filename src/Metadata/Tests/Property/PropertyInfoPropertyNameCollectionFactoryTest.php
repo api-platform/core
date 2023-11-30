@@ -24,7 +24,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
@@ -81,7 +81,7 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
             new PropertyInfoExtractor([
                 new SerializerExtractor(
                     new ClassMetadataFactory(
-                        new AnnotationLoader(
+                        new AttributeLoader(
                         )
                     )
                 ),

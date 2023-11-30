@@ -252,8 +252,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         if (null !== $inputOrOutputClass && $className !== $inputOrOutputClass) {
-            $parts = explode('\\', $inputOrOutputClass);
-            $shortName = end($parts);
+            $shortName = $this->getShortClassName($inputOrOutputClass);
             $prefix .= '.'.$shortName;
         }
 
@@ -289,11 +288,15 @@ final class SchemaFactory implements SchemaFactoryInterface
             ];
         }
 
+        $forceSubschema = $serializerContext[self::FORCE_SUBSCHEMA] ?? false;
         if (null === $operation) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($className);
             try {
                 $operation = $resourceMetadataCollection->getOperation();
             } catch (OperationNotFoundException $e) {
+                $operation = new HttpOperation();
+            }
+            if ($operation->getShortName() === $this->getShortClassName($className) && $forceSubschema) {
                 $operation = new HttpOperation();
             }
 
@@ -313,7 +316,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $inputOrOutput = ['class' => $className];
         $inputOrOutput = Schema::TYPE_OUTPUT === $type ? ($operation->getOutput() ?? $inputOrOutput) : ($operation->getInput() ?? $inputOrOutput);
-        $outputClass = ($serializerContext[self::FORCE_SUBSCHEMA] ?? false) ? ($inputOrOutput['class'] ?? $inputOrOutput->class ?? $operation->getClass()) : ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null);
+        $outputClass = $forceSubschema ? ($inputOrOutput['class'] ?? $inputOrOutput->class ?? $operation->getClass()) : ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null);
 
         if (null === $outputClass) {
             // input or output disabled
@@ -388,5 +391,12 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         return $options;
+    }
+
+    private function getShortClassName(string $fullyQualifiedName): string
+    {
+        $parts = explode('\\', $fullyQualifiedName);
+
+        return end($parts);
     }
 }

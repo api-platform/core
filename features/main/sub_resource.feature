@@ -376,7 +376,11 @@ Feature: Sub-resource support
       "badFourthLevel": null,
       "id": 1,
       "level": 3,
-      "test": true
+      "test": true,
+      "relatedDummies": [
+            "/related_dummies/1",
+            "/related_dummies/2"
+      ]
     }
     """
 
