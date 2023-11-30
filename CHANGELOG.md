@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.1.23
+
+### Bug fixes
+
+* [9848bd4d4](https://github.com/api-platform/core/commit/9848bd4d4917a97000119ee98a09916af469acd8) fix: missing eager joins on to-one relationships (#5992)
+* [d2f281eed](https://github.com/api-platform/core/commit/d2f281eedbd87a3c1a3377bb23a229e1b17a0f45) fix(jsonschema): fix recursive documentation when using a dto entity wrapper (#5973)
+* [dac49cb16](https://github.com/api-platform/core/commit/dac49cb16939ae14fa14eea1190cbf995bca842b) Revert "fix: missing eager joins on to-one relationships (#5992)"
+
 ## v3.1.22
 
 ### Bug fixes
