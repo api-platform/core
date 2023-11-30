@@ -7,8 +7,6 @@
 // executable: true
 // ---
 
-// # Handle links
-//
 // When using subresources with doctrine, API Platform tries to handle your links,
 // and the algorithm sometimes overcomplicates SQL queries.
 

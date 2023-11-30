@@ -7,7 +7,6 @@
 // tags: design
 // ---
 
-// # Declare a Resource
 // This class represents an API resource
 
 namespace App\ApiResource {
