@@ -30,7 +30,6 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
@@ -47,10 +46,6 @@ class CollectionFiltersNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
-            $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
-        }
         $decoratedProphecy->supportsNormalization('foo', 'abc', Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $normalizer = new CollectionFiltersNormalizer(
@@ -61,10 +56,6 @@ class CollectionFiltersNormalizerTest extends TestCase
         );
 
         $this->assertTrue($normalizer->supportsNormalization('foo', 'abc'));
-
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-        }
     }
 
     public function testNormalizeNonResourceCollection(): void
@@ -344,12 +335,12 @@ class CollectionFiltersNormalizerTest extends TestCase
         // TODO: use prophecy when getSupportedTypes() will be added to the interface
         $normalizer = new CollectionFiltersNormalizer(
             new class() implements NormalizerInterface {
-                public function normalize(mixed $object, string $format = null, array $context = [])
+                public function normalize(mixed $object, string $format = null, array $context = []): \ArrayObject|array|string|int|float|bool|null
                 {
                     return null;
                 }
 
-                public function supportsNormalization(mixed $data, string $format = null): bool
+                public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
                 {
                     return true;
                 }

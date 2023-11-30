@@ -31,7 +31,7 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
      *
      * @throws ExceptionInterface
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): \ArrayObject|array|string|int|float|bool|null
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
         if (!\is_array($data)) {
@@ -50,8 +50,13 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
     /**
      * @param mixed|null $format
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
-        return $this->documentationNormalizer->supportsNormalization($data, $format);
+        return $this->documentationNormalizer->supportsNormalization($data, $format, $context);
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [];
     }
 }

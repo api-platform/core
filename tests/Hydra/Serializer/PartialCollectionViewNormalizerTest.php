@@ -25,7 +25,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoMany;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -165,20 +164,12 @@ class PartialCollectionViewNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
-            $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
-        }
         $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null, Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $this->assertTrue($normalizer->supportsNormalization(new \stdClass()));
-
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-        }
     }
 
     public function testSetNormalizer(): void
@@ -202,12 +193,12 @@ class PartialCollectionViewNormalizerTest extends TestCase
 
         // TODO: use prophecy when getSupportedTypes() will be added to the interface
         $normalizer = new PartialCollectionViewNormalizer(new class() implements NormalizerInterface {
-            public function normalize(mixed $object, string $format = null, array $context = [])
+            public function normalize(mixed $object, string $format = null, array $context = []): \ArrayObject|array|string|int|float|bool|null
             {
                 return null;
             }
 
-            public function supportsNormalization(mixed $data, string $format = null): bool
+            public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
             {
                 return true;
             }

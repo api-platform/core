@@ -3,7 +3,7 @@ _main:
 
 controller:
     resource: '@TestBundle/Controller/Orm'
-    type: annotation
+    type: attribute
 
 web_profiler_wdt:
     resource: '@WebProfilerBundle/Resources/config/routing/wdt.xml'
