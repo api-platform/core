@@ -388,6 +388,7 @@ Feature: Documentation support
     And the "data" property for the OpenAPI class "WrappedResponseEntity.CustomOutputEntityWrapperDto-read" should be equal to:
     """
     {
+      "owl:maxCardinality": 1,
       "$ref": "#\/components\/schemas\/WrappedResponseEntity-read"
     }
     """
