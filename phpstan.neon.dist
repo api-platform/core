@@ -16,8 +16,6 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludePaths:
-		- src/OpenApi/Serializer/CacheableSupportsMethodInterface.php
-		- src/Serializer/CacheableSupportsMethodInterface.php
 		- src/Symfony/Bundle/Command/OpenApiCommand.php
 		# Symfony config
 		- tests/Fixtures/app/config/config_swagger.php
@@ -28,7 +26,13 @@ parameters:
 		- src/Symfony/Bundle/DependencyInjection/Configuration.php
 		# Templates for Maker
 		- src/Symfony/Maker/Resources/skeleton
+		# subtree split
 		- **vendor**
+		# Symfony 6 support
+		- src/OpenApi/Serializer/CacheableSupportsMethodInterface.php
+		- src/Serializer/CacheableSupportsMethodInterface.php
+		- tests/Hal/Serializer/ItemNormalizerTest.php
+		- tests/Symfony/Validator/Metadata/Property/ValidatorPropertyMetadataFactoryTest.php
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
