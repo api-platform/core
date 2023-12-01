@@ -72,3 +72,4 @@ mkdir -p "$dest"
 cp node_modules/redoc/bundles/redoc.standalone.js "$dest"
 
 rm -Rf package.json node_modules/
+# TODO Laravel public files

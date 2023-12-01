@@ -80,6 +80,7 @@ final class DocumentationAction
             $context['request'] = $request;
             $operation = new Get(class: OpenApi::class, read: true, serialize: true, provider: fn () => $this->openApiFactory->__invoke($context), normalizationContext: [ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null], outputFormats: $this->documentationFormats);
             if ('html' === $format) {
+                // TODO: support laravel this bounds Documentation with Symfony so it's not perfect
                 $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
             }
             if ('json' === $format) {

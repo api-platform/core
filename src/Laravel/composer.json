@@ -1,0 +1,93 @@
+{
+    "name": "api-platform/laravel",
+    "description": "API Platform support for Laravel",
+    "keywords": ["todo"],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+		{
+		  "name": "Kévin Dunglas",
+		  "email": "kevin@dunglas.fr",
+		  "homepage": "https://dunglas.fr"
+		},
+		{
+		  "name": "API Platform Community",
+		  "homepage": "https://api-platform.com/community/contributors"
+		}
+    ],
+    "require": {
+        "php": "^8.0",
+        "api-platform/documentation": "*@dev || ^3.1",
+        "api-platform/hydra": "*@dev || ^3.1",
+        "api-platform/json-schema": "*@dev || ^3.1",
+        "api-platform/jsonld": "*@dev || ^3.1",
+        "api-platform/metadata": "*@dev || ^3.1",
+        "api-platform/openapi": "*@dev || ^3.1",
+        "api-platform/serializer": "*@dev || ^3.1",
+        "api-platform/state": "*@dev || ^3.1",
+        "illuminate/contracts": "^8.70|^9.0|^10.0",
+        "symfony/web-link": "^6.3",
+        "willdurand/negotiation": "^3.1"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.25|^7.0|^8.0",
+        "phpunit/phpunit": "^10"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\Laravel\\": ""
+        },
+		"exclude-from-classmap": [
+			"/Tests/"
+		]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "suggest": {
+        "phpdocumentor/reflection-docblock": ""
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ApiPlatform\\Laravel\\ApiPlatformProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Metadata"
+        },
+        {
+            "type": "path",
+            "url": "../State"
+        },
+        {
+            "type": "path",
+            "url": "../Serializer"
+        },
+        {
+            "type": "path",
+            "url": "../Hydra"
+        },
+        {
+            "type": "path",
+            "url": "../JsonLd"
+        },
+        {
+            "type": "path",
+            "url": "../Documentation"
+        },
+        {
+            "type": "path",
+            "url": "../OpenApi"
+        },
+        {
+            "type": "path",
+            "url": "../JsonSchema"
+        }
+    ]
+}
