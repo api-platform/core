@@ -93,6 +93,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         $processor = null,
         OptionsInterface $stateOptions = null,
         array $extraProperties = [],
+        bool $throwOnNotFound = null,
         private ?string $itemUriTemplate = null,
     ) {
         parent::__construct(
@@ -166,8 +167,9 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             name: $name,
             provider: $provider,
             processor: $processor,
-            extraProperties: $extraProperties,
+            throwOnNotFound: $throwOnNotFound,
             stateOptions: $stateOptions,
+            extraProperties: $extraProperties,
         );
     }
 

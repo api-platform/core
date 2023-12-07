@@ -197,6 +197,7 @@ class HttpOperation extends Operation
         $provider = null,
         $processor = null,
         OptionsInterface $stateOptions = null,
+        bool $throwOnNotFound = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -244,6 +245,7 @@ class HttpOperation extends Operation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties
         );
     }

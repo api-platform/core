@@ -77,13 +77,7 @@ final class ReadProvider implements ProviderInterface
             $data = null;
         }
 
-        if (
-            null === $data
-            && 'POST' !== $operation->getMethod()
-            && ('PUT' !== $operation->getMethod()
-                || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
-            )
-        ) {
+        if (null === $data && $operation->getThrowOnNotFound()) {
             throw new NotFoundHttpException('Not Found');
         }
 

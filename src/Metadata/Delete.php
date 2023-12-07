@@ -92,6 +92,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         $provider = null,
         $processor = null,
         OptionsInterface $stateOptions = null,
+        bool $throwOnNotFound = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -167,6 +168,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             processor: $processor,
             extraProperties: $extraProperties,
             collectDenormalizationErrors: $collectDenormalizationErrors,
+            throwOnNotFound: $throwOnNotFound,
             stateOptions: $stateOptions,
         );
     }

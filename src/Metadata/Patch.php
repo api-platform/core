@@ -91,6 +91,7 @@ final class Patch extends HttpOperation
         string $name = null,
         $provider = null,
         $processor = null,
+        bool $throwOnNotFound = null,
         OptionsInterface $stateOptions = null,
         array $extraProperties = [],
     ) {
@@ -167,6 +168,7 @@ final class Patch extends HttpOperation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties
         );
     }

@@ -799,6 +799,7 @@ abstract class Operation extends Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        protected ?bool $throwOnNotFound = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(
@@ -839,6 +840,7 @@ abstract class Operation extends Metadata
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
         );
     }

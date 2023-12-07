@@ -19,6 +19,7 @@ use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -77,6 +78,15 @@ final class MainController
 
         if (null === $operation->canDeserialize() && $operation instanceof HttpOperation) {
             $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
+        }
+
+        if (null === $operation->getThrowOnNotFound() && $operation instanceof HttpOperation) {
+            $operation->withThrowOnNotFound(
+                'POST' !== $operation->getMethod()
+                && ('PUT' !== $operation->getMethod()
+                    || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
+                )
+            );
         }
 
         $body = $this->provider->provide($operation, $uriVariables, $context);

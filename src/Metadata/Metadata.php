@@ -69,6 +69,7 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        protected ?bool $throwOnNotFound = null,
         protected array $extraProperties = []
     ) {
     }
@@ -562,6 +563,19 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->stateOptions = $stateOptions;
+
+        return $self;
+    }
+
+    public function getThrowOnNotFound(): ?bool
+    {
+        return $this->throwOnNotFound;
+    }
+
+    public function withThrowOnNotFound(bool $throwOnNotFound): bool
+    {
+        $self = clone $this;
+        $self->throwOnNotFound = $throwOnNotFound;
 
         return $self;
     }

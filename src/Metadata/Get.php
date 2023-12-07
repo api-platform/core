@@ -92,6 +92,7 @@ final class Get extends HttpOperation
         $provider = null,
         $processor = null,
         OptionsInterface $stateOptions = null,
+        bool $throwOnNotFound = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -166,6 +167,7 @@ final class Get extends HttpOperation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
         );
     }
