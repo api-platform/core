@@ -260,10 +260,9 @@ class IdentifiersExtractorTest extends TestCase
                 'id' => (new Link())
                     ->withParameterName('id')
                     ->withFromClass(DummyWithDateTimeIdentifier::class)
-                    ->withIdentifiers(['id'])
+                    ->withIdentifiers(['id']),
             ])
-            ->withClass(DummyWithDateTimeIdentifier::class)
-        ;
+            ->withClass(DummyWithDateTimeIdentifier::class);
 
         $this->assertSame(
             [
