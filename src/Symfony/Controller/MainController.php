@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\State\ProcessorInterface;
@@ -89,6 +90,15 @@ final class MainController
                 || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true));
 
             $operation = $operation->withDenormalizationContext($denormalizationContext + [SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE => $assignObjectToPopulate]);
+        }
+
+        if (null === $operation->getThrowOnNotFound()) {
+            $operation = $operation->withThrowOnNotFound(
+                'POST' !== $operation->getMethod()
+                && ('PUT' !== $operation->getMethod()
+                    || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
+                )
+            );
         }
 
         $body = $this->provider->provide($operation, $uriVariables, $context);

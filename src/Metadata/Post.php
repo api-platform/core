@@ -100,6 +100,7 @@ final class Post extends HttpOperation
         ?string $policy = null,
         array|string|null $middleware = null,
         ?bool $jsonStream = null,
+        ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null,
         ?bool $strictQueryParameterValidation = null,
@@ -188,6 +189,7 @@ final class Post extends HttpOperation
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             map: $map
         );

@@ -978,6 +978,7 @@ class ApiResource extends Metadata
         protected ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
         protected ?bool $jsonStream = null,
+        protected ?bool $throwOnNotFound = null,
         protected array $extraProperties = [],
         ?bool $map = null,
         protected ?array $mcp = null,
@@ -1026,6 +1027,7 @@ class ApiResource extends Metadata
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             map: $map,
         );
