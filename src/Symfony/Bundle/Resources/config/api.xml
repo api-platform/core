@@ -9,6 +9,7 @@
         <service id="api_platform.property_accessor" alias="property_accessor" public="false" />
         <service id="api_platform.property_info" alias="property_info" public="false" />
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
+        <service id="api_platform.serializer.normalizer.datetime" alias="serializer.normalizer.datetime" />
 
         <service id="api_platform.resource_class_resolver" class="ApiPlatform\Metadata\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
@@ -154,6 +155,7 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.serializer.normalizer.datetime" />
             <argument type="service" id="api_platform.property_accessor" />
         </service>
         <service id="api_platform.identifiers_extractor" alias="api_platform.api.identifiers_extractor" />

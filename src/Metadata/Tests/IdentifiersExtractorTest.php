@@ -17,17 +17,20 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyWithDateTimeIdentifier;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyWithEnumIdentifier;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelationMultiple;
 use ApiPlatform\Metadata\Tests\Fixtures\State\RelationMultipleProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Tomasz Grochowski <tg@urias.it>
@@ -42,6 +45,7 @@ class IdentifiersExtractorTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $dateDenormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
         $resourceClassResolver = $resourceClassResolverProphecy->reveal();
 
@@ -49,7 +53,8 @@ class IdentifiersExtractorTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $resourceClassResolver,
             $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal()
+            $propertyMetadataFactoryProphecy->reveal(),
+            $dateDenormalizerProphecy->reveal(),
         );
 
         $operation = $this->prophesize(HttpOperation::class);
@@ -70,6 +75,7 @@ class IdentifiersExtractorTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $dateDenormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
         $resourceClassResolver = $resourceClassResolverProphecy->reveal();
 
@@ -77,7 +83,8 @@ class IdentifiersExtractorTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $resourceClassResolver,
             $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal()
+            $propertyMetadataFactoryProphecy->reveal(),
+            $dateDenormalizerProphecy->reveal(),
         );
 
         $operation = $this->prophesize(HttpOperation::class);
@@ -98,6 +105,7 @@ class IdentifiersExtractorTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $dateDenormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
         $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
         $resourceClassResolver = $resourceClassResolverProphecy->reveal();
@@ -106,7 +114,8 @@ class IdentifiersExtractorTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $resourceClassResolver,
             $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal()
+            $propertyMetadataFactoryProphecy->reveal(),
+            $dateDenormalizerProphecy->reveal(),
         );
 
         $operation = (new Get())->withUriVariables(['id' => (new Link())->withIdentifiers(['id'])->withFromClass(Dummy::class)->withParameterName('id')]);
@@ -125,6 +134,7 @@ class IdentifiersExtractorTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $dateDenormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
         $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
         $resourceClassResolver = $resourceClassResolverProphecy->reveal();
@@ -133,7 +143,8 @@ class IdentifiersExtractorTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $resourceClassResolver,
             $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal()
+            $propertyMetadataFactoryProphecy->reveal(),
+            $dateDenormalizerProphecy->reveal(),
         );
 
         $operation = (new Get())
@@ -182,6 +193,7 @@ class IdentifiersExtractorTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $dateDenormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
         $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
         $resourceClassResolver = $resourceClassResolverProphecy->reveal();
@@ -190,7 +202,8 @@ class IdentifiersExtractorTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $resourceClassResolver,
             $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal()
+            $propertyMetadataFactoryProphecy->reveal(),
+            $dateDenormalizerProphecy->reveal(),
         );
 
         $operation = (new Get())
@@ -213,6 +226,50 @@ class IdentifiersExtractorTest extends TestCase
                 'intEnumAsIdentifier' => '1',
             ],
             $identifiersExtractor->getIdentifiersFromItem(new DummyWithEnumIdentifier(), $operation)
+        );
+    }
+
+    public function testGetIdentifierValueWithDateTimeValue(): void
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $dateDenormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+
+        $dateDenormalizerProphecy->supportsNormalization(Argument::any())->willReturn(true);
+        $dateDenormalizerProphecy->normalize(Argument::any())->willReturn('normalized_datetime');
+
+        $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
+        $resourceClassResolver = $resourceClassResolverProphecy->reveal();
+
+        $identifiersExtractor = new IdentifiersExtractor(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolver,
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $dateDenormalizerProphecy->reveal(),
+        );
+
+        $item = new DummyWithDateTimeIdentifier();
+        $item->id = new \DateTime('now');
+
+        $operation = (new NotExposed())
+            ->withUriTemplate('/resources/{id}')
+            ->withUriVariables([
+                'id' => (new Link())
+                    ->withParameterName('id')
+                    ->withFromClass(DummyWithDateTimeIdentifier::class)
+                    ->withIdentifiers(['id'])
+            ])
+            ->withClass(DummyWithDateTimeIdentifier::class)
+        ;
+
+        $this->assertSame(
+            [
+                'id' => 'normalized_datetime',
+            ],
+            $identifiersExtractor->getIdentifiersFromItem($item, $operation)
         );
     }
 }

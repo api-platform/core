@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * {@inheritdoc}
@@ -38,8 +39,14 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     /**
      * @param LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, $resourceClassResolver, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null)
-    {
+    public function __construct(
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        $resourceClassResolver,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly NormalizerInterface $dateDenormalizer,
+        PropertyAccessorInterface $propertyAccessor = null
+    ) {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
@@ -160,6 +167,10 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
 
         if ($identifierValue instanceof \BackedEnum) {
             return (string) $identifierValue->value;
+        }
+
+        if ($this->dateDenormalizer->supportsNormalization($identifierValue)) {
+            return $this->dateDenormalizer->normalize($identifierValue);
         }
 
         throw new RuntimeException(sprintf('We were not able to resolve the identifier matching parameter "%s".', $parameterName));

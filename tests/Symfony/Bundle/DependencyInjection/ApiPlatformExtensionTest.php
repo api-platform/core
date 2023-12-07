@@ -278,6 +278,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.property_accessor',
             'api_platform.property_info',
             'api_platform.serializer',
+            'api_platform.serializer.normalizer.datetime',
         ];
 
         $this->assertContainerHas($services, $aliases);
