@@ -516,6 +516,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!$config['enable_docs']) {
             $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');
+            $container->removeDefinition('api_platform.hydra.processor.link');
         }
     }
 
