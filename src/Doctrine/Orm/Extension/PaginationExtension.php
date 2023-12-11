@@ -80,6 +80,10 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             $query->setHint(CountWalker::HINT_DISTINCT, false);
         }
 
+        if (null !== $distinctCount = $operation?->getDistinctCount()) {
+            $query->setHint(CountWalker::HINT_DISTINCT, $distinctCount);
+        }
+
         $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->shouldDoctrinePaginatorFetchJoinCollection($queryBuilder, $operation, $context));
         $doctrineOrmPaginator->setUseOutputWalkers($this->shouldDoctrinePaginatorUseOutputWalkers($queryBuilder, $operation, $context));
 

@@ -322,7 +322,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    public function testGetResultWithoutDistinct(): void
+    public function testGetResultWithoutDistinctOnQueryWithSingleAlias(): void
     {
         $dummyMetadata = new ClassMetadata(Dummy::class);
 
@@ -337,6 +337,7 @@ class PaginationExtensionTest extends TestCase
         $queryBuilder->setMaxResults(42);
 
         $query = new Query($entityManagerProphecy->reveal());
+        $query->setHint(CountWalker::HINT_DISTINCT, true);
         $entityManagerProphecy->createQuery($queryBuilder->getDQL())->willReturn($query);
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -348,6 +349,86 @@ class PaginationExtensionTest extends TestCase
         );
 
         $result = $paginationExtension->getResult($queryBuilder, Dummy::class, new GetCollection());
+
+        $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
+        $this->assertInstanceOf(PaginatorInterface::class, $result);
+
+        $this->assertFalse($query->getHint(CountWalker::HINT_DISTINCT));
+    }
+
+    public function testGetResultWithDistinctOnQueryWithMultipleAliases(): void
+    {
+        $dummyMetadata = new ClassMetadata(Dummy::class);
+        $dummyMetadata->mapManyToOne([
+            'fieldName' => 'parent',
+            'targetEntity' => Dummy::class,
+        ]);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getConfiguration()->willReturn(new Configuration());
+        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select('o');
+        $queryBuilder->from(Dummy::class, 'o');
+        $queryBuilder->innerJoin('o.parent', 'p');
+        $queryBuilder->setFirstResult(0);
+        $queryBuilder->setMaxResults(42);
+
+        $query = new Query($entityManagerProphecy->reveal());
+        $query->setHint(CountWalker::HINT_DISTINCT, true);
+        $entityManagerProphecy->createQuery($queryBuilder->getDQL())->willReturn($query);
+
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
+
+        $paginationExtension = new PaginationExtension(
+            $managerRegistryProphecy->reveal(),
+            new Pagination()
+        );
+
+        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, new GetCollection());
+
+        $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
+        $this->assertInstanceOf(PaginatorInterface::class, $result);
+
+        $this->assertTrue($query->getHint(CountWalker::HINT_DISTINCT));
+    }
+
+    public function testGetResultWithoutDistinctOnQueryWithOperationFlagSetToFalse(): void
+    {
+        $dummyMetadata = new ClassMetadata(Dummy::class);
+        $dummyMetadata->mapManyToOne([
+            'fieldName' => 'parent',
+            'targetEntity' => Dummy::class,
+        ]);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getConfiguration()->willReturn(new Configuration());
+        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select('o');
+        $queryBuilder->from(Dummy::class, 'o');
+        $queryBuilder->innerJoin('o.parent', 'p');
+        $queryBuilder->setFirstResult(0);
+        $queryBuilder->setMaxResults(42);
+
+        $query = new Query($entityManagerProphecy->reveal());
+        $query->setHint(CountWalker::HINT_DISTINCT, true);
+        $entityManagerProphecy->createQuery($queryBuilder->getDQL())->willReturn($query);
+
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
+
+        $paginationExtension = new PaginationExtension(
+            $managerRegistryProphecy->reveal(),
+            new Pagination()
+        );
+
+        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, new GetCollection(distinctCount: false));
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertInstanceOf(PaginatorInterface::class, $result);
