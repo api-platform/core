@@ -714,7 +714,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          jq '. + {"conflict": {"sebastian/comparator": ">=5.0"}}' composer.json > composer.new.json
+          jq ". + {\"conflict\": {\"sebastian/comparator\": \">=5.0\"}}" composer.json > composer.new.json
           rm composer.json
           mv composer.new.json composer.json
           composer update --no-interaction --no-progress --ansi
