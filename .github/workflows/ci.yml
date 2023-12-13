@@ -147,7 +147,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          jq '. + {"conflict": {"sebastian/comparator": ">=5.0"}}' composer.json > composer.new.json
+          mv composer.new.json composer.json
+          composer update --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -207,8 +210,10 @@ jobs:
       - name: Run ${{ matrix.component }} tests
         working-directory: src/${{ matrix.component }}
         run: |
-            composer update
-            vendor/bin/simple-phpunit
+          jq '. + {"conflict": {"sebastian/comparator": ">=5.0"}}' composer.json > composer.new.json
+          mv composer.new.json composer.json
+          composer update
+          vendor/bin/simple-phpunit
 
   behat:
     name: Behat (PHP ${{ matrix.php }})
@@ -451,6 +456,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
+          jq '. + {"conflict": {"sebastian/comparator": ">=5.0"}}' composer.json > composer.new.json
+          mv composer.new.json composer.json
           composer update --no-interaction --no-progress --ansi
           composer require --dev doctrine/mongodb-odm-bundle
       - name: Install PHPUnit
@@ -574,7 +581,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          jq '. + {"conflict": {"sebastian/comparator": ">=5.0"}}' composer.json > composer.new.json
+          mv composer.new.json composer.json
+          composer update --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -703,7 +713,11 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          jq '. + {"conflict": {"sebastian/comparator": ">=5.0"}}' composer.json > composer.new.json
+          rm composer.json
+          mv composer.new.json composer.json
+          composer update --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
