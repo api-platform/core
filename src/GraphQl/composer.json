@@ -47,6 +47,9 @@
             "/Tests/"
         ]
     },
+    "conflict": {
+        "sebastian/comparator": ">=5.0"
+    },
     "config": {
         "preferred-install": {
             "*": "dist"

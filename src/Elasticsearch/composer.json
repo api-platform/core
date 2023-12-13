@@ -56,6 +56,9 @@
             "php-http/discovery": false
         }
     },
+    "conflict": {
+        "sebastian/comparator": ">=5.0"
+    },
     "extra": {
         "branch-alias": {
             "dev-main": "3.2.x-dev"
