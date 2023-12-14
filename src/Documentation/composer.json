@@ -19,11 +19,11 @@
 		  "homepage": "https://api-platform.com/community/contributors"
 		}
     ],
-    "conflict": {
-        "sebastian/comparator": ">=5.0"
-    },
     "require": {
         "api-platform/openapi": "*@dev || ^3.1",
         "api-platform/metadata": "*@dev || ^3.1"
+    },
+    "require-dev": {
+        "sebastian/comparator": "<5.0"
     }
 }
