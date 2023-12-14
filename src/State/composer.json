@@ -2,7 +2,17 @@
     "name": "api-platform/state",
     "description": "API Platform state interfaces",
     "type": "library",
-    "keywords": ["REST", "GraphQL", "API", "JSON-LD", "Hydra", "JSONAPI", "OpenAPI", "HAL", "Swagger"],
+    "keywords": [
+        "REST",
+        "GraphQL",
+        "API",
+        "JSON-LD",
+        "Hydra",
+        "JSONAPI",
+        "OpenAPI",
+        "HAL",
+        "Swagger"
+    ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
     "authors": [
@@ -21,7 +31,8 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.0",
-        "symfony/phpunit-bridge": "^6.1"
+        "symfony/phpunit-bridge": "^6.1",
+        "sebastian/comparator": "<5.0"
     },
     "autoload": {
         "psr-4": {
