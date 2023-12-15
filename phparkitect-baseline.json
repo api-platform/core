@@ -1,0 +1,215 @@
+{
+    "violations": [
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Resolver\\Stage\\SecurityPostDenormalizeStage",
+            "line": 27,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Resolver\\Stage\\SecurityPostValidationStage",
+            "line": 28,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Resolver\\Stage\\SecurityStage",
+            "line": 27,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Serializer\\Exception\\ValidationExceptionNormalizer",
+            "line": 78,
+            "error": "depends on ApiPlatform\\Symfony\\Validator\\Exception\\ValidationException, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Serializer\\ItemNormalizer",
+            "line": 50,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Tests\\Resolver\\Stage\\SecurityPostDenormalizeStageTest",
+            "line": 43,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Tests\\Resolver\\Stage\\SecurityPostValidationStageTest",
+            "line": 43,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Tests\\Resolver\\Stage\\SecurityStageTest",
+            "line": 43,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Tests\\Serializer\\Exception\\ValidationExceptionNormalizerTest",
+            "line": 41,
+            "error": "depends on ApiPlatform\\Symfony\\Validator\\Exception\\ValidationException, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Tests\\Serializer\\Exception\\ValidationExceptionNormalizerTest",
+            "line": 69,
+            "error": "depends on ApiPlatform\\Symfony\\Validator\\Exception\\ValidationException, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\GraphQl\\Tests\\Serializer\\ItemNormalizerTest",
+            "line": 162,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\HttpCache\\EventListener\\AddHeadersListener",
+            "line": 44,
+            "error": "depends on ApiPlatform\\Symfony\\Util\\RequestAttributesExtractor, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Serializer\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\HttpCache\\EventListener\\AddTagsListener",
+            "line": 65,
+            "error": "depends on ApiPlatform\\Symfony\\Util\\RequestAttributesExtractor, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Serializer\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Hydra\\Serializer\\ConstraintViolationListNormalizer",
+            "line": 29,
+            "error": "depends on ApiPlatform\\Api\\UrlGeneratorInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Hydra\\Serializer\\DocumentationNormalizer",
+            "line": 518,
+            "error": "depends on ApiPlatform\\Documentation\\Documentation, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Hydra\\Serializer\\DocumentationNormalizer",
+            "line": 562,
+            "error": "depends on ApiPlatform\\Documentation\\Documentation, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Hydra\\Serializer\\DocumentationNormalizer",
+            "line": 567,
+            "error": "depends on ApiPlatform\\Documentation\\Documentation, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Hydra\\Serializer\\EntrypointNormalizer",
+            "line": 87,
+            "error": "depends on ApiPlatform\\Api\\Entrypoint, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Hydra\\Serializer\\EntrypointNormalizer",
+            "line": 87,
+            "error": "depends on ApiPlatform\\Documentation\\Entrypoint, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Hydra\\Serializer\\EntrypointNormalizer",
+            "line": 92,
+            "error": "depends on ApiPlatform\\Api\\Entrypoint, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Hydra\\Serializer\\EntrypointNormalizer",
+            "line": 92,
+            "error": "depends on ApiPlatform\\Documentation\\Entrypoint, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Hydra\\Serializer\\ErrorNormalizer",
+            "line": 38,
+            "error": "depends on ApiPlatform\\Api\\UrlGeneratorInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\JsonLd\\Serializer\\ItemNormalizer",
+            "line": 50,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\OpenApi\\Factory\\OpenApiFactory",
+            "line": 80,
+            "error": "depends on ApiPlatform\\Symfony\\Bundle\\Command\\OpenApiCommand, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Serializer\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\AbstractItemNormalizer",
+            "line": 66,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\ItemNormalizer",
+            "line": 42,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\SerializerContextBuilder",
+            "line": 43,
+            "error": "depends on ApiPlatform\\Symfony\\Util\\RequestAttributesExtractor, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\SerializerFilterContextBuilder",
+            "line": 39,
+            "error": "depends on ApiPlatform\\Symfony\\Util\\RequestAttributesExtractor, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\Tests\\AbstractItemNormalizerTest",
+            "line": 203,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\Tests\\AbstractItemNormalizerTest",
+            "line": 351,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\Tests\\AbstractItemNormalizerTest",
+            "line": 405,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\Tests\\AbstractItemNormalizerTest",
+            "line": 463,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\Tests\\AbstractItemNormalizerTest",
+            "line": 527,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Serializer\\Tests\\AbstractItemNormalizerTest",
+            "line": 592,
+            "error": "depends on ApiPlatform\\Symfony\\Security\\ResourceAccessCheckerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Documentation\\*, ApiPlatform\\Elasticsearch\\*, ApiPlatform\\GraphQl\\*, ApiPlatform\\HttpCache\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\JsonLd\\*, ApiPlatform\\JsonSchema\\*, ApiPlatform\\OpenApi\\*, ApiPlatform\\RamseyUuid\\*, ApiPlatform\\Symfony\\*, ApiPlatform\\Validator\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Symfony\\Bundle\\DependencyInjection\\Configuration",
+            "line": 119,
+            "error": "depends on ApiPlatform\\Doctrine\\Common\\Filter\\OrderFilterInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\RamseyUuid\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Symfony\\Controller\\MainController",
+            "line": 41,
+            "error": "depends on ApiPlatform\\Api\\UriVariablesConverterInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\RamseyUuid\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Symfony\\EventListener\\AddFormatListener",
+            "line": 113,
+            "error": "depends on ApiPlatform\\Api\\FormatMatcher, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\RamseyUuid\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Symfony\\EventListener\\DeserializeListener",
+            "line": 139,
+            "error": "depends on ApiPlatform\\Api\\FormatMatcher, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\RamseyUuid\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Symfony\\EventListener\\QueryParameterValidateListener",
+            "line": 37,
+            "error": "depends on ApiPlatform\\Api\\QueryParameterValidator\\QueryParameterValidator, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\RamseyUuid\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Symfony\\UriVariableTransformer\\UlidUriVariableTransformer",
+            "line": 23,
+            "error": "depends on ApiPlatform\\Api\\UriVariableTransformerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\RamseyUuid\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Symfony\\UriVariableTransformer\\UuidUriVariableTransformer",
+            "line": 23,
+            "error": "depends on ApiPlatform\\Api\\UriVariableTransformerInterface, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\RamseyUuid\\* because of component architecture"
+        },
+        {
+            "fqcn": "ApiPlatform\\Symfony\\Validator\\State\\QueryParameterValidateProvider",
+            "line": 26,
+            "error": "depends on ApiPlatform\\Api\\QueryParameterValidator\\QueryParameterValidator, but should not depend on these namespaces: ApiPlatform\\Api\\*, ApiPlatform\\Doctrine\\Common\\*, ApiPlatform\\Hydra\\*, ApiPlatform\\RamseyUuid\\* because of component architecture"
+        }
+    ],
+    "stopOnFailure": false
+}

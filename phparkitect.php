@@ -27,17 +27,29 @@ return static function (Config $config): void {
         ->component('Validator')->definedBy('ApiPlatform\Validator\*')
 
         ->where('DoctrineCommon')->mayDependOnComponents('Metadata', 'State')
-        ->where('Documentation')->mayDependOnComponents('Metadata', 'OpenApi')
+        ->where('Documentation')->mayDependOnComponents('Metadata', 'OpenApi', 'State')
         ->where('Elasticsearch')->mayDependOnComponents('Metadata', 'Serializer', 'State')
-        ->where('GraphQl')->mayDependOnComponents('Metadata', 'Serializer', 'State')
+        ->where('GraphQl')->mayDependOnComponents('Metadata', 'Serializer', 'State', 'Validator')
         ->where('HttpCache')->mayDependOnComponents('Metadata', 'State')
-        ->where('Hydra')->mayDependOnComponents('Metadata', 'State', 'JsonLd')
-        ->where('JsonLd')->mayDependOnComponents('Metadata', 'State')
+        ->where('Hydra')->mayDependOnComponents('Metadata', 'State', 'JsonLd', 'Serializer', 'JsonSchema')
+        ->where('JsonLd')->mayDependOnComponents('Metadata', 'State', 'Serializer')
         ->where('JsonSchema')->mayDependOnComponents('Metadata')
         ->where('OpenApi')->mayDependOnComponents('JsonSchema', 'Metadata', 'State')
         ->where('RamseyUuid')->mayDependOnComponents('Metadata')
         ->where('Serializer')->mayDependOnComponents('Metadata', 'State')
-        ->where('Symfony')->mayDependOnComponents('Metadata', 'State')
+        ->where('Symfony')->mayDependOnComponents(
+            'Documentation',
+            'GraphQl',
+            'Metadata',
+            'State',
+            'Validator',
+            'Serializer',
+            'JsonSchema',
+            'JsonLd',
+            'OpenApi',
+            'HttpCache',
+            'Elasticsearch'
+        )
         ->where('Validator')->mayDependOnComponents('Metadata')
 
         ->rules()
