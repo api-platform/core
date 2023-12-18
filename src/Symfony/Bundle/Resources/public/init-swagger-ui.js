@@ -45,6 +45,7 @@ window.onload = function() {
         spec: data.spec,
         dom_id: '#swagger-ui',
         validatorUrl: null,
+        deepLinking: true,
         oauth2RedirectUrl: data.oauth.redirectUrl,
         presets: [
             SwaggerUIBundle.presets.apis,
