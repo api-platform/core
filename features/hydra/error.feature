@@ -69,6 +69,40 @@ Feature: Error handling
     And the JSON node "title" should be equal to "An error occurred"
     And the JSON node "detail" should exist
 
+  Scenario: Get an rfc 7807 not found error
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/does_not_exist" with body:
+    """
+    {}
+    """
+    Then the response status code should be 404
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+    And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
+    And the JSON node "@context" should not exist
+    And the JSON node "type" should exist
+    And the JSON node "title" should be equal to "An error occurred"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
+    And the JSON node "detail" should exist
+    And the JSON node "hydra:description" should exist
+
+  Scenario: Get an rfc 7807 bad method error
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PATCH" request to "/dummy_problems" with body:
+    """
+    {}
+    """
+    Then the response status code should be 405
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+    And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
+    And the JSON node "@context" should not exist
+    And the JSON node "type" should exist
+    And the JSON node "title" should be equal to "An error occurred"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
+    And the JSON node "detail" should exist
+    And the JSON node "hydra:description" should exist
+
   Scenario: Get an rfc 7807 validation error
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/validation_exception_problems" with body:
@@ -84,4 +118,3 @@ Feature: Error handling
     And the JSON node "title" should be equal to "An error occurred"
     And the JSON node "detail" should exist
     And the JSON node "violations" should exist
-

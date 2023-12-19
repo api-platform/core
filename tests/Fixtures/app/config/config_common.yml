@@ -33,6 +33,7 @@ api_platform:
     description: |
         This is a test API.
         Made with love
+    handle_symfony_errors: true
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']

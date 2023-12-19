@@ -120,6 +120,13 @@ trait ContentNegotiationTrait
             }
         }
 
+        $contentType = $request->headers->get('Content-Type');
+        if (null !== $contentType) {
+            if ($mediaType = $this->negotiator->getBest($contentType, $mimeTypes)) {
+                return $this->getMimeTypeFormat($mediaType->getType(), $formats);
+            }
+        }
+
         // Finally, if no Accept header nor Symfony request format is set, return the default format
         return array_key_first($formats);
     }

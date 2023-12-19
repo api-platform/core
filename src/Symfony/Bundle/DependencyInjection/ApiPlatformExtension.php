@@ -199,6 +199,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.event_listeners_backward_compatibility_layer', $config['event_listeners_backward_compatibility_layer']);
         $loader->load('legacy/events.xml');
 
+        $container->setParameter('api_platform.handle_symfony_errors', $config['handle_symfony_errors']);
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
         $container->setParameter('api_platform.keep_legacy_inflector', $config['keep_legacy_inflector']);
