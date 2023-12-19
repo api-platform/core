@@ -109,7 +109,8 @@ final class ApiProperty
          * The `security` option defines the access to the current property, on normalization process, based on Symfony Security.
          * It receives an `object` variable related to the current object, and a `property` variable related to the current property.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Review.php
@@ -144,14 +145,16 @@ final class ApiProperty
          *     <property resource="App\Entity\Review" name="letter" security="is_granted('ROLE_ADMIN')" />
          * </properties>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         private ?string $security = null,
         /**
          * The `securityPostDenormalize` option defines access to the current property after the denormalization process, based on Symfony Security.
          * It receives an `object` variable related to the current object, and a `property` variable related to the current property.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Review.php
@@ -186,7 +189,8 @@ final class ApiProperty
          *     <property resource="App\Entity\Review" name="letter" securityPostDenormalize="is_granted('ROLE_ADMIN')" />
          * </properties>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         private ?string $securityPostDenormalize = null,
         private array|string|null $types = null,

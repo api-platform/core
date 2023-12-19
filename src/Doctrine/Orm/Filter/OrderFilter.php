@@ -110,7 +110,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * By default, whenever the query does not specify the direction explicitly (e.g.: `/books?order[title]&order[id]`), filters will not be applied unless you configure a default order direction to use:
  *
- * [codeSelector]
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -181,7 +182,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *     </resource>
  * </resources>
  * ```
- * [/codeSelector]
+ *
+ * </div>
  *
  * When the property used for ordering can contain `null` values, you may want to specify how `null` values are treated in the comparison:
  * - Use the default behavior of the DBMS: use `null` strategy
