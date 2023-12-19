@@ -142,6 +142,7 @@ Feature: Error handling
 
   Scenario: Get an error because of sending bad type property
     When I add "Content-Type" header equal to "application/json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/greetings" with body:
     """
     {
