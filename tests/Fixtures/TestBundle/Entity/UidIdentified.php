@@ -16,10 +16,10 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Annotation\Ignore as LegacyIgnore;
-use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Annotation\SerializedName as LegacySerializedName;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
