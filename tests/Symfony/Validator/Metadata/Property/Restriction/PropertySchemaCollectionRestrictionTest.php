@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property\Restriction;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCollectionRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
+use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +24,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -44,6 +46,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
     protected function setUp(): void
     {
         $this->propertySchemaCollectionRestriction = new PropertySchemaCollectionRestriction([
+            new PropertySchemaGreaterThanRestriction(),
             new PropertySchemaLengthRestriction(),
             new PropertySchemaRegexRestriction(),
             new PropertySchemaFormat(),
@@ -71,7 +74,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
      */
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
-        self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));
+        self::assertEquals($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));
     }
 
     public static function createProvider(): \Generator
@@ -93,6 +96,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             ]),
             'age' => new Optional([
                 new Type(['type' => 'int']),
+                new GreaterThan(0),
             ]),
             'social' => new Collection([
                 'fields' => [
@@ -101,11 +105,11 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             ]),
         ];
         $properties = [
-            'name' => [],
-            'email' => ['format' => 'email'],
+            'name' => new \ArrayObject(),
+            'email' => ['minLength' => 2, 'maxLength' => 255, 'format' => 'email'],
             'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
-            'age' => [],
-            'social' => ['type' => 'object', 'properties' => ['githubUsername' => []], 'additionalProperties' => false, 'required' => ['githubUsername']],
+            'age' => ['exclusiveMinimum' => 0],
+            'social' => ['type' => 'object', 'properties' => ['githubUsername' => new \ArrayObject()], 'additionalProperties' => false, 'required' => ['githubUsername']],
         ];
         $required = ['name', 'email', 'social'];
 
