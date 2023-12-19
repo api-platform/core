@@ -56,6 +56,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
             $jsonApiObject = $this->itemNormalizer->normalize($object, $format, $context);
             $error = $jsonApiObject['data']['attributes'];
             $error['id'] = $jsonApiObject['data']['id'];
+            $error['type'] = $jsonApiObject['data']['id'];
 
             return ['errors' => [$error]];
         }

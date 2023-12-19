@@ -1,6 +1,8 @@
 @!mongodb
 @v3
 Feature: Exposing a collection of objects should use the specified operation to generate the IRI
+  Background:
+    Given I add "Accept" header equal to "application/ld+json"
 
   Scenario: Get a collection of objects without any itemUriTemplate should generate the IRI from the first Get operation
     When I send a "GET" request to "/cars"
