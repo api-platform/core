@@ -96,22 +96,22 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
             new Type(Type::BUILTIN_TYPE_STRING),
             new Type(Type::BUILTIN_TYPE_INT),
             new Type(Type::BUILTIN_TYPE_FLOAT),
-        ]), ['type' => 'array', 'items' => ['type' => ['string', 'number'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]]]];
+        ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]]]];
         yield 'multi string/int/float choice min with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2], 'multiple' => true, 'min' => 2]), (new ApiProperty())->withBuiltinTypes([
             new Type(Type::BUILTIN_TYPE_STRING),
             new Type(Type::BUILTIN_TYPE_INT),
             new Type(Type::BUILTIN_TYPE_FLOAT),
-        ]), ['type' => 'array', 'items' => ['type' => ['string', 'number'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]], 'minItems' => 2]];
+        ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]], 'minItems' => 2]];
         yield 'multi string/int/float choice max with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([
             new Type(Type::BUILTIN_TYPE_STRING),
             new Type(Type::BUILTIN_TYPE_INT),
             new Type(Type::BUILTIN_TYPE_FLOAT),
-        ]), ['type' => 'array', 'items' => ['type' => ['string', 'number'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
+        ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
         yield 'multi string/int/float choice min/max with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([
             new Type(Type::BUILTIN_TYPE_STRING),
             new Type(Type::BUILTIN_TYPE_INT),
             new Type(Type::BUILTIN_TYPE_FLOAT),
-        ]), ['type' => 'array', 'items' => ['type' => ['string', 'number'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
+        ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
 
         yield 'single choice callback' => [new Choice(['callback' => ChoiceCallback::getChoices(...)]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), ['enum' => ['a', 'b', 'c', 'd']]];
         yield 'multi choice callback' => [new Choice(['callback' => ChoiceCallback::getChoices(...), 'multiple' => true]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]];

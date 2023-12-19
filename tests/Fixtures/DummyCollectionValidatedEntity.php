@@ -37,6 +37,7 @@ class DummyCollectionValidatedEntity
             ]),
             'age' => new Assert\Optional([
                 new Assert\Type(type: 'int'),
+                new Assert\GreaterThan(0),
             ]),
             'social' => new Assert\Collection(
                 fields: [
