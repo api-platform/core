@@ -76,18 +76,20 @@ class ItemNormalizer extends AbstractItemNormalizer
         try {
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException) {
-            $operation = $this->resourceMetadataCollectionFactory->create($context['resource_class'])->getOperation();
+            $operation = $this->resourceMetadataCollectionFactory?->create($context['resource_class'])->getOperation();
             if (
-                null !== ($context['uri_variables'] ?? null)
-                && $operation instanceof HttpOperation
-                && \count($operation->getUriVariables() ?? []) > 1
+                !$operation || (
+                    null !== ($context['uri_variables'] ?? null)
+                    && $operation instanceof HttpOperation
+                    && \count($operation->getUriVariables() ?? []) > 1
+                )
             ) {
                 throw new InvalidArgumentException('Cannot find object to populate, use JSON-LD or specify an IRI at path "id".');
             }
             $uriVariables = $this->getContextUriVariables($data, $operation, $context);
             $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($iri, $context + ['fetch_data' => true]);
         }
     }
 
