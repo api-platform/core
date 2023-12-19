@@ -150,4 +150,16 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
         $this->assertEquals($json['definitions']['SaveProduct.jsonld']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode.jsonld');
     }
+
+    /**
+     * Test related Schema keeps json-ld context.
+     */
+    public function testSubSchemaJsonLd(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy', '--type' => 'output', '--format' => 'jsonld']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertArrayHasKey('@id', $json['definitions']['ThirdLevel.jsonld-friends']['properties']);
+    }
 }

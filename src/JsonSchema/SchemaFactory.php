@@ -33,11 +33,12 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class SchemaFactory implements SchemaFactoryInterface
+final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     use ResourceClassInfoTrait;
     private array $distinctFormats = [];
     private ?TypeFactoryInterface $typeFactory = null;
+    private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
     public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
@@ -217,7 +218,8 @@ final class SchemaFactory implements SchemaFactoryInterface
                 continue;
             }
 
-            $subSchema = $this->buildSchema($className, $format, $parentType, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+            $subSchemaFactory = $this->schemaFactory ?: $this;
+            $subSchema = $subSchemaFactory->buildSchema($className, $format, $parentType, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
             if (!isset($subSchema['$ref'])) {
                 continue;
             }
@@ -398,5 +400,10 @@ final class SchemaFactory implements SchemaFactoryInterface
         $parts = explode('\\', $fullyQualifiedName);
 
         return end($parts);
+    }
+
+    public function setSchemaFactory(SchemaFactoryInterface $schemaFactory): void
+    {
+        $this->schemaFactory = $schemaFactory;
     }
 }

@@ -16,6 +16,7 @@ namespace ApiPlatform\Hydra\JsonSchema;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
+use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Operation;
 
@@ -60,6 +61,9 @@ final class SchemaFactory implements SchemaFactoryInterface
     public function __construct(private readonly SchemaFactoryInterface $schemaFactory)
     {
         $this->addDistinctFormat('jsonld');
+        if ($this->schemaFactory instanceof SchemaFactoryAwareInterface) {
+            $this->schemaFactory->setSchemaFactory($this);
+        }
     }
 
     /**
