@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.1.24
+
+### Bug fixes
+
+* [9660a190a](https://github.com/api-platform/core/commit/9660a190a264102f7d1cfa1eae41f397ec559391) fix(serializer): concat context on wrong id (#6050)
+* [a9a06897b](https://github.com/api-platform/core/commit/a9a06897b38a1b7a68db0e217d659d2dc5450851) fix(doctrine): get reference with identifier value (#6019)
+* [cc16a1ced](https://github.com/api-platform/core/commit/cc16a1ced3300a6080fbc428bade0291ca5bcb82) fix(jsonschema): iri example (#5901)
+
 ## v3.1.23
 
 ### Bug fixes
