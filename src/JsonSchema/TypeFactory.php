@@ -147,6 +147,7 @@ final class TypeFactory implements TypeFactoryInterface
             return [
                 'type' => 'string',
                 'format' => 'iri-reference',
+                'example' => 'https://example.com/',
             ];
         }
 
