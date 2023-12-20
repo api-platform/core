@@ -91,6 +91,12 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
             $operation = $operation->withProvider($this->getProvider($operation));
         }
 
+        $options = $operation->getStateOptions() ?: new Options();
+        if ($options instanceof Options && null === $options->getHandleLinks()) {
+            $options = $options->withHandleLinks('api_platform.doctrine.orm.links_handler');
+            $operation = $operation->withStateOptions($options);
+        }
+
         if (null === $operation->getProcessor()) {
             $operation = $operation->withProcessor($this->getProcessor($operation));
         }

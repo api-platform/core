@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\State;
 
 use ApiPlatform\Doctrine\Common\State\LinksHandlerTrait as CommonLinksHandlerTrait;
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @internal
@@ -27,7 +28,9 @@ trait LinksHandlerTrait
 {
     use CommonLinksHandlerTrait;
 
-    private function handleLinks(QueryBuilder $queryBuilder, array $identifiers, QueryNameGenerator $queryNameGenerator, array $context, string $entityClass, Operation $operation): void
+    private ManagerRegistry $managerRegistry;
+
+    private function handleLinks(QueryBuilder $queryBuilder, array $identifiers, QueryNameGeneratorInterface $queryNameGenerator, array $context, string $entityClass, Operation $operation): void
     {
         if (!$identifiers) {
             return;

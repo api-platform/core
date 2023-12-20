@@ -82,6 +82,12 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
 
     private function addDefaults(Operation $operation): Operation
     {
+        $options = $operation->getStateOptions() ?: new Options();
+        if ($options instanceof Options && null === $options->getHandleLinks()) {
+            $options = $options->withHandleLinks('api_platform.doctrine.odm.links_handler');
+            $operation = $operation->withStateOptions($options);
+        }
+
         if (null === $operation->getProvider()) {
             $operation = $operation->withProvider($this->getProvider($operation));
         }

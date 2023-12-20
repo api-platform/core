@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @internal
@@ -27,6 +28,8 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 trait LinksHandlerTrait
 {
     use CommonLinksHandlerTrait;
+
+    private ManagerRegistry $managerRegistry;
 
     private function handleLinks(Builder $aggregationBuilder, array $identifiers, array $context, string $resourceClass, Operation $operation = null): void
     {
