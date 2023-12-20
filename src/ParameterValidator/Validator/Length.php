@@ -11,14 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Api\QueryParameterValidator\Validator;
+namespace ApiPlatform\ParameterValidator\Validator;
 
-use ApiPlatform\ParameterValidator\Validator\CheckFilterDeprecationsTrait;
-use ApiPlatform\ParameterValidator\Validator\ValidatorInterface;
-
-/**
- * @deprecated use \ApiPlatform\ParameterValidator\Validator\Length instead
- */
 final class Length implements ValidatorInterface
 {
     use CheckFilterDeprecationsTrait;

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Api\QueryParameterValidator\Validator;
+namespace ApiPlatform\ParameterValidator\Validator;
 
 /**
  * @internal

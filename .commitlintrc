@@ -16,6 +16,7 @@
         "jsonapi",
         "graphql",
         "openapi",
+        "parametervalidator",
         "serializer",
         "jsonschema",
         "validation",

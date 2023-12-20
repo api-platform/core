@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Api\QueryParameterValidator\Validator;
+namespace ApiPlatform\ParameterValidator\Tests\Validator;
 
-use ApiPlatform\Api\QueryParameterValidator\Validator\Enum;
+use ApiPlatform\ParameterValidator\Validator\Enum;
 use PHPUnit\Framework\TestCase;
 
 /**

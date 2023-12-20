@@ -11,15 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Api\QueryParameterValidator\Validator;
+namespace ApiPlatform\ParameterValidator\Validator;
 
-use ApiPlatform\ParameterValidator\Validator\CheckFilterDeprecationsTrait;
-use ApiPlatform\ParameterValidator\Validator\ValidatorInterface;
-
-/**
- * @deprecated use \ApiPlatform\ParameterValidator\Validator\MultipleOf instead
- */
-final class MultipleOf implements ValidatorInterface
+final class Pattern implements ValidatorInterface
 {
     use CheckFilterDeprecationsTrait;
 
@@ -35,11 +29,11 @@ final class MultipleOf implements ValidatorInterface
 
         $this->checkFilterDeprecations($filterDescription);
 
-        $multipleOf = $filterDescription['openapi']['multipleOf'] ?? $filterDescription['swagger']['multipleOf'] ?? null;
+        $pattern = $filterDescription['openapi']['pattern'] ?? $filterDescription['swagger']['pattern'] ?? null;
 
-        if (null !== $multipleOf && 0 !== ($value % $multipleOf)) {
+        if (null !== $pattern && !preg_match($pattern, $value)) {
             return [
-                sprintf('Query parameter "%s" must multiple of %s', $name, $multipleOf),
+                sprintf('Query parameter "%s" must match pattern %s', $name, $pattern),
             ];
         }
 

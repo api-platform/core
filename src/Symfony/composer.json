@@ -20,8 +20,17 @@
     ],
     "require": {
         "php": ">=8.1",
+        "api-platform/documentation": "*@dev || ^3.1",
+        "api-platform/elasticsearch": "*@dev || ^3.1",
+        "api-platform/graphql": "*@dev || ^3.1",
+        "api-platform/http-cache": "*@dev || ^3.1",
+        "api-platform/json-schema": "*@dev || ^3.1",
+        "api-platform/jsonld": "*@dev || ^3.1",
         "api-platform/metadata": "*@dev || ^3.1",
+        "api-platform/parameter-validator": "*@dev || ^3.1",
+        "api-platform/serializer": "*@dev || ^3.1",
         "api-platform/state": "*@dev || ^3.1",
+        "api-platform/validator": "*@dev || ^3.1",
         "symfony/property-info": "^6.1",
         "symfony/serializer": "^6.1",
         "symfony/security-core": "^6.1"
@@ -65,6 +74,10 @@
         {
             "type": "path",
             "url": "../Metadata"
+        },
+        {
+            "type": "path",
+            "url": "../ParameterValidator"
         },
         {
             "type": "path",
