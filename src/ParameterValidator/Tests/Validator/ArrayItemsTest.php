@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Api\QueryParameterValidator\Validator;
+namespace ApiPlatform\ParameterValidator\Tests\Validator;
 
-use ApiPlatform\Api\QueryParameterValidator\Validator\ArrayItems;
+use ApiPlatform\ParameterValidator\Validator\ArrayItems;
 use PHPUnit\Framework\TestCase;
 
 /**

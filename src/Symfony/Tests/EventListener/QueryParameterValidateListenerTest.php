@@ -11,15 +11,15 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\EventListener;
+namespace ApiPlatform\Symfony\Tests\EventListener;
 
-use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
-use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\ParameterValidator\Exception\ValidationException;
+use ApiPlatform\ParameterValidator\ParameterValidator;
 use ApiPlatform\Symfony\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
@@ -68,7 +68,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
 
-        $queryParameterValidator = $this->prophesize(QueryParameterValidator::class);
+        $queryParameterValidator = $this->prophesize(ParameterValidator::class);
         $queryParameterValidator->validateFilters(Argument::cetera())->shouldNotBeCalled();
 
         $listener = new QueryParameterValidateListener(
@@ -93,7 +93,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
 
-        $queryParameterValidator = $this->prophesize(QueryParameterValidator::class);
+        $queryParameterValidator = $this->prophesize(ParameterValidator::class);
         $queryParameterValidator->validateFilters(Argument::cetera())->shouldNotBeCalled();
 
         $listener = new QueryParameterValidateListener(
@@ -123,7 +123,7 @@ class QueryParameterValidateListenerTest extends TestCase
     }
 
     /**
-     * if the required parameter is not set, throw an FilterValidationException.
+     * if the required parameter is not set, throw an ValidationException.
      */
     public function testOnKernelRequestWithRequiredFilterNotSet(): void
     {
@@ -138,8 +138,8 @@ class QueryParameterValidateListenerTest extends TestCase
         $this->queryParameterValidator
             ->validateFilters(Dummy::class, ['some_filter'], [])
             ->shouldBeCalled()
-            ->willThrow(new FilterValidationException(['Query parameter "required" is required']));
-        $this->expectException(FilterValidationException::class);
+            ->willThrow(new ValidationException(['Query parameter "required" is required']));
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Query parameter "required" is required');
         $this->testedInstance->onKernelRequest($eventProphecy->reveal());
     }
@@ -180,7 +180,7 @@ class QueryParameterValidateListenerTest extends TestCase
             ]),
         ]));
 
-        $this->queryParameterValidator = $this->prophesize(QueryParameterValidator::class);
+        $this->queryParameterValidator = $this->prophesize(ParameterValidator::class);
 
         $this->testedInstance = new QueryParameterValidateListener(
             $this->queryParameterValidator->reveal(),

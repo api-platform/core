@@ -14,6 +14,14 @@ declare(strict_types=1);
 $deprecatedClassesWithAliases = [
     \ApiPlatform\HttpCache\EventListener\AddHeadersListener::class => \ApiPlatform\Symfony\EventListener\AddHeadersListener::class,
     \ApiPlatform\HttpCache\EventListener\AddTagsListener::class => \ApiPlatform\Symfony\EventListener\AddTagsListener::class,
+    \ApiPlatform\Exception\FilterValidationException::class => \ApiPlatform\ParameterValidator\Exception\ValidationException::class,
+    \ApiPlatform\Api\QueryParameterValidator\Validator\ArrayItems::class => \ApiPlatform\ParameterValidator\Validator\ArrayItems::class,
+    \ApiPlatform\Api\QueryParameterValidator\Validator\Bounds::class => \ApiPlatform\ParameterValidator\Validator\Bounds::class,
+    \ApiPlatform\Api\QueryParameterValidator\Validator\Enum::class => \ApiPlatform\ParameterValidator\Validator\Enum::class,
+    \ApiPlatform\Api\QueryParameterValidator\Validator\Length::class => \ApiPlatform\ParameterValidator\Validator\Length::class,
+    \ApiPlatform\Api\QueryParameterValidator\Validator\MultipleOf::class => \ApiPlatform\ParameterValidator\Validator\MultipleOf::class,
+    \ApiPlatform\Api\QueryParameterValidator\Validator\Pattern::class => \ApiPlatform\ParameterValidator\Validator\Pattern::class,
+    \ApiPlatform\Api\QueryParameterValidator\Validator\Required::class => \ApiPlatform\ParameterValidator\Validator\Required::class,
 ];
 
 spl_autoload_register(function ($className) use ($deprecatedClassesWithAliases): void {

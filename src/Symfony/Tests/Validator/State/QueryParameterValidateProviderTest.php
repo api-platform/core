@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Validator\State;
+namespace ApiPlatform\Symfony\Tests\Validator\State;
 
-use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\ParameterValidator\ParameterValidator;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\State\QueryParameterValidateProvider;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +36,7 @@ class QueryParameterValidateProviderTest extends TestCase
         $obj = new \stdClass();
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
-        $validator = $this->createMock(QueryParameterValidator::class);
+        $validator = $this->createMock(ParameterValidator::class);
         $validator->expects($this->once())->method('validateFilters')->with('foo', $filters, ['foo' => 'bar']);
         $provider = new QueryParameterValidateProvider($decorated, $validator);
         $provider->provide($operation, [], $context);

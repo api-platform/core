@@ -11,15 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Api\QueryParameterValidator\Validator;
+namespace ApiPlatform\ParameterValidator\Validator;
 
-use ApiPlatform\ParameterValidator\Validator\CheckFilterDeprecationsTrait;
-use ApiPlatform\ParameterValidator\Validator\ValidatorInterface;
-
-/**
- * @deprecated use \ApiPlatform\ParameterValidator\Validator\MultipleOf instead
- */
-final class MultipleOf implements ValidatorInterface
+final class Enum implements ValidatorInterface
 {
     use CheckFilterDeprecationsTrait;
 
@@ -35,11 +29,11 @@ final class MultipleOf implements ValidatorInterface
 
         $this->checkFilterDeprecations($filterDescription);
 
-        $multipleOf = $filterDescription['openapi']['multipleOf'] ?? $filterDescription['swagger']['multipleOf'] ?? null;
+        $enum = $filterDescription['openapi']['enum'] ?? $filterDescription['swagger']['enum'] ?? null;
 
-        if (null !== $multipleOf && 0 !== ($value % $multipleOf)) {
+        if (null !== $enum && !\in_array($value, $enum, true)) {
             return [
-                sprintf('Query parameter "%s" must multiple of %s', $name, $multipleOf),
+                sprintf('Query parameter "%s" must be one of "%s"', $name, implode(', ', $enum)),
             ];
         }
 

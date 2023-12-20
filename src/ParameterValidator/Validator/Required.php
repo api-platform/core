@@ -11,15 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Api\QueryParameterValidator\Validator;
+namespace ApiPlatform\ParameterValidator\Validator;
 
-use ApiPlatform\ParameterValidator\Validator\CheckFilterDeprecationsTrait;
-use ApiPlatform\ParameterValidator\Validator\ValidatorInterface;
 use ApiPlatform\State\Util\RequestParser;
 
-/**
- * @deprecated use \ApiPlatform\ParameterValidator\Validator\Required instead
- */
 final class Required implements ValidatorInterface
 {
     use CheckFilterDeprecationsTrait;

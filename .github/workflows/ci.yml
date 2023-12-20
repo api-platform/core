@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run commitlint
-        run: | 
+        run: |
             commit=$(gh api \
               /repos/${{ github.repository }}/pulls/${{github.event.number}}/commits \
               | jq -r '.[0].commit.message' \
@@ -197,11 +197,13 @@ jobs:
           - JsonSchema
           - OpenApi
           - Metadata
+          - ParameterValidator
           - Elasticsearch
           - HttpCache
           - RamseyUuid
           - GraphQl
           - Serializer
+          - Symfony
       fail-fast: false
     steps:
       - name: Checkout
@@ -1139,4 +1141,3 @@ jobs:
           name: openapi-docs-php${{ matrix.php }}
           path: build/out/openapi
         continue-on-error: true
-

@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
-interface ValidatorInterface
+use ApiPlatform\ParameterValidator\Validator as ParameterValidatorComponent;
+
+/** @deprecated use \ApiPlatform\ParameterValidator\Validator\ValidatorInterface instead */
+interface ValidatorInterface extends ParameterValidatorComponent\ValidatorInterface
 {
-    /**
-     * @param string               $name              the parameter name to validate
-     * @param array<string, mixed> $filterDescription the filter descriptions as returned by `\ApiPlatform\Api\FilterInterface::getDescription()`
-     * @param array<string, mixed> $queryParameters   the list of query parameter
-     */
-    public function validate(string $name, array $filterDescription, array $queryParameters): array;
 }

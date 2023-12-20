@@ -11,11 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Api\QueryParameterValidator;
+namespace ApiPlatform\ParameterValidator\Tests;
 
-use ApiPlatform\Api\FilterInterface;
-use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
 use ApiPlatform\Exception\FilterValidationException;
+use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\ParameterValidator\Exception\ValidationException;
+use ApiPlatform\ParameterValidator\ParameterValidator;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -23,15 +24,13 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 
 /**
- * Class QueryParameterValidatorTest.
- *
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
-class QueryParameterValidatorTest extends TestCase
+class ParameterValidatorTest extends TestCase
 {
     use ProphecyTrait;
 
-    private QueryParameterValidator $testedInstance;
+    private ParameterValidator $testedInstance;
     private ObjectProphecy $filterLocatorProphecy;
 
     /**
@@ -41,7 +40,7 @@ class QueryParameterValidatorTest extends TestCase
     {
         $this->filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
 
-        $this->testedInstance = new QueryParameterValidator(
+        $this->testedInstance = new ParameterValidator(
             $this->filterLocatorProphecy->reveal()
         );
     }
@@ -96,7 +95,7 @@ class QueryParameterValidatorTest extends TestCase
             ->shouldBeCalled()
             ->willReturn($filterProphecy->reveal());
 
-        $this->expectException(FilterValidationException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Query parameter "required" is required');
         $this->testedInstance->validateFilters(Dummy::class, ['some_filter'], $request);
     }
