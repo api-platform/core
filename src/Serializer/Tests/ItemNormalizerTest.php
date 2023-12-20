@@ -14,11 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Serializer\Tests;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\Dummy;
 use PHPUnit\Framework\TestCase;
@@ -282,5 +289,81 @@ class ItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $object);
         $this->assertSame('42', $object->getId());
         $this->assertSame('hello', $object->getName());
+    }
+
+    public function testDenormalizeWithWrongIdAndNoResourceMetadataFactory(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getResourceFromIri('fail', $context + ['fetch_data' => true])->willThrow(new InvalidArgumentException());
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['name' => 'hello', 'id' => 'fail'], Dummy::class, null, $context));
+    }
+
+    public function testDenormalizeWithWrongId(): void
+    {
+        $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];
+        $operation = new Get(uriVariables: ['id' => new Link(identifiers: ['id'], parameterName: 'id')]);
+        $obj = new Dummy();
+
+        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
+
+        $propertyMetadata = (new ApiProperty())->withReadable(true)->withWritable(true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata)->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getResourceFromIri('fail', $context + ['fetch_data' => true])->willThrow(new InvalidArgumentException());
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => 'fail']])->willReturn('/dummies/fail');
+        $iriConverterProphecy->getResourceFromIri('/dummies/fail', $context + ['fetch_data' => true])->willReturn($obj);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($obj, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            new ApiResource(operations: [$operation]),
+        ]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            $resourceMetadataCollectionFactory->reveal()
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['name' => 'hello', 'id' => 'fail'], Dummy::class, null, $context));
     }
 }
