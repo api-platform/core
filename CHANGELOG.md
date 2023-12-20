@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.2.8
+
+### Bug fixes
+
+* [2a43268f9](https://github.com/api-platform/core/commit/2a43268f997e79a8407992c0bd7704a19d860479) fix(jsonschema): fix invalid "int" type to "integer" (#6049)
+* [9660a190a](https://github.com/api-platform/core/commit/9660a190a264102f7d1cfa1eae41f397ec559391) fix(serializer): concat context on wrong id (#6050)
+* [a35f0da11](https://github.com/api-platform/core/commit/a35f0da118444e7d735a37de5e918e8927a99b5e) fix(jsonld): remove link to ApiDocumentation when doc is disabled (#6029)
+* [a9a06897b](https://github.com/api-platform/core/commit/a9a06897b38a1b7a68db0e217d659d2dc5450851) fix(doctrine): get reference with identifier value (#6019)
+* [aac883e93](https://github.com/api-platform/core/commit/aac883e9331adac959c097796277e8a6d3e63ef0) fix(symfony): bypass symfony exception listener (#6056)
+* [b1926f533](https://github.com/api-platform/core/commit/b1926f533f4dd1f979285ac6bb26e339fe9d908f) fix(symfony): do not use metadata when merging schema constraints in Collection constraint (#6057)
+* [cc16a1ced](https://github.com/api-platform/core/commit/cc16a1ced3300a6080fbc428bade0291ca5bcb82) fix(jsonschema): iri example (#5901)
+* [ccf52c199](https://github.com/api-platform/core/commit/ccf52c19953874fbafbb398de0a3419244079f48) fix: item_uri_template conflict with context on relation (#6015)
+* [dcce75121](https://github.com/api-platform/core/commit/dcce75121153b32401d9301d8502d43ef46a8b17) fix(doctrine): OrderFilterTrait - properties null value causing error in foreach
+* [dcfd3c5ca](https://github.com/api-platform/core/commit/dcfd3c5ca34c4add63d299a8400f94795461c982) fix(jsonschema): keep format subschema generation (#6055)
+* [c13c88e5c](https://github.com/api-platform/core/commit/c13c88e5c2c8206664bda2d708e43c995968ae84) fix(metadata): throw exception if itemUriTemplate if used on invalid operation (xml/yaml formats) (#6053)
+
 ## v3.2.7
 
 Symfony 7 support.
