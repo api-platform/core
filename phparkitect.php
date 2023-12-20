@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 use Arkitect\ClassSet;
@@ -7,9 +16,11 @@ use Arkitect\CLI\Config;
 use Arkitect\RuleBuilders\Architecture\Architecture;
 
 return static function (Config $config): void {
-    $classSet = ClassSet::fromDir(__DIR__.'/src');
+    $classSet = ClassSet::fromDir(__DIR__.'/src')
+        ->excludePath('*/vendor/*')
+        ->excludePath('*/Tests/*');
+
     $config->add($classSet, ...Architecture::withComponents()
-        ->component('Api')->definedBy('ApiPlatform\Api\*')
         ->component('DoctrineCommon')->definedBy('ApiPlatform\Doctrine\Common\*')
         ->component('Documentation')->definedBy('ApiPlatform\Documentation\*')
         ->component('Elasticsearch')->definedBy('ApiPlatform\Elasticsearch\*')
@@ -20,6 +31,7 @@ return static function (Config $config): void {
         ->component('JsonSchema')->definedBy('ApiPlatform\JsonSchema\*')
         ->component('Metadata')->definedBy('ApiPlatform\Metadata\*')
         ->component('OpenApi')->definedBy('ApiPlatform\OpenApi\*')
+        ->component('ParameterValidator')->definedBy('ApiPlatform\ParameterValidator\*')
         ->component('RamseyUuid')->definedBy('ApiPlatform\RamseyUuid\*')
         ->component('Serializer')->definedBy('ApiPlatform\Serializer\*')
         ->component('State')->definedBy('ApiPlatform\State\*')
@@ -47,6 +59,7 @@ return static function (Config $config): void {
             'JsonSchema',
             'JsonLd',
             'OpenApi',
+            'ParameterValidator',
             'HttpCache',
             'Elasticsearch'
         )
