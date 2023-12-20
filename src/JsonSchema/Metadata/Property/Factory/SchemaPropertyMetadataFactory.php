@@ -244,7 +244,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         if (!$this->isResourceClass($className) && is_a($className, \BackedEnum::class, true)) {
             $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
 
-            $type = \is_string($enumCases[0] ?? '') ? 'string' : 'int';
+            $type = \is_string($enumCases[0] ?? '') ? 'string' : 'integer';
 
             if ($nullable) {
                 $enumCases[] = null;
@@ -260,6 +260,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return [
                 'type' => 'string',
                 'format' => 'iri-reference',
+                'example' => 'https://example.com/',
             ];
         }
 

@@ -69,19 +69,19 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
         return $constraint instanceof Collection;
     }
 
-    private function mergeConstraintRestrictions(Required|Optional $constraint, ApiProperty $propertyMetadata): array
+    private function mergeConstraintRestrictions(Required|Optional $constraint, ApiProperty $propertyMetadata): array|\ArrayObject
     {
         $propertyRestrictions = [];
         $nestedConstraints = $constraint->constraints;
 
         foreach ($nestedConstraints as $nestedConstraint) {
             foreach ($this->restrictionsMetadata as $restrictionMetadata) {
-                if ($restrictionMetadata->supports($nestedConstraint, $propertyMetadata) && !empty($nestedConstraintRestriction = $restrictionMetadata->create($nestedConstraint, $propertyMetadata))) {
+                if ($restrictionMetadata->supports($nestedConstraint, $propertyMetadata->withExtraProperties(($propertyMetadata->getExtraProperties() ?? []) + ['nested_schema' => true])) && !empty($nestedConstraintRestriction = $restrictionMetadata->create($nestedConstraint, $propertyMetadata))) {
                     $propertyRestrictions[] = $nestedConstraintRestriction;
                 }
             }
         }
 
-        return array_merge([], ...$propertyRestrictions);
+        return array_merge([], ...$propertyRestrictions) ?: new \ArrayObject();
     }
 }

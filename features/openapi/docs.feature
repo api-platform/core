@@ -100,7 +100,8 @@ Feature: Documentation support
     {
       "owl:maxCardinality": 1,
       "type": "string",
-      "format": "iri-reference"
+      "format": "iri-reference",
+      "example": "https://example.com/"
     }
     """
     # Enable these tests when SF 4.4 / PHP 7.1 support is dropped

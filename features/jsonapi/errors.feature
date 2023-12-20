@@ -47,5 +47,17 @@ Feature: JSON API error handling
     And the JSON node "errors[0].title" should be equal to "An error occurred"
     And the JSON node "errors[0].status" should be equal to 400
     And the JSON node "errors[0].detail" should exist
-    And the JSON node "errors[0].detail" should exist
+    And the JSON node "errors[0].type" should exist
 
+  Scenario: Get an rfc 7807 error
+    When I send a "POST" request to "/does_not_exist" with body:
+    """
+    {}
+    """
+    Then the response status code should be 404
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/vnd.api+json; charset=utf-8"
+    And the JSON node "errors[0].title" should be equal to "An error occurred"
+    And the JSON node "errors[0].status" should be equal to 404
+    And the JSON node "errors[0].detail" should exist
+    And the JSON node "errors[0].type" should exist

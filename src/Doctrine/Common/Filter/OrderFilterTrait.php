@@ -43,7 +43,7 @@ trait OrderFilterTrait
             $properties = array_fill_keys($fieldNames, null);
         }
 
-        foreach ($properties as $property => $propertyOptions) {
+        foreach ($properties ?? [] as $property => $propertyOptions) {
             if (!$this->isPropertyMapped($property, $resourceClass)) {
                 continue;
             }

@@ -589,18 +589,22 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY)])
         )->shouldBeCalled();
 
+        $greaterThanRestriction = new PropertySchemaGreaterThanRestriction();
         $lengthRestriction = new PropertySchemaLengthRestriction();
         $regexRestriction = new PropertySchemaRegexRestriction();
         $formatRestriction = new PropertySchemaFormat();
         $restrictionsMetadata = [
+            $greaterThanRestriction,
             $lengthRestriction,
             $regexRestriction,
             $formatRestriction,
             new PropertySchemaCollectionRestriction([
+                $greaterThanRestriction,
                 $lengthRestriction,
                 $regexRestriction,
                 $formatRestriction,
                 new PropertySchemaCollectionRestriction([
+                    $greaterThanRestriction,
                     $lengthRestriction,
                     $regexRestriction,
                     $formatRestriction,
@@ -619,14 +623,16 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals([
             'type' => 'object',
             'properties' => [
-                'name' => [],
-                'email' => ['format' => 'email'],
+                'name' => new \ArrayObject(),
+                'email' => ['format' => 'email', 'minLength' => 2, 'maxLength' => 255],
                 'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
-                'age' => [],
+                'age' => [
+                    'exclusiveMinimum' => 0,
+                ],
                 'social' => [
                     'type' => 'object',
                     'properties' => [
-                        'githubUsername' => [],
+                        'githubUsername' => new \ArrayObject(),
                     ],
                     'additionalProperties' => false,
                     'required' => ['githubUsername'],

@@ -388,6 +388,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
 
             if (\in_array((string) $operation['class'], [GetCollection::class, Post::class], true)) {
                 $datum['itemUriTemplate'] = $this->phpize($operation, 'itemUriTemplate', 'string');
+            } elseif (isset($operation['itemUriTemplate'])) {
+                throw new InvalidArgumentException(sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $operation['class']));
             }
 
             $data[] = array_merge($datum, [

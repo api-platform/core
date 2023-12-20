@@ -17,6 +17,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\State\CreateProvider;
 
 #[GetCollection(
     uriTemplate: '/issue5662/admin/reviews{._format}',
@@ -43,10 +45,26 @@ use ApiPlatform\Metadata\Operation;
         'id' => new Link(fromClass: Review::class),
     ]
 )]
+#[Post(
+    itemUriTemplate: '/issue5662/books/{bookId}/reviews/{id}{._format}',
+    uriTemplate: '/issue5662/books/{id}/reviews{._format}',
+    uriVariables: [
+        'id' => new Link(toProperty: 'book', fromClass: Book::class),
+    ],
+    provider: CreateProvider::class,
+    processor: [Review::class, 'process']
+)]
 class Review
 {
-    public function __construct(public Book $book, public int $id, public string $body)
+    public function __construct(public ?Book $book = null, public ?int $id = null, public ?string $body = null)
     {
+    }
+
+    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    {
+        $data->id = 0;
+
+        return $data;
     }
 
     public static function getData(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
