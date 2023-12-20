@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.2.9
+
+* [ecffcde](https://github.com/api-platform/core/pull/6063/commits/ecffcdeb0a27e49256c56502f6f6e327d9e03d5b) chore: remove comparator conflict wrongly introduced
+
 ## v3.2.8
 
 ### Bug fixes
