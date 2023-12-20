@@ -366,7 +366,7 @@ class DeserializeListenerTest extends TestCase
             $this->assertSame($violation->getPropertyPath(), 'foo');
             $this->assertNull($violation->getInvalidValue());
             $this->assertNull($violation->getPlural());
-            $this->assertSame($violation->getCode(), 'ba785a8c-82cb-4283-967c-3cf342181b40');
+            $this->assertSame($violation->getCode(), '0');
         }
     }
 }
