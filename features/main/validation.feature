@@ -119,40 +119,40 @@ Feature: Using validations groups
         {
           "propertyPath": "",
           "message": "This value should be of type unknown.",
-          "code": "0",
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
           "hint": "Failed to create object because the class misses the \"baz\" property."
         },
         {
           "propertyPath": "qux",
           "message": "This value should be of type string.",
-          "code": "0"
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
         },
         {
           "propertyPath": "foo",
           "message": "This value should be of type bool.",
-          "code": "0"
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
         },
         {
           "propertyPath": "bar",
           "message": "This value should be of type int.",
-          "code": "0"
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
         },
         {
           "propertyPath": "uuid",
           "message": "This value should be of type uuid.",
-          "code": "0",
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
           "hint": "Invalid UUID string: y"
         },
         {
           "propertyPath": "relatedDummy",
           "message": "This value should be of type array|string.",
-          "code": "0",
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
           "hint": "The type of the \"relatedDummy\" attribute must be \"array\" (nested document) or \"string\" (IRI), \"integer\" given."
         },
         {
           "propertyPath": "relatedDummies",
           "message": "This value should be of type array.",
-          "code": "0"
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
         }
       ]
     }
