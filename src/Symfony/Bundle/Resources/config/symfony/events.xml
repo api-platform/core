@@ -6,6 +6,7 @@
     <services>
         <service id="api_platform.listener.exception" class="ApiPlatform\Symfony\EventListener\ExceptionListener">
             <argument type="service" id="api_platform.error_listener" on-invalid="null" />
+            <argument>%api_platform.handle_symfony_errors%</argument>
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
             <tag name="monolog.logger" channel="request" />

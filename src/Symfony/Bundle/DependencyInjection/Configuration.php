@@ -103,6 +103,7 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('force_eager')->defaultTrue()->info('Force join on every relation. If disabled, it will only join relations having the EAGER fetch mode.')->end()
                     ->end()
                 ->end()
+                ->booleanNode('handle_symfony_errors')->defaultFalse()->info('Allows to handle symfony exceptions.')->end()
                 ->booleanNode('enable_swagger')->defaultTrue()->info('Enable the Swagger documentation and export.')->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger UI')->end()
                 ->booleanNode('enable_re_doc')->defaultValue(class_exists(TwigBundle::class))->info('Enable ReDoc')->end()
