@@ -823,7 +823,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $context['iri'] = $iri = $this->iriConverter->getIriFromResource(resource: $relatedObject, context: $context);
-
         $context['data'] = $iri;
         $context['object'] = $relatedObject;
         unset($context['property_metadata']);

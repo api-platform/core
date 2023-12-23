@@ -90,7 +90,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
 
         $this->assertTrue($normalizer->supportsNormalization($dummy));
@@ -162,7 +161,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -224,7 +222,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             $resourceAccessChecker->reveal(),
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -369,7 +366,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             $resourceAccessChecker->reveal(),
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -424,7 +420,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             $resourceAccessChecker->reveal(),
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -488,7 +483,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             $resourceAccessChecker->reveal(),
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -553,7 +547,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             $resourceAccessChecker->reveal(),
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -614,7 +607,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             $resourceAccessChecker->reveal(),
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -686,7 +678,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -752,7 +743,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -811,7 +801,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             [],
-            null,
             null,
             null,
         ]);
@@ -873,7 +862,7 @@ class AbstractItemNormalizerTest extends TestCase
         // $serializerProphecy->willImplement(DenormalizerInterface::class);
         // $serializerProphecy->denormalize($data, DummyForAdditionalFieldsInput::class, 'json', $cleanedContextWithObjectToPopulate)->willReturn($dummyInputDto);
         //
-        // $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, [], null, null, null) extends AbstractItemNormalizer {
+        // $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, [], null, null) extends AbstractItemNormalizer {
         // };
         // $normalizer->setSerializer($serializerProphecy->reveal());
         //
@@ -931,7 +920,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -983,7 +971,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             [],
-            null,
             null,
             null,
         ]);
@@ -1081,7 +1068,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1125,7 +1111,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1164,7 +1149,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             [],
-            null,
             null,
             null,
         ]);
@@ -1209,7 +1193,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             [],
-            null,
             null,
             null,
         ]);
@@ -1280,7 +1263,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1319,7 +1301,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             [],
-            null,
             null,
             null,
         ]);
@@ -1398,7 +1379,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1470,7 +1450,6 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             null,
             null,
-            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1511,7 +1490,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             [],
-            null,
             null,
             null,
         ]);
@@ -1556,7 +1534,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             [],
-            null,
             null,
             null,
         ]);
