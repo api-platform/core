@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Playground\DependencyInjection\Compiler;
 
-use ApiPlatform\Util\AttributeFilterExtractorTrait;
+use ApiPlatform\Metadata\Util\AttributeFilterExtractorTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
