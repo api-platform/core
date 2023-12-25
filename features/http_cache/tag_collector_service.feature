@@ -1,5 +1,6 @@
 @sqlite
 @customTagCollector
+@disableForSymfonyLowest
 Feature: Cache invalidation through HTTP Cache tags (custom TagCollector service)
   In order to have a fast API
   As an API software developer
