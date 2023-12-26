@@ -992,7 +992,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
+        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags='~@disableForSymfonyLowest'
 
   phpunit_legacy:
     name: PHPUnit Legacy event listeners (PHP ${{ matrix.php }})
