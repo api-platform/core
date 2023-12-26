@@ -455,5 +455,3 @@ services:
     api_platform.http_cache.tag_collector:
         class: ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorDefault
         public: true
-    
-
