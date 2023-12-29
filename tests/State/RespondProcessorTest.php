@@ -113,4 +113,18 @@ class RespondProcessorTest extends TestCase
 
         $this->assertSame('32', $response->headers->get('retry-after'));
     }
+
+    public function testAddsHeaders(): void
+    {
+        $operation = new Get(headers: ['foo' => 'bar']);
+
+        /** @var ProcessorInterface<string, Response> $respondProcessor */
+        $respondProcessor = new RespondProcessor();
+        $req = new Request();
+        $response = $respondProcessor->process('content', $operation, context: [
+            'request' => $req,
+        ]);
+
+        $this->assertSame('bar', $response->headers->get('foo'));
+    }
 }

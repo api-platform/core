@@ -96,6 +96,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
             'stateOptions' => $this->buildStateOptions($resource),
             'links' => $this->buildLinks($resource),
+            'headers' => $this->buildHeaders($resource),
         ]);
     }
 
@@ -465,7 +466,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
      */
     private function buildLinks(\SimpleXMLElement $resource): ?array
     {
-        $links = $resource->links ?? null;
         if (!$resource->links) {
             return null;
         }
@@ -476,5 +476,22 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $links;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function buildHeaders(\SimpleXMLElement $resource): ?array
+    {
+        if (!$resource->headers) {
+            return null;
+        }
+
+        $headers = [];
+        foreach ($resource->headers as $header) {
+            $headers[(string) $header->header->attributes()->key] = (string) $header->header->attributes()->value;
+        }
+
+        return $headers;
     }
 }

@@ -49,8 +49,14 @@ final class ReadProvider implements ProviderInterface
         }
 
         $request = ($context['request'] ?? null);
-
         if (!$operation->canRead()) {
+            return null;
+        }
+
+        $output = $operation->getOutput() ?? [];
+        if (\array_key_exists('class', $output) && null === $output['class']) {
+            $request?->attributes->set('data', null);
+
             return null;
         }
 

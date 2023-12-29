@@ -123,6 +123,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'outputFormats' => $this->buildArrayValue($resource, 'outputFormats'),
             'stateOptions' => $this->buildStateOptions($resource),
             'links' => $this->buildLinks($resource),
+            'headers' => $this->buildHeaders($resource),
         ]);
     }
 
@@ -431,5 +432,22 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $links;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function buildHeaders(array $resource): ?array
+    {
+        if (!isset($resource['headers']) || !\is_array($resource['headers'])) {
+            return null;
+        }
+
+        $headers = [];
+        foreach ($resource['headers'] as $key => $value) {
+            $headers[$key] = $value;
+        }
+
+        return $headers;
     }
 }

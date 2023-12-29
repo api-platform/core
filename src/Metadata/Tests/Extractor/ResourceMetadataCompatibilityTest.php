@@ -341,6 +341,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'status' => 204,
                     'host' => 'api-platform.com',
                     'schemes' => ['https'],
+                    'headers' => ['key' => 'value'],
                     'condition' => 'request.headers.has(\'Accept\')',
                     'controller' => 'App\Controller\CustomController',
                     'class' => GetCollection::class,
@@ -506,6 +507,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'paginationViaCursor',
         'stateOptions',
         'links',
+        'headers',
     ];
 
     /**

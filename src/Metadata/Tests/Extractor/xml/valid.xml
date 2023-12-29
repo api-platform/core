@@ -45,6 +45,10 @@
             </cacheHeader>
         </cacheHeaders>
 
+        <headers>
+            <header key="hello" value="world" />
+        </headers>
+
         <normalizationContext>
             <values>
                 <value name="groups">

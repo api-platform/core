@@ -50,6 +50,7 @@ final class NotExposed extends HttpOperation
         array $schemes = null,
         string $condition = null,
         ?string $controller = 'api_platform.action.not_exposed',
+        array $headers = null,
         array $cacheHeaders = null,
         array $paginationViaCursor = null,
 
@@ -128,6 +129,7 @@ final class NotExposed extends HttpOperation
             schemes: $schemes,
             condition: $condition,
             controller: $controller,
+            headers: $headers,
             cacheHeaders: $cacheHeaders,
             paginationViaCursor: $paginationViaCursor,
             hydraContext: $hydraContext,

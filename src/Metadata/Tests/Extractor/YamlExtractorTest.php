@@ -101,6 +101,7 @@ class YamlExtractorTest extends TestCase
                     'write' => null,
                     'stateOptions' => null,
                     'links' => null,
+                    'headers' => null,
                 ],
             ],
             Program::class => [
@@ -172,6 +173,7 @@ class YamlExtractorTest extends TestCase
                     'write' => null,
                     'stateOptions' => null,
                     'links' => null,
+                    'headers' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/programs{._format}',
@@ -314,6 +316,7 @@ class YamlExtractorTest extends TestCase
                             'itemUriTemplate' => null,
                             'stateOptions' => null,
                             'links' => null,
+                            'headers' => ['hello' => 'world'],
                         ],
                         [
                             'name' => null,
@@ -397,6 +400,7 @@ class YamlExtractorTest extends TestCase
                             'provider' => null,
                             'stateOptions' => null,
                             'links' => null,
+                            'headers' => ['hello' => 'world'],
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -406,6 +410,7 @@ class YamlExtractorTest extends TestCase
                     'write' => null,
                     'stateOptions' => null,
                     'links' => null,
+                    'headers' => ['hello' => 'world'],
                 ],
             ],
             SingleFileConfigDummy::class => [
@@ -477,6 +482,7 @@ class YamlExtractorTest extends TestCase
                     'write' => null,
                     'stateOptions' => null,
                     'links' => null,
+                    'headers' => null,
                 ],
             ],
         ], $extractor->getResources());
