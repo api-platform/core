@@ -19,7 +19,9 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\State\Pagination\ArrayPaginator;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
 
@@ -51,6 +53,10 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
+
+            if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && !$operation->getProvider() && $source && \array_key_exists($info->fieldName, $source)) {
+                return ($this->serializeStage)(new ArrayPaginator($source[$info->fieldName], 0, \count($source[$info->fieldName])), $resourceClass, $operation, $resolverContext);
+            }
 
             $collection = ($this->readStage)($resourceClass, $rootClass, $operation, $resolverContext);
             if (!is_iterable($collection)) {

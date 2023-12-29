@@ -45,7 +45,7 @@ class ResolverFactoryTest extends TestCase
         $this->assertEquals($resolverFactory->__invoke($resourceClass, $rootClass, $operation)(['test' => null], [], [], $resolveInfo), $returnValue);
     }
 
-    public function graphQlQueries(): array
+    public static function graphQlQueries(): array
     {
         return [
             ['Dummy', 'Dummy', new Query()],

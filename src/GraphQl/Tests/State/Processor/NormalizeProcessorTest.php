@@ -41,7 +41,7 @@ class NormalizeProcessorTest extends TestCase
         $processor->process($body, $operation, [], $context);
     }
 
-    public function processItems(): array
+    public static function processItems(): array
     {
         return [
             [new \stdClass(), new Query(class: 'foo')],
@@ -68,7 +68,7 @@ class NormalizeProcessorTest extends TestCase
         $processor->process($body, $operation, [], $context);
     }
 
-    public function processCollection(): array
+    public static function processCollection(): array
     {
         return [
             [new ArrayPaginator([new \stdClass()], 0, 1), new QueryCollection(class: 'foo')],

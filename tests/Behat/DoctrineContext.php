@@ -66,6 +66,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\IriOnlyDummy as IriOnlyDummyD
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\LinkHandledDummy as LinkHandledDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsDummy as MultiRelationsDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsNested as MultiRelationsNestedDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsNestedPaginated as MultiRelationsNestedPaginatedDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsRelatedDummy as MultiRelationsRelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MusicGroup as MusicGroupDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
@@ -157,6 +159,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\Group;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\LinkHandledDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsNested;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsNestedPaginated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MusicGroup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
@@ -801,9 +805,9 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @Given there are :nb multiRelationsDummy objects having each a manyToOneRelation, :nbmtmr manyToManyRelations and :nbotmr oneToManyRelations
+     * @Given there are :nb multiRelationsDummy objects having each a manyToOneRelation, :nbmtmr manyToManyRelations, :nbotmr oneToManyRelations and :nber embeddedRelations
      */
-    public function thereAreMultiRelationsDummyObjectsHavingEachAManyToOneRelationManyToManyRelationsAndOneToManyRelations(int $nb, int $nbmtmr, int $nbotmr): void
+    public function thereAreMultiRelationsDummyObjectsHavingEachAManyToOneRelationManyToManyRelationsOneToManyRelationsAndEmbeddedRelations(int $nb, int $nbmtmr, int $nbotmr, int $nber): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = $this->buildMultiRelationsRelatedDummy();
@@ -829,6 +833,22 @@ final class DoctrineContext implements Context
 
                 $dummy->addOneToManyRelation($oneToManyItem);
             }
+
+            $nested = new ArrayCollection();
+            for ($j = 1; $j <= $nber; ++$j) {
+                $embeddedItem = $this->buildMultiRelationsNested();
+                $embeddedItem->name = 'NestedDummy'.$j;
+                $nested->add($embeddedItem);
+            }
+            $dummy->setNestedCollection($nested);
+
+            $nestedPaginated = new ArrayCollection();
+            for ($j = 1; $j <= $nber; ++$j) {
+                $embeddedItem = $this->buildMultiRelationsNestedPaginated();
+                $embeddedItem->name = 'NestedPaginatedDummy'.$j;
+                $nestedPaginated->add($embeddedItem);
+            }
+            $dummy->setNestedPaginatedCollection($nestedPaginated);
 
             $this->manager->persist($relatedDummy);
             $this->manager->persist($dummy);
@@ -2597,6 +2617,16 @@ final class DoctrineContext implements Context
     private function buildMultiRelationsRelatedDummy(): MultiRelationsRelatedDummy|MultiRelationsRelatedDummyDocument
     {
         return $this->isOrm() ? new MultiRelationsRelatedDummy() : new MultiRelationsRelatedDummyDocument();
+    }
+
+    private function buildMultiRelationsNested(): MultiRelationsNested|MultiRelationsNestedDocument
+    {
+        return $this->isOrm() ? new MultiRelationsNested() : new MultiRelationsNestedDocument();
+    }
+
+    private function buildMultiRelationsNestedPaginated(): MultiRelationsNestedPaginated|MultiRelationsNestedPaginatedDocument
+    {
+        return $this->isOrm() ? new MultiRelationsNestedPaginated() : new MultiRelationsNestedPaginatedDocument();
     }
 
     private function buildMusicGroup(): MusicGroup|MusicGroupDocument
