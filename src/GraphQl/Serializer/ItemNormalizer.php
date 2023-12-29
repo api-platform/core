@@ -111,12 +111,10 @@ final class ItemNormalizer extends BaseItemNormalizer
      */
     protected function normalizeCollectionOfRelations(ApiProperty $propertyMetadata, iterable $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
-        if ($this->resourceMetadataCollectionFactory) {
-            // check for nested collection
-            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(forceCollection: true, forceGraphQl: true);
-            if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && !$operation->getProvider()) {
-                return [...$attributeValue];
-            }
+        // check for nested collection
+        $operation = $this?->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(forceCollection: true, forceGraphQl: true);
+        if ($operation && $operation instanceof Query && $operation->getNested() && !$operation->getResolver() && !$operation->getProvider()) {
+            return [...$attributeValue];
         }
 
         // to-many are handled directly by the GraphQL resolver
