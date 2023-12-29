@@ -580,7 +580,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $options['serializer_groups'] = (array) $context[self::GROUPS];
         }
 
-        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? '').($context['api_normalize'] ?? '');
+        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? $context['root_operation_name'] ?? '').($context['api_normalize'] ?? '');
         if ($operationCacheKey && isset($this->localFactoryOptionsCache[$operationCacheKey])) {
             return $options + $this->localFactoryOptionsCache[$operationCacheKey];
         }
