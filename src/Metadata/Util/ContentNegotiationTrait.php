@@ -28,7 +28,7 @@ trait ContentNegotiationTrait
     /**
      * Gets the format associated with the mime type.
      *
-     * Adapted from {@see \Symfony\Component\HttpFoundation\Request::getFormat}.
+     * Adapted from {@see Request::getFormat}.
      *
      * @param array<string, string|string[]> $formats
      */

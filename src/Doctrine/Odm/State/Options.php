@@ -20,7 +20,7 @@ class Options implements OptionsInterface
     /**
      * @param mixed $handleLinks experimental callable, typed mixed as we may want a service name in the future
      *
-     * @see \ApiPlatform\Doctrine\Odm\State\LinksHandlerInterface
+     * @see LinksHandlerInterface
      */
     public function __construct(
         protected ?string $documentClass = null,
