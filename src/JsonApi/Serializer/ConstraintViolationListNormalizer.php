@@ -22,7 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
- * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} to a JSON API error representation.
+ * Converts {@see ConstraintViolationListInterface} to a JSON API error representation.
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */

@@ -91,7 +91,7 @@ final class ItemProviderTest extends TestCase
 
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
 
-        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\ClientInterface::class;
+        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : ClientInterface::class;
 
         $clientProphecy = $this->prophesize($clientClass);
         $clientProphecy->get(['index' => 'foo', 'id' => '404'])->willReturn([

@@ -2233,7 +2233,7 @@ final class DoctrineContext implements Context
     public function thereIsAGroupWithUuidAndNUsers(string $uuid, int $nbUsers): void
     {
         $group = new Group();
-        $group->setUuid(\Symfony\Component\Uid\Uuid::fromString($uuid));
+        $group->setUuid(SymfonyUuid::fromString($uuid));
 
         $this->manager->persist($group);
 

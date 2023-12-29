@@ -1,5 +1,17 @@
 # Changelog
 
+## v3.2.10
+
+### Bug fixes
+
+* [6f3c6a663](https://github.com/api-platform/core/commit/6f3c6a663cc55730580b82d146b8d62cac4f1bc5) fix(symfony): attribute filter names (#6062)
+* [dc77c7949](https://github.com/api-platform/core/commit/dc77c7949a6e8c48d57708d8f43027e00124388c) fix(symfony): disable symfony error handling by default
+* [f75649d49](https://github.com/api-platform/core/commit/f75649d49139e332bb739aece56a315943162770) fix(symfony): use Type constraint violation code instead of exception code
+
+## v3.2.9
+
+* [ecffcde](https://github.com/api-platform/core/pull/6063/commits/ecffcdeb0a27e49256c56502f6f6e327d9e03d5b) chore: remove comparator conflict wrongly introduced
+
 ## v3.2.8
 
 ### Bug fixes

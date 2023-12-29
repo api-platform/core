@@ -20,7 +20,7 @@ class Options implements OptionsInterface
     /**
      * @param string|callable $handleLinks experimental callable, typed mixed as we may want a service name in the future
      *
-     * @see \ApiPlatform\Doctrine\Orm\State\LinksHandlerInterface
+     * @see LinksHandlerInterface
      */
     public function __construct(
         protected ?string $entityClass = null,
