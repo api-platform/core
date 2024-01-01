@@ -69,6 +69,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
 
         $context['iri'] = $iri;
+        $context['object'] = $object;
+        $context['format'] = $format;
         $context['api_normalize'] = true;
 
         if (!isset($context['cache_key'])) {
