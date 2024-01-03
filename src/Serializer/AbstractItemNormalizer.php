@@ -62,8 +62,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected PropertyAccessorInterface $propertyAccessor;
     protected array $localCache = [];
     protected array $localFactoryOptionsCache = [];
+    protected $resourceAccessChecker;
 
-    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected LegacyIriConverterInterface|IriConverterInterface $iriConverter, protected LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null)
+    /**
+     * @param LegacyResourceAccessCheckerInterface|ResourceAccessCheckerInterface $resourceAccessChecker
+     */
+    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected LegacyIriConverterInterface|IriConverterInterface $iriConverter, protected LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = fn ($object): ?string => $this->iriConverter->getIriFromResource($object);
@@ -71,6 +75,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         parent::__construct($classMetadataFactory, $nameConverter, null, null, \Closure::fromCallable($this->getObjectClass(...)), $defaultContext);
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->resourceAccessChecker = $resourceAccessChecker;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 

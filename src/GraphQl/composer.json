@@ -31,7 +31,6 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.0",
-        "api-platform/symfony": "*@dev || ^3.1",
         "api-platform/validator": "*@dev || ^3.1",
         "twig/twig": "^3.7",
         "symfony/mercure-bundle": "*",
@@ -55,7 +54,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "php-http/discovery": false
         }
     },
     "extra": {
@@ -78,10 +78,6 @@
         {
             "type": "path",
             "url": "../Serializer"
-        },
-        {
-            "type": "path",
-            "url": "../Symfony"
         },
         {
             "type": "path",
