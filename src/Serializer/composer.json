@@ -24,18 +24,18 @@
         "api-platform/metadata": "*@dev || ^3.1",
         "api-platform/state": "*@dev || ^3.1",
         "doctrine/collections": "^2.1",
-        "symfony/property-access": "^6.3",
-        "symfony/property-info": "^6.1",
-        "symfony/serializer": "^6.1",
-        "symfony/validator": "^6.3"
+        "symfony/property-access": "^6.3 || ^7.0",
+        "symfony/property-info": "^6.1 || ^7.0",
+        "symfony/serializer": "^6.1 || ^7.0",
+        "symfony/validator": "^6.3 || ^7.0"
     },
     "require-dev": {
-        "api-platform/symfony": "*@dev || ^3.1",
         "phpspec/prophecy-phpunit": "^2.0",
+        "sebastian/comparator": "<5.0",
         "symfony/mercure-bundle": "*",
-        "symfony/phpunit-bridge": "^6.1",
-        "symfony/yaml": "^6.3",
-        "sebastian/comparator": "<5.0"
+        "symfony/phpunit-bridge": "^6.1 || ^7.0",
+        "symfony/var-dumper": "^6.1 || ^7.0",
+        "symfony/yaml": "^6.3 || ^7.0"
     },
     "autoload": {
         "psr-4": {
@@ -71,10 +71,6 @@
         {
             "type": "path",
             "url": "../State"
-        },
-        {
-            "type": "path",
-            "url": "../Symfony"
         }
     ]
 }
