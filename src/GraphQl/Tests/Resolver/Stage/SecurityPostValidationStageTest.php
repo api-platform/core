@@ -16,7 +16,7 @@ namespace ApiPlatform\GraphQl\Tests\Resolver\Stage;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostValidationStage;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

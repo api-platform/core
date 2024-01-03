@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Tests\Serializer\Exception;
 
 use ApiPlatform\GraphQl\Serializer\Exception\ValidationExceptionNormalizer;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use GraphQL\Error\Error;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * @author Mahmood Bazdar<mahmood@bazdar.me>
@@ -38,10 +39,15 @@ class ValidationExceptionNormalizerTest extends TestCase
     public function testNormalize(): void
     {
         $exceptionMessage = 'exception message';
-        $exception = new ValidationException(new ConstraintViolationList([
-            new ConstraintViolation('message 1', '', [], '', 'field 1', 'invalid'),
-            new ConstraintViolation('message 2', '', [], '', 'field 2', 'invalid'),
-        ]), $exceptionMessage);
+        $exception = new class($exceptionMessage) extends \Exception implements ConstraintViolationListAwareExceptionInterface {
+            public function getConstraintViolationList(): ConstraintViolationListInterface
+            {
+                return new ConstraintViolationList([
+                    new ConstraintViolation('message 1', '', [], '', 'field 1', 'invalid'),
+                    new ConstraintViolation('message 2', '', [], '', 'field 2', 'invalid'),
+                ]);
+            }
+        };
         $error = new Error('test message', null, null, [], null, $exception);
 
         $normalizedError = $this->validationExceptionNormalizer->normalize($error);
@@ -66,7 +72,8 @@ class ValidationExceptionNormalizerTest extends TestCase
 
     public function testSupportsNormalization(): void
     {
-        $exception = new ValidationException(new ConstraintViolationList([]));
+        $exception = $this->createStub(ConstraintViolationListAwareExceptionInterface::class);
+        $exception->method('getConstraintViolationList')->willReturn(new ConstraintViolationList([]));
         $error = new Error('test message', null, null, [], null, $exception);
 
         $this->assertTrue($this->validationExceptionNormalizer->supportsNormalization($error));
