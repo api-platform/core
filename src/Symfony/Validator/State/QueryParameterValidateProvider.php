@@ -23,7 +23,7 @@ use ApiPlatform\State\Util\RequestParser;
 
 final class QueryParameterValidateProvider implements ProviderInterface
 {
-    public function __construct(private readonly ProviderInterface $decorated, private readonly ParameterValidator $queryParameterValidator)
+    public function __construct(private readonly ProviderInterface $decorated, private readonly ParameterValidator $parameterValidator)
     {
     }
 
@@ -49,7 +49,7 @@ final class QueryParameterValidateProvider implements ProviderInterface
             $class = $options->getEntityClass();
         }
 
-        $this->queryParameterValidator->validateFilters($class, $operation->getFilters() ?? [], $queryParameters);
+        $this->parameterValidator->validateFilters($class, $operation->getFilters() ?? [], $queryParameters);
 
         return $this->decorated->provide($operation, $uriVariables, $context);
     }
