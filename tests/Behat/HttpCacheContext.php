@@ -39,7 +39,9 @@ final class HttpCacheContext implements Context
     public function registerCustomTagCollector(BeforeScenarioScope $scope): void
     {
         $this->disableReboot($scope);
-        $this->driverContainer->set('api_platform.http_cache.tag_collector', new TagCollectorCustom());
+        /** @phpstan-ignore-next-line */
+        $iriConverter = $this->driverContainer->get('api_platform.iri_converter');
+        $this->driverContainer->set('api_platform.http_cache.tag_collector', new TagCollectorCustom($iriConverter));
     }
 
     /**

@@ -23,7 +23,7 @@ interface TagCollectorInterface
     /**
      * Collect cache tags for cache invalidation.
      *
-     * @param array<string, mixed>&array{iri?: string, data?: mixed, object?: mixed, property_metadata?: \ApiPlatform\Metadata\ApiProperty, api_attribute?: string, resources?: array<string, string>} $context
+     * @param array<string, mixed>&array{iri?: string, data?: mixed, object?: mixed, property_metadata?: \ApiPlatform\Metadata\ApiProperty, api_attribute?: string, resources?: array<string, string>, format?: string, operation?: \ApiPlatform\Metadata\Operation} $context
      */
     public function collect(array $context = []): void;
 }
