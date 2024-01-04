@@ -132,7 +132,7 @@ final class DeserializeListener
     {
         /** @var ?string $contentType */
         $contentType = $request->headers->get('CONTENT_TYPE');
-        if (null === $contentType) {
+        if (null === $contentType || '' === $contentType) {
             throw new UnsupportedMediaTypeHttpException('The "Content-Type" header must exist.');
         }
 
