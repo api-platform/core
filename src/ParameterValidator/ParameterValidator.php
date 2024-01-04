@@ -60,17 +60,23 @@ class ParameterValidator
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
                 $collectionFormat = $this->getCollectionFormat($data);
+                $validatorErrors = [];
 
                 // validate simple values
                 if ($errors = $this->validate($name, $data, $queryParameters)) {
-                    $errorList[] = $errors;
+                    $validatorErrors[] = $errors;
                 }
 
                 // manipulate query data to validate each value
                 foreach ($this->iterateValue($name, $queryParameters, $collectionFormat) as $scalarQueryParameters) {
                     if ($errors = $this->validate($name, $data, $scalarQueryParameters)) {
-                        $errorList[] = $errors;
+                        $validatorErrors[] = $errors;
                     }
+                }
+
+                if (\count($validatorErrors)) {
+                    // Remove duplicate messages
+                    $errorList[] = array_unique(array_merge(...$validatorErrors));
                 }
             }
         }
