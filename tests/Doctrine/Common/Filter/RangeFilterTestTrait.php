@@ -134,6 +134,22 @@ trait RangeFilterTestTrait
                     ],
                 ],
             ],
+            'ne' => [
+                null,
+                [
+                    'dummyPrice' => [
+                        'ne' => '9.99',
+                    ],
+                ],
+            ],
+            'ne (non-numeric)' => [
+                null,
+                [
+                    'dummyPrice' => [
+                        'ne' => '127.0.0.1',
+                    ],
+                ],
+            ],
         ];
     }
 }

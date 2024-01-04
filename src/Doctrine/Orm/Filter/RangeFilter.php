@@ -220,6 +220,17 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
                     ->setParameter($valueParameter, $value);
 
                 break;
+            case self::PARAMETER_NOT_EQUAL:
+                $value = $this->normalizeValue($value, $operator);
+                if (null === $value) {
+                    return;
+                }
+
+                $queryBuilder
+                    ->andWhere(sprintf('%s.%s <> :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+
+                break;
         }
     }
 }

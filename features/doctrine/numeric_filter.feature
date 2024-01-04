@@ -193,7 +193,7 @@ Feature: Numeric filter on collections
                   "@type": {"pattern": "^IriTemplateMapping$"},
                   "variable": {
                     "oneOf": [
-                      {"pattern": "^name_converted(\\[(between|gt|gte|lt|lte)?\\])?$"},
+                      {"pattern": "^name_converted(\\[(between|gt|gte|lt|lte|ne)?\\])?$"},
                       {"pattern": "^order\\[name_converted\\]$"}
                     ]
                   },
@@ -203,8 +203,8 @@ Feature: Numeric filter on collections
                 "required": ["@type", "variable", "property", "required"],
                 "additionalProperties": false
               },
-              "minItems": 8,
-              "maxItems": 8,
+              "minItems": 9,
+              "maxItems": 9,
               "uniqueItems": true
             }
           },

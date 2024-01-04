@@ -396,6 +396,49 @@ Feature: Range filter on collections
     }
     """
 
+  Scenario: Filter for entities by range (not equal to)
+    When I send a "GET" request to "/dummies?dummyPrice[ne]=12.99"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/3$"},
+                  {"pattern": "^/dummies/4$"}
+                ]
+              }
+            }
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "hydra:totalItems": {"type": "number", "minimum": 22, "maximum": 22},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bne%5D=12.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
   Scenario: Filter for entities within an impossible range
     When I send a "GET" request to "/dummies?dummyPrice[gt]=19.99"
     Then the response status code should be 200
@@ -471,7 +514,7 @@ Feature: Range filter on collections
           "type": "object",
           "properties": {
             "@type": {"pattern": "^hydra:IriTemplate$"},
-            "hydra:template": {"pattern": "^/converted_integers\\{\\?.*name_converted\\[between\\],name_converted\\[gt\\],name_converted\\[gte\\],name_converted\\[lt\\],name_converted\\[lte\\].*\\}$"},
+            "hydra:template": {"pattern": "^/converted_integers\\{\\?.*name_converted\\[between\\],name_converted\\[gt\\],name_converted\\[gte\\],name_converted\\[lt\\],name_converted\\[lte\\],name_converted\\[ne\\].*\\}$"},
             "hydra:variableRepresentation": {"pattern": "^BasicRepresentation$"},
             "hydra:mapping": {
               "type": "array",
@@ -481,7 +524,7 @@ Feature: Range filter on collections
                   "@type": {"pattern": "^IriTemplateMapping$"},
                   "variable": {
                     "oneOf": [
-                      {"pattern": "^name_converted(\\[(between|gt|gte|lt|lte)?\\])?$"},
+                      {"pattern": "^name_converted(\\[(between|gt|gte|lt|lte|ne)?\\])?$"},
                       {"pattern": "^order\\[name_converted\\]$"}
                     ]
                   },
@@ -491,8 +534,8 @@ Feature: Range filter on collections
                 "required": ["@type", "variable", "property", "required"],
                 "additionalProperties": false
               },
-              "minItems": 8,
-              "maxItems": 8,
+              "minItems": 9,
+              "maxItems": 9,
               "uniqueItems": true
             }
           },

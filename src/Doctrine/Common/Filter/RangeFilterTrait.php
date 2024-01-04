@@ -49,6 +49,7 @@ trait RangeFilterTrait
             $description += $this->getFilterDescription($property, self::PARAMETER_GREATER_THAN_OR_EQUAL);
             $description += $this->getFilterDescription($property, self::PARAMETER_LESS_THAN);
             $description += $this->getFilterDescription($property, self::PARAMETER_LESS_THAN_OR_EQUAL);
+            $description += $this->getFilterDescription($property, self::PARAMETER_NOT_EQUAL);
         }
 
         return $description;
@@ -78,7 +79,7 @@ trait RangeFilterTrait
 
     private function normalizeValues(array $values, string $property): ?array
     {
-        $operators = [self::PARAMETER_BETWEEN, self::PARAMETER_GREATER_THAN, self::PARAMETER_GREATER_THAN_OR_EQUAL, self::PARAMETER_LESS_THAN, self::PARAMETER_LESS_THAN_OR_EQUAL];
+        $operators = [self::PARAMETER_BETWEEN, self::PARAMETER_GREATER_THAN, self::PARAMETER_GREATER_THAN_OR_EQUAL, self::PARAMETER_LESS_THAN, self::PARAMETER_LESS_THAN_OR_EQUAL, self::PARAMETER_NOT_EQUAL];
 
         foreach ($values as $operator => $value) {
             if (!\in_array($operator, $operators, true)) {

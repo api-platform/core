@@ -57,6 +57,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'id[ne]' => [
+                'property' => 'id',
+                'type' => 'string',
+                'required' => false,
+            ],
             'name[between]' => [
                 'property' => 'name',
                 'type' => 'string',
@@ -78,6 +83,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'required' => false,
             ],
             'name[lte]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'name[ne]' => [
                 'property' => 'name',
                 'type' => 'string',
                 'required' => false,
@@ -107,6 +117,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'alias[ne]' => [
+                'property' => 'alias',
+                'type' => 'string',
+                'required' => false,
+            ],
             'description[between]' => [
                 'property' => 'description',
                 'type' => 'string',
@@ -128,6 +143,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'required' => false,
             ],
             'description[lte]' => [
+                'property' => 'description',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'description[ne]' => [
                 'property' => 'description',
                 'type' => 'string',
                 'required' => false,
@@ -157,6 +177,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'dummy[ne]' => [
+                'property' => 'dummy',
+                'type' => 'string',
+                'required' => false,
+            ],
             'dummyDate[between]' => [
                 'property' => 'dummyDate',
                 'type' => 'string',
@@ -178,6 +203,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'required' => false,
             ],
             'dummyDate[lte]' => [
+                'property' => 'dummyDate',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyDate[ne]' => [
                 'property' => 'dummyDate',
                 'type' => 'string',
                 'required' => false,
@@ -207,6 +237,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'dummyFloat[ne]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
             'dummyPrice[between]' => [
                 'property' => 'dummyPrice',
                 'type' => 'string',
@@ -228,6 +263,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'required' => false,
             ],
             'dummyPrice[lte]' => [
+                'property' => 'dummyPrice',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyPrice[ne]' => [
                 'property' => 'dummyPrice',
                 'type' => 'string',
                 'required' => false,
@@ -257,6 +297,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'jsonData[ne]' => [
+                'property' => 'jsonData',
+                'type' => 'string',
+                'required' => false,
+            ],
             'arrayData[between]' => [
                 'property' => 'arrayData',
                 'type' => 'string',
@@ -278,6 +323,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'required' => false,
             ],
             'arrayData[lte]' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'arrayData[ne]' => [
                 'property' => 'arrayData',
                 'type' => 'string',
                 'required' => false,
@@ -307,6 +357,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'nameConverted[ne]' => [
+                'property' => 'nameConverted',
+                'type' => 'string',
+                'required' => false,
+            ],
             'dummyBoolean[between]' => [
                 'property' => 'dummyBoolean',
                 'type' => 'string',
@@ -328,6 +383,11 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'required' => false,
             ],
             'dummyBoolean[lte]' => [
+                'property' => 'dummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBoolean[ne]' => [
                 'property' => 'dummyBoolean',
                 'type' => 'string',
                 'required' => false,
@@ -381,6 +441,12 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 ],
                 'lte + gte' => [
                     sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1 AND o.dummyPrice <= :dummyPrice_p2', Dummy::class),
+                ],
+                'ne' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice <> :dummyPrice_p1', Dummy::class),
+                ],
+                'ne (non-numeric)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
             ]
         );
