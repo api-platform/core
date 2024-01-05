@@ -64,7 +64,7 @@ final class DocumentationAction
         $context = [
             'api_gateway' => $request->query->getBoolean(ApiGatewayNormalizer::API_GATEWAY),
             'base_url' => $request->getBaseUrl(),
-            'spec_version' => $request->query->getString(LegacyOpenApiNormalizer::SPEC_VERSION),
+            'spec_version' => (string) $request->query->get(LegacyOpenApiNormalizer::SPEC_VERSION),
         ];
         $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
         $format = $this->getRequestFormat($request, $this->documentationFormats);

@@ -44,7 +44,7 @@ final class EntrypointAction
         static::$resourceNameCollection = $this->resourceNameCollectionFactory->create();
         $context = [
             'request' => $request,
-            'spec_version' => $request->query->getString(LegacyOpenApiNormalizer::SPEC_VERSION),
+            'spec_version' => (string) $request->query->get(LegacyOpenApiNormalizer::SPEC_VERSION),
         ];
         $request->attributes->set('_api_platform_disable_listeners', true);
         $operation = new Get(outputFormats: $this->documentationFormats, read: true, serialize: true, class: Entrypoint::class, provider: [self::class, 'provide']);
