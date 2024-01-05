@@ -97,7 +97,8 @@ final class ContentNegotiationProvider implements ProviderInterface
      */
     private function getInputFormat(HttpOperation $operation, Request $request): ?string
     {
-        if (null === ($contentType = $request->headers->get('CONTENT_TYPE'))) {
+        $contentType = $request->headers->get('CONTENT_TYPE');
+        if (null === $contentType || '' === $contentType) {
             return null;
         }
 
