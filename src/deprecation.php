@@ -12,8 +12,8 @@
 declare(strict_types=1);
 
 $deprecatedClassesWithAliases = [
-    ApiPlatform\HttpCache\EventListener\AddHeadersListener::class => \ApiPlatform\Symfony\EventListener\AddHeadersListener::class,
-    ApiPlatform\HttpCache\EventListener\AddTagsListener::class => \ApiPlatform\Symfony\EventListener\AddTagsListener::class,
+    ApiPlatform\HttpCache\EventListener\AddHeadersListener::class => ApiPlatform\Symfony\EventListener\AddHeadersListener::class,
+    ApiPlatform\HttpCache\EventListener\AddTagsListener::class => ApiPlatform\Symfony\EventListener\AddTagsListener::class,
 ];
 
 spl_autoload_register(function ($className) use ($deprecatedClassesWithAliases): void {
