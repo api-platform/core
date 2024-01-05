@@ -67,7 +67,7 @@ class RespondProcessorTest extends TestCase
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $iriConverter
             ->getIriFromResource(Argument::cetera())
-            ->will(static function (array $args): ?string {
+            ->will(static function (array $args): string {
                 return ($args[2] ?? null)?->getUriTemplate() ?? '/default';
             });
 

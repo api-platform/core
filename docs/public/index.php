@@ -17,9 +17,10 @@ ini_set('date.timezone', 'Europe/Paris');
 require __DIR__.'/../vendor/autoload.php';
 
 use ApiPlatform\Playground\Kernel;
+use RuntimeException;
 
 if (!($guide = $_SERVER['APP_GUIDE'] ?? $_ENV['APP_GUIDE'] ?? null)) {
-    throw new \RuntimeException('No guide.');
+    throw new RuntimeException('No guide.');
 }
 
 $app = function (array $context) use ($guide) {
