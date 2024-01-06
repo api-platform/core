@@ -61,7 +61,7 @@ class ParameterValidator
             }
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
-                $collectionFormat = $this->getCollectionFormat($data);
+                $collectionFormat = ParameterValueExtractor::getCollectionFormat($data);
                 $validatorErrors = [];
 
                 // validate simple values
@@ -70,7 +70,7 @@ class ParameterValidator
                 }
 
                 // manipulate query data to validate each value
-                foreach ($this->iterateValue($name, $queryParameters, $collectionFormat) as $scalarQueryParameters) {
+                foreach (ParameterValueExtractor::iterateValue($name, $queryParameters, $collectionFormat) as $scalarQueryParameters) {
                     foreach ($this->validate($name, $data, $scalarQueryParameters) as $error) {
                         $validatorErrors[] = $error;
                     }
@@ -86,61 +86,6 @@ class ParameterValidator
         if ($errorList) {
             throw new ValidationException(array_merge(...$errorList));
         }
-    }
-
-    /**
-     * @param array<string, array<string, mixed>> $filterDescription
-     */
-    private static function getCollectionFormat(array $filterDescription): string
-    {
-        return $filterDescription['openapi']['collectionFormat'] ?? $filterDescription['swagger']['collectionFormat'] ?? 'csv';
-    }
-
-    /**
-     * @param array<string, mixed> $queryParameters
-     *
-     * @throws \InvalidArgumentException
-     */
-    private static function iterateValue(string $name, array $queryParameters, string $collectionFormat = 'csv'): \Generator
-    {
-        foreach ($queryParameters as $key => $value) {
-            if ($key === $name || "{$key}[]" === $name) {
-                $values = self::getValue($value, $collectionFormat);
-                foreach ($values as $v) {
-                    yield [$key => $v];
-                }
-            }
-        }
-    }
-
-    /**
-     * @param int|int[]|string|string[] $value
-     *
-     * @return int[]|string[]
-     */
-    private static function getValue(int|string|array $value, string $collectionFormat = 'csv'): array
-    {
-        if (\is_array($value)) {
-            return $value;
-        }
-
-        if (\is_string($value)) {
-            return explode(self::getSeparator($collectionFormat), $value);
-        }
-
-        return [$value];
-    }
-
-    /** @return non-empty-string */
-    private static function getSeparator(string $collectionFormat): string
-    {
-        return match ($collectionFormat) {
-            'csv' => ',',
-            'ssv' => ' ',
-            'tsv' => '\t',
-            'pipes' => '|',
-            default => throw new \InvalidArgumentException(sprintf('Unknown collection format %s', $collectionFormat)),
-        };
     }
 
     /** @return iterable<string> validation errors that occured */
