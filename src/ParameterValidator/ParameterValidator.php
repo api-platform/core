@@ -21,6 +21,7 @@ use ApiPlatform\ParameterValidator\Validator\Length;
 use ApiPlatform\ParameterValidator\Validator\MultipleOf;
 use ApiPlatform\ParameterValidator\Validator\Pattern;
 use ApiPlatform\ParameterValidator\Validator\Required;
+use ApiPlatform\ParameterValidator\Validator\ValidatorInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -32,6 +33,7 @@ class ParameterValidator
 {
     use FilterLocatorTrait;
 
+    /** @var list<ValidatorInterface> */
     private array $validators;
 
     public function __construct(ContainerInterface $filterLocator)
@@ -63,20 +65,20 @@ class ParameterValidator
                 $validatorErrors = [];
 
                 // validate simple values
-                if ($errors = $this->validate($name, $data, $queryParameters)) {
-                    $validatorErrors[] = $errors;
+                foreach ($this->validate($name, $data, $queryParameters) as $error) {
+                    $validatorErrors[] = $error;
                 }
 
                 // manipulate query data to validate each value
                 foreach ($this->iterateValue($name, $queryParameters, $collectionFormat) as $scalarQueryParameters) {
-                    if ($errors = $this->validate($name, $data, $scalarQueryParameters)) {
-                        $validatorErrors[] = $errors;
+                    foreach ($this->validate($name, $data, $scalarQueryParameters) as $error) {
+                        $validatorErrors[] = $error;
                     }
                 }
 
-                if (\count($validatorErrors)) {
+                if ($validatorErrors) {
                     // Remove duplicate messages
-                    $errorList[] = array_unique(array_merge(...$validatorErrors));
+                    $errorList[] = array_unique($validatorErrors);
                 }
             }
         }
@@ -141,16 +143,13 @@ class ParameterValidator
         };
     }
 
-    private function validate(string $name, array $data, array $queryParameters): array
+    /** @return iterable<string> validation errors that occured */
+    private function validate(string $name, array $data, array $queryParameters): iterable
     {
-        $errorList = [];
-
         foreach ($this->validators as $validator) {
-            if ($errors = $validator->validate($name, $data, $queryParameters)) {
-                $errorList[] = $errors;
+            foreach ($validator->validate($name, $data, $queryParameters) as $error) {
+                yield $error;
             }
         }
-
-        return array_merge(...$errorList);
     }
 }
