@@ -87,4 +87,45 @@ class ParameterValueExtractorTest extends TestCase
             ];
         }
     }
+
+    /**
+     * @dataProvider provideGetValueCases
+     *
+     * @param int[]|string[]            $expectedValue
+     * @param int|int[]|string|string[] $value
+     */
+    public function testGetValue(array $expectedValue, int|string|array $value, string $collectionFormat): void
+    {
+        self::assertSame($expectedValue, ParameterValueExtractor::getValue($value, $collectionFormat));
+    }
+
+    /**
+     * @return iterable<array{int[]|string[], int|string|int[]|string[], string}>
+     */
+    public function provideGetValueCases(): iterable
+    {
+        yield 'empty input' => [
+            [], [], 'csv',
+        ];
+
+        yield 'comma separated value' => [
+            ['foo', 'bar'], 'foo,bar', 'csv',
+        ];
+
+        yield 'space separated value' => [
+            ['foo', 'bar'], 'foo bar', 'ssv',
+        ];
+
+        yield 'tab separated value' => [
+            ['foo', 'bar'], 'foo\tbar', 'tsv',
+        ];
+
+        yield 'pipe separated value' => [
+            ['foo', 'bar'], 'foo|bar', 'pipes',
+        ];
+
+        yield 'array values' => [
+            ['foo', 'bar'], ['foo', 'bar'], 'csv',
+        ];
+    }
 }
