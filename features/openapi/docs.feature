@@ -399,3 +399,4 @@ Feature: Documentation support
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON node "openapi" should be equal to "3.0.0"
+    And the JSON should not contain the key "owl:maxCardinality"

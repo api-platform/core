@@ -35,18 +35,17 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
             return $openapi;
         }
 
+        $schemas = &$openapi['components']['schemas'];
         $openapi['openapi'] = '3.0.0';
-        foreach ($openapi['components']['schemas'] as &$schemas) {
-            foreach ($schemas as $name => $component) {
-                foreach ($component['properties'] ?? [] as $property => $value) {
-                    if (\is_array($value['type'] ?? false)) {
-                        foreach ($value['type'] as $type) {
-                            $schemas[$name]['properties'][$property]['anyOf'][] = ['type' => $type];
-                        }
-                        unset($schemas[$name]['properties'][$property]['type']);
+        foreach ($openapi['components']['schemas'] as $name => $component) {
+            foreach ($component['properties'] ?? [] as $property => $value) {
+                if (\is_array($value['type'] ?? false)) {
+                    foreach ($value['type'] as $type) {
+                        $schemas[$name]['properties'][$property]['anyOf'][] = ['type' => $type];
                     }
-                    unset($value['owl:maxCardinality']);
+                    unset($schemas[$name]['properties'][$property]['type']);
                 }
+                unset($schemas[$name]['properties'][$property]['owl:maxCardinality']);
             }
         }
 

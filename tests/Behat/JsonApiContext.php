@@ -176,6 +176,16 @@ final class JsonApiContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Then the JSON should not contain the key :key
+     */
+    public function theJsonShouldNotContainTheKey($key): void
+    {
+        if (strpos($key, (string) $this->getJson()) !== false) {
+            throw new ExpectationFailedException(sprintf('The key "%s" was found in the JSON response.', $key));
+        }
+    }
+
     private function getValueOfNode(string $node)
     {
         return $this->inspector->evaluate($this->getJson(), $node);
@@ -209,5 +219,20 @@ final class JsonApiContext implements Context
     private function buildRelatedDummy(): RelatedDummy|RelatedDummyDocument
     {
         return $this->isOrm() ? new RelatedDummy() : new RelatedDummyDocument();
+    }
+
+    private function isKeyInArray($key, $array): bool
+    {
+        if (array_key_exists($key, $array)) {
+            return true;
+        }
+
+        foreach ($array as $item) {
+            if (is_array($item) && $this->isKeyInArray($key, $item)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
