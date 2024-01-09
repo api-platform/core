@@ -69,6 +69,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsDummy as MultiR
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsNested as MultiRelationsNestedDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsNestedPaginated as MultiRelationsNestedPaginatedDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsRelatedDummy as MultiRelationsRelatedDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsResolveDummy as MultiRelationsResolveDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MusicGroup as MusicGroupDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
@@ -165,6 +166,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsNested;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsNestedPaginated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsResolveDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MusicGroup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
@@ -809,17 +811,24 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @Given there are :nb multiRelationsDummy objects having each a manyToOneRelation, :nbmtmr manyToManyRelations, :nbotmr oneToManyRelations and :nber embeddedRelations
+     * @Given there are :nb multiRelationsDummy objects having each :nbmtor manyToOneRelation, :nbmtmr manyToManyRelations, :nbotmr oneToManyRelations and :nber embeddedRelations
      */
-    public function thereAreMultiRelationsDummyObjectsHavingEachAManyToOneRelationManyToManyRelationsOneToManyRelationsAndEmbeddedRelations(int $nb, int $nbmtmr, int $nbotmr, int $nber): void
+    public function thereAreMultiRelationsDummyObjectsHavingEachAManyToOneRelationManyToManyRelationsOneToManyRelationsAndEmbeddedRelations(int $nb, int $nbmtor, int $nbmtmr, int $nbotmr, int $nber): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = $this->buildMultiRelationsRelatedDummy();
             $relatedDummy->name = 'RelatedManyToOneDummy #'.$i;
 
+            $resolveDummy = $this->buildMultiRelationsResolveDummy();
+            $resolveDummy->name = 'RelatedManyToOneResolveDummy #'.$i;
+
             $dummy = $this->buildMultiRelationsDummy();
             $dummy->name = 'Dummy #'.$i;
-            $dummy->setManyToOneRelation($relatedDummy);
+
+            if ($nbmtor) {
+                $dummy->setManyToOneRelation($relatedDummy);
+                $dummy->setManyToOneResolveRelation($resolveDummy);
+            }
 
             for ($j = 1; $j <= $nbmtmr; ++$j) {
                 $manyToManyItem = $this->buildMultiRelationsRelatedDummy();
@@ -855,6 +864,7 @@ final class DoctrineContext implements Context
             $dummy->setNestedPaginatedCollection($nestedPaginated);
 
             $this->manager->persist($relatedDummy);
+            $this->manager->persist($resolveDummy);
             $this->manager->persist($dummy);
         }
         $this->manager->flush();
@@ -2656,6 +2666,11 @@ final class DoctrineContext implements Context
     private function buildMultiRelationsRelatedDummy(): MultiRelationsRelatedDummy|MultiRelationsRelatedDummyDocument
     {
         return $this->isOrm() ? new MultiRelationsRelatedDummy() : new MultiRelationsRelatedDummyDocument();
+    }
+
+    private function buildMultiRelationsResolveDummy(): MultiRelationsResolveDummy|MultiRelationsResolveDummyDocument
+    {
+        return $this->isOrm() ? new MultiRelationsResolveDummy() : new MultiRelationsResolveDummyDocument();
     }
 
     private function buildMultiRelationsNested(): MultiRelationsNested|MultiRelationsNestedDocument
