@@ -16,6 +16,7 @@ namespace ApiPlatform\GraphQl\Resolver\Factory;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -24,20 +25,23 @@ class ResolverFactory implements ResolverFactoryInterface
 {
     public function __construct(
         private readonly ProviderInterface $provider,
-        private readonly ProcessorInterface $processor
+        private readonly ProcessorInterface $processor,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory
     ) {
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
-            // Data already fetched and normalized (field or nested resource)
-            if ($body = $source[$info->fieldName] ?? null) {
-                return $body;
-            }
+            if (\array_key_exists($info->fieldName, $source ?? [])) {
+                $body = $source[$info->fieldName];
 
-            if (null === $resourceClass && \array_key_exists($info->fieldName, $source ?? [])) {
-                return $body;
+                $propertyMetadata = $rootClass ? $this->propertyMetadataFactory->create($rootClass, $info->fieldName) : null;
+                $propertySchemaType = $propertyMetadata?->getSchema()['type'] ?? null;
+                // Data already fetched and normalized (field or nested resource)
+                if ($body || null === $resourceClass || 'array' !== $propertySchemaType) {
+                    return $body;
+                }
             }
 
             // If authorization has failed for a relation field (e.g. via ApiProperty security), the field is not present in the source: null can be returned directly to ensure the collection isn't in the response.
