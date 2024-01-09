@@ -181,7 +181,7 @@ final class JsonApiContext implements Context
      */
     public function theJsonShouldNotContainTheKey($key): void
     {
-        if (str_contains($key, (string)$this->getJson())) {
+        if (str_contains($key, (string) $this->getJson())) {
             throw new ExpectationFailedException(sprintf('The key "%s" was found in the JSON response.', $key));
         }
     }
