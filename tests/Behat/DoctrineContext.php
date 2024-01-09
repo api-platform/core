@@ -67,6 +67,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\LinkHandledDummy as LinkHandl
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsDummy as MultiRelationsDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsRelatedDummy as MultiRelationsRelatedDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsResolveDummy as MultiRelationsResolveDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MusicGroup as MusicGroupDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
@@ -158,6 +159,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\LinkHandledDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsRelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsResolveDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MusicGroup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
@@ -801,17 +803,24 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @Given there are :nb multiRelationsDummy objects having each a manyToOneRelation, :nbmtmr manyToManyRelations and :nbotmr oneToManyRelations
+     * @Given there are :nb multiRelationsDummy objects having each :nbmtor manyToOneRelation, :nbmtmr manyToManyRelations and :nbotmr oneToManyRelations
      */
-    public function thereAreMultiRelationsDummyObjectsHavingEachAManyToOneRelationManyToManyRelationsAndOneToManyRelations(int $nb, int $nbmtmr, int $nbotmr): void
+    public function thereAreMultiRelationsDummyObjectsHavingEachAManyToOneRelationManyToManyRelationsAndOneToManyRelations(int $nb, int $nbmtor, int $nbmtmr, int $nbotmr): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = $this->buildMultiRelationsRelatedDummy();
             $relatedDummy->name = 'RelatedManyToOneDummy #'.$i;
 
+            $resolveDummy = $this->buildMultiRelationsResolveDummy();
+            $resolveDummy->name = 'RelatedManyToOneResolveDummy #'.$i;
+
             $dummy = $this->buildMultiRelationsDummy();
             $dummy->name = 'Dummy #'.$i;
-            $dummy->setManyToOneRelation($relatedDummy);
+
+            if ($nbmtor) {
+                $dummy->setManyToOneRelation($relatedDummy);
+                $dummy->setManyToOneResolveRelation($resolveDummy);
+            }
 
             for ($j = 1; $j <= $nbmtmr; ++$j) {
                 $manyToManyItem = $this->buildMultiRelationsRelatedDummy();
@@ -831,6 +840,7 @@ final class DoctrineContext implements Context
             }
 
             $this->manager->persist($relatedDummy);
+            $this->manager->persist($resolveDummy);
             $this->manager->persist($dummy);
         }
         $this->manager->flush();
@@ -2597,6 +2607,11 @@ final class DoctrineContext implements Context
     private function buildMultiRelationsRelatedDummy(): MultiRelationsRelatedDummy|MultiRelationsRelatedDummyDocument
     {
         return $this->isOrm() ? new MultiRelationsRelatedDummy() : new MultiRelationsRelatedDummyDocument();
+    }
+
+    private function buildMultiRelationsResolveDummy(): MultiRelationsResolveDummy|MultiRelationsResolveDummyDocument
+    {
+        return $this->isOrm() ? new MultiRelationsResolveDummy() : new MultiRelationsResolveDummyDocument();
     }
 
     private function buildMusicGroup(): MusicGroup|MusicGroupDocument

@@ -110,6 +110,11 @@ services:
         tags:
             - { name: 'api_platform.graphql.resolver' }
 
+    app.graphql.query_resolver.multi_relations_custom_item_document:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\MultiRelationsResolveQueryItemResolver'
+        tags:
+            - { name: 'api_platform.graphql.resolver' }
+
     app.graphql.mutation_resolver.dummy_custom_only_persist_document:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumOnlyPersistDocumentMutationResolver'
         public: false
