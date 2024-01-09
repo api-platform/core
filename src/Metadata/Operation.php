@@ -611,11 +611,11 @@ abstract class Operation extends Metadata
         protected ?array $normalizationContext = null,
         protected ?array $denormalizationContext = null,
         protected ?bool $collectDenormalizationErrors = null,
-        protected ?string $security = null,
+        protected string|\Stringable|null $security = null,
         protected ?string $securityMessage = null,
-        protected ?string $securityPostDenormalize = null,
+        protected string|\Stringable|null $securityPostDenormalize = null,
         protected ?string $securityPostDenormalizeMessage = null,
-        protected ?string $securityPostValidation = null,
+        protected string|\Stringable|null $securityPostValidation = null,
         protected ?string $securityPostValidationMessage = null,
         /**
          * The `deprecationReason` option deprecates the current operation with a deprecation message.

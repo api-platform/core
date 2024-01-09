@@ -105,8 +105,8 @@ final class ApiProperty
         private ?array $openapiContext = null,
         private ?array $jsonSchemaContext = null,
         private ?bool $push = null,
-        private ?string $security = null,
-        private ?string $securityPostDenormalize = null,
+        private string|\Stringable|null $security = null,
+        private string|\Stringable|null $securityPostDenormalize = null,
         private array|string|null $types = null,
         /*
          * The related php types.
@@ -334,7 +334,7 @@ final class ApiProperty
 
     public function getSecurity(): ?string
     {
-        return $this->security;
+        return $this->security instanceof \Stringable ? (string) $this->security : $this->security;
     }
 
     public function withSecurity($security): self
@@ -347,7 +347,7 @@ final class ApiProperty
 
     public function getSecurityPostDenormalize(): ?string
     {
-        return $this->securityPostDenormalize;
+        return $this->securityPostDenormalize instanceof \Stringable ? (string) $this->securityPostDenormalize : $this->securityPostDenormalize;
     }
 
     public function withSecurityPostDenormalize($securityPostDenormalize): self

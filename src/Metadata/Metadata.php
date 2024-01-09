@@ -60,11 +60,11 @@ abstract class Metadata
         protected ?bool $paginationClientPartial = null,
         protected ?bool $paginationFetchJoinCollection = null,
         protected ?bool $paginationUseOutputWalkers = null,
-        protected ?string $security = null,
+        protected string|\Stringable|null $security = null,
         protected ?string $securityMessage = null,
-        protected ?string $securityPostDenormalize = null,
+        protected string|\Stringable|null $securityPostDenormalize = null,
         protected ?string $securityPostDenormalizeMessage = null,
-        protected ?string $securityPostValidation = null,
+        protected string|\Stringable|null $securityPostValidation = null,
         protected ?string $securityPostValidationMessage = null,
         protected $provider = null,
         protected $processor = null,
@@ -451,7 +451,7 @@ abstract class Metadata
 
     public function getSecurity(): ?string
     {
-        return $this->security;
+        return $this->security instanceof \Stringable ? (string) $this->security : $this->security;
     }
 
     public function withSecurity($security): static
@@ -477,7 +477,7 @@ abstract class Metadata
 
     public function getSecurityPostDenormalize(): ?string
     {
-        return $this->securityPostDenormalize;
+        return $this->securityPostDenormalize instanceof \Stringable ? (string) $this->securityPostDenormalize : $this->securityPostDenormalize;
     }
 
     public function withSecurityPostDenormalize($securityPostDenormalize): static
@@ -503,10 +503,10 @@ abstract class Metadata
 
     public function getSecurityPostValidation(): ?string
     {
-        return $this->securityPostValidation;
+        return $this->securityPostValidation instanceof \Stringable ? (string) $this->securityPostValidation : $this->securityPostValidation;
     }
 
-    public function withSecurityPostValidation(string $securityPostValidation = null): static
+    public function withSecurityPostValidation(string|\Stringable $securityPostValidation = null): static
     {
         $self = clone $this;
         $self->securityPostValidation = $securityPostValidation;
