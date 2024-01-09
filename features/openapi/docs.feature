@@ -399,4 +399,38 @@ Feature: Documentation support
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON node "openapi" should be equal to "3.0.0"
-    And the JSON should not contain the key "owl:maxCardinality"
+    And the JSON node "components.schemas.DummyBoolean" should be equal to:
+    """
+    {
+      "type": "object",
+      "description": "",
+      "deprecated": false,
+      "properties": {
+        "id": {
+          "readOnly": true,
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isDummyBoolean": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dummyBoolean": {
+          "readOnly": true,
+          "type": "boolean"
+        }
+      }
+    }
+    """

@@ -176,16 +176,6 @@ final class JsonApiContext implements Context
         $this->manager->flush();
     }
 
-    /**
-     * @Then the JSON should not contain the key :key
-     */
-    public function theJsonShouldNotContainTheKey($key): void
-    {
-        if (str_contains($key, (string) $this->getJson())) {
-            throw new ExpectationFailedException(sprintf('The key "%s" was found in the JSON response.', $key));
-        }
-    }
-
     private function getValueOfNode(string $node)
     {
         return $this->inspector->evaluate($this->getJson(), $node);
