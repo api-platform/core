@@ -23,18 +23,18 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Interface implemented to build a GraphQL type.
  *
- * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @deprecated Since API Platform 3.3. Use @see ContextAwareTypeBuilderInterface instead.
+ * @author Antoine Bluchet <soyuka@gmail.com>
  */
-interface TypeBuilderEnumInterface
+interface ContextAwareTypeBuilderInterface
 {
     /**
      * Gets the object type of the given resource.
      *
+     * @param array<string, mixed>&array{input?: bool, wrapped?: bool, depth?: int} $context
+     *
      * @return GraphQLType the object type, possibly wrapped by NonNull
      */
-    public function getResourceObjectType(?string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, bool $input, bool $wrapped = false, int $depth = 0, ?ApiProperty $propertyMetadata = null): GraphQLType;
+    public function getResourceObjectType(ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, ?ApiProperty $propertyMetadata = null, array $context = []): GraphQLType;
 
     /**
      * Get the interface type of a node.

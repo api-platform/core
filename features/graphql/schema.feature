@@ -98,3 +98,16 @@ Feature: GraphQL schema-related features
       clientMutationId: String
     }
     """
+    And the command output should contain:
+    """
+    "Updates a OptionalRequiredDummy."
+    input updateOptionalRequiredDummyInput {
+      id: ID!
+      thirdLevel: updateThirdLevelNestedInput
+      thirdLevelRequired: updateThirdLevelNestedInput!
+
+      "Get relatedToDummyFriend."
+      relatedToDummyFriend: [updateRelatedToDummyFriendNestedInput]
+      clientMutationId: String
+    }
+    """
