@@ -52,9 +52,10 @@ class DocumentationActionTest extends TestCase
         $requestProphecy->headers = $this->prophesize(ParameterBagInterface::class)->reveal();
         $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
         $queryProphecy->getBoolean('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
+        $queryProphecy->get('spec_version')->willReturn('3.1.0')->shouldBeCalledTimes(1);
         $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
         $attributesProphecy->get('_format')->willReturn(null)->shouldBeCalledTimes(1);
-        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true])->shouldBeCalledTimes(1);
+        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0'])->shouldBeCalledTimes(1);
 
         $documentation = new DocumentationAction($this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(), 'my api', '', '1.0.0', $openApiFactoryProphecy->reveal());
         $this->assertInstanceOf(OpenApi::class, $documentation($requestProphecy->reveal()));
@@ -75,8 +76,9 @@ class DocumentationActionTest extends TestCase
         $requestProphecy->query = $queryProphecy->reveal();
         $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
         $queryProphecy->getBoolean('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
+        $queryProphecy->get('spec_version')->willReturn('3.1.0')->shouldBeCalledTimes(1);
         $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
-        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true])->shouldBeCalledTimes(1);
+        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0'])->shouldBeCalledTimes(1);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']))->shouldBeCalled();
 

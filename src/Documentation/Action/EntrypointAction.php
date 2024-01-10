@@ -17,6 +17,7 @@ use ApiPlatform\Documentation\Entrypoint;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\OpenApi\Serializer\LegacyOpenApiNormalizer;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +42,10 @@ final class EntrypointAction
     public function __invoke(Request $request)
     {
         static::$resourceNameCollection = $this->resourceNameCollectionFactory->create();
-        $context = ['request' => $request];
+        $context = [
+            'request' => $request,
+            'spec_version' => (string) $request->query->get(LegacyOpenApiNormalizer::SPEC_VERSION),
+        ];
         $request->attributes->set('_api_platform_disable_listeners', true);
         $operation = new Get(outputFormats: $this->documentationFormats, read: true, serialize: true, class: Entrypoint::class, provider: [self::class, 'provide']);
         $request->attributes->set('_api_operation', $operation);
