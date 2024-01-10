@@ -29,6 +29,7 @@
             <directory>features</directory>
             <directory>tests</directory>
             <directory>vendor</directory>
+            <directory>src/**/Tests/</directory>
             <file>.php-cs-fixer.dist.php</file>
         </exclude>
     </coverage>

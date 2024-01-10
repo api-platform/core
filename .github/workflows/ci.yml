@@ -202,6 +202,14 @@ jobs:
           - RamseyUuid
           - GraphQl
           - Serializer
+          - Symfony
+        include:
+          - php: '8.1'
+            coverage: true
+          - php: '8.2'
+            coverage: true
+          - php: '8.3'
+            coverage: true
       fail-fast: false
     steps:
       - name: Checkout
