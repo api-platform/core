@@ -204,6 +204,13 @@ jobs:
           - GraphQl
           - Serializer
           - Symfony
+        include:
+          - php: '8.1'
+            coverage: true
+          - php: '8.2'
+            coverage: true
+          - php: '8.3'
+            coverage: true
       fail-fast: false
     steps:
       - name: Checkout
@@ -219,7 +226,32 @@ jobs:
         working-directory: src/${{ matrix.component }}
         run: |
             composer update
-            vendor/bin/simple-phpunit
+            vendor/bin/simple-phpunit --log-junit "build/logs/phpunit/junit.xml" ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: "phpunit-logs-php${{ matrix.php }}-${{ matrix.component }}"
+          path: build/logs/phpunit
+        continue-on-error: true
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v3
+        with:
+          directory: build/logs/phpunit
+          name: "phpunit-php${{ matrix.php }}-${{ matrix.component }}"
+          flags: phpunit
+          fail_ci_if_error: true
+        continue-on-error: true
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          php-coveralls --coverage_clover "build/logs/phpunit/clover.xml"
+        continue-on-error: true
 
   behat:
     name: Behat (PHP ${{ matrix.php }})
