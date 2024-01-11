@@ -30,7 +30,9 @@
         "php": ">=8.1",
         "api-platform/state": "*@dev || ^3.1",
         "api-platform/metadata": "*@dev || ^3.1",
-        "api-platform/jsonld": "*@dev || ^3.1"
+        "api-platform/jsonld": "*@dev || ^3.1",
+        "api-platform/json-schema": "*@dev || ^3.1",
+        "api-platform/serializer": "*@dev || ^3.1"
     },
     "require-dev": {
         "sebastian/comparator": "<5.0"
