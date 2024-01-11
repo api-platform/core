@@ -150,6 +150,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $context['api_normalize'] = true;
         $iri = $context['iri'] ??= $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
+        $context = $this->excludeIriFromCacheKey($context);
 
         /*
          * When true, converts the normalized data array of a resource into an

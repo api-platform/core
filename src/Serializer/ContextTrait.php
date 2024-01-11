@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+
+
 /**
  * Creates and manipulates the Serializer context.
  *
@@ -29,5 +32,23 @@ trait ContextTrait
             'api_sub_level' => true,
             'resource_class' => $resourceClass,
         ]);
+    }
+
+    /**
+     * Exclude 'iri' from serializer cache key. Not doing this results in a cache explosion
+     * when iterating big result sets because a unique iri generates unique cache keys in
+     * Symfony Serializer's AbstractObjectNormalizer::getCacheKey()
+     */
+    private function excludeIriFromCacheKey(array $context): array
+    {
+        if (empty($context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY])) {
+            $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY] = ['iri'];
+        } else {
+            if (!in_array('iri', $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY])) {
+                $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'iri';
+            }
+        }
+
+        return $context;
     }
 }
