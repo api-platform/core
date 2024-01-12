@@ -33,6 +33,7 @@ parameters:
 		- src/Serializer/CacheableSupportsMethodInterface.php
 		- tests/Hal/Serializer/ItemNormalizerTest.php
 		- tests/Symfony/Validator/Metadata/Property/ValidatorPropertyMetadataFactoryTest.php
+		- src/Symfony/Bundle/ArgumentResolver/CompatibleValueResolverInterface.php
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
@@ -98,3 +99,4 @@ parameters:
 		# Backward compatibility
 		- '#Call to method hasCacheableSupportsMethod\(\) on an unknown class Symfony\\Component\\Serializer\\Normalizer\\CacheableSupportsMethodInterface\.#'
 		- '#Class Symfony\\Component\\Serializer\\Normalizer\\CacheableSupportsMethodInterface not found\.#'
+		- '#Access to undefined constant Symfony\\Component\\HttpKernel\\HttpKernelInterface::MASTER_REQUEST\.#'
