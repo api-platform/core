@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
+use ApiPlatform\OpenApi\Serializer\LegacyOpenApiNormalizer;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -60,7 +61,11 @@ final class DocumentationAction
             return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);
         }
 
-        $context = ['api_gateway' => $request->query->getBoolean(ApiGatewayNormalizer::API_GATEWAY), 'base_url' => $request->getBaseUrl()];
+        $context = [
+            'api_gateway' => $request->query->getBoolean(ApiGatewayNormalizer::API_GATEWAY),
+            'base_url' => $request->getBaseUrl(),
+            'spec_version' => (string) $request->query->get(LegacyOpenApiNormalizer::SPEC_VERSION),
+        ];
         $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
         $format = $this->getRequestFormat($request, $this->documentationFormats);
 
@@ -78,7 +83,18 @@ final class DocumentationAction
     {
         if ($this->provider && $this->processor) {
             $context['request'] = $request;
-            $operation = new Get(class: OpenApi::class, read: true, serialize: true, provider: fn () => $this->openApiFactory->__invoke($context), normalizationContext: [ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null], outputFormats: $this->documentationFormats);
+            $operation = new Get(
+                class: OpenApi::class,
+                read: true,
+                serialize: true,
+                provider: fn () => $this->openApiFactory->__invoke($context),
+                normalizationContext: [
+                    ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null,
+                    LegacyOpenApiNormalizer::SPEC_VERSION => $context['spec_version'] ?? null,
+                ],
+                outputFormats: $this->documentationFormats
+            );
+
             if ('html' === $format) {
                 $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
             }
