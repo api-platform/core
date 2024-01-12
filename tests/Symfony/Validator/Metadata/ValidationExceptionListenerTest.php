@@ -94,7 +94,7 @@ class ValidationExceptionListenerTest extends TestCase
         $exceptionEvent = new ExceptionEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request(),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $exception
         );
 
