@@ -4,7 +4,6 @@
 
 ### Bug fixes
 
-* [36850102a](https://github.com/api-platform/core/commit/36850102ac750797f1acabe0c753d17f233a87c6) style: latest cs-fixer
 * [5de077e7d](https://github.com/api-platform/core/commit/5de077e7de94f2e07ca615efc5ecf1b32b37a10e) fix(symfony): use Type constraint violation code instead of exception code (#6064)
 * [d3484b0f1](https://github.com/api-platform/core/commit/d3484b0f1bf06e518c83cd15e67ed10e9a75fe03) fix(serializer): integrate root_resource_class to cache key (#6073)
 
