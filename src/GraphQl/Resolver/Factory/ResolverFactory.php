@@ -26,7 +26,7 @@ class ResolverFactory implements ResolverFactoryInterface
     public function __construct(
         private readonly ProviderInterface $provider,
         private readonly ProcessorInterface $processor,
-        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory
+        private readonly ?PropertyMetadataFactoryInterface $propertyMetadataFactory = null
     ) {
     }
 
@@ -36,10 +36,10 @@ class ResolverFactory implements ResolverFactoryInterface
             if (\array_key_exists($info->fieldName, $source ?? [])) {
                 $body = $source[$info->fieldName];
 
-                $propertyMetadata = $rootClass ? $this->propertyMetadataFactory->create($rootClass, $info->fieldName) : null;
+                $propertyMetadata = $rootClass ? $this->propertyMetadataFactory?->create($rootClass, $info->fieldName) : null;
                 $propertySchemaType = $propertyMetadata?->getSchema()['type'] ?? null;
                 // Data already fetched and normalized (field or nested resource)
-                if ($body || null === $resourceClass || 'array' !== $propertySchemaType) {
+                if ($body || null === $resourceClass || $propertyMetadata && 'array' !== $propertySchemaType) {
                     return $body;
                 }
             }
