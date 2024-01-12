@@ -209,7 +209,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_resources' => ['/foo' => '/foo', '/bar' => '/bar'], '_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -239,7 +239,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_resources' => ['/foo' => '/foo', '/bar' => '/bar'], '_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -269,7 +269,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_resources' => ['/foo' => '/foo', '/bar' => '/bar'], '_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
