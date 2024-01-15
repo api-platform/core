@@ -78,6 +78,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * The target configuration for API Platform 4 is at src/Symfony/Tests/Bundle/DependencyInjection/ApiPlatformExtensionTest.php
+ * this holds tests for the legacy configuration having event_listeners_backward_compatibility_layer=true.
+ *
+ * @group legacy
+ */
 class ApiPlatformExtensionTest extends TestCase
 {
     use ExpectDeprecationTrait;
@@ -156,6 +162,7 @@ class ApiPlatformExtensionTest extends TestCase
             'graphql_playground' => ['enabled' => false],
         ],
         'keep_legacy_inflector' => false,
+        'event_listeners_backward_compatibility_layer' => true,
     ]];
 
     private ContainerBuilder $container;

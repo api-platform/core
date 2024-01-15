@@ -225,7 +225,8 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'keep_legacy_inflector' => true,
-            'event_listeners_backward_compatibility_layer' => true,
+            'event_listeners_backward_compatibility_layer' => null,
+            'use_symfony_listeners' => false,
             'handle_symfony_errors' => false,
             'enable_link_security' => false,
         ], $config);

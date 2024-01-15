@@ -17,11 +17,17 @@ use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Api\UriVariablesConverterInterface as LegacyUriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\State\CallableProcessor;
+use ApiPlatform\State\Processor\WriteProcessor;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
@@ -39,18 +45,36 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class WriteListener
 {
     use ClassInfoTrait;
+    use CloneTrait;
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
+    private LegacyIriConverterInterface|IriConverterInterface|null $iriConverter = null;
+
+    /**
+     * @param ProcessorInterface<mixed, mixed> $processor
+     */
     public function __construct(
         private readonly ProcessorInterface $processor,
-        private readonly LegacyIriConverterInterface|IriConverterInterface $iriConverter,
-        private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver,
+        LegacyIriConverterInterface|IriConverterInterface|ResourceMetadataCollectionFactoryInterface $iriConverter = null,
+        private readonly null|ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver = null,
         ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         LegacyUriVariablesConverterInterface|UriVariablesConverterInterface $uriVariablesConverter = null,
     ) {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
+
+        if ($processor instanceof CallableProcessor) {
+            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as first argument in "%s" instead of "%s".', WriteProcessor::class, self::class, $processor::class);
+        }
+
+        if ($iriConverter instanceof ResourceMetadataCollectionFactoryInterface) {
+            $resourceMetadataCollectionFactory = $iriConverter;
+        } else {
+            $this->iriConverter = $iriConverter;
+            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as second argument in "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, self::class, IriConverterInterface::class);
+        }
+
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**
@@ -61,6 +85,41 @@ final class WriteListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
+
+        if (!($attributes = RequestAttributesExtractor::extractAttributes($request)) || !$attributes['persist']) {
+            return;
+        }
+
+        if ($operation && (!$this->processor instanceof CallableProcessor && !$this->iriConverter)) {
+            if (null === $operation->canWrite()) {
+                $operation = $operation->withWrite(!$request->isMethodSafe());
+            }
+
+            $uriVariables = $request->attributes->get('_api_uri_variables') ?? [];
+            if (!$uriVariables && !$operation instanceof Error && $operation instanceof HttpOperation) {
+                try {
+                    $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+                } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
+                    throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+                }
+            }
+
+            // $request->attributes->set('original_data', $this->clone($controllerResult));
+            $data = $this->processor->process($controllerResult, $operation, $uriVariables, [
+                'request' => $request,
+                'uri_variables' => $uriVariables,
+                'resource_class' => $operation->getClass(),
+                'previous_data' => false === $operation->canRead() ? null : $request->attributes->get('previous_data'),
+            ]);
+
+            if ($data) {
+                $request->attributes->set('original_data', $this->clone($data));
+            }
+
+            $event->setControllerResult($data);
+
+            return;
+        }
 
         // API Platform 3.2 has a MainController where everything is handled by processors/providers
         if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {

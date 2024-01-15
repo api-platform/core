@@ -237,16 +237,22 @@ class AppKernel extends Kernel
         $c->prependExtensionConfig('twig', $twigConfig);
 
         $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
+        $useSymfonyListeners = (bool) ($_SERVER['USE_SYMFONY_LISTENERS'] ?? false);
         $rfc7807CompliantErrors = (bool) ($_SERVER['RFC_7807_COMPLIANT_ERRORS'] ?? true);
 
-        $c->prependExtensionConfig('api_platform', [
+        $legacyConfig = [];
+        if ($metadataBackwardCompatibilityLayer) {
+            $legacyConfig = ['event_listeners_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer];
+        }
+
+        $c->prependExtensionConfig('api_platform', $legacyConfig + [
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
             ],
             'graphql' => [
                 'graphql_playground' => false,
             ],
-            'event_listeners_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer,
+            'use_symfony_listeners' => $useSymfonyListeners,
             'defaults' => [
                 'pagination_client_enabled' => true,
                 'pagination_client_items_per_page' => true,

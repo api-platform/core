@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
@@ -31,8 +32,18 @@ final class ValidateListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'validate';
 
-    public function __construct(private readonly ValidatorInterface $validator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    private ValidatorInterface $validator;
+    private ?ProviderInterface $provider = null;
+
+    public function __construct(ProviderInterface|ValidatorInterface $validator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
+        if ($validator instanceof ProviderInterface) {
+            $this->provider = $validator;
+        } else {
+            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as first argument in "%s" instead of "%s".', ProviderInterface::class, self::class, ValidatorInterface::class);
+            $this->validator = $validator;
+        }
+
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
@@ -46,6 +57,21 @@ final class ValidateListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
+
+        if ($operation && $this->provider instanceof ProviderInterface) {
+            if (null === $operation->canValidate()) {
+                $operation = $operation->withValidate(!$request->isMethodSafe() && !$request->isMethod('DELETE'));
+            }
+
+            $this->provider->provide($operation, $request->attributes->get('_api_uri_variables') ?? [], [
+                'request' => $request,
+                'uri_variables' => $request->attributes->get('_api_uri_variables') ?? [],
+                'resource_class' => $operation->getClass(),
+            ]);
+
+            return;
+        }
+
         if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
             return;
         }

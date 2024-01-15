@@ -16,12 +16,16 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\UriVariablesConverterInterface as LegacyUriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
+use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
@@ -49,6 +53,10 @@ final class ReadListener
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
+
+        if ($provider instanceof CallableProvider) {
+            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as first argument in "%s" instead of "%s".', ReadProvider::class, self::class, $provider::class);
+        }
     }
 
     /**
@@ -59,17 +67,42 @@ final class ReadListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+
+        if (!($attributes = RequestAttributesExtractor::extractAttributes($request)) || !$attributes['receive']) {
+            return;
+        }
+
         $operation = $this->initializeOperation($request);
+
+        if ($operation && !$this->provider instanceof CallableProvider) {
+            if (null === $operation->canRead()) {
+                $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe());
+            }
+
+            $uriVariables = [];
+            if (!$operation instanceof Error && $operation instanceof HttpOperation) {
+                try {
+                    $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+                } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
+                    throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+                }
+            }
+
+            $request->attributes->set('_api_uri_variables', $uriVariables);
+            $this->provider->provide($operation, $uriVariables, [
+                'request' => $request,
+                'uri_variables' => $uriVariables,
+                'resource_class' => $operation->getClass(),
+            ]);
+
+            return;
+        }
 
         if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
             return;
         }
 
-        if (!($attributes = RequestAttributesExtractor::extractAttributes($request))) {
-            return;
-        }
-
-        if (!$attributes['receive'] || !$operation || !($operation->canRead() ?? true) || (!$operation->getUriVariables() && !$request->isMethodSafe())) {
+        if (!$operation || !($operation->canRead() ?? true) || (!$operation->getUriVariables() && !$request->isMethodSafe())) {
             return;
         }
 

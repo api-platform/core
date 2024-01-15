@@ -5,6 +5,10 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.action.not_found" class="ApiPlatform\Action\NotFoundAction" public="true" />
+        <service id="api_platform.action.not_exposed" class="ApiPlatform\Action\NotExposedAction" public="true" />
+        <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
+        <service id="ApiPlatform\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
         <service id="api_platform.serializer" alias="serializer" />
         <service id="api_platform.property_accessor" alias="property_accessor" public="false" />
         <service id="api_platform.property_info" alias="property_info" public="false" />
@@ -84,39 +88,6 @@
         <service id="api_platform.metadata.path_segment_name_generator.dash" class="ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator" public="false" />
 
         <!-- Action -->
-
-        <service id="api_platform.action.placeholder" class="ApiPlatform\Action\PlaceholderAction" public="true" />
-        <service id="ApiPlatform\Action\PlaceholderAction" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.patch_item" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.not_found" class="ApiPlatform\Action\NotFoundAction" public="true" />
-        <service id="api_platform.action.not_exposed" class="ApiPlatform\Action\NotExposedAction" public="true" />
-        <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
-        <service id="ApiPlatform\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
-
-        <service id="api_platform.action.entrypoint" class="ApiPlatform\Documentation\Action\EntrypointAction" public="true">
-            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
-            <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
-            <argument>%api_platform.docs_formats%</argument>
-        </service>
-
-        <service id="api_platform.action.documentation" class="ApiPlatform\Documentation\Action\DocumentationAction" public="true">
-            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument>%api_platform.title%</argument>
-            <argument>%api_platform.description%</argument>
-            <argument>%api_platform.version%</argument>
-            <argument type="service" id="api_platform.openapi.factory" on-invalid="null" />
-            <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
-            <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
-            <argument type="service" id="api_platform.negotiator" on-invalid="null" />
-            <argument>%api_platform.docs_formats%</argument>
-        </service>
-
         <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
             <argument type="service" id="api_platform.serializer" />
             <argument>%api_platform.error_formats%</argument>
@@ -190,20 +161,6 @@
         </service>
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
         <service id="ApiPlatform\Metadata\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
-
-        <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener">
-            <argument key="$controller">api_platform.symfony.main_controller</argument>
-            <argument key="$logger" type="service" id="logger" on-invalid="null" />
-            <argument key="$debug">%kernel.debug%</argument>
-            <argument key="$exceptionsMapping" type="collection"></argument>
-            <argument key="$resourceMetadataCollectionFactory" type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument key="$errorFormats">%api_platform.error_formats%</argument>
-            <argument key="$exceptionToStatus">%api_platform.exception_to_status%</argument>
-            <argument key="$identifiersExtractor">null</argument>
-            <argument key="$resourceClassResolver" type="service" id="api_platform.resource_class_resolver"/>
-            <argument key="$negotiator">null</argument>
-            <argument key="$problemCompliantErrors">%api_platform.rfc_7807_compliant_errors%</argument>
-        </service>
 
         <service id="api_platform.state.error_provider" class="ApiPlatform\State\ErrorProvider">
             <argument key="$debug">%kernel.debug%</argument>

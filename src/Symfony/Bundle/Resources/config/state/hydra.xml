@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <!-- State -->
+        <service id="api_platform.hydra.processor.link" class="ApiPlatform\Hydra\State\HydraLinkProcessor" decorates="api_platform.state_processor.respond" decoration-priority="410">
+            <argument type="service" id="api_platform.hydra.processor.link.inner" />
+            <argument type="service" id="api_platform.router" />
+        </service>
+    </services>
+</container>

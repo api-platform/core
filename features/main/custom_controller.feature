@@ -1,3 +1,4 @@
+@controller
 Feature: Custom operation
   As a client software developer
   I need to be able to create custom operations

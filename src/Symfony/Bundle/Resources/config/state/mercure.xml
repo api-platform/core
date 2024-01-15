@@ -5,9 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <!-- Event listener -->
-
-        <service id="api_platform.mercure.processor.add_link_header" class="ApiPlatform\Symfony\State\MercureLinkProcessor" decorates="api_platform.state_processor.main" decoration-priority="400">
+        <service id="api_platform.mercure.processor.add_link_header" class="ApiPlatform\Symfony\State\MercureLinkProcessor" decorates="api_platform.state_processor.respond" decoration-priority="400">
             <argument type="service" id="api_platform.mercure.processor.add_link_header.inner" />
             <argument type="service" id="Symfony\Component\Mercure\Discovery" on-invalid="ignore"/>
         </service>

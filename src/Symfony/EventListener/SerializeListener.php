@@ -16,9 +16,11 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ResourceList;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use ApiPlatform\Util\ErrorFormatGuesser;
@@ -42,15 +44,32 @@ final class SerializeListener
     use OperationRequestInitiatorTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'serialize';
+    private ?SerializerInterface $serializer = null;
+    private ?ProcessorInterface $processor = null;
+    private ?SerializerContextBuilderInterface $serializerContextBuilder = null;
 
     public function __construct(
-        private readonly SerializerInterface $serializer,
-        private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+        SerializerInterface|ProcessorInterface $serializer,
+        SerializerContextBuilderInterface|ResourceMetadataCollectionFactoryInterface $serializerContextBuilder = null,
         ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
         private readonly array $errorFormats = [],
         // @phpstan-ignore-next-line we don't need this anymore
         private readonly bool $debug = false,
     ) {
+        if ($serializer instanceof ProcessorInterface) {
+            $this->processor = $serializer;
+        } else {
+            $this->serializer = $serializer;
+            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as first argument in "%s" instead of "%s".', ProcessorInterface::class, self::class, SerializerInterface::class);
+        }
+
+        if ($serializerContextBuilder instanceof ResourceMetadataCollectionFactoryInterface) {
+            $resourceMetadataFactory = $serializerContextBuilder;
+        } else {
+            $this->serializerContextBuilder = $serializerContextBuilder;
+            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as second argument in "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, self::class, SerializerContextBuilderInterface::class);
+        }
+
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
 
@@ -61,7 +80,37 @@ final class SerializeListener
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
+        $operation = $this->initializeOperation($request);
 
+        $attributes = RequestAttributesExtractor::extractAttributes($request);
+
+        if (!($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond', false))) {
+            return;
+        }
+
+        if ($operation && $this->processor instanceof ProcessorInterface) {
+            if (null === $operation->canSerialize()) {
+                $operation = $operation->withSerialize(true);
+            }
+
+            if ($operation instanceof Error) {
+                // we don't want the FlattenException
+                $controllerResult = $request->attributes->get('data') ?? $controllerResult;
+            }
+
+            $uriVariables = $request->attributes->get('_api_uri_variables') ?? [];
+            $serialized = $this->processor->process($controllerResult, $operation, $uriVariables, [
+                'request' => $request,
+                'uri_variables' => $uriVariables,
+                'resource_class' => $operation->getClass(),
+            ]);
+
+            $event->setControllerResult($serialized);
+
+            return;
+        }
+
+        // TODO: the code below needs to be removed in 4.x
         if ($controllerResult instanceof Response) {
             return;
         }
@@ -71,8 +120,6 @@ final class SerializeListener
         if (!($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond', false))) {
             return;
         }
-
-        $operation = $this->initializeOperation($request);
 
         if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
             return;

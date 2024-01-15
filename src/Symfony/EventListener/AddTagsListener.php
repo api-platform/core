@@ -32,6 +32,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  *
  * The "xkey" is used because it is supported by Varnish.
  * @see https://docs.varnish-software.com/varnish-cache-plus/vmods/ykey/
+ * @deprecated use ApiPlatform\HttpCache\State\AddTagsProcessor instead
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

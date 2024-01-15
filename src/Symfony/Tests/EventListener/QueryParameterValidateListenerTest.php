@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\ParameterValidator\Exception\ValidationException;
 use ApiPlatform\ParameterValidator\ParameterValidator;
+use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
@@ -37,6 +38,7 @@ class QueryParameterValidateListenerTest extends TestCase
     private ObjectProphecy $queryParameterValidator;
 
     /**
+     * @group legacy
      * unsafe method should not use filter validations.
      */
     public function testOnKernelRequestWithUnsafeMethod(): void
@@ -54,6 +56,9 @@ class QueryParameterValidateListenerTest extends TestCase
         $this->testedInstance->onKernelRequest($eventProphecy->reveal());
     }
 
+    /**
+     * @group legacy
+     */
     public function testDoNotValidateWhenDisabledGlobally(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -79,6 +84,9 @@ class QueryParameterValidateListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
+    /**
+     * @group legacy
+     */
     public function testDoNotValidateWhenDisabledInOperationAttribute(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -106,6 +114,8 @@ class QueryParameterValidateListenerTest extends TestCase
 
     /**
      * If the tested filter is non-existent, then nothing should append.
+     *
+     * @group legacy
      */
     public function testOnKernelRequestWithWrongFilter(): void
     {
@@ -124,6 +134,8 @@ class QueryParameterValidateListenerTest extends TestCase
 
     /**
      * if the required parameter is not set, throw an ValidationException.
+     *
+     * @group legacy
      */
     public function testOnKernelRequestWithRequiredFilterNotSet(): void
     {
@@ -146,6 +158,8 @@ class QueryParameterValidateListenerTest extends TestCase
 
     /**
      * if the required parameter is set, no exception should be thrown.
+     *
+     * @group legacy
      */
     public function testOnKernelRequestWithRequiredFilter(): void
     {
@@ -186,5 +200,34 @@ class QueryParameterValidateListenerTest extends TestCase
             $this->queryParameterValidator->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
         );
+    }
+
+    public function testOnKernelRequest(): void
+    {
+        $request = new Request(
+            [],
+            [],
+            ['_api_resource_class' => Dummy::class, '_api_operation' => new GetCollection()],
+            [],
+            [],
+            ['QUERY_STRING' => 'required=foo']
+        );
+        $request->setMethod('GET');
+
+        $event = $this->createMock(RequestEvent::class);
+        $event->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request);
+
+        $resourceMetadataFactoryProphecy = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('provide');
+
+        $qp = new QueryParameterValidateListener(
+            $provider,
+            $resourceMetadataFactoryProphecy,
+        );
+        $qp->onKernelRequest($event);
     }
 }

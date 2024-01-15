@@ -72,6 +72,9 @@ final class SwaggerUiProvider implements ProviderInterface
         // save our operation
         $request->attributes->set('_api_operation', $swaggerUiOperation);
 
-        return $this->openApiFactory->__invoke(['base_url' => $request->getBaseUrl() ?: '/']);
+        $data = $this->openApiFactory->__invoke(['base_url' => $request->getBaseUrl() ?: '/']);
+        $request->attributes->set('data', $data);
+
+        return $data;
     }
 }

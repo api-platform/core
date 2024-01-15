@@ -186,6 +186,7 @@ Feature: JSON-LD DTO input and output
     """
 
   @createSchema
+  @controller
   Scenario: Create a resource with no input
     When I send a "POST" request to "/dummy_dto_no_inputs"
     Then the response status code should be 201
@@ -210,6 +211,7 @@ Feature: JSON-LD DTO input and output
     }
     """
 
+  @controller
   Scenario: Update a resource with no input
     When I send a "POST" request to "/dummy_dto_no_inputs/1/double_bat"
     Then the response status code should be 200

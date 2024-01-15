@@ -44,7 +44,8 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: ['groups' => ['json'],
                 'skip_null_values' => true,
                 'rfc_7807_compliant_errors' => true,
-            ]),
+            ]
+        ),
         new ErrorOperation(
             name: '_api_validation_errors_hydra',
             outputFormats: ['jsonld' => ['application/problem+json']],

@@ -14,11 +14,6 @@
             <argument>%api_platform.swagger_ui.extra_configuration%</argument>
         </service>
 
-        <service id="api_platform.swagger_ui.provider" class="ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiProvider" public="false" decorates="api_platform.state_provider.read">
-            <argument type="service" id="api_platform.swagger_ui.provider.inner" />
-            <argument type="service" id="api_platform.openapi.factory" />
-        </service>
-
         <service id="api_platform.swagger_ui.processor" class="ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiProcessor" public="false">
             <argument type="service" id="twig" on-invalid="null" />
             <argument type="service" id="router" />

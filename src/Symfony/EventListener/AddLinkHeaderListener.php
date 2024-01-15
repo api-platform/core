@@ -25,6 +25,8 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
 /**
  * Adds the HTTP Link header pointing to the Mercure hub for resources having their updates dispatched.
  *
+ * @deprecated use ApiPlatform\Symfony\State\MercureLinkProcessor instead
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class AddLinkHeaderListener

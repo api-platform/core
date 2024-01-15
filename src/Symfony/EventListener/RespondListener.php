@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,10 +39,18 @@ final class RespondListener
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
-    public function __construct(
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
-        private readonly null|IriConverterInterface|LegacyIriConverterInterface $iriConverter = null,
-    ) {
+    private null|IriConverterInterface|LegacyIriConverterInterface $iriConverter = null;
+    private ?ProcessorInterface $processor = null;
+
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, IriConverterInterface|LegacyIriConverterInterface|ProcessorInterface $iriConverter = null)
+    {
+        if ($iriConverter instanceof ProcessorInterface) {
+            $this->processor = $iriConverter;
+        } else {
+            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as second argument in "%s" instead of "%s".', ProcessorInterface::class, self::class, IriConverterInterface::class);
+            $this->iriConverter = $iriConverter;
+        }
+
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
 
@@ -54,6 +63,26 @@ final class RespondListener
         $controllerResult = $event->getControllerResult();
         $operation = $this->initializeOperation($request);
 
+        $attributes = RequestAttributesExtractor::extractAttributes($request);
+        if (!($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond'))) {
+            return;
+        }
+
+        if ($operation && $this->processor instanceof ProcessorInterface) {
+            $uriVariables = $request->attributes->get('_api_uri_variables') ?? [];
+            $response = $this->processor->process($controllerResult, $operation, $uriVariables, [
+                'request' => $request,
+                'uri_variables' => $uriVariables,
+                'resource_class' => $operation->getClass(),
+                'original_data' => $request->attributes->get('original_data'),
+            ]);
+
+            $event->setResponse($response);
+
+            return;
+        }
+
+        // TODO: the code below needs to be removed in 4.x
         if ('api_platform.symfony.main_controller' === $operation?->getController() || $request->attributes->get('_api_platform_disable_listeners')) {
             return;
         }

@@ -19,6 +19,13 @@
             <tag name="serializer.normalizer" priority="-780" />
         </service>
 
+        <service id="api_platform.problem.normalizer.validation_exception" class="ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer" public="false">
+            <argument type="service" id="api_platform.serializer.normalizer.item" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" priority="-800" />
+        </service>
+
         <!-- deprecated -->
         <service id="api_platform.problem.normalizer.error" class="ApiPlatform\Problem\Serializer\ErrorNormalizer" public="false">
             <argument>%kernel.debug%</argument>

@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.swagger_ui.documentation.provider" class="ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiProvider" public="false" decorates="api_platform.state_provider.documentation.read">
+            <argument type="service" id="api_platform.swagger_ui.documentation.provider.inner" />
+            <argument type="service" id="api_platform.openapi.factory" />
+        </service>
+    </services>
+</container>

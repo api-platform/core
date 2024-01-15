@@ -36,16 +36,16 @@ use Symfony\Component\WebLink\Link;
 final class SerializeProcessor implements ProcessorInterface
 {
     /**
-     * @param ProcessorInterface<T1, T2> $processor
+     * @param ProcessorInterface<mixed, mixed>|null $processor
      */
-    public function __construct(private readonly ProcessorInterface $processor, private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(private readonly ?ProcessorInterface $processor, private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
     {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if ($data instanceof Response || !$operation->canSerialize() || !($request = $context['request'] ?? null)) {
-            return $this->processor->process($data, $operation, $uriVariables, $context);
+            return $this->processor ? $this->processor->process($data, $operation, $uriVariables, $context) : $data;
         }
 
         // @see ApiPlatform\State\Processor\RespondProcessor
@@ -59,7 +59,7 @@ final class SerializeProcessor implements ProcessorInterface
         $serializerContext['uri_variables'] = $uriVariables;
 
         if (isset($serializerContext['output']) && \array_key_exists('class', $serializerContext['output']) && null === $serializerContext['output']['class']) {
-            return $this->processor->process(null, $operation, $uriVariables, $context);
+            return $this->processor ? $this->processor->process(null, $operation, $uriVariables, $context) : null;
         }
 
         $resources = new ResourceList();
@@ -80,6 +80,6 @@ final class SerializeProcessor implements ProcessorInterface
             $request->attributes->set('_api_platform_links', $linkProvider);
         }
 
-        return $this->processor->process($serialized, $operation, $uriVariables, $context);
+        return $this->processor ? $this->processor->process($serialized, $operation, $uriVariables, $context) : $serialized;
     }
 }

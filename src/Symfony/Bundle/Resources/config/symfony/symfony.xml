@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <!-- TODO: move this to events.xml in API Platform 4 to lighten the container -->
+        <service id="api_platform.action.placeholder" class="ApiPlatform\Action\PlaceholderAction" public="true" />
+        <service id="ApiPlatform\Action\PlaceholderAction" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.patch_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
+
+        <service id="api_platform.listener.exception" class="ApiPlatform\Symfony\EventListener\ExceptionListener">
+            <argument type="service" id="api_platform.error_listener" on-invalid="null" />
+            <argument>%api_platform.handle_symfony_errors%</argument>
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
+            <tag name="monolog.logger" channel="request" />
+        </service>
+
+        <service id="api_platform.cache_warmer.cache_pool_clearer" class="ApiPlatform\Symfony\Bundle\CacheWarmer\CachePoolClearerCacheWarmer" public="false">
+            <argument type="service" id="cache.system_clearer" />
+            <argument type="collection">
+                <argument>api_platform.cache.metadata.property</argument>
+                <argument>api_platform.cache.metadata.resource</argument>
+                <argument>api_platform.cache.metadata.resource_collection</argument>
+                <argument>api_platform.cache.route_name_resolver</argument>
+                <argument>api_platform.cache.identifiers_extractor</argument>
+                <argument>api_platform.elasticsearch.cache.metadata.document</argument>
+            </argument>
+            <tag name="kernel.cache_warmer" priority="64" />
+        </service>
+    </services>
+</container>
