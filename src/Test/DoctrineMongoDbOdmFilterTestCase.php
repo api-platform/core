@@ -41,7 +41,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
         self::bootKernel();
 
         $this->manager = DoctrineMongoDbOdmTestCase::createTestDocumentManager();
-        $this->managerRegistry = self::$kernel->getContainer()->get('doctrine_mongodb'); // @phpstan-ignore-line
+        $this->managerRegistry = self::$kernel->getContainer()->get('doctrine_mongodb');
         $this->repository = $this->manager->getRepository($this->resourceClass);
     }
 
