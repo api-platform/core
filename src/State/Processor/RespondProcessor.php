@@ -24,7 +24,6 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\State\ProcessorInterface;
-use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 
@@ -75,7 +74,7 @@ final class RespondProcessor implements ProcessorInterface
         $status = $operation->getStatus();
 
         if ($sunset = $operation->getSunset()) {
-            $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(DateTimeInterface::RFC1123);
+            $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTimeInterface::RFC1123);
         }
 
         if ($acceptPatch = $operation->getAcceptPatch()) {
