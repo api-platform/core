@@ -17,6 +17,12 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Psr\Container\ContainerInterface;
 
+/**
+ * @template T1
+ * @template T2
+ *
+ * @implements ProcessorInterface<T1, T2>
+ */
 final class CallableProcessor implements ProcessorInterface
 {
     public function __construct(private readonly ?ContainerInterface $locator = null)
@@ -40,7 +46,7 @@ final class CallableProcessor implements ProcessorInterface
             throw new RuntimeException(sprintf('Processor "%s" not found on operation "%s"', $processor, $operation->getName()));
         }
 
-        /** @var ProcessorInterface $processorInstance */
+        /** @var ProcessorInterface<T1, T2> $processorInstance */
         $processorInstance = $this->locator->get($processor);
 
         return $processorInstance->process($data, $operation, $uriVariables, $context);

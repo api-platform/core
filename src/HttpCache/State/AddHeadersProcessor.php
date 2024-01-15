@@ -18,10 +18,16 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @template T1
+ * @template T2
+ *
+ * @implements ProcessorInterface<T1, T2>
+ */
 final class AddHeadersProcessor implements ProcessorInterface
 {
     /**
-     * @param ProcessorInterface<Response>|ProcessorInterface<mixed> $decorated
+     * @param ProcessorInterface<T1, T2> $decorated
      */
     public function __construct(private readonly ProcessorInterface $decorated, private readonly bool $etag = false, private readonly ?int $maxAge = null, private readonly ?int $sharedMaxAge = null, private readonly ?array $vary = null, private readonly ?bool $public = null, private readonly ?int $staleWhileRevalidate = null, private readonly ?int $staleIfError = null)
     {
