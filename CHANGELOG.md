@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.2.11
+
+### Bug fixes
+
+* [5de077e7d](https://github.com/api-platform/core/commit/5de077e7de94f2e07ca615efc5ecf1b32b37a10e) fix(symfony): use Type constraint violation code instead of exception code (#6064)
+* [804da1be7](https://github.com/api-platform/core/commit/804da1be73991e7c5efffb495345499943802102) fix(openapi): compatibility with OpenAPI 3.0 (#6065)
+* [cd01e043a](https://github.com/api-platform/core/commit/cd01e043a17f4092bf302a415bba777fab3a9cfc) fix(symfony): handle empty content-type as set by Symfony (#6078)
+* [d3484b0f1](https://github.com/api-platform/core/commit/d3484b0f1bf06e518c83cd15e67ed10e9a75fe03) fix(serializer): integrate root_resource_class to cache key (#6073)
+
+For OpenAPI 3.0, the `spec_version=3.0.0` query parameter will force OpenAPI to the 3.0 version. This option is also available through the command line.
+
 ## v3.2.10
 
 ### Bug fixes
@@ -255,6 +266,13 @@ Notes:
 * [851aa3778](https://github.com/api-platform/core/commit/851aa3778ef8a6f959a44b759fc343e9f8cfc8bf) feat(graphql)!: add extra args for custom queries or mutations (#5359)
 * [92a81f024](https://github.com/api-platform/core/commit/92a81f024541054b9322e7457b75c721261e14e0) feat(graphql): allow to disable the introspection query (#5711)
 * [d793ffb92](https://github.com/api-platform/core/commit/d793ffb9228a21655ee35f0b90a959f93281a4cf) feat: union/intersect types (#5470)
+
+## v3.1.25
+
+### Bug fixes
+
+* [5de077e7d](https://github.com/api-platform/core/commit/5de077e7de94f2e07ca615efc5ecf1b32b37a10e) fix(symfony): use Type constraint violation code instead of exception code (#6064)
+* [d3484b0f1](https://github.com/api-platform/core/commit/d3484b0f1bf06e518c83cd15e67ed10e9a75fe03) fix(serializer): integrate root_resource_class to cache key (#6073)
 
 ## v3.1.24
 

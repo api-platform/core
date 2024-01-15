@@ -74,7 +74,7 @@ final class RespondProcessor implements ProcessorInterface
         $status = $operation->getStatus();
 
         if ($sunset = $operation->getSunset()) {
-            $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
+            $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTimeInterface::RFC1123);
         }
 
         if ($acceptPatch = $operation->getAcceptPatch()) {
