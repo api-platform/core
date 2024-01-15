@@ -19,8 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Processes data: sends an email, persists to storage, adds to queue etc.
  *
- * @template T1 of object
- * @template T2 of object
+ * @template T1
+ * @template T2
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */

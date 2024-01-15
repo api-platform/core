@@ -22,12 +22,18 @@ use ApiPlatform\State\Util\CorsTrait;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\Link;
 
+/**
+ * @template T1
+ * @template T2
+ *
+ * @implements ProcessorInterface<T1, T2>
+ */
 final class HydraLinkProcessor implements ProcessorInterface
 {
     use CorsTrait;
 
     /**
-     * @param ProcessorInterface<mixed> $decorated
+     * @param ProcessorInterface<T1, T2> $decorated
      */
     public function __construct(private readonly ProcessorInterface $decorated, private readonly UrlGeneratorInterface $urlGenerator)
     {

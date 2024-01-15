@@ -18,8 +18,17 @@ use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
+/**
+ * @template T1
+ * @template T2
+ *
+ * @implements ProcessorInterface<T1, T2>
+ */
 final class AddLinkHeaderProcessor implements ProcessorInterface
 {
+    /**
+     * @param ProcessorInterface<T1, T2> $decorated
+     */
     public function __construct(private readonly ProcessorInterface $decorated, private readonly ?HttpHeaderSerializer $serializer = new HttpHeaderSerializer())
     {
     }
