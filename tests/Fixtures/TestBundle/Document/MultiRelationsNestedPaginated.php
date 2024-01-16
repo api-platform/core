@@ -15,9 +15,12 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ApiResource(graphQlOperations: [new QueryCollection(nested: true)])]
+#[ODM\EmbeddedDocument]
 class MultiRelationsNestedPaginated
 {
+    #[ODM\Field(type: 'string')]
     public ?string $name;
 }
