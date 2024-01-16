@@ -36,6 +36,10 @@
             <argument type="service" id="api_platform.json_schema.metadata.property.metadata_factory.schema.inner" />
         </service>
 
+        <service id="api_platform.json_schema.backward_compatible_schema_factory" decorates="api_platform.json_schema.schema_factory" decoration-priority="-2" class="ApiPlatform\JsonSchema\BackwardCompatibleSchemaFactory">
+            <argument type="service" id="api_platform.json_schema.backward_compatible_schema_factory.inner" />
+        </service>
+
     </services>
 
 </container>
