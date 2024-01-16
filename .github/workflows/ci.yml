@@ -265,21 +265,22 @@ jobs:
       - name: Run ${{ matrix.component }} tests
         working-directory: src/${{ matrix.component }}
         run: |
-            composer update
-            vendor/bin/simple-phpunit --log-junit "build/logs/phpunit/junit.xml" ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
+          composer update
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit "build/logs/phpunit/junit.xml" ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: "phpunit-logs-php${{ matrix.php }}-${{ matrix.component }}"
-          path: build/logs/phpunit
+          name: phpunit-logs-php${{ matrix.php }}
+          path: src/${{ matrix.component }}/build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v3
         with:
-          directory: build/logs/phpunit
-          name: "phpunit-php${{ matrix.php }}-${{ matrix.component }}"
+          directory: src/${{ matrix.component }}/build/logs/phpunit
+          name: phpunit-php${{ matrix.php }}
           flags: phpunit
           fail_ci_if_error: true
         continue-on-error: true
@@ -287,10 +288,11 @@ jobs:
         if: matrix.coverage
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: src/${{ matrix.component }}
         run: |
           composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover "build/logs/phpunit/clover.xml"
+          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
   behat:
