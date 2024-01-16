@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Tests\Fixtures;
 
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

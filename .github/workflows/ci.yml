@@ -52,10 +52,6 @@ jobs:
           ini-values: memory_limit=-1
           tools: pecl, composer
           coverage: none
-      - name: Download PHPArkitect PHAR
-        run: |
-          wget -q https://github.com/phparkitect/arkitect/releases/latest/download/phparkitect.phar
-          chmod +x phparkitect.phar
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -68,8 +64,7 @@ jobs:
       - name: Update project dependencies
         run: |
           composer update --no-interaction --no-progress --ansi
-      - name: Run PHPArkitect
-        run: ./phparkitect.phar check
+      - run: php components.php
 
   php-cs-fixer:
     name: PHP CS Fixer (PHP ${{ matrix.php }})
@@ -244,6 +239,9 @@ jobs:
           - GraphQl
           - Serializer
           - Symfony
+          - Doctrine/Common
+          - Doctrine/Orm
+          - Doctrine/Odm
         include:
           - php: '8.1'
             coverage: true

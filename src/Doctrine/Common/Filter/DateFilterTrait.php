@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Common\Filter;
 
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 
 /**
  * Trait for filtering the collection by date intervals.

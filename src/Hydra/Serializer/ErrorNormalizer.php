@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use ApiPlatform\State\ApiResource\Error;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -23,6 +22,8 @@ use Symfony\Component\Serializer\Serializer;
 
 /**
  * Converts {@see \Exception} or {@see FlattenException} to a Hydra error representation.
+ *
+ * @deprecated Errors are resources since API Platform 3.2 we use the ItemNormalizer
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>

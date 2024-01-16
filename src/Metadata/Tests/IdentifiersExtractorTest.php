@@ -24,7 +24,6 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyWithEnumIdentifier;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelationMultiple;
-use ApiPlatform\Metadata\Tests\Fixtures\State\RelationMultipleProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -150,7 +149,6 @@ class IdentifiersExtractorTest extends TestCase
                     ->withIdentifiers(['id'])
                     ->withParameterName('secondId'),
             ])
-            ->withProvider(RelationMultipleProvider::class)
             ->withClass(RelationMultiple::class);
 
         $first = new Dummy();

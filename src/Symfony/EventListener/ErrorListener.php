@@ -27,7 +27,7 @@ use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
-use ApiPlatform\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
@@ -192,7 +192,7 @@ final class ErrorListener extends SymfonyErrorListener
             return 400;
         }
 
-        if ($exception instanceof ValidationException) {
+        if ($exception instanceof ConstraintViolationListAwareExceptionInterface) {
             return 422;
         }
 

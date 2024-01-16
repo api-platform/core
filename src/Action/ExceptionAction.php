@@ -20,6 +20,7 @@ use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
+use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface as ApiPlatformConstraintViolationListAwareExceptionInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -77,7 +78,7 @@ final class ExceptionAction
 
         $context = ['statusCode' => $statusCode, 'rfc_7807_compliant_errors' => $operation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false];
         $error = $request->attributes->get('exception') ?? $exception;
-        if ($error instanceof ConstraintViolationListAwareExceptionInterface) {
+        if ($error instanceof ConstraintViolationListAwareExceptionInterface || $error instanceof ApiPlatformConstraintViolationListAwareExceptionInterface) {
             $error = $error->getConstraintViolationList();
         } elseif (method_exists($error, 'getViolations') && $error->getViolations() instanceof ConstraintViolationListInterface) {
             $error = $error->getViolations();

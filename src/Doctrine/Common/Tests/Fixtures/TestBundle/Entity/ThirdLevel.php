@@ -16,7 +16,6 @@ namespace ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 

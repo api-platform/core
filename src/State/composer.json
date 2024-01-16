@@ -19,14 +19,16 @@
     "require": {
         "php": ">=8.1",
         "api-platform/metadata": "*@dev || ^3.1",
+        "api-platform/jsonld": "*@dev || ^3.1",
         "psr/container": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.3",
-        "symfony/web-link": "^6.3",
-        "symfony/http-foundation": "^6.3",
+        "symfony/web-link": "^6.4 || ^7.0",
+        "symfony/http-foundation": "^6.4 || 7.0",
         "willdurand/negotiation": "^3.1",
-        "sebastian/comparator": "<5.0"
+        "api-platform/serializer": "*@dev || ^3.1",
+        "api-platform/validator": "*@dev || ^3.1"
     },
     "autoload": {
         "psr-4": {
@@ -51,18 +53,32 @@
             "dev-main": "3.2.x-dev"
         },
         "symfony": {
-            "require": "^6.1"
+            "require": "^6.4"
         }
     },
     "suggest": {
         "symfony/web-link": "To support adding web links to the response headers.",
         "symfony/http-foundation": "To use our HTTP providers and processor.",
-        "willdurand/negotiation": "To use the API Platform content negoatiation provider."
+        "willdurand/negotiation": "To use the API Platform content negoatiation provider.",
+        "api-platform/serializer": "To use API Platform serializer.",
+        "api-platform/validator": "To use API Platform validation."
     },
     "repositories": [
         {
             "type": "path",
             "url": "../Metadata"
+        },
+        {
+            "type": "path",
+            "url": "../Serializer"
+        },
+        {
+            "type": "path",
+            "url": "../Validator"
+        },
+        {
+            "type": "path",
+            "url": "../JsonLd"
         }
     ]
 }

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common\State;
 
-use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Psr\Container\ContainerInterface;

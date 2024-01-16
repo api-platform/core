@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -80,7 +81,7 @@ class ValidateStageTest extends TestCase
         $context = ['info' => $info];
 
         $object = new \stdClass();
-        $this->validatorProphecy->validate($object, ['groups' => $validationGroups])->shouldBeCalled()->willThrow(new ValidationException());
+        $this->validatorProphecy->validate($object, ['groups' => $validationGroups])->shouldBeCalled()->willThrow(new ValidationException(new ConstraintViolationList()));
 
         $this->expectException(ValidationException::class);
 

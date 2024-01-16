@@ -13,11 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\ParameterValidator\Tests;
 
-use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\ParameterValidator\Exception\ValidationException;
 use ApiPlatform\ParameterValidator\ParameterValidator;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\ParameterValidator\Tests\Fixtures\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;

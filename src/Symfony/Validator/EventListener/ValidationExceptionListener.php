@@ -15,8 +15,9 @@ namespace ApiPlatform\Symfony\Validator\EventListener;
 
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Symfony\EventListener\ExceptionListener;
-use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
+use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface as SymfonyConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
+use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -49,9 +50,11 @@ final class ValidationExceptionListener
         trigger_deprecation('api-platform', '3.2', sprintf('The class "%s" is deprecated and will be removed in 4.x.', __CLASS__));
 
         $exception = $event->getThrowable();
-        if (!$exception instanceof ConstraintViolationListAwareExceptionInterface && !$exception instanceof FilterValidationException) {
+        $hasConstraintViolationList = ($exception instanceof ConstraintViolationListAwareExceptionInterface || $exception instanceof SymfonyConstraintViolationListAwareExceptionInterface);
+        if (!$hasConstraintViolationList && !$exception instanceof FilterValidationException) {
             return;
         }
+
         $exceptionClass = $exception::class;
         $statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
 
@@ -71,7 +74,7 @@ final class ValidationExceptionListener
         }
 
         $event->setResponse(new Response(
-            $this->serializer->serialize($exception instanceof ConstraintViolationListAwareExceptionInterface ? $exception->getConstraintViolationList() : $exception, $format['key'], $context),
+            $this->serializer->serialize($hasConstraintViolationList ? $exception->getConstraintViolationList() : $exception, $format['key'], $context),
             $statusCode,
             [
                 'Content-Type' => sprintf('%s; charset=utf-8', $format['value'][0]),

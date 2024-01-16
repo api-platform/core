@@ -21,28 +21,11 @@ use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class ApiGatewayNormalizerTest extends TestCase
 {
     use ProphecyTrait;
-
-    /**
-     * @group legacy
-     */
-    public function testSupportsNormalization(): void
-    {
-        $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
-        $normalizerProphecy->supportsNormalization(OpenApiNormalizer::FORMAT, OpenApi::class)->willReturn(true);
-        $normalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
-
-        $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
-
-        $this->assertTrue($normalizer->supportsNormalization(OpenApiNormalizer::FORMAT, OpenApi::class));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-    }
 
     public function testNormalize(): void
     {
