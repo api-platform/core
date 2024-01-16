@@ -158,7 +158,7 @@ class DoctrineExtractorTest extends TestCase
             ['string', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['key', [new Type(Type::BUILTIN_TYPE_INT)]],
             ['hash', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
-            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(TYPE::BUILTIN_TYPE_INT))]],
+            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT))]],
             ['objectId', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['raw', null],
             ['foo', [new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)]],

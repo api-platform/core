@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test;
 
+use ApiPlatform\JsonSchema\BackwardCompatibleSchemaFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Get;
@@ -118,7 +119,7 @@ trait ApiTestAssertionsTrait
             $operation = $operationName ? (new GetCollection())->withName($operationName) : new GetCollection();
         }
 
-        $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null, $serializationContext);
+        $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null, ($serializationContext ?? []) + [BackwardCompatibleSchemaFactory::SCHEMA_DRAFT4_VERSION => true]);
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
@@ -133,7 +134,7 @@ trait ApiTestAssertionsTrait
             $operation = $operationName ? (new Get())->withName($operationName) : new Get();
         }
 
-        $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null, $serializationContext);
+        $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null, ($serializationContext ?? []) + [BackwardCompatibleSchemaFactory::SCHEMA_DRAFT4_VERSION => true]);
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
