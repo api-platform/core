@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\Security\State;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
@@ -52,6 +51,9 @@ final class AccessCheckerProvider implements ProviderInterface
         }
 
         $body = $this->decorated->provide($operation, $uriVariables, $context);
+        if (null === $isGranted) {
+            return $body;
+        }
 
         // On a GraphQl QueryCollection we want to perform security stage only on the top-level query
         if ($operation instanceof QueryCollection && null !== ($context['source'] ?? null)) {
@@ -73,29 +75,8 @@ final class AccessCheckerProvider implements ProviderInterface
             ];
         }
 
-        if ($isGranted && !$this->resourceAccessChecker->isGranted($operation->getClass(), $isGranted, $resourceAccessCheckerContext)) {
+        if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $isGranted, $resourceAccessCheckerContext)) {
             $operation instanceof GraphQlOperation ? throw new AccessDeniedHttpException($message ?? 'Access Denied.') : throw new AccessDeniedException($message ?? 'Access Denied.');
-        }
-
-        if ($operation instanceof HttpOperation && $operation->getUriVariables()) {
-            foreach ($operation->getUriVariables() as $uriVariable) {
-                if (!$uriVariable instanceof Link || !$uriVariable->getSecurity()) {
-                    continue;
-                }
-
-                $targetResource = $uriVariable->getFromClass() ?? $uriVariable->getToClass();
-
-                if (!$targetResource) {
-                    continue;
-                }
-
-                // We need to add all attributes here again because we do not know the name of the security object
-                $resourceAccessCheckerContext += $request->attributes->all();
-
-                if (!$this->resourceAccessChecker->isGranted($targetResource, $uriVariable->getSecurity(), $resourceAccessCheckerContext)) {
-                    throw new AccessDeniedException($uriVariable->getSecurityMessage() ?? 'Access Denied.');
-                }
-            }
         }
 
         return $body;

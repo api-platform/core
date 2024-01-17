@@ -13,18 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Provider;
 
-use ApiPlatform\Exception\InvalidIdentifierException;
-use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
+use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\State\Util\RequestParser;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -36,11 +33,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class ReadProvider implements ProviderInterface
 {
     use CloneTrait;
+    use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
     public function __construct(
         private readonly ProviderInterface $provider,
-        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
     ) {
     }
@@ -88,47 +85,6 @@ final class ReadProvider implements ProviderInterface
             )
         ) {
             throw new NotFoundHttpException('Not Found');
-        }
-
-        if ($operation->getUriVariables()) {
-            foreach ($operation->getUriVariables() as $key => $uriVariable) {
-                if (!$uriVariable instanceof Link || !$uriVariable->getSecurity()) {
-                    continue;
-                }
-
-                $relationClass = $uriVariable->getFromClass() ?? $uriVariable->getToClass();
-
-                if (!$relationClass) {
-                    continue;
-                }
-
-                $parentOperation = $this->resourceMetadataCollectionFactory
-                    ->create($relationClass)
-                    ->getOperation($operation->getExtraProperties()['parent_uri_template'] ?? null);
-                try {
-                    $relation = $this->provider->provide($parentOperation, [$uriVariable->getIdentifiers()[0] => $request?->attributes->all()[$key]], $context);
-                } catch (ProviderNotFoundException) {
-                    $relation = null;
-                }
-                if (!$relation) {
-                    throw new NotFoundHttpException('Not Found');
-                }
-
-                try {
-                    $securityObjectName = $uriVariable->getSecurityObjectName();
-
-                    if (!$securityObjectName) {
-                        $securityObjectName = $uriVariable->getToProperty() ?? $uriVariable->getFromProperty();
-                    }
-
-                    if (!$securityObjectName) {
-                        continue;
-                    }
-                    $request?->attributes->set($securityObjectName, $relation);
-                } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
-                    throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
-                }
-            }
         }
 
         $request?->attributes->set('data', $data);

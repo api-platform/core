@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="api_platform.state_provider.read_link" class="ApiPlatform\Symfony\Security\State\LinkedReadProvider" decorates="api_platform.state_provider.read">
+            <argument type="service" id="api_platform.state_provider.read_link.inner" />
+            <argument type="service" id="api_platform.state_provider.locator" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+        </service>
+
+        <service id="api_platform.state_provider.access_checker_linked" class="ApiPlatform\Symfony\Security\State\LinkAccessCheckerProvider" decorates="api_platform.state_provider.read_link">
+            <argument type="service" id="api_platform.state_provider.access_checker_linked.inner" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+        </service>
+    </services>
+</container>

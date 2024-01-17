@@ -24,7 +24,6 @@
 
         <service id="api_platform.state_provider.read" class="ApiPlatform\State\Provider\ReadProvider" decorates="api_platform.state_provider.main" decoration-priority="500">
             <argument type="service" id="api_platform.state_provider.read.inner" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.serializer.context_builder" />
         </service>
 
