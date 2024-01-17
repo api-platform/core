@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-#[ApiResource(graphQlOperations: [new QueryCollection(paginationEnabled: false, nested: true)])]
+#[ApiResource(graphQlOperations: [new QueryCollection(paginationEnabled: false, provider: self::class, nested: true)])]
 #[ODM\EmbeddedDocument]
 class MultiRelationsNested
 {

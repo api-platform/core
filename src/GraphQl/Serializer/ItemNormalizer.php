@@ -113,7 +113,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     {
         // check for nested collection
         $operation = $this->resourceMetadataCollectionFactory?->create($resourceClass)->getOperation(forceCollection: true, forceGraphQl: true);
-        if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && !$operation->getProvider()) {
+        if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && (!$operation->getProvider() || $operation->getProvider() === $resourceClass)) {
             return [...$attributeValue];
         }
 

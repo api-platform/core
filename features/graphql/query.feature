@@ -68,7 +68,6 @@ Feature: GraphQL query support
     And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[0].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
     And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[2].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
 
-  @createSchema @!mongodb
   Scenario: Retrieve embedded collections
     Given there are 2 multiRelationsDummy objects having each a manyToOneRelation, 2 manyToManyRelations, 3 oneToManyRelations and 4 embeddedRelations
     When I send the following GraphQL request:

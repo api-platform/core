@@ -35,7 +35,7 @@ class ResolverFactory implements ResolverFactoryInterface
             // Data already fetched and normalized (field or nested resource)
             if ($body = $source[$info->fieldName] ?? null) {
                 // special treatment for nested resources without a resolver/provider
-                if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && !$operation->getProvider()) {
+                if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && (!$operation->getProvider() || $operation->getProvider() === $resourceClass)) {
                     return $this->resolve($source, $args, $info, $rootClass, $operation, new ArrayPaginator($body, 0, \count($body)));
                 }
 
