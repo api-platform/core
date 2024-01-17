@@ -98,7 +98,7 @@ final class NormalizeProcessor implements ProcessorInterface
             } else {
                 $data = 'cursor' === $this->pagination->getGraphQlPaginationType($operation) ?
                     $this->serializeCursorBasedPaginatedCollection($itemOrCollection, $normalizationContext, $context) :
-                    $this->serializePageBasedPaginatedCollection($itemOrCollection, $normalizationContext);
+                    $this->serializePageBasedPaginatedCollection($itemOrCollection, $normalizationContext, $context);
             }
         }
 
@@ -129,53 +129,61 @@ final class NormalizeProcessor implements ProcessorInterface
             throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s or %s.', PaginatorInterface::class, PartialPaginatorInterface::class));
         }
 
+        $selection = $context['info']->getFieldSelection(1);
+
         $offset = 0;
         $totalItems = 1; // For partial pagination, always consider there is at least one item.
-        $nbPageItems = $collection->count();
-        if (isset($args['after'])) {
-            $after = base64_decode($args['after'], true);
-            if (false === $after || '' === $args['after']) {
-                throw new \UnexpectedValueException('' === $args['after'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['after']));
-            }
-            $offset = 1 + (int) $after;
-        }
-
-        if ($collection instanceof PaginatorInterface) {
-            $totalItems = $collection->getTotalItems();
-
-            if (isset($args['before'])) {
-                $before = base64_decode($args['before'], true);
-                if (false === $before || '' === $args['before']) {
-                    throw new \UnexpectedValueException('' === $args['before'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['before']));
+        $data = ['edges' => []];
+        if (isset($selection['pageInfo']) || isset($selection['totalCount']) || isset($selection['edges']['cursor'])) {
+            $nbPageItems = $collection->count();
+            if (isset($args['after'])) {
+                $after = base64_decode($args['after'], true);
+                if (false === $after || '' === $args['after']) {
+                    throw new \UnexpectedValueException('' === $args['after'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['after']));
                 }
-                $offset = (int) $before - $nbPageItems;
+                $offset = 1 + (int) $after;
             }
-            if (isset($args['last']) && !isset($args['before'])) {
-                $offset = $totalItems - $args['last'];
+
+            if ($collection instanceof PaginatorInterface && (isset($selection['pageInfo']) || isset($selection['totalCount']))) {
+                $totalItems = $collection->getTotalItems();
+                if (isset($args['before'])) {
+                    $before = base64_decode($args['before'], true);
+                    if (false === $before || '' === $args['before']) {
+                        throw new \UnexpectedValueException('' === $args['before'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['before']));
+                    }
+                    $offset = (int) $before - $nbPageItems;
+                }
+                if (isset($args['last']) && !isset($args['before'])) {
+                    $offset = $totalItems - $args['last'];
+                }
             }
-        }
 
-        $offset = 0 > $offset ? 0 : $offset;
+            $offset = max(0, $offset);
 
-        $data = $this->getDefaultCursorBasedPaginatedData();
-        if ($totalItems > 0) {
-            $data['pageInfo']['startCursor'] = base64_encode((string) $offset);
-            $end = $offset + $nbPageItems - 1;
-            $data['pageInfo']['endCursor'] = base64_encode((string) ($end >= 0 ? $end : 0));
-            $data['pageInfo']['hasPreviousPage'] = $offset > 0;
-            if ($collection instanceof PaginatorInterface) {
-                $data['totalCount'] = $totalItems;
-                $itemsPerPage = $collection->getItemsPerPage();
-                $data['pageInfo']['hasNextPage'] = (float) ($itemsPerPage > 0 ? $offset % $itemsPerPage : $offset) + $itemsPerPage * $collection->getCurrentPage() < $totalItems;
+            $data = $this->getDefaultCursorBasedPaginatedData();
+            if ((isset($selection['pageInfo']) || isset($selection['totalCount'])) && $totalItems > 0) {
+                isset($selection['pageInfo']['startCursor']) && $data['pageInfo']['startCursor'] = base64_encode((string) $offset);
+                $end = $offset + $nbPageItems - 1;
+                isset($selection['pageInfo']['endCursor']) && $data['pageInfo']['endCursor'] = base64_encode((string) max($end, 0));
+                isset($selection['pageInfo']['hasPreviousPage']) && $data['pageInfo']['hasPreviousPage'] = $offset > 0;
+                if ($collection instanceof PaginatorInterface) {
+                    isset($selection['totalCount']) && $data['totalCount'] = $totalItems;
+
+                    $itemsPerPage = $collection->getItemsPerPage();
+                    isset($selection['pageInfo']['hasNextPage']) && $data['pageInfo']['hasNextPage'] = (float) ($itemsPerPage > 0 ? $offset % $itemsPerPage : $offset) + $itemsPerPage * $collection->getCurrentPage() < $totalItems;
+                }
             }
         }
 
         $index = 0;
         foreach ($collection as $object) {
-            $data['edges'][$index] = [
+            $edge = [
                 'node' => $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext),
-                'cursor' => base64_encode((string) ($index + $offset)),
             ];
+            if (isset($selection['edges']['cursor'])) {
+                $edge['cursor'] = base64_encode((string) ($index + $offset));
+            }
+            $data['edges'][$index] = $edge;
             ++$index;
         }
 
@@ -185,16 +193,32 @@ final class NormalizeProcessor implements ProcessorInterface
     /**
      * @throws \LogicException
      */
-    private function serializePageBasedPaginatedCollection(iterable $collection, array $normalizationContext): array
+    private function serializePageBasedPaginatedCollection(iterable $collection, array $normalizationContext, array $context): array
     {
-        if (!($collection instanceof PaginatorInterface)) {
-            throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s.', PaginatorInterface::class));
-        }
+        $data = ['collection' => []];
 
-        $data = $this->getDefaultPageBasedPaginatedData();
-        $data['paginationInfo']['totalCount'] = $collection->getTotalItems();
-        $data['paginationInfo']['lastPage'] = $collection->getLastPage();
-        $data['paginationInfo']['itemsPerPage'] = $collection->getItemsPerPage();
+        $selection = $context['info']->getFieldSelection(1);
+        if (isset($selection['paginationInfo'])) {
+            $data['paginationInfo'] = [];
+            if (isset($selection['paginationInfo']['itemsPerPage'])) {
+                if (!($collection instanceof PartialPaginatorInterface)) {
+                    throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return itemsPerPage field.', PartialPaginatorInterface::class));
+                }
+                $data['paginationInfo']['itemsPerPage'] = $collection->getItemsPerPage();
+            }
+            if (isset($selection['paginationInfo']['totalCount'])) {
+                if (!($collection instanceof PaginatorInterface)) {
+                    throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return totalCount field.', PaginatorInterface::class));
+                }
+                $data['paginationInfo']['totalCount'] = $collection->getTotalItems();
+            }
+            if (isset($selection['paginationInfo']['lastPage'])) {
+                if (!($collection instanceof PaginatorInterface)) {
+                    throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return lastPage field.', PaginatorInterface::class));
+                }
+                $data['paginationInfo']['lastPage'] = $collection->getLastPage();
+            }
+        }
 
         foreach ($collection as $object) {
             $data['collection'][] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);
