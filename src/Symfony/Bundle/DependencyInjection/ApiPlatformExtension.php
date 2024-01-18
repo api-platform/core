@@ -896,7 +896,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerLinkSecurityConfiguration(XmlFileLoader $loader, array $config): void
     {
-        if ($config['enable_link_security'] ?? true) {
+        if ($config['enable_link_security']) {
             $loader->load('link_security.xml');
         }
     }

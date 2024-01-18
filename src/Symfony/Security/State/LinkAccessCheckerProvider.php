@@ -20,7 +20,12 @@ use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 
-class LinkAccessCheckerProvider implements ProviderInterface
+/**
+ * Checks the individual parts of the linked resource for access rights.
+ *
+ * @experimental
+ */
+final class LinkAccessCheckerProvider implements ProviderInterface
 {
     public function __construct(
         private readonly ProviderInterface $decorated,

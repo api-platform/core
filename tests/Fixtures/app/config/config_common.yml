@@ -78,6 +78,7 @@ api_platform:
         invalidation:
             enabled: true
     keep_legacy_inflector: false
+    enable_link_security: true
     # see also defaults in AppKernel
 
     doctrine_mongodb_odm: false

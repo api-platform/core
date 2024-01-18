@@ -23,7 +23,12 @@ use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class LinkedReadProvider implements ProviderInterface
+/**
+ * Checks if the linked resources have security attributes and prepares them for access checking.
+ *
+ * @experimental
+ */
+final class LinkedReadProvider implements ProviderInterface
 {
     public function __construct(
         private readonly ProviderInterface $decorated,

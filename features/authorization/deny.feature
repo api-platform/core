@@ -211,6 +211,7 @@ Feature: Authorization checking
     And the response should contain "ownerOnlyProperty"
     And the JSON node "ownerOnlyProperty" should be equal to the string "updated"
 
+  @link_security
   Scenario: An non existing entity should return Not found
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
@@ -218,6 +219,7 @@ Feature: Authorization checking
     And I send a "GET" request to "/secured_dummies/40000/to_from"
     Then the response status code should be 404
 
+  @link_security
   Scenario: An user can get related linked dummies for an secured dummy they own
     Given there are 1 SecuredDummy objects owned by dunglas with related dummies
     When I add "Accept" header equal to "application/ld+json"
@@ -228,6 +230,7 @@ Feature: Authorization checking
     And the response should contain "securedDummy"
     And the JSON node "hydra:member[0].id" should be equal to 1
 
+  @link_security
   Scenario: I define a custom name of the security object
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
@@ -237,6 +240,7 @@ Feature: Authorization checking
     And the response should contain "securedDummy"
     And the JSON node "hydra:member[0].id" should be equal to 1
 
+  @link_security
   Scenario: I define a from from link
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
@@ -246,6 +250,7 @@ Feature: Authorization checking
     And the response should contain "id"
     And the JSON node "hydra:member[0].id" should be equal to 4
 
+  @link_security
   Scenario: I define multiple links with security
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
@@ -255,6 +260,7 @@ Feature: Authorization checking
     And the response should contain "id"
     And the JSON node "hydra:member[0].id" should be equal to 1
 
+  @link_security
   Scenario: An user can not get related linked dummies for an secured dummy they do not own
     Given there are 1 SecuredDummy objects owned by someone with related dummies
     When I add "Accept" header equal to "application/ld+json"
@@ -263,6 +269,7 @@ Feature: Authorization checking
     And I send a "GET" request to "/secured_dummies/5/to_from"
     Then the response status code should be 403
 
+  @link_security
   Scenario: I define a custom name of the security object
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
@@ -270,6 +277,7 @@ Feature: Authorization checking
     And I send a "GET" request to "/secured_dummies/5/with_name"
     Then the response status code should be 403
 
+  @link_security
   Scenario: I define a from from link
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
@@ -277,6 +285,7 @@ Feature: Authorization checking
     And I send a "GET" request to "/related_linked_dummies/2/from_from"
     Then the response status code should be 403
 
+  @link_security
   Scenario: I define multiple links with security
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
