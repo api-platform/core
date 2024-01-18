@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use ApiPlatform\Validator\Exception\ValidationException as BaseValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -34,9 +35,16 @@ use Symfony\Component\WebLink\Link;
     status: 422,
     openapi: false,
     uriVariables: ['id'],
+    provider: 'api_platform.validator.state.error_provider',
     shortName: 'ConstraintViolationList',
     operations: [
-        new ErrorOperation(name: '_api_validation_errors_problem', outputFormats: ['json' => ['application/problem+json']], normalizationContext: ['groups' => ['json'], 'skip_null_values' => true]),
+        new ErrorOperation(
+            name: '_api_validation_errors_problem',
+            outputFormats: ['json' => ['application/problem+json']],
+            normalizationContext: ['groups' => ['json'],
+                'skip_null_values' => true,
+                'rfc_7807_compliant_errors' => true,
+            ]),
         new ErrorOperation(
             name: '_api_validation_errors_hydra',
             outputFormats: ['jsonld' => ['application/problem+json']],
@@ -44,13 +52,18 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
+                'rfc_7807_compliant_errors' => true,
             ]
         ),
-        new ErrorOperation(name: '_api_validation_errors_jsonapi', outputFormats: ['jsonapi' => ['application/vnd.api+json']], normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]),
+        new ErrorOperation(
+            name: '_api_validation_errors_jsonapi',
+            outputFormats: ['jsonapi' => ['application/vnd.api+json']],
+            normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true, 'rfc_7807_compliant_errors' => true]
+        ),
     ],
     graphQlOperations: []
 )]
-final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface
+final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface, HttpExceptionInterface
 {
     private int $status = 422;
 
@@ -75,56 +88,46 @@ final class ValidationException extends BaseValidationException implements Const
         return $id;
     }
 
-    public function __toString(): string
-    {
-        $message = '';
-        foreach ($this->constraintViolationList as $violation) {
-            if ('' !== $message) {
-                $message .= "\n";
-            }
-            if ($propertyPath = $violation->getPropertyPath()) {
-                $message .= "$propertyPath: ";
-            }
-
-            $message .= $violation->getMessage();
-        }
-
-        return $message;
-    }
-
     #[SerializedName('hydra:title')]
-    #[Groups(['jsonld', 'legacy_jsonld'])]
+    #[Groups(['jsonld'])]
     public function getHydraTitle(): string
     {
         return $this->errorTitle ?? 'An error occurred';
     }
 
+    #[Groups(['jsonld'])]
     #[SerializedName('hydra:description')]
-    #[Groups(['jsonld', 'legacy_jsonld'])]
     public function getHydraDescription(): string
     {
-        return $this->__toString();
+        return $this->detail;
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
+    #[Groups(['jsonld', 'json'])]
     public function getType(): string
     {
         return '/validation_errors/'.$this->getId();
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
+    #[Groups(['jsonld', 'json'])]
     public function getTitle(): ?string
     {
         return $this->errorTitle ?? 'An error occurred';
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
+    #[Groups(['jsonld', 'json'])]
+    private string $detail;
+
     public function getDetail(): ?string
     {
-        return $this->__toString();
+        return $this->detail;
     }
 
-    #[Groups(['jsonld', 'json', 'legacy_jsonproblem', 'legacy_json'])]
+    public function setDetail(string $detail): void
+    {
+        $this->detail = $detail;
+    }
+
+    #[Groups(['jsonld', 'json'])]
     public function getStatus(): ?int
     {
         return $this->status;
@@ -142,9 +145,36 @@ final class ValidationException extends BaseValidationException implements Const
     }
 
     #[SerializedName('violations')]
-    #[Groups(['json', 'jsonld', 'legacy_jsonld', 'legacy_jsonproblem', 'legacy_json'])]
+    #[Groups(['json', 'jsonld'])]
     public function getConstraintViolationList(): ConstraintViolationListInterface
     {
         return $this->constraintViolationList;
+    }
+
+    public function __toString(): string
+    {
+        $message = '';
+        foreach ($this->constraintViolationList as $violation) {
+            if ('' !== $message) {
+                $message .= "\n";
+            }
+            if ($propertyPath = $violation->getPropertyPath()) {
+                $message .= "$propertyPath: ";
+            }
+
+            $message .= $violation->getMessage();
+        }
+
+        return $message;
+    }
+
+    public function getStatusCode(): int
+    {
+        return $this->status;
+    }
+
+    public function getHeaders(): array
+    {
+        return [];
     }
 }

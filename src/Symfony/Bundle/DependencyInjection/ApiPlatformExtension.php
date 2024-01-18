@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
-use ApiPlatform\ApiResource\Error;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter as DoctrineMongoDbOdmAbstractFilter;
@@ -34,6 +33,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
+use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
@@ -119,12 +119,17 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $errorFormats = $this->getFormats($config['error_formats']);
         $docsFormats = $this->getFormats($config['docs_formats']);
 
-        if (!isset($errorFormats['html']) && $config['enable_swagger'] && $config['enable_swagger_ui']) {
-            $errorFormats['html'] = ['text/html'];
-        }
-
         if (!isset($errorFormats['json'])) {
             $errorFormats['json'] = ['application/problem+json', 'application/json'];
+        }
+
+        if (!isset($errorFormats['jsonproblem'])) {
+            $errorFormats['jsonproblem'] = ['application/problem+json'];
+        }
+
+        if ($this->isConfigEnabled($container, $config['graphql']) && !isset($formats['json'])) {
+            trigger_deprecation('api-platform/core', '3.2', 'Add the "json" format to the configuration to use GraphQL.');
+            $formats['json'] = ['application/json'];
         }
 
         // Backward Compatibility layer
@@ -228,6 +233,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.collection.pagination.items_per_page_parameter_name', $config['defaults']['pagination_items_per_page_parameter_name'] ?? $config['collection']['pagination']['items_per_page_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.partial_parameter_name', $config['defaults']['pagination_partial_parameter_name'] ?? $config['collection']['pagination']['partial_parameter_name']);
         $container->setParameter('api_platform.collection.pagination', $this->getPaginationDefaults($config['defaults'] ?? [], $config['collection']['pagination']));
+        $container->setParameter('api_platform.handle_symfony_errors', $config['handle_symfony_errors'] ?? false);
         $container->setParameter('api_platform.http_cache.etag', $config['defaults']['cache_headers']['etag'] ?? true);
         $container->setParameter('api_platform.http_cache.max_age', $config['defaults']['cache_headers']['max_age'] ?? null);
         $container->setParameter('api_platform.http_cache.shared_max_age', $config['defaults']['cache_headers']['shared_max_age'] ?? null);
@@ -243,6 +249,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
         $container->setParameter('api_platform.asset_package', $config['asset_package']);
         $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
+        $container->setParameter('api_platform.rfc_7807_compliant_errors', $config['defaults']['extra_properties']['rfc_7807_compliant_errors'] ?? false);
 
         if ($container->getParameter('kernel.debug')) {
             $container->removeDefinition('api_platform.serializer.mapping.cache_class_metadata_factory');
@@ -511,6 +518,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!$config['enable_docs']) {
             $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');
+            $container->removeDefinition('api_platform.hydra.processor.link');
         }
     }
 
@@ -579,13 +587,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(ErrorHandlerInterface::class)
             ->addTag('api_platform.graphql.error_handler');
 
-        if (!$container->getParameter('kernel.debug')) {
-            return;
-        }
-
         /* TODO: remove these in 4.x only one resolver factory is used and we're using providers/processors */
         if ($config['event_listeners_backward_compatibility_layer'] ?? true) {
+            // @TODO: API Platform 3.3 trigger_deprecation('api-platform/core', '3.3', 'In API Platform 4 only one factory "api_platform.graphql.resolver.factory.item" will remain. Stages are deprecated in favor of using a provider/processor.');
+            // + deprecate every service from legacy/graphql.xml
             $loader->load('legacy/graphql.xml');
+
+            if (!$container->getParameter('kernel.debug')) {
+                return;
+            }
+
             $requestStack = new Reference('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE);
             $collectionDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
                 ->setDecoratedService('api_platform.graphql.resolver.factory.collection')

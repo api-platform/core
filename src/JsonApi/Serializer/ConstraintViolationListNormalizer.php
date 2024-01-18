@@ -22,7 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
- * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} to a JSON API error representation.
+ * Converts {@see ConstraintViolationListInterface} to a JSON API error representation.
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
@@ -99,12 +99,9 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
             $fieldName = $this->nameConverter->normalize($fieldName, $class, self::FORMAT);
         }
 
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
-
-        foreach ($types as $type) {
-            if (null !== $type->getClassName()) {
-                return "data/relationships/$fieldName";
-            }
+        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        if ($type && null !== $type->getClassName()) {
+            return "data/relationships/$fieldName";
         }
 
         return "data/attributes/$fieldName";

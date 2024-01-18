@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\State;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\Processor\RespondProcessor;
@@ -25,6 +25,7 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class RespondProcessorTest extends TestCase
 {
@@ -66,11 +67,11 @@ class RespondProcessorTest extends TestCase
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $iriConverter
             ->getIriFromResource(Argument::cetera())
-            ->will(static function (array $args): ?string {
+            ->will(static function (array $args): string {
                 return ($args[2] ?? null)?->getUriTemplate() ?? '/default';
             });
 
-        /** @var ProcessorInterface<Response> $respondProcessor */
+        /** @var ProcessorInterface<string, Response> $respondProcessor */
         $respondProcessor = new RespondProcessor($iriConverter->reveal(), $resourceClassResolver->reveal(), $operationMetadataFactory->reveal());
 
         $response = $respondProcessor->process('content', $canonicalUriTemplateRedirectingOperation, context: [
@@ -96,5 +97,20 @@ class RespondProcessorTest extends TestCase
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertNull($response->headers->get('Location'));
+    }
+
+    public function testAddsExceptionHeaders(): void
+    {
+        $operation = new Get();
+
+        /** @var ProcessorInterface<string, Response> $respondProcessor */
+        $respondProcessor = new RespondProcessor();
+        $req = new Request();
+        $req->attributes->set('exception', new TooManyRequestsHttpException(32));
+        $response = $respondProcessor->process('content', new Get(), context: [
+            'request' => $req,
+        ]);
+
+        $this->assertSame('32', $response->headers->get('retry-after'));
     }
 }

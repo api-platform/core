@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hal\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;

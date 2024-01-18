@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
+use ApiPlatform\Metadata\Util\AttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -40,7 +40,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
      */
     public function createFromRequest(Request $request, bool $normalization, array $attributes = null): array
     {
-        if (null === $attributes && !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
+        if (null === $attributes && !$attributes = AttributesExtractor::extractAttributes($request->attributes->all())) {
             throw new RuntimeException('Request attributes are not valid.');
         }
 
@@ -62,7 +62,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $context['uri'] = $request->getUri();
         $context['input'] = $operation->getInput();
         $context['output'] = $operation->getOutput();
-        $context['skip_deprecated_exception_normalizers'] = true;
 
         // Special case as this is usually handled by our OperationContextTrait, here we want to force the IRI in the response
         if (!$operation instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && $operation->getItemUriTemplate()) {

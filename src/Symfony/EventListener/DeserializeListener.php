@@ -115,7 +115,7 @@ final class DeserializeListener
                 if ($exception->canUseMessageForUser()) {
                     $parameters['hint'] = $exception->getMessage();
                 }
-                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $exception->getExpectedTypes() ?? [])], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) $exception->getCode()));
+                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $exception->getExpectedTypes() ?? [])], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, Type::INVALID_TYPE_ERROR));
             }
             if (0 !== \count($violations)) {
                 throw new ValidationException($violations);
@@ -132,7 +132,7 @@ final class DeserializeListener
     {
         /** @var ?string $contentType */
         $contentType = $request->headers->get('CONTENT_TYPE');
-        if (null === $contentType) {
+        if (null === $contentType || '' === $contentType) {
             throw new UnsupportedMediaTypeHttpException('The "Content-Type" header must exist.');
         }
 

@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hal\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Hal\Serializer\ItemNormalizer;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\ActivableInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Author;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
@@ -35,6 +35,7 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -132,7 +133,7 @@ class ItemNormalizerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
-        $iriConverterProphecy->getIriFromResource($relatedDummy)->willReturn('/related-dummies/2');
+        $iriConverterProphecy->getIriFromResource($relatedDummy, Argument::cetera())->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
@@ -260,7 +261,7 @@ class ItemNormalizerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
-        $iriConverterProphecy->getIriFromResource($relatedDummy)->willReturn('/related-dummies/2');
+        $iriConverterProphecy->getIriFromResource($relatedDummy, Argument::cetera())->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
@@ -359,7 +360,7 @@ class ItemNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             null,
             null,
-            new ClassMetadataFactory(new AnnotationLoader())
+            new ClassMetadataFactory(class_exists(AttributeLoader::class) ? new AttributeLoader() : new AnnotationLoader())
         );
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);

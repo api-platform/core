@@ -19,6 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Lookup;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Sort;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Unwind;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -126,9 +127,11 @@ class OrderExtensionTest extends TestCase
         $lookupProphecy = $this->prophesize(Lookup::class);
         $lookupProphecy->localField('author')->shouldBeCalled()->willReturn($lookupProphecy);
         $lookupProphecy->foreignField('_id')->shouldBeCalled()->willReturn($lookupProphecy);
-        $lookupProphecy->alias('author_lkup')->shouldBeCalled();
+        $lookupProphecy->alias('author_lkup')->shouldBeCalled()->willReturn($lookupProphecy);
         $aggregationBuilderProphecy->lookup(Dummy::class)->shouldBeCalled()->willReturn($lookupProphecy->reveal());
-        $aggregationBuilderProphecy->unwind('$author_lkup')->shouldBeCalled();
+        $unwindProphecy = $this->prophesize(Unwind::class);
+        $unwindProphecy->preserveNullAndEmptyArrays(true)->shouldBeCalled()->willReturn($unwindProphecy->reveal());
+        $aggregationBuilderProphecy->unwind('$author_lkup')->shouldBeCalled()->willReturn($unwindProphecy->reveal());
         $aggregationBuilderProphecy->getStage(0)->willThrow(new \OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['author_lkup.name' => 'ASC'])->shouldBeCalled();
 

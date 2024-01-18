@@ -325,6 +325,14 @@ trait OrderFilterTestTrait
                     ],
                 ],
             ],
+            'nullable field in relation will be a LEFT JOIN' => [
+                [
+                    'relatedDummy.name' => null,
+                ],
+                [
+                    'order' => ['relatedDummy.name' => 'ASC'],
+                ],
+            ],
         ];
     }
 }

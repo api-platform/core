@@ -14,19 +14,31 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Metadata\GraphQl\Operation;
-use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
+use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface as LegacyResourceAccessCheckerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Security post validation stage of GraphQL resolvers.
+ *
+ * @deprecated use providers instead of stages
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 final class SecurityPostValidationStage implements SecurityPostValidationStageInterface
 {
-    public function __construct(private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker)
+    /**
+     * @var LegacyResourceAccessCheckerInterface|ResourceAccessCheckerInterface
+     */
+    private $resourceAccessChecker;
+
+    /**
+     * @param LegacyResourceAccessCheckerInterface|ResourceAccessCheckerInterface|null $resourceAccessChecker
+     */
+    public function __construct($resourceAccessChecker)
     {
+        $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     /**

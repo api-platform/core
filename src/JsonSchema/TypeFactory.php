@@ -23,6 +23,8 @@ use Symfony\Component\Uid\Uuid;
 /**
  * {@inheritdoc}
  *
+ * @deprecated since 3.3 https://github.com/api-platform/core/pull/5470
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class TypeFactory implements TypeFactoryInterface
@@ -46,6 +48,11 @@ final class TypeFactory implements TypeFactoryInterface
      */
     public function getType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array
     {
+        if ('jsonschema' === $format) {
+            return [];
+        }
+
+        // TODO: OpenApiFactory uses this to compute filter types
         if ($type->isCollection()) {
             $keyType = $type->getCollectionKeyTypes()[0] ?? null;
             $subType = ($type->getCollectionValueTypes()[0] ?? null) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
@@ -140,6 +147,7 @@ final class TypeFactory implements TypeFactoryInterface
             return [
                 'type' => 'string',
                 'format' => 'iri-reference',
+                'example' => 'https://example.com/',
             ];
         }
 

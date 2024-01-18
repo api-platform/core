@@ -50,6 +50,11 @@ final class ReadProvider implements ProviderInterface
 
         $args = $context['args'] ?? [];
 
+        if ($this->serializerContextBuilder) {
+            // Builtin data providers are able to use the serialization context to automatically add join clauses
+            $context += $this->serializerContextBuilder->create($operation->getClass(), $operation, $context, true);
+        }
+
         if (!$operation instanceof CollectionOperationInterface) {
             $identifier = $this->getIdentifierFromOperation($operation, $args);
 
@@ -100,11 +105,6 @@ final class ReadProvider implements ProviderInterface
             $uriVariables = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
             $context['linkClass'] = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
             $context['linkProperty'] = $info->fieldName;
-        }
-
-        if ($this->serializerContextBuilder) {
-            // Builtin data providers are able to use the serialization context to automatically add join clauses
-            $context += $this->serializerContextBuilder->create($operation->getClass(), $operation, $context, true);
         }
 
         return $this->provider->provide($operation, $uriVariables, $context);

@@ -18,11 +18,13 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
+use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Renders a normalized exception for a given see [FlattenException](https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/ErrorHandler/Exception/FlattenException.php).
@@ -73,7 +75,22 @@ final class ExceptionAction
         $headers['X-Content-Type-Options'] = 'nosniff';
         $headers['X-Frame-Options'] = 'deny';
 
-        return new Response($this->serializer->serialize($exception, $format['key'], ['statusCode' => $statusCode]), $statusCode, $headers);
+        $context = ['statusCode' => $statusCode, 'rfc_7807_compliant_errors' => $operation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false];
+        $error = $request->attributes->get('exception') ?? $exception;
+        if ($error instanceof ConstraintViolationListAwareExceptionInterface) {
+            $error = $error->getConstraintViolationList();
+        } elseif (method_exists($error, 'getViolations') && $error->getViolations() instanceof ConstraintViolationListInterface) {
+            $error = $error->getViolations();
+        } else {
+            $error = $exception;
+        }
+
+        $serializerFormat = $format['key'];
+        if ('json' === $serializerFormat && 'application/problem+json' === $format['value'][0]) {
+            $serializerFormat = 'jsonproblem';
+        }
+
+        return new Response($this->serializer->serialize($error, $serializerFormat, $context), $statusCode, $headers);
     }
 
     private function getOperationExceptionToStatus(Request $request): array

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Serializer\Exception;
 
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,7 +38,7 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
-        /** @var ValidationException */
+        /** @var ConstraintViolationListAwareExceptionInterface */
         $validationException = $object->getPrevious();
         $error = FormattedError::createFromException($object);
         $error['message'] = $validationException->getMessage();
@@ -75,7 +76,10 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        return $data instanceof Error && $data->getPrevious() instanceof ValidationException;
+        return $data instanceof Error && (
+            $data->getPrevious() instanceof ConstraintViolationListAwareExceptionInterface
+            || $data->getPrevious() instanceof ValidationException
+        );
     }
 
     public function getSupportedTypes($format): array

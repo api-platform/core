@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Processor;
 
+use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
@@ -24,6 +25,7 @@ use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 
 /**
  * Serializes data.
@@ -64,10 +66,15 @@ final class RespondProcessor implements ProcessorInterface
             'X-Frame-Options' => 'deny',
         ];
 
+        $exception = $request->attributes->get('exception');
+        if (($exception instanceof HttpExceptionInterface || $exception instanceof SymfonyHttpExceptionInterface) && $exceptionHeaders = $exception->getHeaders()) {
+            $headers = array_merge($headers, $exceptionHeaders);
+        }
+
         $status = $operation->getStatus();
 
         if ($sunset = $operation->getSunset()) {
-            $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
+            $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTimeInterface::RFC1123);
         }
 
         if ($acceptPatch = $operation->getAcceptPatch()) {

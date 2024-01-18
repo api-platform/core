@@ -23,7 +23,7 @@ Feature: Cache invalidation through HTTP Cache tags
   Scenario: Tags must be set for items
     When I send a "GET" request to "/relation_embedders/1"
     Then the response status code should be 200
-    And the header "Cache-Tags" should be equal to "/relation_embedders/1,/related_dummies/1,/third_levels/1"
+    And the header "Cache-Tags" should be equal to "/third_levels/1,/related_dummies/1,/relation_embedders/1"
 
   Scenario: Create some more resources
     When I add "Content-Type" header equal to "application/ld+json"
@@ -42,7 +42,7 @@ Feature: Cache invalidation through HTTP Cache tags
   Scenario: Tags must be set for collections
     When I send a "GET" request to "/relation_embedders"
     Then the response status code should be 200
-    And the header "Cache-Tags" should be equal to "/relation_embedders/1,/related_dummies/1,/third_levels/1,/relation_embedders/2,/related_dummies/2,/third_levels/2,/relation_embedders"
+    And the header "Cache-Tags" should be equal to "/third_levels/1,/related_dummies/1,/relation_embedders/1,/third_levels/2,/related_dummies/2,/relation_embedders/2,/relation_embedders"
 
   Scenario: Purge item on update
     When I add "Content-Type" header equal to "application/ld+json"
@@ -119,7 +119,7 @@ Feature: Cache invalidation through HTTP Cache tags
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/relation3s"
     Then the response status code should be 200
-    And the header "Cache-Tags" should be equal to "/relation3s/1,/relation2s/1,/relation2s/2,/relation3s"
+    And the header "Cache-Tags" should be equal to "/relation2s/1,/relation2s/2,/relation3s/1,/relation3s"
 
   Scenario: Update a collection member only (legacy non-standard PUT)
     When I add "Content-Type" header equal to "application/ld+json"

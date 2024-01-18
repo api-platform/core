@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Util\AttributeFilterExtractorTrait;
 use ApiPlatform\Metadata\Util\ReflectionClassRecursiveIterator;
-use ApiPlatform\Util\AttributeFilterExtractorTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

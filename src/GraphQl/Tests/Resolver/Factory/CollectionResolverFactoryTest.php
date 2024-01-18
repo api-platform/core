@@ -18,6 +18,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\GraphQl\Tests\Fixtures\Enum\GenderTypeEnum;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -91,6 +92,20 @@ class CollectionResolverFactoryTest extends TestCase
         $this->serializeStageProphecy->__invoke($readStageCollection, $resourceClass, $operation, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
         $this->assertSame($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
+    }
+
+    public function testResolveEnumFieldFromSource(): void
+    {
+        $resourceClass = GenderTypeEnum::class;
+        $rootClass = 'rootClass';
+        $operationName = 'collection_query';
+        $operation = (new QueryCollection())->withName($operationName);
+        $source = ['genders' => [GenderTypeEnum::MALE, GenderTypeEnum::FEMALE]];
+        $args = ['args'];
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'genders';
+
+        $this->assertSame([GenderTypeEnum::MALE, GenderTypeEnum::FEMALE], ($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
 
     public function testResolveFieldNotInSource(): void

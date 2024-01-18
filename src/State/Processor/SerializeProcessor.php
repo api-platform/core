@@ -26,10 +26,18 @@ use Symfony\Component\WebLink\Link;
 /**
  * Serializes data.
  *
+ * @template T1
+ * @template T2
+ *
+ * @implements ProcessorInterface<T1, T2>
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class SerializeProcessor implements ProcessorInterface
 {
+    /**
+     * @param ProcessorInterface<T1, T2> $processor
+     */
     public function __construct(private readonly ProcessorInterface $processor, private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
     {
     }

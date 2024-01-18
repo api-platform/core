@@ -35,7 +35,7 @@ final class ResourceMetadataCollection extends \ArrayObject
         parent::__construct($input);
     }
 
-    public function getOperation(string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
+    public function getOperation(string $operationName = null, bool $forceCollection = false, bool $httpOperation = false, bool $forceGraphQl = false): Operation
     {
         $operationName ??= '';
         $cachePrefix = ($forceCollection ? self::FORCE_COLLECTION : '').($httpOperation ? self::HTTP_OPERATION : '');
@@ -56,20 +56,22 @@ final class ResourceMetadataCollection extends \ArrayObject
             /** @var ApiResource $metadata */
             $metadata = $it->current();
 
-            foreach ($metadata->getOperations() ?? [] as $name => $operation) {
-                $isCollection = $operation instanceof CollectionOperationInterface;
-                $method = $operation->getMethod() ?? 'GET';
-                $isGetOperation = 'GET' === $method || 'OPTIONS' === $method || 'HEAD' === $method;
-                if ('' === $operationName && $isGetOperation && ($forceCollection ? $isCollection : !$isCollection)) {
-                    return $this->operationCache[$httpCacheKey] = $operation;
-                }
+            if (!$forceGraphQl) {
+                foreach ($metadata->getOperations() ?? [] as $name => $operation) {
+                    $isCollection = $operation instanceof CollectionOperationInterface;
+                    $method = $operation->getMethod() ?? 'GET';
+                    $isGetOperation = 'GET' === $method || 'OPTIONS' === $method || 'HEAD' === $method;
+                    if ('' === $operationName && $isGetOperation && ($forceCollection ? $isCollection : !$isCollection)) {
+                        return $this->operationCache[$httpCacheKey] = $operation;
+                    }
 
-                if ($name === $operationName) {
-                    return $this->operationCache[$httpCacheKey] = $operation;
-                }
+                    if ($name === $operationName) {
+                        return $this->operationCache[$httpCacheKey] = $operation;
+                    }
 
-                if ($operation->getUriTemplate() === $operationName) {
-                    return $this->operationCache[$httpCacheKey] = $operation;
+                    if ($operation->getUriTemplate() === $operationName) {
+                        return $this->operationCache[$httpCacheKey] = $operation;
+                    }
                 }
             }
 

@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator\State;
 
-use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\ParameterValidator\ParameterValidator;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\RequestParser;
 
 final class QueryParameterValidateProvider implements ProviderInterface
 {
-    public function __construct(private readonly ProviderInterface $decorated, private readonly QueryParameterValidator $queryParameterValidator)
+    public function __construct(private readonly ProviderInterface $decorated, private readonly ParameterValidator $parameterValidator)
     {
     }
 
@@ -49,7 +49,7 @@ final class QueryParameterValidateProvider implements ProviderInterface
             $class = $options->getEntityClass();
         }
 
-        $this->queryParameterValidator->validateFilters($class, $operation->getFilters() ?? [], $queryParameters);
+        $this->parameterValidator->validateFilters($class, $operation->getFilters() ?? [], $queryParameters);
 
         return $this->decorated->provide($operation, $uriVariables, $context);
     }

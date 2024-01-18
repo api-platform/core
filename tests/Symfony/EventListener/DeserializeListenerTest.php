@@ -28,6 +28,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -366,7 +367,59 @@ class DeserializeListenerTest extends TestCase
             $this->assertSame($violation->getPropertyPath(), 'foo');
             $this->assertNull($violation->getInvalidValue());
             $this->assertNull($violation->getPlural());
-            $this->assertSame($violation->getCode(), '0');
+            $this->assertSame($violation->getCode(), 'ba785a8c-82cb-4283-967c-3cf342181b40');
         }
+    }
+
+    public function testRequestWithEmptyContentType(): void
+    {
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->deserialize(Argument::cetera())->shouldNotBeCalled();
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::cetera())->willReturn([]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Argument::cetera())->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            new ApiResource(operations: [
+                'post' => new Post(inputFormats: self::FORMATS),
+            ]),
+        ]))->shouldBeCalled();
+
+        $listener = new DeserializeListener(
+            $serializerProphecy->reveal(),
+            $serializerContextBuilderProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal()
+        );
+
+        // in Symfony (at least up to 7.0.2, 6.4.2, 6.3.11, 5.4.34), a request
+        // without a content-type and content-length header will result in the
+        // variables set to an empty string, not null
+
+        $request = new Request(
+            server: [
+                'REQUEST_METHOD' => 'POST',
+                'REQUEST_URI' => '/',
+                'CONTENT_TYPE' => '',
+                'CONTENT_LENGTH' => '',
+            ],
+            attributes: [
+                '_api_resource_class' => Dummy::class,
+                '_api_operation_name' => 'post',
+                '_api_receive' => true,
+            ],
+            content: ''
+        );
+
+        $event = new RequestEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
+        );
+
+        $this->expectException(UnsupportedMediaTypeHttpException::class);
+        $this->expectExceptionMessage('The "Content-Type" header must exist.');
+
+        $listener->onKernelRequest($event);
     }
 }

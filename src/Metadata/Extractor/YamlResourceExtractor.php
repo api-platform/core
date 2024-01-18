@@ -324,6 +324,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
 
             if (\in_array((string) $class, [GetCollection::class, Post::class], true)) {
                 $datum['itemUriTemplate'] = $this->phpize($operation, 'itemUriTemplate', 'string');
+            } elseif (isset($operation['itemUriTemplate'])) {
+                throw new InvalidArgumentException(sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $class));
             }
 
             $data[] = array_merge($datum, [

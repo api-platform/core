@@ -2,7 +2,17 @@
     "name": "api-platform/openapi",
     "description": "Models to build and serialize an OpenAPI specification.",
     "type": "library",
-    "keywords": ["REST", "GraphQL", "API", "JSON-LD", "Hydra", "JSONAPI", "OpenAPI", "HAL", "Swagger"],
+    "keywords": [
+        "REST",
+        "GraphQL",
+        "API",
+        "JSON-LD",
+        "Hydra",
+        "JSONAPI",
+        "OpenAPI",
+        "HAL",
+        "Swagger"
+    ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
     "authors": [
@@ -23,7 +33,8 @@
         "api-platform/state": "*@dev || ^3.1",
         "symfony/console": "^6.1",
         "symfony/property-access": "^6.1",
-        "symfony/serializer": "^6.1"
+        "symfony/serializer": "^6.1",
+        "sebastian/comparator": "<5.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.0",
@@ -36,6 +47,9 @@
         "exclude-from-classmap": [
             "/Tests/"
         ]
+    },
+    "conflict": {
+        "sebastian/comparator": ">=5.0"
     },
     "config": {
         "preferred-install": {

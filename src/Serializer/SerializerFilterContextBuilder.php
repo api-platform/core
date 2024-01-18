@@ -15,8 +15,8 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Util\AttributesExtractor;
 use ApiPlatform\Serializer\Filter\FilterInterface;
-use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -36,7 +36,7 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
      */
     public function createFromRequest(Request $request, bool $normalization, array $attributes = null): array
     {
-        if (null === $attributes && !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
+        if (null === $attributes && !$attributes = AttributesExtractor::extractAttributes($request->attributes->all())) {
             throw new RuntimeException('Request attributes are not valid.');
         }
 

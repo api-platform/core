@@ -58,7 +58,12 @@
 
         <service id="api_platform.openapi.normalizer.api_gateway"  class="ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer" public="false" decorates="api_platform.openapi.normalizer" decoration-priority="-1">
             <argument type="service" id="api_platform.openapi.normalizer.api_gateway.inner" />
-            <tag name="serializer.normalizer" priority="-780" />
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="api_platform.openapi.normalizer.legacy"  class="ApiPlatform\OpenApi\Serializer\LegacyOpenApiNormalizer" public="false" decorates="api_platform.openapi.normalizer.api_gateway" decoration-priority="-2">
+            <argument type="service" id="api_platform.openapi.normalizer.legacy.inner" />
+            <tag name="serializer.normalizer" />
         </service>
         <service id="ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface" alias="api_platform.openapi.factory" />
 

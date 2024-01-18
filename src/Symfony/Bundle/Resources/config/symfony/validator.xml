@@ -11,7 +11,7 @@
         </service>
         <service id="ApiPlatform\Validator\ValidatorInterface" alias="api_platform.validator" />
 
-        <service id="api_platform.validator.query_parameter_validator" class="ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator" public="false">
+        <service id="api_platform.validator.query_parameter_validator" class="ApiPlatform\ParameterValidator\ParameterValidator" public="false">
             <argument type="service" id="api_platform.filter_locator" />
         </service>
 
@@ -25,6 +25,16 @@
             <argument type="service" id="api_platform.validator" />
         </service>
 
+        <service id="api_platform.validator.state.error_provider" class="ApiPlatform\Symfony\Validator\State\ErrorProvider">
+            <tag name="api_platform.state_provider" key="api_platform.validator.state.error_provider" />
+        </service>
+
+        <service id="api_platform.serializer.normalizer.validation_exception" class="ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer" public="false">
+            <argument type="service" id="api_platform.serializer.normalizer.item" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" priority="-800" />
+        </service>
     </services>
 
 </container>

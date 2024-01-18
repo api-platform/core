@@ -1,3 +1,4 @@
+@!mongodb
 Feature: Error handling valid according to RFC 7807 (application/problem+json)
   In order to be able to handle error client side
   As a client software developer
@@ -6,7 +7,7 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
   Scenario: Get an error
     When I add "Content-Type" header equal to "application/json"
     And I add "Accept" header equal to "application/json"
-    And I send a "POST" request to "/dummies" with body:
+    And I send a "POST" request to "/dummy_problems" with body:
     """
     {}
     """
@@ -33,7 +34,7 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
   Scenario: Get an error during deserialization of simple relation
     When I add "Content-Type" header equal to "application/json"
     And I add "Accept" header equal to "application/json"
-    And I send a "POST" request to "/dummies" with body:
+    And I send a "POST" request to "/dummy_problems" with body:
     """
     {
       "name": "Foo",

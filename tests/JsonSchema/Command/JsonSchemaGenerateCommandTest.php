@@ -124,4 +124,42 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             '$ref' => '#/definitions/TestEntity.jsonld-write',
         ]);
     }
+
+    /**
+     * TODO: add deprecation (TypeFactory will be deprecated in api platform 3.3).
+     *
+     * @group legacy
+     */
+    public function testArraySchemaWithTypeFactory(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\Foo', '--type' => 'output']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals($json['definitions']['Foo.jsonld']['properties']['expiration'], ['type' => 'string', 'format' => 'date']);
+    }
+
+    /**
+     * Test issue #5998.
+     */
+    public function testWritableNonResourceRef(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5998\SaveProduct', '--type' => 'input']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals($json['definitions']['SaveProduct.jsonld']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode.jsonld');
+    }
+
+    /**
+     * Test related Schema keeps json-ld context.
+     */
+    public function testSubSchemaJsonLd(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy', '--type' => 'output', '--format' => 'jsonld']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertArrayHasKey('@id', $json['definitions']['ThirdLevel.jsonld-friends']['properties']);
+    }
 }

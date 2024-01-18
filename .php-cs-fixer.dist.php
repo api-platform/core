@@ -18,6 +18,7 @@ $finder = PhpCsFixer\Finder::create()
         'tests/Fixtures/app/var',
         'docs/guides',
         'docs/var',
+        '**vendor**'
     ])
     ->notPath('src/Symfony/Bundle/DependencyInjection/Configuration.php')
     ->notPath('src/Annotation/ApiFilter.php') // temporary
@@ -81,6 +82,7 @@ return (new PhpCsFixer\Config())
         'no_superfluous_elseif' => true,
         'no_superfluous_phpdoc_tags' => [
             'allow_mixed' => false,
+            'allow_unused_params' => true,
         ],
         'no_unset_cast' => true,
         'no_unset_on_property' => true,

@@ -13,17 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Security;
 
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface as MetadataResourceAccessCheckerInterface;
+
 /**
  * Checks if the logged user has sufficient permissions to access the given resource.
  *
+ * @deprecated use \ApiPlatform\Metadata\ResourceAccessCheckerInterface instead
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface ResourceAccessCheckerInterface
+interface ResourceAccessCheckerInterface extends MetadataResourceAccessCheckerInterface
 {
-    /**
-     * Checks if the given item can be accessed by the current user.
-     *
-     * @param array{object?: mixed, previous_object?: mixed, request?: \Symfony\Component\HttpFoundation\Request} $extraVariables
-     */
-    public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool;
 }

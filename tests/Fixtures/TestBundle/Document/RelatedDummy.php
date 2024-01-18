@@ -72,7 +72,7 @@ class RelatedDummy extends ParentDummy implements \Stringable
     #[ApiFilter(filterClass: DateFilter::class)]
     public $dummyDate;
     #[Groups(['barcelona', 'chicago', 'friends'])]
-    #[ODM\ReferenceOne(targetDocument: ThirdLevel::class, cascade: ['persist'], nullable: true, storeAs: 'id')]
+    #[ODM\ReferenceOne(targetDocument: ThirdLevel::class, cascade: ['persist'], nullable: true, storeAs: 'id', inversedBy: 'relatedDummies')]
     public ?ThirdLevel $thirdLevel = null;
     #[Groups(['fakemanytomany', 'friends'])]
     #[ODM\ReferenceMany(targetDocument: RelatedToDummyFriend::class, cascade: ['persist'], mappedBy: 'relatedDummy', storeAs: 'id')]

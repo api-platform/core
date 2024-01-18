@@ -16,6 +16,8 @@ namespace ApiPlatform\Symfony\Controller;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
@@ -46,11 +48,17 @@ final class MainController
     public function __invoke(Request $request): Response
     {
         $operation = $this->initializeOperation($request);
+        if (!$operation) {
+            throw new RuntimeException('Not an API operation.');
+        }
+
         $uriVariables = [];
-        try {
-            $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
-        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
-            throw new NotFoundHttpException('Invalid uri variables.', $e);
+        if (!$operation instanceof Error) {
+            try {
+                $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+            } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
+                throw new NotFoundHttpException('Invalid uri variables.', $e);
+            }
         }
 
         $context = [
@@ -76,12 +84,15 @@ final class MainController
         // The provider can change the Operation, extract it again from the Request attributes
         if ($request->attributes->get('_api_operation') !== $operation) {
             $operation = $this->initializeOperation($request);
-            try {
-                $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
-            } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
-                // if this occurs with our base operation we throw above so log instead of throw here
-                if ($this->logger) {
-                    $this->logger->error($e->getMessage(), ['operation' => $operation]);
+
+            if (!$operation instanceof Error) {
+                try {
+                    $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+                } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
+                    // if this occurs with our base operation we throw above so log instead of throw here
+                    if ($this->logger) {
+                        $this->logger->error($e->getMessage(), ['operation' => $operation]);
+                    }
                 }
             }
         }

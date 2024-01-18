@@ -48,6 +48,7 @@
             <argument type="collection" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
+            <argument type="service" id="api_platform.http_cache.tag_collector" on-invalid="ignore" />
 
             <!-- Run before serializer.normalizer.json_serializable -->
             <tag name="serializer.normalizer" priority="-890" />
@@ -73,6 +74,9 @@
         <!-- deprecated -->
         <service id="api_platform.jsonapi.normalizer.error" class="ApiPlatform\JsonApi\Serializer\ErrorNormalizer" public="false">
             <argument>%kernel.debug%</argument>
+            <argument type="collection"></argument>
+            <argument type="service" id="api_platform.jsonapi.normalizer.item" on-invalid="null" />
+            <argument type="service" id="api_platform.jsonapi.normalizer.constraint_violation_list" on-invalid="null" />
 
             <tag name="serializer.normalizer" priority="-790"/>
         </service>

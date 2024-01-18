@@ -171,6 +171,12 @@
             <argument type="service" id="api_platform.doctrine.orm.metadata.resource.link_factory.inner" />
         </service>
 
+        <service id="api_platform.doctrine.orm.links_handler" class="ApiPlatform\Doctrine\Orm\State\LinksHandler">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="doctrine" />
+
+            <tag name="api_platform.doctrine.orm.links_handler" key="api_platform.doctrine.orm.links_handler" />
+        </service>
     </services>
 
 </container>

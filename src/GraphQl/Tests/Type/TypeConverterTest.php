@@ -67,7 +67,7 @@ class TypeConverterTest extends TestCase
     public function testConvertType(Type $type, bool $input, int $depth, GraphQLType|string|null $expectedGraphqlType): void
     {
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
-        $this->resourceMetadataCollectionFactoryProphecy->create(Argument::type('string'))->willThrow(new ResourceClassNotFoundException());
+        $this->resourceMetadataCollectionFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadataCollection('resourceClass'));
         $this->typeBuilderProphecy->getEnumType(Argument::type(Operation::class))->willReturn($expectedGraphqlType);
 
         /** @var Operation $operation */
@@ -193,6 +193,20 @@ class TypeConverterTest extends TestCase
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
             [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
         ];
+    }
+
+    public function testConvertTypeCollectionEnum(): void
+    {
+        $type = new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class));
+        $expectedGraphqlType = new EnumType(['name' => 'GenderTypeEnum', 'values' => []]);
+        $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(true);
+        $this->resourceMetadataCollectionFactoryProphecy->create(GenderTypeEnum::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(GenderTypeEnum::class, []));
+        $this->typeBuilderProphecy->getEnumType(Argument::type(Operation::class))->willReturn($expectedGraphqlType);
+
+        /** @var Operation $rootOperation */
+        $rootOperation = (new Query())->withName('test');
+        $graphqlType = $this->typeConverter->convertType($type, false, $rootOperation, 'resourceClass', 'rootClass', null, 0);
+        $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
     /**

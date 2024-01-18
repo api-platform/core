@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
+use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
@@ -21,11 +23,12 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
-use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface as LegacyResourceAccessCheckerInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -60,8 +63,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected PropertyAccessorInterface $propertyAccessor;
     protected array $localCache = [];
     protected array $localFactoryOptionsCache = [];
+    protected $resourceAccessChecker;
 
-    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    /**
+     * @param LegacyResourceAccessCheckerInterface|ResourceAccessCheckerInterface $resourceAccessChecker
+     */
+    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected LegacyIriConverterInterface|IriConverterInterface $iriConverter, protected LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = fn ($object): ?string => $this->iriConverter->getIriFromResource($object);
@@ -69,6 +76,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         parent::__construct($classMetadataFactory, $nameConverter, null, null, \Closure::fromCallable($this->getObjectClass(...)), $defaultContext);
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->resourceAccessChecker = $resourceAccessChecker;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
@@ -162,14 +170,31 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $emptyResourceAsIri = $context['api_empty_resource_as_iri'] ?? false;
         unset($context['api_empty_resource_as_iri']);
 
-        if (isset($context['resources'])) {
+        if (!$this->tagCollector && isset($context['resources'])) {
             $context['resources'][$iri] = $iri;
         }
 
+        $context['object'] = $object;
+        $context['format'] = $format;
+
         $data = parent::normalize($object, $format, $context);
 
+        $context['data'] = $data;
+        unset($context['property_metadata']);
+        unset($context['api_attribute']);
+
         if ($emptyResourceAsIri && \is_array($data) && 0 === \count($data)) {
+            $context['data'] = $iri;
+
+            if ($this->tagCollector) {
+                $this->tagCollector->collect($context);
+            }
+
             return $iri;
+        }
+
+        if ($this->tagCollector) {
+            $this->tagCollector->collect($context);
         }
 
         return $data;
@@ -605,9 +630,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $options['serializer_groups'] = (array) $context[self::GROUPS];
         }
 
-        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? '').($context['api_normalize'] ?? '');
-        if ($operationCacheKey && isset($this->localFactoryOptionsCache[$operationCacheKey])) {
-            return $options + $this->localFactoryOptionsCache[$operationCacheKey];
+        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? '').($context['root_operation_name'] ?? '');
+        $suffix = ($context['api_normalize'] ?? '') ? 'n' : '';
+        if ($operationCacheKey && isset($this->localFactoryOptionsCache[$operationCacheKey.$suffix])) {
+            return $options + $this->localFactoryOptionsCache[$operationCacheKey.$suffix];
         }
 
         // This is a hot spot
@@ -620,7 +646,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        return $options + $this->localFactoryOptionsCache[$operationCacheKey] = $options;
+        return $options + $this->localFactoryOptionsCache[$operationCacheKey.$suffix] = $options;
     }
 
     /**
@@ -631,7 +657,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
         $context['api_attribute'] = $attribute;
-        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
+        $context['property_metadata'] = $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
 
         if ($context['api_denormalize'] ?? false) {
             return $this->propertyAccessor->getValue($object, $attribute);
@@ -668,7 +694,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
 
-                return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
+                $data = $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
+                $context['data'] = $data;
+                $context['type'] = $type;
+
+                if ($this->tagCollector) {
+                    $this->tagCollector->collect($context);
+                }
+
+                return $data;
             }
 
             if (
@@ -676,7 +710,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
                 $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
-                unset($childContext['iri'], $childContext['uri_variables']);
+                unset($childContext['iri'], $childContext['uri_variables'], $childContext['item_uri_template']);
 
                 if ('jsonld' === $format && $uriTemplate = $propertyMetadata->getUriTemplate()) {
                     $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
@@ -695,7 +729,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
 
-                return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
+                $data = $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
+                $context['data'] = $data;
+                $context['type'] = $type;
+
+                if ($this->tagCollector) {
+                    $this->tagCollector->collect($context);
+                }
+
+                return $data;
             }
 
             if (!$this->serializer instanceof NormalizerInterface) {
@@ -708,8 +750,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             );
 
             // Anonymous resources
-            if ($type->getClassName()) {
-                $childContext = $this->createChildContext($this->createOperationContext($context, null), $attribute, $format);
+            if ($className) {
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
                 $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
 
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
@@ -787,9 +829,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $normalizedRelatedObject;
         }
 
-        $iri = $this->iriConverter->getIriFromResource($relatedObject);
+        $context['iri'] = $iri = $this->iriConverter->getIriFromResource(resource: $relatedObject, context: $context);
+        $context['data'] = $iri;
+        $context['object'] = $relatedObject;
+        unset($context['property_metadata']);
+        unset($context['api_attribute']);
 
-        if (isset($context['resources'])) {
+        if ($this->tagCollector) {
+            $this->tagCollector->collect($context);
+        } elseif (isset($context['resources'])) {
             $context['resources'][$iri] = $iri;
         }
 

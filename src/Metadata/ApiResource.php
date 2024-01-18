@@ -183,7 +183,7 @@ class ApiResource extends Metadata
         /**
          * The `sunset` option indicates when a deprecated operation will be removed.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
          *
          * ```php
          * <?php
@@ -218,7 +218,7 @@ class ApiResource extends Metadata
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?string $sunset = null,
         protected ?string $acceptPatch = null,
@@ -233,7 +233,8 @@ class ApiResource extends Metadata
          *
          * See: [UrlGeneratorInterface::class](/reference/Api/UrlGeneratorInterface)
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -265,13 +266,15 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" urlGenerationStrategy="0" />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?int $urlGenerationStrategy = null,
         /**
          * The `deprecationReason` option deprecates the current resource with a deprecation message.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Parchment.php
@@ -303,7 +306,8 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Parchment" deprecationReason="Create a Book instead" />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * - With JSON-lD / Hydra, [an `owl:deprecated` annotation property](https://www.w3.org/TR/owl2-syntax/#Annotation_Properties) will be added to the appropriate data structure
          * - With Swagger / OpenAPI, [a `deprecated` property](https://swagger.io/docs/specification/2-0/paths-and-operations/) will be added
@@ -331,7 +335,8 @@ class ApiResource extends Metadata
         /**
          * The `filters` option configures the filters (declared as services) available on the collection routes for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -366,7 +371,8 @@ class ApiResource extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?array $filters = null,
         protected ?bool $elasticsearch = null,
@@ -374,7 +380,8 @@ class ApiResource extends Metadata
         /**
          * The `messenger` option dispatches the current resource through the Message Bus.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -406,7 +413,8 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" messenger=true />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * Note: when using `messenger=true` on a Doctrine entity, the Doctrine Processor is not called. If you want it
          * to be called, you should [decorate a built-in state processor](/docs/guide/hook-a-persistence-layer-with-a-processor)
@@ -426,7 +434,7 @@ class ApiResource extends Metadata
          * By default, items in the collection are ordered in ascending (ASC) order by their resource identifier(s). If you want to
          * customize this order, you must add an `order` attribute on your ApiResource annotation:
          *
-         * <CodeSelector>
+         * <div data-code-selector>
          *
          * ```php
          * <?php
@@ -448,7 +456,7 @@ class ApiResource extends Metadata
          *         foo: ASC
          * ```
          *
-         * </CodeSelector>
+         * </div>
          *
          * This `order` attribute is used as an array: the key defines the order field, the values defines the direction.
          * If you only specify the key, `ASC` direction will be used as default.
@@ -459,7 +467,8 @@ class ApiResource extends Metadata
         /**
          * The `paginationClientEnabled` option allows (or disallows) the client to enable (or disable) the pagination for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -491,7 +500,8 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" paginationClientEnabled=true />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * The pagination can now be enabled (or disabled) by adding a query parameter named `pagination`:
          * - `GET /books?pagination=false`: disabled
@@ -501,7 +511,8 @@ class ApiResource extends Metadata
         /**
          * The `paginationClientItemsPerPage` option allows (or disallows) the client to set the number of items per page for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -533,7 +544,8 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" paginationClientItemsPerPage=true />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * The number of items can now be set by adding a query parameter named `itemsPerPage`:
          * - `GET /books?itemsPerPage=50`
@@ -542,7 +554,7 @@ class ApiResource extends Metadata
         /**
          * The `paginationClientPartial` option allows (or disallows) the client to enable (or disable) the partial pagination for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
          *
          * ```php
          * <?php
@@ -575,7 +587,8 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" paginationClientPartial=true />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * The partial pagination can now be enabled (or disabled) by adding a query parameter named `partial`:
          * - `GET /books?partial=false`: disabled
@@ -587,7 +600,8 @@ class ApiResource extends Metadata
          * Select your unique sorted field as well as the direction you'll like the pagination to go via filters.
          * Note that for now you have to declare a `RangeFilter` and an `OrderFilter` on the property used for the cursor-based pagination:.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -635,7 +649,8 @@ class ApiResource extends Metadata
          *     </resource>
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * To know more about cursor-based pagination take a look at [this blog post on medium (draft)](https://medium.com/@sroze/74fd1d324723).
          */
@@ -643,7 +658,8 @@ class ApiResource extends Metadata
         /**
          * The `paginationEnabled` option enables (or disables) the pagination for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -675,7 +691,8 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" paginationEnabled=true />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?bool $paginationEnabled = null,
         /**
@@ -686,7 +703,8 @@ class ApiResource extends Metadata
          * When set to `true`, the Doctrine ORM Paginator will perform an additional query, in order to get the
          * correct number of results. You can configure this using the `paginationFetchJoinCollection` option:
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -718,7 +736,8 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" paginationFetchJoinCollection=false />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
          */
@@ -731,7 +750,8 @@ class ApiResource extends Metadata
          * When set to `true`, the Doctrine ORM Paginator will use output walkers, which are compulsory for some types
          * of queries. You can configure this using the `paginationUseOutputWalkers` option:
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -762,7 +782,8 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" paginationUseOutputWalkers=false />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          *
          * For more information, please see the [Pagination](https://www.doctrine-project.org/projects/doctrine-orm/en/current/tutorials/pagination.html) entry in the Doctrine ORM documentation.
          */
@@ -770,7 +791,8 @@ class ApiResource extends Metadata
         /**
          * The `paginationItemsPerPage` option defines the number of items per page for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -801,13 +823,15 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" paginationItemsPerPage=30 />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?int $paginationItemsPerPage = null,
         /**
          * The `paginationMaximumItemsPerPage` option defines the maximum number of items per page for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -839,13 +863,14 @@ class ApiResource extends Metadata
          * </resources>
          * ```
          *
-         * </CodeSelector>
+         * </div>
          */
         protected ?int $paginationMaximumItemsPerPage = null,
         /**
          * The `paginationPartial` option enables (or disables) the partial pagination for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -876,13 +901,15 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" paginationPartial=true />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?bool $paginationPartial = null,
         /**
          * The `paginationType` option defines the type of pagination (`page` or `cursor`) to use for the current resource.
          *
-         * <CodeSelector>
+         * <div data-code-selector>
+         *
          * ```php
          * <?php
          * // api/src/Entity/Book.php
@@ -913,7 +940,8 @@ class ApiResource extends Metadata
          *     <resource class="App\Entity\Book" paginationType="page" />
          * </resources>
          * ```
-         * </CodeSelector>
+         *
+         * </div>
          */
         protected ?string $paginationType = null,
         protected ?string $security = null,

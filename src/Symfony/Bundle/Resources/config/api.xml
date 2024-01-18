@@ -60,6 +60,8 @@
             <argument>null</argument>
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
+            <argument type="collection" />
+            <argument type="service" id="api_platform.http_cache.tag_collector" on-invalid="ignore" />
 
             <!-- Run before serializer.normalizer.json_serializable -->
             <tag name="serializer.normalizer" priority="-895" />
@@ -193,11 +195,27 @@
             <argument key="$controller">api_platform.symfony.main_controller</argument>
             <argument key="$logger" type="service" id="logger" on-invalid="null" />
             <argument key="$debug">%kernel.debug%</argument>
+            <argument key="$exceptionsMapping" type="collection"></argument>
             <argument key="$resourceMetadataCollectionFactory" type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument key="$errorFormats">%api_platform.error_formats%</argument>
             <argument key="$exceptionToStatus">%api_platform.exception_to_status%</argument>
-            <argument key="$identifiersExtractor" type="service" id="api_platform.api.identifiers_extractor"/>
+            <argument key="$identifiersExtractor">null</argument>
             <argument key="$resourceClassResolver" type="service" id="api_platform.resource_class_resolver"/>
+            <argument key="$negotiator">null</argument>
+            <argument key="$problemCompliantErrors">%api_platform.rfc_7807_compliant_errors%</argument>
+        </service>
+
+        <service id="api_platform.state.error_provider" class="ApiPlatform\State\ErrorProvider">
+            <argument key="$debug">%kernel.debug%</argument>
+            <argument type="service" key="$resourceClassResolver" id="api_platform.resource_class_resolver" />
+            <tag name="api_platform.state_provider" key="api_platform.state.error_provider" />
+        </service>
+
+        <service id="api_platform.normalizer.constraint_violation_list" class="ApiPlatform\Serializer\ConstraintViolationListNormalizer" public="false">
+            <argument>%api_platform.validator.serialize_payload_fields%</argument>
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" priority="-780" />
         </service>
     </services>
 </container>

@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6041\NumericValidated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaContextDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
@@ -24,9 +25,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 class ApiTestCaseTest extends ApiTestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testAssertJsonContains(): void
     {
         self::createClient()->request('GET', '/');
@@ -177,6 +181,33 @@ JSON;
         $this->assertMatchesResourceCollectionJsonSchema(User::class, null, 'jsonld', ['groups' => ['api-test-case-group']]);
     }
 
+    public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithRangeAssertions(): void
+    {
+        $this->recreateSchema();
+
+        /** @var EntityManagerInterface $manager */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        $numericValidated = new NumericValidated();
+        $numericValidated->range = 5;
+        $numericValidated->greaterThanMe = 11;
+        $numericValidated->greaterThanOrEqualToMe = 10.99;
+        $numericValidated->lessThanMe = 11;
+        $numericValidated->lessThanOrEqualToMe = 99.33;
+        $numericValidated->positive = 1;
+        $numericValidated->positiveOrZero = 0;
+        $numericValidated->negative = -1;
+        $numericValidated->negativeOrZero = 0;
+
+        $manager->persist($numericValidated);
+        $manager->flush();
+
+        self::createClient()->request('GET', "/numeric-validated/{$numericValidated->getId()}");
+        $this->assertMatchesResourceItemJsonSchema(NumericValidated::class);
+
+        self::createClient()->request('GET', '/numeric-validated');
+        $this->assertMatchesResourceCollectionJsonSchema(NumericValidated::class);
+    }
+
     // Next tests have been imported from dms/phpunit-arraysubset-asserts, because the original constraint has been deprecated.
 
     public function testAssertArraySubsetPassesStrictConfig(): void
@@ -280,5 +311,27 @@ JSON
 
         @$schemaTool->dropSchema($classes);
         @$schemaTool->createSchema($classes);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testExceptionNormalizer(): void
+    {
+        $response = self::createClient()->request('GET', '/issue5921', [
+            'headers' => [
+                'accept' => 'application/json',
+            ],
+        ]);
+
+        $data = $response->toArray(false);
+        $this->assertArrayHasKey('hello', $data);
+        $this->assertEquals($data['hello'], 'world');
+    }
+
+    public function testMissingMethod(): void
+    {
+        $response = self::createClient([], ['headers' => ['accept' => 'application/json']])->request('DELETE', '/something/that/does/not/exist/ever');
+        $this->assertResponseStatusCodeSame(404);
     }
 }

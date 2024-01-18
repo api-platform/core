@@ -84,26 +84,10 @@ Feature: Using validations groups
     """
     Then the response status code should be 422
     And the response should be in JSON
-    And the JSON should be equal to:
-    """
-      {
-        "@id": "/validation_errors/ad32d13f-c3d4-423b-909a-857b961eb720",
-        "@type": "ConstraintViolationList",
-        "status": 422,
-        "violations": [
-          {
-            "propertyPath": "test",
-            "message": "This value should not be null.",
-            "code": "ad32d13f-c3d4-423b-909a-857b961eb720"
-          }
-        ],
-        "hydra:title": "An error occurred",
-        "hydra:description": "title: This value should not be null.",
-        "type": "/validation_errors/ad32d13f-c3d4-423b-909a-857b961eb720",
-        "title": "An error occurred",
-        "detail": "title: This value should not be null."
-      }
-    """
+    And the JSON node "violations[0].message" should be equal to "This value should not be null."
+    And the JSON node "violations[0].propertyPath" should be equal to "test"
+    And the JSON node "detail" should be equal to "test: This value should not be null."
+    And the JSON node "hydra:description" should be equal to "test: This value should not be null."
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   @!mongodb
@@ -135,41 +119,72 @@ Feature: Using validations groups
         {
           "propertyPath": "",
           "message": "This value should be of type unknown.",
-          "code": "0",
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
           "hint": "Failed to create object because the class misses the \"baz\" property."
         },
         {
           "propertyPath": "qux",
           "message": "This value should be of type string.",
-          "code": "0"
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
         },
         {
           "propertyPath": "foo",
           "message": "This value should be of type bool.",
-          "code": "0"
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
         },
         {
           "propertyPath": "bar",
           "message": "This value should be of type int.",
-          "code": "0"
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
         },
         {
           "propertyPath": "uuid",
           "message": "This value should be of type uuid.",
-          "code": "0",
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
           "hint": "Invalid UUID string: y"
         },
         {
           "propertyPath": "relatedDummy",
           "message": "This value should be of type array|string.",
-          "code": "0",
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
           "hint": "The type of the \"relatedDummy\" attribute must be \"array\" (nested document) or \"string\" (IRI), \"integer\" given."
         },
         {
           "propertyPath": "relatedDummies",
           "message": "This value should be of type array.",
-          "code": "0"
+          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
         }
       ]
     }
     """
+
+  @!mongodb
+  Scenario: Get violations constraints
+    When I add "Accept" header equal to "application/json"
+    And I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/issue5912s" with body:
+    """
+    {
+      "title": ""
+    }
+    """
+    Then the response status code should be 422
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "status": 422,
+      "violations": [
+        {
+          "propertyPath": "title",
+          "message": "This value should not be blank.",
+          "code": "c1051bb4-d103-4f74-8988-acbcafc7fdc3"
+        }
+      ],
+      "detail": "title: This value should not be blank.",
+      "type": "/validation_errors/c1051bb4-d103-4f74-8988-acbcafc7fdc3",
+      "title": "An error occurred"
+    }
+    """
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+

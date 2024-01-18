@@ -22,7 +22,7 @@ Feature: GraphQL query support
 
   @createSchema
   Scenario: Retrieve an item with different relations to the same resource
-    Given there are 2 multiRelationsDummy objects having each a manyToOneRelation, 2 manyToManyRelations and 3 oneToManyRelations
+    Given there are 2 multiRelationsDummy objects having each a manyToOneRelation, 2 manyToManyRelations, 3 oneToManyRelations and 4 embeddedRelations
     When I send the following GraphQL request:
     """
     {
@@ -67,6 +67,73 @@ Feature: GraphQL query support
     And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[1].node.id" should not be null
     And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[0].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
     And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[2].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
+
+  @createSchema @!mongodb
+  Scenario: Retrieve embedded collections
+    Given there are 2 multiRelationsDummy objects having each a manyToOneRelation, 2 manyToManyRelations, 3 oneToManyRelations and 4 embeddedRelations
+    When I send the following GraphQL request:
+    """
+    {
+      multiRelationsDummy(id: "/multi_relations_dummies/2") {
+        id
+        name
+        manyToOneRelation {
+          id
+          name
+        }
+        manyToManyRelations {
+          edges{
+            node {
+             id
+              name
+            }
+          }
+        }
+        oneToManyRelations {
+          edges{
+            node {
+              id
+              name
+            }
+          }
+        }
+        nestedCollection {
+          name
+        }
+        nestedPaginatedCollection {
+          edges{
+            node {
+              name
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.multiRelationsDummy.id" should be equal to "/multi_relations_dummies/2"
+    And the JSON node "data.multiRelationsDummy.name" should be equal to "Dummy #2"
+    And the JSON node "data.multiRelationsDummy.manyToOneRelation.id" should not be null
+    And the JSON node "data.multiRelationsDummy.manyToOneRelation.name" should be equal to "RelatedManyToOneDummy #2"
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges" should have 2 element
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.id" should not be null
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[0].node.name" should match "#RelatedManyToManyDummy(1|2)2#"
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.name" should match "#RelatedManyToManyDummy(1|2)2#"
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges" should have 3 element
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[1].node.id" should not be null
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[0].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges[2].node.name" should match "#RelatedOneToManyDummy(1|3)2#"
+    And the JSON node "data.multiRelationsDummy.nestedCollection[0].name" should be equal to "NestedDummy1"
+    And the JSON node "data.multiRelationsDummy.nestedCollection[1].name" should be equal to "NestedDummy2"
+    And the JSON node "data.multiRelationsDummy.nestedCollection[2].name" should be equal to "NestedDummy3"
+    And the JSON node "data.multiRelationsDummy.nestedCollection[3].name" should be equal to "NestedDummy4"
+    And the JSON node "data.multiRelationsDummy.nestedPaginatedCollection.edges" should have 4 element
+    And the JSON node "data.multiRelationsDummy.nestedPaginatedCollection.edges[0].node.name" should be equal to "NestedPaginatedDummy1"
+    And the JSON node "data.multiRelationsDummy.nestedPaginatedCollection.edges[1].node.name" should be equal to "NestedPaginatedDummy2"
+    And the JSON node "data.multiRelationsDummy.nestedPaginatedCollection.edges[2].node.name" should be equal to "NestedPaginatedDummy3"
+    And the JSON node "data.multiRelationsDummy.nestedPaginatedCollection.edges[3].node.name" should be equal to "NestedPaginatedDummy4"
 
   @createSchema @!mongodb
   Scenario: Retrieve an item with child relation to the same resource

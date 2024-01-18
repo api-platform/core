@@ -151,6 +151,13 @@
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="api_platform.doctrine.odm.metadata.resource.metadata_collection_factory.inner" />
         </service>
+
+        <service id="api_platform.doctrine.odm.links_handler" class="ApiPlatform\Doctrine\Odm\State\LinksHandler">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="doctrine_mongodb" />
+
+            <tag name="api_platform.doctrine.odm.links_handler" key="api_platform.doctrine.odm.links_handler" />
+        </service>
     </services>
 
 </container>

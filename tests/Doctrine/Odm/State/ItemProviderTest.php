@@ -49,7 +49,7 @@ class ItemProviderTest extends TestCase
 
         $matchProphecy = $this->prophesize(AggregationMatch::class);
         $matchProphecy->field('id')->willReturn($matchProphecy)->shouldBeCalled();
-        $matchProphecy->equals(1)->shouldBeCalled();
+        $matchProphecy->equals(1)->shouldBeCalled()->willReturn($matchProphecy);
 
         $iterator = $this->prophesize(Iterator::class);
         $result = new \stdClass();
@@ -81,8 +81,8 @@ class ItemProviderTest extends TestCase
         $context = ['foo' => 'bar', 'fetch_data' => true];
 
         $matchProphecy = $this->prophesize(AggregationMatch::class);
-        $matchProphecy->field('id')->willReturn($matchProphecy)->shouldBeCalled();
-        $matchProphecy->equals(1)->shouldBeCalled();
+        $matchProphecy->field('id')->willReturn($matchProphecy->reveal())->shouldBeCalled();
+        $matchProphecy->equals(1)->shouldBeCalled()->willReturn($matchProphecy->reveal());
 
         $iterator = $this->prophesize(Iterator::class);
         $result = new \stdClass();
@@ -115,8 +115,8 @@ class ItemProviderTest extends TestCase
         $matchProphecy = $this->prophesize(AggregationMatch::class);
         $matchProphecy->field('ida')->willReturn($matchProphecy)->shouldBeCalled();
         $matchProphecy->field('idb')->willReturn($matchProphecy)->shouldBeCalled();
-        $matchProphecy->equals(1)->shouldBeCalled();
-        $matchProphecy->equals(2)->shouldBeCalled();
+        $matchProphecy->equals(1)->shouldBeCalled()->willReturn($matchProphecy);
+        $matchProphecy->equals(2)->shouldBeCalled()->willReturn($matchProphecy);
 
         $iterator = $this->prophesize(Iterator::class);
         $result = new \stdClass();
@@ -150,7 +150,7 @@ class ItemProviderTest extends TestCase
 
         $matchProphecy = $this->prophesize(AggregationMatch::class);
         $matchProphecy->field('id')->willReturn($matchProphecy)->shouldBeCalled();
-        $matchProphecy->equals(1)->shouldBeCalled();
+        $matchProphecy->equals(1)->shouldBeCalled()->willReturn($matchProphecy);
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->match()->willReturn($matchProphecy->reveal())->shouldBeCalled();

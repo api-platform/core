@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
-use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\ParameterValidator\Exception\ValidationExceptionInterface;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
@@ -96,11 +96,12 @@ class ConfigurationTest extends TestCase
             'error_formats' => [
                 'jsonproblem' => ['mime_types' => ['application/problem+json']],
                 'jsonld' => ['mime_types' => ['application/ld+json']],
+                'json' => ['mime_types' => ['application/problem+json', 'application/json']],
             ],
             'exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                FilterValidationException::class => Response::HTTP_BAD_REQUEST,
+                ValidationExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 OptimisticLockException::class => Response::HTTP_CONFLICT,
             ],
             'path_segment_name_generator' => 'api_platform.metadata.path_segment_name_generator.underscore',
@@ -225,7 +226,8 @@ class ConfigurationTest extends TestCase
             ],
             'keep_legacy_inflector' => true,
             'event_listeners_backward_compatibility_layer' => true,
-            'enable_link_security' => true
+            'handle_symfony_errors' => false,
+            'enable_link_security' => true,
         ], $config);
     }
 

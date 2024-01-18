@@ -17,10 +17,16 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\Mercure\Discovery;
 
+/**
+ * @template T1
+ * @template T2
+ *
+ * @implements ProcessorInterface<T1, T2>
+ */
 final class MercureLinkProcessor implements ProcessorInterface
 {
     /**
-     * @param ProcessorInterface<mixed> $decorated
+     * @param ProcessorInterface<T1, T2> $decorated
      */
     public function __construct(private readonly ProcessorInterface $decorated, private readonly Discovery $discovery)
     {

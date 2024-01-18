@@ -43,6 +43,11 @@ trait FieldDatatypeTrait
 
     /**
      * Get the nested path to the decomposed given property (e.g.: foo.bar.baz => foo.bar).
+     *
+     * Elasticsearch can save arrays of Objects as nested documents.
+     * In the case of foo.bar.baz
+     *   foo.bar will be returned if foo.bar is an array of objects.
+     *   If neither foo nor bar is an array, it is not a nested property and will return null.
      */
     private function getNestedFieldPath(string $resourceClass, string $property): ?string
     {
@@ -78,7 +83,9 @@ trait FieldDatatypeTrait
                 && null !== ($className = $type->getClassName())
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
-                return $currentProperty;
+                $nestedPath = $this->getNestedFieldPath($className, implode('.', $properties));
+
+                return null === $nestedPath ? $currentProperty : "$currentProperty.$nestedPath";
             }
         }
 

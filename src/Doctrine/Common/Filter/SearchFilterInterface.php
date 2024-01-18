@@ -39,7 +39,7 @@ interface SearchFilterInterface
     /**
      * @var string The value must be contained in the field case-insensitive
      */
-    public const STRATEGY_IPARTIAL = 'partial';
+    public const STRATEGY_IPARTIAL = 'ipartial';
 
     /**
      * @var string Finds fields that are starting with the value
@@ -49,7 +49,7 @@ interface SearchFilterInterface
     /**
      * @var string Finds fields that are starting with the value case-insensitive
      */
-    public const STRATEGY_ISTART = 'start';
+    public const STRATEGY_ISTART = 'istart';
 
     /**
      * @var string Finds fields that are ending with the value
@@ -59,7 +59,7 @@ interface SearchFilterInterface
     /**
      * @var string Finds fields that are ending with the value case-insensitive
      */
-    public const STRATEGY_IEND = 'end';
+    public const STRATEGY_IEND = 'iend';
 
     /**
      * @var string Finds fields that are starting with the word
@@ -69,5 +69,5 @@ interface SearchFilterInterface
     /**
      * @var string Finds fields that are starting with the word case-insensitive
      */
-    public const STRATEGY_IWORD_START = 'word_start';
+    public const STRATEGY_IWORD_START = 'iword_start';
 }

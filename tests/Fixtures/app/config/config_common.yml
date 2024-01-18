@@ -73,26 +73,12 @@ api_platform:
         Symfony\Component\Serializer\Exception\ExceptionInterface: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
         ApiPlatform\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
         ApiPlatform\Exception\FilterValidationException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+    handle_symfony_errors: true
     http_cache:
         invalidation:
             enabled: true
     keep_legacy_inflector: false
-    defaults:
-        extra_properties:
-            standard_put: true
-            rfc_7807_compliant_errors: true
-            legacy_api_platform_controller: true
-        normalization_context: 
-            skip_null_values: false
-        pagination_client_enabled:            true
-        pagination_client_items_per_page:     true
-        pagination_client_partial:            true
-        pagination_items_per_page:            3
-        cache_headers:
-            max_age:                          60
-            shared_max_age:                   3600
-            vary:                             ['Accept', 'Cookie']
-            public:                           true
+    # see also defaults in AppKernel
 
     doctrine_mongodb_odm: false
     mapping:
@@ -457,3 +443,16 @@ services:
     ApiPlatform\Tests\Fixtures\TestBundle\State\ODMLinkHandledDummyLinksHandler:
         tags:
             - {name: 'api_platform.doctrine.odm.links_handler'}
+
+    ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\TypeFactoryDecorator:
+      decorates: 'api_platform.json_schema.type_factory'
+      arguments:
+        $decorated: '@.inner'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Serializer\ErrorNormalizer:
+        decorates: 'api_platform.problem.normalizer.error'
+        arguments: [ '@.inner' ]
+        
+    api_platform.http_cache.tag_collector:
+        class: ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorDefault
+        public: true

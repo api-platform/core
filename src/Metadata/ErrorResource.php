@@ -92,7 +92,7 @@ class ErrorResource extends ApiResource
             shortName: $shortName,
             description: $description,
             types: $types,
-            operations: $operations ?? [new Get()],
+            operations: $operations ?? [new Error()],
             formats: $formats,
             inputFormats: $inputFormats,
             outputFormats: $outputFormats,

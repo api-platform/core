@@ -52,8 +52,7 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
 
         $restriction['type'] = 'array';
 
-        $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
-        $types = array_unique(array_map(fn (Type $type) => Type::BUILTIN_TYPE_STRING === $type->getBuiltinType() ? 'string' : 'number', $builtInTypes));
+        $types = array_values(array_unique(array_map(fn (mixed $choice) => \is_string($choice) ? 'string' : 'number', $choices)));
 
         if ($count = \count($types)) {
             if (1 === $count) {
@@ -80,6 +79,9 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
         $types = array_map(fn (Type $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+        if ($propertyMetadata->getExtraProperties()['nested_schema'] ?? false) {
+            $types = [Type::BUILTIN_TYPE_STRING];
+        }
 
         return $constraint instanceof Choice && \count($types) && array_intersect($types, [Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT]);
     }

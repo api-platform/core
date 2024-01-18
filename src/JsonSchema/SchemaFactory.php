@@ -33,11 +33,12 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class SchemaFactory implements SchemaFactoryInterface
+final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     use ResourceClassInfoTrait;
     private array $distinctFormats = [];
-
+    private ?TypeFactoryInterface $typeFactory = null;
+    private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
     public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
@@ -45,7 +46,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     public function __construct(?TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         if ($typeFactory) {
-            trigger_deprecation('api-platform/core', '3.2', sprintf('The "%s" is not needed anymore and will not be used anymore.', TypeFactoryInterface::class));
+            $this->typeFactory = $typeFactory;
         }
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -83,7 +84,8 @@ final class SchemaFactory implements SchemaFactoryInterface
             $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
         }
 
-        if (Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
+        // In case of FORCE_SUBSCHEMA an object can be writable through another class eventhough it has no POST operation
+        if (!($serializerContext[self::FORCE_SUBSCHEMA] ?? false) && Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
             return $schema;
         }
 
@@ -139,13 +141,13 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $definition['required'][] = $normalizedPropertyName;
             }
 
-            $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format);
+            $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
         }
 
         return $schema;
     }
 
-    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format): void
+    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, string $parentType): void
     {
         $version = $schema->getVersion();
         if (Schema::VERSION_SWAGGER === $version || Schema::VERSION_OPENAPI === $version) {
@@ -198,6 +200,12 @@ final class SchemaFactory implements SchemaFactoryInterface
         $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
 
         foreach ($types as $type) {
+            // TODO: in 3.3 add trigger_deprecation() as type factories are not used anymore, we moved this logic to SchemaPropertyMetadataFactory so that it gets cached
+            if ($typeFromFactory = $this->typeFactory?->getType($type, 'jsonschema', $propertyMetadata->isReadableLink(), $serializerContext)) {
+                $propertySchema = $typeFromFactory;
+                break;
+            }
+
             $isCollection = $type->isCollection();
             if ($isCollection) {
                 $valueType = $type->getCollectionValueTypes()[0] ?? null;
@@ -210,7 +218,12 @@ final class SchemaFactory implements SchemaFactoryInterface
                 continue;
             }
 
-            $subSchema = $this->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+            $subSchemaFactory = $this->schemaFactory ?: $this;
+            $subSchema = $subSchemaFactory->buildSchema($className, $format, $parentType, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+            if (!isset($subSchema['$ref'])) {
+                continue;
+            }
+
             if ($isCollection) {
                 $propertySchema['items']['$ref'] = $subSchema['$ref'];
                 unset($propertySchema['items']['type']);
@@ -241,8 +254,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         if (null !== $inputOrOutputClass && $className !== $inputOrOutputClass) {
-            $parts = explode('\\', $inputOrOutputClass);
-            $shortName = end($parts);
+            $shortName = $this->getShortClassName($inputOrOutputClass);
             $prefix .= '.'.$shortName;
         }
 
@@ -278,11 +290,15 @@ final class SchemaFactory implements SchemaFactoryInterface
             ];
         }
 
+        $forceSubschema = $serializerContext[self::FORCE_SUBSCHEMA] ?? false;
         if (null === $operation) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($className);
             try {
                 $operation = $resourceMetadataCollection->getOperation();
             } catch (OperationNotFoundException $e) {
+                $operation = new HttpOperation();
+            }
+            if ($operation->getShortName() === $this->getShortClassName($className) && $forceSubschema) {
                 $operation = new HttpOperation();
             }
 
@@ -302,7 +318,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $inputOrOutput = ['class' => $className];
         $inputOrOutput = Schema::TYPE_OUTPUT === $type ? ($operation->getOutput() ?? $inputOrOutput) : ($operation->getInput() ?? $inputOrOutput);
-        $outputClass = ($serializerContext[self::FORCE_SUBSCHEMA] ?? false) ? ($inputOrOutput['class'] ?? $inputOrOutput->class ?? $operation->getClass()) : ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null);
+        $outputClass = $forceSubschema ? ($inputOrOutput['class'] ?? $inputOrOutput->class ?? $operation->getClass()) : ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null);
 
         if (null === $outputClass) {
             // input or output disabled
@@ -377,5 +393,17 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         return $options;
+    }
+
+    private function getShortClassName(string $fullyQualifiedName): string
+    {
+        $parts = explode('\\', $fullyQualifiedName);
+
+        return end($parts);
+    }
+
+    public function setSchemaFactory(SchemaFactoryInterface $schemaFactory): void
+    {
+        $this->schemaFactory = $schemaFactory;
     }
 }

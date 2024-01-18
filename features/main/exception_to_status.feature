@@ -38,3 +38,10 @@ Feature: Using exception_to_status config
     And I send a "DELETE" request to "/error_with_overriden_status/1"
     Then the response status code should be 403
     And the JSON node "status" should be equal to 403
+
+  @!mongodb
+  Scenario: Get HTTP Exception headers
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/issue5924"
+    Then the response status code should be 429
+    Then the header "retry-after" should be equal to 32

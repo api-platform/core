@@ -18,8 +18,17 @@ use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
+/**
+ * @template T1
+ * @template T2
+ *
+ * @implements ProcessorInterface<T1, T2>
+ */
 final class AddLinkHeaderProcessor implements ProcessorInterface
 {
+    /**
+     * @param ProcessorInterface<T1, T2> $decorated
+     */
     public function __construct(private readonly ProcessorInterface $decorated, private readonly ?HttpHeaderSerializer $serializer = new HttpHeaderSerializer())
     {
     }
@@ -37,7 +46,7 @@ final class AddLinkHeaderProcessor implements ProcessorInterface
 
         // We add our header here as Symfony does it only for the main Request and we want it to be done on errors (sub-request) as well
         $linksProvider = $request->attributes->get('_api_platform_links');
-        if ($this->serializer && ($links = $linksProvider->getLinks())) {
+        if ($this->serializer && ($links = $linksProvider?->getLinks())) {
             $response->headers->set('Link', $this->serializer->serialize($links));
         }
 

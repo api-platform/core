@@ -20,6 +20,18 @@
           },
           "lastName": {
             "type": "text"
+          },
+          "relatedGenres": {
+            "type": "nested",
+            "properties": {
+              "id": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "text"
+              }
+            },
+            "dynamic": "strict"
           }
         },
         "dynamic": "strict"

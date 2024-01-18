@@ -24,6 +24,7 @@
         "api-platform/metadata": "*@dev || ^3.1",
         "api-platform/serializer": "*@dev || ^3.1",
         "api-platform/state": "*@dev || ^3.1",
+        "api-platform/validator": "*@dev || ^3.1",
         "symfony/property-info": "^6.1",
         "symfony/serializer": "^6.1",
         "webonyx/graphql-php": "^14.0 || ^15.0",
@@ -31,13 +32,13 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.0",
-        "api-platform/symfony": "*@dev || ^3.1",
         "api-platform/validator": "*@dev || ^3.1",
         "twig/twig": "^3.7",
         "symfony/mercure-bundle": "*",
         "symfony/phpunit-bridge": "^6.1",
         "symfony/routing": "^6.1",
-        "symfony/validator": "^6.1"
+        "symfony/validator": "^6.1",
+        "sebastian/comparator": "<5.0"
     },
     "autoload": {
         "psr-4": {
@@ -54,7 +55,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "php-http/discovery": false
         }
     },
     "extra": {
@@ -77,10 +79,6 @@
         {
             "type": "path",
             "url": "../Serializer"
-        },
-        {
-            "type": "path",
-            "url": "../Symfony"
         },
         {
             "type": "path",

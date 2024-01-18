@@ -46,10 +46,20 @@ class MultiRelationsDummy
     #[ODM\ReferenceMany(targetDocument: MultiRelationsRelatedDummy::class, mappedBy: 'oneToManyRelation', storeAs: 'id')]
     public Collection $oneToManyRelations;
 
+    /** @var Collection<MultiRelationsNested> */
+    #[ODM\EmbedMany]
+    private Collection $nestedCollection;
+
+    /** @var Collection<MultiRelationsNestedPaginated> */
+    #[ODM\EmbedMany]
+    private Collection $nestedPaginatedCollection;
+
     public function __construct()
     {
         $this->manyToManyRelations = new ArrayCollection();
         $this->oneToManyRelations = new ArrayCollection();
+        $this->nestedCollection = new ArrayCollection();
+        $this->nestedPaginatedCollection = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -75,5 +85,29 @@ class MultiRelationsDummy
     public function addOneToManyRelation(MultiRelationsRelatedDummy $relatedMultiUsedDummy): void
     {
         $this->oneToManyRelations->add($relatedMultiUsedDummy);
+    }
+
+    public function getNestedCollection(): Collection
+    {
+        return $this->nestedCollection;
+    }
+
+    public function setNestedCollection(Collection $nestedCollection): self
+    {
+        $this->nestedCollection = $nestedCollection;
+
+        return $this;
+    }
+
+    public function getNestedPaginatedCollection(): Collection
+    {
+        return $this->nestedPaginatedCollection;
+    }
+
+    public function setNestedPaginatedCollection(Collection $nestedPaginatedCollection): self
+    {
+        $this->nestedPaginatedCollection = $nestedPaginatedCollection;
+
+        return $this;
     }
 }

@@ -100,7 +100,8 @@ Feature: Documentation support
     {
       "owl:maxCardinality": 1,
       "type": "string",
-      "format": "iri-reference"
+      "format": "iri-reference",
+      "example": "https://example.com/"
     }
     """
     # Enable these tests when SF 4.4 / PHP 7.1 support is dropped
@@ -368,3 +369,68 @@ Feature: Documentation support
     And I send a "GET" request to "/"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "text/html; charset=utf-8"
+
+  @!mongodb
+  Scenario: Retrieve the OpenAPI documentation for Entity Dto Wrappers
+    Given I send a "GET" request to "/docs.json"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the OpenAPI class "WrappedResponseEntity-read" exists
+    And the "id" property exists for the OpenAPI class "WrappedResponseEntity-read"
+    And the "id" property for the OpenAPI class "WrappedResponseEntity-read" should be equal to:
+    """
+    {
+      "type": "string"
+    }
+    """
+    And the OpenAPI class "WrappedResponseEntity.CustomOutputEntityWrapperDto-read" exists
+    And the "data" property exists for the OpenAPI class "WrappedResponseEntity.CustomOutputEntityWrapperDto-read"
+    And the "data" property for the OpenAPI class "WrappedResponseEntity.CustomOutputEntityWrapperDto-read" should be equal to:
+    """
+    {
+      "owl:maxCardinality": 1,
+      "$ref": "#\/components\/schemas\/WrappedResponseEntity-read"
+    }
+    """
+
+  Scenario: Retrieve the OpenAPI documentation with 3.0 specification
+    Given I send a "GET" request to "/docs.jsonopenapi?spec_version=3.0.0"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "openapi" should be equal to "3.0.0"
+    And the JSON node "components.schemas.DummyBoolean" should be equal to:
+    """
+    {
+      "type": "object",
+      "description": "",
+      "deprecated": false,
+      "properties": {
+        "id": {
+          "readOnly": true,
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isDummyBoolean": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dummyBoolean": {
+          "readOnly": true,
+          "type": "boolean"
+        }
+      }
+    }
+    """

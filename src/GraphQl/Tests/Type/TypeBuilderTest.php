@@ -568,15 +568,15 @@ class TypeBuilderTest extends TestCase
     {
         $enumClass = GamePlayMode::class;
         $enumName = 'GamePlayMode';
-        $enumDescription = 'GamePlayModeEnum description';
+        $enumDescription = 'GamePlayMode description';
         /** @var Operation $operation */
         $operation = (new Operation())
             ->withClass($enumClass)
             ->withShortName($enumName)
-            ->withDescription('GamePlayModeEnum description');
+            ->withDescription('GamePlayMode description');
 
-        $this->typesContainerProphecy->has('GamePlayModeEnum')->shouldBeCalled()->willReturn(false);
-        $this->typesContainerProphecy->set('GamePlayModeEnum', Argument::type(EnumType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('GamePlayMode')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('GamePlayMode', Argument::type(EnumType::class))->shouldBeCalled();
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
         $enumValues = [
             GamePlayMode::CO_OP->name => ['value' => GamePlayMode::CO_OP->value],
@@ -587,7 +587,7 @@ class TypeBuilderTest extends TestCase
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->willReturn($fieldsBuilderProphecy->reveal());
 
         self::assertEquals(new EnumType([
-            'name' => 'GamePlayModeEnum',
+            'name' => 'GamePlayMode',
             'description' => $enumDescription,
             'values' => $enumValues,
         ]), $this->typeBuilder->getEnumType($operation));

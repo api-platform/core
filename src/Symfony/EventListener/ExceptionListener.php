@@ -26,16 +26,18 @@ use Symfony\Component\HttpKernel\EventListener\ErrorListener;
  */
 final class ExceptionListener
 {
-    public function __construct(private readonly ErrorListener $errorListener)
+    public function __construct(private readonly ErrorListener $errorListener, public bool $handleSymfonyErrors = false)
     {
     }
 
     public function onKernelException(ExceptionEvent $event): void
     {
         $request = $event->getRequest();
+
         // Normalize exceptions only for routes managed by API Platform
         if (
-            !((RequestAttributesExtractor::extractAttributes($request)['respond'] ?? $request->attributes->getBoolean('_api_respond', false)) || $request->attributes->getBoolean('_graphql', false))
+            false === $this->handleSymfonyErrors
+            && !((RequestAttributesExtractor::extractAttributes($request)['respond'] ?? $request->attributes->getBoolean('_api_respond', false)) || $request->attributes->getBoolean('_graphql', false))
         ) {
             return;
         }

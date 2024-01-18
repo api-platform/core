@@ -6,7 +6,17 @@
       "gender": "male",
       "age": 31,
       "firstName": "Kilian",
-      "lastName": "Jornet"
+      "lastName": "Jornet",
+      "relatedGenres": [
+        {
+          "id": "5b45d21a-8cdf-4dac-9237-4fea7bb1535f%",
+          "name": "Fiction"
+        },
+        {
+          "id": "e7a24c7d-84a8-4133-b6b2-4bf050b36023",
+          "name": "Contemporary"
+        }
+      ]
     },
     "date": "2017-01-01 01:01:01",
     "message": "The north summit, Store Vengetind Thanks for t... These Top 10 Women of a fk... Francois is the field which."
@@ -90,7 +100,17 @@
       "gender": "male",
       "age": 35,
       "firstName": "Anton",
-      "lastName": "Krupicka"
+      "lastName": "Krupicka",
+      "relatedGenres": [
+        {
+          "id": "5b45d21a-8cdf-4dac-9237-4fea7bb1535f%",
+          "name": "Fiction"
+        },
+        {
+          "id": "e7a24c7d-84a8-4133-b6b2-4bf050b36023",
+          "name": "Contemporary"
+        }
+      ]
     },
     "date": "2017-08-08 08:08:08",
     "message": "Whoever curates the Marathon yesterday. Truly inspiring stuff. The new is straight. Such a couple!"

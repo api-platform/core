@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Problem\Serializer;
 
 use ApiPlatform\Problem\Serializer\ErrorNormalizer;
+use ApiPlatform\State\ApiResource\Error;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,14 +39,14 @@ class ErrorNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new FlattenException(), ErrorNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new FlattenException(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
-        $this->assertEmpty($normalizer->getSupportedTypes('json'));
         $this->assertSame([
-            \Exception::class => false,
-            FlattenException::class => false,
+            \Exception::class => true,
+            Error::class => false,
+            FlattenException::class => true,
         ], $normalizer->getSupportedTypes($normalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertFalse($normalizer->hasCacheableSupportsMethod());
+            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
         }
     }
 

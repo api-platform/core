@@ -58,7 +58,7 @@ final class DocumentNormalizer implements NormalizerInterface, DenormalizerInter
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && $this->decoratedNormalizer->supportsDenormalization($data, $type, $format, $context); // @phpstan-ignore-line symfony bc-layer
+        return self::FORMAT === $format && $this->decoratedNormalizer->supportsDenormalization($data, $type, $format, $context);
     }
 
     /**

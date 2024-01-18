@@ -171,7 +171,6 @@ Feature: Expose only a collection of objects
     When I send a "GET" request to "<uri>"
     Then the response status code should be 404
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:description" should be equal to "<hydra:description>"
     Examples:
       | uri                      | hydra:description                                                                                                          |

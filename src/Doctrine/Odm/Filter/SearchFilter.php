@@ -56,7 +56,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * Syntax: `?property[]=foo&property[]=bar`.
  *
- * <CodeSelector>
+ * <div data-code-selector>
+ *
  * ```php
  * <?php
  * // api/src/Entity/Book.php
@@ -129,7 +130,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *     </resource>
  * </resources>
  * ```
- * </CodeSelector>
+ *
+ * </div>
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -149,7 +151,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    protected function getIriConverter(): IriConverterInterface
+    protected function getIriConverter(): LegacyIriConverterInterface|IriConverterInterface
     {
         return $this->iriConverter;
     }

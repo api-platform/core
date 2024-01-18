@@ -13,15 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-class_exists(\ApiPlatform\Metadata\UriVariablesConverterInterface::class);
+use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
 
-class_alias(
-    \ApiPlatform\Metadata\UriVariablesConverterInterface::class,
-    __NAMESPACE__.'\UriVariablesConverterInterface'
-);
-
-if (false) { // @phpstan-ignore-line
-    interface UriVariablesConverterInterface extends \ApiPlatform\Metadata\UriVariablesConverterInterface
-    {
-    }
+/**
+ * Identifier converter.
+ *
+ * @author Antoine Bluchet <soyuka@gmail.com>
+ */
+interface UriVariablesConverterInterface
+{
+    /**
+     * Takes an array of strings representing URI variables (identifiers) and transform their values to the expected type.
+     *
+     * @param array  $data  URI variables to convert to PHP values
+     * @param string $class The class to which the URI variables belong to
+     *
+     * @throws InvalidIdentifierException
+     *
+     * @return array Array indexed by identifiers properties with their values denormalized
+     */
+    public function convert(array $data, string $class, array $context = []): array;
 }

@@ -7,7 +7,6 @@
 // tags: validation
 // ---
 
-// # Validing incoming data
 // When processing the incoming request, when creating or updating content, API-Platform will validate the
 // incoming content. It will use the [Symfony's validator](https://symfony.com/doc/current/validation.html).
 //
