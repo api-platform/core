@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.jsonld.action.context" class="ApiPlatform\JsonLd\Action\ContextAction" public="true">
+            <argument type="service" id="api_platform.jsonld.context_builder" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.state_provider.main" on-invalid="null" />
+            <argument type="service" id="api_platform.state_processor.main" on-invalid="null" />
+            <argument type="service" id="api_platform.serializer" on-invalid="null" />
+        </service>
+    </services>
+</container>

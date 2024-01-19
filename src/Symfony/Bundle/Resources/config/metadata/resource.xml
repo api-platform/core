@@ -37,7 +37,7 @@
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.main_controller" class="ApiPlatform\Metadata\Resource\Factory\MainControllerResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="500" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.main_controller.inner" />
-            <argument>%api_platform.event_listeners_backward_compatibility_layer%</argument>
+            <argument>%api_platform.use_symfony_listeners%</argument>
         </service>
 
 

@@ -18,11 +18,5 @@
             <argument type="tagged" tag="api_platform.http_cache.http_client" />
             <argument>%api_platform.http_cache.invalidation.max_header_length%</argument>
         </service>
-
-        <service id="api_platform.http_cache_purger.processor.add_tags" class="ApiPlatform\HttpCache\State\AddTagsProcessor" decorates="api_platform.state_processor.respond">
-            <argument type="service" id="api_platform.http_cache_purger.processor.add_tags.inner" />
-            <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.http_cache.purger" on-invalid="null" />
-        </service>
     </services>
 </container>

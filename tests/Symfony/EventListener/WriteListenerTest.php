@@ -40,6 +40,9 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+/**
+ * @group legacy
+ */
 class WriteListenerTest extends TestCase
 {
     use ProphecyTrait;

@@ -25,6 +25,8 @@ use Symfony\Component\WebLink\Link;
 /**
  * Adds the HTTP Link header pointing to the Hydra documentation.
  *
+ * @deprecated use ApiPlatform\Hydra\State\HydraLinkProcessor instead
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class AddLinkHeaderListener

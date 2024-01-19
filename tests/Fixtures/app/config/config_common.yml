@@ -80,7 +80,6 @@ api_platform:
     keep_legacy_inflector: false
     enable_link_security: true
     # see also defaults in AppKernel
-
     doctrine_mongodb_odm: false
     mapping:
         paths:

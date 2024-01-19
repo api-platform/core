@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\FormatMatcher;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
@@ -43,9 +45,24 @@ final class DeserializeListener
     use OperationRequestInitiatorTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'deserialize';
+    private SerializerInterface $serializer;
+    private ?ProviderInterface $provider = null;
 
-    public function __construct(private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
+    public function __construct(ProviderInterface|SerializerInterface $serializer, private readonly null|SerializerContextBuilderInterface|ResourceMetadataCollectionFactoryInterface $serializerContextBuilder = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
     {
+        if ($serializer instanceof ProviderInterface) {
+            $this->provider = $serializer;
+        } else {
+            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as first argument in "%s" instead of "%s".', ProviderInterface::class, self::class, SerializerInterface::class);
+            $this->serializer = $serializer;
+        }
+
+        if ($serializerContextBuilder instanceof ResourceMetadataCollectionFactoryInterface) {
+            $resourceMetadataFactory = $serializerContextBuilder;
+        } else {
+            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as second argument in "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, self::class, SerializerContextBuilderInterface::class);
+        }
+
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
         if (null === $this->translator) {
             $this->translator = new class() implements TranslatorInterface, LocaleAwareInterface {
@@ -66,16 +83,42 @@ final class DeserializeListener
         $method = $request->getMethod();
 
         if (
-            'DELETE' === $method
-            || $request->isMethodSafe()
-            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
-            || $request->attributes->get('_api_platform_disable_listeners')
         ) {
             return;
         }
 
         $operation = $this->initializeOperation($request);
+
+        if ($operation && $this->provider) {
+            if (null === $operation->canDeserialize() && $operation instanceof HttpOperation) {
+                $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
+            }
+
+            if (!$operation->canDeserialize()) {
+                return;
+            }
+
+            $data = $this->provider->provide($operation, $request->attributes->get('_api_uri_variables') ?? [], [
+                'request' => $request,
+                'uri_variables' => $request->attributes->get('_api_uri_variables') ?? [],
+                'resource_class' => $operation->getClass(),
+            ]);
+
+            $request->attributes->set('data', $data);
+
+            return;
+        }
+
+        // TODO: the code below needs to be removed in 4.x
+        if (
+            'DELETE' === $method
+            || $request->isMethodSafe()
+            || $request->attributes->get('_api_platform_disable_listeners')
+        ) {
+            return;
+        }
 
         if ('api_platform.symfony.main_controller' === $operation?->getController()) {
             return;

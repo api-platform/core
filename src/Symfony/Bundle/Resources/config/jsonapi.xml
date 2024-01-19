@@ -15,11 +15,6 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.jsonapi.state_provider" class="ApiPlatform\JsonApi\State\JsonApiProvider" public="false" decorates="api_platform.state_provider.read">
-            <argument type="service" id="api_platform.jsonapi.state_provider.inner" />
-            <argument>%api_platform.collection.order_parameter_name%</argument>
-        </service>
-
         <service id="api_platform.jsonapi.normalizer.entrypoint" class="ApiPlatform\JsonApi\Serializer\EntrypointNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.iri_converter" />

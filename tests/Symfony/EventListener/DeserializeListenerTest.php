@@ -37,6 +37,8 @@ use Symfony\Component\Translation\IdentityTranslator;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @group legacy
  */
 class DeserializeListenerTest extends TestCase
 {

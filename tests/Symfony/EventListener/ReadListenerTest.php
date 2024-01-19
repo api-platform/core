@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\EventListener\ReadListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -31,6 +32,9 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
+/**
+ * @group legacy
+ */
 class ReadListenerTest extends TestCase
 {
     use ProphecyTrait;
@@ -79,8 +83,7 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(RequestEvent::class);
         $event->getRequest()->willReturn($request);
 
-        $provider = $this->prophesize(ProviderInterface::class);
-        $provider->provide()->shouldNotBeCalled();
+        $provider = new CallableProvider();
         $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withOperations(new Operations([
@@ -88,8 +91,7 @@ class ReadListenerTest extends TestCase
             ])),
         ]));
         $serializerContextBuilder = $this->prophesize(SerializerContextBuilderInterface::class);
-        $uriVariablesConverter = $this->prophesize(UriVariablesConverterInterface::class);
-        $listener = new ReadListener($provider->reveal(), $resourceMetadataCollectionFactory->reveal(), $serializerContextBuilder->reveal(), $uriVariablesConverter->reveal());
+        $listener = new ReadListener($provider, $resourceMetadataCollectionFactory->reveal(), $serializerContextBuilder->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 

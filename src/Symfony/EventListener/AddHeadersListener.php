@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 /**
  * Configures cache HTTP headers for the current response.
  *
+ * @deprecated use ApiPlatform\HttpCache\State\AddHeadersProcessor instead
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class AddHeadersListener

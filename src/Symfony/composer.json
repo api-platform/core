@@ -31,18 +31,18 @@
         "api-platform/serializer": "*@dev || ^3.1",
         "api-platform/state": "*@dev || ^3.1",
         "api-platform/validator": "*@dev || ^3.1",
+        "api-platform/doctrine-common": "*@dev || ^3.1",
         "symfony/property-info": "^6.1",
         "symfony/serializer": "^6.1",
         "symfony/security-core": "^6.1"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.0",
-        "symfony/phpunit-bridge": "^6.1",
+        "phpunit/phpunit": "^10",
+        "symfony/mercure-bundle": "*",
         "symfony/routing": "^6.1",
         "symfony/validator": "^6.1",
-        "symfony/mercure-bundle": "*",
-        "webonyx/graphql-php": "^14.0 || ^15.0",
-        "sebastian/comparator": "<5.0"
+        "webonyx/graphql-php": "^14.0 || ^15.0"
     },
     "autoload": {
         "psr-4": {
@@ -59,7 +59,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "php-http/discovery": false
         }
     },
     "extra": {
@@ -82,6 +83,10 @@
         {
             "type": "path",
             "url": "../State"
+        },
+        {
+            "type": "path",
+            "url": "../Doctrine/Common"
         }
     ]
 }

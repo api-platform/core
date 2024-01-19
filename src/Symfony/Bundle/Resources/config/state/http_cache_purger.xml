@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.http_cache_purger.processor.add_tags" class="ApiPlatform\HttpCache\State\AddTagsProcessor" decorates="api_platform.state_processor.respond">
+            <argument type="service" id="api_platform.http_cache_purger.processor.add_tags.inner" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.http_cache.purger" on-invalid="null" />
+        </service>
+    </services>
+</container>
