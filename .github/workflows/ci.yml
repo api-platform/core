@@ -202,7 +202,6 @@ jobs:
           - RamseyUuid
           - GraphQl
           - Serializer
-          - Symfony
         include:
           - php: '8.1'
             coverage: true
