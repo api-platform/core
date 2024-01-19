@@ -26,8 +26,8 @@ interface LinksHandlerInterface
      *
      * @see LinksHandlerTrait
      *
-     * @param array<string, mixed>                                                  $uriVariables
-     * @param array{entityClass: string, operation: Operation}&array<string, mixed> $context
+     * @param array<string, mixed>                                                    $uriVariables
+     * @param array{documentClass: string, operation: Operation}&array<string, mixed> $context
      */
     public function handleLinks(Builder $aggregationBuilder, array $uriVariables, array $context): void;
 }

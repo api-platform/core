@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\Validator\State;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 
 /**
  * @internal
@@ -27,7 +26,7 @@ final class ErrorProvider implements ProviderInterface
     {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ValidationException
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): \Throwable
     {
         if (!($request = $context['request'] ?? null) || !$operation instanceof HttpOperation) {
             throw new \RuntimeException('Not an HTTP request');

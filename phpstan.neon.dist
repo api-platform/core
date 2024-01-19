@@ -27,7 +27,10 @@ parameters:
 		# Templates for Maker
 		- src/Symfony/Maker/Resources/skeleton
 		# subtree split
-		- **vendor**
+		- src/Doctrine/Orm/Tests/var/*
+		- src/Doctrine/Odm/Tests/var/*
+		- src/Doctrine/*/vendor/*
+		- src/*/vendor/*
 		# Symfony 6 support
 		- src/OpenApi/Serializer/CacheableSupportsMethodInterface.php
 		- src/Serializer/CacheableSupportsMethodInterface.php
@@ -90,9 +93,6 @@ parameters:
 		-
 			message: '#^Service "[^"]+" is private.$#'
 			path: src
-		-
-			message: '#^Property .+ is unused.$#'
-			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php
 		-
 			message: '#^Class .+ not found.$#'
 			path: src/Elasticsearch/Tests

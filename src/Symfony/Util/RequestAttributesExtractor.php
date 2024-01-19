@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @internal
  *
+ * @deprecated moved to ApiPlatform\State\Util\RequestAttributesExtractor
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class RequestAttributesExtractor

@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema\Tests\Fixtures\Enum;
 
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Tests\Fixtures\TestBundle\Metadata\Get;
 
 #[Get(description: 'Indicates whether this game is multi-player, co-op or single-player.', provider: self::class.'::getCase')]
 #[GetCollection(provider: self::class.'::getCases')]

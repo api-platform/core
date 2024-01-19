@@ -26,16 +26,16 @@
         "api-platform/serializer": "*@dev || ^3.1",
         "api-platform/state": "*@dev || ^3.1",
         "elasticsearch/elasticsearch": "^8.9",
-        "symfony/cache": "^6.1",
-        "symfony/console": "^6.2",
-        "symfony/property-access": "^6.1",
-        "symfony/property-info": "^6.1",
-        "symfony/serializer": "^6.1",
-        "symfony/uid": "^6.1"
+        "symfony/cache": "^6.4 || ^7.0",
+        "symfony/console": "^6.4 || ^7.0",
+        "symfony/property-access": "^6.4 || ^7.0",
+        "symfony/property-info": "^6.4 || ^7.0",
+        "symfony/serializer": "^6.4 || ^7.0",
+        "symfony/uid": "^6.4 || ^7.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.0",
-        "symfony/phpunit-bridge": "^6.1",
+        "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "sebastian/comparator": "<5.0"
     },
     "autoload": {
@@ -62,7 +62,7 @@
             "dev-main": "3.2.x-dev"
         },
         "symfony": {
-            "require": "^6.1"
+            "require": "^6.4"
         }
     },
     "repositories": [

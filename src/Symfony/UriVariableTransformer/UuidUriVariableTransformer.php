@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\UriVariableTransformer;
 
-use ApiPlatform\Api\UriVariableTransformerInterface;
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use Symfony\Component\Uid\Uuid;
 
 /**

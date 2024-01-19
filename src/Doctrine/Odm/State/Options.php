@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\State;
 
+use ApiPlatform\Doctrine\Common\State\Options as CommonOptions;
 use ApiPlatform\State\OptionsInterface;
 
-class Options implements OptionsInterface
+class Options extends CommonOptions implements OptionsInterface
 {
     /**
      * @param mixed $handleLinks experimental callable, typed mixed as we may want a service name in the future
@@ -24,8 +25,9 @@ class Options implements OptionsInterface
      */
     public function __construct(
         protected ?string $documentClass = null,
-        protected mixed $handleLinks = null,
+        mixed $handleLinks = null,
     ) {
+        parent::__construct(handleLinks: $handleLinks);
     }
 
     public function getDocumentClass(): ?string
@@ -37,19 +39,6 @@ class Options implements OptionsInterface
     {
         $self = clone $this;
         $self->documentClass = $documentClass;
-
-        return $self;
-    }
-
-    public function getHandleLinks(): mixed
-    {
-        return $this->handleLinks;
-    }
-
-    public function withHandleLinks(mixed $handleLinks): self
-    {
-        $self = clone $this;
-        $self->handleLinks = $handleLinks;
 
         return $self;
     }

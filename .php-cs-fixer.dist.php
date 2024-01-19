@@ -18,7 +18,8 @@ $finder = PhpCsFixer\Finder::create()
         'tests/Fixtures/app/var',
         'docs/guides',
         'docs/var',
-        '**vendor**'
+        'src/Doctrine/Orm/Tests/var',
+        'src/Doctrine/Odm/Tests/var'
     ])
     ->notPath('src/Symfony/Bundle/DependencyInjection/Configuration.php')
     ->notPath('src/Annotation/ApiFilter.php') // temporary

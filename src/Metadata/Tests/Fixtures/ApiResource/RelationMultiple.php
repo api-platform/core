@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Tests\Fixtures\TestBundle\State\RelationMultipleProvider;
 
 #[ApiResource(
     mercure: true,
@@ -39,7 +38,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\State\RelationMultipleProvider;
                     identifiers: ['id'],
                 ),
             ],
-            provider: RelationMultipleProvider::class,
         ),
         new GetCollection(
             uriTemplate : '/dummy/{firstId}/relations',
@@ -50,7 +48,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\State\RelationMultipleProvider;
                     identifiers: ['id'],
                 ),
             ],
-            provider: RelationMultipleProvider::class,
         ),
     ]
 )]

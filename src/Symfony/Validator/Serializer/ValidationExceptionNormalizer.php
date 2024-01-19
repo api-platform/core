@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Validator\Serializer;
 
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;

@@ -30,6 +30,7 @@
             <directory>tests</directory>
             <directory>vendor</directory>
             <directory>src/**/Tests/</directory>
+            <directory>src/Doctrine/**/Tests/</directory>
             <file>.php-cs-fixer.dist.php</file>
         </exclude>
     </coverage>

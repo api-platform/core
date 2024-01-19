@@ -1,0 +1,32 @@
+parameters:
+    env(MONGODB_DB): api_platform_test
+    env(MONGODB_URL): mongodb://localhost:27017
+
+doctrine_mongodb:
+    connections:
+        default:
+            server: '%env(resolve:MONGODB_URL)%'
+            options: {}
+    default_database: '%env(resolve:MONGODB_DB)%'
+    document_managers:
+        default:
+            mappings:
+                TestBundle:
+                    type: 'attribute'
+                    dir: '%kernel.project_dir%/Fixtures/Document'
+                    prefix: 'ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document'
+
+api_platform:
+    formats: 
+        json: ['application/json']
+    doctrine: false
+    doctrine_mongodb_odm: true
+    mapping:
+        paths:
+            - '%kernel.project_dir%/Fixtures/Document'
+
+services:
+    test.property_accessor:
+        alias: property_accessor
+        public: true
+

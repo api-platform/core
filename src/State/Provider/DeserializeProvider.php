@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
@@ -87,6 +87,10 @@ final class DeserializeProvider implements ProviderInterface
         try {
             return $this->serializer->deserialize((string) $request->getContent(), $operation->getClass(), $format, $serializerContext);
         } catch (PartialDenormalizationException $e) {
+            if (!class_exists(ConstraintViolationList::class)) {
+                throw $e;
+            }
+
             $violations = new ConstraintViolationList();
             foreach ($e->getErrors() as $exception) {
                 if (!$exception instanceof NotNormalizableValueException) {
