@@ -69,7 +69,9 @@ class CollectionResolverFactoryTest extends TestCase
         $operation = (new QueryCollection())->withName($operationName);
         $source = ['testField' => 0];
         $args = ['args'];
-        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $infoProphecy = $this->prophesize(ResolveInfo::class);
+        $infoProphecy->getFieldSelection()->willReturn(['testField' => true]);
+        $info = $infoProphecy->reveal();
         $info->fieldName = 'testField';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
@@ -116,7 +118,9 @@ class CollectionResolverFactoryTest extends TestCase
         $operation = (new QueryCollection())->withName($operationName);
         $source = ['source'];
         $args = ['args'];
-        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $infoProphecy = $this->prophesize(ResolveInfo::class);
+        $infoProphecy->getFieldSelection()->willReturn(['testField' => true]);
+        $info = $infoProphecy->reveal();
         $info->fieldName = 'testField';
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
@@ -147,7 +151,9 @@ class CollectionResolverFactoryTest extends TestCase
         $operation = (new QueryCollection())->withName($operationName);
         $source = null;
         $args = ['args'];
-        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $infoProphecy = $this->prophesize(ResolveInfo::class);
+        $infoProphecy->getFieldSelection()->willReturn([]);
+        $info = $infoProphecy->reveal();
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageCollection = [new \stdClass()];
@@ -179,7 +185,9 @@ class CollectionResolverFactoryTest extends TestCase
         $operation = (new QueryCollection())->withName($operationName);
         $source = ['source'];
         $args = ['args'];
-        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $infoProphecy = $this->prophesize(ResolveInfo::class);
+        $infoProphecy->getFieldSelection()->willReturn([]);
+        $info = $infoProphecy->reveal();
 
         $this->assertNull(($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
@@ -192,7 +200,9 @@ class CollectionResolverFactoryTest extends TestCase
         $operation = (new QueryCollection())->withName($operationName);
         $source = ['source'];
         $args = ['args'];
-        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $infoProphecy = $this->prophesize(ResolveInfo::class);
+        $infoProphecy->getFieldSelection()->willReturn([]);
+        $info = $infoProphecy->reveal();
 
         $this->assertNull(($this->collectionResolverFactory)($resourceClass, $rootClass, $operation)($source, $args, null, $info));
     }
@@ -205,7 +215,9 @@ class CollectionResolverFactoryTest extends TestCase
         $operation = (new QueryCollection())->withName($operationName);
         $source = null;
         $args = ['args'];
-        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $infoProphecy = $this->prophesize(ResolveInfo::class);
+        $infoProphecy->getFieldSelection()->willReturn([]);
+        $info = $infoProphecy->reveal();
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageCollection = new \stdClass();
@@ -225,7 +237,9 @@ class CollectionResolverFactoryTest extends TestCase
         $operation = (new QueryCollection())->withResolver('query_resolver_id')->withName($operationName);
         $source = null;
         $args = ['args'];
-        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $infoProphecy = $this->prophesize(ResolveInfo::class);
+        $infoProphecy->getFieldSelection()->willReturn([]);
+        $info = $infoProphecy->reveal();
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageCollection = [new \stdClass()];
