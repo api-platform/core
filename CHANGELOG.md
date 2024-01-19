@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.2.12
+
+### Bug fixes
+
+* [1c1023a71](https://github.com/api-platform/core/commit/1c1023a71dd6ea9302c6065aade72f3e93deb6b6) fix: better generics support for State\ProcessorInterface (#6103)
+* [dcab6c79e](https://github.com/api-platform/core/commit/dcab6c79e96ccf8351d855013474d32d5cf129e5) fix(jsonschema): keep integer and number properties draft 4 compliant (#6098)
+* [ef4b261f1](https://github.com/api-platform/core/commit/ef4b261f1e4d67d064be9745d2b9e0c68d3032aa) fix(graphql): remove count query if paginationInfo is not requested (#6068)
+
 ## v3.2.11
 
 ### Bug fixes
