@@ -1,5 +1,61 @@
 # Changelog
 
+## v3.3.0-alpha.1
+
+### Bug fixes
+
+* [2828157f6](https://github.com/api-platform/core/commit/2828157f61e43783d49375dae689e898cc7f91bb) fix(doctrine): constants case sensitive values
+* [bbc99cfbe](https://github.com/api-platform/core/commit/bbc99cfbe7b0ed20e38178ee9bff15c71289f059) fix(serializer): improve TagCollector context (JSONAPI HAL) (#6076)
+* [e10cc5ecf](https://github.com/api-platform/core/commit/e10cc5ecf88b98f862222b2e3fea0f4ace94c515) fix(graphql): use normalization context to get item from IRI (#5915)
+
+### Features
+
+* [4f59677d4](https://github.com/api-platform/core/commit/4f59677d4e55bfdfb66620592a5ab7ffd57c8d8e) feat(parametervalidator): create api-platform/parameter-validator component
+* [670e7fbea](https://github.com/api-platform/core/commit/670e7fbeae3276373fa1a5805a74997091a5428c) feat(serializer): collect cache tags using a TagCollector (#5758)
+* [6b79b6f47](https://github.com/api-platform/core/commit/6b79b6f47fa498bdc6c92b574c176f3897e07ec2) feat(elasticsearch): filtering on nested fields (#5835)
+* [8e3a48810](https://github.com/api-platform/core/commit/8e3a488103a51becd9c900ec5a3849b806121fbf) feat: enable Swagger UI deep linking (#6051)
+* [9083765b0](https://github.com/api-platform/core/commit/9083765b0175aabe8e0043889383f4a0697ec098) feat(graphql): support enum collection as property (#5955)
+* [a749fe849](https://github.com/api-platform/core/commit/a749fe8494a5b3ca41139a418ed1e29c3e7b33a6) feat(doctrine): allow to extend link handling (#6061)
+* [b48836690](https://github.com/api-platform/core/commit/b488366901635dc665f1bb95a4a059aaa30cefd3) feat(symfony): Link security (#5290)
+* [cc9f6a518](https://github.com/api-platform/core/commit/cc9f6a518222598d20556fc1ec62b7c4be52bf52) feat(symfony): request and view kernel listeners (#6102)
+* [ce9ab8226](https://github.com/api-platform/core/commit/ce9ab8226934bfac45e3408e9468bf32a02aa2e9) feat(metadata): headers configuration (#6074)
+
+Components: 
+  - `api-platform/parametervalidator`
+  - `api-platform/doctrine-common`
+  - `api-platform/doctrine-orm`
+  - `api-platform/doctrine-odm`
+
+A new interface `ApiPlatform\Serializer\TagCollectorInterface` allows to collect cache tags (IRIs) during serialization instead of using API Platform defaults.
+An experimental feature (#5290) gives the ability to use `security` on sub resource links.
+
+If you use controllers you should use: 
+
+```yaml
+api_platform:
+    use_symfony_listeners: true
+```
+
+The default is `false` you can get rid of the `event_listeners_backward_compatibility_layer` flag. You can now force an operation state, for example:
+
+```php
+<?php
+
+#[Delete(validate: true)]
+#[Post(read: true)]
+class Book {}
+```
+
+These namespaces are deprecated: 
+
+- `ApiPlatform\Api`
+- `ApiPlatform\Exception`
+- `ApiPlatform\Problem`
+- `ApiPlatform\Action`
+- `ApiPlatform\Util`
+
+Most of the classes have moved to `ApiPlatform\Metadata`.
+
 ## v3.2.11
 
 ### Bug fixes
