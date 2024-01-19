@@ -31,8 +31,8 @@
         "doctrine/inflector": "^2.0",
         "psr/cache": "^3.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
-        "symfony/property-info": "^6.1",
-        "symfony/string": "^6.1"
+        "symfony/property-info": "^6.1 || ^7.0",
+        "symfony/string": "^6.1 || ^7.0"
     },
     "require-dev": {
         "api-platform/json-schema": "*@dev || ^3.1",
@@ -41,12 +41,12 @@
         "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/phpdoc-parser": "^1.16",
         "sebastian/comparator": "<5.0",
-        "symfony/config": "^6.1",
-        "symfony/phpunit-bridge": "^6.1",
-        "symfony/routing": "^6.1",
-        "symfony/var-dumper": "^6.3",
-        "symfony/web-link": "^6.3",
-        "symfony/yaml": "^6.1"
+        "symfony/config": "^6.1 || ^7.0",
+        "symfony/phpunit-bridge": "^6.1 || ^7.0",
+        "symfony/routing": "^6.1 || ^7.0",
+        "symfony/var-dumper": "^6.3 || ^7.0",
+        "symfony/web-link": "^6.3 || ^7.0",
+        "symfony/yaml": "^6.1 || ^7.0"
     },
     "suggest": {
         "phpstan/phpdoc-parser": "For PHP documentation support.",

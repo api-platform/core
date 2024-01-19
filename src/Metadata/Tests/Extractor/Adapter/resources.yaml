@@ -44,6 +44,8 @@ resources:
                     host: api-platform.com
                     schemes:
                         - https
+                    headers:
+                        key: value
                     condition: "request.headers.has('Accept')"
                     controller: App\Controller\CustomController
                     class: ApiPlatform\Metadata\GetCollection
@@ -165,6 +167,7 @@ resources:
             class: null
             urlGenerationStrategy: 1
             deprecationReason: 'This resource is deprecated'
+            headers: null
             cacheHeaders:
                 max_age: 60
                 shared_max_age: 120

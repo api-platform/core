@@ -507,6 +507,20 @@ XML_WRAP
         $childNode->addAttribute('href', $values[0]['href']);
     }
 
+    private function buildHeaders(\SimpleXMLElement $resource, array $values = null): void
+    {
+        if (!$values) {
+            return;
+        }
+
+        $node = $resource->addChild('headers');
+        foreach ($values as $key => $value) {
+            $childNode = $node->addChild('header');
+            $childNode->addAttribute('key', $key);
+            $childNode->addAttribute('value', $value);
+        }
+    }
+
     private function parse($value): ?string
     {
         if (null === $value) {

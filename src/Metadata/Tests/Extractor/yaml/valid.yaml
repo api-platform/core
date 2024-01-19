@@ -7,6 +7,8 @@ resources:
             uriVariables: ['author']
             types: ['someirischema']
             description: User programs
+            headers:
+                hello: 'world'
             normalizationContext:
                 groups: ['foo', 'bar']
                 enabled: false

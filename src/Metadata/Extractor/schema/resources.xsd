@@ -407,6 +407,19 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:element name="header">
+        <xsd:complexType>
+            <xsd:attribute name="key" type="xsd:string"/>
+            <xsd:attribute name="value" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="headers">
+        <xsd:sequence>
+            <xsd:element ref="header"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
     <xsd:group name="base">
         <xsd:sequence>
             <xsd:element name="denormalizationContext" minOccurs="0" type="sequenceWithValues"/>
@@ -439,6 +452,7 @@
             <xsd:element name="types" minOccurs="0" type="types"/>
             <xsd:element name="uriVariables" minOccurs="0" type="uriVariables"/>
             <xsd:element name="links" minOccurs="0" type="links"/>
+            <xsd:element name="headers" minOccurs="0" type="headers"/>
         </xsd:sequence>
     </xsd:group>
 

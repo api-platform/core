@@ -55,6 +55,7 @@ class HttpOperation extends Operation
      *     stale_while_revalidate?: int,
      *     stale-if-error?: int,
      * }|null $cacheHeaders {@see https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers}
+     * @param array<string, string>|null $headers
      * @param array{
      *     field: string,
      *     direction: string,
@@ -144,6 +145,7 @@ class HttpOperation extends Operation
         protected ?array $schemes = null,
         protected ?string $condition = null,
         protected ?string $controller = null,
+        protected ?array $headers = null,
         protected ?array $cacheHeaders = null,
         protected ?array $paginationViaCursor = null,
         protected ?array $hydraContext = null,
@@ -507,6 +509,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->controller = $controller;
+
+        return $self;
+    }
+
+    public function getHeaders(): ?array
+    {
+        return $this->headers;
+    }
+
+    public function withHeaders(array $headers): self
+    {
+        $self = clone $this;
+        $self->headers = $headers;
 
         return $self;
     }

@@ -38,6 +38,7 @@ class ApiResource extends Metadata
     /**
      * @param array<int, HttpOperation>|array<string, HttpOperation>|Operations|null $operations   Operations is a list of HttpOperation
      * @param array<string, Link>|array<string, mixed[]>|string[]|string|null        $uriVariables
+     * @param array<string, string>                                                  $headers
      * @param string|callable|null                                                   $provider
      * @param string|callable|null                                                   $processor
      * @param mixed|null                                                             $mercure
@@ -314,6 +315,7 @@ class ApiResource extends Metadata
          * - With GraphQL, the [`isDeprecated` and `deprecationReason` properties](https://facebook.github.io/graphql/June2018/#sec-Deprecation) will be added to the schema
          */
         protected ?string $deprecationReason = null,
+        protected ?array $headers = null,
         protected ?array $cacheHeaders = null,
         protected ?array $normalizationContext = null,
         protected ?array $denormalizationContext = null,
@@ -1276,6 +1278,19 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->controller = $controller;
+
+        return $self;
+    }
+
+    public function getHeaders(): ?array
+    {
+        return $this->headers;
+    }
+
+    public function withHeaders(array $headers): self
+    {
+        $self = clone $this;
+        $self->headers = $headers;
 
         return $self;
     }
