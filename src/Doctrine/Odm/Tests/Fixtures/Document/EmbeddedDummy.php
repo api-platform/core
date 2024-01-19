@@ -13,15 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Embedded Dummy.
@@ -29,7 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Jordan Samouh <jordan.samouh@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  */
-#[ApiResource(operations: [new Get(), new Put(), new Delete(), new Get(uriTemplate: '/embedded_dummies_groups/{id}', normalizationContext: ['groups' => ['embed']]), new Post(), new GetCollection()], filters: ['my_dummy.mongodb.search', 'my_dummy.mongodb.order', 'my_dummy.mongodb.date', 'my_dummy.mongodb.boolean'])]
 #[ODM\Document]
 class EmbeddedDummy
 {
@@ -41,16 +32,13 @@ class EmbeddedDummy
     /**
      * @var string|null The dummy name
      */
-    #[Groups(['embed'])]
     #[ODM\Field(type: 'string')]
     private ?string $name = null;
     /**
      * @var \DateTime|null A dummy date
      */
-    #[Assert\DateTime]
     #[ODM\Field(type: 'date')]
     public ?\DateTime $dummyDate = null;
-    #[Groups(['embed'])]
     #[ODM\EmbedOne(targetDocument: EmbeddableDummy::class)]
     public ?EmbeddableDummy $embeddedDummy = null;
     /**

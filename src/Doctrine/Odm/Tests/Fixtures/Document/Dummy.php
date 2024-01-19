@@ -13,10 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document;
 
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -28,9 +24,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  */
-#[ApiResource(extraProperties: ['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]], 'standard_put' => false, 'rfc_7807_compliant_errors' => false], filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'])]
-#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy')], status: 200, filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'], operations: [new Get()])]
-#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy')], status: 200, filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'], operations: [new Get()])]
 #[ODM\Document]
 class Dummy
 {
@@ -39,14 +32,12 @@ class Dummy
     /**
      * @var string|null The dummy name
      */
-    #[ApiProperty(iris: ['https://schema.org/name'])]
     #[Assert\NotBlank]
     #[ODM\Field(type: 'string')]
     private $name;
     /**
      * @var string|null The dummy name alias
      */
-    #[ApiProperty(iris: ['https://schema.org/alternateName'])]
     #[ODM\Field(nullable: true)]
     private $alias;
     /**
@@ -56,7 +47,6 @@ class Dummy
     /**
      * @var string|null A short description of the item
      */
-    #[ApiProperty(iris: ['https://schema.org/description'])]
     #[ODM\Field(type: 'string', nullable: true)]
     public $description;
     /**
@@ -72,7 +62,6 @@ class Dummy
     /**
      * @var \DateTime|null A dummy date
      */
-    #[ApiProperty(iris: ['https://schema.org/DateTime'])]
     #[ODM\Field(type: 'date', nullable: true)]
     public $dummyDate;
     /**

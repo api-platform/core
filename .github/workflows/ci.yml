@@ -140,8 +140,6 @@ jobs:
           rm -Rf tests/Fixtures/app/var/cache/*
           tests/Fixtures/app/console cache:warmup
       - name: Run PHPStan analysis
-        env:
-          SYMFONY_PHPUNIT_VERSION: '9.5'
         run: |
           ./vendor/bin/phpstan --version
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
@@ -766,8 +764,6 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --prefer-lowest --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -1031,12 +1027,10 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --prefer-lowest --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit
+        run: vendor/bin/phpunit
         env:
           SYMFONY_DEPRECATIONS_HELPER: max[self]=0&ignoreFile=./tests/.ignored-deprecations
 
@@ -1075,8 +1069,6 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --prefer-lowest --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests

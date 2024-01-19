@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Validator;
+namespace ApiPlatform\Tests\Symfony\Validator\EventListener;
 
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Symfony\Validator\EventListener\ValidationExceptionListener;

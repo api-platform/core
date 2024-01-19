@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document;
 
-use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -22,7 +21,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-#[ApiResource(types: ['https://schema.org/Product'])]
 #[ODM\Document]
 class RelatedOwnedDummy
 {

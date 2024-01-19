@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Embeddable Dummy.
@@ -29,7 +27,6 @@ class EmbeddableDummy
     /**
      * @var string|null The dummy name
      */
-    #[Groups(['embed'])]
     #[ODM\Field(type: 'string')]
     private ?string $dummyName = null;
     /**
@@ -40,7 +37,6 @@ class EmbeddableDummy
     /**
      * @var \DateTime|null A dummy date
      */
-    #[Assert\DateTime]
     #[ODM\Field(type: 'date')]
     public ?\DateTime $dummyDate = null;
     /**
@@ -53,7 +49,6 @@ class EmbeddableDummy
      */
     #[ODM\Field(type: 'float')]
     public ?float $dummyPrice = null;
-    #[Groups(['barcelona', 'chicago'])]
     #[ODM\Field(type: 'string')]
     protected ?string $symfony = null;
 

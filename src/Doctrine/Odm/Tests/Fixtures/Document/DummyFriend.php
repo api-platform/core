@@ -13,11 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document;
 
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Dummy Friend.
@@ -25,7 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-#[ApiResource]
 #[ODM\Document]
 class DummyFriend implements \Stringable
 {
@@ -37,9 +32,6 @@ class DummyFriend implements \Stringable
     /**
      * @var string|null The dummy name
      */
-    #[Assert\NotBlank]
-    #[ApiProperty(types: ['https://schema.org/name'])]
-    #[Groups(['fakemanytomany', 'friends'])]
     #[ODM\Field(type: 'string')]
     private ?string $name = null;
 
