@@ -94,6 +94,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         OptionsInterface $stateOptions = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null,
+        private ?bool $distinctCount = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -174,6 +175,11 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
     public function getItemUriTemplate(): ?string
     {
         return $this->itemUriTemplate;
+    }
+
+    public function getDistinctCount(): ?bool
+    {
+        return $this->distinctCount;
     }
 
     public function withItemUriTemplate(string $itemUriTemplate): self
