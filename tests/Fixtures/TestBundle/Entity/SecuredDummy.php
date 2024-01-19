@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -47,6 +48,13 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Mutation(name: 'create', security: 'is_granted(\'ROLE_ADMIN\')', securityMessage: 'Only admins can create a secured dummy.'),
     ],
     security: 'is_granted(\'ROLE_USER\')'
+)]
+#[ApiResource(
+    uriTemplate: '/related_linked_dummies/{relatedDummyId}/from_from',
+    operations: [new GetCollection()],
+    uriVariables: [
+        'relatedDummyId' => new Link(fromProperty: 'securedDummy', fromClass: RelatedLinkedDummy::class, security: "is_granted('ROLE_USER') and relatedDummy.getSecuredDummy().getOwner() == user", securityObjectName: 'relatedDummy'),
+    ]
 )]
 #[ORM\Entity]
 class SecuredDummy

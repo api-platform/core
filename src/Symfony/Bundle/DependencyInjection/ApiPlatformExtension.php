@@ -164,6 +164,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerSecurityConfiguration($container, $config, $loader);
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($loader);
+        $this->registerLinkSecurityConfiguration($loader, $config);
 
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
@@ -890,6 +891,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             trigger_deprecation('api-platform/core', '3.2', 'Using doctrine/inflector is deprecated since API Platform 3.2 and will be removed in API Platform 4. Use symfony/string instead. Run "composer require symfony/string" and set "keep_legacy_inflector" to false in config.');
         } else {
             Inflector::keepLegacyInflector(false);
+        }
+    }
+
+    private function registerLinkSecurityConfiguration(XmlFileLoader $loader, array $config): void
+    {
+        if ($config['enable_link_security']) {
+            $loader->load('link_security.xml');
         }
     }
 }

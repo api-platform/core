@@ -111,6 +111,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
                 ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
                 ->booleanNode('keep_legacy_inflector')->defaultTrue()->info('Keep doctrine/inflector instead of symfony/string to generate plurals for routes.')->end()
+                ->booleanNode('enable_link_security')->defaultFalse()->info('Enable security for Links (sub resources)')->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()

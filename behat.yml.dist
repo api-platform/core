@@ -203,7 +203,7 @@ legacy:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@link_security'
   extensions:
     'FriendsOfBehat\SymfonyExtension':
       bootstrap: 'tests/Fixtures/app/bootstrap.php'

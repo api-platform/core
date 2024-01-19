@@ -85,6 +85,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\PropertyCollectionIriOnlyRela
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\PropertyUriTemplateOneToOneRelation as PropertyUriTemplateOneToOneRelationDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedLinkedDummy as RelatedLinkedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy as RelatedOwnedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy as RelatedOwningDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedSecuredDummy as RelatedSecuredDummyDocument;
@@ -180,6 +181,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PropertyUriTemplateOneToOneRela
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedLinkedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedSecuredDummy;
@@ -1197,12 +1199,16 @@ final class DoctrineContext implements Context
             $publicRelatedSecuredDummy = $this->buildRelatedSecureDummy();
             $this->manager->persist($publicRelatedSecuredDummy);
 
+            $relatedLinkedDummy = $this->buildRelatedLinkedDummy();
+            $this->manager->persist($relatedLinkedDummy);
+
             $securedDummy->addRelatedDummy($relatedDummy);
             $securedDummy->setRelatedDummy($relatedDummy);
             $securedDummy->addRelatedSecuredDummy($relatedSecuredDummy);
             $securedDummy->setRelatedSecuredDummy($relatedSecuredDummy);
             $securedDummy->addPublicRelatedSecuredDummy($publicRelatedSecuredDummy);
             $securedDummy->setPublicRelatedSecuredDummy($publicRelatedSecuredDummy);
+            $relatedLinkedDummy->setSecuredDummy($securedDummy);
 
             $this->manager->persist($securedDummy);
         }
@@ -2497,6 +2503,11 @@ final class DoctrineContext implements Context
     private function buildRelatedToDummyFriend(): RelatedToDummyFriend|RelatedToDummyFriendDocument
     {
         return $this->isOrm() ? new RelatedToDummyFriend() : new RelatedToDummyFriendDocument();
+    }
+
+    private function buildRelatedLinkedDummy(): RelatedLinkedDummy|RelatedLinkedDummyDocument
+    {
+        return $this->isOrm() ? new RelatedLinkedDummy() : new RelatedLinkedDummyDocument();
     }
 
     private function buildRelationEmbedder(): RelationEmbedder|RelationEmbedderDocument
