@@ -39,10 +39,15 @@ class ReadProviderTest extends TestCase
 
     /**
      * Tests that provider returns null if resource is not found.
+     *
      * @see https://github.com/api-platform/core/issues/6072
      */
     public function testProvideNotExistedResource(): void
     {
+        if (!class_exists('\ApiPlatform\Exception\ItemNotFoundException')) {
+            class_alias('\ApiPlatform\Metadata\Exception\ItemNotFoundException', '\ApiPlatform\Exception\ItemNotFoundException');
+        }
+
         $context = ['args' => ['id' => '/dummy/1']];
         $operation = new Query(class: 'dummy');
         $decorated = $this->createMock(ProviderInterface::class);
