@@ -21,6 +21,7 @@ use ApiPlatform\GraphQl\Util\ArrayTrait;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -66,6 +67,10 @@ final class ReadProvider implements ProviderInterface
                 $item = $this->iriConverter->getResourceFromIri($identifier, $context);
             } catch (ItemNotFoundException) {
                 $item = null;
+            }
+
+            if ($operation instanceof Query && null === $item) {
+                return $item;
             }
 
             if ($operation instanceof Subscription || $operation instanceof Mutation) {
