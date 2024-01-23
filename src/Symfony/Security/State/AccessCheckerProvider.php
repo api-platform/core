@@ -73,6 +73,10 @@ final class AccessCheckerProvider implements ProviderInterface
                 'object' => $body,
                 'previous_object' => $context['graphql_context']['previous_object'] ?? null,
             ];
+
+            if (null === $resourceAccessCheckerContext['object'] && null === $resourceAccessCheckerContext['previous_object']) {
+                return null;
+            }
         }
 
         if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $isGranted, $resourceAccessCheckerContext)) {
