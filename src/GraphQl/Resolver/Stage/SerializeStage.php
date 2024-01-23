@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\State\Pagination\HasNextPagePaginatorInterface;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -206,6 +207,12 @@ final class SerializeStage implements SerializeStageInterface
                 }
                 $data['paginationInfo']['lastPage'] = $collection->getLastPage();
             }
+            if (isset($selection['paginationInfo']['hasNextPage'])) {
+                if (!($collection instanceof HasNextPagePaginatorInterface)) {
+                    throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return hasNextPage field.', HasNextPagePaginatorInterface::class));
+                }
+                $data['paginationInfo']['hasNextPage'] = $collection->hasNextPage();
+            }
         }
 
         foreach ($collection as $object) {
@@ -222,7 +229,7 @@ final class SerializeStage implements SerializeStageInterface
 
     private function getDefaultPageBasedPaginatedData(): array
     {
-        return ['collection' => [], 'paginationInfo' => ['itemsPerPage' => 0., 'totalCount' => 0., 'lastPage' => 0.]];
+        return ['collection' => [], 'paginationInfo' => ['itemsPerPage' => 0., 'totalCount' => 0., 'lastPage' => 0., 'hasNextPage' => false]];
     }
 
     private function getDefaultMutationData(array $context): array

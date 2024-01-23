@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\HasNextPagePaginatorInterface;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -217,6 +218,12 @@ final class NormalizeProcessor implements ProcessorInterface
                     throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return lastPage field.', PaginatorInterface::class));
                 }
                 $data['paginationInfo']['lastPage'] = $collection->getLastPage();
+            }
+            if (isset($selection['paginationInfo']['hasNextPage'])) {
+                if (!($collection instanceof HasNextPagePaginatorInterface)) {
+                    throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return hasNextPage field.', HasNextPagePaginatorInterface::class));
+                }
+                $data['paginationInfo']['hasNextPage'] = $collection->hasNextPage();
             }
         }
 

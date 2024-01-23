@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\State\Pagination\HasNextPagePaginatorInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\UnitOfWork;
@@ -24,7 +25,7 @@ use Doctrine\ODM\MongoDB\UnitOfWork;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class Paginator implements \IteratorAggregate, PaginatorInterface
+final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNextPagePaginatorInterface
 {
     public const LIMIT_ZERO_MARKER_FIELD = '___';
     public const LIMIT_ZERO_MARKER = 'limit0';
@@ -105,6 +106,14 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     public function count(): int
     {
         return is_countable($this->mongoDbOdmIterator->toArray()[0]['results']) ? \count($this->mongoDbOdmIterator->toArray()[0]['results']) : 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasNextPage(): bool
+    {
+        return $this->getLastPage() > $this->getCurrentPage();
     }
 
     /**

@@ -332,6 +332,7 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
                 'itemsPerPage' => GraphQLType::nonNull(GraphQLType::int()),
                 'lastPage' => GraphQLType::nonNull(GraphQLType::int()),
                 'totalCount' => GraphQLType::nonNull(GraphQLType::int()),
+                'hasNextPage' => GraphQLType::nonNull(GraphQLType::boolean()),
             ],
         ];
         $paginationInfoObjectType = new ObjectType($paginationInfoObjectTypeConfiguration);

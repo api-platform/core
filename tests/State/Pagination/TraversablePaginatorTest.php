@@ -27,7 +27,8 @@ class TraversablePaginatorTest extends TestCase
         float $perPage,
         float $totalItems,
         float $lastPage,
-        int $currentItems
+        int $currentItems,
+        bool $hasNextPage
     ): void {
         $traversable = new \ArrayIterator($results);
 
@@ -38,6 +39,7 @@ class TraversablePaginatorTest extends TestCase
         self::assertSame($lastPage, $paginator->getLastPage());
         self::assertSame($perPage, $paginator->getItemsPerPage());
         self::assertCount($currentItems, $paginator);
+        self::assertSame($hasNextPage, $paginator->hasNextPage());
 
         self::assertSame($results, iterator_to_array($paginator));
     }
@@ -45,11 +47,11 @@ class TraversablePaginatorTest extends TestCase
     public static function initializeProvider(): array
     {
         return [
-            'First of three pages of 3 items each' => [[0, 1, 2, 3, 4, 5, 6], 1, 3, 7, 3, 3],
-            'Second of two pages of 3 items for the first page and 2 for the second' => [[0, 1, 2, 3, 4], 2, 3, 5, 2, 2],
-            'Empty results' => [[], 1, 2, 0, 1, 0],
-            '0 items per page' => [[0, 1, 2, 3], 1, 0, 4, 1, 4],
-            'Total items less than items per page' => [[0, 1, 2], 1, 4, 3, 1, 3],
+            'First of three pages of 3 items each' => [[0, 1, 2, 3, 4, 5, 6], 1, 3, 7, 3, 3, true],
+            'Second of two pages of 3 items for the first page and 2 for the second' => [[0, 1, 2, 3, 4], 2, 3, 5, 2, 2, false],
+            'Empty results' => [[], 1, 2, 0, 1, 0, false],
+            '0 items per page' => [[0, 1, 2, 3], 1, 0, 4, 1, 4, false],
+            'Total items less than items per page' => [[0, 1, 2], 1, 4, 3, 1, 3, false],
         ];
     }
 }

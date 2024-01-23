@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Tests;
 
+use ApiPlatform\Doctrine\Orm\Extension\DoctrinePaginatorFactory;
 use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Query;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 class PaginatorTest extends TestCase
@@ -27,13 +30,14 @@ class PaginatorTest extends TestCase
     /**
      * @dataProvider initializeProvider
      */
-    public function testInitialize(int $firstResult, int $maxResults, int $totalItems, int $currentPage, int $lastPage): void
+    public function testInitialize(int $firstResult, int $maxResults, int $totalItems, int $currentPage, int $lastPage, bool $hasNextPage): void
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
         $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
         $this->assertSame((float) $lastPage, $paginator->getLastPage());
         $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
+        $this->assertSame($hasNextPage, $paginator->hasNextPage());
     }
 
     public function testInitializeWithQueryFirstResultNotApplied(): void
@@ -90,11 +94,60 @@ class PaginatorTest extends TestCase
         new Paginator($doctrinePaginator->reveal());
     }
 
+    public function testHasNextPageShouldNotMakeQueryIfTotalPagesHasBeenCalled(): void
+    {
+        $query = $this->prophesize(Query::class);
+        $query->getFirstResult()->willReturn(1)->shouldBeCalled();
+        $query->getMaxResults()->willReturn(15)->shouldBeCalled();
+        $query->setMaxResults(Argument::any())->shouldNotBeCalled();
+
+        $doctrinePaginator = $this->prophesize(DoctrinePaginator::class);
+
+        $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
+        $doctrinePaginator->count()->willReturn(42);
+
+        $doctrinePaginator->getIterator()->will(fn (): \ArrayIterator => new \ArrayIterator());
+
+        $paginator = new Paginator($doctrinePaginator->reveal());
+        $paginator->getTotalItems();
+        $this->assertTrue($paginator->hasNextPage());
+    }
+
+    public function testHasNextPageShouldMakeQueryIfTotalPagesHasNotBeenCalled(): void
+    {
+        $query = $this->prophesize(Query::class);
+        $query->getFirstResult()->willReturn(1)->shouldBeCalled();
+        $query->getMaxResults()->willReturn(15)->shouldBeCalled();
+        $query->getParameters()->willReturn(new ArrayCollection())->shouldBeCalled();
+        $query->setParameters(Argument::any())->willReturn($query->reveal())->shouldBeCalled();
+        $query->setCacheable(false)->willReturn($query->reveal())->shouldBeCalled();
+        $query->setMaxResults(1)->shouldBeCalled();
+        $query->getHints()->willReturn([])->shouldBeCalled();
+        $query->setFirstResult(Argument::any())->willReturn($query->reveal())->shouldBeCalled();
+
+        $doctrinePaginator = $this->prophesize(DoctrinePaginator::class);
+
+        $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
+        $doctrinePaginator->count()->willReturn(42);
+        $doctrinePaginator->getFetchJoinCollection()->willReturn(false);
+
+        $doctrinePaginator->getIterator()->will(fn (): \ArrayIterator => new \ArrayIterator());
+
+        $secondDoctrinePaginator = $this->prophesize(DoctrinePaginator::class);
+        $secondDoctrinePaginator->getIterator()->will(fn (): \ArrayIterator => new \ArrayIterator());
+        $doctrinePaginatorFactory = $this->prophesize(DoctrinePaginatorFactory::class);
+        $doctrinePaginatorFactory->getPaginator(Argument::any(), Argument::any())->willReturn($secondDoctrinePaginator->reveal());
+
+        $paginator = new Paginator($doctrinePaginator->reveal());
+        $paginator->setDoctrinePaginatorFactory($doctrinePaginatorFactory->reveal());
+        $this->assertFalse($paginator->hasNextPage());
+    }
+
     public static function initializeProvider(): array
     {
         return [
-            'First of three pages of 15 items each' => [0, 15, 42, 1, 3],
-            'Second of two pages of 10 items each' => [10, 10, 20, 2, 2],
+            'First of three pages of 15 items each' => [0, 15, 42, 1, 3, true],
+            'Second of two pages of 10 items each' => [10, 10, 20, 2, 2, false],
         ];
     }
 }
