@@ -26,4 +26,4 @@ jobs:
           chmod +x splitsh-lite
           echo "$(pwd)" >> $GITHUB_PATH
       - name: 'Split to manyrepo'
-        run: find src -maxdepth 2 -name composer.json -exec bash subtree.sh {} ${{ github.ref }} \;
+        run: find src -maxdepth 2 -name composer.json -print0 | xargs -I '{}' -n 1 -0 bash subtree.sh {} ${{ github.ref }}
