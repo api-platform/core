@@ -185,7 +185,7 @@ trait ApiTestAssertionsTrait
         return $hub;
     }
 
-    private static function getHttpClient(Client $newClient = null): ?Client
+    protected static function getHttpClient(Client $newClient = null): ?Client
     {
         static $client;
 
@@ -200,7 +200,7 @@ trait ApiTestAssertionsTrait
         return $client;
     }
 
-    private static function getHttpResponse(): ResponseInterface
+    protected static function getHttpResponse(): ResponseInterface
     {
         if (!$response = self::getHttpClient()->getResponse()) {
             static::fail('A client must have an HTTP Response to make assertions. Did you forget to make an HTTP request?');
@@ -209,7 +209,7 @@ trait ApiTestAssertionsTrait
         return $response;
     }
 
-    private static function getSchemaFactory(): SchemaFactoryInterface
+    protected static function getSchemaFactory(): SchemaFactoryInterface
     {
         $container = static::getContainer();
 
@@ -223,7 +223,7 @@ trait ApiTestAssertionsTrait
         return $schemaFactory;
     }
 
-    private static function getResourceMetadataCollectionFactory(): ?ResourceMetadataCollectionFactoryInterface
+    protected static function getResourceMetadataCollectionFactory(): ?ResourceMetadataCollectionFactoryInterface
     {
         $container = static::getContainer();
 
