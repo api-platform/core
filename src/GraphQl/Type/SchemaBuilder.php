@@ -18,9 +18,8 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use GraphQL\Type\Definition\NamedType;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Type\Schema;
 
 /**
@@ -86,15 +85,24 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $this->typesContainer->set('Query', $queryType);
 
         $schema = [
-            'query' => $queryType,
-            'typeLoader' => function (string $typeName): ?NamedType {
-                try {
-                    $type = $this->typesContainer->get($typeName);
-                } catch (TypeNotFoundException) {
+            'query' => new ObjectType([
+                'name' => 'Query',
+                'fields' => $queryFields,
+            ]),
+            'typeLoader' => function ($name) {
+                try{
+                    $type = $this->typesContainer->get($name);
+
+                    if ($type instanceof WrappingType) {
+                        return $type->getWrappedType(true);
+                    }
+
+                    return $type;
+                }
+                catch (TypeNotFoundException) {
                     return null;
                 }
 
-                return Type::getNamedType($type);
             },
         ];
 
