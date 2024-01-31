@@ -347,6 +347,7 @@ jobs:
         run: |
           npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
           npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
+          npx @redocly/cli lint build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v3
@@ -1180,6 +1181,7 @@ jobs:
         run: |
           npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
           npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
+          npx @redocly/cli lint build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v3
