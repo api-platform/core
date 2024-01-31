@@ -386,6 +386,23 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return 1 === \count($types) ? $types[0] : $types;
     }
 
+    private function isSingleRelation(ApiProperty $propertyMetadata): bool
+    {
+        $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
+
+        foreach ($builtInTypes as $type) {
+            $className = $type->getClassName();
+            if (!$type->isCollection()
+                && null !== $className
+                && $this->resourceClassResolver->isResourceClass($className)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Builds the classes array.
      */
@@ -507,6 +524,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         if ($propertyMetadata->getDeprecationReason()) {
             $property['owl:deprecated'] = true;
+        }
+
+        if ($this->isSingleRelation($propertyMetadata)) {
+            $property['owl:maxCardinality'] = true;
         }
 
         return $property;
