@@ -15,7 +15,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
             -   name: Setup PHP with pre-release PECL extension
                 uses: shivammathur/setup-php@v2
                 with:
@@ -35,7 +35,7 @@ jobs:
                     composer global config --no-plugins allow-plugins.symfony/runtime true
                     composer global require php-documentation-generator/php-documentation-generator:dev-main
             -   name: Cache dependencies
-                uses: actions/cache@v3
+                uses: actions/cache@v4
                 with:
                     path: ${{ steps.composercache.outputs.dir }}
                     key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
