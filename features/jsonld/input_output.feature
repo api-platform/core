@@ -178,7 +178,10 @@ Feature: JSON-LD DTO input and output
       "@context": {
         "@vocab": "http://example.com/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
-        "dummy": "RecoverPasswordOutput/dummy"
+        "dummy": {
+          "owl:maxCardinality": 1,
+          "@id": "RecoverPasswordOutput/dummy"
+        }
       },
       "@type": "RecoverPasswordOutput",
       "dummy": "/dummies/1"

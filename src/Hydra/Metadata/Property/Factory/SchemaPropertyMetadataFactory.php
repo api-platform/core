@@ -54,7 +54,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         foreach ($types as $type) {
-            $className = $type?->getClassName();
+            $className = $type->getClassName();
             if (!$type->isCollection()
                 && null !== $className
                 && $this->resourceClassResolver->isResourceClass($className)

@@ -61,8 +61,14 @@ Feature: JSON-LD contexts generation
               "hydra": "http://www.w3.org/ns/hydra/core#",
               "paris": "RelationEmbedder/paris",
               "krondstadt": "RelationEmbedder/krondstadt",
-              "anotherRelated": "RelationEmbedder/anotherRelated",
-              "related": "RelationEmbedder/related"
+              "anotherRelated": {
+                "owl:maxCardinality": 1,
+                "@id": "RelationEmbedder/anotherRelated"
+              },
+              "related": {
+                "owl:maxCardinality": 1,
+                "@id": "RelationEmbedder/related"
+              }
           }
       }
       """
