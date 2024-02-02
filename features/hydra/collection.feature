@@ -555,6 +555,97 @@ Feature: Collections support
     """
 
   @createSchema
+  Scenario: Cursor-based pagination with ranged items and set cursor
+    Given there are 10 of these so many objects
+    When I send a "GET" request to "/so_manies?order%5Bid%5D=desc&id%5Blt%5D=7"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+     """
+     {
+       "type": "object",
+       "properties": {
+         "@context": {"pattern": "^/contexts/SoMany$"},
+         "@id": {"pattern": "^/so_manies$"},
+         "@type": {"pattern": "^hydra:Collection"},
+         "hydra:view": {
+           "type": "object",
+           "properties": {
+             "@id": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Blt%5D=7$"},
+             "@type": {"pattern": "^hydra:PartialCollectionView$"},
+             "hydra:previous": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Bgt%5D=6$"},
+             "hydra:next": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Blt%5D=4$"}
+           },
+           "additionalProperties": false
+         },
+         "hydra:member": {
+           "type": "array",
+           "items": {
+             "type": "object",
+             "properties": {
+               "@id": {
+                 "oneOf": [
+                   {"pattern": "^/so_manies/6$"},
+                   {"pattern": "^/so_manies/5$"},
+                   {"pattern": "^/so_manies/4$"}
+                 ]
+               }
+             }
+           },
+           "minItems": 3
+         }
+       }
+     }
+     """
+
+  @createSchema
+  Scenario: Cursor-based pagination with ranged items on uids
+    Given there are 10 of these so many uid objects
+    When I send a "GET" request to "/so_many_uids?order%5Bid%5D=desc&id%5Blt%5D=018b7743-c432-76ad-bb16-66151bb60a8a"
+    Then the response status code should be 200
+    Then print last JSON response
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+     """
+     {
+       "type": "object",
+       "properties": {
+         "@context": {"pattern": "^/contexts/SoManyUid"},
+         "@id": {"pattern": "^/so_many_uid"},
+         "@type": {"pattern": "^hydra:Collection"},
+         "hydra:view": {
+           "type": "object",
+           "properties": {
+             "@id": {"pattern": "^/so_many_uids\\?order%5Bid%5D=desc&id%5Blt%5D=018b7743-c432-76ad-bb16-66151bb60a8a$"},
+             "@type": {"pattern": "^hydra:PartialCollectionView$"},
+             "hydra:previous": {"pattern": "^/so_many_uids\\?order%5Bid%5D=desc&id%5Bgt%5D=018b7743-a62c-7be8-8e4c-67c363fd5a01$"},
+             "hydra:next": {"pattern": "^/so_many_uids\\?order%5Bid%5D=desc&id%5Blt%5D=018b7743-6a9f-72af-9587-c7e06f11c33e$"}
+           },
+           "additionalProperties": false
+         },
+         "hydra:member": {
+           "type": "array",
+           "items": {
+             "type": "object",
+             "properties": {
+               "content": {
+                 "oneOf": [
+                   {"pattern": "^Many #7$"},
+                   {"pattern": "^Many #6$"},
+                   {"pattern": "^Many #5$"}
+                 ]
+               }
+             }
+           },
+           "minItems": 3
+         }
+       }
+     }
+     """
+
+  @createSchema
   Scenario: Cursor-based pagination with range filtered items
     Given there are 10 of these so many objects
     When I send a "GET" request to "/so_manies?order[id]=desc&id[gt]=10"

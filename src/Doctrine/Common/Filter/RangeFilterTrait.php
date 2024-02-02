@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 /**
- * Trait for filtering the collection by range.
+ * Trait for filtering the collection by range using numbers.
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -76,7 +76,7 @@ trait RangeFilterTrait
         ];
     }
 
-    private function normalizeValues(array $values, string $property): ?array
+    protected function normalizeValues(array $values, string $property): ?array
     {
         $operators = [self::PARAMETER_BETWEEN, self::PARAMETER_GREATER_THAN, self::PARAMETER_GREATER_THAN_OR_EQUAL, self::PARAMETER_LESS_THAN, self::PARAMETER_LESS_THAN_OR_EQUAL];
 
@@ -100,7 +100,7 @@ trait RangeFilterTrait
     /**
      * Normalize the values array for between operator.
      */
-    private function normalizeBetweenValues(array $values): ?array
+    protected function normalizeBetweenValues(array $values): ?array
     {
         if (2 !== \count($values)) {
             $this->getLogger()->notice('Invalid filter ignored', [
@@ -124,7 +124,7 @@ trait RangeFilterTrait
     /**
      * Normalize the value.
      */
-    private function normalizeValue(string $value, string $operator): float|int|null
+    protected function normalizeValue(string $value, string $operator): float|int|null
     {
         if (!is_numeric($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [

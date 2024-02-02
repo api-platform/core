@@ -1030,6 +1030,7 @@ Doctrine: new interfaces for Filters and Extensions ready, switch to the `ApiPla
 * Mark the GraphQL subsystem as stable (#4500)
 * feat(test): add `Client::loginUser()` (#4588)
 * feat(http_cache): use symfony/http-client instead of guzzlehttp/guzzle, `ApiPlatform\Core\HttpCache\PurgerInterface` is deprecated in favor of `ApiPlatform\HttpCache\PurgerInterface`, new purger that uses PURGE (#4695)
+* Add `UuidRangeFilter` to allow cursor based pagination on UUIDs (V1 and V6)
 
 ## 2.6.9
 

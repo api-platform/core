@@ -192,6 +192,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SeparatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoMany;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoManyUid;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
@@ -326,6 +327,35 @@ final class DoctrineContext implements Context
             $this->manager->persist($soMany);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb of these so many uid objects
+     */
+    public function thereAreOfTheseSoManyUidObjects(int $nb): void
+    {
+        $ids = [
+            '018b7741-df00-7d0b-9895-bcc1fa36daad', // 1
+            '018b7743-0bff-7298-9916-11e31114d2f4',
+            '018b7743-3122-7337-a658-f3fddb4b2764',
+            '018b7743-4e2f-7126-ac8c-befb62055095',
+            '018b7743-6a9f-72af-9587-c7e06f11c33e',
+            '018b7743-8758-7f01-a3fd-3e63af5eaa5f',
+            '018b7743-a62c-7be8-8e4c-67c363fd5a01', // 7
+            '018b7743-c432-76ad-bb16-66151bb60a8a',
+            '018b7743-dfb1-708f-a76c-b645e49fc231',
+            '018b7743-f975-77da-8289-f25d475def71', // 10
+        ];
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            //$ids[] = UuidV7::v7()->toRfc4122();
+            $id = $ids[$i - 1] ?? null;
+            $dummy = new SoManyUid($id);
+            $dummy->content = 'Many #'.$i;
+
+            $this->manager->persist($dummy);
+        }
         $this->manager->flush();
     }
 
