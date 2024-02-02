@@ -22,7 +22,7 @@ final class ErrorNormalizer implements NormalizerInterface
     {
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject
     {
         $a = $this->decorated->normalize($object, $format, $context);
         $a['hello'] = 'world';
@@ -30,7 +30,7 @@ final class ErrorNormalizer implements NormalizerInterface
         return $a;
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         if (\is_object($data) && $data instanceof TestException) {
             return true;

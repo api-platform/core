@@ -39,7 +39,7 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
         return "$scheme://$host/subscriptions/$subscriptionId";
     }
 
-    public function generateMercureUrl(string $subscriptionId, string $hub = null): string
+    public function generateMercureUrl(string $subscriptionId, ?string $hub = null): string
     {
         return sprintf('%s?topic=%s', $this->registry->getHub($hub)->getUrl(), $this->generateTopicIri($subscriptionId));
     }

@@ -102,14 +102,14 @@ trait ApiTestAssertionsTrait
         static::assertThat($array, $constraint, $message);
     }
 
-    public static function assertMatchesJsonSchema(object|array|string $jsonSchema, int $checkMode = null, string $message = ''): void
+    public static function assertMatchesJsonSchema(object|array|string $jsonSchema, ?int $checkMode = null, string $message = ''): void
     {
         $constraint = new MatchesJsonSchema($jsonSchema, $checkMode);
 
         static::assertThat(self::getHttpResponse()->toArray(false), $constraint, $message);
     }
 
-    public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, string $operationName = null, string $format = 'jsonld', array $serializationContext = null): void
+    public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld', ?array $serializationContext = null): void
     {
         $schemaFactory = self::getSchemaFactory();
 
@@ -124,7 +124,7 @@ trait ApiTestAssertionsTrait
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
-    public static function assertMatchesResourceItemJsonSchema(string $resourceClass, string $operationName = null, string $format = 'jsonld', array $serializationContext = null): void
+    public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld', ?array $serializationContext = null): void
     {
         $schemaFactory = self::getSchemaFactory();
 
@@ -142,12 +142,12 @@ trait ApiTestAssertionsTrait
     /**
      * @return Update[]
      */
-    public static function getMercureMessages(string $hubName = null): array
+    public static function getMercureMessages(?string $hubName = null): array
     {
         return array_map(fn (array $update) => $update['object'], self::getMercureHub($hubName)->getMessages());
     }
 
-    public static function getMercureMessage(int $index = 0, string $hubName = null): ?Update
+    public static function getMercureMessage(int $index = 0, ?string $hubName = null): ?Update
     {
         return static::getMercureMessages($hubName)[$index] ?? null;
     }
@@ -155,7 +155,7 @@ trait ApiTestAssertionsTrait
     /**
      * @throws \JsonException
      */
-    public static function assertMercureUpdateMatchesJsonSchema(Update $update, array $topics, array|object|string $jsonSchema = '', bool $private = false, string $id = null, string $type = null, int $retry = null, string $message = ''): void
+    public static function assertMercureUpdateMatchesJsonSchema(Update $update, array $topics, array|object|string $jsonSchema = '', bool $private = false, ?string $id = null, ?string $type = null, ?int $retry = null, string $message = ''): void
     {
         static::assertSame($topics, $update->getTopics(), $message);
         static::assertThat(json_decode($update->getData(), true, \JSON_THROW_ON_ERROR), new MatchesJsonSchema($jsonSchema), $message);
@@ -175,7 +175,7 @@ trait ApiTestAssertionsTrait
         static::fail('A client must have Mercure enabled to make update assertions. Did you forget to require symfony/mercure?');
     }
 
-    public static function getMercureHub(string $name = null): TraceableHub
+    public static function getMercureHub(?string $name = null): TraceableHub
     {
         $hub = self::getMercureRegistry()->getHub($name);
         if (!$hub instanceof TraceableHub) {
@@ -185,7 +185,7 @@ trait ApiTestAssertionsTrait
         return $hub;
     }
 
-    private static function getHttpClient(Client $newClient = null): ?Client
+    private static function getHttpClient(?Client $newClient = null): ?Client
     {
         static $client;
 

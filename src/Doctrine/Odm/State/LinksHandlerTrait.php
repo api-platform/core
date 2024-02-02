@@ -28,7 +28,7 @@ trait LinksHandlerTrait
 {
     use CommonLinksHandlerTrait;
 
-    private function handleLinks(Builder $aggregationBuilder, array $identifiers, array $context, string $resourceClass, Operation $operation = null): void
+    private function handleLinks(Builder $aggregationBuilder, array $identifiers, array $context, string $resourceClass, ?Operation $operation = null): void
     {
         if (!$identifiers) {
             return;
@@ -54,7 +54,7 @@ trait LinksHandlerTrait
     /**
      * @throws RuntimeException
      */
-    private function buildAggregation(string $toClass, array $links, array $identifiers, array $context, array $executeOptions, string $previousAggregationClass, Builder $previousAggregationBuilder, Operation $operation = null): Builder
+    private function buildAggregation(string $toClass, array $links, array $identifiers, array $context, array $executeOptions, string $previousAggregationClass, Builder $previousAggregationBuilder, ?Operation $operation = null): Builder
     {
         if (!$operation) {
             trigger_deprecation('api-platform/core', '3.2', 'In API Platform 4 the last argument "operation" will be required and this trait will be internal. Use the "handleLinks" feature instead.');

@@ -90,7 +90,7 @@ trait LinksHandlerTrait
         return [$newLink];
     }
 
-    private function getIdentifierValue(array &$identifiers, string $name = null): mixed
+    private function getIdentifierValue(array &$identifiers, ?string $name = null): mixed
     {
         if (isset($identifiers[$name])) {
             $value = $identifiers[$name];
@@ -102,7 +102,7 @@ trait LinksHandlerTrait
         return array_shift($identifiers);
     }
 
-    private function getOperationLinks(Operation $operation = null): array
+    private function getOperationLinks(?Operation $operation = null): array
     {
         if ($operation instanceof GraphQlOperation) {
             return $operation->getLinks() ?? [];

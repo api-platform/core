@@ -27,7 +27,7 @@ class ResolverFactoryTest extends TestCase
     /**
      * @dataProvider graphQlQueries
      */
-    public function testGraphQlResolver(string $resourceClass = null, string $rootClass = null, Operation $operation = null, Operation $providedOperation = null, Operation $processedOperation = null): void
+    public function testGraphQlResolver(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null, ?Operation $providedOperation = null, ?Operation $processedOperation = null): void
     {
         $returnValue = new \stdClass();
         $body = new \stdClass();

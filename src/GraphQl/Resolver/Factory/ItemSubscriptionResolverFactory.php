@@ -37,7 +37,7 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
     {
     }
 
-    public function __invoke(string $resourceClass = null, string $rootClass = null, Operation $operation = null): callable
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation): ?array {
             if (null === $resourceClass || null === $operation) {

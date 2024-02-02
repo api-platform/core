@@ -88,7 +88,7 @@ class Answer
     /**
      * Set question.
      */
-    public function setQuestion(Question $question = null): self
+    public function setQuestion(?Question $question = null): self
     {
         $this->question = $question;
 

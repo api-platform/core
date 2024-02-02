@@ -38,7 +38,7 @@ final class MainController
         ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         private readonly ProviderInterface $provider,
         private readonly ProcessorInterface $processor,
-        UriVariablesConverterInterface $uriVariablesConverter = null,
+        ?UriVariablesConverterInterface $uriVariablesConverter = null,
         private readonly ?LoggerInterface $logger = null
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;

@@ -54,7 +54,7 @@ final class ContextAction
      *
      * @return array{'@context': array<string, mixed>}|Response
      */
-    public function __invoke(string $shortName = 'Entrypoint', Request $request = null): array|Response
+    public function __invoke(string $shortName = 'Entrypoint', ?Request $request = null): array|Response
     {
         if (null !== $request && $this->provider && $this->processor && $this->serializer) {
             $operation = new Get(

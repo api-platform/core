@@ -48,14 +48,14 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
     /**
      * @dataProvider provideApplyTestData
      */
-    public function testApply(?array $properties, array $filterParameters, array $expectedPipeline, callable $factory = null, string $resourceClass = null): void
+    public function testApply(?array $properties, array $filterParameters, array $expectedPipeline, ?callable $factory = null, ?string $resourceClass = null): void
     {
         $this->doTestApply($properties, $filterParameters, $expectedPipeline, $factory, $resourceClass);
     }
 
-    protected function doTestApply(?array $properties, array $filterParameters, array $expectedPipeline, callable $filterFactory = null, string $resourceClass = null): void
+    protected function doTestApply(?array $properties, array $filterParameters, array $expectedPipeline, ?callable $filterFactory = null, ?string $resourceClass = null): void
     {
-        $filterFactory ??= fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): FilterInterface => new ($this->filterClass)($managerRegistry, null, $properties);
+        $filterFactory ??= fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): FilterInterface => new ($this->filterClass)($managerRegistry, null, $properties);
 
         $repository = $this->repository;
         if ($resourceClass) {
@@ -75,7 +75,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
         $this->assertEquals($expectedPipeline, $pipeline);
     }
 
-    protected function buildFilter(array $properties = null)
+    protected function buildFilter(?array $properties = null)
     {
         return new $this->filterClass($this->managerRegistry, null, $properties);
     }

@@ -41,7 +41,7 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
     /** @var array<string, PhpDocNode> */
     private array $docBlocks = [];
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated, DocBlockFactoryInterface $docBlockFactory = null)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated, ?DocBlockFactoryInterface $docBlockFactory = null)
     {
         $contextFactory = null;
         if ($docBlockFactory instanceof DocBlockFactoryInterface) {

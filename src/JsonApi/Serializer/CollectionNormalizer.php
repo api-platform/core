@@ -85,7 +85,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
      *
      * @throws UnexpectedValueException
      */
-    protected function getItemsData($object, string $format = null, array $context = []): array
+    protected function getItemsData($object, ?string $format = null, array $context = []): array
     {
         $data = [
             'data' => [],

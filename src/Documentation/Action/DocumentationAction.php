@@ -46,7 +46,7 @@ final class DocumentationAction
         private readonly ?OpenApiFactoryInterface $openApiFactory = null,
         private readonly ?ProviderInterface $provider = null,
         private readonly ?ProcessorInterface $processor = null,
-        Negotiator $negotiator = null,
+        ?Negotiator $negotiator = null,
         private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']]
     ) {
         $this->negotiator = $negotiator ?? new Negotiator();
@@ -55,7 +55,7 @@ final class DocumentationAction
     /**
      * @return DocumentationInterface|OpenApi|Response
      */
-    public function __invoke(Request $request = null)
+    public function __invoke(?Request $request = null)
     {
         if (null === $request) {
             return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);

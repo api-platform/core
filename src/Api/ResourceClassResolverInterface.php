@@ -30,7 +30,7 @@ interface ResourceClassResolverInterface
      *
      * @throws InvalidArgumentException
      */
-    public function getResourceClass(mixed $value, string $resourceClass = null, bool $strict = false): string;
+    public function getResourceClass(mixed $value, ?string $resourceClass = null, bool $strict = false): string;
 
     /**
      * Is the given class a resource class?

@@ -39,8 +39,8 @@ final class RespondListener
     ];
 
     public function __construct(
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
-        private readonly null|IriConverterInterface|LegacyIriConverterInterface $iriConverter = null,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
+        private readonly IriConverterInterface|LegacyIriConverterInterface|null $iriConverter = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }

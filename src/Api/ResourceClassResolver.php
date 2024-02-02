@@ -38,7 +38,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceClass(mixed $value, string $resourceClass = null, bool $strict = false): string
+    public function getResourceClass(mixed $value, ?string $resourceClass = null, bool $strict = false): string
     {
         if ($strict && null === $resourceClass) {
             throw new InvalidArgumentException('Strict checking is only possible when resource class is specified.');

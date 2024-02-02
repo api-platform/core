@@ -59,7 +59,7 @@ class CompositeItem implements \Stringable
     /**
      * Sets field1.
      */
-    public function setField1(string $field1 = null): void
+    public function setField1(?string $field1 = null): void
     {
         $this->field1 = $field1;
     }
