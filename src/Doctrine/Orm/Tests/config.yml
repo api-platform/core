@@ -20,6 +20,7 @@ api_platform:
     formats: 
         json: ['application/json']
     doctrine: true
+    keep_legacy_inflector: false
     mapping:
         paths:
             - '%kernel.project_dir%/Fixtures/Entity'
