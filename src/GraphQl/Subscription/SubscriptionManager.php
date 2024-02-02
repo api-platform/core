@@ -41,7 +41,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     {
     }
 
-    public function retrieveSubscriptionId(array $context, ?array $result, Operation $operation = null): ?string
+    public function retrieveSubscriptionId(array $context, ?array $result, ?Operation $operation = null): ?string
     {
         /** @var ResolveInfo $info */
         $info = $context['info'];

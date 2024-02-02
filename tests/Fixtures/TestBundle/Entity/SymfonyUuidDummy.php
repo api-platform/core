@@ -32,7 +32,7 @@ class SymfonyUuidDummy
     #[ORM\Column(nullable: true)]
     private ?string $number = null;
 
-    public function __construct(Uuid $id = null)
+    public function __construct(?Uuid $id = null)
     {
         $this->id = $id ?? Uuid::v4();
     }

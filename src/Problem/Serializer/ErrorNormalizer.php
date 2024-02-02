@@ -45,7 +45,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $data = [
             'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE],
@@ -63,7 +63,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         if ($context['api_error_resource'] ?? false) {
             return false;

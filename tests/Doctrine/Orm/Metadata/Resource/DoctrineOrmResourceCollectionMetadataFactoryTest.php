@@ -65,7 +65,7 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
     /**
      * @dataProvider operationProvider
      */
-    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null): void
+    public function testWithProvider(Operation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
     {
         $objectManager = $this->prophesize(EntityManagerInterface::class);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);

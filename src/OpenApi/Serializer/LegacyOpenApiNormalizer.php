@@ -27,7 +27,7 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $openapi = $this->decorated->normalize($object, $format, $context);
 
@@ -54,7 +54,7 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $this->decorated->supportsNormalization($data, $format, $context);
     }

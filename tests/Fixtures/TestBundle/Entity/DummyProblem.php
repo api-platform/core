@@ -191,12 +191,12 @@ class DummyProblem
         return $this->foo;
     }
 
-    public function setFoo(array $foo = null): void
+    public function setFoo(?array $foo = null): void
     {
         $this->foo = $foo;
     }
 
-    public function setDummyDate(\DateTime $dummyDate = null): void
+    public function setDummyDate(?\DateTime $dummyDate = null): void
     {
         $this->dummyDate = $dummyDate;
     }

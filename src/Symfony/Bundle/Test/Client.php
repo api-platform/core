@@ -121,7 +121,7 @@ final class Client implements HttpClientInterface
     /**
      * {@inheritdoc}
      */
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         throw new \LogicException('Not implemented yet');
     }

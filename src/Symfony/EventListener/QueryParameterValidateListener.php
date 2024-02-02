@@ -34,7 +34,7 @@ final class QueryParameterValidateListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'query_parameter_validate';
 
-    public function __construct(private readonly QueryParameterValidator $queryParameterValidator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+    public function __construct(private readonly QueryParameterValidator $queryParameterValidator, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }

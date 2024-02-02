@@ -37,7 +37,7 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $pathsCallback = static fn ($decoratedObject): array => $decoratedObject instanceof Paths ? $decoratedObject->getPaths() : [];
         $context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] = true;
@@ -72,7 +72,7 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return (self::FORMAT === $format || self::JSON_FORMAT === $format || self::YAML_FORMAT === $format) && $data instanceof OpenApi;
     }

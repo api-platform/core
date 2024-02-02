@@ -46,7 +46,7 @@ final class ApiLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function load(mixed $data, string $type = null): RouteCollection
+    public function load(mixed $data, ?string $type = null): RouteCollection
     {
         $routeCollection = new RouteCollection();
         foreach ($this->resourceClassDirectories as $directory) {
@@ -114,7 +114,7 @@ final class ApiLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'api_platform' === $type;
     }

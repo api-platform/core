@@ -30,7 +30,7 @@ final class ContentNegotiationProvider implements ProviderInterface
      * @param array<string, string[]> $formats
      * @param array<string, string[]> $errorFormats
      */
-    public function __construct(private readonly ProviderInterface $decorated, Negotiator $negotiator = null, private readonly array $formats = [], private readonly array $errorFormats = [])
+    public function __construct(private readonly ProviderInterface $decorated, ?Negotiator $negotiator = null, private readonly array $formats = [], private readonly array $errorFormats = [])
     {
         $this->negotiator = $negotiator ?? new Negotiator();
     }

@@ -34,7 +34,7 @@ final class AddFormatListener
 {
     use OperationRequestInitiatorTrait;
 
-    public function __construct(private readonly Negotiator $negotiator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [], private readonly array $errorFormats = [], private readonly array $docsFormats = [], private readonly ?bool $eventsBackwardCompatibility = null) // @phpstan-ignore-line
+    public function __construct(private readonly Negotiator $negotiator, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [], private readonly array $errorFormats = [], private readonly array $docsFormats = [], private readonly ?bool $eventsBackwardCompatibility = null) // @phpstan-ignore-line
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }

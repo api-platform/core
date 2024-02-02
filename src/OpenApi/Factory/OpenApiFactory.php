@@ -70,7 +70,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, private readonly TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, private readonly array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, private readonly TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, private readonly array $formats = [], ?Options $openApiOptions = null, ?PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
     {
         $this->filterLocator = $filterLocator;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
@@ -388,7 +388,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
     }
 
-    private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, Model\Operation $openapiOperation = null, HttpOperation $operation = null, array $responseMimeTypes = null, array $operationOutputSchemas = null, ResourceMetadataCollection $resourceMetadataCollection = null): Model\Operation
+    private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, ?Model\Operation $openapiOperation = null, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null): Model\Operation
     {
         if (isset($existingResponses[$status])) {
             return $openapiOperation;

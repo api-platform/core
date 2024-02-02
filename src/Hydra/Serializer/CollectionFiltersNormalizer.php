@@ -50,7 +50,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
@@ -82,7 +82,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && $object instanceof \ArrayObject && !\count($object)) {
             return $object;

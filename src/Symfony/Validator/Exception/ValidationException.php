@@ -67,7 +67,7 @@ final class ValidationException extends BaseValidationException implements Const
 {
     private int $status = 422;
 
-    public function __construct(private readonly ConstraintViolationListInterface $constraintViolationList, string $message = '', int $code = 0, \Throwable $previous = null, string $errorTitle = null)
+    public function __construct(private readonly ConstraintViolationListInterface $constraintViolationList, string $message = '', int $code = 0, ?\Throwable $previous = null, ?string $errorTitle = null)
     {
         parent::__construct($message ?: $this->__toString(), $code, $previous, $errorTitle);
     }

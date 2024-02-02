@@ -110,7 +110,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
         throw new PropertyNotFoundException(sprintf('Property "%s" of class "%s" not found.', $property, $resourceClass));
     }
 
-    private function createMetadata(ApiProperty $attribute, ApiProperty $propertyMetadata = null): ApiProperty
+    private function createMetadata(ApiProperty $attribute, ?ApiProperty $propertyMetadata = null): ApiProperty
     {
         if (null === $propertyMetadata) {
             return $this->handleUserDefinedSchema($attribute);

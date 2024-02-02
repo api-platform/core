@@ -26,7 +26,7 @@ class ValidationExceptionNormalizer implements NormalizerInterface, CacheableSup
     {
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $messages = [];
         foreach ($object->getConstraintViolationList() as $violation) {
@@ -49,7 +49,7 @@ class ValidationExceptionNormalizer implements NormalizerInterface, CacheableSup
         return $this->decorated->normalize($object, $format, $context);
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof ValidationException && $this->decorated->supportsNormalization($data, $format, $context);
     }
