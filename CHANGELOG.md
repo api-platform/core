@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.2.13
+
+### Bug fixes
+
+* [05713bfc8](https://github.com/api-platform/core/commit/05713bfc8ca4e749d408aaf870a4880e6c8fa74f) fix(hydra): move owl:maxCardinality from JsonSchema to Hydra (#6136)
+
 ## v3.2.12
 
 ### Bug fixes

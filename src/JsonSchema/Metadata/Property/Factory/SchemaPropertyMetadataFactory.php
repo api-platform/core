@@ -125,14 +125,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
                 $className = $valueType->getClassName();
             }
 
-            if (!\array_key_exists('owl:maxCardinality', $propertySchema)
-                && !$isCollection
-                && null !== $className
-                && $this->resourceClassResolver->isResourceClass($className)
-            ) {
-                $propertySchema['owl:maxCardinality'] = 1;
-            }
-
             if ($isCollection && null !== $propertyMetadata->getUriTemplate()) {
                 $keyType = null;
                 $isCollection = false;

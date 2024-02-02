@@ -98,7 +98,6 @@ Feature: Documentation support
     And the "playMode" property for the OpenAPI class "VideoGame" should be equal to:
     """
     {
-      "owl:maxCardinality": 1,
       "type": "string",
       "format": "iri-reference",
       "example": "https://example.com/"
@@ -310,7 +309,6 @@ Feature: Documentation support
     And the "resourceRelated" property for the OpenAPI class "Resource" should be equal to:
     """
     {
-      "owl:maxCardinality": 1,
       "readOnly": true,
       "anyOf": [
         {
@@ -389,7 +387,6 @@ Feature: Documentation support
     And the "data" property for the OpenAPI class "WrappedResponseEntity.CustomOutputEntityWrapperDto-read" should be equal to:
     """
     {
-      "owl:maxCardinality": 1,
       "$ref": "#\/components\/schemas\/WrappedResponseEntity-read"
     }
     """

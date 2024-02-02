@@ -45,7 +45,6 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
                     }
                     unset($schemas[$name]['properties'][$property]['type']);
                 }
-                unset($schemas[$name]['properties'][$property]['owl:maxCardinality']);
             }
         }
 
