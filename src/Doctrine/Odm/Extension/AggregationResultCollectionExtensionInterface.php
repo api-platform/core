@@ -24,7 +24,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  */
 interface AggregationResultCollectionExtensionInterface extends AggregationCollectionExtensionInterface
 {
-    public function supportsResult(string $resourceClass, Operation $operation = null, array $context = []): bool;
+    public function supportsResult(string $resourceClass, ?Operation $operation = null, array $context = []): bool;
 
-    public function getResult(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array $context = []): iterable;
+    public function getResult(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array $context = []): iterable;
 }

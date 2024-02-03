@@ -75,7 +75,7 @@ final class IterableType extends ScalarType implements TypeInterface
      *
      * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
      */
-    public function parseLiteral(Node $valueNode, array $variables = null): float|array|bool|int|string|null
+    public function parseLiteral(Node $valueNode, ?array $variables = null): float|array|bool|int|string|null
     {
         if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
             return $this->parseIterableLiteral($valueNode);

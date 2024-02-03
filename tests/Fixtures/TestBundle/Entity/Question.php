@@ -65,7 +65,7 @@ class Question
     /**
      * Set answer.
      */
-    public function setAnswer(Answer $answer = null): self
+    public function setAnswer(?Answer $answer = null): self
     {
         $this->answer = $answer;
 

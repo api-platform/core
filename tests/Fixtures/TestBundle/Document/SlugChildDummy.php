@@ -62,7 +62,7 @@ class SlugChildDummy
         return $this->parentDummy;
     }
 
-    public function setParentDummy(SlugParentDummy $parentDummy = null): self
+    public function setParentDummy(?SlugParentDummy $parentDummy = null): self
     {
         $this->parentDummy = $parentDummy;
 

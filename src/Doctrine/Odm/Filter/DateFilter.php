@@ -129,7 +129,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
+    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (
@@ -197,7 +197,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
     /**
      * Adds the match stage according to the chosen null management.
      */
-    private function addMatch(Builder $aggregationBuilder, string $field, string $operator, $value, string $nullManagement = null): void
+    private function addMatch(Builder $aggregationBuilder, string $field, string $operator, $value, ?string $nullManagement = null): void
     {
         $value = $this->normalizeValue($value, $operator);
 

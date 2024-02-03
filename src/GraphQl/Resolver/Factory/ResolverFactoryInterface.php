@@ -22,5 +22,5 @@ use ApiPlatform\Metadata\GraphQl\Operation;
  */
 interface ResolverFactoryInterface
 {
-    public function __invoke(string $resourceClass = null, string $rootClass = null, Operation $operation = null): callable;
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable;
 }

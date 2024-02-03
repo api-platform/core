@@ -178,7 +178,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $serializerContextBuilderFilter->createFromRequest($request, true);
     }
 
-    private function getMetadataWithFilter(string $class, array $filters = null): ResourceMetadataCollection
+    private function getMetadataWithFilter(string $class, ?array $filters = null): ResourceMetadataCollection
     {
         return new ResourceMetadataCollection($class, [
             new ApiResource(operations: [

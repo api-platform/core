@@ -22,7 +22,7 @@ trait OperationContextTrait
      * This context is created when working on a relation context or items of a collection. It cleans the previously given
      * context as the operation changes.
      */
-    protected function createOperationContext(array $context, string $resourceClass = null): array
+    protected function createOperationContext(array $context, ?string $resourceClass = null): array
     {
         if (isset($context['operation']) && !isset($context['root_operation'])) {
             $context['root_operation'] = $context['operation'];

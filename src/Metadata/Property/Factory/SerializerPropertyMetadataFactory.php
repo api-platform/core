@@ -30,7 +30,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 {
     use ResourceClassInfoTrait;
 
-    public function __construct(private readonly SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(private readonly SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, ?ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
     }
@@ -80,7 +80,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
-    private function transformReadWrite(ApiProperty $propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null): ApiProperty
+    private function transformReadWrite(ApiProperty $propertyMetadata, string $resourceClass, string $propertyName, ?array $normalizationGroups = null, ?array $denormalizationGroups = null): ApiProperty
     {
         $serializerAttributeMetadata = $this->getSerializerAttributeMetadata($resourceClass, $propertyName);
         $groups = $serializerAttributeMetadata ? $serializerAttributeMetadata->getGroups() : [];
@@ -106,7 +106,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
-    private function transformLinkStatus(ApiProperty $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null, array $types = null): ApiProperty
+    private function transformLinkStatus(ApiProperty $propertyMetadata, ?array $normalizationGroups = null, ?array $denormalizationGroups = null, ?array $types = null): ApiProperty
     {
         // No need to check link status if property is not readable and not writable
         if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {

@@ -31,7 +31,7 @@ final class QueryBuilderHelper
     /**
      * Adds a join to the QueryBuilder if none exists.
      */
-    public static function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, string $joinType = null, string $conditionType = null, string $condition = null, string $originAlias = null, string $newAlias = null): string
+    public static function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, ?string $joinType = null, ?string $conditionType = null, ?string $condition = null, ?string $originAlias = null, ?string $newAlias = null): string
     {
         $join = self::getExistingJoin($queryBuilder, $alias, $association, $originAlias);
 
@@ -160,7 +160,7 @@ final class QueryBuilderHelper
     /**
      * Gets the existing join from QueryBuilder DQL parts.
      */
-    public static function getExistingJoin(QueryBuilder $queryBuilder, string $alias, string $association, string $originAlias = null): ?Join
+    public static function getExistingJoin(QueryBuilder $queryBuilder, string $alias, string $association, ?string $originAlias = null): ?Join
     {
         $parts = $queryBuilder->getDQLPart('join');
         $rootAlias = $originAlias ?? $queryBuilder->getRootAliases()[0];

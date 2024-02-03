@@ -40,50 +40,50 @@ class Operation extends AbstractOperation
         protected ?array $extraArgs = null,
         protected ?array $links = null,
 
-        string $shortName = null,
-        string $class = null,
-        bool $paginationEnabled = null,
-        string $paginationType = null,
-        int $paginationItemsPerPage = null,
-        int $paginationMaximumItemsPerPage = null,
-        bool $paginationPartial = null,
-        bool $paginationClientEnabled = null,
-        bool $paginationClientItemsPerPage = null,
-        bool $paginationClientPartial = null,
-        bool $paginationFetchJoinCollection = null,
-        bool $paginationUseOutputWalkers = null,
-        array $order = null,
-        string $description = null,
-        array $normalizationContext = null,
-        array $denormalizationContext = null,
-        bool $collectDenormalizationErrors = null,
-        string $security = null,
-        string $securityMessage = null,
-        string $securityPostDenormalize = null,
-        string $securityPostDenormalizeMessage = null,
-        string $securityPostValidation = null,
-        string $securityPostValidationMessage = null,
-        string $deprecationReason = null,
-        array $filters = null,
-        array $validationContext = null,
+        ?string $shortName = null,
+        ?string $class = null,
+        ?bool $paginationEnabled = null,
+        ?string $paginationType = null,
+        ?int $paginationItemsPerPage = null,
+        ?int $paginationMaximumItemsPerPage = null,
+        ?bool $paginationPartial = null,
+        ?bool $paginationClientEnabled = null,
+        ?bool $paginationClientItemsPerPage = null,
+        ?bool $paginationClientPartial = null,
+        ?bool $paginationFetchJoinCollection = null,
+        ?bool $paginationUseOutputWalkers = null,
+        ?array $order = null,
+        ?string $description = null,
+        ?array $normalizationContext = null,
+        ?array $denormalizationContext = null,
+        ?bool $collectDenormalizationErrors = null,
+        ?string $security = null,
+        ?string $securityMessage = null,
+        ?string $securityPostDenormalize = null,
+        ?string $securityPostDenormalizeMessage = null,
+        ?string $securityPostValidation = null,
+        ?string $securityPostValidationMessage = null,
+        ?string $deprecationReason = null,
+        ?array $filters = null,
+        ?array $validationContext = null,
         $input = null,
         $output = null,
         $mercure = null,
         $messenger = null,
-        bool $elasticsearch = null,
-        int $urlGenerationStrategy = null,
-        bool $read = null,
-        bool $deserialize = null,
-        bool $validate = null,
-        bool $write = null,
-        bool $serialize = null,
-        bool $fetchPartial = null,
-        bool $forceEager = null,
-        int $priority = null,
-        string $name = null,
+        ?bool $elasticsearch = null,
+        ?int $urlGenerationStrategy = null,
+        ?bool $read = null,
+        ?bool $deserialize = null,
+        ?bool $validate = null,
+        ?bool $write = null,
+        ?bool $serialize = null,
+        ?bool $fetchPartial = null,
+        ?bool $forceEager = null,
+        ?int $priority = null,
+        ?string $name = null,
         $provider = null,
         $processor = null,
-        OptionsInterface $stateOptions = null,
+        ?OptionsInterface $stateOptions = null,
         array $extraProperties = []
     ) {
         parent::__construct(
@@ -140,7 +140,7 @@ class Operation extends AbstractOperation
         return $this->resolver;
     }
 
-    public function withResolver(string $resolver = null): self
+    public function withResolver(?string $resolver = null): self
     {
         $self = clone $this;
         $self->resolver = $resolver;
@@ -153,7 +153,7 @@ class Operation extends AbstractOperation
         return $this->args;
     }
 
-    public function withArgs(array $args = null): self
+    public function withArgs(?array $args = null): self
     {
         $self = clone $this;
         $self->args = $args;
@@ -166,7 +166,7 @@ class Operation extends AbstractOperation
         return $this->extraArgs;
     }
 
-    public function withExtraArgs(array $extraArgs = null): self
+    public function withExtraArgs(?array $extraArgs = null): self
     {
         $self = clone $this;
         $self->extraArgs = $extraArgs;

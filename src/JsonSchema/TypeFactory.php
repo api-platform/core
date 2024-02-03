@@ -33,7 +33,7 @@ final class TypeFactory implements TypeFactoryInterface
 
     private ?SchemaFactoryInterface $schemaFactory = null;
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(?ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
     }
@@ -46,7 +46,7 @@ final class TypeFactory implements TypeFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array
+    public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, ?Schema $schema = null): array
     {
         if ('jsonschema' === $format) {
             return [];
@@ -73,7 +73,7 @@ final class TypeFactory implements TypeFactoryInterface
         return $this->addNullabilityToTypeDefinition($this->makeBasicType($type, $format, $readableLink, $serializerContext, $schema), $type, $schema);
     }
 
-    private function makeBasicType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array
+    private function makeBasicType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, ?Schema $schema = null): array
     {
         return match ($type->getBuiltinType()) {
             Type::BUILTIN_TYPE_INT => ['type' => 'integer'],

@@ -22,5 +22,5 @@ use ApiPlatform\Metadata\GraphQl\Operation;
  */
 interface OperationAwareSubscriptionManagerInterface extends SubscriptionManagerInterface
 {
-    public function retrieveSubscriptionId(array $context, ?array $result, Operation $operation = null): ?string;
+    public function retrieveSubscriptionId(array $context, ?array $result, ?Operation $operation = null): ?string;
 }

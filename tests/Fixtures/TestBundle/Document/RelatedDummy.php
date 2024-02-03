@@ -148,7 +148,7 @@ class RelatedDummy extends ParentDummy implements \Stringable
         return $this->thirdLevel;
     }
 
-    public function setThirdLevel(ThirdLevel $thirdLevel = null): void
+    public function setThirdLevel(?ThirdLevel $thirdLevel = null): void
     {
         $this->thirdLevel = $thirdLevel;
     }

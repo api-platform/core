@@ -34,7 +34,7 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
     /**
      * {@inheritdoc}
      */
-    public function createFromRequest(Request $request, bool $normalization, array $attributes = null): array
+    public function createFromRequest(Request $request, bool $normalization, ?array $attributes = null): array
     {
         if (null === $attributes && !$attributes = AttributesExtractor::extractAttributes($request->attributes->all())) {
             throw new RuntimeException('Request attributes are not valid.');

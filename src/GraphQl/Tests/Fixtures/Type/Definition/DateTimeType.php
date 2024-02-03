@@ -78,7 +78,7 @@ final class DateTimeType extends ScalarType implements TypeInterface
     /**
      * {@inheritdoc}
      */
-    public function parseLiteral(Node $valueNode, array $variables = null): string
+    public function parseLiteral(Node $valueNode, ?array $variables = null): string
     {
         if ($valueNode instanceof StringValueNode && false !== \DateTime::createFromFormat(\DateTime::ATOM, $valueNode->value)) {
             return $valueNode->value;

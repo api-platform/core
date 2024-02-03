@@ -69,7 +69,7 @@ class NormalizeProcessorTest extends TestCase
     /**
      * @dataProvider processCollection
      */
-    public function testProcessCollection($collection, $operation, $args, ?array $expectedResult, array $getFieldSelection, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
+    public function testProcessCollection($collection, $operation, $args, ?array $expectedResult, array $getFieldSelection, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $this->resolveInfoProphecy->getFieldSelection(1)->willReturn($getFieldSelection);
         $context = ['args' => $args, 'info' => $this->resolveInfoProphecy->reveal()];

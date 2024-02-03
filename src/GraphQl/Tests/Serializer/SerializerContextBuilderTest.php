@@ -42,12 +42,12 @@ class SerializerContextBuilderTest extends TestCase
         $this->serializerContextBuilder = $this->buildSerializerContextBuilder();
     }
 
-    private function buildSerializerContextBuilder(AdvancedNameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
+    private function buildSerializerContextBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
     {
         return new SerializerContextBuilder($advancedNameConverter ?? new CustomConverter());
     }
 
-    private function buildOperationFromContext(bool $isMutation, bool $isSubscription, array $expectedContext, bool $isNormalization = true, string $resourceClass = null): Operation
+    private function buildOperationFromContext(bool $isMutation, bool $isSubscription, array $expectedContext, bool $isNormalization = true, ?string $resourceClass = null): Operation
     {
         $operation = !$isMutation && !$isSubscription ? new Query() : new Mutation();
         if ($isSubscription) {
@@ -85,7 +85,7 @@ class SerializerContextBuilderTest extends TestCase
     /**
      * @dataProvider createNormalizationContextProvider
      */
-    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, callable $advancedNameConverter = null, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
+    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, ?callable $advancedNameConverter = null, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $resolverContext = [];
 

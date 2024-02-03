@@ -48,7 +48,7 @@ final class EntrypointAction
         private readonly bool $graphiqlEnabled = false,
         private readonly bool $graphQlPlaygroundEnabled = false,
         private readonly ?string $defaultIde = null,
-        Negotiator $negotiator = null
+        ?Negotiator $negotiator = null
     ) {
         $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
         $this->negotiator = $negotiator ?? new Negotiator();

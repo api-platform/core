@@ -35,7 +35,7 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $validationException = $object->getPrevious();
         if (!$validationException instanceof ConstraintViolationListAwareExceptionInterface) {
@@ -75,7 +75,7 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Error && ($data->getPrevious() instanceof ConstraintViolationListAwareExceptionInterface);
     }
