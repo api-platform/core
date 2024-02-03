@@ -48,7 +48,7 @@ final class DeserializeListener
     private SerializerInterface $serializer;
     private ?ProviderInterface $provider = null;
 
-    public function __construct(ProviderInterface|SerializerInterface $serializer, private readonly null|SerializerContextBuilderInterface|ResourceMetadataCollectionFactoryInterface $serializerContextBuilder = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
+    public function __construct(ProviderInterface|SerializerInterface $serializer, private readonly SerializerContextBuilderInterface|ResourceMetadataCollectionFactoryInterface|null $serializerContextBuilder = null, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?TranslatorInterface $translator = null)
     {
         if ($serializer instanceof ProviderInterface) {
             $this->provider = $serializer;

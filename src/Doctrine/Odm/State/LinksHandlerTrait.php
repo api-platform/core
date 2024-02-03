@@ -31,7 +31,7 @@ trait LinksHandlerTrait
 
     private ManagerRegistry $managerRegistry;
 
-    private function handleLinks(Builder $aggregationBuilder, array $identifiers, array $context, string $resourceClass, Operation $operation = null): void
+    private function handleLinks(Builder $aggregationBuilder, array $identifiers, array $context, string $resourceClass, ?Operation $operation = null): void
     {
         if (!$identifiers) {
             return;

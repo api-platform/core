@@ -25,7 +25,7 @@ final class ValidationException extends \Exception implements ValidationExceptio
     /**
      * @param string[] $constraintViolationList
      */
-    public function __construct(private readonly array $constraintViolationList, string $message = '', int $code = 0, \Exception $previous = null)
+    public function __construct(private readonly array $constraintViolationList, string $message = '', int $code = 0, ?\Exception $previous = null)
     {
         parent::__construct($message ?: $this->__toString(), $code, $previous);
     }

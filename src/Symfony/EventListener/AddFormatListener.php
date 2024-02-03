@@ -42,7 +42,7 @@ final class AddFormatListener
     /**
      * @param ProviderInterface|Negotiator $negotiator
      */
-    public function __construct($negotiator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [], private readonly array $errorFormats = [], private readonly array $docsFormats = [], private readonly ?bool $eventsBackwardCompatibility = null) // @phpstan-ignore-line
+    public function __construct($negotiator, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly array $formats = [], private readonly array $errorFormats = [], private readonly array $docsFormats = [], private readonly ?bool $eventsBackwardCompatibility = null) // @phpstan-ignore-line
     {
         if ($negotiator instanceof ProviderInterface) {
             $this->provider = $negotiator;

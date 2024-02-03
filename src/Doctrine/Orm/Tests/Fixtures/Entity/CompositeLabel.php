@@ -53,7 +53,7 @@ class CompositeLabel implements \Stringable
      *
      * @param string|null $value the value to set
      */
-    public function setValue(string $value = null): void
+    public function setValue(?string $value = null): void
     {
         $this->value = $value;
     }

@@ -50,8 +50,8 @@ final class SerializeListener
 
     public function __construct(
         SerializerInterface|ProcessorInterface $serializer,
-        SerializerContextBuilderInterface|ResourceMetadataCollectionFactoryInterface $serializerContextBuilder = null,
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
+        SerializerContextBuilderInterface|ResourceMetadataCollectionFactoryInterface|null $serializerContextBuilder = null,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
         private readonly array $errorFormats = [],
         // @phpstan-ignore-next-line we don't need this anymore
         private readonly bool $debug = false,

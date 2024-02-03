@@ -56,10 +56,10 @@ final class WriteListener
      */
     public function __construct(
         private readonly ProcessorInterface $processor,
-        LegacyIriConverterInterface|IriConverterInterface|ResourceMetadataCollectionFactoryInterface $iriConverter = null,
-        private readonly null|ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver = null,
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
-        LegacyUriVariablesConverterInterface|UriVariablesConverterInterface $uriVariablesConverter = null,
+        LegacyIriConverterInterface|IriConverterInterface|ResourceMetadataCollectionFactoryInterface|null $iriConverter = null,
+        private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface|null $resourceClassResolver = null,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        LegacyUriVariablesConverterInterface|UriVariablesConverterInterface|null $uriVariablesConverter = null,
     ) {
         $this->uriVariablesConverter = $uriVariablesConverter;
 

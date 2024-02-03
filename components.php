@@ -86,7 +86,7 @@ foreach ($map as $component) {
 }
 
 $warned = [];
-$getComponentNamespace = function (ReflectionClass $r, ReflectionClass $inside = null) use ($psrMap, $warned, $ignoreList, $namespace) {
+$getComponentNamespace = function (ReflectionClass $r, ?ReflectionClass $inside = null) use ($psrMap, $warned, $ignoreList, $namespace) {
     $ns = $r->getNamespaceName();
     // Find this components namespace
     $nsParts = explode('\\', $ns);

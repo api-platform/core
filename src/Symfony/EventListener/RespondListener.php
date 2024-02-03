@@ -39,10 +39,10 @@ final class RespondListener
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
-    private null|IriConverterInterface|LegacyIriConverterInterface $iriConverter = null;
+    private IriConverterInterface|LegacyIriConverterInterface|null $iriConverter = null;
     private ?ProcessorInterface $processor = null;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, IriConverterInterface|LegacyIriConverterInterface|ProcessorInterface $iriConverter = null)
+    public function __construct(?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, IriConverterInterface|LegacyIriConverterInterface|ProcessorInterface|null $iriConverter = null)
     {
         if ($iriConverter instanceof ProcessorInterface) {
             $this->processor = $iriConverter;

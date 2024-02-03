@@ -92,7 +92,7 @@ trait LinksHandlerTrait
     /**
      * @param array<int|string,mixed> $identifiers
      */
-    private function getIdentifierValue(array &$identifiers, string $name = null): mixed
+    private function getIdentifierValue(array &$identifiers, ?string $name = null): mixed
     {
         if (null !== $name && isset($identifiers[$name])) {
             $value = $identifiers[$name];
@@ -107,7 +107,7 @@ trait LinksHandlerTrait
     /**
      * @return \ApiPlatform\Metadata\Link[]|array
      */
-    private function getOperationLinks(Operation $operation = null): array
+    private function getOperationLinks(?Operation $operation = null): array
     {
         if ($operation instanceof GraphQlOperation) {
             return $operation->getLinks() ?? [];
