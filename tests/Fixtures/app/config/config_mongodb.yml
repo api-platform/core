@@ -96,31 +96,31 @@ services:
         public: false
         arguments: ['@doctrine_mongodb']
         tags:
-            -  { name: 'api_platform.state_provider' }
+            - name: 'api_platform.state_provider'
 
     app.graphql.query_resolver.dummy_custom_not_retrieved_item_document:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemDocumentResolver'
         public: false
         tags:
-            - { name: 'api_platform.graphql.resolver' }
+            - name: 'api_platform.graphql.resolver'
 
     app.graphql.query_resolver.dummy_custom_item_no_read_and_serialize_document:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeItemDocumentResolver'
         public: false
         tags:
-            - { name: 'api_platform.graphql.resolver' }
+            - name: 'api_platform.graphql.resolver'
 
     app.graphql.mutation_resolver.dummy_custom_only_persist_document:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumOnlyPersistDocumentMutationResolver'
         public: false
         tags:
-            - { name: 'api_platform.graphql.resolver' }
+            - name: 'api_platform.graphql.resolver'
 
     app.messenger_handler.messenger_with_inputs:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Document\MessengerWithInputHandler'
         public: false
         tags:
-            -  { name: 'messenger.message_handler' }
+            - name: 'messenger.message_handler'
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider: 
         arguments:
