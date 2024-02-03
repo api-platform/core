@@ -48,15 +48,15 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
     /**
      * @dataProvider provideApplyTestData
      */
-    public function testApply(?array $properties, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $factory = null, string $resourceClass = null): void
+    public function testApply(?array $properties, array $filterParameters, string $expectedDql, ?array $expectedParameters = null, ?callable $factory = null, ?string $resourceClass = null): void
     {
         $this->doTestApply($properties, $filterParameters, $expectedDql, $expectedParameters, $factory, $resourceClass);
     }
 
-    protected function doTestApply(?array $properties, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $filterFactory = null, string $resourceClass = null): void
+    protected function doTestApply(?array $properties, array $filterParameters, string $expectedDql, ?array $expectedParameters = null, ?callable $filterFactory = null, ?string $resourceClass = null): void
     {
         if (null === $filterFactory) {
-            $filterFactory = fn (self $that, ManagerRegistry $managerRegistry, array $properties = null): FilterInterface => new ($this->filterClass)($managerRegistry, null, $properties);
+            $filterFactory = fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): FilterInterface => new ($this->filterClass)($managerRegistry, null, $properties);
         }
 
         $repository = $this->repository;
@@ -83,7 +83,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
         }
     }
 
-    protected function buildFilter(array $properties = null)
+    protected function buildFilter(?array $properties = null)
     {
         return new $this->filterClass($this->managerRegistry, null, $properties);
     }

@@ -21,12 +21,12 @@ use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 
 trait UriVariablesResolverTrait
 {
-    private null|LegacyUriVariablesConverterInterface|UriVariablesConverterInterface $uriVariablesConverter = null;
+    private LegacyUriVariablesConverterInterface|UriVariablesConverterInterface|null $uriVariablesConverter = null;
 
     /**
      * Resolves an operation's UriVariables to their identifiers values.
      */
-    private function getOperationUriVariables(HttpOperation $operation = null, array $parameters = [], string $resourceClass = null): array
+    private function getOperationUriVariables(?HttpOperation $operation = null, array $parameters = [], ?string $resourceClass = null): array
     {
         $identifiers = [];
 

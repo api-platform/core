@@ -79,7 +79,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         if (!\is_object($data) || is_iterable($data)) {
             return false;
@@ -122,7 +122,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @throws LogicException
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $resourceClass = $context['force_resource_class'] ?? $this->getObjectClass($object);
         if ($outputClass = $this->getOutputClass($context)) {
@@ -199,7 +199,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         if (($context['input']['class'] ?? null) === $type) {
             return true;
@@ -211,7 +211,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $class, ?string $format = null, array $context = []): mixed
     {
         $resourceClass = $class;
 
@@ -300,7 +300,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @internal
      */
-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, ?string $format = null): object
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
             unset($context[static::OBJECT_TO_POPULATE]);
@@ -390,7 +390,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $mappedClass;
     }
 
-    protected function createConstructorArgument($parameterData, string $key, \ReflectionParameter $constructorParameter, array &$context, string $format = null): mixed
+    protected function createConstructorArgument($parameterData, string $key, \ReflectionParameter $constructorParameter, array &$context, ?string $format = null): mixed
     {
         return $this->createAndValidateAttributeValue($constructorParameter->name, $parameterData, $format, $context);
     }
@@ -440,7 +440,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
+    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, ?string $format = null, array $context = []): bool
     {
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
             return false;
@@ -491,7 +491,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
     {
         try {
             $this->setValue($object, $attribute, $this->createAttributeValue($attribute, $value, $format, $context));
@@ -508,7 +508,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @throws NotNormalizableValueException
      */
-    protected function validateType(string $attribute, Type $type, mixed $value, string $format = null, array $context = []): void
+    protected function validateType(string $attribute, Type $type, mixed $value, ?string $format = null, array $context = []): void
     {
         $builtinType = $type->getBuiltinType();
         if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && str_contains($format, 'json')) {
@@ -650,7 +650,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @throws UnexpectedValueException
      */
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
     {
         $context['api_attribute'] = $attribute;
         $context['property_metadata'] = $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
@@ -845,7 +845,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $iri;
     }
 
-    private function createAttributeValue(string $attribute, mixed $value, string $format = null, array &$context = []): mixed
+    private function createAttributeValue(string $attribute, mixed $value, ?string $format = null, array &$context = []): mixed
     {
         try {
             return $this->createAndValidateAttributeValue($attribute, $value, $format, $context);
@@ -859,7 +859,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
     }
 
-    private function createAndValidateAttributeValue(string $attribute, mixed $value, string $format = null, array $context = []): mixed
+    private function createAndValidateAttributeValue(string $attribute, mixed $value, ?string $format = null, array $context = []): mixed
     {
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
         $types = $propertyMetadata->getBuiltinTypes() ?? [];

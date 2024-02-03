@@ -24,7 +24,7 @@ class TypeFactoryDecorator implements TypeFactoryInterface
     ) {
     }
 
-    public function getType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array
+    public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, ?Schema $schema = null): array
     {
         if (is_a($type->getClassName(), LocalDate::class, true)) {
             return [

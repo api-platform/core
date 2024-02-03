@@ -51,7 +51,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $classes = [];
         $entrypointProperties = [];
@@ -72,7 +72,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Populates entrypoint properties.
      */
-    private function populateEntrypointProperties(ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, ResourceMetadataCollection $resourceMetadataCollection = null): void
+    private function populateEntrypointProperties(ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, ?ResourceMetadataCollection $resourceMetadataCollection = null): void
     {
         $hydraCollectionOperations = $this->getHydraOperations(true, $resourceMetadataCollection);
         if (empty($hydraCollectionOperations)) {
@@ -112,7 +112,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets a Hydra class.
      */
-    private function getClass(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array $context, ResourceMetadataCollection $resourceMetadataCollection = null): array
+    private function getClass(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array $context, ?ResourceMetadataCollection $resourceMetadataCollection = null): array
     {
         $description = $resourceMetadata->getDescription();
         $isDeprecated = $resourceMetadata->getDeprecationReason();
@@ -223,7 +223,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets Hydra operations.
      */
-    private function getHydraOperations(bool $collection, ResourceMetadataCollection $resourceMetadataCollection = null): array
+    private function getHydraOperations(bool $collection, ?ResourceMetadataCollection $resourceMetadataCollection = null): array
     {
         $hydraOperations = [];
         foreach ($resourceMetadataCollection as $resourceMetadata) {
@@ -386,6 +386,23 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return 1 === \count($types) ? $types[0] : $types;
     }
 
+    private function isSingleRelation(ApiProperty $propertyMetadata): bool
+    {
+        $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
+
+        foreach ($builtInTypes as $type) {
+            $className = $type->getClassName();
+            if (!$type->isCollection()
+                && null !== $className
+                && $this->resourceClassResolver->isResourceClass($className)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Builds the classes array.
      */
@@ -509,6 +526,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $property['owl:deprecated'] = true;
         }
 
+        if ($this->isSingleRelation($propertyMetadata)) {
+            $property['owl:maxCardinality'] = true;
+        }
+
         return $property;
     }
 
@@ -557,7 +578,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof Documentation;
     }

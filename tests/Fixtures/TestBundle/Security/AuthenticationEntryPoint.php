@@ -28,7 +28,7 @@ final class AuthenticationEntryPoint implements AuthenticationEntryPointInterfac
     {
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if ('html' === $request->getRequestFormat()) {
             return new RedirectResponse($this->router->generate('api_doc', [], UrlGeneratorInterface::ABSOLUTE_URL));

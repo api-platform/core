@@ -31,7 +31,7 @@ class RamseyUuidDummy
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?UuidInterface $other = null;
 
-    public function __construct(UuidInterface $id = null)
+    public function __construct(?UuidInterface $id = null)
     {
         $this->id = $id ?? Uuid::uuid4();
     }

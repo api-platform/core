@@ -63,7 +63,7 @@ trait NumericFilterTrait
     /**
      * Gets the PHP type corresponding to this Doctrine type.
      */
-    abstract protected function getType(string $doctrineType = null): string;
+    abstract protected function getType(?string $doctrineType = null): string;
 
     abstract protected function getProperties(): ?array;
 

@@ -50,7 +50,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return static::FORMAT === $format && is_iterable($data);
     }
@@ -91,7 +91,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      *
      * @param iterable $object
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $this->normalizeRawCollection($object, $format, $context);
@@ -111,7 +111,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     /**
      * Normalizes a raw collection (not API resources).
      */
-    protected function normalizeRawCollection(iterable $object, string $format = null, array $context = []): array|\ArrayObject
+    protected function normalizeRawCollection(iterable $object, ?string $format = null, array $context = []): array|\ArrayObject
     {
         if (!$object && ($context[Serializer::EMPTY_ARRAY_AS_OBJECT] ?? false) && \is_array($object)) {
             return new \ArrayObject();
@@ -166,5 +166,5 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     /**
      * Gets items data.
      */
-    abstract protected function getItemsData(iterable $object, string $format = null, array $context = []): array;
+    abstract protected function getItemsData(iterable $object, ?string $format = null, array $context = []): array;
 }

@@ -77,7 +77,7 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
         }
     }
 
-    private function buildExtraProperties(\SimpleXMLElement $resource, string $key = null): ?array
+    private function buildExtraProperties(\SimpleXMLElement $resource, ?string $key = null): ?array
     {
         if (null !== $key) {
             if (!isset($resource->{$key})) {

@@ -29,7 +29,7 @@ abstract class AbstractFilter implements FilterInterface
     use PropertyHelperTrait;
     protected LoggerInterface $logger;
 
-    public function __construct(protected ManagerRegistry $managerRegistry, LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
+    public function __construct(protected ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
     {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -37,7 +37,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         foreach ($context['filters'] as $property => $value) {
             $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
@@ -47,7 +47,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Passes a property through the filter.
      */
-    abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void;
+    abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void;
 
     protected function getManagerRegistry(): ManagerRegistry
     {

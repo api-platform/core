@@ -33,7 +33,7 @@ final class BackwardCompatibleSchemaFactory implements SchemaFactoryInterface, S
     /**
      * {@inheritDoc}
      */
-    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, Operation $operation = null, Schema $schema = null, array $serializerContext = null, bool $forceCollection = false): Schema
+    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = $this->decorated->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
 

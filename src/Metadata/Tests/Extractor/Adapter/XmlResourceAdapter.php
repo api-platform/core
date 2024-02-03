@@ -495,7 +495,7 @@ XML_WRAP
         }
     }
 
-    private function buildLinks(\SimpleXMLElement $resource, array $values = null): void
+    private function buildLinks(\SimpleXMLElement $resource, ?array $values = null): void
     {
         if (!$values) {
             return;

@@ -120,7 +120,6 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         ]);
 
         $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['type'], [
-            'owl:maxCardinality' => 1,
             '$ref' => '#/definitions/TestEntity.jsonld-write',
         ]);
     }

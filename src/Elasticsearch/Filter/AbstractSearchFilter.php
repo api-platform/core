@@ -35,12 +35,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractSearchFilter extends AbstractFilter implements ConstantScoreFilterInterface
 {
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected IriConverterInterface $iriConverter, protected PropertyAccessorInterface $propertyAccessor, NameConverterInterface $nameConverter = null, array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected IriConverterInterface $iriConverter, protected PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
     }
 
-    public function apply(array $clauseBody, string $resourceClass, Operation $operation = null, array $context = []): array
+    public function apply(array $clauseBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
     {
         $searches = [];
 
@@ -135,7 +135,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
     /**
      * Is the given property of the given resource class an identifier?
      */
-    protected function isIdentifier(string $resourceClass, string $property, Operation $operation = null): bool
+    protected function isIdentifier(string $resourceClass, string $property, ?Operation $operation = null): bool
     {
         $identifier = 'id';
         if ($operation instanceof HttpOperation) {

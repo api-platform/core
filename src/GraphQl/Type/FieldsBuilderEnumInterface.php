@@ -50,7 +50,7 @@ interface FieldsBuilderEnumInterface
     /**
      * Gets the fields of the type of the given resource.
      */
-    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, array $ioMetadata = null): array;
+    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, ?array $ioMetadata = null): array;
 
     /**
      * Gets the fields (cases) of the enum.
