@@ -161,22 +161,6 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
-    contain_non_resource.item_data_provider:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
-        tags:
-            -  { name: 'api_platform.item_data_provider' }
-
-    serializable.item_data_provider:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\SerializableItemDataProvider'
-        tags:
-            -  { name: 'api_platform.item_data_provider' }
-
-    resource_interface.data_provider:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ResourceInterfaceImplementationDataProvider'
-        tags:
-            -  { name: 'api_platform.item_data_provider' }
-            -  { name: 'api_platform.collection_data_provider' }
-
     app.serializer.denormalizer.serializable_resource:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'
         tags:
