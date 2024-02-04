@@ -116,7 +116,7 @@ services:
     ApiPlatform\Tests\Fixtures\TestBundle\State\EntityClassAndCustomProviderResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\EntityClassAndCustomProviderResourceProvider'
         tags:
-            -  { name: 'api_platform.state_provider' }
+            - name: 'api_platform.state_provider'
         arguments:
             $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
             $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'

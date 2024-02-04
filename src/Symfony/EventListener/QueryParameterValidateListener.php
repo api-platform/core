@@ -37,7 +37,7 @@ final class QueryParameterValidateListener
     private ?ParameterValidator $queryParameterValidator = null;
     private ?ProviderInterface $provider = null;
 
-    public function __construct($queryParameterValidator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+    public function __construct($queryParameterValidator, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
         if ($queryParameterValidator instanceof ProviderInterface) {
             $this->provider = $queryParameterValidator;

@@ -70,7 +70,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
     protected ?string $errorTitle = null;
     private ConstraintViolationListInterface $constraintViolationList;
 
-    public function __construct(string|ConstraintViolationListInterface $message = '', string|int $code = null, int|\Throwable $previous = null, \Throwable|string $errorTitle = null)
+    public function __construct(string|ConstraintViolationListInterface $message = '', string|int|null $code = null, int|\Throwable|null $previous = null, \Throwable|string|null $errorTitle = null)
     {
         $this->errorTitle = $errorTitle;
 

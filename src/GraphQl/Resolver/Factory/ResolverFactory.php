@@ -55,7 +55,7 @@ class ResolverFactory implements ResolverFactoryInterface
         };
     }
 
-    private function resolve(?array $source, array $args, ResolveInfo $info, string $rootClass = null, Operation $operation = null, mixed $body)
+    private function resolve(?array $source, array $args, ResolveInfo $info, ?string $rootClass = null, ?Operation $operation = null, mixed $body = null)
     {
         // Handles relay nodes
         $operation ??= new Query();

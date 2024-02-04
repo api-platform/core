@@ -21,6 +21,7 @@ api_platform:
         json: ['application/json']
     doctrine: false
     doctrine_mongodb_odm: true
+    keep_legacy_inflector: false
     mapping:
         paths:
             - '%kernel.project_dir%/Fixtures/Document'
