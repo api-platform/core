@@ -32,7 +32,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 {
     use OperationDefaultsTrait;
 
-    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, LoggerInterface $logger = null, array $defaults = [], private readonly bool $graphQlEnabled = false)
+    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, ?LoggerInterface $logger = null, array $defaults = [], private readonly bool $graphQlEnabled = false)
     {
         $this->logger = $logger ?? new NullLogger();
         $this->defaults = $defaults;

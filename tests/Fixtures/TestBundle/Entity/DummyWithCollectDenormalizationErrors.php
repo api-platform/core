@@ -55,7 +55,7 @@ class DummyWithCollectDenormalizationErrors
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
     public Collection|iterable $relatedDummies;
 
-    public function __construct(string $baz, string $qux = null)
+    public function __construct(string $baz, ?string $qux = null)
     {
         $this->baz = $baz;
         $this->qux = $qux;

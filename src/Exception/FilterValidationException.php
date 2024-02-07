@@ -20,7 +20,7 @@ namespace ApiPlatform\Exception;
  */
 final class FilterValidationException extends \Exception implements ExceptionInterface, \Stringable
 {
-    public function __construct(private readonly array $constraintViolationList, string $message = '', int $code = 0, \Exception $previous = null)
+    public function __construct(private readonly array $constraintViolationList, string $message = '', int $code = 0, ?\Exception $previous = null)
     {
         parent::__construct($message ?: $this->__toString(), $code, $previous);
     }

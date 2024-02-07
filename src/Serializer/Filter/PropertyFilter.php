@@ -117,7 +117,7 @@ final class PropertyFilter implements FilterInterface
 {
     private ?array $whitelist;
 
-    public function __construct(private readonly string $parameterName = 'properties', private readonly bool $overrideDefaultProperties = false, array $whitelist = null, private readonly ?NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly string $parameterName = 'properties', private readonly bool $overrideDefaultProperties = false, ?array $whitelist = null, private readonly ?NameConverterInterface $nameConverter = null)
     {
         $this->whitelist = null === $whitelist ? null : $this->formatWhitelist($whitelist);
     }
@@ -213,7 +213,7 @@ final class PropertyFilter implements FilterInterface
         return $whitelist;
     }
 
-    private function getProperties(array $properties, array $whitelist = null): array
+    private function getProperties(array $properties, ?array $whitelist = null): array
     {
         $whitelist ??= $this->whitelist;
         $result = [];

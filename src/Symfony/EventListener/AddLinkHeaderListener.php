@@ -34,7 +34,7 @@ final class AddLinkHeaderListener
 
     public function __construct(
         private readonly Discovery $discovery,
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         private readonly HttpHeaderSerializer $serializer = new HttpHeaderSerializer()
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;

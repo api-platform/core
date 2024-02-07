@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;

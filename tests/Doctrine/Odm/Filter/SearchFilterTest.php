@@ -753,7 +753,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         );
     }
 
-    protected static function buildSearchFilter(self $that, ManagerRegistry $managerRegistry, array $properties = null): SearchFilter
+    protected static function buildSearchFilter(self $that, ManagerRegistry $managerRegistry, ?array $properties = null): SearchFilter
     {
         $relatedDummyProphecy = $that->prophesize(RelatedDummy::class);
         $iriConverterProphecy = $that->prophesize(IriConverterInterface::class);

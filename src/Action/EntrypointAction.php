@@ -41,7 +41,7 @@ final class EntrypointAction
     /**
      * @return Entrypoint|Response
      */
-    public function __invoke(Request $request = null)
+    public function __invoke(?Request $request = null)
     {
         if ($this->provider && $this->processor) {
             $context = ['request' => $request];

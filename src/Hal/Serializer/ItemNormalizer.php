@@ -41,7 +41,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
@@ -54,7 +54,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $resourceClass = $this->getObjectClass($object);
         if ($this->getOutputClass($context)) {
@@ -98,7 +98,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
         return self::FORMAT === $format;
@@ -109,7 +109,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws LogicException
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): never
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): never
     {
         throw new LogicException(sprintf('%s is a read-only format.', self::FORMAT));
     }

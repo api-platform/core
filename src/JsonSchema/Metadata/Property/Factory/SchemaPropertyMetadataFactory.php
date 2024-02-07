@@ -154,7 +154,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         return $propertyMetadata->withSchema($propertySchema + [$composition => $valueSchema]);
     }
 
-    private function getType(Type $type, bool $readableLink = null): array
+    private function getType(Type $type, ?bool $readableLink = null): array
     {
         if (!$type->isCollection()) {
             return $this->addNullabilityToTypeDefinition($this->typeToArray($type, $readableLink), $type);
@@ -176,7 +176,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         ], $type);
     }
 
-    private function typeToArray(Type $type, bool $readableLink = null): array
+    private function typeToArray(Type $type, ?bool $readableLink = null): array
     {
         return match ($type->getBuiltinType()) {
             Type::BUILTIN_TYPE_INT => ['type' => 'integer'],

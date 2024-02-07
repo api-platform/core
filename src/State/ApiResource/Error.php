@@ -69,11 +69,11 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         private string $title,
         private string $detail,
         #[ApiProperty(identifier: true)] private int $status,
-        array $originalTrace = null,
+        ?array $originalTrace = null,
         private ?string $instance = null,
         private string $type = 'about:blank',
         private array $headers = [],
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($title, $status, $previous);
 
@@ -156,7 +156,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         return $this->title;
     }
 
-    public function setTitle(string $title = null): void
+    public function setTitle(?string $title = null): void
     {
         $this->title = $title;
     }
@@ -178,7 +178,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         return $this->detail;
     }
 
-    public function setDetail(string $detail = null): void
+    public function setDetail(?string $detail = null): void
     {
         $this->detail = $detail;
     }
@@ -189,7 +189,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         return $this->instance;
     }
 
-    public function setInstance(string $instance = null): void
+    public function setInstance(?string $instance = null): void
     {
         $this->instance = $instance;
     }

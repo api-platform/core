@@ -41,7 +41,7 @@ trait AttributeFilterExtractorTrait
     /**
      * Given a filter attribute and reflection elements, find out the properties where the filter is applied.
      */
-    private function getFilterProperties(ApiFilter $filterAttribute, \ReflectionClass $reflectionClass, \ReflectionProperty $reflectionProperty = null): array
+    private function getFilterProperties(ApiFilter $filterAttribute, \ReflectionClass $reflectionClass, ?\ReflectionProperty $reflectionProperty = null): array
     {
         $properties = [];
 
@@ -129,7 +129,7 @@ trait AttributeFilterExtractorTrait
      * @param string           $filterClass     the filter class
      * @param string|null      $filterId        the filter id
      */
-    private function generateFilterId(\ReflectionClass $reflectionClass, string $filterClass, string $filterId = null): string
+    private function generateFilterId(\ReflectionClass $reflectionClass, string $filterClass, ?string $filterId = null): string
     {
         $suffix = null !== $filterId ? '_'.$filterId : $filterId;
 

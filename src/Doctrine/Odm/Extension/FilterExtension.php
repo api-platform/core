@@ -33,7 +33,7 @@ final class FilterExtension implements AggregationCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         $resourceFilters = $operation?->getFilters();
 

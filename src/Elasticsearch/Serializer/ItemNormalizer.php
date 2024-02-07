@@ -62,7 +62,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @throws LogicException
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!$this->decorated instanceof DenormalizerInterface) {
             throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
@@ -76,7 +76,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @throws LogicException
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         if (!$this->decorated instanceof DenormalizerInterface) {
             throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
@@ -88,7 +88,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         return $this->decorated->normalize($object, $format, $context);
     }
@@ -96,7 +96,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsNormalization($data, $format);
     }

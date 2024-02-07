@@ -43,7 +43,7 @@ final class PurgeHttpCacheListener
     private readonly PropertyAccessorInterface $propertyAccessor;
     private array $tags = [];
 
-    public function __construct(private readonly PurgerInterface $purger, private readonly IriConverterInterface|LegacyIriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(private readonly PurgerInterface $purger, private readonly IriConverterInterface|LegacyIriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }

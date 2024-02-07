@@ -46,7 +46,7 @@ final class SerializeListener
     public function __construct(
         private readonly SerializerInterface $serializer,
         private readonly SerializerContextBuilderInterface $serializerContextBuilder,
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
         private readonly array $errorFormats = [],
         // @phpstan-ignore-next-line we don't need this anymore
         private readonly bool $debug = false,

@@ -49,16 +49,16 @@ final class ErrorListener extends SymfonyErrorListener
 
     public function __construct(
         object|array|string|null $controller,
-        LoggerInterface $logger = null,
+        ?LoggerInterface $logger = null,
         bool $debug = false,
         array $exceptionsMapping = [],
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         private readonly array $errorFormats = [],
         private readonly array $exceptionToStatus = [],
         /** @phpstan-ignore-next-line we're not using this anymore but keeping for bc layer */
-        private readonly null|IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface $identifiersExtractor = null,
-        private readonly null|ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver = null,
-        Negotiator $negotiator = null,
+        private readonly IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null,
+        private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface|null $resourceClassResolver = null,
+        ?Negotiator $negotiator = null,
         private readonly bool $problemCompliantErrors = true,
     ) {
         parent::__construct($controller, $logger, $debug, $exceptionsMapping);

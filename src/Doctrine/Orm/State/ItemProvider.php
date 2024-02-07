@@ -37,7 +37,7 @@ final class ItemProvider implements ProviderInterface
     /**
      * @param QueryItemExtensionInterface[] $itemExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $itemExtensions = [], ContainerInterface $handleLinksLocator = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ManagerRegistry $managerRegistry, private readonly iterable $itemExtensions = [], ?ContainerInterface $handleLinksLocator = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->handleLinksLocator = $handleLinksLocator;

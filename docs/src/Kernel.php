@@ -45,7 +45,7 @@ class Kernel extends BaseKernel
     private $declaredClasses = [];
     private string $guide;
 
-    public function __construct(string $environment, bool $debug, string $guide = null)
+    public function __construct(string $environment, bool $debug, ?string $guide = null)
     {
         parent::__construct($environment, $debug);
 
@@ -118,7 +118,7 @@ class Kernel extends BaseKernel
         }
     }
 
-    public function request(Request $request = null): Response
+    public function request(?Request $request = null): Response
     {
         if (null === $request && \function_exists('App\Playground\request')) {
             $request = request();

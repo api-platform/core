@@ -40,7 +40,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         // Do not apply order if already defined on $aggregationBuilder
         if ($this->hasSortStage($aggregationBuilder)) {

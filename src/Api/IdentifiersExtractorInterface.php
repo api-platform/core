@@ -28,5 +28,5 @@ interface IdentifiersExtractorInterface
      *
      * @throws RuntimeException
      */
-    public function getIdentifiersFromItem(object $item, Operation $operation = null, array $context = []): array;
+    public function getIdentifiersFromItem(object $item, ?Operation $operation = null, array $context = []): array;
 }

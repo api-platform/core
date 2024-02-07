@@ -42,12 +42,12 @@ final class DocumentNormalizer implements NormalizerInterface, DenormalizerInter
 
     public function __construct(
         private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
-        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        ?ClassMetadataFactoryInterface $classMetadataFactory = null,
         private readonly ?NameConverterInterface $nameConverter = null,
-        PropertyAccessorInterface $propertyAccessor = null,
-        PropertyTypeExtractorInterface $propertyTypeExtractor = null,
-        ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
-        callable $objectClassResolver = null,
+        ?PropertyAccessorInterface $propertyAccessor = null,
+        ?PropertyTypeExtractorInterface $propertyTypeExtractor = null,
+        ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
+        ?callable $objectClassResolver = null,
         array $defaultContext = [],
     ) {
         $this->decoratedNormalizer = new ObjectNormalizer($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
@@ -56,7 +56,7 @@ final class DocumentNormalizer implements NormalizerInterface, DenormalizerInter
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $this->decoratedNormalizer->supportsDenormalization($data, $type, $format, $context);
     }
@@ -64,7 +64,7 @@ final class DocumentNormalizer implements NormalizerInterface, DenormalizerInter
     /**
      * {@inheritdoc}
      */
-    public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $class, ?string $format = null, array $context = []): mixed
     {
         if (\is_string($data['_id'] ?? null) && \is_array($data['_source'] ?? null)) {
             $data = $this->populateIdentifier($data, $class)['_source'];
@@ -76,7 +76,7 @@ final class DocumentNormalizer implements NormalizerInterface, DenormalizerInter
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
         return self::FORMAT === $format;
@@ -87,7 +87,7 @@ final class DocumentNormalizer implements NormalizerInterface, DenormalizerInter
      *
      * @throws LogicException
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         throw new LogicException(sprintf('%s is a write-only format.', self::FORMAT));
     }

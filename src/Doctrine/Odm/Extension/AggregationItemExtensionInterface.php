@@ -23,5 +23,5 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  */
 interface AggregationItemExtensionInterface
 {
-    public function applyToItem(Builder $aggregationBuilder, string $resourceClass, array $identifiers, Operation $operation = null, array &$context = []): void;
+    public function applyToItem(Builder $aggregationBuilder, string $resourceClass, array $identifiers, ?Operation $operation = null, array &$context = []): void;
 }

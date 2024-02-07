@@ -35,7 +35,7 @@ final class ResourceMetadataCollection extends \ArrayObject
         parent::__construct($input);
     }
 
-    public function getOperation(string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
+    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
     {
         $operationName ??= '';
         $cachePrefix = ($forceCollection ? self::FORCE_COLLECTION : '').($httpOperation ? self::HTTP_OPERATION : '');
