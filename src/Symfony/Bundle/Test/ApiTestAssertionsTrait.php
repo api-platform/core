@@ -185,7 +185,7 @@ trait ApiTestAssertionsTrait
         return $hub;
     }
 
-    private static function getHttpClient(Client $newClient = null): ?Client
+    protected static function getHttpClient(Client $newClient = null): ?Client
     {
         static $client;
 
