@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
+use ApiPlatform\Api\FilterInterface as LegacyFilterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -36,12 +36,14 @@ use Symfony\Component\Serializer\Serializer;
  */
 final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
+    private ?ContainerInterface $filterLocator = null;
+
     /**
      * @param ContainerInterface $filterLocator The new filter locator or the deprecated filter collection
      */
     public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
     {
-        $this->setFilterLocator($filterLocator);
+        $this->filterLocator = $filterLocator;
     }
 
     /**
@@ -155,20 +157,6 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
 
         return ['@type' => 'hydra:IriTemplate', 'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), 'hydra:variableRepresentation' => 'BasicRepresentation', 'hydra:mapping' => $mapping];
-    }
-
-    private ?ContainerInterface $filterLocator = null;
-
-    /**
-     * Sets a filter locator with a backward compatibility.
-     */
-    private function setFilterLocator(?ContainerInterface $filterLocator, bool $allowNull = false): void
-    {
-        if ($filterLocator instanceof ContainerInterface || (null === $filterLocator && $allowNull)) {
-            $this->filterLocator = $filterLocator;
-        } else {
-            throw new InvalidArgumentException(sprintf('The "$filterLocator" argument is expected to be an implementation of the "%s" interface%s.', ContainerInterface::class, $allowNull ? ' or null' : ''));
-        }
     }
 
     /**
