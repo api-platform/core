@@ -18,7 +18,7 @@ use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -199,7 +199,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 
         if ($metadata->hasAssociation($field)) {
             if ($metadata->isSingleValuedAssociation($field)) {
-                if (!($metadata instanceof ClassMetadataInfo)) {
+                if (!($metadata instanceof ClassMetadata)) {
                     return false;
                 }
 
@@ -211,7 +211,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
             return true;
         }
 
-        if ($metadata instanceof ClassMetadataInfo && $metadata->hasField($field)) {
+        if ($metadata instanceof ClassMetadata && $metadata->hasField($field)) {
             return $metadata->isNullable($field);
         }
 

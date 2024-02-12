@@ -33,7 +33,6 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
@@ -255,7 +254,7 @@ class ItemProviderTest extends TestCase
 
         $employeeClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $employeeClassMetadataProphecy->getAssociationMapping('company')->willReturn([
-            'type' => ClassMetadataInfo::TO_ONE,
+            'type' => ClassMetadata::TO_ONE,
             'fieldName' => 'company',
         ]);
         $employeeClassMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER);

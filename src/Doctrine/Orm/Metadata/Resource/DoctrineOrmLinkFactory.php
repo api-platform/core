@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Resource\Factory\LinkFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\PropertyLinkFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\InverseSideMapping;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -66,8 +67,20 @@ final class DoctrineOrmLinkFactory implements LinkFactoryInterface, PropertyLink
                 continue;
             }
 
+            if (class_exists(InverseSideMapping::class)) {
+                // Doctrine throws on getAssociationMappedByTargetField, we want to avoid catching exceptions in this hot path
+                $assoc = $doctrineMetadata->getAssociationMapping($property);
+                if (!$assoc instanceof InverseSideMapping) {
+                    continue;
+                }
+            }
+
+            if (!($mappedBy = $doctrineMetadata->getAssociationMappedByTargetField($property) ?? null)) {
+                continue;
+            }
+
             $relationClass = $doctrineMetadata->getAssociationTargetClass($property);
-            if (!($mappedBy = $doctrineMetadata->getAssociationMappedByTargetField($property)) || !$this->resourceClassResolver->isResourceClass($relationClass)) {
+            if (!$this->resourceClassResolver->isResourceClass($relationClass)) {
                 continue;
             }
 

@@ -35,7 +35,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UnknownDummy;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
@@ -95,8 +94,8 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
-            'relatedDummy2' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy2' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
         ];
 
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -182,13 +181,13 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
-            'relatedDummy2' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => UnknownDummy::class],
-            'relatedDummy3' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinTable' => ['joinColumns' => [['nullable' => false]]], 'targetEntity' => UnknownDummy::class],
-            'relatedDummy4' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'targetEntity' => UnknownDummy::class],
-            'relatedDummy5' => ['fetch' => ClassMetadataInfo::FETCH_LAZY, 'targetEntity' => UnknownDummy::class],
-            'singleInheritanceRelation' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'targetEntity' => AbstractDummy::class],
-            'relatedDummies' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy2' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => UnknownDummy::class],
+            'relatedDummy3' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinTable' => ['joinColumns' => [['nullable' => false]]], 'targetEntity' => UnknownDummy::class],
+            'relatedDummy4' => ['fetch' => ClassMetadata::FETCH_EAGER, 'targetEntity' => UnknownDummy::class],
+            'relatedDummy5' => ['fetch' => ClassMetadata::FETCH_LAZY, 'targetEntity' => UnknownDummy::class],
+            'singleInheritanceRelation' => ['fetch' => ClassMetadata::FETCH_EAGER, 'targetEntity' => AbstractDummy::class],
+            'relatedDummies' => ['fetch' => ClassMetadata::FETCH_EAGER, 'targetEntity' => RelatedDummy::class],
         ];
 
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -201,8 +200,8 @@ class EagerLoadingExtensionTest extends TestCase
         $relatedClassMetadataProphecy->hasField('embeddedDummy.name')->willReturn(true)->shouldBeCalled();
 
         $relatedClassMetadataProphecy->associationMappings = [
-            'relation' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => UnknownDummy::class],
-            'thirdLevel' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'targetEntity' => ThirdLevel::class, 'sourceEntity' => RelatedDummy::class, 'inversedBy' => 'relatedDummies', 'type' => ClassMetadata::TO_ONE],
+            'relation' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => UnknownDummy::class],
+            'thirdLevel' => ['fetch' => ClassMetadata::FETCH_EAGER, 'targetEntity' => ThirdLevel::class, 'sourceEntity' => RelatedDummy::class, 'inversedBy' => 'relatedDummies', 'type' => ClassMetadata::TO_ONE],
         ];
 
         $relatedClassMetadataProphecy->embeddedClasses = ['embeddedDummy' => ['class' => EmbeddableDummy::class]];
@@ -362,12 +361,12 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
         ];
 
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $relatedClassMetadataProphecy->associationMappings = [
-            'dummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => Dummy::class],
+            'dummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => Dummy::class],
         ];
 
         $emProphecy = $this->prophesize(EntityManager::class);
@@ -409,12 +408,12 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
         ];
 
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $relatedClassMetadataProphecy->associationMappings = [
-            'dummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => Dummy::class],
+            'dummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => Dummy::class],
         ];
 
         $dummyClassMetadataInterfaceProphecy = $this->prophesize(ClassMetadataInterface::class);
@@ -468,7 +467,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relation' => ['fetch' => ClassMetadataInfo::FETCH_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
+            'relation' => ['fetch' => ClassMetadata::FETCH_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
         ];
 
         $unknownClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -504,7 +503,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relation' => ['fetch' => ClassMetadataInfo::FETCH_EXTRA_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
+            'relation' => ['fetch' => ClassMetadata::FETCH_EXTRA_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
         ];
 
         $unknownClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -529,7 +528,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relation' => ['fetch' => ClassMetadataInfo::FETCH_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
+            'relation' => ['fetch' => ClassMetadata::FETCH_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
         ];
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -550,7 +549,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relation' => ['fetch' => ClassMetadataInfo::FETCH_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
+            'relation' => ['fetch' => ClassMetadata::FETCH_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
         ];
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -574,7 +573,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relation' => ['fetch' => ClassMetadataInfo::FETCH_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
+            'relation' => ['fetch' => ClassMetadata::FETCH_LAZY, 'targetEntity' => UnknownDummy::class, 'joinColumns' => [['nullable' => false]]],
         ];
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -615,8 +614,8 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummies' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummies' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
         ];
 
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -703,8 +702,8 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummies' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummies' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
         ];
 
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -748,8 +747,8 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
-            'relatedDummy2' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy2' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
         ];
 
         $emProphecy = $this->prophesize(EntityManager::class);
@@ -793,8 +792,8 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
-            'relatedDummy2' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy2' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
         ];
 
         $emProphecy = $this->prophesize(EntityManager::class);
@@ -838,7 +837,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
         ];
 
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -885,8 +884,8 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'relatedDummy' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
-            'relatedDummy2' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy2' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
         ];
 
         $emProphecy = $this->prophesize(EntityManager::class);
@@ -923,7 +922,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
-            'propertyCollectionIriOnlyRelation' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => PropertyCollectionIriOnlyRelation::class],
+            'propertyCollectionIriOnlyRelation' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => PropertyCollectionIriOnlyRelation::class],
         ];
 
         $emProphecy = $this->prophesize(EntityManager::class);
