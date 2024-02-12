@@ -265,7 +265,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
-                $parameter = new Parameter($parameterName, 'path', (new \ReflectionClass($uriVariable->getFromClass()))->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                $fromClass = $this->resourceMetadataFactory->create($uriVariable->getFromClass());
+                $shortName = $fromClass->getOperation()->getShortName();
+
+                if (!$shortName) {
+                    $shortName = (new \ReflectionClass($uriVariable->getFromClass()))->getShortName();
+                }
+
+                $parameter = new Parameter($parameterName, 'path', $shortName.' identifier', true, false, false, ['type' => 'string']);
                 if ($this->hasParameter($openapiOperation, $parameter)) {
                     continue;
                 }

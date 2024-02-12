@@ -54,6 +54,7 @@ use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Tests\Fixtures\Dummy;
 use ApiPlatform\OpenApi\Tests\Fixtures\DummyFilter;
+use ApiPlatform\OpenApi\Tests\Fixtures\DummyWithDifferentShortName;
 use ApiPlatform\OpenApi\Tests\Fixtures\OutputDto;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use PHPUnit\Framework\TestCase;
@@ -83,6 +84,7 @@ class OpenApiFactoryTest extends TestCase
             'ignored' => new NotExposed(),
             'ignoredWithUriTemplate' => (new NotExposed())->withUriTemplate('/dummies/{id}'),
             'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+            'postDummyItemFromDummyWithDifferentShortName' => (new Post())->withUriTemplate('/otherdummies/{id}/dummy')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(DummyWithDifferentShortName::class)->withIdentifiers(['id'])]),
             'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
             'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
             'customDummyItem' => (new HttpOperation())->withMethod('HEAD')->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapi(new OpenApiOperation(
@@ -242,11 +244,18 @@ class OpenApiFactoryTest extends TestCase
         ])
         );
 
+        $dummyWithDifferentShortNameResource = (new ApiResource())
+            ->withShortName('DummyShortName')
+            ->withOperations(new Operations([
+                (new Get())->withUriTemplate('/dummiesWithDifferentShortName/{id}')->withUriVariables(['id' => (new Link())->withFromClass(DummyWithDifferentShortName::class)->withIdentifiers(['id'])]),
+            ]));
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class]));
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [$dummyResource]));
+        $resourceCollectionMetadataFactoryProphecy->create(DummyWithDifferentShortName::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(DummyWithDifferentShortName::class, [$dummyWithDifferentShortNameResource]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
@@ -927,5 +936,37 @@ class OpenApiFactoryTest extends TestCase
                 ]),
             ]
         ), $dummyItemPath->getGet());
+
+        $dummyItemPath = $paths->getPath('/otherdummies/{id}/dummy');
+
+        $this->assertEquals(new Operation(
+            'postDummyItemFromDummyWithDifferentShortName',
+            ['Dummy'],
+            [
+                '201' => new Response(
+                    'Dummy resource created',
+                    new \ArrayObject([
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '400' => new Response('Invalid input'),
+                '422' => new Response('Unprocessable entity'),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [
+                new Parameter('id', 'path', 'DummyWithDifferentShortName identifier', true, false, false, ['type' => 'string']),
+            ],
+            new RequestBody(
+                'The new Dummy resource',
+                new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
+                ]),
+                true
+            )
+        ), $dummyItemPath->getPost());
     }
 }
