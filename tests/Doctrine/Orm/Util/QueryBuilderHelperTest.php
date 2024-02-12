@@ -35,8 +35,8 @@ class QueryBuilderHelperTest extends TestCase
     public function testAddJoinOnce(?string $originAliasForJoinOnce, string $expectedAlias): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
-        $queryBuilder->from('foo', 'f');
-        $queryBuilder->from('foo', 'f2');
+        $queryBuilder->from(Dummy::class, 'f');
+        $queryBuilder->from(Dummy::class, 'f2');
         $queryBuilder->join('f.bar', 'b');
         $queryBuilder->join('f2.bar', 'b2');
 
@@ -63,7 +63,7 @@ class QueryBuilderHelperTest extends TestCase
     public function testAddJoinOnceWithSpecifiedNewAlias(): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
-        $queryBuilder->from('foo', 'f');
+        $queryBuilder->from(Dummy::class, 'f');
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
         $queryNameGenerator->generateJoinAlias(Argument::any())->shouldNotbeCalled();

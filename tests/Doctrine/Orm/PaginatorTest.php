@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Doctrine\Orm;
 
 use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Tests\Fixtures\Query;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -78,7 +78,7 @@ class PaginatorTest extends TestCase
     private function getPaginatorWithMalformedQuery(bool $maxResults = false): void
     {
         $query = $this->prophesize(Query::class);
-        $query->getFirstResult()->willReturn($maxResults ? 42 : null)->shouldBeCalled();
+        $query->getFirstResult()->willReturn($maxResults ? 42 : -1)->shouldBeCalled();
 
         if ($maxResults) {
             $query->getMaxResults()->willReturn(null)->shouldBeCalled();
