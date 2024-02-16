@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\State\Provider;
 
-use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\GraphQl\Util\ArrayTrait;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
@@ -76,6 +76,10 @@ final class ReadProvider implements ProviderInterface
                 if ($operation->getClass() !== $this->getObjectClass($item)) {
                     throw new \UnexpectedValueException(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $operation->getShortName()));
                 }
+            }
+
+            if (null === $item) {
+                return $item;
             }
 
             if (!\is_object($item)) {
