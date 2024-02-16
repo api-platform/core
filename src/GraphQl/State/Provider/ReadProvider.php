@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\State\Provider;
 
-use ApiPlatform\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
@@ -69,10 +69,6 @@ final class ReadProvider implements ProviderInterface
                 $item = null;
             }
 
-            if ($operation instanceof Query && null === $item) {
-                return $item;
-            }
-
             if ($operation instanceof Subscription || $operation instanceof Mutation) {
                 if (null === $item) {
                     throw new NotFoundHttpException(sprintf('Item "%s" not found.', $args['input']['id']));
@@ -83,7 +79,7 @@ final class ReadProvider implements ProviderInterface
                 }
             }
 
-            if (!\is_object($item)) {
+            if (null !== $item && !\is_object($item)) {
                 throw new \LogicException('Item from read provider should be a nullable object.');
             }
 

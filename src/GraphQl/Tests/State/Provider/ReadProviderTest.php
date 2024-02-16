@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Tests\State\Provider;
 
-use ApiPlatform\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\GraphQl\State\Provider\ReadProvider;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -44,10 +44,6 @@ class ReadProviderTest extends TestCase
      */
     public function testProvideNotExistedResource(): void
     {
-        if (!class_exists('\ApiPlatform\Exception\ItemNotFoundException')) {
-            class_alias('\ApiPlatform\Metadata\Exception\ItemNotFoundException', '\ApiPlatform\Exception\ItemNotFoundException');
-        }
-
         $context = ['args' => ['id' => '/dummy/1']];
         $operation = new Query(class: 'dummy');
         $decorated = $this->createMock(ProviderInterface::class);
