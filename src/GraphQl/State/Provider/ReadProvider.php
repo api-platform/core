@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\State\Provider;
 
-use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\GraphQl\Util\ArrayTrait;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -79,7 +78,11 @@ final class ReadProvider implements ProviderInterface
                 }
             }
 
-            if (null !== $item && !\is_object($item)) {
+            if (null === $item) {
+                return $item;
+            }
+
+            if (!\is_object($item)) {
                 throw new \LogicException('Item from read provider should be a nullable object.');
             }
 
