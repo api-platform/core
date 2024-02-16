@@ -369,8 +369,12 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      */
     protected function getType(string $doctrineType): string
     {
+        // Remove this test when doctrine/dbal:3 support is removed
+        if (\defined(Types::class.'::ARRAY') && Types::ARRAY === $doctrineType) {
+            return 'array';
+        }
+
         return match ($doctrineType) {
-            Types::ARRAY => 'array',
             Types::BIGINT, Types::INTEGER, Types::SMALLINT => 'int',
             Types::BOOLEAN => 'bool',
             Types::DATE_MUTABLE, Types::TIME_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE => \DateTimeInterface::class,
