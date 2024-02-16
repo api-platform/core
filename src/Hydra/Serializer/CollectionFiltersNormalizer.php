@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Api\FilterInterface as LegacyFilterInterface;
-use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
@@ -37,14 +36,14 @@ use Symfony\Component\Serializer\Serializer;
  */
 final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
-    use FilterLocatorTrait;
+    private ?ContainerInterface $filterLocator = null;
 
     /**
      * @param ContainerInterface $filterLocator The new filter locator or the deprecated filter collection
      */
     public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
     {
-        $this->setFilterLocator($filterLocator);
+        $this->filterLocator = $filterLocator;
     }
 
     /**
@@ -158,5 +157,17 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
 
         return ['@type' => 'hydra:IriTemplate', 'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), 'hydra:variableRepresentation' => 'BasicRepresentation', 'hydra:mapping' => $mapping];
+    }
+
+    /**
+     * Gets a filter with a backward compatibility.
+     */
+    private function getFilter(string $filterId): LegacyFilterInterface|FilterInterface|null
+    {
+        if ($this->filterLocator && $this->filterLocator->has($filterId)) {
+            return $this->filterLocator->get($filterId);
+        }
+
+        return null;
     }
 }
