@@ -353,7 +353,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
                 $input = $operation->getInput();
 
-                if (!(false === $input || (\is_array($input) && $input['class'] === null))) {
+                if (!(false === $input || (\is_array($input) && null === $input['class']))) {
                     $operationInputSchemas = [];
                     foreach ($requestMimeTypes as $operationFormat) {
                         $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
