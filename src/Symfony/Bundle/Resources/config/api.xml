@@ -133,7 +133,7 @@
         <service id="ApiPlatform\Api\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
         <service id="ApiPlatform\Metadata\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
 
-        <service id="api_platform.uri_variables.converter" class="ApiPlatform\Api\UriVariablesConverter" public="false">
+        <service id="api_platform.uri_variables.converter" class="ApiPlatform\Metadata\UriVariablesConverter" public="false">
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="tagged" tag="api_platform.uri_variables.transformer" />
