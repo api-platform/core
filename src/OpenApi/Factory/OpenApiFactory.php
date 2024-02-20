@@ -347,22 +347,18 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     'The "openapiContext" option is deprecated, use "openapi" instead.'
                 );
                 $openapiOperation = $openapiOperation->withRequestBody(new RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false));
-            } elseif (null === $openapiOperation->getRequestBody() && \in_array($method, ['PATCH', 'PUT', 'POST'], true)) {
-                // if input is false, or input is an array with a null 'class',
-                // then we don't add the request body
-
-                $input = $operation->getInput();
-
-                if (!(false === $input || (\is_array($input) && null === $input['class']))) {
-                    $operationInputSchemas = [];
-                    foreach ($requestMimeTypes as $operationFormat) {
-                        $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
-                        $operationInputSchemas[$operationFormat] = $operationInputSchema;
-                        $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
-                    }
-
-                    $openapiOperation = $openapiOperation->withRequestBody(new RequestBody(sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true));
+            } elseif (
+                null === $openapiOperation->getRequestBody() && \in_array($method, ['PATCH', 'PUT', 'POST'], true)
+                && !(false === ($input = $operation->getInput()) || (\is_array($input) && null === $input['class']))
+            ) {
+                $operationInputSchemas = [];
+                foreach ($requestMimeTypes as $operationFormat) {
+                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
+                    $operationInputSchemas[$operationFormat] = $operationInputSchema;
+                    $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                 }
+
+                $openapiOperation = $openapiOperation->withRequestBody(new RequestBody(sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true));
             }
 
             // TODO Remove in 4.0
