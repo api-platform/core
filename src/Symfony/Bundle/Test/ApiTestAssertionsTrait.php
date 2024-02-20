@@ -119,6 +119,8 @@ trait ApiTestAssertionsTrait
             $operation = $operationName ? (new GetCollection())->withName($operationName) : new GetCollection();
         }
 
+        $serializationContext = $serializationContext ?? $operation->getNormalizationContext();
+
         $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null, ($serializationContext ?? []) + [BackwardCompatibleSchemaFactory::SCHEMA_DRAFT4_VERSION => true]);
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
@@ -133,6 +135,8 @@ trait ApiTestAssertionsTrait
         } else {
             $operation = $operationName ? (new Get())->withName($operationName) : new Get();
         }
+
+        $serializationContext = $serializationContext ?? $operation->getNormalizationContext();
 
         $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null, ($serializationContext ?? []) + [BackwardCompatibleSchemaFactory::SCHEMA_DRAFT4_VERSION => true]);
 
