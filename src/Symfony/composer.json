@@ -21,6 +21,7 @@
     "require": {
         "php": ">=8.1",
         "api-platform/documentation": "*@dev || ^3.1",
+        "api-platform/doctrine-common": "*@dev || ^3.1",
         "api-platform/elasticsearch": "*@dev || ^3.1",
         "api-platform/graphql": "*@dev || ^3.1",
         "api-platform/http-cache": "*@dev || ^3.1",
