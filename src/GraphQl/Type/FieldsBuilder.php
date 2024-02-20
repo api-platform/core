@@ -47,12 +47,15 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumInterface
 {
-    private readonly TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder;
+    private readonly ContextAwareTypeBuilderInterface|TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder;
 
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ?ResolverFactoryInterface $collectionResolverFactory, private readonly ?ResolverFactoryInterface $itemMutationResolverFactory, private readonly ?ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator)
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, ContextAwareTypeBuilderInterface|TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ?ResolverFactoryInterface $collectionResolverFactory, private readonly ?ResolverFactoryInterface $itemMutationResolverFactory, private readonly ?ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator)
     {
         if ($typeBuilder instanceof TypeBuilderInterface) {
             @trigger_error(sprintf('$typeBuilder argument of FieldsBuilder implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', TypeBuilderInterface::class, TypeBuilderEnumInterface::class), \E_USER_DEPRECATED);
+        }
+        if ($typeBuilder instanceof TypeBuilderEnumInterface) {
+            @trigger_error(sprintf('$typeBuilder argument of TypeConverter implementing "%s" is deprecated since API Platform 3.3. It has to implement "%s" instead.', TypeBuilderEnumInterface::class, ContextAwareTypeBuilderInterface::class), \E_USER_DEPRECATED);
         }
         $this->typeBuilder = $typeBuilder;
     }

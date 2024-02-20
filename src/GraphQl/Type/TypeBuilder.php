@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Mutation;
@@ -36,7 +37,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterface
+final class TypeBuilder implements ContextAwareTypeBuilderInterface
 {
     private $defaultFieldResolver;
 
@@ -48,10 +49,13 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
     /**
      * {@inheritdoc}
      */
-    public function getResourceObjectType(?string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, bool $input, bool $wrapped = false, int $depth = 0): GraphQLType
+    public function getResourceObjectType(ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, ?ApiProperty $propertyMetadata = null, array $context = []): GraphQLType
     {
         $shortName = $operation->getShortName();
         $operationName = $operation->getName();
+        $input = $context['input'];
+        $depth = $context['depth'] ?? 0;
+        $wrapped = $context['wrapped'] ?? false;
 
         if ($operation instanceof Mutation) {
             $shortName = $operationName.ucfirst($shortName);
@@ -84,80 +88,21 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
             $shortName .= 'Data';
         }
 
-        if ($this->typesContainer->has($shortName)) {
-            $resourceObjectType = $this->typesContainer->get($shortName);
-            if (!($resourceObjectType instanceof ObjectType || $resourceObjectType instanceof NonNull)) {
-                throw new \LogicException(sprintf('Expected GraphQL type "%s" to be %s.', $shortName, implode('|', [ObjectType::class, NonNull::class])));
-            }
-
-            return $resourceObjectType;
+        $resourceObjectType = null;
+        if (!$this->typesContainer->has($shortName)) {
+            $resourceObjectType = $this->getResourceObjectTypeConfiguration($shortName, $resourceMetadataCollection, $operation, $context);
+            $this->typesContainer->set($shortName, $resourceObjectType);
         }
 
-        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
-        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
-            $resourceClass = $ioMetadata['class'];
+        $resourceObjectType = $resourceObjectType ?? $this->typesContainer->get($shortName);
+        if (!($resourceObjectType instanceof ObjectType || $resourceObjectType instanceof NonNull || $resourceObjectType instanceof InputObjectType)) {
+            throw new \LogicException(sprintf('Expected GraphQL type "%s" to be %s.', $shortName, implode('|', [ObjectType::class, NonNull::class, InputObjectType::class])));
         }
 
-        $wrapData = !$wrapped && ($operation instanceof Mutation || $operation instanceof Subscription) && !$input && $depth < 1;
-
-        $configuration = [
-            'name' => $shortName,
-            'description' => $operation->getDescription(),
-            'resolveField' => $this->defaultFieldResolver,
-            'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
-                if ($wrapData) {
-                    $queryNormalizationContext = $this->getQueryOperation($resourceMetadataCollection)?->getNormalizationContext() ?? [];
-
-                    try {
-                        $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
-                    } catch (OperationNotFoundException) {
-                        $mutationNormalizationContext = [];
-                    }
-                    // Use a new type for the wrapped object only if there is a specific normalization context for the mutation or the subscription.
-                    // If not, use the query type in order to ensure the client cache could be used.
-                    $useWrappedType = $queryNormalizationContext !== $mutationNormalizationContext;
-
-                    $wrappedOperationName = $operationName;
-
-                    if (!$useWrappedType) {
-                        $wrappedOperationName = $operation instanceof Query ? $operationName : 'item_query';
-                    }
-
-                    $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
-
-                    $fields = [
-                        lcfirst($wrappedOperation->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadataCollection, $wrappedOperation instanceof Operation ? $wrappedOperation : null, $input, true, $depth),
-                    ];
-
-                    if ($operation instanceof Subscription) {
-                        $fields['clientSubscriptionId'] = GraphQLType::string();
-                        if ($operation->getMercure()) {
-                            $fields['mercureUrl'] = GraphQLType::string();
-                        }
-
-                        return $fields;
-                    }
-
-                    return $fields + ['clientMutationId' => GraphQLType::string()];
-                }
-
-                $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
-                $fields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $operation, $input, $depth, $ioMetadata);
-
-                if ($input && $operation instanceof Mutation && null !== $mutationArgs = $operation->getArgs()) {
-                    return $fieldsBuilder->resolveResourceArgs($mutationArgs, $operation) + ['clientMutationId' => $fields['clientMutationId']];
-                }
-                if ($input && $operation instanceof Mutation && null !== $extraMutationArgs = $operation->getExtraArgs()) {
-                    return $fields + $fieldsBuilder->resolveResourceArgs($extraMutationArgs, $operation);
-                }
-
-                return $fields;
-            },
-            'interfaces' => $wrapData ? [] : [$this->getNodeInterface()],
-        ];
-
-        $resourceObjectType = $input ? GraphQLType::nonNull(new InputObjectType($configuration)) : new ObjectType($configuration);
-        $this->typesContainer->set($shortName, $resourceObjectType);
+        $required = $propertyMetadata?->isRequired() ?? true;
+        if ($required && $input) {
+            $resourceObjectType = GraphQLType::nonNull($resourceObjectType);
+        }
 
         return $resourceObjectType;
     }
@@ -356,5 +301,83 @@ final class TypeBuilder implements TypeBuilderInterface, TypeBuilderEnumInterfac
         }
 
         return null;
+    }
+
+    private function getResourceObjectTypeConfiguration(string $shortName, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, array $context = []): InputObjectType|ObjectType
+    {
+        $operationName = $operation->getName();
+        $resourceClass = $operation->getClass();
+        $input = $context['input'];
+        $depth = $context['depth'] ?? 0;
+        $wrapped = $context['wrapped'] ?? false;
+
+        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
+        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
+            $resourceClass = $ioMetadata['class'];
+        }
+
+        $wrapData = !$wrapped && ($operation instanceof Mutation || $operation instanceof Subscription) && !$input && $depth < 1;
+
+        $configuration = [
+            'name' => $shortName,
+            'description' => $operation->getDescription(),
+            'resolveField' => $this->defaultFieldResolver,
+            'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
+                if ($wrapData) {
+                    $queryNormalizationContext = $this->getQueryOperation($resourceMetadataCollection)?->getNormalizationContext() ?? [];
+
+                    try {
+                        $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
+                    } catch (OperationNotFoundException) {
+                        $mutationNormalizationContext = [];
+                    }
+                    // Use a new type for the wrapped object only if there is a specific normalization context for the mutation or the subscription.
+                    // If not, use the query type in order to ensure the client cache could be used.
+                    $useWrappedType = $queryNormalizationContext !== $mutationNormalizationContext;
+
+                    $wrappedOperationName = $operationName;
+
+                    if (!$useWrappedType) {
+                        $wrappedOperationName = $operation instanceof Query ? $operationName : 'item_query';
+                    }
+
+                    $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
+
+                    $fields = [
+                        lcfirst($wrappedOperation->getShortName()) => $this->getResourceObjectType($resourceMetadataCollection, $wrappedOperation instanceof Operation ? $wrappedOperation : null, null, [
+                            'input' => $input,
+                            'wrapped' => true,
+                            'depth' => $depth,
+                        ]),
+                    ];
+
+                    if ($operation instanceof Subscription) {
+                        $fields['clientSubscriptionId'] = GraphQLType::string();
+                        if ($operation->getMercure()) {
+                            $fields['mercureUrl'] = GraphQLType::string();
+                        }
+
+                        return $fields;
+                    }
+
+                    return $fields + ['clientMutationId' => GraphQLType::string()];
+                }
+
+                $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
+                $fields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $operation, $input, $depth, $ioMetadata);
+
+                if ($input && $operation instanceof Mutation && null !== $mutationArgs = $operation->getArgs()) {
+                    return $fieldsBuilder->resolveResourceArgs($mutationArgs, $operation) + ['clientMutationId' => $fields['clientMutationId']];
+                }
+                if ($input && $operation instanceof Mutation && null !== $extraMutationArgs = $operation->getExtraArgs()) {
+                    return $fields + $fieldsBuilder->resolveResourceArgs($extraMutationArgs, $operation);
+                }
+
+                return $fields;
+            },
+            'interfaces' => $wrapData ? [] : [$this->getNodeInterface()],
+        ];
+
+        return $input ? new InputObjectType($configuration) : new ObjectType($configuration);
     }
 }

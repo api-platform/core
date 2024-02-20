@@ -16,8 +16,8 @@ namespace ApiPlatform\GraphQl\Tests\Type;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Tests\Fixtures\Enum\GenderTypeEnum;
 use ApiPlatform\GraphQl\Tests\Fixtures\Serializer\NameConverter\CustomConverter;
+use ApiPlatform\GraphQl\Type\ContextAwareTypeBuilderInterface;
 use ApiPlatform\GraphQl\Type\FieldsBuilder;
-use ApiPlatform\GraphQl\Type\TypeBuilderEnumInterface;
 use ApiPlatform\GraphQl\Type\TypeConverterInterface;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\Metadata\ApiProperty;
@@ -79,7 +79,7 @@ class FieldsBuilderTest extends TestCase
         $this->propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
-        $this->typeBuilderProphecy = $this->prophesize(TypeBuilderEnumInterface::class);
+        $this->typeBuilderProphecy = $this->prophesize(ContextAwareTypeBuilderInterface::class);
         $this->typeConverterProphecy = $this->prophesize(TypeConverterInterface::class);
         $this->itemResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $this->collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
