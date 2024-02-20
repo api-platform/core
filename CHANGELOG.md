@@ -56,6 +56,24 @@ These namespaces are deprecated:
 
 Most of the classes have moved to `ApiPlatform\Metadata`.
 
+## v3.2.14
+
+### Bug fixes
+
+* [26295392d](https://github.com/api-platform/core/commit/26295392d5e70075b2951d27c633cf29d6fdf542) fix: use normalisation context when none is provided in ApiTestAssertionsTrait (#6157)
+* [2999d9ef1](https://github.com/api-platform/core/commit/2999d9ef14416b4cb8728ad713a9edd367df9816) fix: return null instead of exception for GraphQL Query operation (#6118)
+* [30f3f353e](https://github.com/api-platform/core/commit/30f3f353e2022ad6ec80733e90f209f326dc3225) fix(openapi): skip requestBody if input is false (#6163)
+* [507edba82](https://github.com/api-platform/core/commit/507edba822d80005345794cec1a946f9a7e0c12c) fix(symfony): autoconfiguration on UriVariableTransformerInterface (#6159)
+* [643cff2db](https://github.com/api-platform/core/commit/643cff2db8dbab050aa125eb32a347ad37a95e08) fix(symfony): throw metadata exception (#6164)
+* [a987469e0](https://github.com/api-platform/core/commit/a987469e09608d91afd4507ec1f6ceacbd8653b2) fix(openapi): method OpenApi::getComponents must always return a Components object (#6158)
+* [c08f1e164](https://github.com/api-platform/core/commit/c08f1e1642f4427269a7f684f0b3def34ba4c433) fix(doctrine): test array type existence before using it (#6161)
+
+## v3.2.13
+
+### Bug fixes
+
+* [05713bfc8](https://github.com/api-platform/core/commit/05713bfc8ca4e749d408aaf870a4880e6c8fa74f) fix(hydra): move owl:maxCardinality from JsonSchema to Hydra (#6136)
+
 ## v3.2.12
 
 ### Bug fixes
