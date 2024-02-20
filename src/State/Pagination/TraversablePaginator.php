@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Pagination;
 
-final class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
+final class TraversablePaginator implements \IteratorAggregate, PaginatorInterface, HasNextPagePaginatorInterface
 {
     public function __construct(private readonly \Traversable $traversable, private readonly float $currentPage, private readonly float $itemsPerPage, private readonly float $totalItems)
     {
@@ -77,5 +77,13 @@ final class TraversablePaginator implements \IteratorAggregate, PaginatorInterfa
     public function getIterator(): \Traversable
     {
         return $this->traversable;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasNextPage(): bool
+    {
+        return $this->getCurrentPage() < $this->getLastPage();
     }
 }

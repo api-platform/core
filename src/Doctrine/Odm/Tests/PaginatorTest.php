@@ -31,13 +31,14 @@ class PaginatorTest extends TestCase
     /**
      * @dataProvider initializeProvider
      */
-    public function testInitialize(int $firstResult, int $maxResults, int $totalItems, int $currentPage, int $lastPage): void
+    public function testInitialize(int $firstResult, int $maxResults, int $totalItems, int $currentPage, int $lastPage, bool $hasNextPage): void
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
         $this->assertSame((float) $currentPage, $paginator->getCurrentPage());
         $this->assertSame((float) $lastPage, $paginator->getLastPage());
         $this->assertSame((float) $maxResults, $paginator->getItemsPerPage());
+        $this->assertSame($hasNextPage, $paginator->hasNextPage());
     }
 
     public function testInitializeWithFacetStageNotApplied(): void
@@ -203,8 +204,8 @@ class PaginatorTest extends TestCase
     public static function initializeProvider(): array
     {
         return [
-            'First of three pages of 15 items each' => [0, 15, 42, 1, 3],
-            'Second of two pages of 10 items each' => [10, 10, 20, 2, 2],
+            'First of three pages of 15 items each' => [0, 15, 42, 1, 3, true],
+            'Second of two pages of 10 items each' => [10, 10, 20, 2, 2, false],
         ];
     }
 }

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
  * Replace Doctrine\ORM\Query in tests because it cannot be mocked.
  */
@@ -26,5 +28,44 @@ class Query
     public function getMaxResults(): ?int
     {
         return null;
+    }
+
+    public function setMaxResults($maxResults): self
+    {
+        return $this;
+    }
+
+    public function setFirstResult($firstResult): self
+    {
+        return $this;
+    }
+
+    public function setParameters($parameters): self
+    {
+        return $this;
+    }
+
+    public function getParameters()
+    {
+        return new ArrayCollection();
+    }
+
+    public function setCacheable($cacheable): self
+    {
+        return $this;
+    }
+
+    public function getHints()
+    {
+        return [];
+    }
+
+    public function getFetchJoinCollection()
+    {
+        return false;
+    }
+
+    public function getResult(): void
+    {
     }
 }
