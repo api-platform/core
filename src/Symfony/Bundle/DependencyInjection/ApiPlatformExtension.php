@@ -157,7 +157,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerJsonApiConfiguration($formats, $loader, $config);
         $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config);
         $this->registerJsonHalConfiguration($formats, $loader);
-        $this->registerJsonProblemConfiguration($errorFormats, $loader);
+        $this->registerJsonProblemConfiguration($errorFormats, $loader, $config);
         $this->registerGraphQlConfiguration($container, $config, $loader);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineOrmConfiguration($container, $config, $loader);
@@ -585,10 +585,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('hal.xml');
     }
 
-    private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader): void
+    private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader, array $config): void
     {
         if (!isset($errorFormats['jsonproblem'])) {
             return;
+        }
+
+        if (false === ($config['defaults']['extra_properties']['rfc_7807_compliant_errors'] ?? true)) {
+            $loader->load('legacy/problem.xml');
         }
 
         $loader->load('problem.xml');

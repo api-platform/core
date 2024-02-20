@@ -245,6 +245,10 @@ class AppKernel extends Kernel
             $legacyConfig = ['event_listeners_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer];
         }
 
+        if (!$rfc7807CompliantErrors) {
+            $loader->load(__DIR__.'/config/config_legacy_error.yml');
+        }
+
         $c->prependExtensionConfig('api_platform', $legacyConfig + [
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],

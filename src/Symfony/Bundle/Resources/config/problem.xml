@@ -12,26 +12,11 @@
             <tag name="serializer.encoder" />
         </service>
 
-        <service id="api_platform.problem.normalizer.constraint_violation_list" class="ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer" public="false">
-            <argument>%api_platform.validator.serialize_payload_fields%</argument>
-            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
-
-            <tag name="serializer.normalizer" priority="-780" />
-        </service>
-
         <service id="api_platform.problem.normalizer.validation_exception" class="ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer" public="false">
             <argument type="service" id="api_platform.serializer.normalizer.item" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
             <tag name="serializer.normalizer" priority="-800" />
-        </service>
-
-        <!-- deprecated -->
-        <service id="api_platform.problem.normalizer.error" class="ApiPlatform\Problem\Serializer\ErrorNormalizer" public="false">
-            <argument>%kernel.debug%</argument>
-            <argument type="collection"></argument>
-
-            <tag name="serializer.normalizer" priority="-810" />
         </service>
     </services>
 

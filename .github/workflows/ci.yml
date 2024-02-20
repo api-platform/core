@@ -1153,6 +1153,85 @@ jobs:
           php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
+  phpunit_legacy_errors:
+    name: PHPUnit Legacy errors (PHP ${{ matrix.php }})
+    env:
+      RFC_7807_COMPLIANT_ERRORS: 0
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.3'
+        include:
+          - php: '8.3'
+            coverage: true
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          coverage: pcov
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo "COVERAGE=1" >> $GITHUB_ENV
+      - name: Update project dependencies
+        run: composer update --no-interaction --no-progress --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Use legacy ignored deprecations 
+        run: cp tests/.ignored-deprecations-legacy-events tests/.ignored-deprecations
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p build/logs/phpunit
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml
+          else
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
+          fi
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phpunit-logs-php${{ matrix.php }}
+          path: build/logs/phpunit
+        continue-on-error: true
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v3
+        with:
+          directory: build/logs/phpunit
+          name: phpunit-php${{ matrix.php }}
+          flags: phpunit
+          fail_ci_if_error: true
+        continue-on-error: true
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
+        continue-on-error: true
+
   behat_legacy:
     name: Behat Legacy event listeners (PHP ${{ matrix.php }})
     env:

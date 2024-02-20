@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.problem.normalizer.constraint_violation_list" class="ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer" public="false">
+            <argument>%api_platform.validator.serialize_payload_fields%</argument>
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" priority="-780" />
+        </service>
+
+        <!-- deprecated -->
+        <service id="api_platform.problem.normalizer.error" class="ApiPlatform\Problem\Serializer\ErrorNormalizer" public="false">
+            <argument>%kernel.debug%</argument>
+            <argument type="collection"></argument>
+
+            <tag name="serializer.normalizer" priority="-810" />
+        </service>
+    </services>
+
+</container>
