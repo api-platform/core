@@ -18,6 +18,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6041\NumericValidated;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6146\Issue6146Child;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6146\Issue6146Parent;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaContextDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
@@ -124,6 +126,31 @@ JSON;
     {
         self::createClient()->request('GET', '/resource_interfaces');
         $this->assertMatchesResourceCollectionJsonSchema(ResourceInterface::class);
+    }
+
+    public function testAssertMatchesResourceCollectionJsonSchemaKeepSerializationContext(): void
+    {
+        $this->recreateSchema();
+
+        /** @var EntityManagerInterface $manager */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+
+        $parent = new Issue6146Parent();
+        $manager->persist($parent);
+
+        $child = new Issue6146Child();
+        $child->setParent($parent);
+        $parent->addChild($child);
+        $manager->persist($child);
+
+        $manager->persist($child);
+        $manager->flush();
+
+        self::createClient()->request('GET', "issue-6146-parents/{$parent->getId()}");
+        $this->assertMatchesResourceItemJsonSchema(Issue6146Parent::class);
+
+        self::createClient()->request('GET', '/issue-6146-parents');
+        $this->assertMatchesResourceCollectionJsonSchema(Issue6146Parent::class);
     }
 
     public function testAssertMatchesResourceItemJsonSchema(): void

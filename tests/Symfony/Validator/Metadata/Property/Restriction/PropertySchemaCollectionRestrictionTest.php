@@ -79,7 +79,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
 
     public static function createProvider(): \Generator
     {
-        yield 'empty' => [new Collection(['fields' => []]), new ApiProperty(), ['type' => 'object', 'properties' => [], 'additionalProperties' => false]];
+        yield 'empty' => [new Collection([]), new ApiProperty(), ['type' => 'object', 'properties' => [], 'additionalProperties' => false]];
 
         $fields = [
             'name' => new Required([

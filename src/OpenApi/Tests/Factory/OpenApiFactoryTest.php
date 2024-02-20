@@ -239,6 +239,7 @@ class OpenApiFactoryTest extends TestCase
                     ),
                 ],
             )),
+            'postDummyItemWithoutInput' => (new Post())->withUriTemplate('/dummyitem/noinput')->withOperation($baseOperation)->withInput(false),
         ])
         );
 
@@ -927,5 +928,28 @@ class OpenApiFactoryTest extends TestCase
                 ]),
             ]
         ), $dummyItemPath->getGet());
+
+        $emptyRequestBodyPath = $paths->getPath('/dummyitem/noinput');
+        $this->assertEquals(new Operation(
+            'postDummyItemWithoutInput',
+            ['Dummy'],
+            [
+                '201' => new Response(
+                    'Dummy resource created',
+                    new \ArrayObject([
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '400' => new Response('Invalid input'),
+                '422' => new Response('Unprocessable entity'),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [],
+            null
+        ), $emptyRequestBodyPath->getPost());
     }
 }

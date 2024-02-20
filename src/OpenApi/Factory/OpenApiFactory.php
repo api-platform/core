@@ -347,7 +347,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     'The "openapiContext" option is deprecated, use "openapi" instead.'
                 );
                 $openapiOperation = $openapiOperation->withRequestBody(new RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false));
-            } elseif (null === $openapiOperation->getRequestBody() && \in_array($method, ['PATCH', 'PUT', 'POST'], true)) {
+            } elseif (
+                null === $openapiOperation->getRequestBody() && \in_array($method, ['PATCH', 'PUT', 'POST'], true)
+                && !(false === ($input = $operation->getInput()) || (\is_array($input) && null === $input['class']))
+            ) {
                 $operationInputSchemas = [];
                 foreach ($requestMimeTypes as $operationFormat) {
                     $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);

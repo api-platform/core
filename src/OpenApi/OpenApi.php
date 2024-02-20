@@ -25,9 +25,11 @@ final class OpenApi
     public const VERSION = '3.1.0';
 
     private string $openapi = self::VERSION;
+    private Components $components;
 
-    public function __construct(private Info $info, private array $servers, private Paths $paths, private ?Components $components = null, private array $security = [], private array $tags = [], private $externalDocs = null, private ?string $jsonSchemaDialect = null, private readonly ?\ArrayObject $webhooks = null)
+    public function __construct(private Info $info, private array $servers, private Paths $paths, ?Components $components = null, private array $security = [], private array $tags = [], private $externalDocs = null, private ?string $jsonSchemaDialect = null, private readonly ?\ArrayObject $webhooks = null)
     {
+        $this->components = $components ?? new Components();
     }
 
     public function getOpenapi(): string
