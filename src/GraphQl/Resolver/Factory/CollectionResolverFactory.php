@@ -19,6 +19,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
@@ -38,7 +39,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     {
     }
 
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null, ?PropertyMetadataFactoryInterface $propertyMetadataFactory = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation): ?array {
             // If authorization has failed for a relation field (e.g. via ApiProperty security), the field is not present in the source: null can be returned directly to ensure the collection isn't in the response.

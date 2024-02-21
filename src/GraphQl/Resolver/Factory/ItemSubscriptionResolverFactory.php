@@ -19,6 +19,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -37,7 +38,7 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
     {
     }
 
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null, ?PropertyMetadataFactoryInterface $propertyMetadataFactory = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation): ?array {
             if (null === $resourceClass || null === $operation) {
