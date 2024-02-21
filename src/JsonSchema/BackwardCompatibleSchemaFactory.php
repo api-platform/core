@@ -43,7 +43,15 @@ final class BackwardCompatibleSchemaFactory implements SchemaFactoryInterface, S
 
         foreach ($schema->getDefinitions() as $definition) {
             foreach ($definition['properties'] ?? [] as $property) {
-                if (isset($property['type']) && \in_array($property['type'], ['integer', 'number'], true)) {
+                if (!isset($property['type'])) {
+                    continue;
+                }
+
+                foreach ((array) $property['type'] as $type) {
+                    if ('integer' !== $type && 'number' !== $type) {
+                        continue;
+                    }
+
                     if (isset($property['exclusiveMinimum'])) {
                         $property['minimum'] = $property['exclusiveMinimum'];
                         $property['exclusiveMinimum'] = true;
@@ -52,6 +60,8 @@ final class BackwardCompatibleSchemaFactory implements SchemaFactoryInterface, S
                         $property['maximum'] = $property['exclusiveMaximum'];
                         $property['exclusiveMaximum'] = true;
                     }
+
+                    break;
                 }
             }
         }
