@@ -95,7 +95,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         if (!$normalization) {
             if (!isset($context['api_allow_update'])) {
-                $context['api_allow_update'] = \in_array($method = $request->getMethod(), ['PUT', 'PATCH'], true);
+                $context['api_allow_update'] = \in_array($method = $request->getMethod(), ['PUT', 'PATCH', 'POST'], true);
 
                 if ($context['api_allow_update'] && 'PATCH' === $method) {
                     $context['deep_object_to_populate'] ??= true;
