@@ -82,7 +82,7 @@ class SerializerContextBuilderTest extends TestCase
 
         $request = Request::create('/foos', 'POST');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'post', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => false, 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation->withName('post'), 'exclude_from_cache_key' => ['root_operation', 'operation']];
+        $expected = ['bar' => 'baz', 'operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => true, 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation->withName('post'), 'exclude_from_cache_key' => ['root_operation', 'operation']];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foos', 'PUT');
