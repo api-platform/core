@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Documentation\Action;
+namespace ApiPlatform\Symfony\Action;
 
 use ApiPlatform\Documentation\Entrypoint;
 use ApiPlatform\Metadata\Get;
@@ -24,8 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Generates the API entrypoint.
- *
- * @deprecated use ApiPlatform\Symfony\EntrypointAction instead
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

@@ -16,16 +16,6 @@ doctrine_mongodb:
                     dir: '%kernel.project_dir%/Fixtures/Document'
                     prefix: 'ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document'
 
-api_platform:
-    formats: 
-        json: ['application/json']
-    doctrine: false
-    doctrine_mongodb_odm: true
-    keep_legacy_inflector: false
-    mapping:
-        paths:
-            - '%kernel.project_dir%/Fixtures/Document'
-
 services:
     test.property_accessor:
         alias: property_accessor

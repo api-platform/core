@@ -22,7 +22,6 @@
     "require": {
         "php": ">=8.1",
         "api-platform/metadata": "*@dev || ^3.1",
-        "api-platform/jsonld": "*@dev || ^3.1",
         "symfony/web-link": "^6.4 || ^7.0"
     },
     "require-dev": {
@@ -50,16 +49,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.2.x-dev"
+            "dev-main": "3.3.x-dev"
         },
         "symfony": {
             "require": "^6.4"
         }
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../Metadata"
-        }
-    ]
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    }
 }

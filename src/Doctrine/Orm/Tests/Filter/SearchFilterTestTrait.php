@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Common\Tests\Filter;
+namespace ApiPlatform\Doctrine\Orm\Tests\Filter;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>

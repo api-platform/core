@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Serializer\ResourceList;
-use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ResourceList;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;

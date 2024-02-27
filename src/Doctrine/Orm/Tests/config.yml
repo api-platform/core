@@ -17,15 +17,6 @@ doctrine:
                 prefix: ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity
                 alias: App
 
-api_platform:
-    formats: 
-        json: ['application/json']
-    doctrine: true
-    keep_legacy_inflector: false
-    mapping:
-        paths:
-            - '%kernel.project_dir%/Fixtures/Entity'
-
 services:
     test.property_accessor:
         alias: property_accessor

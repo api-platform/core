@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\ApiResource;
 
-use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Error as Operation;
 use ApiPlatform\Metadata\ErrorResource;
@@ -48,7 +47,7 @@ use Symfony\Component\WebLink\Link;
                 'skip_null_values' => true,
                 'rfc_7807_compliant_errors' => true,
             ],
-            links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')],
+            links: [new Link(rel: 'http://www.w3.org/ns/json-ld#error', href: 'http://www.w3.org/ns/hydra/error')],
         ),
         new Operation(
             name: '_api_errors_jsonapi',

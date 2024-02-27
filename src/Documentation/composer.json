@@ -6,25 +6,25 @@
     "autoload": {
         "psr-4": {
             "ApiPlatform\\Documentation\\": ""
-       }
+        }
     },
     "authors": [
-		{
-		  "name": "Kévin Dunglas",
-		  "email": "kevin@dunglas.fr",
-		  "homepage": "https://dunglas.fr"
-		},
-		{
-		  "name": "API Platform Community",
-		  "homepage": "https://api-platform.com/community/contributors"
-		}
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        },
+        {
+            "name": "API Platform Community",
+            "homepage": "https://api-platform.com/community/contributors"
+        }
     ],
     "require": {
-        "api-platform/openapi": "*@dev || ^3.1",
-        "api-platform/metadata": "*@dev || ^3.1",
-        "api-platform/state": "*@dev || ^3.1"
+        "api-platform/metadata": "*@dev || ^3.1"
     },
-    "require-dev": {
-        "sebastian/comparator": "<5.0"
+    "extra": {
+        "branch-alias": {
+            "dev-main": "3.3.x-dev"
+        }
     }
 }

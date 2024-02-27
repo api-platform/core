@@ -21,6 +21,7 @@
     "require": {
         "php": ">=8.1",
         "api-platform/documentation": "*@dev || ^3.1",
+        "api-platform/doctrine-common": "*@dev || ^3.1",
         "api-platform/elasticsearch": "*@dev || ^3.1",
         "api-platform/graphql": "*@dev || ^3.1",
         "api-platform/http-cache": "*@dev || ^3.1",
@@ -71,76 +72,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.2.x-dev"
+            "dev-main": "3.3.x-dev"
         },
         "symfony": {
             "require": "^6.4"
         }
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../Metadata"
-        },
-        {
-            "type": "path",
-            "url": "../ParameterValidator"
-        },
-        {
-            "type": "path",
-            "url": "../State"
-        },
-        {
-            "type": "path",
-            "url": "../Doctrine/Common"
-        },
-        {
-            "type": "path",
-            "url": "../Documentation"
-        },
-        {
-            "type": "path",
-            "url": "../Elasticsearch"
-        },
-        {
-            "type": "path",
-            "url": "../GraphQl"
-        },
-        {
-            "type": "path",
-            "url": "../JsonLd"
-        },
-        {
-            "type": "path",
-            "url": "../HttpCache"
-        },
-        {
-            "type": "path",
-            "url": "../JsonSchema"
-        },
-        {
-            "type": "path",
-            "url": "../Serializer"
-        },
-        {
-            "type": "path",
-            "url": "../Validator"
-        },
-        {
-            "type": "path",
-            "url": "../OpenApi"
-        },
-        {
-            "type": "path",
-            "url": "../Doctrine/Orm"
-        },
-        {
-            "type": "path",
-            "url": "../Doctrine/Odm"
-        },
-        {
-            "type": "path",
-            "url": "../Hydra"
-        }
-    ]
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    }
 }

@@ -13,20 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Exception\RuntimeException;
-use Symfony\Component\HttpFoundation\Request;
+use ApiPlatform\State\SerializerContextBuilderInterface as StateSerializerContextBuilderInterface;
 
 /**
  * Builds the context used by the Symfony Serializer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface SerializerContextBuilderInterface
+interface SerializerContextBuilderInterface extends StateSerializerContextBuilderInterface
 {
-    /**
-     * Creates a serialization context from a Request.
-     *
-     * @throws RuntimeException
-     */
-    public function createFromRequest(Request $request, bool $normalization, ?array $extractedAttributes = null): array;
 }
