@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Validator\Exception;
 
-use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
@@ -49,7 +48,7 @@ use Symfony\Component\WebLink\Link;
         new ErrorOperation(
             name: '_api_validation_errors_hydra',
             outputFormats: ['jsonld' => ['application/problem+json']],
-            links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')],
+            links: [new Link(rel: 'http://www.w3.org/ns/json-ld#error', href: 'http://www.w3.org/ns/hydra/error')],
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,

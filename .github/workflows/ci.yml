@@ -62,9 +62,8 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: |
-          composer update --no-interaction --no-progress --ansi
-      - run: php components.php
+        run: composer update --no-interaction --no-progress --ansi
+      - run: composer check-dependencies
 
   php-cs-fixer:
     name: PHP CS Fixer (PHP ${{ matrix.php }})
@@ -227,19 +226,21 @@ jobs:
           - '8.2'
           - '8.3'
         component:
-          - JsonSchema
-          - OpenApi
-          - Metadata
-          - ParameterValidator
-          - Elasticsearch
-          - HttpCache
-          - RamseyUuid
-          - GraphQl
-          - Serializer
-          - Symfony
-          - Doctrine/Common
-          - Doctrine/Orm
-          - Doctrine/Odm
+          - api-platform/doctrine-common
+          - api-platform/doctrine-orm
+          - api-platform/doctrine-odm
+          - api-platform/metadata
+          - api-platform/json-schema
+          - api-platform/elasticsearch
+          - api-platform/openapi
+          - api-platform/graphql
+          - api-platform/http-cache
+          - api-platform/parameter-validator
+          - api-platform/ramsey-uuid
+          - api-platform/serializer
+          - api-platform/state
+          - api-platform/symfony
+          - api-platform/validator
         include:
           - php: '8.1'
             coverage: true
@@ -259,23 +260,23 @@ jobs:
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
       - name: Run ${{ matrix.component }} tests
-        working-directory: src/${{ matrix.component }}
         run: |
           composer update
-          mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit "build/logs/phpunit/junit.xml" ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
+          composer ${{matrix.component}} update
+          mkdir -p /tmp/build/logs/phpunit
+          composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: phpunit-logs-php${{ matrix.php }}
-          path: src/${{ matrix.component }}/build/logs/phpunit
+          path: /tmp/build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v3
         with:
-          directory: src/${{ matrix.component }}/build/logs/phpunit
+          directory: /tmp/build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
           fail_ci_if_error: true
@@ -284,11 +285,10 @@ jobs:
         if: matrix.coverage
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: src/${{ matrix.component }}
         run: |
           composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
+          php-coveralls --coverage_clover=/tmp/build/logs/phpunit/clover.xml
         continue-on-error: true
 
   behat:

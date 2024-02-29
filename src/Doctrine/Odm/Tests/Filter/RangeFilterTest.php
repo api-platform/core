@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Tests\Filter;
 
-use ApiPlatform\Doctrine\Common\Tests\Filter\RangeFilterTestTrait;
 use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Odm\Tests\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;

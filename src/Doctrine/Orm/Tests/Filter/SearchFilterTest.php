@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Tests\Filter;
 
-use ApiPlatform\Doctrine\Common\Tests\Filter\SearchFilterTestTrait;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Tests\DoctrineOrmFilterTestCase;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\CustomConverter;

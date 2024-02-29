@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Documentation\Action;
+namespace ApiPlatform\Symfony\Action;
 
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Documentation\DocumentationInterface;
@@ -31,8 +31,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Generates the API documentation.
- *
- * @deprecated use ApiPlatform\Symfony\DocumentationAction instead
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */

@@ -64,40 +64,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.2.x-dev"
+            "dev-main": "3.3.x-dev"
         },
         "symfony": {
             "require": "^6.4"
         }
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../Metadata"
-        },
-        {
-            "type": "path",
-            "url": "../State"
-        },
-        {
-            "type": "path",
-            "url": "../Serializer"
-        },
-        {
-            "type": "path",
-            "url": "../Validator"
-        },
-        {
-            "type": "path",
-            "url": "../Doctrine/Orm"
-        },
-        {
-            "type": "path",
-            "url": "../Doctrine/Odm"
-        },
-        {
-            "type": "path",
-            "url": "../Doctrine/Common"
-        }
-    ]
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    }
 }

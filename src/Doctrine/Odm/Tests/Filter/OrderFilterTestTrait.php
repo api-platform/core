@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Common\Tests\Filter;
+namespace ApiPlatform\Doctrine\Odm\Tests\Filter;
 
 /**
  * @author Théo FIDRY <theo.fidry@gmail.com>

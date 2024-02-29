@@ -38,6 +38,7 @@
         "willdurand/negotiation": "^3.0"
     },
     "require-dev": {
+        "soyuka/pmu": "^0.0.2",
         "behat/behat": "^3.11",
         "behat/mink": "^1.9",
         "doctrine/cache": "^1.11 || ^2.1",
@@ -149,7 +150,8 @@
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "phpstan/extension-installer": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "soyuka/pmu": true
         }
     },
     "extra": {
@@ -158,6 +160,46 @@
         },
         "symfony": {
             "require": "^6.4 || ^7.0"
-        }
-    }
+        },
+        "projects": [
+            "api-platform/doctrine-common",
+            "api-platform/doctrine-orm",
+            "api-platform/doctrine-odm",
+            "api-platform/metadata",
+            "api-platform/json-schema",
+            "api-platform/elasticsearch",
+            "api-platform/jsonld",
+            "api-platform/hydra",
+            "api-platform/openapi",
+            "api-platform/graphql",
+            "api-platform/http-cache",
+            "api-platform/documentation",
+            "api-platform/parameter-validator",
+            "api-platform/ramsey-uuid",
+            "api-platform/serializer",
+            "api-platform/state",
+            "api-platform/symfony",
+            "api-platform/validator"
+        ]
+    },
+    "repositories": [
+      {"type": "path", "url": "./src/Doctrine/Common"},
+      {"type": "path", "url": "./src/Doctrine/Orm"},
+      {"type": "path", "url": "./src/Doctrine/Odm"},
+      {"type": "path", "url": "./src/Metadata"},
+      {"type": "path", "url": "./src/JsonSchema"},
+      {"type": "path", "url": "./src/Elasticsearch"},
+      {"type": "path", "url": "./src/JsonLd"},
+      {"type": "path", "url": "./src/Hydra"},
+      {"type": "path", "url": "./src/OpenApi"},
+      {"type": "path", "url": "./src/GraphQl"},
+      {"type": "path", "url": "./src/HttpCache"},
+      {"type": "path", "url": "./src/Documentation"},
+      {"type": "path", "url": "./src/ParameterValidator"},
+      {"type": "path", "url": "./src/RamseyUuid"},
+      {"type": "path", "url": "./src/Serializer"},
+      {"type": "path", "url": "./src/State"},
+      {"type": "path", "url": "./src/Symfony"},
+      {"type": "path", "url": "./src/Validator"}
+    ]
 }

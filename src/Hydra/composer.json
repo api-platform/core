@@ -36,7 +36,6 @@
         "api-platform/serializer": "*@dev || ^3.1"
     },
     "require-dev": {
-        "sebastian/comparator": "<5.0",
         "api-platform/doctrine-odm": "*@dev || ^3.2",
         "api-platform/doctrine-orm": "*@dev || ^3.2",
         "api-platform/doctrine-common": "*@dev || ^3.2"
@@ -61,48 +60,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.2.x-dev"
+            "dev-main": "3.3.x-dev"
         },
         "symfony": {
             "require": "^6.1"
         }
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../State"
-        },
-        {
-            "type": "path",
-            "url": "../Metadata"
-        },
-        {
-            "type": "path",
-            "url": "../JsonLd"
-        },
-        {
-            "type": "path",
-            "url": "../Serializer"
-        },
-        {
-            "type": "path",
-            "url": "../JsonSchema"
-        },
-        {
-            "type": "path",
-            "url": "../Documentation"
-        },
-        {
-            "type": "path",
-            "url": "../Doctrine/Orm"
-        },
-        {
-            "type": "path",
-            "url": "../Doctrine/Odm"
-        },
-        {
-            "type": "path",
-            "url": "../Doctrine/Common"
-        }
-    ]
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    }
 }

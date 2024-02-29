@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Tests;
 
-use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -41,7 +40,6 @@ class AppKernel extends Kernel
     public function registerBundles(): array
     {
         return [
-            new ApiPlatformBundle(),
             new FrameworkBundle(),
             new DoctrineBundle(),
             new TestBundle(),

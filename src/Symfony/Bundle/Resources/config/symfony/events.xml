@@ -129,14 +129,14 @@
             <argument type="service" id="api_platform.serializer.context_builder" />
         </service>
 
-        <service id="api_platform.action.entrypoint" class="ApiPlatform\Documentation\Action\EntrypointAction" public="true">
+        <service id="api_platform.action.entrypoint" class="ApiPlatform\Symfony\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.state_provider.documentation" />
             <argument type="service" id="api_platform.state_processor.documentation" />
             <argument>%api_platform.docs_formats%</argument>
         </service>
 
-        <service id="api_platform.action.documentation" class="ApiPlatform\Documentation\Action\DocumentationAction" public="true">
+        <service id="api_platform.action.documentation" class="ApiPlatform\Symfony\Action\DocumentationAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>

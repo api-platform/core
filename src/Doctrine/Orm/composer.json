@@ -1,88 +1,71 @@
 {
-  "name": "api-platform/doctrine-orm",
-  "description": "Doctrine ORM bridge",
-  "type": "library",
-  "keywords": [
-    "Doctrine",
-    "ORM"
-  ],
-  "homepage": "https://api-platform.com",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Kévin Dunglas",
-      "email": "kevin@dunglas.fr",
-      "homepage": "https://dunglas.fr"
+    "name": "api-platform/doctrine-orm",
+    "description": "Doctrine ORM bridge",
+    "type": "library",
+    "keywords": [
+        "Doctrine",
+        "ORM"
+    ],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        },
+        {
+            "name": "API Platform Community",
+            "homepage": "https://api-platform.com/community/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "api-platform/doctrine-common": "*@dev || ^3.1",
+        "api-platform/metadata": "*@dev || ^3.1",
+        "api-platform/state": "*@dev || ^3.1",
+        "doctrine/doctrine-bundle": "^2.11",
+        "doctrine/orm": "^2.17",
+        "symfony/property-info": "^6.4 || ^7.0"
     },
-    {
-      "name": "API Platform Community",
-      "homepage": "https://api-platform.com/community/contributors"
-    }
-  ],
-  "require": {
-    "php": ">=8.1",
-    "api-platform/doctrine-common": "*@dev || ^3.1",
-    "api-platform/metadata": "*@dev || ^3.1",
-    "api-platform/state": "*@dev || ^3.1",
-    "doctrine/doctrine-bundle": "^2.11",
-    "doctrine/orm": "^2.17",
-    "symfony/property-info": "^6.4 || ^7.0"
-  },
-  "require-dev": {
-    "api-platform/parameter-validator": "*@dev || ^3.2",
-    "api-platform/symfony": "*@dev || ^3.2",
-    "phpspec/prophecy-phpunit": "^2.0",
-    "phpunit/phpunit": "^10.0",
-    "ramsey/uuid": "^4.7",
-    "ramsey/uuid-doctrine": "^2.0",
-    "symfony/cache": "^6.4 || ^7.0",
-    "symfony/framework-bundle": "^6.4 || ^7.0",
-    "symfony/phpunit-bridge": "^6.4 || ^7.0",
-    "symfony/serializer": "^6.4 || ^7.0",
-    "symfony/yaml": "^6.4 || ^7.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "ApiPlatform\\Doctrine\\Orm\\": ""
-    }
-  },
-  "config": {
-    "preferred-install": {
-      "*": "dist"
+    "require-dev": {
+        "api-platform/parameter-validator": "*@dev || ^3.2",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^10.0",
+        "ramsey/uuid": "^4.7",
+        "ramsey/uuid-doctrine": "^2.0",
+        "symfony/cache": "^6.4 || ^7.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0",
+        "symfony/phpunit-bridge": "^6.4 || ^7.0",
+        "symfony/property-access": "^6.4 || ^7.0",
+        "symfony/serializer": "^6.4 || ^7.0",
+        "symfony/uid": "^6.4 || ^7.0",
+        "symfony/validator": "^6.4 || ^7.0",
+        "symfony/yaml": "^6.4 || ^7.0"
     },
-    "sort-packages": true,
-    "allow-plugins": {
-      "php-http/discovery": false
-    }
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-main": "3.2.x-dev"
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\Doctrine\\Orm\\": ""
+        }
     },
-    "symfony": {
-      "require": "^6.4"
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "3.3.x-dev"
+        },
+        "symfony": {
+            "require": "^6.4"
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
     }
-  },
-  "repositories": [
-      {
-          "type": "path",
-          "url": "../../Metadata"
-      },
-      {
-          "type": "path",
-          "url": "../../State"
-      },
-      {
-          "type": "path",
-          "url": "../Common"
-      },
-      {
-          "type": "path",
-          "url": "../../Symfony"
-      },
-      {
-          "type": "path",
-          "url": "../../ParameterValidator"
-      }
-  ]
 }

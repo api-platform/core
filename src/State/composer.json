@@ -2,7 +2,17 @@
     "name": "api-platform/state",
     "description": "API Platform State component ",
     "type": "library",
-    "keywords": ["REST", "GraphQL", "API", "JSON-LD", "Hydra", "JSONAPI", "OpenAPI", "HAL", "Swagger"],
+    "keywords": [
+        "REST",
+        "GraphQL",
+        "API",
+        "JSON-LD",
+        "Hydra",
+        "JSONAPI",
+        "OpenAPI",
+        "HAL",
+        "Swagger"
+    ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
     "authors": [
@@ -19,7 +29,6 @@
     "require": {
         "php": ">=8.1",
         "api-platform/metadata": "*@dev || ^3.1",
-        "api-platform/jsonld": "*@dev || ^3.1",
         "psr/container": "^2.0"
     },
     "require-dev": {
@@ -27,7 +36,6 @@
         "symfony/web-link": "^6.4 || ^7.0",
         "symfony/http-foundation": "^6.4 || 7.0",
         "willdurand/negotiation": "^3.1",
-        "api-platform/serializer": "*@dev || ^3.1",
         "api-platform/validator": "*@dev || ^3.1"
     },
     "autoload": {
@@ -50,7 +58,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.2.x-dev"
+            "dev-main": "3.3.x-dev"
         },
         "symfony": {
             "require": "^6.4"
@@ -63,22 +71,7 @@
         "api-platform/serializer": "To use API Platform serializer.",
         "api-platform/validator": "To use API Platform validation."
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../Metadata"
-        },
-        {
-            "type": "path",
-            "url": "../Serializer"
-        },
-        {
-            "type": "path",
-            "url": "../Validator"
-        },
-        {
-            "type": "path",
-            "url": "../JsonLd"
-        }
-    ]
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    }
 }

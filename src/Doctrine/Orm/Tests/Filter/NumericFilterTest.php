@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Tests\Filter;
 
-use ApiPlatform\Doctrine\Common\Tests\Filter\NumericFilterTestTrait;
 use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
 use ApiPlatform\Doctrine\Orm\Tests\DoctrineOrmFilterTestCase;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
