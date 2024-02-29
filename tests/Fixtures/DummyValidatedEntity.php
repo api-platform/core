@@ -39,6 +39,7 @@ class DummyValidatedEntity
      * @var string
      */
     #[Assert\Email]
+    #[Assert\NotBlank(allowNull: true)]
     public $dummyEmail;
 
     /**
