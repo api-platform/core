@@ -36,6 +36,7 @@ use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
+use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -589,6 +590,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if (!isset($errorFormats['jsonproblem'])) {
             return;
+        }
+
+        if (class_exists(ConstraintViolationListNormalizer::class)) {
+            $loader->load('legacy/problem.xml');
         }
 
         $loader->load('problem.xml');

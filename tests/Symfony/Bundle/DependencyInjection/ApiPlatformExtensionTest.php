@@ -622,16 +622,12 @@ class ApiPlatformExtensionTest extends TestCase
         $services = [
             // problem.xml
             'api_platform.problem.encoder',
-            'api_platform.problem.normalizer.constraint_violation_list',
-            'api_platform.problem.normalizer.error',
         ];
 
         $this->assertContainerHas($services, []);
 
         // problem.xml
         $this->assertServiceHasTags('api_platform.problem.encoder', ['serializer.encoder']);
-        $this->assertServiceHasTags('api_platform.problem.normalizer.constraint_violation_list', ['serializer.normalizer']);
-        $this->assertServiceHasTags('api_platform.problem.normalizer.error', ['serializer.normalizer']);
     }
 
     public function testGraphQlConfiguration(): void
@@ -1291,5 +1287,27 @@ class ApiPlatformExtensionTest extends TestCase
 
         (new ApiPlatformExtension())->load($config, $this->container);
         $this->assertTrue($this->container->hasDefinition('api_platform.graphql.resolver.factory.item'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyJsonProblemConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults']['extra_properties'] = ['rfc_7807_compliant_errors' => false];
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $services = [
+            // problem.xml
+            'api_platform.problem.normalizer.constraint_violation_list',
+            'api_platform.problem.normalizer.error',
+        ];
+
+        $this->assertContainerHas($services, []);
+
+        // problem.xml
+        $this->assertServiceHasTags('api_platform.problem.normalizer.constraint_violation_list', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.problem.normalizer.error', ['serializer.normalizer']);
     }
 }
