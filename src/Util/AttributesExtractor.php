@@ -32,10 +32,6 @@ final class AttributesExtractor
      */
     public static function extractAttributes(array $attributes): array
     {
-        if (($attributes['_api_operation'] ?? null) && !isset($attributes['_api_resource_class'])) {
-            $attributes['_api_resource_class'] = $attributes['_api_operation']->getClass();
-        }
-
         $result = ['resource_class' => $attributes['_api_resource_class'] ?? null, 'has_composite_identifier' => $attributes['_api_has_composite_identifier'] ?? false];
 
         if (null === $result['resource_class']) {

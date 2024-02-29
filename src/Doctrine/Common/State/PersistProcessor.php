@@ -128,11 +128,15 @@ final class PersistProcessor implements ProcessorInterface
     private function getReflectionProperties(mixed $data): array
     {
         $ret = [];
-        $props = (new \ReflectionObject($data))->getProperties(~\ReflectionProperty::IS_STATIC);
+        $r = new \ReflectionObject($data);
 
-        foreach ($props as $prop) {
-            $ret[$prop->getName()] = $prop;
-        }
+        do {
+            $props = $r->getProperties(~\ReflectionProperty::IS_STATIC);
+
+            foreach ($props as $prop) {
+                $ret[$prop->getName()] = $prop;
+            }
+        } while ($r = $r->getParentClass());
 
         return $ret;
     }

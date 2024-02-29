@@ -193,6 +193,10 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
      */
     private function isRequired(Constraint $constraint): bool
     {
+        if ($constraint instanceof NotBlank && $constraint->allowNull) {
+            return false;
+        }
+
         foreach (self::REQUIRED_CONSTRAINTS as $requiredConstraint) {
             if ($constraint instanceof $requiredConstraint) {
                 return true;
