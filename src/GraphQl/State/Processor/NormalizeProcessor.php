@@ -39,7 +39,7 @@ final class NormalizeProcessor implements ProcessorInterface
     {
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): array|null
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?array
     {
         if (!$operation instanceof GraphQlOperation) {
             return $data;
