@@ -345,11 +345,6 @@ JSON
      */
     public function testExceptionNormalizer(): void
     {
-        $container = static::getContainer();
-        if (true === static::$kernel->getContainer()->getParameter('api_platform.rfc_7807_compliant_errors')) {
-            $this->markTestSkipped();
-        }
-
         $response = self::createClient()->request('GET', '/issue5921', [
             'headers' => [
                 'accept' => 'application/json',

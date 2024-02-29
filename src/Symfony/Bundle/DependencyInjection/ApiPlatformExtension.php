@@ -36,6 +36,7 @@ use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
+use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -157,7 +158,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerJsonApiConfiguration($formats, $loader, $config);
         $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config);
         $this->registerJsonHalConfiguration($formats, $loader);
-        $this->registerJsonProblemConfiguration($errorFormats, $loader, $config);
+        $this->registerJsonProblemConfiguration($errorFormats, $loader);
         $this->registerGraphQlConfiguration($container, $config, $loader);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineOrmConfiguration($container, $config, $loader);
@@ -585,13 +586,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('hal.xml');
     }
 
-    private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader, array $config): void
+    private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader): void
     {
         if (!isset($errorFormats['jsonproblem'])) {
             return;
         }
 
-        if (false === ($config['defaults']['extra_properties']['rfc_7807_compliant_errors'] ?? true)) {
+        if (class_exists(ConstraintViolationListNormalizer::class)) {
             $loader->load('legacy/problem.xml');
         }
 

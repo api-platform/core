@@ -1,5 +1,0 @@
-services:
-    ApiPlatform\Tests\Fixtures\TestBundle\Serializer\ErrorNormalizer:
-        decorates: 'api_platform.problem.normalizer.error'
-        arguments: [ '@.inner' ]
-
