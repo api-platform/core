@@ -32,11 +32,11 @@ class DummyCar
     #[Serializer\Groups(['colors'])]
     private iterable $colors;
     #[Serializer\Groups(['colors'])]
-    private iterable|null $secondColors = null;
+    private ?iterable $secondColors = null;
     #[Serializer\Groups(['colors'])]
-    private iterable|null $thirdColors = null;
+    private ?iterable $thirdColors = null;
     #[Serializer\Groups(['colors'])]
-    private iterable|null $uuid = null;
+    private ?iterable $uuid = null;
 
     private string $name;
     private bool $canSell;
