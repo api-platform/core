@@ -45,7 +45,7 @@ trait FilterLocatorTrait
     /**
      * Gets a filter with a backward compatibility.
      */
-    private function getFilter(string $filterId): FilterInterface|null
+    private function getFilter(string $filterId): ?FilterInterface
     {
         if ($this->filterLocator && $this->filterLocator->has($filterId)) {
             return $this->filterLocator->get($filterId);
