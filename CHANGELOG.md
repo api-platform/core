@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.2.15
+
+### Bug fixes
+
+* [09aacf98a](https://github.com/api-platform/core/commit/09aacf98a2e4d0ffa00fbefa59cb2b31f35fbb54) fix(symfony): revert breaking change on attributes extractor (#6170)
+* [4138cb7c0](https://github.com/api-platform/core/commit/4138cb7c031b38731162d99b3d43754251fc5913) fix(openapi): resource name parameter description (#6178)
+* [5e4b6312a](https://github.com/api-platform/core/commit/5e4b6312a057ba4d1f45c395c7a215dc393acd80) fix(jsonschema): multiple type support (draft4) (#6171)
+* [8535f9def](https://github.com/api-platform/core/commit/8535f9def6fbd2baff9cedc79c34103940eb4fca) fix(doctrine): read parent class properties on PUT (#6176)
+* [a188c9473](https://github.com/api-platform/core/commit/a188c947396e0400ba6e1aadaa262d2e785fd941) fix(symfony): autoconfigure legacy alias fixes #6177 (#6181)
+* [e7b442149](https://github.com/api-platform/core/commit/e7b4421496b58f7c3db414d11dd357a8dc759323) fix(validator): stop considering properties marked with NotBlank(allowNull=true) as required (#6184)
+
 ## v3.2.14
 
 ### Bug fixes
