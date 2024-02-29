@@ -132,6 +132,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyMappedSubclass;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyMercure;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPassenger;
@@ -2282,6 +2283,16 @@ final class DoctrineContext implements Context
         $this->manager->persist($this->buildLinkHandledDummy('bar'));
         $this->manager->persist($this->buildLinkHandledDummy('baz'));
         $this->manager->persist($this->buildLinkHandledDummy('foz'));
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a dummy entity with a mapped superclass
+     */
+    public function thereIsADummyEntityWithAMappedSuperclass(): void
+    {
+        $entity = new DummyMappedSubclass();
+        $this->manager->persist($entity);
         $this->manager->flush();
     }
 

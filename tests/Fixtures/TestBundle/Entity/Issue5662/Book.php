@@ -37,7 +37,7 @@ class Book
         return [new self('a', 'hello'), new self('b', 'you')];
     }
 
-    public static function getDatum(Operation $operation, array $uriVariables = [], array $context = []): self|null
+    public static function getDatum(Operation $operation, array $uriVariables = [], array $context = []): ?self
     {
         $id = $uriVariables['id'];
         foreach (static::getData($operation, $uriVariables, $context) as $datum) {

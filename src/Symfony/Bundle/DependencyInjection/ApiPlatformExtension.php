@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Api\FilterInterface as LegacyFilterInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter as DoctrineMongoDbOdmAbstractFilter;
@@ -173,6 +174,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerLinkSecurityConfiguration($loader, $config);
 
         $container->registerForAutoconfiguration(FilterInterface::class)
+            ->addTag('api_platform.filter');
+        $container->registerForAutoconfiguration(LegacyFilterInterface::class)
             ->addTag('api_platform.filter');
         $container->registerForAutoconfiguration(ProviderInterface::class)
             ->addTag('api_platform.state_provider');
