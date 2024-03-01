@@ -28,6 +28,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -125,12 +126,18 @@ final class PurgeHttpCacheListener
     private function gatherRelationTags(EntityManagerInterface $em, object $entity): void
     {
         $associationMappings = $em->getClassMetadata(ClassUtils::getClass($entity))->getAssociationMappings();
-        foreach (array_keys($associationMappings) as $property) {
+        foreach ($associationMappings as $property => $associationMapping) {
             if (
-                \array_key_exists('targetEntity', $associationMappings[$property])
+                !$associationMapping instanceof AssociationMapping
+                && \array_key_exists('targetEntity', $associationMappings[$property])
                 && !$this->resourceClassResolver->isResourceClass($associationMappings[$property]['targetEntity'])) {
                 return;
             }
+
+            if ($associationMappings[$property] instanceof AssociationMapping && ($associationMapping->targetEntity ?? null) && !$this->resourceClassResolver->isResourceClass($associationMapping->targetEntity)) {
+                return;
+            }
+
             if ($this->propertyAccessor->isReadable($entity, $property)) {
                 $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
             }

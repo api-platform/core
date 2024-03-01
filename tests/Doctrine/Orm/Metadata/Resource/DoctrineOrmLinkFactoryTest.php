@@ -26,11 +26,12 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\Car;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\AssociationMapping;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\InverseSideMapping;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Doctrine\ORM\Mapping\InverseSideMapping;
 
 final class DoctrineOrmLinkFactoryTest extends TestCase
 {
@@ -53,6 +54,12 @@ final class DoctrineOrmLinkFactoryTest extends TestCase
         $classMetadataProphecy->getAssociationMappedByTargetField('relatedNonResource')->willReturn('dummies');
         $classMetadataProphecy->getAssociationMappedByTargetField('relatedDummy')->willReturn(null);
         $classMetadataProphecy->getAssociationMappedByTargetField('relatedDummies')->willReturn('dummies');
+        if (class_exists(InverseSideMapping::class)) {
+            $classMetadataProphecy->getAssociationMapping('relatedNonResource')->willReturn(new class('a', 'a', 'a') extends AssociationMapping {});
+            $classMetadataProphecy->getAssociationMapping('relatedDummy')->willReturn(new class('a', 'a', 'a') extends AssociationMapping {});
+            $classMetadataProphecy->getAssociationMapping('relatedDummies')->willReturn(new class('a', 'a', 'a') extends InverseSideMapping {});
+        }
+
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
         $entityManagerProphecy->getClassMetadata($class)->willReturn($classMetadataProphecy->reveal());
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -72,34 +79,6 @@ final class DoctrineOrmLinkFactoryTest extends TestCase
                 fromClass: Dummy::class,
                 toClass: RelatedDummy::class,
             ),
-        ], $doctrineOrmLinkFactory->createLinksFromRelations($operation));
-    }
-
-    public function testCreateLinksFromRelationsDoctrine3(): void
-    {
-        if (!class_exists(InverseSideMapping::class)) {
-            $this->markTestSkipped();
-        }
-
-        $class = Dummy::class;
-        $operation = (new Get())->withClass($class);
-
-        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $classMetadataProphecy->hasAssociation('noMappedBy')->willReturn(true);
-        $classMetadataProphecy->getAssociationTargetClass('noMappedBy')->willReturn('NoMappedByClass');
-        $classMetadataProphecy->getAssociationMappedByTargetField('noMappedBy')->shouldNotBeCalled();
-        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
-        $entityManagerProphecy->getClassMetadata($class)->willReturn($classMetadataProphecy->reveal());
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass($class)->willReturn($entityManagerProphecy->reveal());
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create($class)->willReturn(new PropertyNameCollection(['noMappedBy']));
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Car::class)->shouldNotBeCalled();
-
-        $doctrineOrmLinkFactory = new DoctrineOrmLinkFactory($managerRegistryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), new LinkFactoryStub());
-
-        self::assertEquals([
         ], $doctrineOrmLinkFactory->createLinksFromRelations($operation));
     }
 }

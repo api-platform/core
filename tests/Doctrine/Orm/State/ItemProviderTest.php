@@ -20,7 +20,6 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
@@ -29,15 +28,16 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ManyToOneAssociationMapping;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 class ItemProviderTest extends TestCase
@@ -49,35 +49,38 @@ class ItemProviderTest extends TestCase
         $returnObject = new \stdClass();
 
         $context = ['foo' => 'bar', 'fetch_data' => true];
-        $queryProphecy = $this->prophesize(AbstractQuery::class);
-        $queryProphecy->getOneOrNullResult()->willReturn($returnObject)->shouldBeCalled();
 
-        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
-        $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
-        $queryBuilderProphecy->andWhere('o.identifier = :identifier_p1')->shouldBeCalled();
-        $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter('identifier_p1', 1, Types::INTEGER)->shouldBeCalled();
+        $queryMock = $this->createMock(Query::class);
+        $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
 
-        $queryBuilder = $queryBuilderProphecy->reveal();
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getQuery')->willReturn($queryMock);
+        $queryBuilderMock->method('andWhere')->with('o.identifier = :identifier_p1');
+        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderMock->method('setParameter')->with('identifier_p1', 1, Types::INTEGER);
 
-        $managerRegistryProphecy = $this->getManagerRegistry(OperationResource::class, [
+        $managerMock = $this->getManagerRegistry(OperationResource::class, [
             'identifier' => [
                 'type' => Types::INTEGER,
             ],
-        ], $queryBuilder);
+        ], $queryBuilderMock);
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->with(OperationResource::class)->willReturn($managerMock);
 
-        /** @var HttpOperation */
         $operation = (new Get())->withUriVariables([
             'identifier' => (new Link())->withFromClass(OperationResource::class)
-            ->withIdentifiers([
-                0 => 'identifier',
-            ]),
+                ->withIdentifiers([0 => 'identifier']),
         ])->withClass(OperationResource::class)->withName('get');
 
-        $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);
-        $extensionProphecy->applyToItem($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, ['identifier' => 1], $operation, $context)->shouldBeCalled();
+        $extensionMock = $this->createMock(QueryItemExtensionInterface::class);
+        $extensionMock->method('applyToItem')
+            ->with($queryBuilderMock, $this->isInstanceOf(QueryNameGeneratorInterface::class), OperationResource::class, ['identifier' => 1], $operation, $context);
 
-        $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+            [$extensionMock]
+        );
 
         $this->assertEquals($returnObject, $dataProvider->provide($operation, ['identifier' => 1], $context));
     }
@@ -86,20 +89,19 @@ class ItemProviderTest extends TestCase
     {
         $returnObject = new \stdClass();
 
-        $queryProphecy = $this->prophesize(AbstractQuery::class);
-        $queryProphecy->getOneOrNullResult()->willReturn($returnObject)->shouldBeCalled();
+        $queryMock = $this->createMock(Query::class);
+        $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
 
-        // $exprProphecy = $this->prophesize(Expr::class);
-        // $exprProphecy->eq('o.ida', ':id_ida')->willReturn($comparisonProphecy)->shouldBeCalled();
-        // $exprProphecy->eq('o.idb', ':id_idb')->willReturn($comparisonProphecy)->shouldBeCalled();
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getQuery')->willReturn($queryMock);
+        $queryBuilderMock->expects($this->exactly(2))
+            ->method('andWhere')
+            ->withConsecutive(['o.idb = :idb_p1'], ['o.ida = :ida_p2']);
+        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderMock->expects($this->exactly(2))
+            ->method('setParameter')
+            ->withConsecutive(['idb_p1', 2, Types::INTEGER], ['ida_p2', 1, Types::INTEGER]);
 
-        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
-        $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
-        $queryBuilderProphecy->andWhere('o.idb = :idb_p1')->shouldBeCalled();
-        $queryBuilderProphecy->andWhere('o.ida = :ida_p2')->shouldBeCalled();
-        $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-
-        /** @var HttpOperation */
         $operation = (new Get())->withUriVariables([
             'ida' => (new Link())->withFromClass(OperationResource::class)
                 ->withIdentifiers([
@@ -111,25 +113,28 @@ class ItemProviderTest extends TestCase
                 ]),
         ])->withName('get')->withClass(OperationResource::class);
 
-        $queryBuilderProphecy->setParameter('idb_p1', 2, Types::INTEGER)->shouldBeCalled();
-        $queryBuilderProphecy->setParameter('ida_p2', 1, Types::INTEGER)->shouldBeCalled();
-
-        $queryBuilder = $queryBuilderProphecy->reveal();
-
-        $managerRegistryProphecy = $this->getManagerRegistry(OperationResource::class, [
+        $managerMock = $this->getManagerRegistry(OperationResource::class, [
             'ida' => [
                 'type' => Types::INTEGER,
             ],
             'idb' => [
                 'type' => Types::INTEGER,
             ],
-        ], $queryBuilder);
+        ], $queryBuilderMock);
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->with(OperationResource::class)->willReturn($managerMock);
 
         $context = [];
-        $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);
-        $extensionProphecy->applyToItem($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, ['ida' => 1, 'idb' => 2], $operation, $context)->shouldBeCalled();
+        $extensionMock = $this->createMock(QueryItemExtensionInterface::class);
+        $extensionMock->expects($this->once())
+            ->method('applyToItem')
+            ->with($queryBuilderMock, $this->isInstanceOf(QueryNameGeneratorInterface::class), OperationResource::class, ['ida' => 1, 'idb' => 2], $operation, $context);
 
-        $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+            [$extensionMock]
+        );
 
         $this->assertEquals($returnObject, $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
     }
@@ -138,20 +143,20 @@ class ItemProviderTest extends TestCase
     {
         $returnObject = new \stdClass();
 
-        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
-        $queryBuilderProphecy->andWhere('o.identifier = :identifier_p1')->shouldBeCalled();
-        $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter('identifier_p1', 1, Types::INTEGER)->shouldBeCalled();
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->expects($this->once())->method('andWhere')->with('o.identifier = :identifier_p1');
+        $queryBuilderMock->expects($this->once())->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderMock->expects($this->once())->method('setParameter')->with('identifier_p1', 1, Types::INTEGER);
 
-        $queryBuilder = $queryBuilderProphecy->reveal();
-
-        $managerRegistryProphecy = $this->getManagerRegistry(OperationResource::class, [
+        $managerMock = $this->getManagerRegistry(OperationResource::class, [
             'identifier' => [
                 'type' => Types::INTEGER,
             ],
-        ], $queryBuilder);
+        ], $queryBuilderMock);
 
-        /** @var HttpOperation */
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->with(OperationResource::class)->willReturn($managerMock);
+
         $operation = (new Get())->withUriVariables([
             'identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers([
                 0 => 'identifier',
@@ -159,18 +164,34 @@ class ItemProviderTest extends TestCase
         ])->withClass(OperationResource::class)->withName('get');
 
         $context = [];
-        $extensionProphecy = $this->prophesize(QueryResultItemExtensionInterface::class);
-        $extensionProphecy->applyToItem($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, ['identifier' => 1], $operation, $context)->shouldBeCalled();
-        $extensionProphecy->supportsResult(OperationResource::class, $operation, $context)->willReturn(true)->shouldBeCalled();
-        $extensionProphecy->getResult($queryBuilder, OperationResource::class, $operation, $context)->willReturn($returnObject)->shouldBeCalled();
+        $extensionMock = $this->createMock(QueryResultItemExtensionInterface::class);
+        $extensionMock->expects($this->once())
+            ->method('applyToItem')
+            ->with($queryBuilderMock, $this->isInstanceOf(QueryNameGeneratorInterface::class), OperationResource::class, ['identifier' => 1], $operation, $context);
+        $extensionMock->expects($this->once())
+            ->method('supportsResult')
+            ->with(OperationResource::class, $operation, $context)
+            ->willReturn(true);
+        $extensionMock->expects($this->once())
+            ->method('getResult')
+            ->with($queryBuilderMock, OperationResource::class, $operation, $context)
+            ->willReturn($returnObject);
 
-        $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+            [$extensionMock]
+        );
 
         $this->assertEquals($returnObject, $dataProvider->provide($operation, ['identifier' => 1], $context));
     }
 
     public function testCannotCreateQueryBuilder(): void
     {
+        if (class_exists(AssociationMapping::class)) {
+            $this->markTestSkipped();
+        }
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The repository class must have a "createQueryBuilder" method.');
 
@@ -206,71 +227,77 @@ class ItemProviderTest extends TestCase
      */
     private function getManagerRegistry(string $resourceClass, array $identifierFields, QueryBuilder $queryBuilder, array $classMetadatas = [])
     {
-        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $classMetadataProphecy->getIdentifierFieldNames()->willReturn(array_keys($identifierFields));
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(array_keys($identifierFields));
 
+        $getTypeOfFieldExpectations = [];
         foreach ($identifierFields as $name => $field) {
-            $classMetadataProphecy->getTypeOfField($name)->willReturn($field['type']);
+            $getTypeOfFieldExpectations[$name] = $field['type'];
         }
 
-        $platformProphecy = $this->prophesize(AbstractPlatform::class);
+        $classMetadataMock->method('getTypeOfField')
+            ->with($this->logicalOr(...array_keys($identifierFields)))
+            ->willReturnCallback(function ($name) use ($getTypeOfFieldExpectations) {
+                return $getTypeOfFieldExpectations[$name];
+            });
 
-        $connectionProphecy = $this->prophesize(Connection::class);
-        $connectionProphecy->getDatabasePlatform()->willReturn($platformProphecy);
+        $platformMock = $this->createMock(AbstractPlatform::class);
 
-        $repositoryProphecy = $this->prophesize(EntityRepository::class);
-        $repositoryProphecy->createQueryBuilder('o')->willReturn($queryBuilder);
+        $connectionMock = $this->createMock(Connection::class);
+        $connectionMock->method('getDatabasePlatform')->willReturn($platformMock);
 
-        $managerProphecy = $this->prophesize(EntityManagerInterface::class);
-        $managerProphecy->getClassMetadata($resourceClass)->willReturn($classMetadataProphecy->reveal());
-        $managerProphecy->getConnection()->willReturn($connectionProphecy);
-        $managerProphecy->getRepository($resourceClass)->willReturn($repositoryProphecy->reveal());
+        $repositoryMock = $this->createMock(EntityRepository::class);
+        $repositoryMock->method('createQueryBuilder')->with('o')->willReturn($queryBuilder);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getConnection')->willReturn($connectionMock);
+        $managerMock->method('getRepository')->with($resourceClass)->willReturn($repositoryMock);
+
+        $classMetadataExpectations = [$resourceClass => $classMetadataMock];
 
         foreach ($classMetadatas as $class => $classMetadata) {
-            $managerProphecy->getClassMetadata($class)->willReturn($classMetadata);
+            $classMetadataExpectations[$class] = $classMetadata;
         }
 
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass($resourceClass)->willReturn($managerProphecy->reveal());
+        $managerMock->method('getClassMetadata')
+            ->with($this->logicalOr(...array_keys($classMetadataExpectations)))
+            ->willReturnCallback(function ($name) use ($classMetadataExpectations) {
+                return $classMetadataExpectations[$name];
+            });
 
-        return $managerRegistryProphecy;
+        return $managerMock;
     }
 
     public function testGetSubresourceFromProperty(): void
     {
         $returnObject = new \stdClass();
 
-        $queryProphecy = $this->prophesize(AbstractQuery::class);
-        $queryProphecy->getOneOrNullResult()->willReturn($returnObject)->shouldBeCalled();
+        $queryMock = $this->createMock(Query::class);
+        $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
 
-        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
-        $queryBuilderProphecy->join(Employee::class, 'm_a1', 'WITH', 'o.id = m_a1.company')->shouldBeCalled();
-        $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
-        $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->andWhere('m_a1.id = :id_p1')->shouldBeCalled();
-        $queryBuilderProphecy->setParameter('id_p1', 1, Types::INTEGER)->shouldBeCalled();
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->expects($this->once())->method('join')->with(Employee::class, 'm_a1', 'WITH', 'o.id = m_a1.company');
+        $queryBuilderMock->expects($this->once())->method('getQuery')->willReturn($queryMock);
+        $queryBuilderMock->expects($this->once())->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderMock->expects($this->once())->method('andWhere')->with('m_a1.id = :id_p1');
+        $queryBuilderMock->expects($this->once())->method('setParameter')->with('id_p1', 1, Types::INTEGER);
 
-        $queryBuilder = $queryBuilderProphecy->reveal();
+        $employeeClassMetadataMock = $this->createMock(ClassMetadata::class);
+        $employeeClassMetadataMock->method('getAssociationMapping')->with('company')->willReturn(new ManyToOneAssociationMapping('company', Employee::class, Company::class));
+        $employeeClassMetadataMock->method('getTypeOfField')->with('id')->willReturn(Types::INTEGER);
 
-        $employeeClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $employeeClassMetadataProphecy->getAssociationMapping('company')->willReturn([
-            'type' => ClassMetadata::TO_ONE,
-            'fieldName' => 'company',
-        ]);
-        $employeeClassMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER);
-
-        $managerRegistryProphecy = $this->getManagerRegistry(Company::class, [
+        $managerMock = $this->getManagerRegistry(Company::class, [
             'id' => [
                 'type' => Types::INTEGER,
             ],
-        ], $queryBuilder, [
-            Employee::class => $employeeClassMetadataProphecy->reveal(),
+        ], $queryBuilderMock, [
+            Employee::class => $employeeClassMetadataMock,
         ]);
 
-        $managerProphecy = $this->prophesize(EntityManagerInterface::class);
-        $managerRegistryProphecy->getManagerForClass(Employee::class)->willReturn($managerProphecy->reveal());
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->with($this->logicalOr(Company::class, Employee::class))
+            ->willReturn($managerMock);
 
-        /** @var HttpOperation */
         $operation = (new Get())->withUriVariables([
             'employeeId' => (new Link())->withFromClass(Employee::class)
                 ->withIdentifiers([
@@ -278,10 +305,16 @@ class ItemProviderTest extends TestCase
                 ])->withFromProperty('company'),
         ])->withName('getCompany')->withClass(Company::class);
 
-        $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);
-        $extensionProphecy->applyToItem($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), Company::class, ['employeeId' => 1], $operation, [])->shouldBeCalled();
+        $extensionMock = $this->createMock(QueryItemExtensionInterface::class);
+        $extensionMock->expects($this->once())
+            ->method('applyToItem')
+            ->with($queryBuilderMock, $this->isInstanceOf(QueryNameGeneratorInterface::class), Company::class, ['employeeId' => 1], $operation, []);
 
-        $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+            [$extensionMock]
+        );
 
         $this->assertEquals($returnObject, $dataProvider->provide($operation, ['employeeId' => 1]));
     }
@@ -290,7 +323,7 @@ class ItemProviderTest extends TestCase
     {
         $class = 'foo';
         $resourceMetadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $query = $this->createStub(AbstractQuery::class);
+        $query = $this->createStub(Query::class);
         $query->method('getOneOrNullResult')->willReturn(null);
         $qb = $this->createStub(QueryBuilder::class);
         $qb->method('getQuery')->willReturn($query);

@@ -15,29 +15,11 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Test;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Response;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class ClientTest extends ApiTestCase
 {
-    protected function setUp(): void
-    {
-        self::bootKernel();
-        /**
-         * @var EntityManagerInterface
-         */
-        $manager = static::getContainer()->get('doctrine')->getManager();
-        /** @var ClassMetadata[] $classes */
-        $classes = $manager->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($manager);
-
-        @$schemaTool->dropSchema($classes);
-        @$schemaTool->createSchema($classes);
-    }
-
     public function testRequest(): void
     {
         $client = self::createClient();

@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Orm\Metadata\Property;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -70,7 +71,11 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
         if ($doctrineClassMetadata instanceof ClassMetadata && \in_array($property, $doctrineClassMetadata->getFieldNames(), true)) {
             /** @var mixed[] */
             $fieldMapping = $doctrineClassMetadata->getFieldMapping($property);
-            $propertyMetadata = $propertyMetadata->withDefault($fieldMapping['options']['default'] ?? $propertyMetadata->getDefault());
+            if (class_exists(FieldMapping::class) && $fieldMapping instanceof FieldMapping) {
+                $propertyMetadata = $propertyMetadata->withDefault($fieldMapping->default ?? $propertyMetadata->getDefault());
+            } else {
+                $propertyMetadata = $propertyMetadata->withDefault($fieldMapping['options']['default'] ?? $propertyMetadata->getDefault());
+            }
         }
 
         return $propertyMetadata;

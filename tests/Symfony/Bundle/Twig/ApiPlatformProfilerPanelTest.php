@@ -16,8 +16,6 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Twig;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -29,7 +27,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 {
     use ExpectDeprecationTrait;
     private EntityManagerInterface $manager;
-    private SchemaTool $schemaTool;
     private string $env;
 
     protected function setUp(): void
@@ -42,19 +39,11 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         /** @var EntityManagerInterface $manager */
         $manager = $doctrine->getManager();
         $this->manager = $manager;
-        $this->schemaTool = new SchemaTool($this->manager);
-        /** @var ClassMetadata[] $classes */
-        $classes = $this->manager->getMetadataFactory()->getAllMetadata();
-        @$this->schemaTool->dropSchema($classes);
-        $this->manager->clear();
-        @$this->schemaTool->createSchema($classes);
-
         $this->ensureKernelShutdown();
     }
 
     protected function tearDown(): void
     {
-        $this->schemaTool->dropSchema($this->manager->getMetadataFactory()->getAllMetadata());
         $this->manager->clear();
         parent::tearDown();
     }

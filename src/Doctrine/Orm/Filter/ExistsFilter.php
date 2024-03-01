@@ -18,6 +18,7 @@ use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
+use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -223,7 +224,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
      *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
      */
-    private function isAssociationNullable(array $associationMapping): bool
+    private function isAssociationNullable(AssociationMapping|array $associationMapping): bool
     {
         if (!empty($associationMapping['id'])) {
             return false;

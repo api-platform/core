@@ -24,8 +24,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaContextDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
@@ -130,8 +128,6 @@ JSON;
 
     public function testAssertMatchesResourceCollectionJsonSchemaKeepSerializationContext(): void
     {
-        $this->recreateSchema();
-
         /** @var EntityManagerInterface $manager */
         $manager = static::getContainer()->get('doctrine')->getManager();
 
@@ -161,8 +157,6 @@ JSON;
 
     public function testAssertMatchesResourceItemJsonSchemaWithCustomJson(): void
     {
-        $this->recreateSchema();
-
         /** @var EntityManagerInterface $manager */
         $manager = static::getContainer()->get('doctrine')->getManager();
         $jsonSchemaContextDummy = new JsonSchemaContextDummy();
@@ -175,8 +169,6 @@ JSON;
 
     public function testAssertMatchesResourceItemJsonSchemaOutput(): void
     {
-        $this->recreateSchema();
-
         /** @var EntityManagerInterface $manager */
         $manager = static::getContainer()->get('doctrine')->getManager();
         $dummyDtoInputOutput = new DummyDtoInputOutput();
@@ -190,8 +182,6 @@ JSON;
 
     public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithContext(): void
     {
-        $this->recreateSchema();
-
         /** @var EntityManagerInterface $manager */
         $manager = static::getContainer()->get('doctrine')->getManager();
         $user = new User();
@@ -210,8 +200,6 @@ JSON;
 
     public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithRangeAssertions(): void
     {
-        $this->recreateSchema();
-
         /** @var EntityManagerInterface $manager */
         $manager = static::getContainer()->get('doctrine')->getManager();
         $numericValidated = new NumericValidated();
@@ -250,8 +238,6 @@ JSON;
 
     public function testFindIriBy(): void
     {
-        $this->recreateSchema();
-
         self::createClient()->request('POST', '/dummies', [
             'headers' => [
                 'content-type' => 'application/json',
@@ -273,8 +259,6 @@ JSON;
     public function testGetMercureMessages(): void
     {
         // debug mode is required to get Mercure TraceableHub
-        $this->recreateSchema(['debug' => true, 'environment' => 'mercure']);
-
         self::createClient()->request('POST', '/direct_mercures', [
             'headers' => [
                 'content-type' => 'application/ld+json',
@@ -324,20 +308,6 @@ JSON;
 }
 JSON
         );
-    }
-
-    private function recreateSchema(array $options = []): void
-    {
-        self::bootKernel($options);
-
-        /** @var EntityManagerInterface $manager */
-        $manager = static::getContainer()->get('doctrine')->getManager();
-        /** @var ClassMetadata[] $classes */
-        $classes = $manager->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($manager);
-
-        @$schemaTool->dropSchema($classes);
-        @$schemaTool->createSchema($classes);
     }
 
     /**

@@ -19,7 +19,6 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Repository\RepositoryFactory;
-use Doctrine\Persistence\ObjectRepository;
 
 final class EntityManager extends EntityManagerDecorator
 {
@@ -45,5 +44,10 @@ final class EntityManager extends EntityManagerDecorator
         self::$dql = $dql;
 
         return $this->wrapped->createQuery($dql);
+    }
+
+    public function isUninitializedObject(mixed $value): bool
+    {
+        return true;
     }
 }

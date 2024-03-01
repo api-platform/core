@@ -60,7 +60,7 @@ class PaginationExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->setFirstResult(40)->willReturn($queryBuilderProphecy)->shouldBeCalled();
-        $queryBuilderProphecy->setMaxResults(40)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(40)->shouldBeCalled()->willReturn($queryBuilderProphecy);
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -79,7 +79,7 @@ class PaginationExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->setFirstResult(0)->willReturn($queryBuilderProphecy)->shouldBeCalled();
-        $queryBuilderProphecy->setMaxResults(0)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(0)->shouldBeCalled()->willReturn($queryBuilderProphecy);
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -101,7 +101,7 @@ class PaginationExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->setFirstResult(0)->willReturn($queryBuilderProphecy)->shouldNotBeCalled();
-        $queryBuilderProphecy->setMaxResults(0)->shouldNotBeCalled();
+        $queryBuilderProphecy->setMaxResults(0)->shouldNotBeCalled()->willReturn($queryBuilderProphecy);
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -123,7 +123,7 @@ class PaginationExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->setFirstResult(40)->willReturn($queryBuilderProphecy)->shouldNotBeCalled();
-        $queryBuilderProphecy->setMaxResults(40)->shouldNotBeCalled();
+        $queryBuilderProphecy->setMaxResults(40)->shouldNotBeCalled()->willReturn($queryBuilderProphecy);
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -142,7 +142,7 @@ class PaginationExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->setFirstResult(300)->willReturn($queryBuilderProphecy)->shouldBeCalled();
-        $queryBuilderProphecy->setMaxResults(300)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(300)->shouldBeCalled()->willReturn($queryBuilderProphecy);
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -158,7 +158,7 @@ class PaginationExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->setFirstResult(10)->willReturn($queryBuilderProphecy)->shouldBeCalled();
-        $queryBuilderProphecy->setMaxResults(5)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(5)->shouldBeCalled()->willReturn($queryBuilderProphecy);
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -174,7 +174,7 @@ class PaginationExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->setFirstResult(0)->willReturn($queryBuilderProphecy)->shouldBeCalled();
-        $queryBuilderProphecy->setMaxResults(30)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(30)->shouldBeCalled()->willReturn($queryBuilderProphecy);
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -230,7 +230,7 @@ class PaginationExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->setFirstResult(0)->willReturn($queryBuilderProphecy)->shouldBeCalled();
-        $queryBuilderProphecy->setMaxResults(80)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(80)->shouldBeCalled()->willReturn($queryBuilderProphecy);
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $extension = new PaginationExtension(
