@@ -17,7 +17,7 @@ use ApiPlatform\State\OptionsInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Subscription extends Operation
-
+{
     public function __construct(
         ?string $resolver = null,
         ?array $args = null,

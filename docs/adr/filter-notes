@@ -1,0 +1,61 @@
+```php
+// how to give uidfilter the parameters it should declare?
+// is it automatic if we find a property having the uid type?
+#[Get(filters: [new SearchFilter(), new UidFilter()])
+#[Parameter('key', schema: ['type' => 'string'])] // add transform + validate extension points
+class Book {
+
+}
+
+final class Parameter {
+    mixed $value;
+    ?string $property;
+    ?string $class;
+    array $attributes;
+}
+
+class FilterInterface {}
+
+class UidFilter {
+    public function __construct(private readonly string $class) {}
+
+    public function parseQueryParameter(array $queryParameters = []): Parameter[] {
+        return [
+            new Parameter(value: '', attributes: ['operation' => 'and'])
+        ];
+    }
+
+    // Query parameter type
+    public function getSchema(): array {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameter(): OpenApi\Parameter {
+        return ...;
+    }
+}
+
+public function process(Operation $operation) {
+    $request = $context['request'];
+
+    foreach($operation->getFilters() as $filter) {
+        foreach ($filter->parseQueryParameter($request->query, $context) as $parameter) {
+            $this->queryParameterValidator->validate($filter, $parameter, $context);
+            $filter->execute($filter, $parameter, $context);
+        }
+    }
+}
+```
+
+
+TODO:
+see SerializerFilterContextBuilder: public function apply(Request $request, bool $normalization, array $attributes, array &$context): void;
+maybe something like:
+
+```
+class SerializerFilterInterface {
+    public function getNormalizationContext(...);
+    public function getDenormalizationContext(...);
+}
+```
+

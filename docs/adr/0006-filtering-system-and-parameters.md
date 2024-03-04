@@ -71,7 +71,7 @@ For this to work, we need to consider a 4 year old bug on searching with UIDs. O
 /books?author.id=/author/1
 ```
 
-Many attempts to fix these behavior on API Platform have lead to bugs and to be reverted. My proposal is to change how filters are applied to provide filters with less logic, that are easier to maintain and that do one thing good. 
+Many attempts to fix these behavior on API Platform have lead to bugs and to be reverted. The proposal is to change how filters are applied to provide filters with less logic, that are easier to maintain and that do one thing good. 
 
 For the following example we will use an UUID to represent the stored identifier of an Author resource.
 
