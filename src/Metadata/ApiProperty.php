@@ -105,7 +105,93 @@ final class ApiProperty
         private ?array $openapiContext = null,
         private ?array $jsonSchemaContext = null,
         private ?bool $push = null,
+        /**
+         * The `security` option defines the access to the current property, on normalization process, based on Symfony Security.
+         * It receives an `object` variable related to the current object, and a `property` variable related to the current property.
+         *
+         * <div data-code-selector>
+         *
+         * ```php
+         * <?php
+         * // api/src/Entity/Review.php
+         * use ApiPlatform\Metadata\ApiProperty;
+         * use ApiPlatform\Metadata\ApiResource;
+         *
+         * #[ApiResource]
+         * class Review
+         * {
+         *     #[ApiProperty(security: 'is_granted("ROLE_ADMIN")')]
+         *     public string $letter;
+         * }
+         * ```
+         *
+         * ```yaml
+         * # api/config/api_platform/properties.yaml
+         * properties:
+         *     App\Entity\Review:
+         *         letter:
+         *             security: 'is_granted("ROLE_ADMIN")'
+         * ```
+         *
+         * ```xml
+         * <?xml version="1.0" encoding="UTF-8" ?>
+         * <!-- api/config/api_platform/properties.xml -->
+         *
+         * <properties
+         *         xmlns="https://api-platform.com/schema/metadata/properties-3.0"
+         *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         *         xsi:schemaLocation="https://api-platform.com/schema/metadata/properties-3.0
+         *         https://api-platform.com/schema/metadata/properties-3.0.xsd">
+         *     <property resource="App\Entity\Review" name="letter" security="is_granted('ROLE_ADMIN')" />
+         * </properties>
+         * ```
+         *
+         * </div>
+         */
         private ?string $security = null,
+        /**
+         * The `securityPostDenormalize` option defines access to the current property after the denormalization process, based on Symfony Security.
+         * It receives an `object` variable related to the current object, and a `property` variable related to the current property.
+         *
+         * <div data-code-selector>
+         *
+         * ```php
+         * <?php
+         * // api/src/Entity/Review.php
+         * use ApiPlatform\Metadata\ApiProperty;
+         * use ApiPlatform\Metadata\ApiResource;
+         *
+         * #[ApiResource]
+         * class Review
+         * {
+         *     #[ApiProperty(securityPostDenormalize: 'is_granted("ROLE_ADMIN")')]
+         *     public string $letter;
+         * }
+         * ```
+         *
+         * ```yaml
+         * # api/config/api_platform/properties.yaml
+         * properties:
+         *     App\Entity\Review:
+         *         letter:
+         *             securityPostDenormalize: 'is_granted("ROLE_ADMIN")'
+         * ```
+         *
+         * ```xml
+         * <?xml version="1.0" encoding="UTF-8" ?>
+         * <!-- api/config/api_platform/properties.xml -->
+         *
+         * <properties
+         *         xmlns="https://api-platform.com/schema/metadata/properties-3.0"
+         *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         *         xsi:schemaLocation="https://api-platform.com/schema/metadata/properties-3.0
+         *         https://api-platform.com/schema/metadata/properties-3.0.xsd">
+         *     <property resource="App\Entity\Review" name="letter" securityPostDenormalize="is_granted('ROLE_ADMIN')" />
+         * </properties>
+         * ```
+         *
+         * </div>
+         */
         private ?string $securityPostDenormalize = null,
         private array|string|null $types = null,
         /*

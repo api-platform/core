@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Tests\Fixtures\TestBundle\Security\SecuredDummyAttributeBasedVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -74,6 +75,13 @@ class SecuredDummy
     #[ApiProperty(security: 'object == null or object.getOwner() == user', securityPostDenormalize: 'object.getOwner() == user')]
     #[ODM\Field]
     private ?string $ownerOnlyProperty = '';
+
+    /**
+     * @var string Secret property, only readable/writable through voters using "property" attribute
+     */
+    #[ApiProperty(security: 'is_granted("'.SecuredDummyAttributeBasedVoter::ROLE.'", property)', securityPostDenormalize: 'is_granted("'.SecuredDummyAttributeBasedVoter::ROLE.'", property)')]
+    #[ODM\Field]
+    private string $attributeBasedProperty = '';
 
     /**
      * @var string|null The owner
@@ -171,6 +179,16 @@ class SecuredDummy
     public function setOwnerOnlyProperty(?string $ownerOnlyProperty): void
     {
         $this->ownerOnlyProperty = $ownerOnlyProperty;
+    }
+
+    public function getAttributeBasedProperty(): string
+    {
+        return $this->attributeBasedProperty;
+    }
+
+    public function setAttributeBasedProperty(string $attributeBasedProperty): void
+    {
+        $this->attributeBasedProperty = $attributeBasedProperty;
     }
 
     public function getOwner(): ?string

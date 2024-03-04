@@ -204,7 +204,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
-            ['object' => $dummy]
+            ['object' => $dummy, 'property' => 'adminOnlyProperty']
         )->willReturn(false);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -352,7 +352,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
-            ['object' => null]
+            ['object' => null, 'property' => 'adminOnlyProperty']
         )->willReturn(false);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
@@ -464,12 +464,12 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'true',
-            ['object' => null]
+            ['object' => null, 'property' => 'ownerOnlyProperty']
         )->willReturn(true);
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'true',
-            ['object' => $dummy]
+            ['object' => $dummy, 'property' => 'ownerOnlyProperty']
         )->willReturn(true);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
@@ -528,12 +528,12 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'false',
-            ['object' => null]
+            ['object' => null, 'property' => 'ownerOnlyProperty']
         )->willReturn(false);
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'false',
-            ['object' => $dummy]
+            ['object' => $dummy, 'property' => 'ownerOnlyProperty']
         )->willReturn(false);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
@@ -593,7 +593,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'false',
-            ['object' => $dummy, 'previous_object' => $dummy]
+            ['object' => $dummy, 'previous_object' => $dummy, 'property' => 'ownerOnlyProperty']
         )->willReturn(false);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
