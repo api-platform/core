@@ -272,8 +272,7 @@ JSON;
      */
     public function testGetMercureMessages(): void
     {
-        // debug mode is required to get Mercure TraceableHub
-        $this->recreateSchema(['debug' => true, 'environment' => 'mercure']);
+        $this->recreateSchema(['environment' => 'mercure']);
 
         self::createClient()->request('POST', '/direct_mercures', [
             'headers' => [
