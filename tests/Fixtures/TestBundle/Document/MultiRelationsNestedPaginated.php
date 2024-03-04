@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\GraphQl\State\Provider\NoopProvider;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-#[ApiResource(graphQlOperations: [new QueryCollection(provider: self::class, nested: true)])]
+#[ApiResource(graphQlOperations: [new QueryCollection(provider: NoopProvider::class, nested: true)])]
 #[ODM\EmbeddedDocument]
 class MultiRelationsNestedPaginated
 {
