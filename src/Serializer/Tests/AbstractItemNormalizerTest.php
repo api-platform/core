@@ -878,21 +878,27 @@ class AbstractItemNormalizerTest extends TestCase
             'name' => 'foo',
             'relatedDummy' => ['foo' => 'bar'],
             'relatedDummies' => [['bar' => 'baz']],
+            'relatedDummiesWithUnionTypes' => [0 => ['bar' => 'qux'], 1. => ['bar' => 'quux']],
         ];
 
         $relatedDummy1 = new RelatedDummy();
         $relatedDummy2 = new RelatedDummy();
+        $relatedDummy3 = new RelatedDummy();
+        $relatedDummy4 = new RelatedDummy();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['name', 'relatedDummy', 'relatedDummies']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['name', 'relatedDummy', 'relatedDummies', 'relatedDummiesWithUnionTypes']));
 
         $relatedDummyType = new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class);
         $relatedDummiesType = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_INT), $relatedDummyType);
+        $relatedDummiesWithUnionTypesIntType = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_INT), $relatedDummyType);
+        $relatedDummiesWithUnionTypesFloatType = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_FLOAT), $relatedDummyType);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(false)->withWritable(true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummyType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummiesType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummiesWithUnionTypes', [])->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummiesWithUnionTypesIntType, $relatedDummiesWithUnionTypesFloatType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -908,6 +914,8 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(DenormalizerInterface::class);
         $serializerProphecy->denormalize(['foo' => 'bar'], RelatedDummy::class, null, Argument::type('array'))->willReturn($relatedDummy1);
         $serializerProphecy->denormalize(['bar' => 'baz'], RelatedDummy::class, null, Argument::type('array'))->willReturn($relatedDummy2);
+        $serializerProphecy->denormalize(['bar' => 'qux'], RelatedDummy::class, null, Argument::type('array'))->willReturn($relatedDummy3);
+        $serializerProphecy->denormalize(['bar' => 'quux'], RelatedDummy::class, null, Argument::type('array'))->willReturn($relatedDummy4);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -930,6 +938,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'name', 'foo')->shouldHaveBeenCalled();
         $propertyAccessorProphecy->setValue($actual, 'relatedDummy', $relatedDummy1)->shouldHaveBeenCalled();
         $propertyAccessorProphecy->setValue($actual, 'relatedDummies', [$relatedDummy2])->shouldHaveBeenCalled();
+        $propertyAccessorProphecy->setValue($actual, 'relatedDummiesWithUnionTypes', [0 => $relatedDummy3, 1. => $relatedDummy4])->shouldHaveBeenCalled();
     }
 
     public function testBadRelationType(): void
@@ -1216,6 +1225,11 @@ class AbstractItemNormalizerTest extends TestCase
                 'foo' => 'bar',
             ],
             'relatedDummies' => [
+                'a' => [
+                    'bar' => 'baz',
+                ],
+            ],
+            'relatedDummiesWithUnionTypes' => [
                 'a' => [
                     'bar' => 'baz',
                 ],

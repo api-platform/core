@@ -514,16 +514,27 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)), $value, [Type::BUILTIN_TYPE_ARRAY], $context['deserialization_path'] ?? null);
         }
 
-        $collectionKeyType = $type->getCollectionKeyTypes()[0] ?? null;
-        $collectionKeyBuiltinType = $collectionKeyType?->getBuiltinType();
-        $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
         $values = [];
+        $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
+        $collectionKeyTypes = $type->getCollectionKeyTypes();
         foreach ($value as $index => $obj) {
-            if (null !== $collectionKeyBuiltinType && !\call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
-                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyBuiltinType, \gettype($index)), $index, [$collectionKeyBuiltinType], ($context['deserialization_path'] ?? false) ? sprintf('key(%s)', $context['deserialization_path']) : null, true);
+            // no typehint provided on collection key
+            if (!$collectionKeyTypes) {
+                $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $childContext);
+                continue;
             }
 
-            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $childContext);
+            // validate collection key typehint
+            foreach ($collectionKeyTypes as $collectionKeyType) {
+                $collectionKeyBuiltinType = $collectionKeyType->getBuiltinType();
+                if (!\call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
+                    continue;
+                }
+
+                $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $childContext);
+                continue 2;
+            }
+            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyTypes[0]->getBuiltinType(), \gettype($index)), $index, [$collectionKeyTypes[0]->getBuiltinType()], ($context['deserialization_path'] ?? false) ? sprintf('key(%s)', $context['deserialization_path']) : null, true);
         }
 
         return $values;
