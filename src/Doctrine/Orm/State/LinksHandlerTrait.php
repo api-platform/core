@@ -17,7 +17,7 @@ use ApiPlatform\Doctrine\Common\State\LinksHandlerTrait as CommonLinksHandlerTra
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -86,7 +86,7 @@ trait LinksHandlerTrait
                 $associationMapping = $fromClassMetadata->getAssociationMapping($link->getFromProperty()); // @phpstan-ignore-line
                 $relationType = $associationMapping['type'];
 
-                if ($relationType & ClassMetadataInfo::TO_MANY) {
+                if ($relationType & ClassMetadata::TO_MANY) {
                     $nextAlias = $queryNameGenerator->generateJoinAlias($alias);
                     $whereClause = [];
                     foreach ($identifierProperties as $identifierProperty) {
@@ -103,7 +103,7 @@ trait LinksHandlerTrait
                 }
 
                 // A single-valued association path expression to an inverse side is not supported in DQL queries.
-                if ($relationType & ClassMetadataInfo::TO_ONE && !($associationMapping['isOwningSide'] ?? true)) {
+                if ($relationType & ClassMetadata::TO_ONE && !($associationMapping['isOwningSide'] ?? true)) {
                     $queryBuilder->innerJoin("$previousAlias.".$associationMapping['mappedBy'], $joinAlias);
                 } else {
                     $queryBuilder->join(

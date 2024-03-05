@@ -31,7 +31,7 @@
     },
     "require-dev": {
         "doctrine/mongodb-odm": "^2.6",
-        "doctrine/orm": "^2.17",
+        "doctrine/orm": "^2.17 || ^3.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpunit/phpunit": "^10.0",
         "symfony/phpunit-bridge": "^6.4 || ^7.0"

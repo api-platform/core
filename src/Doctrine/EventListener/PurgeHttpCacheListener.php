@@ -28,6 +28,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -57,6 +58,7 @@ final class PurgeHttpCacheListener
         $this->gatherResourceAndItemTags($object, true);
 
         $changeSet = $eventArgs->getEntityChangeSet();
+        // @phpstan-ignore-next-line
         $objectManager = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
         $associationMappings = $objectManager->getClassMetadata(ClassUtils::getClass($eventArgs->getObject()))->getAssociationMappings();
 
@@ -75,6 +77,7 @@ final class PurgeHttpCacheListener
      */
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
+        // @phpstan-ignore-next-line
         $em = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
         $uow = $em->getUnitOfWork();
 
@@ -125,12 +128,19 @@ final class PurgeHttpCacheListener
     private function gatherRelationTags(EntityManagerInterface $em, object $entity): void
     {
         $associationMappings = $em->getClassMetadata(ClassUtils::getClass($entity))->getAssociationMappings();
-        foreach (array_keys($associationMappings) as $property) {
-            if (
-                \array_key_exists('targetEntity', $associationMappings[$property])
-                && !$this->resourceClassResolver->isResourceClass($associationMappings[$property]['targetEntity'])) {
+        /** @var array|AssociationMapping $associationMapping according to the version of doctrine orm */
+        foreach ($associationMappings as $property => $associationMapping) {
+            if ($associationMapping instanceof AssociationMapping && ($associationMapping->targetEntity ?? null) && !$this->resourceClassResolver->isResourceClass($associationMapping->targetEntity)) {
                 return;
             }
+
+            if (
+                \is_array($associationMapping)
+                && \array_key_exists('targetEntity', $associationMapping)
+                && !$this->resourceClassResolver->isResourceClass($associationMapping['targetEntity'])) {
+                return;
+            }
+
             if ($this->propertyAccessor->isReadable($entity, $property)) {
                 $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
             }

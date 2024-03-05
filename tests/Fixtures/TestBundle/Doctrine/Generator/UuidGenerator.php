@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Id\AbstractIdGenerator;
 
 class UuidGenerator extends AbstractIdGenerator
 {
-    public function generate(EntityManager $em, $entity): Uuid
+    public function generateId(EntityManagerInterface $em, /* ?object */ $entity): mixed
     {
         return new Uuid();
     }
