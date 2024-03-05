@@ -18,7 +18,10 @@ use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\AssociationMapping;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ManyToManyOwningSideMapping;
+use Doctrine\ORM\Mapping\ToOneOwningSideMapping;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -199,7 +202,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 
         if ($metadata->hasAssociation($field)) {
             if ($metadata->isSingleValuedAssociation($field)) {
-                if (!($metadata instanceof ClassMetadataInfo)) {
+                if (!($metadata instanceof ClassMetadata)) {
                     return false;
                 }
 
@@ -211,7 +214,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
             return true;
         }
 
-        if ($metadata instanceof ClassMetadataInfo && $metadata->hasField($field)) {
+        if ($metadata instanceof ClassMetadata && $metadata->hasField($field)) {
             return $metadata->isNullable($field);
         }
 
@@ -223,8 +226,26 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
      *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
      */
-    private function isAssociationNullable(array $associationMapping): bool
+    private function isAssociationNullable(AssociationMapping|array $associationMapping): bool
     {
+        if ($associationMapping instanceof AssociationMapping) {
+            if (!empty($associationMapping->id)) {
+                return false;
+            }
+
+            if ($associationMapping instanceof ToOneOwningSideMapping || $associationMapping instanceof ManyToManyOwningSideMapping) {
+                foreach ($associationMapping->joinColumns as $joinColumn) {
+                    if (false === $joinColumn->nullable) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return true;
+        }
+
         if (!empty($associationMapping['id'])) {
             return false;
         }

@@ -25,7 +25,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Join;
@@ -43,7 +43,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
     public function testIsNoForceEagerCollectionAttributes(): void
     {
         $em = $this->prophesize(EntityManager::class);
-        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadata(DummyCar::class));
 
         $qb = $this->prophesize(QueryBuilder::class);
         $qb->getDQLPart('where')->shouldNotBeCalled();
@@ -58,7 +58,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
     public function testIsForceEagerConfig(): void
     {
         $em = $this->prophesize(EntityManager::class);
-        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadata(DummyCar::class));
 
         $qb = $this->prophesize(QueryBuilder::class);
         $qb->getDQLPart('where')->shouldNotBeCalled();
@@ -73,7 +73,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
     public function testHasNoWherePart(): void
     {
         $em = $this->prophesize(EntityManager::class);
-        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadata(DummyCar::class));
 
         $qb = $this->prophesize(QueryBuilder::class);
         $qb->getDQLPart('where')->shouldBeCalled()->willReturn(null);
@@ -88,7 +88,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
     public function testHasNoJoinPart(): void
     {
         $em = $this->prophesize(EntityManager::class);
-        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadata(DummyCar::class));
 
         $qb = $this->prophesize(QueryBuilder::class);
         $qb->getDQLPart('where')->shouldBeCalled()->willReturn(new Andx());
@@ -106,7 +106,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
     {
         $em = $this->prophesize(EntityManager::class);
         $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
-        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadata(DummyCar::class));
 
         $qb = new QueryBuilder($em->reveal());
 
@@ -133,7 +133,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
 
         $em = $this->prophesize(EntityManager::class);
         $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
-        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadata(DummyCar::class));
 
         $qb = new QueryBuilder($em->reveal());
 
@@ -178,7 +178,7 @@ SQL;
 
         $em = $this->prophesize(EntityManager::class);
         $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
-        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadata(DummyCar::class));
 
         $qb = new QueryBuilder($em->reveal());
 
@@ -218,7 +218,7 @@ SQL;
     {
         $em = $this->prophesize(EntityManager::class);
         $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
-        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadata(DummyCar::class));
 
         $qb = new QueryBuilder($em->reveal());
 
@@ -253,7 +253,7 @@ SQL;
     {
         $em = $this->prophesize(EntityManager::class);
         $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
-        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadata(DummyCar::class));
 
         $qb = new QueryBuilder($em->reveal());
 
@@ -290,9 +290,9 @@ SQL;
 
     public function testCompositeIdentifiers(): void
     {
-        $classMetadataProphecy = $this->prophesize(ClassMetadataInfo::class);
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->willReturn(['item', 'label']);
-        $classMetadataProphecy->getAssociationMappings()->willReturn(['item' => ['fetch' => ClassMetadataInfo::FETCH_EAGER]]);
+        $classMetadataProphecy->getAssociationMappings()->willReturn(['item' => ['fetch' => ClassMetadata::FETCH_EAGER]]);
         $classMetadataProphecy->hasAssociation('item')->shouldBeCalled()->willReturn(true);
         $classMetadataProphecy->hasAssociation('label')->shouldBeCalled()->willReturn(true);
 
@@ -343,7 +343,7 @@ SQL;
 
     public function testFetchEagerWithNoForceEager(): void
     {
-        $classMetadata = new ClassMetadataInfo(CompositeRelation::class);
+        $classMetadata = new ClassMetadata(CompositeRelation::class);
         $classMetadata->isIdentifierComposite = true;
         $classMetadata->identifier = ['item', 'label'];
         // @phpstan-ignore-next-line
@@ -414,9 +414,9 @@ DQL;
 
     public function testCompositeIdentifiersWithAssociation(): void
     {
-        $classMetadataProphecy = $this->prophesize(ClassMetadataInfo::class);
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->willReturn(['item', 'label', 'bar']);
-        $classMetadataProphecy->getAssociationMappings()->willReturn(['item' => ['fetch' => ClassMetadataInfo::FETCH_EAGER]]);
+        $classMetadataProphecy->getAssociationMappings()->willReturn(['item' => ['fetch' => ClassMetadata::FETCH_EAGER]]);
         $classMetadataProphecy->hasAssociation('item')->shouldBeCalled()->willReturn(true);
         $classMetadataProphecy->hasAssociation('label')->shouldBeCalled()->willReturn(true);
         $classMetadataProphecy->hasAssociation('bar')->shouldBeCalled()->willReturn(false);
@@ -469,9 +469,9 @@ SQL;
 
     public function testCompositeIdentifiersWithoutAssociation(): void
     {
-        $classMetadataProphecy = $this->prophesize(ClassMetadataInfo::class);
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->willReturn(['foo', 'bar']);
-        $classMetadataProphecy->getAssociationMappings()->willReturn(['item' => ['fetch' => ClassMetadataInfo::FETCH_EAGER]]);
+        $classMetadataProphecy->getAssociationMappings()->willReturn(['item' => ['fetch' => ClassMetadata::FETCH_EAGER]]);
         $classMetadataProphecy->hasAssociation('foo')->shouldBeCalled()->willReturn(false);
         $classMetadataProphecy->hasAssociation('bar')->shouldBeCalled()->willReturn(false);
 
@@ -508,7 +508,7 @@ SQL;
 
     public function testCompositeIdentifiersWithForeignIdentifiers(): void
     {
-        $classMetadata = new ClassMetadataInfo(DummyCar::class);
+        $classMetadata = new ClassMetadata(DummyCar::class);
         $classMetadata->setIdentifier(['id']);
         $classMetadata->containsForeignIdentifier = true;
 

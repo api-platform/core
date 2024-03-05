@@ -32,7 +32,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PartialPaginator
     {
         $query = $paginator->getQuery();
 
-        if (null === ($firstResult = $query->getFirstResult()) || null === $maxResults = $query->getMaxResults()) { // @phpstan-ignore-line
+        if (null === ($firstResult = $query->getFirstResult()) || $firstResult < 0 || null === $maxResults = $query->getMaxResults()) { // @phpstan-ignore-line
             throw new InvalidArgumentException(sprintf('"%1$s::setFirstResult()" or/and "%1$s::setMaxResults()" was/were not applied to the query.', Query::class));
         }
 
