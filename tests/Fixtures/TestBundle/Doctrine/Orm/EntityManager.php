@@ -45,4 +45,9 @@ final class EntityManager extends EntityManagerDecorator
 
         return $this->wrapped->createQuery($dql);
     }
+
+    public function isUninitializedObject(mixed $value): bool
+    {
+        return true;
+    }
 }
