@@ -120,7 +120,7 @@ final class NumericFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass)
@@ -151,7 +151,7 @@ final class NumericFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    protected function getType(string $doctrineType = null): string
+    protected function getType(?string $doctrineType = null): string
     {
         if (null === $doctrineType) {
             return 'string';

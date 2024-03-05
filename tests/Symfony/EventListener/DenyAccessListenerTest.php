@@ -155,7 +155,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onSecurity($event);
     }
 
-    private function getListener(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null): DenyAccessListener
+    private function getListener(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?ResourceAccessCheckerInterface $resourceAccessChecker = null): DenyAccessListener
     {
         if (null === $resourceAccessChecker) {
             $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class)->reveal();

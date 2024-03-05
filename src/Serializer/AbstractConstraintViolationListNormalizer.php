@@ -33,7 +33,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
 
     private readonly ?array $serializePayloadFields;
 
-    public function __construct(array $serializePayloadFields = null, private readonly ?NameConverterInterface $nameConverter = null)
+    public function __construct(?array $serializePayloadFields = null, private readonly ?NameConverterInterface $nameConverter = null)
     {
         $this->serializePayloadFields = null === $serializePayloadFields ? null : array_flip($serializePayloadFields);
     }
@@ -41,7 +41,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return static::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }

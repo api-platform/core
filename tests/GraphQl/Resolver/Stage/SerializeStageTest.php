@@ -124,7 +124,7 @@ class SerializeStageTest extends TestCase
     /**
      * @dataProvider applyCollectionWithPaginationProvider
      */
-    public function testApplyCollectionWithPagination(iterable|callable $collection, array $args, ?array $expectedResult, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
+    public function testApplyCollectionWithPagination(iterable|callable $collection, array $args, ?array $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $operationName = 'collection_query';
         $resourceClass = 'myResource';

@@ -42,7 +42,7 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(array $requestBody, string $resourceClass, Operation $operation = null, array $context = []): array
+    public function applyToCollection(array $requestBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
     {
         $orders = [];
 

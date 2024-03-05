@@ -41,7 +41,7 @@ final class SkolemIriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceFromIri(string $iri, array $context = [], Operation $operation = null): object
+    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
     {
         throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
     }
@@ -49,7 +49,7 @@ final class SkolemIriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
+    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
     {
         $referenceType = $operation ? ($operation->getUrlGenerationStrategy() ?? $referenceType) : $referenceType;
         if (($isObject = \is_object($resource)) && $this->objectHashMap->contains($resource)) {

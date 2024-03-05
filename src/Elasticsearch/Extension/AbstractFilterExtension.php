@@ -32,7 +32,7 @@ abstract class AbstractFilterExtension implements RequestBodySearchCollectionExt
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(array $requestBody, string $resourceClass, Operation $operation = null, array $context = []): array
+    public function applyToCollection(array $requestBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
     {
         $resourceFilters = $operation?->getFilters();
 

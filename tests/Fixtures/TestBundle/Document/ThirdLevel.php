@@ -89,7 +89,7 @@ class ThirdLevel
         return $this->fourthLevel;
     }
 
-    public function setFourthLevel(FourthLevel $fourthLevel = null): void
+    public function setFourthLevel(?FourthLevel $fourthLevel = null): void
     {
         $this->fourthLevel = $fourthLevel;
     }

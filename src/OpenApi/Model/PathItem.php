@@ -176,7 +176,7 @@ final class PathItem
         return $clone;
     }
 
-    public function withServers(array $servers = null): self
+    public function withServers(?array $servers = null): self
     {
         $clone = clone $this;
         $clone->servers = $servers;

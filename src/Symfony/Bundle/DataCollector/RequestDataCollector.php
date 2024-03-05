@@ -36,7 +36,7 @@ final class RequestDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         if ($request->attributes->get('_graphql', false)) {
             $resourceClasses = array_keys($request->attributes->get('_graphql_args', []));

@@ -35,7 +35,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
     private $linkFactory;
     private $decorated;
 
-    public function __construct(LinkFactoryInterface $linkFactory, ResourceMetadataCollectionFactoryInterface $decorated = null)
+    public function __construct(LinkFactoryInterface $linkFactory, ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
         $this->linkFactory = $linkFactory;
         $this->decorated = $decorated;

@@ -31,7 +31,7 @@ final class DenyAccessListener
 {
     use OperationRequestInitiatorTrait;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }

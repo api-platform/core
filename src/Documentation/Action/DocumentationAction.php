@@ -34,7 +34,7 @@ final class DocumentationAction
     /**
      * @return DocumentationInterface|OpenApi
      */
-    public function __invoke(Request $request = null)
+    public function __invoke(?Request $request = null)
     {
         if (null !== $request) {
             $context = ['base_url' => $request->getBaseUrl()];

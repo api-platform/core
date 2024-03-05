@@ -29,7 +29,7 @@ final class ComplexSubQueryFilter extends AbstractFilter
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
-        Operation $operation = null,
+        ?Operation $operation = null,
         array $context = []
     ): void {
         if ('complex_sub_query_filter' !== $property) {

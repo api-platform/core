@@ -27,5 +27,5 @@ interface FilterInterface extends BaseFilterInterface
     /**
      * Applies the filter.
      */
-    public function apply(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void;
+    public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void;
 }

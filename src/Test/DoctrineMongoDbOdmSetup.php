@@ -35,7 +35,7 @@ class DoctrineMongoDbOdmSetup
     /**
      * Creates a configuration with an attribute metadata driver.
      */
-    public static function createAttributeMetadataConfiguration(array $paths, bool $isDevMode = false, string $proxyDir = null, string $hydratorDir = null, Cache $cache = null): Configuration
+    public static function createAttributeMetadataConfiguration(array $paths, bool $isDevMode = false, ?string $proxyDir = null, ?string $hydratorDir = null, ?Cache $cache = null): Configuration
     {
         $config = self::createConfiguration($isDevMode, $proxyDir, $hydratorDir, $cache);
         $config->setMetadataDriverImpl(new AttributeDriver($paths));
@@ -46,7 +46,7 @@ class DoctrineMongoDbOdmSetup
     /**
      * Creates a configuration with a xml metadata driver.
      */
-    public static function createXMLMetadataConfiguration(array $paths, bool $isDevMode = false, string $proxyDir = null, string $hydratorDir = null, Cache $cache = null): Configuration
+    public static function createXMLMetadataConfiguration(array $paths, bool $isDevMode = false, ?string $proxyDir = null, ?string $hydratorDir = null, ?Cache $cache = null): Configuration
     {
         $config = self::createConfiguration($isDevMode, $proxyDir, $hydratorDir, $cache);
         $config->setMetadataDriverImpl(new XmlDriver($paths));
@@ -57,7 +57,7 @@ class DoctrineMongoDbOdmSetup
     /**
      * Creates a configuration without a metadata driver.
      */
-    public static function createConfiguration(bool $isDevMode = false, string $proxyDir = null, string $hydratorDir = null, Cache $cache = null): Configuration
+    public static function createConfiguration(bool $isDevMode = false, ?string $proxyDir = null, ?string $hydratorDir = null, ?Cache $cache = null): Configuration
     {
         $proxyDir = $proxyDir ?: sys_get_temp_dir();
         $hydratorDir = $hydratorDir ?: sys_get_temp_dir();

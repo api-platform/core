@@ -197,7 +197,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
 {
     use OrderFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null, private readonly ?string $orderNullsComparison = null)
+    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null, private readonly ?string $orderNullsComparison = null)
     {
         if (null !== $properties) {
             $properties = array_map(static function ($propertyOptions) {
@@ -220,7 +220,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
             return;
@@ -240,7 +240,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $direction, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $direction, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
             return;

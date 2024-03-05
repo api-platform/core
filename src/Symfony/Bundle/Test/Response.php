@@ -58,7 +58,7 @@ final class Response implements ResponseInterface
         ] + $info;
     }
 
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         if ($type) {
             return $this->info[$type] ?? null;

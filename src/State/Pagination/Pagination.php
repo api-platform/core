@@ -70,7 +70,7 @@ final class Pagination
     /**
      * Gets the current offset.
      */
-    public function getOffset(Operation $operation = null, array $context = []): int
+    public function getOffset(?Operation $operation = null, array $context = []): int
     {
         $graphql = (bool) ($context['graphql_operation_name'] ?? false);
 
@@ -102,7 +102,7 @@ final class Pagination
      *
      * @throws InvalidArgumentException
      */
-    public function getLimit(Operation $operation = null, array $context = []): int
+    public function getLimit(?Operation $operation = null, array $context = []): int
     {
         $graphql = (bool) ($context['graphql_operation_name'] ?? false);
 
@@ -148,7 +148,7 @@ final class Pagination
      *
      * @throws InvalidArgumentException
      */
-    public function getPagination(Operation $operation = null, array $context = []): array
+    public function getPagination(?Operation $operation = null, array $context = []): array
     {
         $page = $this->getPage($context);
         $limit = $this->getLimit($operation, $context);
@@ -163,7 +163,7 @@ final class Pagination
     /**
      * Is the pagination enabled?
      */
-    public function isEnabled(Operation $operation = null, array $context = []): bool
+    public function isEnabled(?Operation $operation = null, array $context = []): bool
     {
         return $this->getEnabled($context, $operation);
     }
@@ -171,7 +171,7 @@ final class Pagination
     /**
      * Is the pagination enabled for GraphQL?
      */
-    public function isGraphQlEnabled(Operation $operation = null, array $context = []): bool
+    public function isGraphQlEnabled(?Operation $operation = null, array $context = []): bool
     {
         return $this->getGraphQlEnabled($operation);
     }
@@ -179,7 +179,7 @@ final class Pagination
     /**
      * Is the partial pagination enabled?
      */
-    public function isPartialEnabled(Operation $operation = null, array $context = []): bool
+    public function isPartialEnabled(?Operation $operation = null, array $context = []): bool
     {
         return $this->getEnabled($context, $operation, true);
     }
@@ -197,7 +197,7 @@ final class Pagination
     /**
      * Is the classic or partial pagination enabled?
      */
-    private function getEnabled(array $context, Operation $operation = null, bool $partial = false): bool
+    private function getEnabled(array $context, ?Operation $operation = null, bool $partial = false): bool
     {
         $enabled = $this->options[$partial ? 'partial' : 'enabled'];
         $clientEnabled = $this->options[$partial ? 'client_partial' : 'client_enabled'];

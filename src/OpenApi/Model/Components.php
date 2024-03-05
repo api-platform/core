@@ -31,7 +31,7 @@ final class Components
      * @param \ArrayObject<string, array<string, PathItem>>|\ArrayObject<string, array<string, Reference>> $callbacks
      * @param \ArrayObject<string, PathItem>|\ArrayObject<string, Reference>                               $pathItems
      */
-    public function __construct(\ArrayObject $schemas = null, private ?\ArrayObject $responses = null, private ?\ArrayObject $parameters = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $requestBodies = null, private ?\ArrayObject $headers = null, private ?\ArrayObject $securitySchemes = null, private ?\ArrayObject $links = null, private ?\ArrayObject $callbacks = null, private ?\ArrayObject $pathItems = null)
+    public function __construct(?\ArrayObject $schemas = null, private ?\ArrayObject $responses = null, private ?\ArrayObject $parameters = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $requestBodies = null, private ?\ArrayObject $headers = null, private ?\ArrayObject $securitySchemes = null, private ?\ArrayObject $links = null, private ?\ArrayObject $callbacks = null, private ?\ArrayObject $pathItems = null)
     {
         $schemas?->ksort();
 
