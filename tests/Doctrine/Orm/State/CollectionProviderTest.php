@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Doctrine\Orm\State;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
+use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\GetCollection;
@@ -24,12 +25,12 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 class CollectionProviderTest extends TestCase
@@ -38,57 +39,80 @@ class CollectionProviderTest extends TestCase
 
     public function testGetCollection(): void
     {
-        $queryProphecy = $this->prophesize(AbstractQuery::class);
-        $queryProphecy->getResult()->willReturn([])->shouldBeCalled();
+        $query = $this->createMock($this->getQueryClass());
+        $query->expects($this->once())->method('getResult')->willReturn([]);
 
-        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
-        $queryBuilderProphecy->getRootAliases()->willReturn(['alias']);
-        $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
-        $queryBuilder = $queryBuilderProphecy->reveal();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects($this->once())->method('getQuery')->willReturn($query);
 
-        $repositoryProphecy = $this->prophesize(EntityRepository::class);
-        $repositoryProphecy->createQueryBuilder('o')->willReturn($queryBuilder)->shouldBeCalled();
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->once())->method('createQueryBuilder')->with('o')->willReturn($queryBuilder);
 
-        $managerProphecy = $this->prophesize(ObjectManager::class);
-        $managerProphecy->getClassMetadata(OperationResource::class)->willReturn(new ClassMetadata(OperationResource::class));
-        $managerProphecy->getRepository(OperationResource::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
+        $manager = $this->createMock(ObjectManager::class);
+        $manager->expects($this->once())->method('getRepository')->with(OperationResource::class)->willReturn($repository);
 
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass(OperationResource::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->expects($this->once())->method('getManagerForClass')->with(OperationResource::class)->willReturn($manager);
 
         $operation = (new GetCollection())->withClass(OperationResource::class)->withName('getCollection');
 
-        $extensionProphecy = $this->prophesize(QueryCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, $operation, [])->shouldBeCalled();
+        $extension = $this->createMock(QueryCollectionExtensionInterface::class);
+        $extension->expects($this->once())->method('applyToCollection')->with(
+            $queryBuilder,
+            new QueryNameGenerator(),
+            OperationResource::class,
+            $operation,
+            []
+        );
 
-        $dataProvider = new CollectionProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+
+        $dataProvider = new CollectionProvider($resourceMetadataCollectionFactory, $managerRegistry, [$extension]);
         $this->assertEquals([], $dataProvider->provide($operation));
     }
 
     public function testQueryResultExtension(): void
     {
-        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
-        $queryBuilderProphecy->getRootAliases()->willReturn(['alias']);
-        $queryBuilder = $queryBuilderProphecy->reveal();
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getRootAliases')->willReturn(['alias']);
 
-        $repositoryProphecy = $this->prophesize(EntityRepository::class);
-        $repositoryProphecy->createQueryBuilder('o')->willReturn($queryBuilder)->shouldBeCalled();
+        $repositoryMock = $this->createMock(EntityRepository::class);
+        $repositoryMock->method('createQueryBuilder')->willReturn($queryBuilderMock);
 
-        $managerProphecy = $this->prophesize(ObjectManager::class);
-        $managerProphecy->getClassMetadata(OperationResource::class)->willReturn(new ClassMetadata(OperationResource::class));
-        $managerProphecy->getRepository(OperationResource::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
+        $managerMock = $this->createMock(ObjectManager::class);
+        $managerMock->method('getClassMetadata')->willReturn(new ClassMetadata(OperationResource::class));
+        $managerMock->method('getRepository')->willReturn($repositoryMock);
 
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass(OperationResource::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->willReturn($managerMock);
 
         $operation = (new GetCollection())->withClass(OperationResource::class);
 
-        $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, $operation, [])->shouldBeCalled();
-        $extensionProphecy->supportsResult(OperationResource::class, $operation, [])->willReturn(true)->shouldBeCalled();
-        $extensionProphecy->getResult($queryBuilder, OperationResource::class, $operation, [])->willReturn([])->shouldBeCalled();
+        $extensionMock = $this->createMock(QueryResultCollectionExtensionInterface::class);
+        $extensionMock->expects($this->once())
+            ->method('applyToCollection')
+            ->with(
+                $queryBuilderMock,
+                $this->isInstanceOf(QueryNameGeneratorInterface::class),
+                OperationResource::class,
+                $operation,
+                []
+            );
+        $extensionMock->expects($this->once())
+            ->method('supportsResult')
+            ->with(OperationResource::class, $operation, [])
+            ->willReturn(true);
+        $extensionMock->expects($this->once())
+            ->method('getResult')
+            ->with($queryBuilderMock, OperationResource::class, $operation, [])
+            ->willReturn([]);
 
-        $dataProvider = new CollectionProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $dataProvider = new CollectionProvider(
+            $this->createMock(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+            [$extensionMock]
+        );
+
         $this->assertEquals([], $dataProvider->provide($operation));
     }
 
@@ -108,5 +132,18 @@ class CollectionProviderTest extends TestCase
         $dataProvider = new CollectionProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal());
         $operation = (new GetCollection())->withClass(OperationResource::class)->withName('getCollection');
         $this->assertEquals([], $dataProvider->provide($operation));
+    }
+
+    /**
+     * Doctrine ORM 3 removed the final keyword but strong-typed return types.
+     * In Doctrine ORM 2 we can mock the AbstractQuery instead, as Query is final.
+     */
+    private function getQueryClass(): string
+    {
+        if ((new \ReflectionClass(Query::class))->isFinal()) {
+            return AbstractQuery::class;
+        }
+
+        return Query::class;
     }
 }

@@ -27,8 +27,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\Car;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -49,12 +49,14 @@ final class DoctrineOrmLinkFactoryTest extends TestCase
         $classMetadataProphecy->getAssociationTargetClass('relatedNonResource')->willReturn(Car::class);
         $classMetadataProphecy->getAssociationTargetClass('relatedDummy')->willReturn(RelatedDummy::class);
         $classMetadataProphecy->getAssociationTargetClass('relatedDummies')->willReturn(RelatedDummy::class);
+        $classMetadataProphecy->getAssociationTargetClass('noMappedBy')->willReturn('NoMappedByClass');
         $classMetadataProphecy->getAssociationMappedByTargetField('relatedNonResource')->willReturn('dummies');
-        $classMetadataProphecy->getAssociationMappedByTargetField('relatedDummy')->willReturn(null);
+        $classMetadataProphecy->getAssociationMappedByTargetField('relatedDummy')->shouldNotBeCalled();
         $classMetadataProphecy->getAssociationMappedByTargetField('relatedDummies')->willReturn('dummies');
         $classMetadataProphecy->isAssociationInverseSide('relatedNonResource')->willReturn(true);
-        $classMetadataProphecy->isAssociationInverseSide('relatedDummy')->willReturn(true);
+        $classMetadataProphecy->isAssociationInverseSide('relatedDummy')->willReturn(false);
         $classMetadataProphecy->isAssociationInverseSide('relatedDummies')->willReturn(true);
+        $classMetadataProphecy->isAssociationInverseSide('noMappedBy')->willReturn(false);
 
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
         $entityManagerProphecy->getClassMetadata($class)->willReturn($classMetadataProphecy->reveal());

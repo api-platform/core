@@ -15,7 +15,8 @@ namespace ApiPlatform\Tests\Doctrine\Orm;
 
 use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Tests\Fixtures\Query;
+use ApiPlatform\Tests\Fixtures\Query as FixturesQuery;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -61,7 +62,7 @@ class PaginatorTest extends TestCase
 
     private function getPaginator(int $firstResult = 1, int $maxResults = 15, int $totalItems = 42): Paginator
     {
-        $query = $this->prophesize(Query::class);
+        $query = $this->prophesize($this->getQueryClass());
         $query->getFirstResult()->willReturn($firstResult)->shouldBeCalled();
         $query->getMaxResults()->willReturn($maxResults)->shouldBeCalled();
 
@@ -77,8 +78,8 @@ class PaginatorTest extends TestCase
 
     private function getPaginatorWithMalformedQuery(bool $maxResults = false): void
     {
-        $query = $this->prophesize(Query::class);
-        $query->getFirstResult()->willReturn($maxResults ? 42 : null)->shouldBeCalled();
+        $query = $this->prophesize($this->getQueryClass());
+        $query->getFirstResult()->willReturn($maxResults ? 42 : -1)->shouldBeCalled();
 
         if ($maxResults) {
             $query->getMaxResults()->willReturn(null)->shouldBeCalled();
@@ -96,5 +97,14 @@ class PaginatorTest extends TestCase
             'First of three pages of 15 items each' => [0, 15, 42, 1, 3],
             'Second of two pages of 10 items each' => [10, 10, 20, 2, 2],
         ];
+    }
+
+    private function getQueryClass(): string
+    {
+        if ((new \ReflectionClass(Query::class))->isFinal()) {
+            return FixturesQuery::class;
+        }
+
+        return Query::class;
     }
 }

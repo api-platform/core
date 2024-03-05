@@ -17,8 +17,8 @@ use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
 
@@ -81,7 +81,7 @@ final class OperationResourceProcessor implements ProcessorInterface
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {
         $classMetadata = $manager->getClassMetadata($this->getObjectClass($data));
-        if (($classMetadata instanceof ClassMetadataInfo || $classMetadata instanceof ClassMetadata) && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
+        if (($classMetadata instanceof ClassMetadata || $classMetadata instanceof ODMClassMetadata) && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
             return $classMetadata->isChangeTrackingDeferredExplicit();
         }
 

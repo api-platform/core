@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
@@ -137,9 +136,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             if (
                 // Always skip extra lazy associations
-                ClassMetadataInfo::FETCH_EXTRA_LAZY === $mapping['fetch']
+                ClassMetadata::FETCH_EXTRA_LAZY === $mapping['fetch']
                 // We don't want to interfere with doctrine on this association
-                || (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'])
+                || (false === $forceEager && ClassMetadata::FETCH_EAGER !== $mapping['fetch'])
             ) {
                 continue;
             }
