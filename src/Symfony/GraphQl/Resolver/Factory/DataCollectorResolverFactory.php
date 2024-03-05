@@ -24,7 +24,7 @@ final class DataCollectorResolverFactory implements ResolverFactoryInterface
     {
     }
 
-    public function __invoke(string $resourceClass = null, string $rootClass = null, Operation $operation = null): callable
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
             if ($this->requestStack && null !== $request = $this->requestStack->getCurrentRequest()) {

@@ -43,9 +43,9 @@ final class ReadListener
 
     public function __construct(
         private readonly ProviderInterface $provider,
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
-        UriVariablesConverterInterface $uriVariablesConverter = null,
+        ?UriVariablesConverterInterface $uriVariablesConverter = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;

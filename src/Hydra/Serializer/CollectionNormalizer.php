@@ -76,7 +76,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     /**
      * Gets items data.
      */
-    protected function getItemsData(iterable $object, string $format = null, array $context = []): array
+    protected function getItemsData(iterable $object, ?string $format = null, array $context = []): array
     {
         $data = [];
         $data['hydra:member'] = [];

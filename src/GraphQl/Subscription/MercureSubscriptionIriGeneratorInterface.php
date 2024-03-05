@@ -22,5 +22,5 @@ interface MercureSubscriptionIriGeneratorInterface
 {
     public function generateTopicIri(string $subscriptionId): string;
 
-    public function generateMercureUrl(string $subscriptionId, string $hub = null): string;
+    public function generateMercureUrl(string $subscriptionId, ?string $hub = null): string;
 }

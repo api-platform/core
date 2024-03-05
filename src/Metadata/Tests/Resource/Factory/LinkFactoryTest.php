@@ -39,7 +39,7 @@ final class LinkFactoryTest extends TestCase
     /**
      * @dataProvider provideCreateLinksFromIdentifiersCases
      */
-    public function testCreateLinksFromIdentifiers(array $propertyNames, bool $compositeIdentifier, array $expectedLinks, bool $idAsIdentifier = null): void
+    public function testCreateLinksFromIdentifiers(array $propertyNames, bool $compositeIdentifier, array $expectedLinks, ?bool $idAsIdentifier = null): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Argument::cetera())->willReturn(new PropertyNameCollection($propertyNames));

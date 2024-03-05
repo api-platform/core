@@ -30,7 +30,7 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function process(mixed $data, Operation $operation = null, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, ?Operation $operation = null, array $uriVariables = [], array $context = [])
     {
         $isOrm = true;
         $em = $this->registry->getManagerForClass(DummyDtoNoOutput::class);
@@ -52,7 +52,7 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function supports($data, array $identifiers = [], string $operationName = null, array $context = []): bool
+    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
     {
         return $data instanceof InputDto || $data instanceof InputDtoDocument;
     }

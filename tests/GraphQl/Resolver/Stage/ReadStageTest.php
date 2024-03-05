@@ -127,7 +127,7 @@ class ReadStageTest extends TestCase
     /**
      * @dataProvider itemMutationOrSubscriptionProvider
      */
-    public function testApplyMutationOrSubscription(bool $isMutation, bool $isSubscription, string $resourceClass, ?string $identifier, ?object $item, bool $throwNotFound, ?object $expectedResult, string $expectedExceptionClass = null, string $expectedExceptionMessage = null): void
+    public function testApplyMutationOrSubscription(bool $isMutation, bool $isSubscription, string $resourceClass, ?string $identifier, ?object $item, bool $throwNotFound, ?object $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $operationName = 'create';
         $info = $this->prophesize(ResolveInfo::class)->reveal();

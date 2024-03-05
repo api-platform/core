@@ -31,7 +31,7 @@ class DebugResourceCommandTest extends TestCase
 {
     use ProphecyTrait;
 
-    private function getCommandTester(DataDumperInterface $dumper = null): CommandTester
+    private function getCommandTester(?DataDumperInterface $dumper = null): CommandTester
     {
         $application = new Application();
         $application->setCatchExceptions(false);

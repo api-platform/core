@@ -138,7 +138,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (
@@ -220,7 +220,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
     /**
      * Adds the where clause according to the chosen null management.
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, mixed $value, string $nullManagement = null, DBALType|string $type = null): void
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, mixed $value, ?string $nullManagement = null, DBALType|string|null $type = null): void
     {
         $type = (string) $type;
         $value = $this->normalizeValue($value, $operator);

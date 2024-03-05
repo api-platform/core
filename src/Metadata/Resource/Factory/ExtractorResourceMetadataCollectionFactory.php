@@ -32,7 +32,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 {
     use OperationDefaultsTrait;
 
-    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [], LoggerInterface $logger = null, private readonly bool $graphQlEnabled = false)
+    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [], ?LoggerInterface $logger = null, private readonly bool $graphQlEnabled = false)
     {
         $this->logger = $logger ?? new NullLogger();
         $this->defaults = $defaults;

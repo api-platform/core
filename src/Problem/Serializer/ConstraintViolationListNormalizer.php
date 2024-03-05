@@ -34,7 +34,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
         self::TITLE => 'An error occurred',
     ];
 
-    public function __construct(array $serializePayloadFields = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
+    public function __construct(?array $serializePayloadFields = null, ?NameConverterInterface $nameConverter = null, array $defaultContext = [])
     {
         parent::__construct($serializePayloadFields, $nameConverter);
 
@@ -44,7 +44,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         [$messages, $violations] = $this->getMessagesAndViolations($object);
 

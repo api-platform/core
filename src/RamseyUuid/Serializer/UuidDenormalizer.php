@@ -24,7 +24,7 @@ final class UuidDenormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): UuidInterface
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): UuidInterface
     {
         try {
             return Uuid::fromString($data);
@@ -33,7 +33,7 @@ final class UuidDenormalizer implements DenormalizerInterface
         }
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return \is_string($data) && is_a($type, UuidInterface::class, true);
     }
