@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.1.26
+
+### Bug fixes
+
+* [efdce062b](https://github.com/api-platform/core/commit/efdce062b0f9bf8ccbfaaa47bc9d2fbaabc38bfa) fix(doctrine): doctrine/orm:^3.0 support (#6193)
+* [ff965b340](https://github.com/api-platform/core/commit/ff965b340a0a5756a5e64711f6c5aeb3b021fb06) fix(doctrine): isAssociationInverseSide before getMappedBy (#6197)
+
 ## v3.1.25
 
 ### Bug fixes
