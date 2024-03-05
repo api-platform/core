@@ -15,9 +15,12 @@ namespace ApiPlatform\Doctrine\Orm\Tests;
 
 use ApiPlatform\Doctrine\Orm\Extension\DoctrinePaginatorFactory;
 use ApiPlatform\Doctrine\Orm\Paginator;
-use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Query;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Tests\Fixtures\Query as FixturesQuery;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -65,7 +68,7 @@ class PaginatorTest extends TestCase
 
     private function getPaginator(int $firstResult = 1, int $maxResults = 15, int $totalItems = 42): Paginator
     {
-        $query = $this->prophesize(Query::class);
+        $query = $this->prophesize($this->getQueryClass());
         $query->getFirstResult()->willReturn($firstResult)->shouldBeCalled();
         $query->getMaxResults()->willReturn($maxResults)->shouldBeCalled();
 
@@ -81,8 +84,8 @@ class PaginatorTest extends TestCase
 
     private function getPaginatorWithMalformedQuery(bool $maxResults = false): void
     {
-        $query = $this->prophesize(Query::class);
-        $query->getFirstResult()->willReturn($maxResults ? 42 : null)->shouldBeCalled();
+        $query = $this->prophesize($this->getQueryClass());
+        $query->getFirstResult()->willReturn($maxResults ? 42 : -1)->shouldBeCalled();
 
         if ($maxResults) {
             $query->getMaxResults()->willReturn(null)->shouldBeCalled();
@@ -115,19 +118,16 @@ class PaginatorTest extends TestCase
 
     public function testHasNextPageShouldMakeQueryIfTotalPagesHasNotBeenCalled(): void
     {
-        $query = $this->prophesize(Query::class);
-        $query->getFirstResult()->willReturn(1)->shouldBeCalled();
-        $query->getMaxResults()->willReturn(15)->shouldBeCalled();
-        $query->getParameters()->willReturn(new ArrayCollection())->shouldBeCalled();
-        $query->setParameters(Argument::any())->willReturn($query->reveal())->shouldBeCalled();
-        $query->setCacheable(false)->willReturn($query->reveal())->shouldBeCalled();
-        $query->setMaxResults(1)->shouldBeCalled();
-        $query->getHints()->willReturn([])->shouldBeCalled();
-        $query->setFirstResult(Argument::any())->willReturn($query->reveal())->shouldBeCalled();
-
+        $em = $this->prophesize(EntityManagerInterface::class);
+        $em->getConfiguration()->willReturn(new Configuration());
+        $query = new Query($em->reveal());
+        $query->setFirstResult(1);
+        $query->setMaxResults(15);
+        $query->setParameters(new ArrayCollection());
+        $query->setCacheable(false);
         $doctrinePaginator = $this->prophesize(DoctrinePaginator::class);
 
-        $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
+        $doctrinePaginator->getQuery()->willReturn($query)->shouldBeCalled();
         $doctrinePaginator->count()->willReturn(42);
         $doctrinePaginator->getFetchJoinCollection()->willReturn(false);
 
@@ -149,5 +149,14 @@ class PaginatorTest extends TestCase
             'First of three pages of 15 items each' => [0, 15, 42, 1, 3, true],
             'Second of two pages of 10 items each' => [10, 10, 20, 2, 2, false],
         ];
+    }
+
+    private function getQueryClass(): string
+    {
+        if ((new \ReflectionClass(Query::class))->isFinal()) {
+            return FixturesQuery::class;
+        }
+
+        return Query::class;
     }
 }

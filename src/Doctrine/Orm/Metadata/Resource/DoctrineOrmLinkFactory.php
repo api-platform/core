@@ -66,8 +66,16 @@ final class DoctrineOrmLinkFactory implements LinkFactoryInterface, PropertyLink
                 continue;
             }
 
+            if (!$doctrineMetadata->isAssociationInverseSide($property)) {
+                continue;
+            }
+
+            if (!($mappedBy = $doctrineMetadata->getAssociationMappedByTargetField($property))) {
+                continue;
+            }
+
             $relationClass = $doctrineMetadata->getAssociationTargetClass($property);
-            if (!($mappedBy = $doctrineMetadata->getAssociationMappedByTargetField($property)) || !$this->resourceClassResolver->isResourceClass($relationClass)) {
+            if (!$this->resourceClassResolver->isResourceClass($relationClass)) {
                 continue;
             }
 
