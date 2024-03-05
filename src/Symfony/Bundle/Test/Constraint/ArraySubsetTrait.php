@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\Test\Constraint;
 
 use SebastianBergmann\Comparator\ComparisonFailure;
+use SebastianBergmann\Exporter\Exporter;
 
 /**
  * Constraint that asserts that the array it is evaluated for has a specified subset.
@@ -67,7 +68,7 @@ trait ArraySubsetTrait
      */
     public function toString(): string
     {
-        return 'has the subset '.$this->exporter()->export($this->subset);
+        return 'has the subset '.(new Exporter())->export($this->subset);
     }
 
     /**
