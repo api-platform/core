@@ -45,9 +45,10 @@ use ApiPlatform\Symfony\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Symfony\EventListener\AddTagsListener;
 use ApiPlatform\Symfony\EventListener\DenyAccessListener;
 use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException as SymfonyValidationException;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Persistence\ManagerRegistry;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -373,6 +374,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         return [
             Error::class,
+            SymfonyValidationException::class,
             ValidationException::class,
         ];
     }
