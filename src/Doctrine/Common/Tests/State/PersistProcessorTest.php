@@ -18,7 +18,7 @@ use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\ProcessorInterface;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
@@ -84,8 +84,8 @@ class PersistProcessorTest extends TestCase
     public static function getTrackingPolicyParameters(): array
     {
         return [
-            'deferred explicit ORM' => [ClassMetadataInfo::class, true, true],
-            'deferred implicit ORM' => [ClassMetadataInfo::class, false, false],
+            'deferred explicit ORM' => [ORMClassMetadata::class, true, true],
+            'deferred implicit ORM' => [ORMClassMetadata::class, false, false],
             'deferred explicit ODM' => [ClassMetadata::class, true, true],
             'deferred implicit ODM' => [ClassMetadata::class, false, false],
         ];
@@ -98,15 +98,15 @@ class PersistProcessorTest extends TestCase
     {
         $dummy = new Dummy();
 
-        $classMetadataInfo = $this->prophesize($metadataClass);
+        $classMetadata = $this->prophesize($metadataClass);
         if (method_exists($metadataClass, 'isChangeTrackingDeferredExplicit')) {
-            $classMetadataInfo->isChangeTrackingDeferredExplicit()->willReturn($deferredExplicit)->shouldBeCalled();
+            $classMetadata->isChangeTrackingDeferredExplicit()->willReturn($deferredExplicit)->shouldBeCalled();
         } else {
             $persisted = false;
         }
 
         $objectManagerProphecy = $this->prophesize(ObjectManager::class);
-        $objectManagerProphecy->getClassMetadata(Dummy::class)->willReturn($classMetadataInfo)->shouldBeCalled();
+        $objectManagerProphecy->getClassMetadata(Dummy::class)->willReturn($classMetadata)->shouldBeCalled();
         $objectManagerProphecy->contains($dummy)->willReturn(true);
         $objectManagerProphecy->persist($dummy)->should($persisted ? new CallPrediction() : new NoCallsPrediction());
         $objectManagerProphecy->flush()->shouldBeCalled();
