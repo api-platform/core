@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.3.0-alpha.2
+
+### Bug fixes
+
+* [bc8d57b88](https://github.com/api-platform/core/commit/bc8d57b885e3b1db42269a29e887ecca17f2a99c) fix(symfony): reduce json-problem dependencies (#6169)
+* [bfd759b62](https://github.com/api-platform/core/commit/bfd759b627990926fddd11c6737af8f993af7bb5) fix: components split dependencies (#6186)
+* [c01e10ff3](https://github.com/api-platform/core/commit/c01e10ff323fac6f6e3549e7e90d8ee01d9285f3) fix(hydra): remove dependency from ApiPlatform/Api dependency (#6154)
+
+### Features
+
+* [24a1a18cb](https://github.com/api-platform/core/commit/24a1a18cbe706c5a3bb4d5602b70c0a68ff8a757) feat: improve ApiProperty::security using property name (#5853)
+* [3d1428e4d](https://github.com/api-platform/core/commit/3d1428e4d2e4342918becf098da8832ac50fef1b) feat(symfony): add getOperation Expression Language function on Mercure topics (#5854)
+* [6b00cea91](https://github.com/api-platform/core/commit/6b00cea914dc5f9c42ca237a3ff498d629a0efb8) feat(graphql): partial pagination for page based pagination (#6120)
+* [79fe01b97](https://github.com/api-platform/core/commit/79fe01b970d90e3c80880f54fc0446b5294173f0) feat(doctrine): paginators for Doctrine Collection & Selectable (#6153)
+* [89c9229f4](https://github.com/api-platform/core/commit/89c9229f484cb409ef3eb2bd88cccc6ddc856378) feat(graphql): support nullable embedded relations in GraphQL types (#6100)
+
 ## v3.3.0-alpha.1
 
 ### Bug fixes
