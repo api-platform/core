@@ -18,7 +18,7 @@ use Doctrine\ORM\Id\AbstractIdGenerator;
 
 class UuidGenerator extends AbstractIdGenerator
 {
-    public function generateId(EntityManagerInterface $em, ?object $entity): mixed
+    public function generateId(EntityManagerInterface $em, /* ?object */ $entity): mixed
     {
         return new Uuid();
     }

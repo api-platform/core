@@ -110,10 +110,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
             $classMetadata->fieldMappings = [$fieldMapping];
             $classMetadata->getFieldMapping('dummyDefaultOption')->willReturn($fieldMapping);
         } else {
-            // @phpstan-ignore-next-line
-            $classMetadata->fieldMappings = [
-                'dummyDefaultOption' => ['options' => ['default' => 'default value']],
-            ];
+            $classMetadata->getFieldMapping('dummyDefaultOption')->willReturn(['options' => ['default' => 'default value']]);
         }
 
         $objectManager = $this->prophesize(ObjectManager::class);

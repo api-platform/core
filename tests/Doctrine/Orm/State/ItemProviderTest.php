@@ -28,6 +28,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\AssociationMapping;
@@ -50,7 +51,7 @@ class ItemProviderTest extends TestCase
 
         $context = ['foo' => 'bar', 'fetch_data' => true];
 
-        $queryMock = $this->createMock(Query::class);
+        $queryMock = $this->createMock($this->getQueryClass());
         $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
 
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
@@ -89,7 +90,7 @@ class ItemProviderTest extends TestCase
     {
         $returnObject = new \stdClass();
 
-        $queryMock = $this->createMock(Query::class);
+        $queryMock = $this->createMock($this->getQueryClass());
         $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
 
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
@@ -272,7 +273,7 @@ class ItemProviderTest extends TestCase
     {
         $returnObject = new \stdClass();
 
-        $queryMock = $this->createMock(Query::class);
+        $queryMock = $this->createMock($this->getQueryClass());
         $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
 
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
@@ -283,7 +284,15 @@ class ItemProviderTest extends TestCase
         $queryBuilderMock->expects($this->once())->method('setParameter')->with('id_p1', 1, Types::INTEGER);
 
         $employeeClassMetadataMock = $this->createMock(ClassMetadata::class);
-        $employeeClassMetadataMock->method('getAssociationMapping')->with('company')->willReturn(new ManyToOneAssociationMapping('company', Employee::class, Company::class));
+        $employeeClassMetadataMock->method('getAssociationMapping')->with('company')->willReturn(
+            class_exists(ManyToOneAssociationMapping::class) ?
+                new ManyToOneAssociationMapping('company', Employee::class, Company::class) :
+                [
+                    'type' => ClassMetadata::TO_ONE,
+                    'fieldName' => 'company',
+                ]
+        );
+
         $employeeClassMetadataMock->method('getTypeOfField')->with('id')->willReturn(Types::INTEGER);
 
         $managerMock = $this->getManagerRegistry(Company::class, [
@@ -323,7 +332,7 @@ class ItemProviderTest extends TestCase
     {
         $class = 'foo';
         $resourceMetadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $query = $this->createStub(Query::class);
+        $query = $this->createStub($this->getQueryClass());
         $query->method('getOneOrNullResult')->willReturn(null);
         $qb = $this->createStub(QueryBuilder::class);
         $qb->method('getQuery')->willReturn($query);
@@ -336,5 +345,18 @@ class ItemProviderTest extends TestCase
         $operation = new Get(class: $class, stateOptions: new Options(handleLinks: fn () => $this->assertTrue(true)));
         $dataProvider = new ItemProvider($resourceMetadata, $managerRegistry);
         $dataProvider->provide($operation, ['id' => 1]);
+    }
+
+    /**
+     * Doctrine ORM 3 removed the final keyword but strong-typed return types.
+     * In Doctrine ORM 2 we can mock the AbstractQuery instead, as Query is final.
+     */
+    private function getQueryClass(): string
+    {
+        if ((new \ReflectionClass(Query::class))->isFinal()) {
+            return AbstractQuery::class;
+        }
+
+        return Query::class;
     }
 }

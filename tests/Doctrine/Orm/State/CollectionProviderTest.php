@@ -23,6 +23,7 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -40,7 +41,7 @@ class CollectionProviderTest extends TestCase
 
     public function testGetCollection(): void
     {
-        $query = $this->createMock(Query::class);
+        $query = $this->createMock($this->getQueryClass());
         $query->expects($this->once())->method('getResult')->willReturn([]);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
@@ -139,7 +140,7 @@ class CollectionProviderTest extends TestCase
     {
         $class = 'foo';
         $resourceMetadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $query = $this->createStub(Query::class);
+        $query = $this->createStub($this->getQueryClass());
         $query->method('getResult')->willReturn([]);
         $qb = $this->createStub(QueryBuilder::class);
         $qb->method('getQuery')->willReturn($query);
@@ -152,5 +153,18 @@ class CollectionProviderTest extends TestCase
         $operation = new GetCollection(class: $class, stateOptions: new Options(handleLinks: fn () => $this->assertTrue(true)));
         $dataProvider = new CollectionProvider($resourceMetadata, $managerRegistry);
         $dataProvider->provide($operation, ['id' => 1]);
+    }
+
+    /**
+     * Doctrine ORM 3 removed the final keyword but strong-typed return types.
+     * In Doctrine ORM 2 we can mock the AbstractQuery instead, as Query is final.
+     */
+    private function getQueryClass(): string
+    {
+        if ((new \ReflectionClass(Query::class))->isFinal()) {
+            return AbstractQuery::class;
+        }
+
+        return Query::class;
     }
 }
