@@ -52,6 +52,10 @@ final class DoctrineOrmLinkFactoryTest extends TestCase
         $classMetadataProphecy->getAssociationMappedByTargetField('relatedNonResource')->willReturn('dummies');
         $classMetadataProphecy->getAssociationMappedByTargetField('relatedDummy')->willReturn(null);
         $classMetadataProphecy->getAssociationMappedByTargetField('relatedDummies')->willReturn('dummies');
+        $classMetadataProphecy->isAssociationInverseSide('relatedNonResource')->willReturn(true);
+        $classMetadataProphecy->isAssociationInverseSide('relatedDummy')->willReturn(true);
+        $classMetadataProphecy->isAssociationInverseSide('relatedDummies')->willReturn(true);
+
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
         $entityManagerProphecy->getClassMetadata($class)->willReturn($classMetadataProphecy->reveal());
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
