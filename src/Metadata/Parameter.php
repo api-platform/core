@@ -19,6 +19,7 @@ use ApiPlatform\State\ProviderInterface;
 abstract class Parameter
 {
     /**
+     * @param \ArrayObject<string,mixed>|null $schema
      * @param array<string, mixed>          $extraProperties
      * @param ProviderInterface|string|null $provider
      * @param FilterInterface|string|null   $filter
@@ -90,6 +91,9 @@ abstract class Parameter
         return $self;
     }
 
+    /**
+     * @param ProviderInterface|string $provider
+     */
     public function withProvider(mixed $provider): static
     {
         $self = clone $this;
@@ -98,6 +102,9 @@ abstract class Parameter
         return $self;
     }
 
+    /**
+     * @param FilterInterface|string $filter
+     */
     public function withFilter(mixed $filter): static
     {
         $self = clone $this;
@@ -109,7 +116,7 @@ abstract class Parameter
     /**
      * @param array<string, mixed> $extraProperties
      */
-    public function withExtraProperties(array $extraProperties = []): static
+    public function withExtraProperties(array $extraProperties): static
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;

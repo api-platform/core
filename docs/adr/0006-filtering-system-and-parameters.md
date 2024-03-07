@@ -71,7 +71,7 @@ For this to work, we need to consider a 4 year old bug on searching with UIDs. O
 /books?author.id=/author/1
 ```
 
-Many attempts to fix these behavior on API Platform have lead to bugs and to be reverted. The proposal is to change how filters are applied to provide filters with less logic, that are easier to maintain and that do one thing good. 
+Many attempts to fix these behaviors on API Platform have lead to bugs and to be reverted. The proposal is to change how filters are applied to provide filters with less logic, that are easier to maintain and that do one thing good. 
 
 For the following example we will use an UUID to represent the stored identifier of an Author resource.
 
@@ -89,7 +89,7 @@ With that in mind, an `or` filter would call a bunch of filters specifying the l
 
 ### Query parameter
 
-The above shows that a query parameter **key**, which is a `string` may lead to multiple filters being called. This same can represent one or multiple values, and for a same **key** we can handle multiple types of data.
+The above shows that a query parameter **key**, which is a `string`, may lead to multiple filters being called. The same can represent one or multiple values, and for a same **key** we can handle multiple types of data.
 Also, if someone wants to implement the [loopback API](https://loopback.io/doc/en/lb2/Fields-filter.html) `?filter[fields][vin]=false` the link between the query parameter, the filter and the value gets more complex. 
 
 We need a way to instruct the program to parse query parameters and produce a link between filters, values and some context (property, logical operation, type etc.). The same system could be used to determine the **type** a **filter** must have to pilot query parameter validation and the JSON Schema. 
@@ -132,7 +132,7 @@ $queryString = RequestParser::getQueryString($request);
 $request->attributes->set('_api_query_parameters', $queryString ? RequestParser::parseRequestParams($queryString) : []);
 ```
 
-On top of that we will provide an additional `_api_header_parameters` as we would like to introduce a `QueryParameter` and an `HeaderParameter`. 
+On top of that we will provide an additional `_api_header_parameters` as we would like to introduce a `QueryParameter` and a `HeaderParameter`. 
 
 ### Parameter Provider
 
@@ -145,7 +145,7 @@ During the `Provider` phase (`RequestEvent::REQUEST`), we could use a `Parameter
  * @implements ProviderInterface<HttpOperation>
  */
 interface ParameterProvider extends ProviderInterface {
-    public function provider(Operation $operation, array $uriVariables = [], array $context = []): HttpOperation;
+    public function provider(HttpOperation $operation, array $uriVariables = [], array $context = []): HttpOperation;
 }
 ```
 
