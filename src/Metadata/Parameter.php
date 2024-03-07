@@ -68,7 +68,7 @@ abstract class Parameter
         return $this->filter;
     }
 
-    public function getExtraProperties(): ?array
+    public function getExtraProperties(): array
     {
         return $this->extraProperties;
     }
