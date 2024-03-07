@@ -576,7 +576,7 @@ abstract class Metadata
         return $this->parameters;
     }
 
-    public function withParameters(array $parameters = []): static
+    public function withParameters(array $parameters): static
     {
         $self = clone $this;
         $self->parameters = $parameters;
