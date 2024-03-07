@@ -23,9 +23,9 @@ abstract class Parameter
 {
     /**
      * @param \ArrayObject<string,mixed>|null $schema
-     * @param array<string, mixed>          $extraProperties
-     * @param ProviderInterface|string|null $provider
-     * @param FilterInterface|string|null   $filter
+     * @param array<string, mixed>            $extraProperties
+     * @param ProviderInterface|string|null   $provider
+     * @param FilterInterface|string|null     $filter
      */
     public function __construct(
         protected ?string $key = null,
@@ -33,7 +33,7 @@ abstract class Parameter
         protected ?OpenApi\Model\Parameter $openApi = null,
         protected mixed $provider = null,
         protected mixed $filter = null,
-        protected string $property = null,
+        protected ?string $property = null,
         protected array $extraProperties = [],
     ) {
     }

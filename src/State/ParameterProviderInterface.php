@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
-use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 
 /**
@@ -24,8 +24,8 @@ use ApiPlatform\Metadata\Parameter;
 interface ParameterProviderInterface
 {
     /**
-     * @param array<string, mixed>                                                                             $parameters
-     * @param array<string, mixed>|array{request?: Request, resource_class?: string, operation: HttpOperation} $context
+     * @param array<string, mixed>                                                                         $parameters
+     * @param array<string, mixed>|array{request?: Request, resource_class?: string, operation: Operation} $context
      */
-    public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?HttpOperation;
+    public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation;
 }

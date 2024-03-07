@@ -141,11 +141,14 @@ During the `Provider` phase (`RequestEvent::REQUEST`), we could use a `Parameter
 ```php
 /**
  * Optionnaly transforms request parameters and provides modification to the current Operation.
- *
- * @implements ProviderInterface<HttpOperation>
  */
-interface ParameterProvider extends ProviderInterface {
-    public function provider(HttpOperation $operation, array $uriVariables = [], array $context = []): HttpOperation;
+interface ParameterProviderInterface
+{
+    /**
+     * @param array<string, mixed>                                                                             $parameters
+     * @param array<string, mixed>|array{request?: Request, resource_class?: string, operation: HttpOperation} $context
+     */
+    public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?HttpOperation;
 }
 ```
 
@@ -154,11 +157,11 @@ This provider can:
 1. alter the HTTP Operation to provide additional context:
 
 ```php
-class GroupsParameterProvider implements ProviderInterface {
-    public function provider(Operation $operation, array $uriVariables = [], array $context = []): HttpOperation 
+class GroupsParameterProvider implements ParameterProviderInterface {
+    public function provider(Parameter $parameter, array $uriVariables = [], array $context = []): HttpOperation 
     {
         $request = $context['request'];
-        return $operation->withNormalizationContext(['groups' => $request->query->all('groups')]);
+        return $context['operation']->withNormalizationContext(['groups' => $request->query->all('groups')]);
     }
 }
 ```
@@ -166,10 +169,11 @@ class GroupsParameterProvider implements ProviderInterface {
 2. alter the parameter context:
 
 ```php
-class UuidParameter implements ProviderInterface {
-    public function provider(Operation $operation, array $uriVariables = [], array $context = []): HttpOperation 
+class UuidParameter implements ParameterProviderInterface {
+    public function provider(Parameter $parameter, array $uriVariables = [], array $context = []): HttpOperation 
     {
         $request = $context['request'];
+        $operation = $context['operation'];
         $parameters = $request->attributes->get('_api_query_parameters');
         foreach ($parameters as $key => $value) {
             $parameter = $operation->getParameter($key);
