@@ -27,6 +27,8 @@ use Symfony\Component\WebLink\Link;
  * Thrown when a validation error occurs.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since API Platform 3.3, use {@see BaseValidationException} instead
  */
 #[ErrorResource(
     uriTemplate: '/validation_errors/{id}',
