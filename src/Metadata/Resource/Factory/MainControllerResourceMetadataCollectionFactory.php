@@ -52,7 +52,7 @@ final class MainControllerResourceMetadataCollectionFactory implements ResourceM
                 }
             }
 
-            $resource = $resource->withOperations($operations->sort());
+            $resource = $resource->withOperations($operations);
             $resourceMetadataCollection[$i] = $resource;
         }
 
