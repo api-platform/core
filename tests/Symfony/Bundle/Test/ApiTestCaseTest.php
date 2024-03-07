@@ -267,6 +267,16 @@ JSON;
         $this->assertNull(self::findIriBy($resource, ['name' => 'not-exist']));
     }
 
+    public function testGetPrioritizedOperation(): void
+    {
+        $r = self::createClient()->request('GET', '/operation_priority/1', [
+            'headers' => [
+                'accept' => 'application/ld+json',
+            ],
+        ]);
+        $this->assertResponseIsSuccessful();
+    }
+
     /**
      * @group mercure
      */

@@ -794,6 +794,12 @@ abstract class Operation extends Metadata
         protected ?bool $serialize = null,
         protected ?bool $fetchPartial = null,
         protected ?bool $forceEager = null,
+        /**
+         * The priority helps with the order of operations when looping over a resource's operations.
+         * It can be usefull when we loop over operations to find a matching IRI, although most of the use cases
+         * should be covered by the HttpOperation::itemUriTemplate or the ApiProperty::uriTemplate functionalities.
+         * Sort is ascendant: a lower priority comes first in the list.
+         */
         protected ?int $priority = null,
         protected ?string $name = null,
         protected $provider = null,
