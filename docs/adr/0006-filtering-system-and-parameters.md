@@ -57,7 +57,7 @@ The idea of this ADR is to find a way to introduce more functionalities to API P
 - document query parameters for hydra, JSON Schema (OpenAPI being an extension of JSON Schema). 
 - pilot the query parameter validation (current QueryParameterValidator bases itself on the given documentation schema) this is good but lacks flexibility when you need custom validation (created by @jdeniau)
 - compose with filters, which will naturally help creating an or/and filter
-- remove the relation between a query parameter and a property (they may have different names [#5980][pull/5980]), different types, a query parameter can have no link with a property (order filter)
+- reduce the strong link between a query parameter and a property (they may have different names [#5980][pull/5980]), different types, a query parameter can have no link with a property (order filter). We still keep that link as inspired by [Hydra property search][hydra]
 - provide a way to implement different query parameter syntaxes without changing the Filter implementation behind it
 
 We will keep a BC layer with the current doctrine system as it shouldn't change much.
@@ -201,7 +201,7 @@ class UuidParameter implements ProviderInterface {
 
 ### Filters
 
-Filters should remain mostly unchanged, the current informations about the `property` to filter should be specified inside a `Parameter`'s `context`.
+Filters should remain mostly unchanged, the current informations about the `property` to filter should also be specified inside a `Parameter`.
 They alter the Doctrine/Elasticsearch Query, therefore we need one interface per persistence layer supported. The current logic within API Platform is:
 
 ```php
@@ -248,6 +248,8 @@ foreach ($operation->getParameters() as $key => $parameter) {
 ## Links
 
 * [Filter composition][pull/2400]
+* [Hydra property search](hydra)
 
 [pull/5980]: https://github.com/api-platform/core/pull/5980  "ApiFilter does not respect SerializerName"
 [pull/2400]: https://github.com/api-platform/core/pull/2400  "Filter composition"
+[hydra]: http://www.hydra-cg.com/spec/latest/core/#supported-property-data-source "Hydra property data source"
