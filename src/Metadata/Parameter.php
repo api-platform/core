@@ -16,6 +16,9 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\OpenApi;
 use ApiPlatform\State\ProviderInterface;
 
+/**
+ * @experimental
+ */
 abstract class Parameter
 {
     /**
@@ -30,6 +33,7 @@ abstract class Parameter
         protected ?OpenApi\Model\Parameter $openApi = null,
         protected mixed $provider = null,
         protected mixed $filter = null,
+        protected string $property = null,
         protected array $extraProperties = [],
     ) {
     }
@@ -54,6 +58,11 @@ abstract class Parameter
         return $this->provider;
     }
 
+    public function getProperty(): ?string
+    {
+        return $this->property;
+    }
+
     public function getFilter(): mixed
     {
         return $this->filter;
@@ -64,7 +73,7 @@ abstract class Parameter
         return $this->extraProperties;
     }
 
-    public function withKey(?string $key): static
+    public function withKey(string $key): static
     {
         $self = clone $this;
         $self->key = $key;
@@ -109,6 +118,14 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->filter = $filter;
+
+        return $self;
+    }
+
+    public function withProperty(string $property): static
+    {
+        $self = clone $this;
+        $self->property = $property;
 
         return $self;
     }

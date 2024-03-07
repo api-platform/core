@@ -70,6 +70,9 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        /**
+         * @experimental
+         */
         protected ?array $parameters = [],
         protected array $extraProperties = []
     ) {

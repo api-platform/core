@@ -20,6 +20,9 @@ use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
 
+/**
+ * @experimental
+ */
 final class SerializerFilterParameterProvider implements ParameterProviderInterface
 {
     public function __construct(private readonly ?ContainerInterface $filterLocator)

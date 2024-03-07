@@ -21,7 +21,10 @@ use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\RequestParser;
 use Psr\Container\ContainerInterface;
 
-class ParameterProvider implements ProviderInterface
+/**
+ * @experimental
+ */
+final class ParameterProvider implements ProviderInterface
 {
     public function __construct(private readonly ?ProviderInterface $decorated = null, private readonly ?ContainerInterface $locator = null)
     {
