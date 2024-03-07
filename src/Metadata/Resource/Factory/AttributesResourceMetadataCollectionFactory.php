@@ -121,7 +121,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $operationAttribute);
             $operation = $operation->withPriority(++$operationPriority);
             $operations = $resources[$index]->getOperations() ?? new Operations();
-            $resources[$index] = $resources[$index]->withOperations($operations->add($key, $operation)->sort());
+            $resources[$index] = $resources[$index]->withOperations($operations->add($key, $operation));
         }
 
         // Loop again and set default operations if none where found
