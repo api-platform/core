@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
+use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\RequestParser;
 use Psr\Container\ContainerInterface;
@@ -68,7 +69,7 @@ final class ParameterProvider implements ProviderInterface
                 throw new ProviderNotFoundException(sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
             }
 
-            /** @var ProviderInterface $providerInstance */
+            /** @var ParameterProviderInterface $providerInstance */
             $providerInstance = $this->locator->get($provider);
             if (($op = $providerInstance->provide($parameter, $parameters, $context)) instanceof HttpOperation) {
                 $operation = $op;

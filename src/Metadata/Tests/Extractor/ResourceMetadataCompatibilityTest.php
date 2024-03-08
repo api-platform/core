@@ -749,4 +749,38 @@ final class ResourceMetadataCompatibilityTest extends TestCase
 
         return [new Link($values[0]['rel'] ?? null, $values[0]['href'] ?? null)];
     }
+
+    private function withParameters(array $values): array
+    {
+        // $uriVariables = [];
+        // foreach ($values as $parameterName => $value) {
+        //     if (\is_string($value)) {
+        //         $uriVariables[$value] = $value;
+        //         continue;
+        //     }
+        //
+        //     if (isset($value['fromClass']) || isset($value[0])) {
+        //         $uriVariables[$parameterName]['from_class'] = $value['fromClass'] ?? $value[0];
+        //     }
+        //     if (isset($value['fromProperty']) || isset($value[1])) {
+        //         $uriVariables[$parameterName]['from_property'] = $value['fromProperty'] ?? $value[1];
+        //     }
+        //     if (isset($value['toClass'])) {
+        //         $uriVariables[$parameterName]['to_class'] = $value['toClass'];
+        //     }
+        //     if (isset($value['toProperty'])) {
+        //         $uriVariables[$parameterName]['to_property'] = $value['toProperty'];
+        //     }
+        //     if (isset($value['identifiers'])) {
+        //         $uriVariables[$parameterName]['identifiers'] = $value['identifiers'];
+        //     }
+        //     if (isset($value['compositeIdentifier'])) {
+        //         $uriVariables[$parameterName]['composite_identifier'] = $value['compositeIdentifier'];
+        //     }
+        // }
+
+        dd($values);
+
+        return $values;
+    }
 }

@@ -20,6 +20,7 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -274,28 +275,56 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             // Set up parameters
+            $openapiParameters = $openapiOperation->getParameters();
             foreach ($operation->getUriVariables() ?? [] as $parameterName => $uriVariable) {
                 if ($uriVariable->getExpandedValue() ?? false) {
                     continue;
                 }
 
-                $parameter = new Parameter($parameterName, 'path', "$resourceShortName identifier", true, false, false, ['type' => 'string']);
-                if ($this->hasParameter($openapiOperation, $parameter)) {
+                $parameter = new Parameter($parameterName, 'path', $uriVariable->getDescription() ?? "$resourceShortName identifier", $uriVariable->getRequired() ?? true, false, false, $uriVariable->getSchema() ?? ['type' => 'string']);
+
+                if ($linkParameter = $uriVariable->getOpenApi()) {
+                    $parameter = $this->mergeParameter($parameter, $linkParameter);
+                }
+
+                if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                    $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
                     continue;
                 }
 
-                $openapiOperation = $openapiOperation->withParameter($parameter);
+                $openapiParameters[] = $parameter;
             }
+
+            $openapiOperation = $openapiOperation->withParameters($openapiParameters);
 
             if ($operation instanceof CollectionOperationInterface && 'POST' !== $method) {
                 foreach (array_merge($this->getPaginationParameters($operation), $this->getFiltersParameters($operation)) as $parameter) {
-                    if ($this->hasParameter($openapiOperation, $parameter)) {
+                    if ($operationParameter = $this->hasParameter($openapiOperation, $parameter)) {
                         continue;
                     }
 
                     $openapiOperation = $openapiOperation->withParameter($parameter);
                 }
             }
+
+            $openapiParameters = $openapiOperation->getParameters();
+            foreach ($operation->getParameters() ?? [] as $key => $p) {
+                $in = $p instanceof HeaderParameterInterface ? 'header' : 'query';
+                $parameter = new Parameter($key, $in, $p->getDescription() ?? "$resourceShortName $key", $p->getRequired() ?? false, false, false, $p->getSchema() ?? ['type' => 'string']);
+
+                if ($linkParameter = $p->getOpenApi()) {
+                    $parameter = $this->mergeParameter($parameter, $linkParameter);
+                }
+
+                if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                    $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
+                    continue;
+                }
+
+                $openapiParameters[] = $parameter;
+            }
+
+            $openapiOperation = $openapiOperation->withParameters($openapiParameters);
 
             $existingResponses = $openapiOperation?->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
@@ -712,14 +741,47 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
     }
 
-    private function hasParameter(Model\Operation $operation, Parameter $parameter): bool
+    /**
+     * @return array{0: int, 1: Parameter}|null
+     */
+    private function hasParameter(Model\Operation $operation, Parameter $parameter): ?array
     {
-        foreach ($operation->getParameters() as $existingParameter) {
+        foreach ($operation->getParameters() as $key => $existingParameter) {
             if ($existingParameter->getName() === $parameter->getName() && $existingParameter->getIn() === $parameter->getIn()) {
-                return true;
+                return [$key, $existingParameter];
             }
         }
 
-        return false;
+        return null;
+    }
+
+    private function mergeParameter(Parameter $actual, Parameter $defined): Parameter
+    {
+        foreach ([
+            'name',
+            'in',
+            'description',
+            'required',
+            'deprecated',
+            'allowEmptyValue',
+            'style',
+            'explode',
+            'allowReserved',
+            'example',
+        ] as $method) {
+            $newValue = $defined->{"get$method"}();
+            if (null !== $newValue && $actual->{"get$method"}() !== $newValue) {
+                $actual = $actual->{"with$method"}($newValue);
+            }
+        }
+
+        foreach (['examples', 'content', 'schema'] as $method) {
+            $newValue = $defined->{"get$method"}();
+            if ($newValue && \count($newValue) > 0 && $actual->{"get$method"}() !== $newValue) {
+                $actual = $actual->{"with$method"}($newValue);
+            }
+        }
+
+        return $actual;
     }
 }

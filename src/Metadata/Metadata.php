@@ -571,6 +571,9 @@ abstract class Metadata
         return $self;
     }
 
+    /**
+     * @return array<string, Parameter>
+     */
     public function getParameters(): ?array
     {
         return $this->parameters;

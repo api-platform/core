@@ -22,18 +22,20 @@ use ApiPlatform\State\ProviderInterface;
 abstract class Parameter
 {
     /**
-     * @param \ArrayObject<string,mixed>|null $schema
-     * @param array<string, mixed>            $extraProperties
-     * @param ProviderInterface|string|null   $provider
-     * @param FilterInterface|string|null     $filter
+     * @param array{type?: string}|null              $schema
+     * @param array<string, mixed>                   $extraProperties
+     * @param ProviderInterface|callable|string|null $provider
+     * @param FilterInterface|string|null            $filter
      */
     public function __construct(
         protected ?string $key = null,
-        protected ?\ArrayObject $schema = null,
+        protected ?array $schema = null,
         protected ?OpenApi\Model\Parameter $openApi = null,
         protected mixed $provider = null,
         protected mixed $filter = null,
         protected ?string $property = null,
+        protected ?string $description = null,
+        protected ?bool $required = null,
         protected array $extraProperties = [],
     ) {
     }
@@ -43,7 +45,10 @@ abstract class Parameter
         return $this->key;
     }
 
-    public function getSchema(): ?\ArrayObject
+    /**
+     * @return array{type?: string}|null $schema
+     */
+    public function getSchema(): ?array
     {
         return $this->schema;
     }
@@ -68,6 +73,19 @@ abstract class Parameter
         return $this->filter;
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function getRequired(): ?bool
+    {
+        return $this->required;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     public function getExtraProperties(): array
     {
         return $this->extraProperties;
@@ -82,9 +100,9 @@ abstract class Parameter
     }
 
     /**
-     * @param \ArrayObject<string,mixed> $schema
+     * @param array{type?: string} $schema
      */
-    public function withSchema(\ArrayObject $schema): static
+    public function withSchema(array $schema): static
     {
         $self = clone $this;
         $self->schema = $schema;
@@ -126,6 +144,22 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->property = $property;
+
+        return $self;
+    }
+
+    public function withDescription(string $description): static
+    {
+        $self = clone $this;
+        $self->description = $description;
+
+        return $self;
+    }
+
+    public function withRequired(bool $required): static
+    {
+        $self = clone $this;
+        $self->required = $required;
 
         return $self;
     }

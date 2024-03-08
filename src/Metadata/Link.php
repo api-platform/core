@@ -13,15 +13,50 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\OpenApi;
+
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
-final class Link
+final class Link extends Parameter
 {
-    public function __construct(private ?string $parameterName = null, private ?string $fromProperty = null, private ?string $toProperty = null, private ?string $fromClass = null, private ?string $toClass = null, private ?array $identifiers = null, private ?bool $compositeIdentifier = null, private ?string $expandedValue = null, private ?string $security = null, private ?string $securityMessage = null, private ?string $securityObjectName = null)
-    {
+    public function __construct(
+        private ?string $parameterName = null,
+        private ?string $fromProperty = null,
+        private ?string $toProperty = null,
+        private ?string $fromClass = null,
+        private ?string $toClass = null,
+        private ?array $identifiers = null,
+        private ?bool $compositeIdentifier = null,
+        private ?string $expandedValue = null,
+        private ?string $security = null,
+        private ?string $securityMessage = null,
+        private ?string $securityObjectName = null,
+
+        ?string $key = null,
+        ?array $schema = null,
+        ?OpenApi\Model\Parameter $openApi = null,
+        mixed $provider = null,
+        mixed $filter = null,
+        ?string $property = null,
+        ?string $description = null,
+        ?bool $required = null,
+        array $extraProperties = [],
+    ) {
         // For the inverse property shortcut
         if ($this->parameterName && class_exists($this->parameterName)) {
             $this->fromClass = $this->parameterName;
         }
+
+        parent::__construct(
+            key: $key,
+            schema: $schema,
+            openApi: $openApi,
+            provider: $provider,
+            filter: $filter,
+            property: $property,
+            description: $description,
+            required: $required,
+            extraProperties: $extraProperties
+        );
     }
 
     public function getParameterName(): ?string

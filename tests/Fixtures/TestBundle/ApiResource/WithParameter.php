@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Serializer\Filter\GroupFilter;
@@ -23,6 +25,10 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[Get(
+    uriTemplate: 'with_parameters/{id}',
+    uriVariables: [
+        'id' => new Link(schema: ['type' => 'uuid'], property: 'id'),
+    ],
     parameters: [
         'groups' => new QueryParameter(filter: new GroupFilter(parameterName: 'groups', overrideDefaultGroups: false)),
         'group' => new QueryParameter(provider: [self::class, 'provideGroup']),
@@ -30,14 +36,28 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'service' => new QueryParameter(provider: CustomGroupParameterProvider::class),
         'auth' => new HeaderParameter(provider: [self::class, 'restrictAccess']),
     ],
-    provider: [WithParameter::class, 'provide']
+    provider: [self::class, 'provide']
+)]
+#[GetCollection(
+    uriTemplate: 'with_parameters_collection',
+    parameters: [
+        'hydra' => new QueryParameter(property: 'a', required: true),
+    ],
+    provider: [self::class, 'collectionProvider']
 )]
 class WithParameter
 {
+    public int $id = 1;
+
     #[Groups(['a'])]
     public $a = 'foo';
     #[Groups(['b', 'custom'])]
     public $b = 'bar';
+
+    public static function collectionProvider()
+    {
+        return [new self()];
+    }
 
     public static function provide()
     {

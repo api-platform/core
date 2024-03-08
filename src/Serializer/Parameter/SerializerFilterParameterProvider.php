@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Parameter;
 
-use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Serializer\Filter\FilterInterface;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -29,7 +29,7 @@ final class SerializerFilterParameterProvider implements ParameterProviderInterf
     {
     }
 
-    public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?HttpOperation
+    public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation
     {
         if (null === ($request = $context['request'] ?? null) || null === ($operation = $context['operation'] ?? null)) {
             return null;

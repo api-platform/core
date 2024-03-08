@@ -114,5 +114,22 @@
                 </extraProperties>
             </operation>
         </operations>
+
+        <parameters>
+            <parameter key="author" required="true">
+                <schema>
+                    <values>
+                        <value name="type">string</value>
+                    </values>
+                </schema>
+                <extraProperties>
+                    <values>
+                        <value name="foo">bar</value>
+                        <value name="boolean">true</value>
+                    </values>
+                </extraProperties>
+            </parameter>
+        </parameters>
+
     </resource>
 </resources>
