@@ -209,7 +209,7 @@ Feature: Match filter on collections from Elasticsearch
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/tweets\\?message%5B%5D=Good%20job&message%5B%5D=run&author.firstName=Caroline$"},
+            "@id": {"pattern": "^/tweets\\?author.firstName=Caroline&message%5B%5D=Good%20job&message%5B%5D=run$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -422,7 +422,7 @@ Feature: Match filter on collections from Elasticsearch
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/books\\?message%5B%5D=Good%20job&message%5B%5D=run&library.firstName=Caroline$"},
+            "@id": {"pattern": "^/books\\?library.firstName=Caroline&message%5B%5D=Good%20job&message%5B%5D=run$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
