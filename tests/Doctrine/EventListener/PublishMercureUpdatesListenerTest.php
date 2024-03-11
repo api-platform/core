@@ -177,7 +177,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
             'topics' => [
                 '@=iri(object)',
                 '@=iri(object, '.UrlGeneratorInterface::ABS_PATH.')',
-                '@=iri(object, '.UrlGeneratorInterface::ABS_URL.', getOperation(object, "/custom_resource/mercure_with_topics_and_get_operations/{id}{._format}"))',
+                '@=iri(object, '.UrlGeneratorInterface::ABS_URL.', get_operation(object, "/custom_resource/mercure_with_topics_and_get_operations/{id}{._format}"))',
             ],
         ];
 
