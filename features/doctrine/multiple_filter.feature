@@ -38,7 +38,7 @@ Feature: Multiple filters on collections
         "hydra:view": {
           "type": "object",
           "properties": {
-          "@id": {"pattern": "^/dummies\\?dummyDate%5Bafter%5D=2015-04-28&dummyBoolean=1$"},
+          "@id": {"pattern": "^/dummies\\?dummyBoolean=1&dummyDate%5Bafter%5D=2015-04-28$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }

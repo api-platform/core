@@ -15,6 +15,7 @@ namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -37,7 +38,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 {
     private readonly PropertyAccessorInterface $propertyAccessor;
 
-    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly string $pageParameterName = 'page', private string $enabledParameterName = 'pagination', private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ?PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly string $pageParameterName = 'page', private string $enabledParameterName = 'pagination', private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ?PropertyAccessorInterface $propertyAccessor = null, private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -72,7 +73,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         // TODO: This needs to be changed as well as I wrote in the CollectionFiltersNormalizer
         // We should not rely on the request_uri but instead rely on the UriTemplate
         // This needs that we implement the RFC and that we do more parsing before calling the serialization (MainController)
-        $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
+        $parsed = IriHelper::parseIri($context['uri'] ?? $context['request_uri'] ?? '/', $this->pageParameterName);
         $appliedFilters = $parsed['parameters'];
         unset($appliedFilters[$this->enabledParameterName]);
 
@@ -82,22 +83,24 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
         $isPaginatedWithCursor = false;
         $cursorPaginationAttribute = null;
-        if ($this->resourceMetadataFactory && isset($context['resource_class']) && $paginated) {
-            /** @var HttpOperation $operation */
+        $operation = $context['operation'] ?? null;
+        if (!$operation && $this->resourceMetadataFactory && isset($context['resource_class']) && $paginated) {
             $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation($context['operation_name'] ?? null);
-            $isPaginatedWithCursor = [] !== $cursorPaginationAttribute = ($operation->getPaginationViaCursor() ?? []);
         }
+
+        $cursorPaginationAttribute = $operation instanceof HttpOperation ? $operation->getPaginationViaCursor() : null;
+        $isPaginatedWithCursor = (bool) $cursorPaginationAttribute;
 
         $data['hydra:view'] = ['@id' => null, '@type' => 'hydra:PartialCollectionView'];
 
         if ($isPaginatedWithCursor) {
-            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute);
+            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
         }
 
-        $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null);
+        $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
 
         if ($paginated) {
-            return $this->populateDataWithPagination($data, $parsed, $currentPage, $lastPage, $itemsPerPage, $pageTotalItems);
+            return $this->populateDataWithPagination($data, $parsed, $currentPage, $lastPage, $itemsPerPage, $pageTotalItems, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
         }
 
         return $data;
@@ -165,38 +168,38 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $paginationFilters;
     }
 
-    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, ?array $cursorPaginationAttribute): array
+    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, ?array $cursorPaginationAttribute, ?int $urlGenerationStrategy): array
     {
         $objects = iterator_to_array($object);
         $firstObject = current($objects);
         $lastObject = end($objects);
 
-        $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
+        $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], urlGenerationStrategy: $urlGenerationStrategy);
 
         if (false !== $lastObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)));
+            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)), urlGenerationStrategy: $urlGenerationStrategy);
         }
 
         if (false !== $firstObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)));
+            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)), urlGenerationStrategy: $urlGenerationStrategy);
         }
 
         return $data;
     }
 
-    private function populateDataWithPagination(array $data, array $parsed, ?float $currentPage, ?float $lastPage, ?float $itemsPerPage, ?float $pageTotalItems): array
+    private function populateDataWithPagination(array $data, array $parsed, ?float $currentPage, ?float $lastPage, ?float $itemsPerPage, ?float $pageTotalItems, ?int $urlGenerationStrategy): array
     {
         if (null !== $lastPage) {
-            $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
-            $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+            $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1., $urlGenerationStrategy);
+            $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage, $urlGenerationStrategy);
         }
 
         if (1. !== $currentPage) {
-            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
+            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1., $urlGenerationStrategy);
         }
 
         if ((null !== $lastPage && $currentPage < $lastPage) || (null === $lastPage && $pageTotalItems >= $itemsPerPage)) {
-            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
+            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1., $urlGenerationStrategy);
         }
 
         return $data;

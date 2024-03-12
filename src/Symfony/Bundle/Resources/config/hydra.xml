@@ -70,6 +70,7 @@
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.property_accessor" />
+            <argument>%api_platform.url_generation_strategy%</argument>
         </service>
 
         <service id="api_platform.hydra.normalizer.collection_filters" class="ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
