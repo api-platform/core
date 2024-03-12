@@ -124,6 +124,22 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         ]);
     }
 
+    public function testArraySchemaWithMultipleUnionTypes(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest', '--type' => 'output']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals($json['definitions']['Nest.jsonld']['properties']['owner']['anyOf'], [
+            ['$ref' => '#/definitions/Wren.jsonld'],
+            ['$ref' => '#/definitions/Robin.jsonld'],
+            ['type' => 'null'],
+        ]);
+
+        $this->assertArrayHasKey('Wren.jsonld', $json['definitions']);
+        $this->assertArrayHasKey('Robin.jsonld', $json['definitions']);
+    }
+
     /**
      * TODO: add deprecation (TypeFactory will be deprecated in api platform 3.3).
      *

@@ -196,10 +196,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // property schema is created in SchemaPropertyMetadataFactory, but it cannot build resource reference ($ref)
         // complete property schema with resource reference ($ref) only if it's related to an object
         $version = $schema->getVersion();
-        $subSchema = new Schema($version);
-        $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
+        $refs = [];
+        $isNullable = null;
 
         foreach ($types as $type) {
+            $subSchema = new Schema($version);
+            $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
+
             // TODO: in 3.3 add trigger_deprecation() as type factories are not used anymore, we moved this logic to SchemaPropertyMetadataFactory so that it gets cached
             if ($typeFromFactory = $this->typeFactory?->getType($type, 'jsonschema', $propertyMetadata->isReadableLink(), $serializerContext)) {
                 $propertySchema = $typeFromFactory;
@@ -230,14 +233,20 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 break;
             }
 
-            if ($type->isNullable()) {
-                $propertySchema['anyOf'] = [['$ref' => $subSchema['$ref']], ['type' => 'null']];
-            } else {
-                $propertySchema['$ref'] = $subSchema['$ref'];
-            }
+            $refs[] = ['$ref' => $subSchema['$ref']];
+            $isNullable = $isNullable ?? $type->isNullable();
+        }
 
+        if ($isNullable) {
+            $refs[] = ['type' => 'null'];
+        }
+
+        if (($c = \count($refs)) > 1) {
+            $propertySchema['anyOf'] = $refs;
             unset($propertySchema['type']);
-            break;
+        } elseif (1 === $c) {
+            $propertySchema['$ref'] = $refs[0]['$ref'];
+            unset($propertySchema['type']);
         }
 
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
