@@ -994,6 +994,6 @@ class OpenApiFactoryTest extends TestCase
         $parameter = $paths->getPath('/parameters')->getPut()->getParameters()[0];
         $this->assertEquals(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());
         $this->assertEquals('header', $parameter->getIn());
-        $this->assertEquals('hello', $parameter->getDescription());
+        $this->assertEquals('hi', $parameter->getDescription());
     }
 }

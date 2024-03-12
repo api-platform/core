@@ -15,7 +15,9 @@ namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\StateOptions;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
@@ -124,6 +126,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'stateOptions' => $this->buildStateOptions($resource),
             'links' => $this->buildLinks($resource),
             'headers' => $this->buildHeaders($resource),
+            'parameters' => $this->buildParameters($resource),
         ]);
     }
 
@@ -449,5 +452,27 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $headers;
+    }
+
+    /**
+     * @return array<string, \ApiPlatform\Metadata\Parameter>
+     */
+    private function buildParameters(array $resource): ?array
+    {
+        if (!isset($resource['parameters']) || !\is_array($resource['parameters'])) {
+            return null;
+        }
+
+        $parameters = [];
+        foreach ($resource['parameters'] as $key => $parameter) {
+            $cl = ($parameter['in'] ?? 'query') === 'header' ? HeaderParameter::class : QueryParameter::class;
+            $parameters[$key] = new $cl(
+                key: $key,
+                required: $this->phpize($parameter, 'required', 'bool'),
+                schema: $parameter['schema']
+            );
+        }
+
+        return $parameters;
     }
 }

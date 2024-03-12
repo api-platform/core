@@ -440,7 +440,8 @@
                 <xsd:element name="schema" minOccurs="0" type="sequenceWithValues"/>
                 <xsd:element name="extraProperties" minOccurs="0" type="sequenceWithValues"/>
             </xsd:sequence>
-            <xsd:attribute type="xsd:string" name="key"/>
+            <xsd:attribute type="xsd:string" name="key" use="required"/>
+            <xsd:attribute type="xsd:string" name="in"/>
             <xsd:attribute type="xsd:string" name="provider"/>
             <xsd:attribute type="xsd:string" name="filter"/>
             <xsd:attribute type="xsd:string" name="property"/>
