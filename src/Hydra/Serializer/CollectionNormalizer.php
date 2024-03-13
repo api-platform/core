@@ -136,4 +136,6 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     }
 }
 
-class_alias(CollectionNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer::class);
+if (!class_exists(\ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer::class)) {
+    class_alias(CollectionNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer::class);
+}

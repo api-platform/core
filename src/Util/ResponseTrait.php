@@ -25,4 +25,6 @@ if (\PHP_VERSION_ID < 80000) {
     }
 }
 
-class_alias(ResponseTrait::class, \ApiPlatform\Core\Util\ResponseTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Util\ResponseTrait::class)) {
+    class_alias(ResponseTrait::class, \ApiPlatform\Core\Util\ResponseTrait::class);
+}

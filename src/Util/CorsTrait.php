@@ -32,4 +32,6 @@ trait CorsTrait
     }
 }
 
-class_alias(CorsTrait::class, \ApiPlatform\Core\Util\CorsTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Util\CorsTrait::class)) {
+    class_alias(CorsTrait::class, \ApiPlatform\Core\Util\CorsTrait::class);
+}

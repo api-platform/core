@@ -55,4 +55,6 @@ final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
     }
 }
 
-class_alias(InnerFieldsNameConverter::class, \ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter::class)) {
+    class_alias(InnerFieldsNameConverter::class, \ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter::class);
+}

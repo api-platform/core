@@ -30,4 +30,6 @@ final class UnderscorePathSegmentNameGenerator implements PathSegmentNameGenerat
     }
 }
 
-class_alias(UnderscorePathSegmentNameGenerator::class, \ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator::class);
+if (!class_exists(\ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator::class)) {
+    class_alias(UnderscorePathSegmentNameGenerator::class, \ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator::class);
+}

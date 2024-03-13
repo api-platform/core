@@ -36,4 +36,6 @@ trait CloneTrait
     }
 }
 
-class_alias(CloneTrait::class, \ApiPlatform\Core\Util\CloneTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Util\CloneTrait::class)) {
+    class_alias(CloneTrait::class, \ApiPlatform\Core\Util\CloneTrait::class);
+}

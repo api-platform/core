@@ -88,4 +88,6 @@ final class ContextAction
     }
 }
 
-class_alias(ContextAction::class, \ApiPlatform\Core\JsonLd\Action\ContextAction::class);
+if (!class_exists(\ApiPlatform\Core\JsonLd\Action\ContextAction::class)) {
+    class_alias(ContextAction::class, \ApiPlatform\Core\JsonLd\Action\ContextAction::class);
+}

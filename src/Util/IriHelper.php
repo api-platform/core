@@ -111,4 +111,6 @@ final class IriHelper
     }
 }
 
-class_alias(IriHelper::class, \ApiPlatform\Core\Util\IriHelper::class);
+if (!class_exists(\ApiPlatform\Core\Util\IriHelper::class)) {
+    class_alias(IriHelper::class, \ApiPlatform\Core\Util\IriHelper::class);
+}

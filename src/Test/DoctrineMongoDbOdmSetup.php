@@ -120,4 +120,6 @@ class DoctrineMongoDbOdmSetup
     }
 }
 
-class_alias(DoctrineMongoDbOdmSetup::class, \ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup::class);
+if (!class_exists(\ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup::class)) {
+    class_alias(DoctrineMongoDbOdmSetup::class, \ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup::class);
+}

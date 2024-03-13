@@ -176,4 +176,6 @@ final class PurgeHttpCacheListener
     }
 }
 
-class_alias(PurgeHttpCacheListener::class, \ApiPlatform\Core\Bridge\Doctrine\EventListener\PurgeHttpCacheListener::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Doctrine\EventListener\PurgeHttpCacheListener::class)) {
+    class_alias(PurgeHttpCacheListener::class, \ApiPlatform\Core\Bridge\Doctrine\EventListener\PurgeHttpCacheListener::class);
+}

@@ -76,4 +76,6 @@ final class Documentation implements DocumentationInterface
     }
 }
 
-class_alias(Documentation::class, \ApiPlatform\Core\Documentation\Documentation::class);
+if (!class_exists(\ApiPlatform\Core\Documentation\Documentation::class)) {
+    class_alias(Documentation::class, \ApiPlatform\Core\Documentation\Documentation::class);
+}

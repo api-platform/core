@@ -243,4 +243,6 @@ final class Parameter
     }
 }
 
-class_alias(Parameter::class, \ApiPlatform\Core\OpenApi\Model\Parameter::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Parameter::class)) {
+    class_alias(Parameter::class, \ApiPlatform\Core\OpenApi\Model\Parameter::class);
+}

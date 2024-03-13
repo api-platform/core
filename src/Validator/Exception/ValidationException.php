@@ -24,4 +24,6 @@ class ValidationException extends RuntimeException
 {
 }
 
-class_alias(ValidationException::class, \ApiPlatform\Core\Validator\Exception\ValidationException::class);
+if (!class_exists(\ApiPlatform\Core\Validator\Exception\ValidationException::class)) {
+    class_alias(ValidationException::class, \ApiPlatform\Core\Validator\Exception\ValidationException::class);
+}

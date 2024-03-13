@@ -193,4 +193,6 @@ final class TypeFactory implements TypeFactoryInterface
     }
 }
 
-class_alias(TypeFactory::class, \ApiPlatform\Core\JsonSchema\TypeFactory::class);
+if (!class_exists(\ApiPlatform\Core\JsonSchema\TypeFactory::class)) {
+    class_alias(TypeFactory::class, \ApiPlatform\Core\JsonSchema\TypeFactory::class);
+}

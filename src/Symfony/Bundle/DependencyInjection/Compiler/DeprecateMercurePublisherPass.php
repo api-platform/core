@@ -42,4 +42,6 @@ final class DeprecateMercurePublisherPass implements CompilerPassInterface
     }
 }
 
-class_alias(DeprecateMercurePublisherPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass::class)) {
+    class_alias(DeprecateMercurePublisherPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass::class);
+}

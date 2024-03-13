@@ -25,4 +25,6 @@ if (\PHP_VERSION_ID >= 80000) {
     }
 }
 
-class_alias(ClientTrait::class, \ApiPlatform\Core\Util\ClientTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Util\ClientTrait::class)) {
+    class_alias(ClientTrait::class, \ApiPlatform\Core\Util\ClientTrait::class);
+}

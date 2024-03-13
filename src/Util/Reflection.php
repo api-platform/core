@@ -40,4 +40,6 @@ final class Reflection
     }
 }
 
-class_alias(Reflection::class, \ApiPlatform\Core\Util\Reflection::class);
+if (!class_exists(\ApiPlatform\Core\Util\Reflection::class)) {
+    class_alias(Reflection::class, \ApiPlatform\Core\Util\Reflection::class);
+}

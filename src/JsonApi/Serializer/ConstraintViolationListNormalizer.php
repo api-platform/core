@@ -105,4 +105,6 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
     }
 }
 
-class_alias(ConstraintViolationListNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer::class);
+if (!class_exists(\ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer::class)) {
+    class_alias(ConstraintViolationListNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer::class);
+}

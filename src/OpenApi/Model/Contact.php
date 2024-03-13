@@ -68,4 +68,6 @@ final class Contact
     }
 }
 
-class_alias(Contact::class, \ApiPlatform\Core\OpenApi\Model\Contact::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Contact::class)) {
+    class_alias(Contact::class, \ApiPlatform\Core\OpenApi\Model\Contact::class);
+}

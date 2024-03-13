@@ -53,4 +53,6 @@ final class ExternalDocumentation
     }
 }
 
-class_alias(ExternalDocumentation::class, \ApiPlatform\Core\OpenApi\Model\ExternalDocumentation::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\ExternalDocumentation::class)) {
+    class_alias(ExternalDocumentation::class, \ApiPlatform\Core\OpenApi\Model\ExternalDocumentation::class);
+}

@@ -53,4 +53,6 @@ final class ElasticsearchClientPass implements CompilerPassInterface
     }
 }
 
-class_alias(ElasticsearchClientPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass::class)) {
+    class_alias(ElasticsearchClientPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass::class);
+}

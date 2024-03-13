@@ -48,4 +48,6 @@ final class Paginator extends AbstractPaginator implements PaginatorInterface, Q
     }
 }
 
-class_alias(Paginator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator::class)) {
+    class_alias(Paginator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator::class);
+}

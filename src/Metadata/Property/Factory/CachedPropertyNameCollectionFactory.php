@@ -46,4 +46,6 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
     }
 }
 
-class_alias(CachedPropertyNameCollectionFactory::class, \ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class);
+if (!class_exists(\ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class)) {
+    class_alias(CachedPropertyNameCollectionFactory::class, \ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class);
+}

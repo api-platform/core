@@ -86,4 +86,6 @@ final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryI
     }
 }
 
-class_alias(AttributeDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory::class)) {
+    class_alias(AttributeDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory::class);
+}
