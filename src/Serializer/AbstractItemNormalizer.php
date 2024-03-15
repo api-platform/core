@@ -1071,4 +1071,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 }
 
-class_alias(AbstractItemNormalizer::class, \ApiPlatform\Core\Serializer\AbstractItemNormalizer::class);
+if (!class_exists(\ApiPlatform\Core\Serializer\AbstractItemNormalizer::class)) {
+    class_alias(AbstractItemNormalizer::class, \ApiPlatform\Core\Serializer\AbstractItemNormalizer::class);
+}

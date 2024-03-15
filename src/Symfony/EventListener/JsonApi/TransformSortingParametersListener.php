@@ -64,4 +64,6 @@ final class TransformSortingParametersListener
     }
 }
 
-class_alias(TransformSortingParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformSortingParametersListener::class);
+if (!class_exists(\ApiPlatform\Core\JsonApi\EventListener\TransformSortingParametersListener::class)) {
+    class_alias(TransformSortingParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformSortingParametersListener::class);
+}

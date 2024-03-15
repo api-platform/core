@@ -103,4 +103,6 @@ final class PaginationOptions
     }
 }
 
-class_alias(PaginationOptions::class, \ApiPlatform\Core\DataProvider\PaginationOptions::class);
+if (!class_exists(\ApiPlatform\Core\DataProvider\PaginationOptions::class)) {
+    class_alias(PaginationOptions::class, \ApiPlatform\Core\DataProvider\PaginationOptions::class);
+}

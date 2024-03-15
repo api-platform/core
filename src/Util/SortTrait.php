@@ -34,4 +34,6 @@ trait SortTrait
     }
 }
 
-class_alias(SortTrait::class, \ApiPlatform\Core\Util\SortTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Util\SortTrait::class)) {
+    class_alias(SortTrait::class, \ApiPlatform\Core\Util\SortTrait::class);
+}

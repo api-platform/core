@@ -22,4 +22,6 @@ class InvalidResourceException extends \Exception implements ExceptionInterface
 {
 }
 
-class_alias(InvalidResourceException::class, \ApiPlatform\Core\Exception\InvalidResourceException::class);
+if (!class_exists(\ApiPlatform\Core\Exception\InvalidResourceException::class)) {
+    class_alias(InvalidResourceException::class, \ApiPlatform\Core\Exception\InvalidResourceException::class);
+}

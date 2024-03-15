@@ -177,4 +177,6 @@ final class Components
     }
 }
 
-class_alias(Components::class, \ApiPlatform\Core\OpenApi\Model\Components::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Components::class)) {
+    class_alias(Components::class, \ApiPlatform\Core\OpenApi\Model\Components::class);
+}

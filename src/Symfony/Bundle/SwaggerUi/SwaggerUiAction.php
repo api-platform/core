@@ -136,4 +136,6 @@ final class SwaggerUiAction
     }
 }
 
-class_alias(SwaggerUiAction::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction::class)) {
+    class_alias(SwaggerUiAction::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction::class);
+}

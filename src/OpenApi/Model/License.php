@@ -68,4 +68,6 @@ final class License
     }
 }
 
-class_alias(License::class, \ApiPlatform\Core\OpenApi\Model\License::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\License::class)) {
+    class_alias(License::class, \ApiPlatform\Core\OpenApi\Model\License::class);
+}

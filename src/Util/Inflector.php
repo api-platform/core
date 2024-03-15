@@ -54,4 +54,6 @@ final class Inflector
     }
 }
 
-class_alias(Inflector::class, \ApiPlatform\Core\Util\Inflector::class);
+if (!class_exists(\ApiPlatform\Core\Util\Inflector::class)) {
+    class_alias(Inflector::class, \ApiPlatform\Core\Util\Inflector::class);
+}

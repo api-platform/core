@@ -55,4 +55,6 @@ final class GraphQlPlaygroundAction
     }
 }
 
-class_alias(GraphQlPlaygroundAction::class, \ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction::class);
+if (!class_exists(\ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction::class)) {
+    class_alias(GraphQlPlaygroundAction::class, \ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction::class);
+}

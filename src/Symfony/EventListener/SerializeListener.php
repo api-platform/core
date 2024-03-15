@@ -153,4 +153,6 @@ final class SerializeListener
     }
 }
 
-class_alias(SerializeListener::class, \ApiPlatform\Core\EventListener\SerializeListener::class);
+if (!class_exists(\ApiPlatform\Core\EventListener\SerializeListener::class)) {
+    class_alias(SerializeListener::class, \ApiPlatform\Core\EventListener\SerializeListener::class);
+}

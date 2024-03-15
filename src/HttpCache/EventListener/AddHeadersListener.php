@@ -114,4 +114,6 @@ final class AddHeadersListener
     }
 }
 
-class_alias(AddHeadersListener::class, \ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener::class);
+if (!class_exists(\ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener::class)) {
+    class_alias(AddHeadersListener::class, \ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener::class);
+}

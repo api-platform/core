@@ -156,4 +156,6 @@ trait AnnotationFilterExtractorTrait
     }
 }
 
-class_alias(AnnotationFilterExtractorTrait::class, \ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class)) {
+    class_alias(AnnotationFilterExtractorTrait::class, \ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class);
+}

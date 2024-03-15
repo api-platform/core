@@ -34,4 +34,6 @@ trait IdentifierTrait
     }
 }
 
-class_alias(IdentifierTrait::class, \ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait::class);
+if (!trait_exists(\ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait::class)) {
+    class_alias(IdentifierTrait::class, \ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait::class);
+}

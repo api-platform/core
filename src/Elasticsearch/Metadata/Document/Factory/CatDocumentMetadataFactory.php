@@ -102,4 +102,6 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
     }
 }
 
-class_alias(CatDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory::class)) {
+    class_alias(CatDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory::class);
+}

@@ -39,4 +39,6 @@ final class ClassMetadataFactory implements ClassMetadataFactoryInterface
     }
 }
 
-class_alias(ClassMetadataFactory::class, \ApiPlatform\Core\Serializer\Mapping\Factory\ClassMetadataFactory::class);
+if (!class_exists(\ApiPlatform\Core\Serializer\Mapping\Factory\ClassMetadataFactory::class)) {
+    class_alias(ClassMetadataFactory::class, \ApiPlatform\Core\Serializer\Mapping\Factory\ClassMetadataFactory::class);
+}

@@ -35,4 +35,6 @@ trait ExtensionTrait
     }
 }
 
-class_alias(ExtensionTrait::class, \ApiPlatform\Core\OpenApi\Model\ExtensionTrait::class);
+if (!trait_exists(\ApiPlatform\Core\OpenApi\Model\ExtensionTrait::class)) {
+    class_alias(ExtensionTrait::class, \ApiPlatform\Core\OpenApi\Model\ExtensionTrait::class);
+}

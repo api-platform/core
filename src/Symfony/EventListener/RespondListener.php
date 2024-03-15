@@ -157,4 +157,6 @@ final class RespondListener
     }
 }
 
-class_alias(RespondListener::class, \ApiPlatform\Core\EventListener\RespondListener::class);
+if (!class_exists(\ApiPlatform\Core\EventListener\RespondListener::class)) {
+    class_alias(RespondListener::class, \ApiPlatform\Core\EventListener\RespondListener::class);
+}

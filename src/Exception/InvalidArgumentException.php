@@ -22,4 +22,6 @@ class InvalidArgumentException extends \InvalidArgumentException implements Exce
 {
 }
 
-class_alias(InvalidArgumentException::class, \ApiPlatform\Core\Exception\InvalidArgumentException::class);
+if (!class_exists(\ApiPlatform\Core\Exception\InvalidArgumentException::class)) {
+    class_alias(InvalidArgumentException::class, \ApiPlatform\Core\Exception\InvalidArgumentException::class);
+}

@@ -77,4 +77,6 @@ final class PayloadArgumentResolver implements ArgumentValueResolverInterface
     }
 }
 
-class_alias(PayloadArgumentResolver::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver::class)) {
+    class_alias(PayloadArgumentResolver::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver::class);
+}

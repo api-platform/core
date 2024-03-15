@@ -104,4 +104,6 @@ final class AddLinkHeaderListener
     }
 }
 
-class_alias(AddLinkHeaderListener::class, \ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener::class);
+if (!class_exists(\ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener::class)) {
+    class_alias(AddLinkHeaderListener::class, \ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener::class);
+}

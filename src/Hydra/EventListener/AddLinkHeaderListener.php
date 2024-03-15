@@ -59,4 +59,6 @@ final class AddLinkHeaderListener
     }
 }
 
-class_alias(AddLinkHeaderListener::class, \ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener::class);
+if (!class_exists(\ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener::class)) {
+    class_alias(AddLinkHeaderListener::class, \ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener::class);
+}

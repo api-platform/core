@@ -102,4 +102,6 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
     }
 }
 
-class_alias(ResourceClassResolver::class, \ApiPlatform\Core\Api\ResourceClassResolver::class);
+if (!class_exists(\ApiPlatform\Core\Api\ResourceClassResolver::class)) {
+    class_alias(ResourceClassResolver::class, \ApiPlatform\Core\Api\ResourceClassResolver::class);
+}

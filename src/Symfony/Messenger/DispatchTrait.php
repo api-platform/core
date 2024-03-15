@@ -54,4 +54,6 @@ trait DispatchTrait
     }
 }
 
-class_alias(DispatchTrait::class, \ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait::class)) {
+    class_alias(DispatchTrait::class, \ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait::class);
+}

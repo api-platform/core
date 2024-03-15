@@ -45,4 +45,6 @@ trait CacheKeyTrait
     }
 }
 
-class_alias(CacheKeyTrait::class, \ApiPlatform\Core\Serializer\CacheKeyTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Serializer\CacheKeyTrait::class)) {
+    class_alias(CacheKeyTrait::class, \ApiPlatform\Core\Serializer\CacheKeyTrait::class);
+}

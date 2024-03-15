@@ -62,4 +62,6 @@ final class OperationPathResolver implements OperationPathResolverInterface
     }
 }
 
-class_alias(OperationPathResolver::class, \ApiPlatform\Core\PathResolver\OperationPathResolver::class);
+if (!class_exists(\ApiPlatform\Core\PathResolver\OperationPathResolver::class)) {
+    class_alias(OperationPathResolver::class, \ApiPlatform\Core\PathResolver\OperationPathResolver::class);
+}

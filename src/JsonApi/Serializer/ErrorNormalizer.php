@@ -76,4 +76,6 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     }
 }
 
-class_alias(ErrorNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer::class);
+if (!class_exists(\ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer::class)) {
+    class_alias(ErrorNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer::class);
+}

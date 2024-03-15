@@ -723,4 +723,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     }
 }
 
-class_alias(DocumentationNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\DocumentationNormalizer::class);
+if (!class_exists(\ApiPlatform\Core\Hydra\Serializer\DocumentationNormalizer::class)) {
+    class_alias(DocumentationNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\DocumentationNormalizer::class);
+}
