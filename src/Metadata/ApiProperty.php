@@ -24,23 +24,23 @@ use Symfony\Component\PropertyInfo\Type;
 final class ApiProperty
 {
     /**
-     * @param bool|null   $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null   $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null   $required                https://api-platform.com/docs/admin/validation/#client-side-validation
-     * @param bool|null   $identifier              https://api-platform.com/docs/core/identifiers/
-     * @param string|null $default
-     * @param mixed       $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param string|null $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param bool|null   $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
-     * @param array|null  $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
-     * @param array|null  $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param bool|null   $push                    https://api-platform.com/docs/core/push-relations/
-     * @param string|null $security                https://api-platform.com/docs/core/security
-     * @param string|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param string[]    $types                   the RDF types of this property
-     * @param string[]    $iris
-     * @param Type[]      $builtinTypes
-     * @param string|null $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
+     * @param bool|null               $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null               $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null               $required                https://api-platform.com/docs/admin/validation/#client-side-validation
+     * @param bool|null               $identifier              https://api-platform.com/docs/core/identifiers/
+     * @param string|null             $default
+     * @param mixed                   $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param string|null             $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param bool|null               $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
+     * @param array|null              $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
+     * @param array|null              $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param bool|null               $push                    https://api-platform.com/docs/core/push-relations/
+     * @param string|\Stringable|null $security                https://api-platform.com/docs/core/security
+     * @param string|\Stringable|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param string[]                $types                   the RDF types of this property
+     * @param string[]                $iris
+     * @param Type[]                  $builtinTypes
+     * @param string|null             $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
      */
     public function __construct(
         private ?string $description = null,
@@ -148,7 +148,7 @@ final class ApiProperty
          *
          * </div>
          */
-        private ?string $security = null,
+        private string|\Stringable|null $security = null,
         /**
          * The `securityPostDenormalize` option defines access to the current property after the denormalization process, based on Symfony Security.
          * It receives an `object` variable related to the current object, and a `property` variable related to the current property.
@@ -192,7 +192,7 @@ final class ApiProperty
          *
          * </div>
          */
-        private ?string $securityPostDenormalize = null,
+        private string|\Stringable|null $securityPostDenormalize = null,
         private array|string|null $types = null,
         /*
          * The related php types.
@@ -420,7 +420,7 @@ final class ApiProperty
 
     public function getSecurity(): ?string
     {
-        return $this->security;
+        return $this->security instanceof \Stringable ? (string) $this->security : $this->security;
     }
 
     public function withSecurity($security): self
@@ -433,7 +433,7 @@ final class ApiProperty
 
     public function getSecurityPostDenormalize(): ?string
     {
-        return $this->securityPostDenormalize;
+        return $this->securityPostDenormalize instanceof \Stringable ? (string) $this->securityPostDenormalize : $this->securityPostDenormalize;
     }
 
     public function withSecurityPostDenormalize($securityPostDenormalize): self
