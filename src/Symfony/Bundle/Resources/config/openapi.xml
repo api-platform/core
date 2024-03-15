@@ -47,6 +47,7 @@
             <argument>%api_platform.openapi.termsOfService%</argument>
             <argument>%api_platform.openapi.license.name%</argument>
             <argument>%api_platform.openapi.license.url%</argument>
+            <argument>%api_platform.openapi.overrideResponses%</argument>
         </service>
         <service id="ApiPlatform\OpenApi\Options" alias="api_platform.openapi.options" />
 

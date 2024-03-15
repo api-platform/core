@@ -15,7 +15,7 @@ namespace ApiPlatform\OpenApi;
 
 final class Options
 {
-    public function __construct(private readonly string $title, private readonly string $description = '', private readonly string $version = '', private readonly bool $oAuthEnabled = false, private readonly ?string $oAuthType = null, private readonly ?string $oAuthFlow = null, private readonly ?string $oAuthTokenUrl = null, private readonly ?string $oAuthAuthorizationUrl = null, private readonly ?string $oAuthRefreshUrl = null, private readonly array $oAuthScopes = [], private readonly array $apiKeys = [], private readonly ?string $contactName = null, private readonly ?string $contactUrl = null, private readonly ?string $contactEmail = null, private readonly ?string $termsOfService = null, private readonly ?string $licenseName = null, private readonly ?string $licenseUrl = null)
+    public function __construct(private readonly string $title, private readonly string $description = '', private readonly string $version = '', private readonly bool $oAuthEnabled = false, private readonly ?string $oAuthType = null, private readonly ?string $oAuthFlow = null, private readonly ?string $oAuthTokenUrl = null, private readonly ?string $oAuthAuthorizationUrl = null, private readonly ?string $oAuthRefreshUrl = null, private readonly array $oAuthScopes = [], private readonly array $apiKeys = [], private readonly ?string $contactName = null, private readonly ?string $contactUrl = null, private readonly ?string $contactEmail = null, private readonly ?string $termsOfService = null, private readonly ?string $licenseName = null, private readonly ?string $licenseUrl = null, private bool $overrideResponses = true)
     {
     }
 
@@ -102,5 +102,10 @@ final class Options
     public function getLicenseUrl(): ?string
     {
         return $this->licenseUrl;
+    }
+
+    public function getOverrideResponses(): bool
+    {
+        return $this->overrideResponses;
     }
 }

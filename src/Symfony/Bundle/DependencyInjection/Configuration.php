@@ -488,6 +488,7 @@ final class Configuration implements ConfigurationInterface
                             ->end()
                             ->info('To pass extra configuration to Swagger UI, like docExpansion or filter.')
                         ->end()
+                        ->booleanNode('overrideResponses')->defaultTrue()->info('Whether API Platform adds automatic responses to the OpenAPI documentation.')
                     ->end()
                 ->end()
             ->end();

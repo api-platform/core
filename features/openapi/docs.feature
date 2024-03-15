@@ -266,6 +266,14 @@ Feature: Documentation support
         }
     }
     """
+    And the JSON node "paths./override_open_api_responses.post.responses" should be equal to:
+    """
+    {
+      "204": {
+        "description": "User activated"
+      }
+    }
+    """
 
   Scenario: OpenAPI UI is enabled for docs endpoint
     Given I add "Accept" header equal to "text/html"

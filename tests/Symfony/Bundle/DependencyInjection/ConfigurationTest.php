@@ -220,6 +220,7 @@ class ConfigurationTest extends TestCase
                     'url' => null,
                 ],
                 'swagger_ui_extra_configuration' => [],
+                'overrideResponses' => true,
             ],
             'maker' => [
                 'enabled' => true,
