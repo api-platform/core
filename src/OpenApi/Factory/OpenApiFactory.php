@@ -60,6 +60,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     use NormalizeOperationNameTrait;
 
     public const BASE_URL = 'base_url';
+    public const OVERRIDE_OPENAPI_RESPONSES = 'open_api_override_responses';
     private readonly Options $openApiOptions;
     private readonly PaginationOptions $paginationOptions;
     private ?RouteCollection $routeCollection = null;
@@ -284,37 +285,40 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             $existingResponses = $openapiOperation?->getResponses() ?: [];
-            // Create responses
-            switch ($method) {
-                case 'GET':
-                    $successStatus = (string) $operation->getStatus() ?: 200;
-                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s %s', $resourceShortName, $operation instanceof CollectionOperationInterface ? 'collection' : 'resource'), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas);
-                    break;
-                case 'POST':
-                    $successStatus = (string) $operation->getStatus() ?: 201;
+            $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
+            if ($overrideResponses || !$existingResponses) {
+                // Create responses
+                switch ($method) {
+                    case 'GET':
+                        $successStatus = (string) $operation->getStatus() ?: 200;
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s %s', $resourceShortName, $operation instanceof CollectionOperationInterface ? 'collection' : 'resource'), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas);
+                        break;
+                    case 'POST':
+                        $successStatus = (string) $operation->getStatus() ?: 201;
 
-                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s resource created', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s resource created', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
 
-                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, '400', 'Invalid input', $openapiOperation);
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, '400', 'Invalid input', $openapiOperation);
 
-                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, '422', 'Unprocessable entity', $openapiOperation);
-                    break;
-                case 'PATCH':
-                case 'PUT':
-                    $successStatus = (string) $operation->getStatus() ?: 200;
-                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s resource updated', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
-                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, '400', 'Invalid input', $openapiOperation);
-                    if (!isset($existingResponses[400])) {
-                        $openapiOperation = $openapiOperation->withResponse(400, new Response('Invalid input'));
-                    }
-                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, '422', 'Unprocessable entity', $openapiOperation);
-                    break;
-                case 'DELETE':
-                    $successStatus = (string) $operation->getStatus() ?: 204;
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, '422', 'Unprocessable entity', $openapiOperation);
+                        break;
+                    case 'PATCH':
+                    case 'PUT':
+                        $successStatus = (string) $operation->getStatus() ?: 200;
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s resource updated', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, '400', 'Invalid input', $openapiOperation);
+                        if (!isset($existingResponses[400])) {
+                            $openapiOperation = $openapiOperation->withResponse(400, new Response('Invalid input'));
+                        }
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, '422', 'Unprocessable entity', $openapiOperation);
+                        break;
+                    case 'DELETE':
+                        $successStatus = (string) $operation->getStatus() ?: 204;
 
-                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s resource deleted', $resourceShortName), $openapiOperation);
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s resource deleted', $resourceShortName), $openapiOperation);
 
-                    break;
+                        break;
+                }
             }
 
             if (!$operation instanceof CollectionOperationInterface && 'POST' !== $operation->getMethod()) {
@@ -594,7 +598,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $data['openapi']['explode'] ?? ('array' === $schema['type']),
                     $data['openapi']['allowReserved'] ?? false,
                     $data['openapi']['example'] ?? null,
-                    isset($data['openapi']['examples']
+                    isset(
+                        $data['openapi']['examples']
                     ) ? new \ArrayObject($data['openapi']['examples']) : null
                 );
             }
