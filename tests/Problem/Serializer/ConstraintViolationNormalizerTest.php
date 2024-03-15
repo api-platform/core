@@ -40,8 +40,9 @@ class ConstraintViolationNormalizerTest extends TestCase
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $normalizer = new ConstraintViolationListNormalizer([], $nameConverterProphecy->reveal());
 
-        $this->assertTrue($normalizer->supportsNormalization(new ConstraintViolationList(), ConstraintViolationListNormalizer::FORMAT));
-        $this->assertFalse($normalizer->supportsNormalization(new ConstraintViolationList(), 'xml'));
+        $this->assertTrue($normalizer->supportsNormalization(new ConstraintViolationList(), ConstraintViolationListNormalizer::FORMAT, ['api_error_resource' => true]));
+        $this->assertFalse($normalizer->supportsNormalization(new ConstraintViolationList(), 'xml', ['api_error_resource' => true]));
+        $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ConstraintViolationListNormalizer::FORMAT, ['api_error_resource' => true]));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ConstraintViolationListNormalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('json'));
         $this->assertSame([ConstraintViolationListInterface::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
