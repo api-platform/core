@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Factory;
 
+use ApiPlatform\GraphQl\State\Provider\NoopProvider;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -35,7 +36,7 @@ class ResolverFactory implements ResolverFactoryInterface
             // Data already fetched and normalized (field or nested resource)
             if ($body = $source[$info->fieldName] ?? null) {
                 // special treatment for nested resources without a resolver/provider
-                if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && !$operation->getProvider()) {
+                if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && (!$operation->getProvider() || NoopProvider::class === $operation->getProvider())) {
                     return $this->resolve($source, $args, $info, $rootClass, $operation, new ArrayPaginator($body, 0, \count($body)));
                 }
 

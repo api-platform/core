@@ -29,4 +29,7 @@ class SoMany
     public $id;
     #[ODM\Field(nullable: true)]
     public $content;
+
+    #[ODM\ReferenceOne(targetDocument: FooDummy::class, storeAs: 'id', nullable: true)]
+    public ?FooDummy $fooDummy;
 }
