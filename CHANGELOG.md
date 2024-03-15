@@ -72,6 +72,16 @@ These namespaces are deprecated:
 
 Most of the classes have moved to `ApiPlatform\Metadata`.
 
+If a format is not specified in either the global configuration or the `outputFormats` of an operation, you'll get a 406 Not Acceptable error:
+
+```yaml
+api_platform:
+    formats:
+        jsonld: ['application/ld+json']
+        form: ['multipart/form-data']
+```
+
+
 ## v3.2.15
 
 ### Bug fixes
