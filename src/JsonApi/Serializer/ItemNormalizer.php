@@ -83,8 +83,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return parent::normalize($object, $format, $context);
         }
 
-        if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
+        $previousResourceClass = $context['resource_class'] ?? null;
+        if ($this->resourceClassResolver->isResourceClass($resourceClass) && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $previousResourceClass);
         }
 
         if (($operation = $context['operation'] ?? null) && method_exists($operation, 'getItemUriTemplate')) {
