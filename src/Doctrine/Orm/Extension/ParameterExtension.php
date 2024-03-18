@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\HeaderParameterInterface;
@@ -31,7 +30,8 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
     {
     }
 
-    private function applyFilter(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, ?string $resourceClass = null, ?Operation $operation = null, array $context = []) {
+    private function applyFilter(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, ?string $resourceClass = null, ?Operation $operation = null, array $context = []): void
+    {
         if (!($request = $context['request'] ?? null)) {
             return;
         }
@@ -51,9 +51,10 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
                 continue;
             }
 
+            $value = $parameters[$key];
             $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
             if ($filter instanceof FilterInterface) {
-                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => [$parameter->getProperty() ?? $key => $parameters[$key]]] + $context);
+                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => [$key => $value]] + $context);
             }
         }
     }

@@ -535,7 +535,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 property: $this->phpize($parameter, 'property', 'string'),
                 description: $this->phpize($parameter, 'description', 'string'),
                 priority: $this->phpize($parameter, 'priority', 'integer'),
-                extraProperties: $this->buildExtraProperties($parameter, 'extraProperties'),
+                extraProperties: $this->buildExtraProperties($parameter, 'extraProperties') ?? [],
             );
         }
 

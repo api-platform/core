@@ -470,7 +470,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 key: $key,
                 required: $this->phpize($parameter, 'required', 'bool'),
                 schema: $parameter['schema'],
-                openapi: ($parameter['openapi'] ?? null) ? new Parameter(
+                openApi: ($parameter['openapi'] ?? null) ? new Parameter(
                     name: $parameter['openapi']['name'],
                     in: $parameter['in'] ?? 'query',
                     description: $parameter['openapi']['description'] ?? '',
@@ -490,7 +490,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 property: $this->phpize($parameter, 'property', 'string'),
                 description: $this->phpize($parameter, 'description', 'string'),
                 priority: $this->phpize($parameter, 'priority', 'integer'),
-                extraProperties: $this->buildArrayValue($resource, 'extraProperties'),
+                extraProperties: $this->buildArrayValue($parameter, 'extraProperties') ?? [],
             );
         }
 

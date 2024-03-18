@@ -450,8 +450,3 @@ services:
         tags:
             - name: 'api_platform.parameter_provider'
               key: 'ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider'
-
-    app_search_filter_via_parameter:
-        parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { foo: 'exact' } ]
-        tags:      [ { name: 'api_platform.filter', id: 'app_search_filter_via_parameter' } ]

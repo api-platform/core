@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -57,11 +56,11 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
                     // Read filter description to populate the Parameter
                     $description = $filter instanceof FilterInterface ? $filter->getDescription($resourceClass) : [];
-                    if (($schema = $description['schema'] ?? null) && null === $parameter->getSchema()) {
+                    if (($schema = $description[$key]['schema'] ?? null) && null === $parameter->getSchema()) {
                         $parameter = $parameter->withSchema($schema);
                     }
 
-                    if (null === $parameter->getOpenApi() && $openApi = $description['openapi'] ?? null) {
+                    if (null === $parameter->getOpenApi() && $openApi = $description[$key]['openapi'] ?? null) {
                         if ($openApi instanceof OpenApi\Model\Parameter) {
                             $parameter = $parameter->withOpenApi($openApi);
                         }
@@ -70,8 +69,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                             $parameter->withOpenApi(new OpenApi\Model\Parameter(
                                 $key,
                                 $parameter instanceof HeaderParameterInterface ? 'header' : 'query',
-                                $description['description'] ?? '',
-                                $description['required'] ?? $openApi['required'] ?? false,
+                                $description[$key]['description'] ?? '',
+                                $description[$key]['required'] ?? $openApi['required'] ?? false,
                                 $openApi['deprecated'] ?? false,
                                 $openApi['allowEmptyValue'] ?? true,
                                 $schema,
@@ -96,26 +95,5 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         return $resourceMetadataCollection;
-    }
-
-    /**
-     * @return Iterable<string, Parameter>
-     */
-    private function getIterator(null|array|\SplPriorityQueue $parameters): Iterable {
-        if (!$parameters) {
-            return [];
-        }
-
-        if (is_array($parameters)) {
-            foreach ($parameters as $key => $parameter) {
-                yield $key => $parameter;
-            }
-
-            return $parameters;
-        }
-
-        foreach ($parameters as $priority => $parameter) {
-            yield $parameter->getKey() => $parameter->withPriority($priority);
-        }
     }
 }

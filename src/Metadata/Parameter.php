@@ -37,7 +37,7 @@ abstract class Parameter
         protected ?string $description = null,
         protected ?bool $required = null,
         protected ?int $priority = null,
-        protected array $extraProperties = [],
+        protected ?array $extraProperties = [],
     ) {
     }
 

@@ -386,7 +386,7 @@ class XmlExtractorTest extends TestCase
                                     schema: [
                                         'type' => 'string',
                                     ],
-                                    extraProperties: []
+                                    extraProperties: ['foo' => 'bar']
                                 ),
                             ],
                         ],

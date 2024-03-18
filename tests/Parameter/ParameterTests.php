@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Parameter;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
 final class ParameterTests extends ApiTestCase
@@ -64,7 +65,10 @@ final class ParameterTests extends ApiTestCase
 
     public function testDoctrineEntitySearchFilter(): void
     {
-        $this->recreateSchema();
+        if (false === $this->recreateSchema()) {
+            $this->markTestSkipped();
+        }
+
         $registry = $this->getContainer()->get('doctrine');
         $entityManager = $registry->getManagerForClass(SearchFilterParameter::class);
 
@@ -75,32 +79,38 @@ final class ParameterTests extends ApiTestCase
         }
         $entityManager->flush();
 
-        $response = self::createClient()->request('GET', 'search_filter_parameter?search=bar');
+        $response = self::createClient()->request('GET', 'search_filter_parameter?foo=bar');
         $a = $response->toArray();
         $this->assertCount(2, $a['hydra:member']);
         $this->assertEquals('bar', $a['hydra:member'][0]['foo']);
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
-            'hydra:template' => '/search_filter_parameter{?search}',
+            'hydra:template' => '/search_filter_parameter{?foo,foo[],order[id],order[foo]}',
             'hydra:mapping' => [
-                ['@type' => 'IriTemplateMapping', 'variable' => 'search', 'property' => 'foo'],
+                ['@type' => 'IriTemplateMapping', 'variable' => 'foo', 'property' => 'foo'],
             ],
         ]], $a);
+
+        $response = self::createClient()->request('GET', 'search_filter_parameter?order[foo]=asc');
+        $this->assertEquals($response->toArray()['hydra:member'][0]['foo'], 'bar');
     }
 
-    private function recreateSchema(array $options = []): void
+    /**
+     * @param array<string, mixed> $options kernel options
+     */
+    private function recreateSchema(array $options = []): ?bool
     {
         self::bootKernel($options);
 
-        /** @var EntityManagerInterface $manager */
-        $manager = static::getContainer()->get('doctrine')->getManager();
-        /** @var ClassMetadata[] $classes */
-        $classes = $manager->getMetadataFactory()->getAllMetadata();
+        $manager = static::getContainer()->get('doctrine')->getManagerForClass(SearchFilterParameter::class);
+        if (!$manager instanceof EntityManagerInterface) {
+            return false;
+        }
+
+        $classes = $manager->getClassMetadata(SearchFilterParameter::class);
         $schemaTool = new SchemaTool($manager);
-
-        @$schemaTool->dropSchema($classes);
-        @$schemaTool->createSchema($classes);
+        @$schemaTool->dropSchema([$classes]);
+        @$schemaTool->createSchema([$classes]);
     }
-
 }

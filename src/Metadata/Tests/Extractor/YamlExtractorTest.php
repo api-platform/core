@@ -405,7 +405,7 @@ class YamlExtractorTest extends TestCase
                             'stateOptions' => null,
                             'links' => null,
                             'headers' => ['hello' => 'world'],
-                            'parameters' => ['author' => new QueryParameter(schema: ['type' => 'string'], required: true, key: 'author')],
+                            'parameters' => ['author' => new QueryParameter(schema: ['type' => 'string'], required: true, key: 'author', description: 'hello')],
                         ],
                     ],
                     'graphQlOperations' => null,

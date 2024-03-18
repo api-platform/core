@@ -21,15 +21,15 @@ use ApiPlatform\State\OptionsInterface;
 abstract class Metadata
 {
     /**
-     * @param string|null              $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param string|\Stringable|null  $security                https://api-platform.com/docs/core/security
-     * @param string|\Stringable|null  $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param mixed|null               $mercure
-     * @param mixed|null               $messenger
-     * @param mixed|null               $input
-     * @param mixed|null               $output
-     * @param mixed|null               $provider
-     * @param mixed|null               $processor
+     * @param string|null                         $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param string|\Stringable|null             $security                https://api-platform.com/docs/core/security
+     * @param string|\Stringable|null             $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param mixed|null                          $mercure
+     * @param mixed|null                          $messenger
+     * @param mixed|null                          $input
+     * @param mixed|null                          $output
+     * @param mixed|null                          $provider
+     * @param mixed|null                          $processor
      * @param Parameters|array<string, Parameter> $parameters
      */
     public function __construct(
@@ -73,7 +73,7 @@ abstract class Metadata
         /**
          * @experimental
          */
-        protected null|array|Parameters $parameters = [],
+        protected array|Parameters|null $parameters = [],
         protected array $extraProperties = []
     ) {
     }
@@ -574,7 +574,7 @@ abstract class Metadata
     /**
      * @return array<string, Parameter>
      */
-    public function getParameters(): null|array|Parameters
+    public function getParameters(): array|Parameters|null
     {
         return $this->parameters;
     }

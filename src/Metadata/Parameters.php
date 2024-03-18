@@ -15,6 +15,8 @@ namespace ApiPlatform\Metadata;
 
 /**
  * An parameter dictionnary.
+ *
+ * @implements \IteratorAggregate<string, Parameter>
  */
 final class Parameters implements \IteratorAggregate, \Countable
 {
@@ -36,6 +38,9 @@ final class Parameters implements \IteratorAggregate, \Countable
         $this->sort();
     }
 
+    /**
+     * @return \ArrayIterator<string, Parameter>
+     */
     public function getIterator(): \Traversable
     {
         return (function (): \Generator {

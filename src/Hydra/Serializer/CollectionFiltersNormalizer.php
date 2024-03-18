@@ -128,7 +128,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             }
         }
 
-        if ($currentFilters || $parameters) {
+        if ($currentFilters || ($parameters && \count($parameters))) {
             $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters, $parameters);
         }
 
@@ -151,7 +151,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      * @param LegacyFilterInterface[]|FilterInterface[] $filters
      * @param array<string, Parameter>                  $parameters
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters, null|array|Parameters $parameters): array
+    private function getSearch(string $resourceClass, array $parts, array $filters, array|Parameters|null $parameters): array
     {
         $variables = [];
         $mapping = [];
@@ -164,12 +164,26 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
         foreach ($parameters ?? [] as $key => $parameter) {
             // Each IriTemplateMapping maps a variable used in the template to a property
-            if (!$parameter instanceof QueryParameterInterface || !($property = $parameter->getProperty())) {
+            if (!$parameter instanceof QueryParameterInterface) {
                 continue;
             }
 
-            $variables[] = $key;
+            if (!($property = $parameter->getProperty()) && ($filterId = $parameter->getFilter())) {
+                $filter = $this->getFilter($filterId);
+                foreach ($filter->getDescription($resourceClass) as $variable => $description) {
+                    $variables[] = $variable;
+                    $m = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $description['property'], 'required' => $description['required']];
+                    if (null !== ($required = $parameter->getRequired())) {
+                        $m['required'] = $required;
+                    }
+                    $mapping[] = $m;
+                }
+
+                continue;
+            }
+
             $m = ['@type' => 'IriTemplateMapping', 'variable' => $key, 'property' => $property];
+            $variables[] = $key;
             if (null !== ($required = $parameter->getRequired())) {
                 $m['required'] = $required;
             }

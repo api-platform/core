@@ -37,6 +37,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'auth' => new HeaderParameter(provider: [self::class, 'restrictAccess']),
         'priority' => new QueryParameter(provider: [self::class, 'assertSecond'], priority: 10),
         'priorityb' => new QueryParameter(provider: [self::class, 'assertFirst'], priority: 20),
+        'array' => new QueryParameter(provider: [self::class, 'assertArray']),
     ],
     provider: [self::class, 'provide']
 )]
@@ -49,7 +50,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class WithParameter
 {
-    private static int $counter = 1;
+    public static int $counter = 1;
     public int $id = 1;
 
     #[Groups(['a'])]
@@ -67,15 +68,19 @@ class WithParameter
         return new self();
     }
 
-    public static function assertFirst()
+    public static function assertArray(): void
     {
-        assert(static::$counter === 1);
-        static::$counter++;
     }
 
-    public static function assertSecond()
+    public static function assertFirst(): void
     {
-        assert(static::$counter === 2);
+        \assert(1 === static::$counter);
+        ++static::$counter;
+    }
+
+    public static function assertSecond(): void
+    {
+        \assert(2 === static::$counter);
     }
 
     public static function provideGroup(Parameter $parameter, array $parameters = [], array $context = [])

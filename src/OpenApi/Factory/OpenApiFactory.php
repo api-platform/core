@@ -308,9 +308,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             $openapiParameters = $openapiOperation->getParameters();
-            foreach ($operation->getParameters() ?? [] as $p) {
+            foreach ($operation->getParameters() ?? [] as $key => $p) {
                 $in = $p instanceof HeaderParameterInterface ? 'header' : 'query';
-                $parameter = new Parameter($p->getKey(), $in, $p->getDescription() ?? "$resourceShortName $key", $p->getRequired() ?? false, false, false, $p->getSchema() ?? ['type' => 'string']);
+                $parameter = new Parameter($key, $in, $p->getDescription() ?? "$resourceShortName $key", $p->getRequired() ?? false, false, false, $p->getSchema() ?? ['type' => 'string']);
 
                 if ($linkParameter = $p->getOpenApi()) {
                     $parameter = $this->mergeParameter($parameter, $linkParameter);

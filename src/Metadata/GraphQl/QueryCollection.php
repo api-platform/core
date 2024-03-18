@@ -70,7 +70,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         $provider = null,
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
-        null|array|Parameters $parameters = null,
+        array|Parameters|null $parameters = null,
         array $extraProperties = [],
 
         ?bool $nested = null,

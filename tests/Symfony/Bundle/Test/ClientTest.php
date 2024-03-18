@@ -112,7 +112,7 @@ class ClientTest extends ApiTestCase
 
     public function testComplexScenario(): void
     {
-        self::createClient()->request('GET', '/secured_dummies', ['auth_basic' => ['dunglas', 'kevin']]);
+        $r = self::createClient()->request('GET', '/secured_dummies', ['auth_basic' => ['dunglas', 'kevin']]);
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
 

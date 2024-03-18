@@ -94,7 +94,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
-        null|array|Parameters $parameters = null,
+        array|Parameters|null $parameters = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
