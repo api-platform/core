@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Parameter;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
+use Doctrine\ORM\Tools\SchemaTool;
 
 final class ParameterTests extends ApiTestCase
 {
@@ -59,4 +61,46 @@ final class ParameterTests extends ApiTestCase
             ],
         ]], $response->toArray());
     }
+
+    public function testDoctrineEntitySearchFilter(): void
+    {
+        $this->recreateSchema();
+        $registry = $this->getContainer()->get('doctrine');
+        $entityManager = $registry->getManagerForClass(SearchFilterParameter::class);
+
+        foreach (['foo', 'foo', 'foo', 'bar', 'bar'] as $t) {
+            $s = new SearchFilterParameter();
+            $s->setFoo($t);
+            $entityManager->persist($s);
+        }
+        $entityManager->flush();
+
+        $response = self::createClient()->request('GET', 'search_filter_parameter?search=bar');
+        $a = $response->toArray();
+        $this->assertCount(2, $a['hydra:member']);
+        $this->assertEquals('bar', $a['hydra:member'][0]['foo']);
+        $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
+
+        $this->assertArraySubset(['hydra:search' => [
+            'hydra:template' => '/search_filter_parameter{?search}',
+            'hydra:mapping' => [
+                ['@type' => 'IriTemplateMapping', 'variable' => 'search', 'property' => 'foo'],
+            ],
+        ]], $a);
+    }
+
+    private function recreateSchema(array $options = []): void
+    {
+        self::bootKernel($options);
+
+        /** @var EntityManagerInterface $manager */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        /** @var ClassMetadata[] $classes */
+        $classes = $manager->getMetadataFactory()->getAllMetadata();
+        $schemaTool = new SchemaTool($manager);
+
+        @$schemaTool->dropSchema($classes);
+        @$schemaTool->createSchema($classes);
+    }
+
 }

@@ -36,6 +36,7 @@ abstract class Parameter
         protected ?string $property = null,
         protected ?string $description = null,
         protected ?bool $required = null,
+        protected ?int $priority = null,
         protected array $extraProperties = [],
     ) {
     }
@@ -83,6 +84,11 @@ abstract class Parameter
         return $this->required;
     }
 
+    public function getPriority(): ?int
+    {
+        return $this->priority;
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -95,6 +101,14 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->key = $key;
+
+        return $self;
+    }
+
+    public function withPriority(int $priority): static
+    {
+        $self = clone $this;
+        $self->priority = $priority;
 
         return $self;
     }

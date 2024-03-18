@@ -94,7 +94,7 @@ final class Post extends HttpOperation
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
-        ?array $parameters = null,
+        null|array|Parameters $parameters = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null
     ) {

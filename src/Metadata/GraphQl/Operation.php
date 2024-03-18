@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\GraphQl;
 
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation as AbstractOperation;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\OptionsInterface;
 
 class Operation extends AbstractOperation
@@ -84,7 +85,7 @@ class Operation extends AbstractOperation
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
-        ?array $parameters = null,
+        null|array|Parameters $parameters = null,
         array $extraProperties = []
     ) {
         parent::__construct(

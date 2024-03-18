@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[Get(
-    uriTemplate: 'with_parameters/{id}',
+    uriTemplate: 'with_parameters/{id}{._format}',
     uriVariables: [
         'id' => new Link(schema: ['type' => 'uuid'], property: 'id'),
     ],
@@ -35,6 +35,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'properties' => new QueryParameter(filter: 'my_dummy.property'),
         'service' => new QueryParameter(provider: CustomGroupParameterProvider::class),
         'auth' => new HeaderParameter(provider: [self::class, 'restrictAccess']),
+        'priority' => new QueryParameter(provider: [self::class, 'assertSecond'], priority: 10),
+        'priorityb' => new QueryParameter(provider: [self::class, 'assertFirst'], priority: 20),
     ],
     provider: [self::class, 'provide']
 )]
@@ -47,6 +49,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class WithParameter
 {
+    private static int $counter = 1;
     public int $id = 1;
 
     #[Groups(['a'])]
@@ -62,6 +65,17 @@ class WithParameter
     public static function provide()
     {
         return new self();
+    }
+
+    public static function assertFirst()
+    {
+        assert(static::$counter === 1);
+        static::$counter++;
+    }
+
+    public static function assertSecond()
+    {
+        assert(static::$counter === 2);
     }
 
     public static function provideGroup(Parameter $parameter, array $parameters = [], array $context = [])

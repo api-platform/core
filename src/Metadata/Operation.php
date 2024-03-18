@@ -806,7 +806,7 @@ abstract class Operation extends Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
-        protected ?array $parameters = [],
+        protected null|array|Parameters $parameters = [],
         protected array $extraProperties = [],
     ) {
         parent::__construct(

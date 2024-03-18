@@ -515,6 +515,27 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 key: $key,
                 required: $this->phpize($parameter, 'required', 'bool'),
                 schema: isset($parameter->schema->values) ? $this->buildValues($parameter->schema->values) : null,
+                openApi: isset($parameter->openapi) ? new OpenApiParameter(
+                    name: $this->phpize($parameter->openapi, 'name', 'string'),
+                    in: $this->phpize($parameter->openapi, 'in', 'string'),
+                    description: $this->phpize($parameter->openapi, 'description', 'string'),
+                    required: $this->phpize($parameter->openapi, 'required', 'bool'),
+                    deprecated: $this->phpize($parameter->openapi, 'deprecated', 'bool'),
+                    allowEmptyValue: $this->phpize($parameter->openapi, 'allowEmptyValue', 'bool'),
+                    schema: isset($parameter->openapi->schema->values) ? $this->buildValues($parameter->openapi->schema->values) : null,
+                    style: $this->phpize($parameter->openapi, 'style', 'string'),
+                    explode: $this->phpize($parameter->openapi, 'explode', 'bool'),
+                    allowReserved: $this->phpize($parameter->openapi, 'allowReserved', 'bool'),
+                    example: $this->phpize($parameter->openapi, 'example', 'string'),
+                    examples: isset($parameter->openapi->examples->values) ? new \ArrayObject($this->buildValues($parameter->openapi->examples->values)) : null,
+                    content: isset($parameter->openapi->content->values) ? new \ArrayObject($this->buildValues($parameter->openapi->content->values)) : null,
+                ) : null,
+                provider: $this->phpize($parameter, 'provider', 'string'),
+                filter: $this->phpize($parameter, 'filter', 'string'),
+                property: $this->phpize($parameter, 'property', 'string'),
+                description: $this->phpize($parameter, 'description', 'string'),
+                priority: $this->phpize($parameter, 'priority', 'integer'),
+                extraProperties: $this->buildExtraProperties($parameter, 'extraProperties'),
             );
         }
 

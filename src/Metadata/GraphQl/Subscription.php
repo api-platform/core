@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\GraphQl;
 
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\OptionsInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
@@ -68,7 +69,7 @@ final class Subscription extends Operation
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
-        ?array $parameters = null,
+        null|array|Parameters $parameters = null,
         array $extraProperties = [],
     ) {
         parent::__construct(

@@ -30,7 +30,7 @@ abstract class Metadata
      * @param mixed|null               $output
      * @param mixed|null               $provider
      * @param mixed|null               $processor
-     * @param array<string, Parameter> $parameters
+     * @param Parameters|array<string, Parameter> $parameters
      */
     public function __construct(
         protected ?string $shortName = null,
@@ -73,7 +73,7 @@ abstract class Metadata
         /**
          * @experimental
          */
-        protected ?array $parameters = [],
+        protected null|array|Parameters $parameters = [],
         protected array $extraProperties = []
     ) {
     }
@@ -574,12 +574,12 @@ abstract class Metadata
     /**
      * @return array<string, Parameter>
      */
-    public function getParameters(): ?array
+    public function getParameters(): null|array|Parameters
     {
         return $this->parameters;
     }
 
-    public function withParameters(array $parameters): static
+    public function withParameters(array|Parameters $parameters): static
     {
         $self = clone $this;
         $self->parameters = $parameters;

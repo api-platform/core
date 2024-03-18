@@ -19,6 +19,7 @@ use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -150,7 +151,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      * @param LegacyFilterInterface[]|FilterInterface[] $filters
      * @param array<string, Parameter>                  $parameters
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters, ?array $parameters): array
+    private function getSearch(string $resourceClass, array $parts, array $filters, null|array|Parameters $parameters): array
     {
         $variables = [];
         $mapping = [];

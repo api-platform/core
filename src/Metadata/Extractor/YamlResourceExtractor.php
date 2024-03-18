@@ -469,7 +469,28 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             $parameters[$key] = new $cl(
                 key: $key,
                 required: $this->phpize($parameter, 'required', 'bool'),
-                schema: $parameter['schema']
+                schema: $parameter['schema'],
+                openapi: ($parameter['openapi'] ?? null) ? new Parameter(
+                    name: $parameter['openapi']['name'],
+                    in: $parameter['in'] ?? 'query',
+                    description: $parameter['openapi']['description'] ?? '',
+                    required: $parameter['openapi']['required'] ?? $parameter['required'] ?? false,
+                    deprecated: $parameter['openapi']['deprecated'] ?? false,
+                    allowEmptyValue: $parameter['openapi']['allowEmptyValue'] ?? false,
+                    schema: $parameter['openapi']['schema'] ?? $parameter['schema'] ?? [],
+                    style: $parameter['openapi']['style'] ?? null,
+                    explode: $parameter['openapi']['explode'] ?? false,
+                    allowReserved: $parameter['openapi']['allowReserved '] ?? false,
+                    example: $parameter['openapi']['example'] ?? null,
+                    examples: isset($parameter['openapi']['examples']) ? new \ArrayObject($parameter['openapi']['examples']) : null,
+                    content: isset($parameter['openapi']['content']) ? new \ArrayObject($parameter['openapi']['content']) : null
+                ) : null,
+                provider: $this->phpize($parameter, 'provider', 'string'),
+                filter: $this->phpize($parameter, 'filter', 'string'),
+                property: $this->phpize($parameter, 'property', 'string'),
+                description: $this->phpize($parameter, 'description', 'string'),
+                priority: $this->phpize($parameter, 'priority', 'integer'),
+                extraProperties: $this->buildArrayValue($resource, 'extraProperties'),
             );
         }
 

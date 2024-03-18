@@ -47,8 +47,8 @@ final class ParameterProvider implements ProviderInterface
         }
 
         $context = ['operation' => $operation] + $context;
-
-        foreach ($operation->getParameters() ?? [] as $key => $parameter) {
+        foreach ($operation->getParameters() ?? [] as $parameter) {
+            $key = $parameter->getKey();
             if (null === ($provider = $parameter->getProvider())) {
                 continue;
             }
