@@ -98,6 +98,6 @@ final class Required implements ValidatorInterface
     }
 }
 
-if (!class_exists()) {
+if (!class_exists(\ApiPlatform\Core\Filter\Validator\Required::class)) {
     class_alias(Required::class, \ApiPlatform\Core\Filter\Validator\Required::class);
 }

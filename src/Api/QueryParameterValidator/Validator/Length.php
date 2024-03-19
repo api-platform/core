@@ -39,6 +39,6 @@ final class Length implements ValidatorInterface
     }
 }
 
-if (!class_exists()) {
+if (!class_exists(\ApiPlatform\Core\Filter\Validator\Length::class)) {
     class_alias(Length::class, \ApiPlatform\Core\Filter\Validator\Length::class);
 }
