@@ -140,6 +140,4 @@ final class Options
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\Options::class)) {
-    class_alias(Options::class, \ApiPlatform\Core\OpenApi\Options::class);
-}
+class_alias(Options::class, \ApiPlatform\Core\OpenApi\Options::class);

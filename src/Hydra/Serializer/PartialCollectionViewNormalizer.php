@@ -187,6 +187,4 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer::class)) {
-    class_alias(PartialCollectionViewNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer::class);
-}
+class_alias(PartialCollectionViewNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer::class);

@@ -65,6 +65,4 @@ final class ReservedAttributeNameConverter implements AdvancedNameConverterInter
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter::class)) {
-    class_alias(ReservedAttributeNameConverter::class, \ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter::class);
-}
+class_alias(ReservedAttributeNameConverter::class, \ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter::class);

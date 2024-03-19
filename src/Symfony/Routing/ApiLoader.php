@@ -346,6 +346,4 @@ final class ApiLoader extends Loader
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader::class)) {
-    class_alias(ApiLoader::class, \ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader::class);
-}
+class_alias(ApiLoader::class, \ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader::class);

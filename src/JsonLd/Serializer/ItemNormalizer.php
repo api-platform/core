@@ -159,6 +159,4 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer::class)) {
-    class_alias(ItemNormalizer::class, \ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer::class);
-}
+class_alias(ItemNormalizer::class, \ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer::class);

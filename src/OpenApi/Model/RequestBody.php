@@ -68,6 +68,4 @@ final class RequestBody
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\Model\RequestBody::class)) {
-    class_alias(RequestBody::class, \ApiPlatform\Core\OpenApi\Model\RequestBody::class);
-}
+class_alias(RequestBody::class, \ApiPlatform\Core\OpenApi\Model\RequestBody::class);

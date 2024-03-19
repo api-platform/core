@@ -46,6 +46,4 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Metadata\Property\PropertyNameCollection::class)) {
-    class_alias(PropertyNameCollection::class, \ApiPlatform\Core\Metadata\Property\PropertyNameCollection::class);
-}
+class_alias(PropertyNameCollection::class, \ApiPlatform\Core\Metadata\Property\PropertyNameCollection::class);

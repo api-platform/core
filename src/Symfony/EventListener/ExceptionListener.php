@@ -55,6 +55,4 @@ final class ExceptionListener
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\EventListener\ExceptionListener::class)) {
-    class_alias(ExceptionListener::class, \ApiPlatform\Core\EventListener\ExceptionListener::class);
-}
+class_alias(ExceptionListener::class, \ApiPlatform\Core\EventListener\ExceptionListener::class);

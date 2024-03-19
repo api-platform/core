@@ -36,6 +36,4 @@ final class RequestAttributesExtractor
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Util\RequestAttributesExtractor::class)) {
-    class_alias(RequestAttributesExtractor::class, \ApiPlatform\Core\Util\RequestAttributesExtractor::class);
-}
+class_alias(RequestAttributesExtractor::class, \ApiPlatform\Core\Util\RequestAttributesExtractor::class);

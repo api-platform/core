@@ -40,6 +40,4 @@ final class UuidDenormalizer implements DenormalizerInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer::class)) {
-    class_alias(UuidDenormalizer::class, \ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer::class);
-}
+class_alias(UuidDenormalizer::class, \ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer::class);

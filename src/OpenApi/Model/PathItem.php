@@ -219,6 +219,4 @@ final class PathItem
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\Model\PathItem::class)) {
-    class_alias(PathItem::class, \ApiPlatform\Core\OpenApi\Model\PathItem::class);
-}
+class_alias(PathItem::class, \ApiPlatform\Core\OpenApi\Model\PathItem::class);

@@ -66,6 +66,4 @@ abstract class AbstractPaginator implements \IteratorAggregate, PartialPaginator
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Doctrine\Orm\AbstractPaginator::class)) {
-    class_alias(AbstractPaginator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\AbstractPaginator::class);
-}
+class_alias(AbstractPaginator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\AbstractPaginator::class);

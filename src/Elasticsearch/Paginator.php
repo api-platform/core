@@ -111,6 +111,4 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator::class)) {
-    class_alias(Paginator::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator::class);
-}
+class_alias(Paginator::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator::class);

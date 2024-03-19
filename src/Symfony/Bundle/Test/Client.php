@@ -249,6 +249,4 @@ final class Client implements HttpClientInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client::class)) {
-    class_alias(Client::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client::class);
-}
+class_alias(Client::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client::class);

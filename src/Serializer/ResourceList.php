@@ -20,6 +20,4 @@ class ResourceList extends \ArrayObject
 {
 }
 
-if (!class_exists(\ApiPlatform\Core\Serializer\ResourceList::class)) {
-    class_alias(ResourceList::class, \ApiPlatform\Core\Serializer\ResourceList::class);
-}
+class_alias(ResourceList::class, \ApiPlatform\Core\Serializer\ResourceList::class);

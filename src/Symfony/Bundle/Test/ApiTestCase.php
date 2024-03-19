@@ -101,6 +101,4 @@ abstract class ApiTestCase extends KernelTestCase
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class)) {
-    class_alias(ApiTestCase::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class);
-}
+class_alias(ApiTestCase::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class);

@@ -74,6 +74,4 @@ final class UploadType extends ScalarType implements TypeInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\GraphQl\Type\Definition\UploadType::class)) {
-    class_alias(UploadType::class, \ApiPlatform\Core\GraphQl\Type\Definition\UploadType::class);
-}
+class_alias(UploadType::class, \ApiPlatform\Core\GraphQl\Type\Definition\UploadType::class);

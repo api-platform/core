@@ -84,6 +84,4 @@ trait ResourceClassInfoTrait
     }
 }
 
-if (!trait_exists(\ApiPlatform\Core\Util\ResourceClassInfoTrait::class)) {
-    class_alias(ResourceClassInfoTrait::class, \ApiPlatform\Core\Util\ResourceClassInfoTrait::class);
-}
+class_alias(ResourceClassInfoTrait::class, \ApiPlatform\Core\Util\ResourceClassInfoTrait::class);

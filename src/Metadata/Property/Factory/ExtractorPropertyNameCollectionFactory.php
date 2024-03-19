@@ -74,6 +74,4 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class)) {
-    class_alias(ExtractorPropertyNameCollectionFactory::class, \ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class);
-}
+class_alias(ExtractorPropertyNameCollectionFactory::class, \ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class);

@@ -169,6 +169,4 @@ final class Response implements ResponseInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Response::class)) {
-    class_alias(Response::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Response::class);
-}
+class_alias(Response::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Response::class);

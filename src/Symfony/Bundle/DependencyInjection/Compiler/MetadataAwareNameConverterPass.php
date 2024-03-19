@@ -52,6 +52,4 @@ final class MetadataAwareNameConverterPass implements CompilerPassInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass::class)) {
-    class_alias(MetadataAwareNameConverterPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass::class);
-}
+class_alias(MetadataAwareNameConverterPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass::class);

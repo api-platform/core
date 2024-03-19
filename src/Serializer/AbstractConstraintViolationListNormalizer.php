@@ -80,6 +80,4 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer::class)) {
-    class_alias(AbstractConstraintViolationListNormalizer::class, \ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer::class);
-}
+class_alias(AbstractConstraintViolationListNormalizer::class, \ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer::class);

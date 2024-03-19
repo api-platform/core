@@ -98,6 +98,4 @@ final class ValidateListener
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Validator\EventListener\ValidateListener::class)) {
-    class_alias(ValidateListener::class, \ApiPlatform\Core\Validator\EventListener\ValidateListener::class);
-}
+class_alias(ValidateListener::class, \ApiPlatform\Core\Validator\EventListener\ValidateListener::class);

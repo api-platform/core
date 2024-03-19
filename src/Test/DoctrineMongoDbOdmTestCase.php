@@ -49,6 +49,4 @@ class DoctrineMongoDbOdmTestCase extends TestCase
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Test\DoctrineMongoDbOdmTestCase::class)) {
-    class_alias(DoctrineMongoDbOdmTestCase::class, \ApiPlatform\Core\Test\DoctrineMongoDbOdmTestCase::class);
-}
+class_alias(DoctrineMongoDbOdmTestCase::class, \ApiPlatform\Core\Test\DoctrineMongoDbOdmTestCase::class);

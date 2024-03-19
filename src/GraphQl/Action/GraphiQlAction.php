@@ -55,6 +55,4 @@ final class GraphiQlAction
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\GraphQl\Action\GraphiQlAction::class)) {
-    class_alias(GraphiQlAction::class, \ApiPlatform\Core\GraphQl\Action\GraphiQlAction::class);
-}
+class_alias(GraphiQlAction::class, \ApiPlatform\Core\GraphQl\Action\GraphiQlAction::class);

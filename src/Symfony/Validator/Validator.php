@@ -68,6 +68,4 @@ class Validator implements ValidatorInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Validator\Validator::class)) {
-    class_alias(Validator::class, \ApiPlatform\Core\Bridge\Symfony\Validator\Validator::class);
-}
+class_alias(Validator::class, \ApiPlatform\Core\Bridge\Symfony\Validator\Validator::class);

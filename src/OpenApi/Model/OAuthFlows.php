@@ -83,6 +83,4 @@ final class OAuthFlows
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\Model\OAuthFlows::class)) {
-    class_alias(OAuthFlows::class, \ApiPlatform\Core\OpenApi\Model\OAuthFlows::class);
-}
+class_alias(OAuthFlows::class, \ApiPlatform\Core\OpenApi\Model\OAuthFlows::class);

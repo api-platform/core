@@ -22,6 +22,4 @@ class ItemNotFoundException extends InvalidArgumentException
 {
 }
 
-if (!class_exists(\ApiPlatform\Core\Exception\ItemNotFoundException::class)) {
-    class_alias(ItemNotFoundException::class, \ApiPlatform\Core\Exception\ItemNotFoundException::class);
-}
+class_alias(ItemNotFoundException::class, \ApiPlatform\Core\Exception\ItemNotFoundException::class);

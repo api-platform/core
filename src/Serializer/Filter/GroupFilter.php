@@ -70,6 +70,4 @@ final class GroupFilter implements FilterInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Serializer\Filter\GroupFilter::class)) {
-    class_alias(GroupFilter::class, \ApiPlatform\Core\Serializer\Filter\GroupFilter::class);
-}
+class_alias(GroupFilter::class, \ApiPlatform\Core\Serializer\Filter\GroupFilter::class);

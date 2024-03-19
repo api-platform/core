@@ -77,6 +77,4 @@ final class SwaggerUiContext
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class)) {
-    class_alias(SwaggerUiContext::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class);
-}
+class_alias(SwaggerUiContext::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class);

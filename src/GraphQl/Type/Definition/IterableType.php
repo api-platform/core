@@ -133,6 +133,4 @@ final class IterableType extends ScalarType implements TypeInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class)) {
-    class_alias(IterableType::class, \ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class);
-}
+class_alias(IterableType::class, \ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class);

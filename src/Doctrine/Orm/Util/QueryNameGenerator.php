@@ -36,6 +36,4 @@ final class QueryNameGenerator implements QueryNameGeneratorInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator::class)) {
-    class_alias(QueryNameGenerator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator::class);
-}
+class_alias(QueryNameGenerator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator::class);

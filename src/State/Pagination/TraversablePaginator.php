@@ -71,6 +71,4 @@ final class TraversablePaginator implements \IteratorAggregate, PaginatorInterfa
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\DataProvider\TraversablePaginator::class)) {
-    class_alias(TraversablePaginator::class, \ApiPlatform\Core\DataProvider\TraversablePaginator::class);
-}
+class_alias(TraversablePaginator::class, \ApiPlatform\Core\DataProvider\TraversablePaginator::class);

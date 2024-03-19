@@ -74,6 +74,4 @@ final class DocumentMetadata
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata::class)) {
-    class_alias(DocumentMetadata::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata::class);
-}
+class_alias(DocumentMetadata::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata::class);

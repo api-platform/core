@@ -71,6 +71,4 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Serializer\SerializerFilterContextBuilder::class)) {
-    class_alias(SerializerFilterContextBuilder::class, \ApiPlatform\Core\Serializer\SerializerFilterContextBuilder::class);
-}
+class_alias(SerializerFilterContextBuilder::class, \ApiPlatform\Core\Serializer\SerializerFilterContextBuilder::class);

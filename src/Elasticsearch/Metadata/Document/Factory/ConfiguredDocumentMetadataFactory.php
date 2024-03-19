@@ -67,6 +67,4 @@ final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactory
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory::class)) {
-    class_alias(ConfiguredDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory::class);
-}
+class_alias(ConfiguredDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory::class);

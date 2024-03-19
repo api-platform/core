@@ -105,6 +105,4 @@ class ItemNormalizer extends AbstractItemNormalizer
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Serializer\ItemNormalizer::class)) {
-    class_alias(ItemNormalizer::class, \ApiPlatform\Core\Serializer\ItemNormalizer::class);
-}
+class_alias(ItemNormalizer::class, \ApiPlatform\Core\Serializer\ItemNormalizer::class);

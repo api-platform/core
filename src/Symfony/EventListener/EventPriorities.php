@@ -37,6 +37,4 @@ final class EventPriorities
     public const POST_RESPOND = 0;
 }
 
-if (!class_exists(\ApiPlatform\Core\EventListener\EventPriorities::class)) {
-    class_alias(EventPriorities::class, \ApiPlatform\Core\EventListener\EventPriorities::class);
-}
+class_alias(EventPriorities::class, \ApiPlatform\Core\EventListener\EventPriorities::class);

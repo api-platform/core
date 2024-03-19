@@ -35,6 +35,4 @@ final class FilterValidationException extends \Exception implements ExceptionInt
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Exception\FilterValidationException::class)) {
-    class_alias(FilterValidationException::class, \ApiPlatform\Core\Exception\FilterValidationException::class);
-}
+class_alias(FilterValidationException::class, \ApiPlatform\Core\Exception\FilterValidationException::class);

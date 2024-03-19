@@ -99,6 +99,4 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\JsonLd\Serializer\ObjectNormalizer::class)) {
-    class_alias(ObjectNormalizer::class, \ApiPlatform\Core\JsonLd\Serializer\ObjectNormalizer::class);
-}
+class_alias(ObjectNormalizer::class, \ApiPlatform\Core\JsonLd\Serializer\ObjectNormalizer::class);

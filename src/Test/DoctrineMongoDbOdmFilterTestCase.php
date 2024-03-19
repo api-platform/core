@@ -104,6 +104,4 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
     abstract public function provideApplyTestData(): array;
 }
 
-if (!class_exists(\ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class)) {
-    class_alias(DoctrineMongoDbOdmFilterTestCase::class, \ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class);
-}
+class_alias(DoctrineMongoDbOdmFilterTestCase::class, \ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class);

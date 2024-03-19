@@ -72,6 +72,4 @@ final class ValidationExceptionListener
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener::class)) {
-    class_alias(ValidationExceptionListener::class, \ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener::class);
-}
+class_alias(ValidationExceptionListener::class, \ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener::class);

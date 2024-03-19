@@ -122,6 +122,4 @@ final class JsonSchemaGenerateCommand extends Command
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\JsonSchema\Command\JsonSchemaGenerateCommand::class)) {
-    class_alias(JsonSchemaGenerateCommand::class, \ApiPlatform\Core\JsonSchema\Command\JsonSchemaGenerateCommand::class);
-}
+class_alias(JsonSchemaGenerateCommand::class, \ApiPlatform\Core\JsonSchema\Command\JsonSchemaGenerateCommand::class);

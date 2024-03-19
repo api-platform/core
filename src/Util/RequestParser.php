@@ -93,6 +93,4 @@ final class RequestParser
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Util\RequestParser::class)) {
-    class_alias(RequestParser::class, \ApiPlatform\Core\Util\RequestParser::class);
-}
+class_alias(RequestParser::class, \ApiPlatform\Core\Util\RequestParser::class);

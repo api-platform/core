@@ -76,6 +76,4 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer::class)) {
-    class_alias(ErrorNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer::class);
-}
+class_alias(ErrorNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer::class);
