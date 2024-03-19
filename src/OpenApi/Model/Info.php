@@ -128,6 +128,4 @@ final class Info
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Info::class)) {
-    class_alias(Info::class, \ApiPlatform\Core\OpenApi\Model\Info::class);
-}
+class_alias(Info::class, \ApiPlatform\Core\OpenApi\Model\Info::class);

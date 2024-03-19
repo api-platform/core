@@ -101,6 +101,4 @@ final class QueryParameterValidateListener
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\EventListener\QueryParameterValidateListener::class)) {
-    class_alias(QueryParameterValidateListener::class, \ApiPlatform\Core\EventListener\QueryParameterValidateListener::class);
-}
+class_alias(QueryParameterValidateListener::class, \ApiPlatform\Core\EventListener\QueryParameterValidateListener::class);

@@ -60,6 +60,4 @@ trait JsonLdContextTrait
     }
 }
 
-if (!trait_exists(\ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait::class)) {
-    class_alias(JsonLdContextTrait::class, \ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait::class);
-}
+class_alias(JsonLdContextTrait::class, \ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait::class);

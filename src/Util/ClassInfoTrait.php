@@ -60,6 +60,4 @@ trait ClassInfoTrait
     }
 }
 
-if (!trait_exists(\ApiPlatform\Core\Util\ClassInfoTrait::class)) {
-    class_alias(ClassInfoTrait::class, \ApiPlatform\Core\Util\ClassInfoTrait::class);
-}
+class_alias(ClassInfoTrait::class, \ApiPlatform\Core\Util\ClassInfoTrait::class);

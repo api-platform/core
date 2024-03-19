@@ -113,6 +113,4 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer::class)) {
-    class_alias(CollectionNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer::class);
-}
+class_alias(CollectionNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer::class);

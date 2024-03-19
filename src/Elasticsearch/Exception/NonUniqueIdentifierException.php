@@ -26,6 +26,4 @@ final class NonUniqueIdentifierException extends \Exception implements Exception
 {
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException::class)) {
-    class_alias(NonUniqueIdentifierException::class, \ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException::class);
-}
+class_alias(NonUniqueIdentifierException::class, \ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException::class);

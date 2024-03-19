@@ -98,6 +98,4 @@ final class AnnotationFilterPass implements CompilerPassInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass::class)) {
-    class_alias(AnnotationFilterPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass::class);
-}
+class_alias(AnnotationFilterPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass::class);

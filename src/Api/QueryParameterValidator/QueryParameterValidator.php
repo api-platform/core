@@ -65,6 +65,4 @@ class QueryParameterValidator
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Filter\QueryParameterValidator::class)) {
-    class_alias(QueryParameterValidator::class, \ApiPlatform\Core\Filter\QueryParameterValidator::class);
-}
+class_alias(QueryParameterValidator::class, \ApiPlatform\Core\Filter\QueryParameterValidator::class);

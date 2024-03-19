@@ -56,6 +56,4 @@ final class ApiPlatformBundle extends Bundle
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle::class)) {
-    class_alias(ApiPlatformBundle::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle::class);
-}
+class_alias(ApiPlatformBundle::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle::class);

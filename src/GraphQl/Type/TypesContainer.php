@@ -49,6 +49,4 @@ final class TypesContainer implements TypesContainerInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\GraphQl\Type\TypesContainer::class)) {
-    class_alias(TypesContainer::class, \ApiPlatform\Core\GraphQl\Type\TypesContainer::class);
-}
+class_alias(TypesContainer::class, \ApiPlatform\Core\GraphQl\Type\TypesContainer::class);

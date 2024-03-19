@@ -95,6 +95,4 @@ final class AttributesExtractor
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Util\AttributesExtractor::class)) {
-    class_alias(AttributesExtractor::class, \ApiPlatform\Core\Util\AttributesExtractor::class);
-}
+class_alias(AttributesExtractor::class, \ApiPlatform\Core\Util\AttributesExtractor::class);

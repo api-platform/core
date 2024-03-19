@@ -105,6 +105,4 @@ trait FieldDatatypeTrait
     }
 }
 
-if (!trait_exists(\ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait::class)) {
-    class_alias(FieldDatatypeTrait::class, \ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait::class);
-}
+class_alias(FieldDatatypeTrait::class, \ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait::class);

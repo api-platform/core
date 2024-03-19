@@ -17,6 +17,4 @@ class InvalidValueException extends InvalidArgumentException
 {
 }
 
-if (!class_exists(\ApiPlatform\Core\Exception\InvalidValueException::class)) {
-    class_alias(InvalidValueException::class, \ApiPlatform\Core\Exception\InvalidValueException::class);
-}
+class_alias(InvalidValueException::class, \ApiPlatform\Core\Exception\InvalidValueException::class);

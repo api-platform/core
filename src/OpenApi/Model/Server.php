@@ -68,6 +68,4 @@ final class Server
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Server::class)) {
-    class_alias(Server::class, \ApiPlatform\Core\OpenApi\Model\Server::class);
-}
+class_alias(Server::class, \ApiPlatform\Core\OpenApi\Model\Server::class);

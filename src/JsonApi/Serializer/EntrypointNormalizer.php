@@ -116,6 +116,4 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer::class)) {
-    class_alias(EntrypointNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer::class);
-}
+class_alias(EntrypointNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer::class);

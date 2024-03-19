@@ -22,6 +22,4 @@ class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }
 
-if (!class_exists(\ApiPlatform\Core\Exception\RuntimeException::class)) {
-    class_alias(RuntimeException::class, \ApiPlatform\Core\Exception\RuntimeException::class);
-}
+class_alias(RuntimeException::class, \ApiPlatform\Core\Exception\RuntimeException::class);

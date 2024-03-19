@@ -156,6 +156,4 @@ final class DenyAccessListener
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Security\EventListener\DenyAccessListener::class)) {
-    class_alias(DenyAccessListener::class, \ApiPlatform\Core\Security\EventListener\DenyAccessListener::class);
-}
+class_alias(DenyAccessListener::class, \ApiPlatform\Core\Security\EventListener\DenyAccessListener::class);

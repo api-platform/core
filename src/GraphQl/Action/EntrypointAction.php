@@ -227,6 +227,4 @@ final class EntrypointAction
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\GraphQl\Action\EntrypointAction::class)) {
-    class_alias(EntrypointAction::class, \ApiPlatform\Core\GraphQl\Action\EntrypointAction::class);
-}
+class_alias(EntrypointAction::class, \ApiPlatform\Core\GraphQl\Action\EntrypointAction::class);

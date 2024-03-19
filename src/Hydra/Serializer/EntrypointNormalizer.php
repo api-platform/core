@@ -115,6 +115,4 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer::class)) {
-    class_alias(EntrypointNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer::class);
-}
+class_alias(EntrypointNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer::class);

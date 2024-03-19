@@ -48,6 +48,4 @@ final class FilterPass implements CompilerPassInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass::class)) {
-    class_alias(FilterPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass::class);
-}
+class_alias(FilterPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass::class);

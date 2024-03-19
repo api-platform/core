@@ -208,6 +208,4 @@ trait ApiTestAssertionsTrait
     }
 }
 
-if (!trait_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestAssertionsTrait::class)) {
-    class_alias(ApiTestAssertionsTrait::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestAssertionsTrait::class);
-}
+class_alias(ApiTestAssertionsTrait::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestAssertionsTrait::class);

@@ -147,6 +147,4 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     abstract protected function getItemsData($object, string $format = null, array $context = []): array;
 }
 
-if (!class_exists(\ApiPlatform\Core\Serializer\AbstractCollectionNormalizer::class)) {
-    class_alias(AbstractCollectionNormalizer::class, \ApiPlatform\Core\Serializer\AbstractCollectionNormalizer::class);
-}
+class_alias(AbstractCollectionNormalizer::class, \ApiPlatform\Core\Serializer\AbstractCollectionNormalizer::class);

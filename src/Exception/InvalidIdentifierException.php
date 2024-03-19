@@ -22,6 +22,4 @@ final class InvalidIdentifierException extends \Exception implements ExceptionIn
 {
 }
 
-if (!class_exists(\ApiPlatform\Core\Exception\InvalidIdentifierException::class)) {
-    class_alias(InvalidIdentifierException::class, \ApiPlatform\Core\Exception\InvalidIdentifierException::class);
-}
+class_alias(InvalidIdentifierException::class, \ApiPlatform\Core\Exception\InvalidIdentifierException::class);

@@ -22,6 +22,4 @@ class ResourceClassNotSupportedException extends \Exception implements Exception
 {
 }
 
-if (!class_exists(\ApiPlatform\Core\Exception\ResourceClassNotSupportedException::class)) {
-    class_alias(ResourceClassNotSupportedException::class, \ApiPlatform\Core\Exception\ResourceClassNotSupportedException::class);
-}
+class_alias(ResourceClassNotSupportedException::class, \ApiPlatform\Core\Exception\ResourceClassNotSupportedException::class);

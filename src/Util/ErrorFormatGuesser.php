@@ -54,6 +54,4 @@ final class ErrorFormatGuesser
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Util\ErrorFormatGuesser::class)) {
-    class_alias(ErrorFormatGuesser::class, \ApiPlatform\Core\Util\ErrorFormatGuesser::class);
-}
+class_alias(ErrorFormatGuesser::class, \ApiPlatform\Core\Util\ErrorFormatGuesser::class);

@@ -44,6 +44,4 @@ final class GraphQlTypePass implements CompilerPassInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass::class)) {
-    class_alias(GraphQlTypePass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass::class);
-}
+class_alias(GraphQlTypePass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass::class);

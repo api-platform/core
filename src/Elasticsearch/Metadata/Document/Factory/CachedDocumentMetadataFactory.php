@@ -76,6 +76,4 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory::class)) {
-    class_alias(CachedDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory::class);
-}
+class_alias(CachedDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory::class);

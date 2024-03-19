@@ -175,6 +175,4 @@ final class OpenApi implements DocumentationInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\OpenApi::class)) {
-    class_alias(OpenApi::class, \ApiPlatform\Core\OpenApi\OpenApi::class);
-}
+class_alias(OpenApi::class, \ApiPlatform\Core\OpenApi\OpenApi::class);

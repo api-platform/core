@@ -34,6 +34,4 @@ final class SwaggerUiListener
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener::class)) {
-    class_alias(SwaggerUiListener::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener::class);
-}
+class_alias(SwaggerUiListener::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener::class);

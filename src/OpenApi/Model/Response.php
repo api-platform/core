@@ -83,6 +83,4 @@ final class Response
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Response::class)) {
-    class_alias(Response::class, \ApiPlatform\Core\OpenApi\Model\Response::class);
-}
+class_alias(Response::class, \ApiPlatform\Core\OpenApi\Model\Response::class);

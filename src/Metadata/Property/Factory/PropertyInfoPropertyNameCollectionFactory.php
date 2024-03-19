@@ -40,6 +40,4 @@ final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCol
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class)) {
-    class_alias(PropertyInfoPropertyNameCollectionFactory::class, \ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class);
-}
+class_alias(PropertyInfoPropertyNameCollectionFactory::class, \ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class);

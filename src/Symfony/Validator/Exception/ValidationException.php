@@ -55,6 +55,4 @@ final class ValidationException extends BaseValidationException implements Const
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException::class)) {
-    class_alias(ValidationException::class, \ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException::class);
-}
+class_alias(ValidationException::class, \ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException::class);

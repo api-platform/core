@@ -36,6 +36,4 @@ final class EntrypointAction
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Action\EntrypointAction::class)) {
-    class_alias(EntrypointAction::class, \ApiPlatform\Core\Action\EntrypointAction::class);
-}
+class_alias(EntrypointAction::class, \ApiPlatform\Core\Action\EntrypointAction::class);

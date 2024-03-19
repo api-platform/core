@@ -49,6 +49,4 @@ final class TypesFactory implements TypesFactoryInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\GraphQl\Type\TypesFactory::class)) {
-    class_alias(TypesFactory::class, \ApiPlatform\Core\GraphQl\Type\TypesFactory::class);
-}
+class_alias(TypesFactory::class, \ApiPlatform\Core\GraphQl\Type\TypesFactory::class);

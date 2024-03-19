@@ -26,6 +26,4 @@ final class IndexNotFoundException extends \Exception implements ExceptionInterf
 {
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException::class)) {
-    class_alias(IndexNotFoundException::class, \ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException::class);
-}
+class_alias(IndexNotFoundException::class, \ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException::class);

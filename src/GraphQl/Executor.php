@@ -30,6 +30,4 @@ final class Executor implements ExecutorInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\GraphQl\Executor::class)) {
-    class_alias(Executor::class, \ApiPlatform\Core\GraphQl\Executor::class);
-}
+class_alias(Executor::class, \ApiPlatform\Core\GraphQl\Executor::class);

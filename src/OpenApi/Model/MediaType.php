@@ -83,6 +83,4 @@ final class MediaType
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\Model\MediaType::class)) {
-    class_alias(MediaType::class, \ApiPlatform\Core\OpenApi\Model\MediaType::class);
-}
+class_alias(MediaType::class, \ApiPlatform\Core\OpenApi\Model\MediaType::class);

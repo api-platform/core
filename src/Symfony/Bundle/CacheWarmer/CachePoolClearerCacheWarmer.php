@@ -55,6 +55,4 @@ final class CachePoolClearerCacheWarmer implements CacheWarmerInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\CacheWarmer\CachePoolClearerCacheWarmer::class)) {
-    class_alias(CachePoolClearerCacheWarmer::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\CacheWarmer\CachePoolClearerCacheWarmer::class);
-}
+class_alias(CachePoolClearerCacheWarmer::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\CacheWarmer\CachePoolClearerCacheWarmer::class);

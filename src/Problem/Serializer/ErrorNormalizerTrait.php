@@ -54,6 +54,4 @@ trait ErrorNormalizerTrait
     }
 }
 
-if (!trait_exists(\ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait::class)) {
-    class_alias(ErrorNormalizerTrait::class, \ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait::class);
-}
+class_alias(ErrorNormalizerTrait::class, \ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait::class);

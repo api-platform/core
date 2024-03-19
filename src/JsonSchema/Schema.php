@@ -130,6 +130,4 @@ final class Schema extends \ArrayObject
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\JsonSchema\Schema::class)) {
-    class_alias(Schema::class, \ApiPlatform\Core\JsonSchema\Schema::class);
-}
+class_alias(Schema::class, \ApiPlatform\Core\JsonSchema\Schema::class);

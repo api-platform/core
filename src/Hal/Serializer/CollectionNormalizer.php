@@ -101,6 +101,4 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Hal\Serializer\CollectionNormalizer::class)) {
-    class_alias(CollectionNormalizer::class, \ApiPlatform\Core\Hal\Serializer\CollectionNormalizer::class);
-}
+class_alias(CollectionNormalizer::class, \ApiPlatform\Core\Hal\Serializer\CollectionNormalizer::class);

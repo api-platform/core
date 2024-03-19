@@ -26,6 +26,4 @@ final class NotFoundAction
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Action\NotFoundAction::class)) {
-    class_alias(NotFoundAction::class, \ApiPlatform\Core\Action\NotFoundAction::class);
-}
+class_alias(NotFoundAction::class, \ApiPlatform\Core\Action\NotFoundAction::class);

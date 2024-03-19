@@ -40,6 +40,4 @@ final class TypeNotFoundException extends \InvalidArgumentException implements N
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\GraphQl\Type\TypeNotFoundException::class)) {
-    class_alias(TypeNotFoundException::class, \ApiPlatform\Core\GraphQl\Type\TypeNotFoundException::class);
-}
+class_alias(TypeNotFoundException::class, \ApiPlatform\Core\GraphQl\Type\TypeNotFoundException::class);

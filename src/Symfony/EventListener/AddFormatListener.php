@@ -189,6 +189,4 @@ final class AddFormatListener
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\EventListener\AddFormatListener::class)) {
-    class_alias(AddFormatListener::class, \ApiPlatform\Core\EventListener\AddFormatListener::class);
-}
+class_alias(AddFormatListener::class, \ApiPlatform\Core\EventListener\AddFormatListener::class);

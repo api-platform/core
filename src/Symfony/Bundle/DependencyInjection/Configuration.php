@@ -678,6 +678,4 @@ final class Configuration implements ConfigurationInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration::class)) {
-    class_alias(Configuration::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration::class);
-}
+class_alias(Configuration::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration::class);

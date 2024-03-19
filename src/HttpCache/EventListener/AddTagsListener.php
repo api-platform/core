@@ -107,6 +107,4 @@ final class AddTagsListener
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\HttpCache\EventListener\AddTagsListener::class)) {
-    class_alias(AddTagsListener::class, \ApiPlatform\Core\HttpCache\EventListener\AddTagsListener::class);
-}
+class_alias(AddTagsListener::class, \ApiPlatform\Core\HttpCache\EventListener\AddTagsListener::class);

@@ -143,6 +143,4 @@ final class SecurityScheme
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\OpenApi\Model\SecurityScheme::class)) {
-    class_alias(SecurityScheme::class, \ApiPlatform\Core\OpenApi\Model\SecurityScheme::class);
-}
+class_alias(SecurityScheme::class, \ApiPlatform\Core\OpenApi\Model\SecurityScheme::class);

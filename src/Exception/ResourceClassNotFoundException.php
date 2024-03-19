@@ -22,6 +22,4 @@ class ResourceClassNotFoundException extends \Exception implements ExceptionInte
 {
 }
 
-if (!class_exists(\ApiPlatform\Core\Exception\ResourceClassNotFoundException::class)) {
-    class_alias(ResourceClassNotFoundException::class, \ApiPlatform\Core\Exception\ResourceClassNotFoundException::class);
-}
+class_alias(ResourceClassNotFoundException::class, \ApiPlatform\Core\Exception\ResourceClassNotFoundException::class);

@@ -76,6 +76,4 @@ final class ArrayPaginator implements \IteratorAggregate, PaginatorInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\DataProvider\ArrayPaginator::class)) {
-    class_alias(ArrayPaginator::class, \ApiPlatform\Core\DataProvider\ArrayPaginator::class);
-}
+class_alias(ArrayPaginator::class, \ApiPlatform\Core\DataProvider\ArrayPaginator::class);

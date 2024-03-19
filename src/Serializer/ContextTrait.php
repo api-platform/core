@@ -32,6 +32,4 @@ trait ContextTrait
     }
 }
 
-if (!trait_exists(\ApiPlatform\Core\Serializer\ContextTrait::class)) {
-    class_alias(ContextTrait::class, \ApiPlatform\Core\Serializer\ContextTrait::class);
-}
+class_alias(ContextTrait::class, \ApiPlatform\Core\Serializer\ContextTrait::class);

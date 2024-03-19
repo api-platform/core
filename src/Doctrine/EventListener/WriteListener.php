@@ -83,6 +83,4 @@ final class WriteListener
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener::class)) {
-    class_alias(WriteListener::class, \ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener::class);
-}
+class_alias(WriteListener::class, \ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener::class);
