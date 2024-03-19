@@ -34,6 +34,6 @@ final class Pattern implements ValidatorInterface
     }
 }
 
-if (!class_exists(\ApiPlatform\Core\Filter\Validator\Pattern::class)) {
+if (!class_exists()) {
     class_alias(Pattern::class, \ApiPlatform\Core\Filter\Validator\Pattern::class);
 }
