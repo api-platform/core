@@ -211,4 +211,6 @@ final class Operation
     }
 }
 
-class_alias(Operation::class, \ApiPlatform\Core\OpenApi\Model\Operation::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Operation::class, false)) {
+    class_alias(Operation::class, \ApiPlatform\Core\OpenApi\Model\Operation::class);
+}

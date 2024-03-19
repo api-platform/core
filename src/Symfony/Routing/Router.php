@@ -93,4 +93,6 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     }
 }
 
-class_alias(Router::class, \ApiPlatform\Core\Bridge\Symfony\Routing\Router::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Routing\Router::class, false)) {
+    class_alias(Router::class, \ApiPlatform\Core\Bridge\Symfony\Routing\Router::class);
+}

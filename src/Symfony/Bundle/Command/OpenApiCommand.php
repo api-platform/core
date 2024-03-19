@@ -94,4 +94,6 @@ final class OpenApiCommand extends Command
     }
 }
 
-class_alias(OpenApiCommand::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Command\OpenApiCommand::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\Command\OpenApiCommand::class, false)) {
+    class_alias(OpenApiCommand::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Command\OpenApiCommand::class);
+}

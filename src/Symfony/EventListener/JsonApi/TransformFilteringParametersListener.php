@@ -42,4 +42,6 @@ final class TransformFilteringParametersListener
     }
 }
 
-class_alias(TransformFilteringParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformFilteringParametersListener::class);
+if (!class_exists(\ApiPlatform\Core\JsonApi\EventListener\TransformFilteringParametersListener::class, false)) {
+    class_alias(TransformFilteringParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformFilteringParametersListener::class);
+}

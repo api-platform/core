@@ -170,4 +170,6 @@ final class DeserializeListener
     }
 }
 
-class_alias(DeserializeListener::class, \ApiPlatform\Core\EventListener\DeserializeListener::class);
+if (!class_exists(\ApiPlatform\Core\EventListener\DeserializeListener::class, false)) {
+    class_alias(DeserializeListener::class, \ApiPlatform\Core\EventListener\DeserializeListener::class);
+}

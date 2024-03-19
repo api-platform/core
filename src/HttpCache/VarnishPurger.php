@@ -132,4 +132,6 @@ final class VarnishPurger implements PurgerInterface
     }
 }
 
-class_alias(VarnishPurger::class, \ApiPlatform\Core\HttpCache\VarnishPurger::class);
+if (!class_exists(\ApiPlatform\Core\HttpCache\VarnishPurger::class, false)) {
+    class_alias(VarnishPurger::class, \ApiPlatform\Core\HttpCache\VarnishPurger::class);
+}

@@ -113,4 +113,6 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
     }
 }
 
-class_alias(ResourceAccessChecker::class, \ApiPlatform\Core\Security\ResourceAccessChecker::class);
+if (!class_exists(\ApiPlatform\Core\Security\ResourceAccessChecker::class, false)) {
+    class_alias(ResourceAccessChecker::class, \ApiPlatform\Core\Security\ResourceAccessChecker::class);
+}

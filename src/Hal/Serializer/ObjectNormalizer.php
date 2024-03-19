@@ -100,4 +100,6 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
     }
 }
 
-class_alias(ObjectNormalizer::class, \ApiPlatform\Core\Hal\Serializer\ObjectNormalizer::class);
+if (!class_exists(\ApiPlatform\Core\Hal\Serializer\ObjectNormalizer::class, false)) {
+    class_alias(ObjectNormalizer::class, \ApiPlatform\Core\Hal\Serializer\ObjectNormalizer::class);
+}

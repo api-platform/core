@@ -98,4 +98,6 @@ final class Link
     }
 }
 
-class_alias(Link::class, \ApiPlatform\Core\OpenApi\Model\Link::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Link::class, false)) {
+    class_alias(Link::class, \ApiPlatform\Core\OpenApi\Model\Link::class);
+}

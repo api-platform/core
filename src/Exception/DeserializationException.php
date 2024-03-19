@@ -25,4 +25,6 @@ class DeserializationException extends \Exception implements ExceptionInterface,
 {
 }
 
-class_alias(DeserializationException::class, \ApiPlatform\Core\Exception\DeserializationException::class);
+if (!class_exists(\ApiPlatform\Core\Exception\DeserializationException::class, false)) {
+    class_alias(DeserializationException::class, \ApiPlatform\Core\Exception\DeserializationException::class);
+}

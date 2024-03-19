@@ -95,4 +95,6 @@ final class DocumentationAction
     }
 }
 
-class_alias(DocumentationAction::class, \ApiPlatform\Core\Documentation\Action\DocumentationAction::class);
+if (!class_exists(\ApiPlatform\Core\Documentation\Action\DocumentationAction::class, false)) {
+    class_alias(DocumentationAction::class, \ApiPlatform\Core\Documentation\Action\DocumentationAction::class);
+}

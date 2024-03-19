@@ -33,4 +33,6 @@ final class DashPathSegmentNameGenerator implements PathSegmentNameGeneratorInte
     }
 }
 
-class_alias(DashPathSegmentNameGenerator::class, \ApiPlatform\Core\Operation\DashPathSegmentNameGenerator::class);
+if (!class_exists(\ApiPlatform\Core\Operation\DashPathSegmentNameGenerator::class, false)) {
+    class_alias(DashPathSegmentNameGenerator::class, \ApiPlatform\Core\Operation\DashPathSegmentNameGenerator::class);
+}

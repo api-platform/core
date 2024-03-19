@@ -35,4 +35,6 @@ final class Entrypoint
     }
 }
 
-class_alias(Entrypoint::class, \ApiPlatform\Core\Api\Entrypoint::class);
+if (!class_exists(\ApiPlatform\Core\Api\Entrypoint::class, false)) {
+    class_alias(Entrypoint::class, \ApiPlatform\Core\Api\Entrypoint::class);
+}

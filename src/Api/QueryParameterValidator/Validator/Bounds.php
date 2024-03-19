@@ -47,4 +47,6 @@ final class Bounds implements ValidatorInterface
     }
 }
 
-class_alias(Bounds::class, \ApiPlatform\Core\Filter\Validator\Bounds::class);
+if (!class_exists(\ApiPlatform\Core\Filter\Validator\Bounds::class, false)) {
+    class_alias(Bounds::class, \ApiPlatform\Core\Filter\Validator\Bounds::class);
+}

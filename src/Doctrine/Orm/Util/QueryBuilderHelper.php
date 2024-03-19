@@ -219,4 +219,6 @@ final class QueryBuilderHelper
     }
 }
 
-class_alias(QueryBuilderHelper::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper::class, false)) {
+    class_alias(QueryBuilderHelper::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper::class);
+}

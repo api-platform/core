@@ -35,4 +35,6 @@ final class Paths
     }
 }
 
-class_alias(Paths::class, \ApiPlatform\Core\OpenApi\Model\Paths::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Paths::class, false)) {
+    class_alias(Paths::class, \ApiPlatform\Core\OpenApi\Model\Paths::class);
+}

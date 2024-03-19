@@ -24,4 +24,6 @@ final class RemoveStamp implements StampInterface
 {
 }
 
-class_alias(RemoveStamp::class, \ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp::class, false)) {
+    class_alias(RemoveStamp::class, \ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp::class);
+}

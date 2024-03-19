@@ -262,4 +262,6 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     }
 }
 
-class_alias(ContextBuilder::class, \ApiPlatform\Core\JsonLd\ContextBuilder::class);
+if (!class_exists(\ApiPlatform\Core\JsonLd\ContextBuilder::class, false)) {
+    class_alias(ContextBuilder::class, \ApiPlatform\Core\JsonLd\ContextBuilder::class);
+}

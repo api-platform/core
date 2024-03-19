@@ -54,4 +54,6 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     }
 }
 
-class_alias(ConstraintViolationListNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer::class);
+if (!class_exists(\ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer::class, false)) {
+    class_alias(ConstraintViolationListNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer::class);
+}
