@@ -54,7 +54,10 @@ class SchemaFactoryTest extends TestCase
             null,
             $resourceMetadataFactoryCollection->reveal(),
             $propertyNameCollectionFactory->reveal(),
-            $propertyMetadataFactory->reveal()
+            $propertyMetadataFactory->reveal(),
+            null,
+            null,
+            ['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true],
         );
 
         $this->schemaFactory = new SchemaFactory($baseSchemaFactory);
