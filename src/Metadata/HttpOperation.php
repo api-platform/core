@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\WebLink\Link as WebLink;
@@ -150,7 +151,7 @@ class HttpOperation extends Operation
         protected ?array $paginationViaCursor = null,
         protected ?array $hydraContext = null,
         protected ?array $openapiContext = null, // TODO Remove in 4.0
-        protected bool|OpenApiOperation|null $openapi = null,
+        protected bool|OpenApiOperation|Webhook|null $openapi = null,
         protected ?array $exceptionToStatus = null,
         protected ?bool $queryParameterValidationEnabled = null,
         protected ?array $links = null,
@@ -578,12 +579,12 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    public function getOpenapi(): bool|OpenApiOperation|null
+    public function getOpenapi(): bool|OpenApiOperation|Webhook|null
     {
         return $this->openapi;
     }
 
-    public function withOpenapi(bool|OpenApiOperation $openapi): self
+    public function withOpenapi(bool|OpenApiOperation|Webhook $openapi): self
     {
         $self = clone $this;
         $self->openapi = $openapi;
