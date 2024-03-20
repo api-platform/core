@@ -69,6 +69,7 @@ Feature: Documentation support
     And the value of the node "hydra:property.domain" of the property "name" of the Hydra class "Dummy" is "#Dummy"
     And the value of the node "hydra:property.range" of the property "name" of the Hydra class "Dummy" is "xmls:string"
     And the value of the node "hydra:property.range" of the property "relatedDummy" of the Hydra class "Dummy" is "https://schema.org/Product"
+    And the value of the node "hydra:property.owl:maxCardinality" of the property "relatedDummy" of the Hydra class "Dummy" is "1"
     And the value of the node "hydra:property.range" of the property "relatedDummies" of the Hydra class "Dummy" is "https://schema.org/Product"
     And the value of the node "hydra:title" of the property "name" of the Hydra class "Dummy" is "name"
     And the value of the node "hydra:description" of the property "name" of the Hydra class "Dummy" is "The dummy name"
@@ -84,6 +85,6 @@ Feature: Documentation support
     And the value of the node "returns" of the operation "DELETE" of the Hydra class "Dummy" is "owl:Nothing"
     # Deprecations
     And the boolean value of the node "owl:deprecated" of the Hydra class "DeprecatedResource" is true
-    And the boolean value of the node "owl:deprecated" of the property "deprecatedField" of the Hydra class "DeprecatedResource" is true
+    And the boolean value of the node "hydra:property.owl:deprecated" of the property "deprecatedField" of the Hydra class "DeprecatedResource" is true
     And the boolean value of the node "owl:deprecated" of the property "The collection of DeprecatedResource resources" of the Hydra class "The API entrypoint" is true
     And the boolean value of the node "owl:deprecated" of the operation "GET" of the Hydra class "DeprecatedResource" is true
