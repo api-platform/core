@@ -505,6 +505,18 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'domain' => $prefixedShortName,
         ];
 
+        if ($propertyMetadata->getDeprecationReason()) {
+            $propertyData['owl:deprecated'] = true;
+        }
+
+        if ($this->isSingleRelation($propertyMetadata)) {
+            $propertyData['owl:maxCardinality'] = 1;
+        }
+
+        if (null !== $range = $this->getRange($propertyMetadata)) {
+            $propertyData['range'] = $range;
+        }
+
         $property = [
             '@type' => 'hydra:SupportedProperty',
             'hydra:property' => $propertyData,
@@ -514,20 +526,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'hydra:writeable' => $propertyMetadata->isWritable() || $propertyMetadata->isInitializable(),
         ];
 
-        if (null !== $range = $this->getRange($propertyMetadata)) {
-            $property['hydra:property']['range'] = $range;
-        }
-
         if (null !== $description = $propertyMetadata->getDescription()) {
             $property['hydra:description'] = $description;
-        }
-
-        if ($propertyMetadata->getDeprecationReason()) {
-            $property['owl:deprecated'] = true;
-        }
-
-        if ($this->isSingleRelation($propertyMetadata)) {
-            $property['owl:maxCardinality'] = true;
         }
 
         return $property;
