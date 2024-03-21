@@ -24,7 +24,7 @@ use ApiPlatform\Metadata\Operation;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Jachim Coudenys <jachimcoudenys@gmail.com>
  */
-final class SchemaFactory implements SchemaFactoryInterface
+final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     private const HREF_PROP = [
         'href' => [
@@ -128,5 +128,12 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         return $schema;
+    }
+
+    public function setSchemaFactory(SchemaFactoryInterface $schemaFactory): void
+    {
+        if ($this->schemaFactory instanceof SchemaFactoryAwareInterface) {
+            $this->schemaFactory->setSchemaFactory($schemaFactory);
+        }
     }
 }
