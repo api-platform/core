@@ -81,6 +81,21 @@ api_platform:
         form: ['multipart/form-data']
 ```
 
+## v3.2.17
+
+### Bug fixes
+
+* [2819d56c8](https://github.com/api-platform/core/commit/2819d56c80f39a53f2e3d5fd7119566ad96b4075) fix(hydra): hydra:view with absolute iris (#6208)
+* [98f4b8fca](https://github.com/api-platform/core/commit/98f4b8fcab39b1d09110cc133206e27782ea4791) fix(metadata): Operations priority sort (#6206)
+* [a1309bbf2](https://github.com/api-platform/core/commit/a1309bbf2f678081a82290818a91f0a376b3c94c) fix(serializer): skip symfony validation exception (#6220)
+
+## v3.2.16
+
+### Bug fixes
+
+* [56744dcfa](https://github.com/api-platform/core/commit/56744dcfa07f79ca58926cb199356e849ddb3a93) fix(serializer): fix union types on collection denormalization (#6192)
+* [d8e2d0c5e](https://github.com/api-platform/core/commit/d8e2d0c5e9b48c15d60a734086b0102b6ecf95c8) fix(doctrine): doctrine/orm:^3.0 support (#6193)
+* [f891f16d5](https://github.com/api-platform/core/commit/f891f16d50b665f25e4699291526161e16ce0fa7) fix(doctrine): isAssociationInverseSide before getMappedBy (#6197)
 
 ## v3.2.15
 
@@ -92,7 +107,6 @@ api_platform:
 * [8535f9def](https://github.com/api-platform/core/commit/8535f9def6fbd2baff9cedc79c34103940eb4fca) fix(doctrine): read parent class properties on PUT (#6176)
 * [a188c9473](https://github.com/api-platform/core/commit/a188c947396e0400ba6e1aadaa262d2e785fd941) fix(symfony): autoconfigure legacy alias fixes #6177 (#6181)
 * [e7b442149](https://github.com/api-platform/core/commit/e7b4421496b58f7c3db414d11dd357a8dc759323) fix(validator): stop considering properties marked with NotBlank(allowNull=true) as required (#6184)
->>>>>>> upstream/3.2
 
 ## v3.2.14
 

@@ -34,7 +34,7 @@ class DoctrineMongoDbOdmTestCase extends TestCase
         $config->setHydratorDir(sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setHydratorNamespace('SymfonyTests\Doctrine');
-        $config->setMetadataDriverImpl(new AttributeDriver($paths, new AttributeReader()));
+        $config->setMetadataDriverImpl(new AttributeDriver($paths, class_exists(\Doctrine\Common\Annotations\Reader::class) ? new AttributeReader() : null)); // @phpstan-ignore-line type is only documented as phpdoc
         $config->setMetadataCache(new ArrayAdapter());
 
         return DocumentManager::create(null, $config);

@@ -88,7 +88,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 $operations->add($operation->getName(), $operation);
             }
 
-            $resource = $resource->withOperations($operations->sort());
+            $resource = $resource->withOperations($operations);
             $resourceMetadataCollection[$i] = $resource;
         }
 

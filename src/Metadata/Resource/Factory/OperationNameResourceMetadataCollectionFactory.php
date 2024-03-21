@@ -56,7 +56,7 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
                 $operations->remove($operationName)->add($newOperationName, $operation->withName($newOperationName));
             }
 
-            $resourceMetadataCollection[$i] = $resource->withOperations($operations->sort());
+            $resourceMetadataCollection[$i] = $resource->withOperations($operations);
         }
 
         return $resourceMetadataCollection;

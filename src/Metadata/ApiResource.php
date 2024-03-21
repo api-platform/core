@@ -1020,6 +1020,7 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->operations = $operations;
+        $self->operations->sort();
 
         return $self;
     }

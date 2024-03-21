@@ -576,10 +576,10 @@ Feature: Collections support
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Bgt%5D=10$"},
+            "@id": {"pattern": "^/so_manies\\?id%5Bgt%5D=10&order%5Bid%5D=desc$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"},
-            "hydra:previous": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Bgt%5D=13$"},
-            "hydra:next": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Blt%5D=10$"}
+            "hydra:previous": {"pattern": "^/so_manies\\?id%5Bgt%5D=13&order%5Bid%5D=desc$"},
+            "hydra:next": {"pattern": "^/so_manies\\?id%5Blt%5D=10&order%5Bid%5D=desc$"}
           },
           "additionalProperties": false
         }
