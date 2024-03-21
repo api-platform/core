@@ -81,7 +81,7 @@ class OpenApiFactoryTest extends TestCase
             'class' => OutputDto::class,
         ])->withPaginationClientItemsPerPage(true)->withShortName('Dummy')->withDescription('This is a dummy');
         $dummyResourceWebhook = (new ApiResource())->withOperations(new Operations([
-            'dummy webhook' => (new Get())->withUriTemplate('/dummy/{id}')->withShortName('short')->withOpenapi(new Webhook('happy webhook')),
+            'dummy webhook' => (new Get())->withUriTemplate('/dummy/{id}')->withShortName('short')->withOpenapi(new Webhook('first webhook')),
             'an other dummy webhook' => (new Post())->withUriTemplate('/dummies')->withShortName('short something')->withOpenapi(new Webhook('happy webhook', new Model\PathItem(post: new Operation(
                 summary: 'well...',
                 description: 'I dont\'t know what to say',
@@ -492,14 +492,10 @@ class OpenApiFactoryTest extends TestCase
         $this->assertEquals($openApi->getServers(), [new Server('/app_dev.php/')]);
 
         $webhooks = $openApi->getWebhooks();
-        $this->assertCount(1, $webhooks);
+        $this->assertCount(2, $webhooks);
 
-        $this->assertNotNull($webhooks['happy webhook']);
-        $this->assertCount(2, $webhooks['happy webhook']);
-
-        $firstOperationWebhook = $webhooks['happy webhook'][0];
-        $secondOperationWebhook = $webhooks['happy webhook'][1];
-
+        $firstOperationWebhook = $webhooks['first webhook'];
+        $secondOperationWebhook = $webhooks['happy webhook'];
         $this->assertSame('dummy webhook', $firstOperationWebhook->getGet()->getOperationId());
         $this->assertSame('an other dummy webhook', $secondOperationWebhook->getPost()->getOperationId());
         $this->assertSame('I dont\'t know what to say', $secondOperationWebhook->getPost()->getDescription());

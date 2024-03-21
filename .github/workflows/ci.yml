@@ -383,8 +383,8 @@ jobs:
           node-version: '14'
       - name: Validate OpenAPI documents
         run: |
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
+          npx swagger-cli validate build/out/openapi/openapi_v3.json
+          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -1212,8 +1212,8 @@ jobs:
           node-version: '14'
       - name: Validate OpenAPI documents
         run: |
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
+          npx swagger-cli validate build/out/openapi/openapi_v3.json
+          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -1281,8 +1281,8 @@ jobs:
           node-version: '14'
       - name: Validate OpenAPI documents
         run: |
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
+          npx swagger-cli validate build/out/openapi/openapi_v3.json
+          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v4

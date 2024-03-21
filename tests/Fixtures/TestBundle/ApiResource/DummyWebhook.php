@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -19,10 +19,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\PathItem;
-use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(operations: [new Get(openapi: new Webhook(
-    name: 'webhook',
+    name: 'a',
     pathItem: new PathItem(
         get: new Operation(
             summary: 'Something else here',
@@ -30,7 +29,7 @@ use Doctrine\ORM\Mapping as ORM;
         ),
     )
 )), new Post(openapi: new Webhook(
-    name: 'webhook',
+    name: 'b',
     pathItem: new PathItem(
         post: new Operation(
             summary: 'Something else here',
@@ -39,14 +38,7 @@ use Doctrine\ORM\Mapping as ORM;
     )
 )),
 ])]
-#[ORM\Entity]
 class DummyWebhook
 {
-    /**
-     * @var int|null The id
-     */
-    #[ORM\Column(type: 'integer', nullable: true)]
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    public $id;
 }
