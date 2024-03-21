@@ -405,10 +405,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             if ($openapiAttribute instanceof Webhook) {
-                if (!isset($webhooks[$openapiAttribute->getName()])) {
-                    $webhooks[$openapiAttribute->getName()] = new \ArrayObject();
-                }
-                $webhooks[$openapiAttribute->getName()]->append($pathItem->{'with'.ucfirst($method)}($openapiOperation));
+                $webhooks[$openapiAttribute->getName()] = $pathItem->{'with'.ucfirst($method)}($openapiOperation);
             } else {
                 $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
             }

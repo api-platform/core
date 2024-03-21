@@ -117,8 +117,8 @@ Feature: Documentation support
     And the JSON node "paths./dummy_cars.get.parameters[8].description" should be equal to "Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: foobar[]={propertyName}&foobar[]={anotherPropertyName}&foobar[{nestedPropertyParent}][]={nestedProperty}"
 
     # Webhook
-    And the JSON node "webhooks.webhook[0].get.description" should be equal to "Something else here for example"
-    And the JSON node "webhooks.webhook[1].post.description" should be equal to "Hi! it's me, I'm the problem, it's me"
+    And the JSON node "webhooks.a.get.description" should be equal to "Something else here for example"
+    And the JSON node "webhooks.b.post.description" should be equal to "Hi! it's me, I'm the problem, it's me"
 
     # Subcollection - check filter on subResource
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[0].name" should be equal to "id"
