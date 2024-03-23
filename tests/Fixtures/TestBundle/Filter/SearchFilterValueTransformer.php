@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Doctrine\Orm\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
@@ -23,7 +24,9 @@ final class SearchFilterValueTransformer implements FilterInterface
 {
     public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] readonly FilterInterface $searchFilter, ?array $properties = null, private readonly ?string $key = null)
     {
-        $searchFilter->setProperties($properties);
+        if ($searchFilter instanceof PropertyAwareFilterInterface) {
+            $searchFilter->setProperties($properties);
+        }
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)

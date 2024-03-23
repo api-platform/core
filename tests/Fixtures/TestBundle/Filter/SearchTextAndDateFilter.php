@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Doctrine\Orm\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
@@ -23,8 +24,12 @@ final class SearchTextAndDateFilter implements FilterInterface
 {
     public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] readonly FilterInterface $searchFilter, #[Autowire('@api_platform.doctrine.orm.date_filter.instance')] readonly FilterInterface $dateFilter, protected ?array $properties = null, array $dateFilterProperties = [], array $searchFilterProperties = [])
     {
-        $searchFilter->setProperties($searchFilterProperties);
-        $dateFilter->setProperties($dateFilterProperties);
+        if ($searchFilter instanceof PropertyAwareFilterInterface) {
+            $searchFilter->setProperties($searchFilterProperties);
+        }
+        if ($dateFilter instanceof PropertyAwareFilterInterface) {
+            $dateFilter->setProperties($dateFilterProperties);
+        }
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)

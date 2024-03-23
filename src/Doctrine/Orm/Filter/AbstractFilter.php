@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-abstract class AbstractFilter implements FilterInterface
+abstract class AbstractFilter implements PropertyAwareFilterInterface
 {
     use OrmPropertyHelperTrait;
     use PropertyHelperTrait;
