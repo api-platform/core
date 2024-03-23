@@ -498,22 +498,22 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $iri = "#$shortName/$propertyName";
         }
 
-        $propertyData = [
+        $propertyData = ($propertyMetadata->getJsonldContext()['hydra:property'] ?? []) + [
             '@id' => $iri,
             '@type' => false === $propertyMetadata->isReadableLink() ? 'hydra:Link' : 'rdf:Property',
             'rdfs:label' => $propertyName,
             'domain' => $prefixedShortName,
         ];
 
-        if ($propertyMetadata->getDeprecationReason()) {
+        if (!isset($propertyData['owl:deprecated']) && $propertyMetadata->getDeprecationReason()) {
             $propertyData['owl:deprecated'] = true;
         }
 
-        if ($this->isSingleRelation($propertyMetadata)) {
+        if (!isset($propertyData['owl:maxCardinality']) && $this->isSingleRelation($propertyMetadata)) {
             $propertyData['owl:maxCardinality'] = 1;
         }
 
-        if (null !== $range = $this->getRange($propertyMetadata)) {
+        if (!isset($propertyData['range']) && null !== $range = $this->getRange($propertyMetadata)) {
             $propertyData['range'] = $range;
         }
 

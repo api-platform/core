@@ -669,4 +669,60 @@ class DocumentationNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $documentationNormalizer->normalize($documentation));
     }
+
+    public function testHasHydraContext(): void
+    {
+        $title = 'Test Api';
+        $desc = 'test ApiGerard';
+        $version = '0.0.0';
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create('dummy', Argument::type('array'))->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('dummy', [
+            (new ApiResource())->withShortName('dummy')->withDescription('dummy')->withTypes(['#dummy'])->withOperations(new Operations([
+                'get' => (new Get())->withTypes(['#dummy'])->withShortName('dummy')->withInput(['class' => 'inputClass'])->withOutput(['class' => 'outputClass']),
+            ])),
+        ]));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create('dummy', 'name', Argument::type('array'))->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('b')
+                ->withReadable(true)
+                ->withWritable(true)
+                ->withJsonldContext([
+                    'hydra:property' => [
+                        '@type' => 'https://schema.org/Enumeration',
+                    ],
+                ])
+        );
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
+
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalledTimes(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalledTimes(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalledTimes(1);
+
+        $documentationNormalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $urlGenerator->reveal()
+        );
+
+        $this->assertEquals([
+            '@id' => '#dummy/name',
+            '@type' => 'https://schema.org/Enumeration',
+            'rdfs:label' => 'name',
+            'domain' => '#dummy',
+            'range' => 'xmls:string',
+        ], $documentationNormalizer->normalize($documentation)['hydra:supportedClass'][0]['hydra:supportedProperty'][0]['hydra:property']);
+    }
 }
