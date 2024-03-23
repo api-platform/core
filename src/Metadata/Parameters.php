@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 /**
- * An parameter dictionnary.
+ * A parameter dictionnary.
  *
  * @implements \IteratorAggregate<string, Parameter>
  */

@@ -22,6 +22,8 @@ use Doctrine\ORM\QueryBuilder;
 use Psr\Container\ContainerInterface;
 
 /**
+ * Reads operation parameters and execute its filter.
+ *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class ParameterExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
@@ -47,7 +49,6 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
             }
 
             $parameters = $parameter instanceof HeaderParameterInterface ? $request->attributes->get('_api_header_parameters') : $request->attributes->get('_api_query_parameters');
-
             $parsedKey = explode('[:property]', $key);
             if (isset($parsedKey[0]) && isset($parameters[$parsedKey[0]])) {
                 $key = $parsedKey[0];

@@ -21,10 +21,10 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class SearchTextAndDateFilter implements FilterInterface
 {
-    public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] readonly FilterInterface $searchFilter, #[Autowire('@api_platform.doctrine.orm.date_filter.instance')] readonly FilterInterface $dateFilter, ?array $properties = null, array $dateFilterProperties = [], array $searchFilterProperties = [])
+    public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] readonly FilterInterface $searchFilter, #[Autowire('@api_platform.doctrine.orm.date_filter.instance')] readonly FilterInterface $dateFilter, protected ?array $properties = null, array $dateFilterProperties = [], array $searchFilterProperties = [])
     {
-        $searchFilter->properties = $searchFilterProperties;
-        $dateFilter->properties = $dateFilterProperties;
+        $searchFilter->setProperties($searchFilterProperties);
+        $dateFilter->setProperties($dateFilterProperties);
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)

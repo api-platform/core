@@ -175,6 +175,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                         continue;
                     }
 
+                    // :property is a pattern allowed when defining parameters
                     $k = str_replace(':property', $description['property'], $key);
                     $variable = str_replace($description['property'], $k, $variable);
                     $variables[] = $variable;

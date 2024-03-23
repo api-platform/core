@@ -23,7 +23,7 @@ final class SearchFilterValueTransformer implements FilterInterface
 {
     public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] readonly FilterInterface $searchFilter, ?array $properties = null, private readonly ?string $key = null)
     {
-        $searchFilter->properties = $properties;
+        $searchFilter->setProperties($properties);
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)

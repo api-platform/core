@@ -26,7 +26,7 @@ final class ApiFilter
 {
     /**
      * @param string|class-string<FilterInterface>|class-string<LegacyFilterInterface> $filterClass
-     * @param string                                                                   $alias       a service alias to be referenced in a Parameter
+     * @param string                                                                   $alias       a filter tag alias to be referenced in a Parameter
      */
     public function __construct(
         public string $filterClass,

@@ -22,6 +22,8 @@ use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use Psr\Container\ContainerInterface;
 
 /**
+ * Prepares Parameters documentation by reading its filter details and declaring an OpenApi parameter.
+ *
  * @experimental
  */
 final class ParameterResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
