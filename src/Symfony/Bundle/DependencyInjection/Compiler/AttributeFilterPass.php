@@ -52,7 +52,7 @@ final class AttributeFilterPass implements CompilerPassInterface
      */
     private function createFilterDefinitions(\ReflectionClass $resourceReflectionClass, ContainerBuilder $container): void
     {
-        foreach ($this->readFilterAttributes($resourceReflectionClass) as $id => [$arguments, $filterClass]) {
+        foreach ($this->readFilterAttributes($resourceReflectionClass) as $id => [$arguments, $filterClass, $filterAttribute]) {
             if ($container->has($id)) {
                 continue;
             }
@@ -69,6 +69,10 @@ final class AttributeFilterPass implements CompilerPassInterface
             }
 
             $definition->addTag(self::TAG_FILTER_NAME);
+            if ($filterAttribute->alias) {
+                $definition->addTag(self::TAG_FILTER_NAME, ['id' => $filterAttribute->alias]);
+            }
+
             $definition->setAutowired(true);
 
             $parameterNames = [];

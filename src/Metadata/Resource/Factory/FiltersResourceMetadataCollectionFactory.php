@@ -47,7 +47,14 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
-        $filters = array_keys($this->readFilterAttributes($reflectionClass));
+        $classFilters = $this->readFilterAttributes($reflectionClass);
+        $filters = [];
+
+        foreach ($classFilters as $id => [$args, $filterClass, $attribute]) {
+            if (!$attribute->alias) {
+                $filters[] = $id;
+            }
+        }
 
         foreach ($resourceMetadataCollection as $i => $resource) {
             foreach ($operations = $resource->getOperations() ?? [] as $operationName => $operation) {

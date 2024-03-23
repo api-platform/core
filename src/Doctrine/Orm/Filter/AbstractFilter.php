@@ -29,7 +29,7 @@ abstract class AbstractFilter implements FilterInterface
     use PropertyHelperTrait;
     protected LoggerInterface $logger;
 
-    public function __construct(protected ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
+    public function __construct(protected ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, public ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
     {
         $this->logger = $logger ?? new NullLogger();
     }

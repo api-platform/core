@@ -72,21 +72,27 @@ final class ParameterTests extends ApiTestCase
         $registry = $this->getContainer()->get('doctrine');
         $entityManager = $registry->getManagerForClass(SearchFilterParameter::class);
 
-        foreach (['foo', 'foo', 'foo', 'bar', 'bar'] as $t) {
+        $date = new \DateTimeImmutable('2024-01-21');
+        foreach (['foo', 'foo', 'foo', 'bar', 'bar', 'baz'] as $t) {
             $s = new SearchFilterParameter();
             $s->setFoo($t);
+            if ('bar' === $t) {
+                $s->setCreatedAt($date);
+                $date = new \DateTimeImmutable('2024-01-22');
+            }
+
             $entityManager->persist($s);
         }
         $entityManager->flush();
 
         $response = self::createClient()->request('GET', 'search_filter_parameter?foo=bar');
-        $a = $response->toArray();
+        $a = $response->toArray(false);
         $this->assertCount(2, $a['hydra:member']);
         $this->assertEquals('bar', $a['hydra:member'][0]['foo']);
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
-            'hydra:template' => '/search_filter_parameter{?foo,foo[],order[id],order[foo]}',
+            'hydra:template' => '/search_filter_parameter{?foo,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q}',
             'hydra:mapping' => [
                 ['@type' => 'IriTemplateMapping', 'variable' => 'foo', 'property' => 'foo'],
             ],
@@ -94,6 +100,19 @@ final class ParameterTests extends ApiTestCase
 
         $response = self::createClient()->request('GET', 'search_filter_parameter?order[foo]=asc');
         $this->assertEquals($response->toArray()['hydra:member'][0]['foo'], 'bar');
+
+        $response = self::createClient()->request('GET', 'search_filter_parameter?order[foo]=asc');
+        $this->assertEquals($response->toArray()['hydra:member'][0]['foo'], 'bar');
+
+        $response = self::createClient()->request('GET', 'search_filter_parameter?searchPartial[foo]=az');
+        $members = $response->toArray()['hydra:member'];
+        $this->assertCount(1, $members);
+        $this->assertArraySubset(['foo' => 'baz'], $members[0]);
+
+        $response = self::createClient()->request('GET', 'search_filter_parameter?searchOnTextAndDate[foo]=bar&searchOnTextAndDate[createdAt][before]=2024-01-21');
+        $members = $response->toArray()['hydra:member'];
+        $this->assertCount(1, $members);
+        $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $members[0]);
     }
 
     /**
@@ -112,5 +131,7 @@ final class ParameterTests extends ApiTestCase
         $schemaTool = new SchemaTool($manager);
         @$schemaTool->dropSchema([$classes]);
         @$schemaTool->createSchema([$classes]);
+
+        return null;
     }
 }

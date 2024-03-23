@@ -50,7 +50,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class WithParameter
 {
-    public static int $counter = 1;
+    protected static int $counter = 1;
     public int $id = 1;
 
     #[Groups(['a'])]

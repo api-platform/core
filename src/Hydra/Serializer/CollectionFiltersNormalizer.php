@@ -168,9 +168,15 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                 continue;
             }
 
-            if (!($property = $parameter->getProperty()) && ($filterId = $parameter->getFilter())) {
-                $filter = $this->getFilter($filterId);
-                foreach ($filter->getDescription($resourceClass) as $variable => $description) {
+            if (!($property = $parameter->getProperty()) && ($filterId = $parameter->getFilter()) && ($filter = $this->getFilter($filterId))) {
+                foreach ($filter->getDescription($resourceClass) ?? [] as $variable => $description) {
+                    // This is a practice induced by PHP and is not necessary when implementing URI template
+                    if (str_ends_with((string) $variable, '[]')) {
+                        continue;
+                    }
+
+                    $k = str_replace(':property', $description['property'], $key);
+                    $variable = str_replace($description['property'], $k, $variable);
                     $variables[] = $variable;
                     $m = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $description['property'], 'required' => $description['required']];
                     if (null !== ($required = $parameter->getRequired())) {
@@ -179,6 +185,10 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                     $mapping[] = $m;
                 }
 
+                continue;
+            }
+
+            if (!$property) {
                 continue;
             }
 

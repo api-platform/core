@@ -13,17 +13,28 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchFilterValueTransformer;
+use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchTextAndDateFilter;
 use Doctrine\ORM\Mapping as ORM;
 
 #[GetCollection(
     uriTemplate: 'search_filter_parameter{._format}',
     parameters: [
         'foo' => new QueryParameter(filter: 'app_search_filter_via_parameter'),
-        'order' => new QueryParameter(filter: 'app_search_filter_via_parameter.order_filter'),
+        'order[:property]' => new QueryParameter(filter: 'app_search_filter_via_parameter.order_filter'),
+
+        'searchPartial[:property]' => new QueryParameter(filter: 'app_search_filter_partial'),
+        'searchExact[:property]' => new QueryParameter(filter: 'app_search_filter_with_exact'),
+        'searchOnTextAndDate[:property]' => new QueryParameter(filter: 'app_filter_date_and_search'),
+        'q' => new QueryParameter(property: 'hydra:freetextQuery'),
     ]
 )]
+#[ApiFilter(SearchFilterValueTransformer::class, alias: 'app_search_filter_partial', properties: ['foo' => 'partial'], arguments: ['key' => 'searchPartial'])]
+#[ApiFilter(SearchFilterValueTransformer::class, alias: 'app_search_filter_with_exact', properties: ['foo' => 'exact'], arguments: ['key' => 'searchExact'])]
+#[ApiFilter(SearchTextAndDateFilter::class, alias: 'app_filter_date_and_search', properties: ['foo', 'createdAt'], arguments: ['dateFilterProperties' => ['createdAt' => 'exclude_null'], 'searchFilterProperties' => ['foo' => 'exact']])]
 #[ORM\Entity]
 class SearchFilterParameter
 {
@@ -36,6 +47,9 @@ class SearchFilterParameter
     private ?int $id = null;
     #[ORM\Column(type: 'string')]
     private string $foo = '';
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -50,5 +64,15 @@ class SearchFilterParameter
     public function setFoo(string $foo): void
     {
         $this->foo = $foo;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 }
