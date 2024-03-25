@@ -78,11 +78,17 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $schema['type'] = 'object';
             $schema['properties'] = [
                 '_embedded' => [
-                    'properties' => [
-                        'items' => [
-                            'type' => 'array',
-                            'items' => $items,
+                    'anyOf' => [
+                        [
+                            'type' => 'object',
+                            'properties' => [
+                                'item' => [
+                                    'type' => 'array',
+                                    'items' => $items,
+                                ],
+                            ],
                         ],
+                        ['type' => 'object'],
                     ],
                 ],
                 'totalItems' => [
