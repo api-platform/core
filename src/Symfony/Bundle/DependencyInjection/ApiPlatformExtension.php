@@ -120,6 +120,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $patchFormats = $this->getFormats($config['patch_formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
         $docsFormats = $this->getFormats($config['docs_formats']);
+        $jsonSchemaFormats = $config['jsonschema_formats'];
+
+        if (!$jsonSchemaFormats) {
+            foreach (array_keys($formats) as $f) {
+                // Distinct JSON-based formats must have names that start with 'json'
+                if (str_starts_with($f, 'json')) {
+                    $jsonSchemaFormats[$f] = true;
+                }
+            }
+        }
 
         if (!isset($errorFormats['json'])) {
             $errorFormats['json'] = ['application/problem+json', 'application/json'];
@@ -144,7 +154,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $docsFormats['jsonopenapi'] = ['application/vnd.openapi+json'];
         }
 
-        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats, $docsFormats);
+        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats, $docsFormats, $jsonSchemaFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
         $this->registerOpenApiConfiguration($container, $config, $loader);
@@ -185,7 +195,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerInflectorConfiguration($config);
     }
 
-    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats): void
+    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats, array $jsonSchemaFormats): void
     {
         $loader->load('symfony/events.xml');
         $loader->load('symfony/controller.xml');
@@ -218,6 +228,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.patch_formats', $patchFormats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
         $container->setParameter('api_platform.docs_formats', $docsFormats);
+        $container->setParameter('api_platform.jsonschema_formats', $jsonSchemaFormats);
         $container->setParameter('api_platform.eager_loading.enabled', $this->isConfigEnabled($container, $config['eager_loading']));
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.fetch_partial', $config['eager_loading']['fetch_partial']);

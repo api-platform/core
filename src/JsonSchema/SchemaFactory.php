@@ -36,14 +36,13 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     use ResourceClassInfoTrait;
-    private array $distinctFormats = [];
     private ?TypeFactoryInterface $typeFactory = null;
     private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
     public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
-    public function __construct(?TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(?TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private readonly ?array $distinctFormats = null)
     {
         if ($typeFactory) {
             $this->typeFactory = $typeFactory;
@@ -51,16 +50,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
-    }
-
-    /**
-     * When added to the list, the given format will lead to the creation of a new definition.
-     *
-     * @internal
-     */
-    public function addDistinctFormat(string $format): void
-    {
-        $this->distinctFormats[$format] = true;
     }
 
     /**
@@ -267,7 +256,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $prefix .= '.'.$shortName;
         }
 
-        if (isset($this->distinctFormats[$format])) {
+        if ('json' !== $format && ($this->distinctFormats[$format] ?? false)) {
             // JSON is the default, and so isn't included in the definition name
             $prefix .= '.'.$format;
         }
