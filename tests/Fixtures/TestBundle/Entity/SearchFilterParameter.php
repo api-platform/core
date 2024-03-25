@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchFilterValueTransformer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchTextAndDateFilter;
@@ -22,6 +23,17 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[GetCollection(
     uriTemplate: 'search_filter_parameter{._format}',
+    parameters: [
+        'foo' => new QueryParameter(filter: 'app_search_filter_via_parameter'),
+        'order[:property]' => new QueryParameter(filter: 'app_search_filter_via_parameter.order_filter'),
+
+        'searchPartial[:property]' => new QueryParameter(filter: 'app_search_filter_partial'),
+        'searchExact[:property]' => new QueryParameter(filter: 'app_search_filter_with_exact'),
+        'searchOnTextAndDate[:property]' => new QueryParameter(filter: 'app_filter_date_and_search'),
+        'q' => new QueryParameter(property: 'hydra:freetextQuery'),
+    ]
+)]
+#[QueryCollection(
     parameters: [
         'foo' => new QueryParameter(filter: 'app_search_filter_via_parameter'),
         'order[:property]' => new QueryParameter(filter: 'app_search_filter_via_parameter.order_filter'),

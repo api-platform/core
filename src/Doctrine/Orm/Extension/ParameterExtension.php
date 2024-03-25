@@ -32,36 +32,24 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
     {
     }
 
-    private function applyFilter(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, ?string $resourceClass = null, ?Operation $operation = null, array $context = []): void
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function applyFilter(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
-        if (!($request = $context['request'] ?? null)) {
-            return;
-        }
-
-        if (null === $resourceClass) {
-            throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
-        }
-
         foreach ($operation->getParameters() ?? [] as $parameter) {
-            $key = $parameter->getKey();
+            $values = $parameter->getExtraProperties()['_api_values'] ?? [];
+            if (!$values) {
+                continue;
+            }
+
             if (null === ($filterId = $parameter->getFilter())) {
                 continue;
             }
 
-            $parameters = $parameter instanceof HeaderParameterInterface ? $request->attributes->get('_api_header_parameters') : $request->attributes->get('_api_query_parameters');
-            $parsedKey = explode('[:property]', $key);
-            if (isset($parsedKey[0]) && isset($parameters[$parsedKey[0]])) {
-                $key = $parsedKey[0];
-            }
-
-            if (!isset($parameters[$key])) {
-                continue;
-            }
-
-            $value = $parameters[$key];
             $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
             if ($filter instanceof FilterInterface) {
-                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => [$key => $value]] + $context);
+                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $values] + $context);
             }
         }
     }
@@ -69,7 +57,7 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, ?string $resourceClass = null, ?Operation $operation = null, array $context = []): void
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $this->applyFilter($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
     }

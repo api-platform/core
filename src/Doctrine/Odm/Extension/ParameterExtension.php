@@ -33,34 +33,19 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
 
     private function applyFilter(Builder $aggregationBuilder, ?string $resourceClass = null, ?Operation $operation = null, array &$context = []): void
     {
-        if (!($request = $context['request'] ?? null)) {
-            return;
-        }
-
-        if (null === $resourceClass) {
-            throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
-        }
-
         foreach ($operation->getParameters() ?? [] as $parameter) {
-            $key = $parameter->getKey();
+            $values = $parameter->getExtraProperties()['_api_values'] ?? [];
+            if (!$values) {
+                continue;
+            }
+
             if (null === ($filterId = $parameter->getFilter())) {
                 continue;
             }
 
-            $parameters = $parameter instanceof HeaderParameterInterface ? $request->attributes->get('_api_header_parameters') : $request->attributes->get('_api_query_parameters');
-            $parsedKey = explode('[:property]', $key);
-            if (isset($parsedKey[0]) && isset($parameters[$parsedKey[0]])) {
-                $key = $parsedKey[0];
-            }
-
-            if (!isset($parameters[$key])) {
-                continue;
-            }
-
-            $value = $parameters[$key];
             $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
             if ($filter instanceof FilterInterface) {
-                $filterContext = ['filters' => [$key => $value]] + $context;
+                $filterContext = ['filters' => $values];
                 $filter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
                 // update by reference
                 if (isset($filterContext['mongodb_odm_sort_fields'])) {

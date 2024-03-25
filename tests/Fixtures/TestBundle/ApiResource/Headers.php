@@ -22,8 +22,10 @@ use ApiPlatform\Metadata\Get;
     output: false,
     operations: [
         new Get(uriTemplate: 'redirect_to_foobar'),
-    ]
+    ],
+    graphQlOperations: []
 )]
 class Headers
 {
+    public $id;
 }

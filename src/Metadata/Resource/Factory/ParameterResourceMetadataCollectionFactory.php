@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\HeaderParameterInterface;
+use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi;
@@ -43,49 +44,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             foreach ($operations as $operationName => $operation) {
                 $parameters = [];
                 foreach ($operation->getParameters() ?? [] as $key => $parameter) {
-                    if (null === $parameter->getKey()) {
-                        $parameter = $parameter->withKey($key);
-                    }
-
-                    $filter = $parameter->getFilter();
-                    if (\is_string($filter) && $this->filterLocator->has($filter)) {
-                        $filter = $this->filterLocator->get($filter);
-                    }
-
-                    if ($filter instanceof SerializerFilterInterface && null === $parameter->getProvider()) {
-                        $parameter = $parameter->withProvider('api_platform.serializer.filter_parameter_provider');
-                    }
-
-                    // Read filter description to populate the Parameter
-                    $description = $filter instanceof FilterInterface ? $filter->getDescription($resourceClass) : [];
-                    if (($schema = $description[$key]['schema'] ?? null) && null === $parameter->getSchema()) {
-                        $parameter = $parameter->withSchema($schema);
-                    }
-
-                    if (null === $parameter->getOpenApi() && $openApi = $description[$key]['openapi'] ?? null) {
-                        if ($openApi instanceof OpenApi\Model\Parameter) {
-                            $parameter = $parameter->withOpenApi($openApi);
-                        }
-
-                        if (\is_array($openApi)) {
-                            $parameter->withOpenApi(new OpenApi\Model\Parameter(
-                                $key,
-                                $parameter instanceof HeaderParameterInterface ? 'header' : 'query',
-                                $description[$key]['description'] ?? '',
-                                $description[$key]['required'] ?? $openApi['required'] ?? false,
-                                $openApi['deprecated'] ?? false,
-                                $openApi['allowEmptyValue'] ?? true,
-                                $schema,
-                                $openApi['style'] ?? null,
-                                $openApi['explode'] ?? ('array' === ($schema['type'] ?? null)),
-                                $openApi['allowReserved'] ?? false,
-                                $openApi['example'] ?? null,
-                                isset($openApi['examples']
-                                ) ? new \ArrayObject($openApi['examples']) : null
-                            ));
-                        }
-                    }
-
+                    $parameter = $this->setDefaults($key, $parameter, $resourceClass);
                     $priority = $parameter->getPriority() ?? $internalPriority--;
                     $parameters[$key] = $parameter->withPriority($priority);
                 }
@@ -94,8 +53,74 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             }
 
             $resourceMetadataCollection[$i] = $resource->withOperations($operations->sort());
+
+            $internalPriority = -1;
+            $graphQlOperations = $resource->getGraphQlOperations();
+            foreach ($graphQlOperations ?? [] as $operationName => $operation) {
+                $parameters = [];
+                foreach ($operation->getParameters() ?? [] as $key => $parameter) {
+                    $parameter = $this->setDefaults($key, $parameter, $resourceClass);
+                    $priority = $parameter->getPriority() ?? $internalPriority--;
+                    $parameters[$key] = $parameter->withPriority($priority);
+                }
+
+                $graphQlOperations[$operationName] = $operation->withParameters(new Parameters($parameters));
+            }
+
+            if ($graphQlOperations) {
+                $resourceMetadataCollection[$i] = $resource->withGraphQlOperations($graphQlOperations);
+            }
         }
 
         return $resourceMetadataCollection;
+    }
+
+    private function setDefaults(string $key, Parameter $parameter, string $resourceClass): Parameter
+    {
+        if (null === $parameter->getKey()) {
+            $parameter = $parameter->withKey($key);
+        }
+
+        $filter = $parameter->getFilter();
+        if (\is_string($filter) && $this->filterLocator->has($filter)) {
+            $filter = $this->filterLocator->get($filter);
+        }
+
+        if ($filter instanceof SerializerFilterInterface && null === $parameter->getProvider()) {
+            $parameter = $parameter->withProvider('api_platform.serializer.filter_parameter_provider');
+        }
+
+        // Read filter description to populate the Parameter
+        $description = $filter instanceof FilterInterface ? $filter->getDescription($resourceClass) : [];
+        if (($schema = $description[$key]['schema'] ?? null) && null === $parameter->getSchema()) {
+            $parameter = $parameter->withSchema($schema);
+        }
+
+        if (null === $parameter->getOpenApi() && $openApi = $description[$key]['openapi'] ?? null) {
+            if ($openApi instanceof OpenApi\Model\Parameter) {
+                $parameter = $parameter->withOpenApi($openApi);
+            }
+
+            if (\is_array($openApi)) {
+                $parameter->withOpenApi(new OpenApi\Model\Parameter(
+                    $key,
+                    $parameter instanceof HeaderParameterInterface ? 'header' : 'query',
+                    $description[$key]['description'] ?? '',
+                    $description[$key]['required'] ?? $openApi['required'] ?? false,
+                    $openApi['deprecated'] ?? false,
+                    $openApi['allowEmptyValue'] ?? true,
+                    $schema,
+                    $openApi['style'] ?? null,
+                    $openApi['explode'] ?? ('array' === ($schema['type'] ?? null)),
+                    $openApi['allowReserved'] ?? false,
+                    $openApi['example'] ?? null,
+                    isset(
+                        $openApi['examples']
+                    ) ? new \ArrayObject($openApi['examples']) : null
+                ));
+            }
+        }
+
+        return $parameter;
     }
 }

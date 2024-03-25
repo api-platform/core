@@ -70,7 +70,7 @@ final class ParameterTests extends ApiTestCase
         $container = static::getContainer();
         $route = 'mongodb' === $container->getParameter('kernel.environment') ? 'search_filter_parameter_document' : 'search_filter_parameter';
         $response = self::createClient()->request('GET', $route.'?foo=bar');
-        $a = $response->toArray(false);
+        $a = $response->toArray();
         $this->assertCount(2, $a['hydra:member']);
         $this->assertEquals('bar', $a['hydra:member'][0]['foo']);
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
