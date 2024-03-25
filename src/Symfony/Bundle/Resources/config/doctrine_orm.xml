@@ -143,7 +143,7 @@
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-16" />
             <tag name="api_platform.doctrine.orm.query_extension.item" priority="-9" />
         </service>
-        <service id="ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension" alias="api_platform.doctrine.orm.query_extension.eager_loading" />
+        <service id="ApiPlatform\Doctrine\Orm\Extension\ParameterExtension" alias="api_platform.doctrine.orm.extension.parameter_extension" />
 
         <!-- Metadata loader -->
         <service id="api_platform.doctrine.orm.metadata.property.metadata_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">

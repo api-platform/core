@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Orm\Filter;
+namespace ApiPlatform\Doctrine\Common\Filter;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @experimental
  */
-interface PropertyAwareFilterInterface extends FilterInterface
+interface PropertyAwareFilterInterface
 {
     /**
      * @param string[] $properties

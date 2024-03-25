@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -23,7 +24,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-abstract class AbstractFilter implements PropertyAwareFilterInterface
+abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInterface
 {
     use OrmPropertyHelperTrait;
     use PropertyHelperTrait;

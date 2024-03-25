@@ -14,15 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
-use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\Operation;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class SearchTextAndDateFilter implements FilterInterface
+final class ODMSearchTextAndDateFilter implements FilterInterface
 {
-    public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] readonly FilterInterface $searchFilter, #[Autowire('@api_platform.doctrine.orm.date_filter.instance')] readonly FilterInterface $dateFilter, protected ?array $properties = null, array $dateFilterProperties = [], array $searchFilterProperties = [])
+    public function __construct(#[Autowire('@api_platform.doctrine_mongodb.odm.search_filter.instance')] readonly FilterInterface $searchFilter, #[Autowire('@api_platform.doctrine_mongodb.odm.date_filter.instance')] readonly FilterInterface $dateFilter, protected ?array $properties = null, array $dateFilterProperties = [], array $searchFilterProperties = [])
     {
         if ($searchFilter instanceof PropertyAwareFilterInterface) {
             $searchFilter->setProperties($searchFilterProperties);
@@ -38,9 +37,10 @@ final class SearchTextAndDateFilter implements FilterInterface
         return array_merge($this->searchFilter->getDescription($resourceClass), $this->dateFilter->getDescription($resourceClass));
     }
 
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        $this->searchFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $context['filters']['searchOnTextAndDate']] + $context);
-        $this->dateFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $context['filters']['searchOnTextAndDate']] + $context);
+        $filterContext = ['filters' => $context['filters']['searchOnTextAndDate']] + $context;
+        $this->searchFilter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
+        $this->dateFilter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
     }
 }

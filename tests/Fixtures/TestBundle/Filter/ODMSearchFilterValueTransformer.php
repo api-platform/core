@@ -14,15 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
-use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\Operation;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class SearchFilterValueTransformer implements FilterInterface
+final class ODMSearchFilterValueTransformer implements FilterInterface
 {
-    public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] readonly FilterInterface $searchFilter, ?array $properties = null, private readonly ?string $key = null)
+    public function __construct(#[Autowire('@api_platform.doctrine_mongodb.odm.search_filter.instance')] readonly FilterInterface $searchFilter, ?array $properties = null, private readonly ?string $key = null)
     {
         if ($searchFilter instanceof PropertyAwareFilterInterface) {
             $searchFilter->setProperties($properties);
@@ -35,8 +34,9 @@ final class SearchFilterValueTransformer implements FilterInterface
         return $this->searchFilter->getDescription($resourceClass);
     }
 
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        $this->searchFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $context['filters'][$this->key]] + $context);
+        $filterContext = ['filters' => $context['filters'][$this->key]] + $context;
+        $this->searchFilter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
     }
 }
