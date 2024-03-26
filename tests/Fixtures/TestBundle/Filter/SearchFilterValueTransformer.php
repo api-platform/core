@@ -22,21 +22,26 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class SearchFilterValueTransformer implements FilterInterface
 {
-    public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] readonly FilterInterface $searchFilter, ?array $properties = null, private readonly ?string $key = null)
+    public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] readonly FilterInterface $searchFilter, private ?array $properties = null, private readonly ?string $key = null)
     {
-        if ($searchFilter instanceof PropertyAwareFilterInterface) {
-            $searchFilter->setProperties($properties);
-        }
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
     public function getDescription(string $resourceClass): array
     {
+        if ($this->searchFilter instanceof PropertyAwareFilterInterface) {
+            $this->searchFilter->setProperties($this->properties);
+        }
+
         return $this->searchFilter->getDescription($resourceClass);
     }
 
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
+        if ($this->searchFilter instanceof PropertyAwareFilterInterface) {
+            $this->searchFilter->setProperties($this->properties);
+        }
+
         $this->searchFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $context['filters'][$this->key]] + $context);
     }
 }

@@ -40,6 +40,9 @@ final class ParameterProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $request = $context['request'] ?? null;
+        // if (!$request) {
+        //     return $this->decorated?->provide($operation, $uriVariables, $context);
+        // }
 
         if ($request && null === $request->attributes->get('_api_query_parameters')) {
             $queryString = RequestParser::getQueryString($request);
@@ -89,7 +92,7 @@ final class ParameterProvider implements ProviderInterface
         }
 
         $operation = $operation->withParameters($operationParameters);
-        $request->attributes->set('_api_operation', $operation);
+        $request?->attributes->set('_api_operation', $operation);
         $context['operation'] = $operation;
 
         return $this->decorated?->provide($operation, $uriVariables, $context);
@@ -105,6 +108,6 @@ final class ParameterProvider implements ProviderInterface
         }
 
         // GraphQl
-        return $context['_api_search_parameters'] ?? [];
+        return $context['args'] ?? [];
     }
 }

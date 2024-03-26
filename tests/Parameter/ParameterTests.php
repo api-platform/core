@@ -98,6 +98,32 @@ final class ParameterTests extends ApiTestCase
         $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $members[0]);
     }
 
+    public function testGraphQl() {
+        $this->recreateSchema();
+        $container = static::getContainer();
+        $object = 'mongodb' === $container->getParameter('kernel.environment') ? 'searchFilterParameterDocuments' : 'searchFilterParameters';
+        $response = self::createClient()->request('POST', '/graphql', ['json' => [
+            'query' => sprintf('{ %s(foo: "bar") { edges { node { id foo createdAt } } } }', $object)
+        ]]);
+        $this->assertEquals('bar', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
+
+        $response = self::createClient()->request('POST', '/graphql', ['json' => [
+            'query' => sprintf('{ %s(searchPartial: {foo: "az"}) { edges { node { id foo createdAt } } } }', $object)
+        ]]);
+        $this->assertEquals('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
+
+        $response = self::createClient()->request('POST', '/graphql', ['json' => [
+            'query' => sprintf('{ %s(searchExact: {foo: "baz"}) { edges { node { id foo createdAt } } } }', $object)
+        ]]);
+        $this->assertEquals('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
+
+        $response = self::createClient()->request('POST', '/graphql', ['json' => [
+            'query' => sprintf('{ %s(searchOnTextAndDate: {foo: "bar", createdAt: {before: "2024-01-21"}}) { edges { node { id foo createdAt } } } }', $object)
+        ]]);
+        $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $response->toArray()['data'][$object]['edges'][0]['node']);
+
+    }
+
     /**
      * @param array<string, mixed> $options kernel options
      */

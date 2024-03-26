@@ -22,7 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-#[ApiResource(input: InputDto::class, output: false)]
+#[ApiResource(input: InputDto::class)]
 #[ORM\Entity]
 class DummyDtoNoOutput
 {

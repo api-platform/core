@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
 use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Container\ContainerInterface;
