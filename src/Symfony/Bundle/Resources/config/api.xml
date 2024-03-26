@@ -36,6 +36,13 @@
         </service>
         <service id="ApiPlatform\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
+        <service id="api_platform.serializer.filter_parameter_provider" class="ApiPlatform\Serializer\Parameter\SerializerFilterParameterProvider" public="false">
+            <argument type="service" id="api_platform.filter_locator" />
+            <tag name="api_platform.parameter_provider" key="api_platform.serializer.filter_parameter_provider" priority="-895" />
+        </service>
+
+        <service id="ApiPlatform\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
+
         <service id="api_platform.serializer.context_builder.filter" class="ApiPlatform\Serializer\SerializerFilterContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.filter_locator" />
