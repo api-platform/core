@@ -75,7 +75,7 @@ trait AttributeFilterExtractorTrait
     /**
      * Reads filter attribute from a ReflectionClass.
      *
-     * @return array Key is the filter id. It has two values, properties and the ApiFilter instance
+     * @return array<string, array{array<string, mixed>, class-string, ApiFilter}> indexed by the filter id, the filter tuple has the filter arguments, the filter class and the ApiFilter attribute instance
      */
     private function readFilterAttributes(\ReflectionClass $reflectionClass): array
     {
@@ -83,10 +83,10 @@ trait AttributeFilterExtractorTrait
 
         foreach ($this->getFilterAttributes($reflectionClass) as $filterAttribute) {
             $filterClass = $filterAttribute->filterClass;
-            $id = $this->generateFilterId($reflectionClass, $filterClass, $filterAttribute->id);
+            $id = $this->generateFilterId($reflectionClass, $filterClass, $filterAttribute->id ?? $filterAttribute->alias);
 
             if (!isset($filters[$id])) {
-                $filters[$id] = [$filterAttribute->arguments, $filterClass];
+                $filters[$id] = [$filterAttribute->arguments, $filterClass, $filterAttribute];
             }
 
             if ($properties = $this->getFilterProperties($filterAttribute, $reflectionClass)) {
@@ -97,10 +97,10 @@ trait AttributeFilterExtractorTrait
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
             foreach ($this->getFilterAttributes($reflectionProperty) as $filterAttribute) {
                 $filterClass = $filterAttribute->filterClass;
-                $id = $this->generateFilterId($reflectionClass, $filterClass, $filterAttribute->id);
+                $id = $this->generateFilterId($reflectionClass, $filterClass, $filterAttribute->id ?? $filterAttribute->alias);
 
                 if (!isset($filters[$id])) {
-                    $filters[$id] = [$filterAttribute->arguments, $filterClass];
+                    $filters[$id] = [$filterAttribute->arguments, $filterClass, $filterAttribute];
                 }
 
                 if ($properties = $this->getFilterProperties($filterAttribute, $reflectionClass, $reflectionProperty)) {

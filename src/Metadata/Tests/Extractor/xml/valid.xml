@@ -112,7 +112,24 @@
                         <value name="boolean">true</value>
                     </values>
                 </extraProperties>
+
+                <parameters>
+                    <parameter key="author" required="true" in="query">
+                        <schema>
+                            <values>
+                                <value name="type">string</value>
+                            </values>
+                        </schema>
+                        <extraProperties>
+                            <values>
+                                <value name="foo">bar</value>
+                            </values>
+                        </extraProperties>
+                    </parameter>
+                </parameters>
+
             </operation>
         </operations>
+
     </resource>
 </resources>

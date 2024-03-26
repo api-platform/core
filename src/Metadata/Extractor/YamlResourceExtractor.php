@@ -15,7 +15,9 @@ namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\StateOptions;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
@@ -124,6 +126,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'stateOptions' => $this->buildStateOptions($resource),
             'links' => $this->buildLinks($resource),
             'headers' => $this->buildHeaders($resource),
+            'parameters' => $this->buildParameters($resource),
         ]);
     }
 
@@ -449,5 +452,48 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $headers;
+    }
+
+    /**
+     * @return array<string, \ApiPlatform\Metadata\Parameter>
+     */
+    private function buildParameters(array $resource): ?array
+    {
+        if (!isset($resource['parameters']) || !\is_array($resource['parameters'])) {
+            return null;
+        }
+
+        $parameters = [];
+        foreach ($resource['parameters'] as $key => $parameter) {
+            $cl = ($parameter['in'] ?? 'query') === 'header' ? HeaderParameter::class : QueryParameter::class;
+            $parameters[$key] = new $cl(
+                key: $key,
+                required: $this->phpize($parameter, 'required', 'bool'),
+                schema: $parameter['schema'],
+                openApi: ($parameter['openapi'] ?? null) ? new Parameter(
+                    name: $parameter['openapi']['name'],
+                    in: $parameter['in'] ?? 'query',
+                    description: $parameter['openapi']['description'] ?? '',
+                    required: $parameter['openapi']['required'] ?? $parameter['required'] ?? false,
+                    deprecated: $parameter['openapi']['deprecated'] ?? false,
+                    allowEmptyValue: $parameter['openapi']['allowEmptyValue'] ?? false,
+                    schema: $parameter['openapi']['schema'] ?? $parameter['schema'] ?? [],
+                    style: $parameter['openapi']['style'] ?? null,
+                    explode: $parameter['openapi']['explode'] ?? false,
+                    allowReserved: $parameter['openapi']['allowReserved '] ?? false,
+                    example: $parameter['openapi']['example'] ?? null,
+                    examples: isset($parameter['openapi']['examples']) ? new \ArrayObject($parameter['openapi']['examples']) : null,
+                    content: isset($parameter['openapi']['content']) ? new \ArrayObject($parameter['openapi']['content']) : null
+                ) : null,
+                provider: $this->phpize($parameter, 'provider', 'string'),
+                filter: $this->phpize($parameter, 'filter', 'string'),
+                property: $this->phpize($parameter, 'property', 'string'),
+                description: $this->phpize($parameter, 'description', 'string'),
+                priority: $this->phpize($parameter, 'priority', 'integer'),
+                extraProperties: $this->buildArrayValue($parameter, 'extraProperties') ?? [],
+            );
+        }
+
+        return $parameters;
     }
 }

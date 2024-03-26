@@ -119,6 +119,11 @@ resources:
                         -
                             rel: 'http://www.w3.org/ns/json-ld#error'
                             href: 'http://www.w3.org/ns/hydra/error'
+                    parameters:
+                        author:
+                            key: author
+                            required: true
+                            schema: { type: string }
                 -
                     uriTemplate: '/users/{userId}/comments/{commentId}{._format}'
                     class: ApiPlatform\Metadata\Get
@@ -330,6 +335,7 @@ resources:
                 elasticsearchOptions:
                     index: foo_index
                     type: foo_type
+            parameters: null
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
                 another_custom_property:

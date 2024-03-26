@@ -29,6 +29,7 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\OperationDefaultsTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -421,6 +422,9 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'links' => [
                         ['rel' => 'http://www.w3.org/ns/json-ld#error', 'href' => 'http://www.w3.org/ns/hydra/error'],
                     ],
+                    'parameters' => [
+                        'author' => ['key' => 'author', 'required' => true, 'schema' => ['type' => 'string']],
+                    ],
                 ],
                 [
                     'uriTemplate' => '/users/{userId}/comments/{commentId}{._format}',
@@ -508,6 +512,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'stateOptions',
         'links',
         'headers',
+        'parameters',
     ];
 
     /**
@@ -528,12 +533,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
         }
 
-        $a = new ResourceMetadataCollection(self::RESOURCE_CLASS, $this->buildApiResources());
-        $b = $collection;
-
-        $this->assertEquals($a[0], $b[0]);
-
-        $this->assertEquals(new ResourceMetadataCollection(self::RESOURCE_CLASS, $this->buildApiResources()), $collection);
+        $resources = $this->buildApiResources();
+        $this->assertEquals(new ResourceMetadataCollection(self::RESOURCE_CLASS, $resources), $collection);
     }
 
     public static function getExtractors(): array
@@ -748,5 +749,19 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         }
 
         return [new Link($values[0]['rel'] ?? null, $values[0]['href'] ?? null)];
+    }
+
+    private function withParameters(array $values): ?array
+    {
+        if (!$values) {
+            return null;
+        }
+
+        $parameters = [];
+        foreach ($values as $k => $value) {
+            $parameters[$k] = new QueryParameter(key: $value['key'], required: $value['required'], schema: $value['schema']);
+        }
+
+        return $parameters;
     }
 }

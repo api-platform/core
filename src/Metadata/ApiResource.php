@@ -960,6 +960,7 @@ class ApiResource extends Metadata
         $provider = null,
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        protected array|Parameters|null $parameters = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(
@@ -1000,6 +1001,7 @@ class ApiResource extends Metadata
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            parameters: $parameters,
             extraProperties: $extraProperties
         );
 

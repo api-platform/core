@@ -23,6 +23,13 @@ resources:
                     extraProperties:
                         foo: 'bar'
                         boolean: true
+                    parameters:
+                        author: 
+                            description: 'hello'
+                            required: true
+                            in: 'query'
+                            schema:
+                                type: 'string'
 
     ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SingleFileConfigDummy:
         shortName: single_file_config
