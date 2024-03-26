@@ -63,6 +63,8 @@ if (interface_exists(\ApiPlatform\Api\FilterInterface::class)) {
          * The description can contain additional data specific to a filter.
          *
          * @see \ApiPlatform\OpenApi\Factory\OpenApiFactory::getFiltersParameters
+         *
+         * @return array<string, array{property: string, type: string, required: bool, strategy: string, is_collection: bool, openapi: array<string, mixed>, schema: array<string, mixed>}>
          */
         public function getDescription(string $resourceClass): array;
     }

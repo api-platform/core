@@ -34,6 +34,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProcessor;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProvider;
 use PHPUnit\Framework\TestCase;
@@ -258,5 +259,16 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertTrue($operations->has('password_set'));
         $this->assertTrue($operations->has('password_reset_token'));
         $this->assertTrue($operations->has('password_reset'));
+    }
+
+    public function testWithParameters(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+
+        $metadataCollection = $attributeResourceMetadataCollectionFactory->create(WithParameter::class);
+        $parameters = $metadataCollection[0]->getParameters();
+        $this->assertCount(2, $parameters);
+        $parameters = $metadataCollection->getOperation('collection')->getParameters();
+        $this->assertCount(3, $parameters);
     }
 }

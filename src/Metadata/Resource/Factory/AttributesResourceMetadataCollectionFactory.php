@@ -15,9 +15,12 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use Psr\Log\LoggerInterface;
@@ -83,8 +86,18 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         $index = -1;
         $operationPriority = 0;
         $hasApiResource = false;
+        $globalParameters = [];
 
         foreach ($attributes as $attribute) {
+            if (is_a($attribute->getName(), Parameter::class, true)) {
+                $parameter = $attribute->newInstance();
+                if (!$k = $parameter->getKey()) {
+                    throw new RuntimeException('Parameter "key" is mandatory when used on a class.');
+                }
+                $globalParameters[$k] = $parameter;
+                continue;
+            }
+
             if (is_a($attribute->getName(), ApiResource::class, true)) {
                 $hasApiResource = true;
                 $resource = $this->getResourceWithDefaults($resourceClass, $shortName, $attribute->newInstance());
@@ -128,6 +141,10 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         // Loop again and set default operations if none where found
         foreach ($resources as $index => $resource) {
+            if ($globalParameters) {
+                $resources[$index] = $resource = $this->mergeOperationParameters($resource, $globalParameters);
+            }
+
             if (null === $resource->getOperations()) {
                 $operations = [];
                 foreach ($this->getDefaultHttpOperations($resource) as $operation) {
@@ -137,8 +154,15 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 $resources[$index] = $resource->withOperations(new Operations($operations));
             }
 
-            $graphQlOperations = $resource->getGraphQlOperations();
+            if ($parameters = $resource->getParameters()) {
+                $operations = [];
+                foreach ($resource->getOperations() ?? [] as $operation) {
+                    $operations[$operation->getName()] = $this->mergeOperationParameters($operation, $parameters);
+                }
+                $resources[$index] = $resource = $resource->withOperations(new Operations($operations)); // @phpstan-ignore-line
+            }
 
+            $graphQlOperations = $resource->getGraphQlOperations();
             if (!$this->graphQlEnabled) {
                 continue;
             }
@@ -162,6 +186,10 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             $graphQlOperationsWithDefaults = [];
             foreach ($graphQlOperations as $operation) {
                 [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
+                if ($parameters) {
+                    $operation = $this->mergeOperationParameters($operation, $parameters);
+                }
+
                 $graphQlOperationsWithDefaults[$key] = $operation;
             }
 
@@ -199,5 +227,22 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         }
 
         return false;
+    }
+
+    /**
+     * @template T of Metadata
+     *
+     * @param Parameter[] $globalParameters
+     * @param T           $resource
+     *
+     * @return T
+     */
+    private function mergeOperationParameters(Metadata $resource, array $globalParameters): Metadata
+    {
+        $parameters = $resource->getParameters() ?? [];
+
+        return $resource->withParameters(
+            (\is_array($parameters) ? $parameters : iterator_to_array($parameters)) + $globalParameters
+        );
     }
 }

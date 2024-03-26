@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User;
 use PHPUnit\Framework\TestCase;
@@ -102,6 +103,7 @@ class XmlExtractorTest extends TestCase
                     'stateOptions' => null,
                     'links' => null,
                     'headers' => null,
+                    'parameters' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments{._format}',
@@ -275,6 +277,7 @@ class XmlExtractorTest extends TestCase
                             'stateOptions' => null,
                             'links' => null,
                             'headers' => ['hello' => 'world'],
+                            'parameters' => null,
                         ],
                         [
                             'name' => null,
@@ -376,6 +379,16 @@ class XmlExtractorTest extends TestCase
                             'stateOptions' => null,
                             'links' => null,
                             'headers' => ['hello' => 'world'],
+                            'parameters' => [
+                                'author' => new QueryParameter(
+                                    key: 'author',
+                                    required: true,
+                                    schema: [
+                                        'type' => 'string',
+                                    ],
+                                    extraProperties: ['foo' => 'bar']
+                                ),
+                            ],
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -387,6 +400,7 @@ class XmlExtractorTest extends TestCase
                     'stateOptions' => null,
                     'links' => null,
                     'headers' => ['hello' => 'world'],
+                    'parameters' => null,
                 ],
             ],
         ], $extractor->getResources());
