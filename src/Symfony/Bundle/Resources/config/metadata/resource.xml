@@ -74,6 +74,11 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.deprecations.inner" />
         </service>
 
+        <service id="api_platform.metadata.resource.metadata_collection_factory.parameter" class="ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" public="false" decoration-priority="1000">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.parameter.inner" />
+            <argument type="service" id="api_platform.filter_locator" />
+        </service>
+
         <service id="api_platform.metadata.resource.metadata_collection_factory.cached" class="ApiPlatform\Metadata\Resource\Factory\CachedResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.resource_collection" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.cached.inner" />
