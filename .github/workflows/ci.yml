@@ -252,12 +252,12 @@ jobs:
           composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle
-      - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
       # https://github.com/doctrine/dbal/issues/5570
       - name: Fix Doctrine dependencies
         if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2') || startsWith(matrix.php, '7.3'))
         run: composer require "doctrine/orm:<2.13" -W --dev --no-interaction --no-progress --ansi
+      - name: Update project dependencies
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
         run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
