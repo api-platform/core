@@ -60,7 +60,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 }
             }
 
-            $resourceMetadataCollection[$i] = $resource;
+            $resourceMetadataCollection[] = $resource;
         }
 
         return $resourceMetadataCollection;
