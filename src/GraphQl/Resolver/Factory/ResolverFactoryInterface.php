@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 
 /**
  * Builds a GraphQL resolver.
@@ -22,5 +23,5 @@ use ApiPlatform\Metadata\GraphQl\Operation;
  */
 interface ResolverFactoryInterface
 {
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable;
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null, ?PropertyMetadataFactoryInterface $propertyMetadataFactory = null): callable;
 }

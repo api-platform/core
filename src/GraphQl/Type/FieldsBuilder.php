@@ -348,7 +348,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                 if ($isStandardGraphqlType || $input) {
                     $resolve = null;
                 } else {
-                    $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resourceOperation);
+                    $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resourceOperation, $this->propertyMetadataFactory);
                 }
             } else {
                 if ($isStandardGraphqlType || $input) {
