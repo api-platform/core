@@ -5,6 +5,12 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.jsonapi.json_schema.schema_factory" class="ApiPlatform\JsonApi\JsonSchema\SchemaFactory" decorates="api_platform.json_schema.schema_factory">
+            <argument type="service" id="api_platform.jsonapi.json_schema.schema_factory.inner" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+        </service>
+
         <service id="api_platform.jsonapi.encoder" class="ApiPlatform\Serializer\JsonEncoder" public="false">
             <argument>jsonapi</argument>
 
