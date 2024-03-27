@@ -56,7 +56,7 @@ final class ItemProvider implements ProviderInterface
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && \array_key_exists('id', $uriVariables)) {
             // todo : if uriVariables don't contain the id, this fails. This should behave like it does in the following code
-            return $manager->getReference($entityClass, $uriVariables);
+            return $manager->getReference($entityClass, $uriVariables['id']);
         }
 
         $repository = $manager->getRepository($entityClass);
