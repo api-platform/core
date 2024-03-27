@@ -153,6 +153,11 @@
             <argument>%api_platform.graphql.nesting_separator%</argument>
         </service>
 
+        <service id="api_platform.graphql.state_provider.parameter" class="ApiPlatform\State\Provider\ParameterProvider" decorates="api_platform.graphql.state_provider" decoration-priority="300">
+            <argument type="service" id="api_platform.graphql.state_provider.parameter.inner" />
+            <argument type="tagged_locator" tag="api_platform.parameter_provider" index-by="key" />
+        </service>
+
         <!-- Validation occurs at 200, we want validation to be over when we reach custom resolvers -->
         <service id="api_platform.graphql.state_provider.resolver" class="ApiPlatform\GraphQl\State\Provider\ResolverProvider" decorates="api_platform.graphql.state_provider" decoration-priority="190">
             <argument type="service" id="api_platform.graphql.state_provider.resolver.inner" />

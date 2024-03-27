@@ -159,3 +159,13 @@ services:
             $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
         tags:
             - name: 'api_platform.state_processor'
+
+    app_odm_search_filter_via_parameter:
+        parent:    'api_platform.doctrine_mongodb.odm.search_filter'
+        arguments: [ { foo: 'exact' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'app_odm_search_filter_via_parameter' } ]
+ 
+    app_odm_search_filter_via_parameter.order_filter:
+        parent: 'api_platform.doctrine_mongodb.odm.order_filter'
+        arguments: [ { id: 'ASC', foo: 'DESC' } ]
+        tags:  [ 'api_platform.filter' ]

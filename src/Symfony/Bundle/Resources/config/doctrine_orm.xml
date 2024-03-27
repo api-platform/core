@@ -35,6 +35,9 @@
             <argument key="$orderNullsComparison">%api_platform.collection.order_nulls_comparison%</argument>
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\OrderFilter" alias="api_platform.doctrine.orm.order_filter" />
+        <service id="api_platform.doctrine.orm.date_filter.instance" parent="api_platform.doctrine.orm.date_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine.orm.range_filter" class="ApiPlatform\Doctrine\Orm\Filter\RangeFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
@@ -42,6 +45,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\RangeFilter" alias="api_platform.doctrine.orm.range_filter" />
+        <service id="api_platform.doctrine.orm.range_filter.instance" parent="api_platform.doctrine.orm.range_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine.orm.date_filter" class="ApiPlatform\Doctrine\Orm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
@@ -49,6 +55,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\DateFilter" alias="api_platform.doctrine.orm.date_filter" />
+        <service id="api_platform.doctrine.orm.date_filter.instance" parent="api_platform.doctrine.orm.date_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine.orm.boolean_filter" class="ApiPlatform\Doctrine\Orm\Filter\BooleanFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
@@ -56,6 +65,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\BooleanFilter" alias="api_platform.doctrine.orm.boolean_filter" />
+        <service id="api_platform.doctrine.orm.boolean_filter.instance" parent="api_platform.doctrine.orm.boolean_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine.orm.numeric_filter" class="ApiPlatform\Doctrine\Orm\Filter\NumericFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
@@ -63,6 +75,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\NumericFilter" alias="api_platform.doctrine.orm.numeric_filter" />
+        <service id="api_platform.doctrine.orm.numeric_filter.instance" parent="api_platform.doctrine.orm.numeric_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine.orm.exists_filter" class="ApiPlatform\Doctrine\Orm\Filter\ExistsFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
@@ -71,6 +86,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\ExistsFilter" alias="api_platform.doctrine.orm.exists_filter" />
+        <service id="api_platform.doctrine.orm.exists_filter.instance" parent="api_platform.doctrine.orm.exists_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <!-- Doctrine Query extensions -->
 
@@ -120,6 +138,13 @@
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Extension\OrderExtension" alias="api_platform.doctrine.orm.query_extension.order" />
 
+        <service id="api_platform.doctrine.orm.extension.parameter_extension" class="ApiPlatform\Doctrine\Orm\Extension\ParameterExtension" public="false">
+            <argument type="service" id="api_platform.filter_locator" />
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-16" />
+            <tag name="api_platform.doctrine.orm.query_extension.item" priority="-9" />
+        </service>
+        <service id="ApiPlatform\Doctrine\Orm\Extension\ParameterExtension" alias="api_platform.doctrine.orm.extension.parameter_extension" />
+
         <!-- Metadata loader -->
         <service id="api_platform.doctrine.orm.metadata.property.metadata_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="doctrine" />
@@ -158,6 +183,10 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\SearchFilter" alias="api_platform.doctrine.orm.search_filter" />
+
+        <service id="api_platform.doctrine.orm.search_filter.instance" parent="api_platform.doctrine.orm.search_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine.orm.metadata.resource.metadata_collection_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmResourceCollectionMetadataFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="40">
             <argument type="service" id="doctrine" />

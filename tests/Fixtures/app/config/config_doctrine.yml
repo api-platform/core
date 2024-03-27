@@ -135,3 +135,13 @@ services:
             - name: 'api_platform.state_provider'
         arguments:
             $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+
+    app_search_filter_via_parameter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { foo: 'exact' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'app_search_filter_via_parameter' } ]
+ 
+    app_search_filter_via_parameter.order_filter:
+        parent: 'api_platform.doctrine.orm.order_filter'
+        arguments: [ { id: 'ASC', foo: 'DESC' } ]
+        tags:  [ 'api_platform.filter' ]

@@ -22,7 +22,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-#[ApiResource(input: InputDto::class, output: false)]
+#[ApiResource(input: InputDto::class)]
 #[ODM\Document]
 class DummyDtoNoOutput
 {
