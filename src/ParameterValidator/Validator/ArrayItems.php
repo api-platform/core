@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\ParameterValidator\Validator;
 
+use ApiPlatform\ParameterValidator\ParameterValueExtractor;
+
 final class ArrayItems implements ValidatorInterface
 {
     use CheckFilterDeprecationsTrait;
@@ -60,26 +62,6 @@ final class ArrayItems implements ValidatorInterface
             return [];
         }
 
-        if (\is_array($value)) {
-            return $value;
-        }
-
-        $collectionFormat = $filterDescription['openapi']['collectionFormat'] ?? $filterDescription['swagger']['collectionFormat'] ?? 'csv';
-
-        return explode(self::getSeparator($collectionFormat), (string) $value) ?: []; // @phpstan-ignore-line
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private static function getSeparator(string $collectionFormat): string
-    {
-        return match ($collectionFormat) {
-            'csv' => ',',
-            'ssv' => ' ',
-            'tsv' => '\t',
-            'pipes' => '|',
-            default => throw new \InvalidArgumentException(sprintf('Unknown collection format %s', $collectionFormat)),
-        };
+        return ParameterValueExtractor::getValue($value, ParameterValueExtractor::getCollectionFormat($filterDescription));
     }
 }
