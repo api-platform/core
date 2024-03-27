@@ -71,7 +71,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
      */
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
-        self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));
+        self::assertEquals($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));
     }
 
     public static function createProvider(): \Generator
@@ -101,11 +101,11 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             ]),
         ];
         $properties = [
-            'name' => [],
+            'name' => new \ArrayObject(),
             'email' => ['format' => 'email'],
             'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
-            'age' => [],
-            'social' => ['type' => 'object', 'properties' => ['githubUsername' => []], 'additionalProperties' => false, 'required' => ['githubUsername']],
+            'age' => new \ArrayObject(),
+            'social' => ['type' => 'object', 'properties' => ['githubUsername' => new \ArrayObject()], 'additionalProperties' => false, 'required' => ['githubUsername']],
         ];
         $required = ['name', 'email', 'social'];
 
