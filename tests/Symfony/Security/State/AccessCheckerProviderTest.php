@@ -89,4 +89,16 @@ class AccessCheckerProviderTest extends TestCase
         $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
         $accessChecker->provide($operation, [], []);
     }
+
+    public function testCheckAccessOnNullObjectWithGraphQl(): void
+    {
+        $operation = new Query(class: 'foo', security: 'hi', securityMessage: 'hello');
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->method('provide')->willReturn(null);
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->expects($this->never())->method('isGranted');
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
+        $result = $accessChecker->provide($operation, [], []);
+        $this->assertNull($result);
+    }
 }
