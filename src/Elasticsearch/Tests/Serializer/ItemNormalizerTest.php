@@ -91,6 +91,15 @@ final class ItemNormalizerTest extends TestCase
         self::assertEquals(['foo'], $this->itemNormalizer->normalize($object, 'json', ['groups' => 'foo']));
     }
 
+    public function testNormalizeIntoIri(): void
+    {
+        $iri = '/foobar/1234';
+        $item = new \stdClass();
+        $this->normalizerProphecy->normalize($item, 'json', ['groups' => 'foo'])->willReturn($iri)->shouldBeCalledOnce();
+
+        self::assertEquals($iri, $this->itemNormalizer->normalize($item, 'json', ['groups' => 'foo']));
+    }
+
     public function testSupportsNormalization(): void
     {
         $this->normalizerProphecy->supportsNormalization($object = (object) ['foo'], 'json')->willReturn(true)->shouldBeCalledOnce();
