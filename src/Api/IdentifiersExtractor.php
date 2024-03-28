@@ -160,6 +160,10 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             return (string) $identifierValue->value;
         }
 
+        if ($identifierValue instanceof \DateTimeInterface) {
+            return $identifierValue->format('Y-m-d-H-i-s');
+        }
+
         throw new RuntimeException(sprintf('We were not able to resolve the identifier matching parameter "%s".', $parameterName));
     }
 }
