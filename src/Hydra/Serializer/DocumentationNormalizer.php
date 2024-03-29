@@ -20,6 +20,7 @@ use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -29,6 +30,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -60,6 +62,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
 
             $resourceMetadata = $resourceMetadataCollection[0];
+            if ($resourceMetadata instanceof ErrorResource && ValidationException::class === $resourceMetadata->getClass()) {
+                continue;
+            }
+
             $shortName = $resourceMetadata->getShortName();
             $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
             $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $resourceMetadataCollection);

@@ -14,4 +14,15 @@
         <requirement key="index">index</requirement>
     </route>
 
+    <route id="api_errors" path="/errors/{status}">
+        <default key="_controller">api_platform.action.not_exposed</default>
+        <default key="status">500</default>
+
+        <requirement key="status">\d+</requirement>
+    </route>
+
+    <route id="api_validation_errors" path="/validation_errors/{id}">
+        <default key="_controller">api_platform.action.not_exposed</default>
+    </route>
+
 </routes>

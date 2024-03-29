@@ -40,6 +40,7 @@ use Symfony\Component\WebLink\Link;
     operations: [
         new ErrorOperation(
             name: '_api_validation_errors_problem',
+            routeName: 'api_validation_errors',
             outputFormats: ['json' => ['application/problem+json']],
             normalizationContext: ['groups' => ['json'],
                 'skip_null_values' => true,
@@ -47,6 +48,7 @@ use Symfony\Component\WebLink\Link;
             ]),
         new ErrorOperation(
             name: '_api_validation_errors_hydra',
+            routeName: 'api_validation_errors',
             outputFormats: ['jsonld' => ['application/problem+json']],
             links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')],
             normalizationContext: [
@@ -57,8 +59,13 @@ use Symfony\Component\WebLink\Link;
         ),
         new ErrorOperation(
             name: '_api_validation_errors_jsonapi',
+            routeName: 'api_validation_errors',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true, 'rfc_7807_compliant_errors' => true]
+        ),
+        new ErrorOperation(
+            name: '_api_validation_errors',
+            routeName: 'api_validation_errors'
         ),
     ],
     graphQlOperations: []
