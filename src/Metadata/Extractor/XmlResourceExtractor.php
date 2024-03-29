@@ -93,7 +93,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'paginationViaCursor' => $this->buildPaginationViaCursor($resource),
             'exceptionToStatus' => $this->buildExceptionToStatus($resource),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
-            // 'stateOptions' => $this->buildStateOptions($resource),
+            'stateOptions' => $this->buildStateOptions($resource),
         ]);
     }
 

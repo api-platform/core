@@ -120,7 +120,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'uriVariables' => $this->buildUriVariables($resource),
             'inputFormats' => $this->buildArrayValue($resource, 'inputFormats'),
             'outputFormats' => $this->buildArrayValue($resource, 'outputFormats'),
-            // 'stateOptions' => $this->buildStateOptions($resource),
+            'stateOptions' => $this->buildStateOptions($resource),
         ]);
     }
 
