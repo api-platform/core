@@ -196,6 +196,7 @@ final class PublishMercureUpdatesListener
         }
 
         $options['enable_async_update'] ??= true;
+        $options['type'] ??= substr($property, 0, -8);
 
         if ('deletedObjects' === $property) {
             $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;

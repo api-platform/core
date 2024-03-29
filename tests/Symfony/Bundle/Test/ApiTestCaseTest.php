@@ -320,6 +320,7 @@ JSON;
         $this->assertCount(1, self::getMercureMessages());
         self::assertMercureUpdateMatchesJsonSchema(
             update: self::getMercureMessage(),
+            type: 'create',
             topics: ['http://localhost/direct_mercures/1'],
             jsonSchema: <<<JSON
 {

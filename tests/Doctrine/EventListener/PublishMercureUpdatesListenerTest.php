@@ -127,12 +127,14 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $private = [];
         $retry = [];
         $data = [];
+        $types = [];
 
-        $managedHub = $this->createMockHub(function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+        $managedHub = $this->createMockHub(function (Update $update) use (&$topics, &$private, &$retry, &$data, &$types): string {
             $topics = array_merge($topics, $update->getTopics());
             $private[] = $update->isPrivate();
             $retry[] = $update->getRetry();
             $data[] = $update->getData();
+            $types[] = $update->getType();
 
             return 'id';
         });
@@ -169,6 +171,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertEquals(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4', 'http://example.com/custom_topics/1'], $topics);
         $this->assertEquals([false, false, false, false, false, true, false], $private);
         $this->assertEquals([null, null, null, null, null, 10, null], $retry);
+        $this->assertEquals(['create', 'update', 'update', 'update', 'delete', 'delete', 'delete'], $types);
     }
 
     public function testPublishUpdateMultipleTopicsUsingExpressionLanguage(): void
