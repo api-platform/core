@@ -81,6 +81,15 @@ api_platform:
         form: ['multipart/form-data']
 ```
 
+## v3.2.19
+
+### Bug fixes
+
+* [0154fbf00](https://github.com/api-platform/core/commit/0154fbf00635b46e151c917378e5fe4d76dc1a83) fix(elasticsearch): wrong namespace for stateOptions (#6260)
+* [4adc07524](https://github.com/api-platform/core/commit/4adc0752471910a1dca104c1ac8d9c1dbebf268e) fix: multiple error routes #6214 (#6263)
+* [88d88ed2c](https://github.com/api-platform/core/commit/88d88ed2c41cca89da4ef2185d58adb2ea91d20c) fix(doctrine): wrong return type without name converter #6079 (#6254)
+* [db50a46c1](https://github.com/api-platform/core/commit/db50a46c16689b7fb4db79b1d4ef7e1ad094d358) fix(doctrine): stateOptions force resource class on collection (#6255)
+
 ## v3.2.18
 
 ### Bug fixes
