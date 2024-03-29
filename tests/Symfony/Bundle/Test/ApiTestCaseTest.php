@@ -35,7 +35,7 @@ class ApiTestCaseTest extends ApiTestCase
 
     public static function providerFormats(): iterable
     {
-        // yield 'jsonapi' => ['jsonapi', 'application/vnd.api+json'];
+        yield 'jsonapi' => ['jsonapi', 'application/vnd.api+json'];
         yield 'jsonhal' => ['jsonhal', 'application/hal+json'];
         yield 'jsonld' => ['jsonld', 'application/ld+json'];
     }
