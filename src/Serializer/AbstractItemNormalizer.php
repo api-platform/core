@@ -420,7 +420,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $options = $this->getFactoryOptions($context);
         $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
 
-        $allowedAttributes = [];
+        $allowedAttributes = $context['additional_allowed_attributes'] ?? [];
         foreach ($propertyNames as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
 
