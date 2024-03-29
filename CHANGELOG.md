@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.1.27
+
+### Bug fixes
+
+* [67d387b32](https://github.com/api-platform/core/commit/67d387b327d9be14c6d5885fbd81c095a0e671b1) fix(elasticsearch): wrong namespace for stateOptions (#6259)
+* [7bf7ba3ad](https://github.com/api-platform/core/commit/7bf7ba3adeba973e0562a6a78f5f61b70ba06892) fix(elasticsearch): wrong namespace for stateOptions
+
 ## v3.1.26
 
 ### Bug fixes
