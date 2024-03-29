@@ -33,6 +33,13 @@ class ApiTestCaseTest extends ApiTestCase
 {
     use ExpectDeprecationTrait;
 
+    public static function providerFormats(): iterable
+    {
+        // yield 'jsonapi' => ['jsonapi', 'application/vnd.api+json'];
+        yield 'jsonhal' => ['jsonhal', 'application/hal+json'];
+        yield 'jsonld' => ['jsonld', 'application/ld+json'];
+    }
+
     public function testAssertJsonContains(): void
     {
         self::createClient()->request('GET', '/');
@@ -122,13 +129,19 @@ JSON;
         $this->assertMatchesJsonSchema(json_decode($jsonSchema, true));
     }
 
-    public function testAssertMatchesResourceCollectionJsonSchema(): void
+    /**
+     * @dataProvider providerFormats
+     */
+    public function testAssertMatchesResourceCollectionJsonSchema(string $format, string $mimeType): void
     {
-        self::createClient()->request('GET', '/resource_interfaces');
-        $this->assertMatchesResourceCollectionJsonSchema(ResourceInterface::class);
+        self::createClient()->request('GET', '/resource_interfaces', ['headers' => ['Accept' => $mimeType]]);
+        $this->assertMatchesResourceCollectionJsonSchema(ResourceInterface::class, format: $format);
     }
 
-    public function testAssertMatchesResourceCollectionJsonSchemaKeepSerializationContext(): void
+    /**
+     * @dataProvider providerFormats
+     */
+    public function testAssertMatchesResourceCollectionJsonSchemaKeepSerializationContext(string $format, string $mimeType): void
     {
         $this->recreateSchema();
 
@@ -146,20 +159,26 @@ JSON;
         $manager->persist($child);
         $manager->flush();
 
-        self::createClient()->request('GET', "issue-6146-parents/{$parent->getId()}");
-        $this->assertMatchesResourceItemJsonSchema(Issue6146Parent::class);
+        self::createClient()->request('GET', "issue-6146-parents/{$parent->getId()}", ['headers' => ['Accept' => $mimeType]]);
+        $this->assertMatchesResourceItemJsonSchema(Issue6146Parent::class, format: $format);
 
-        self::createClient()->request('GET', '/issue-6146-parents');
-        $this->assertMatchesResourceCollectionJsonSchema(Issue6146Parent::class);
+        self::createClient()->request('GET', '/issue-6146-parents', ['headers' => ['Accept' => $mimeType]]);
+        $this->assertMatchesResourceCollectionJsonSchema(Issue6146Parent::class, format: $format);
     }
 
-    public function testAssertMatchesResourceItemJsonSchema(): void
+    /**
+     * @dataProvider providerFormats
+     */
+    public function testAssertMatchesResourceItemJsonSchema(string $format, string $mimeType): void
     {
-        self::createClient()->request('GET', '/resource_interfaces/some-id');
-        $this->assertMatchesResourceItemJsonSchema(ResourceInterface::class);
+        self::createClient()->request('GET', '/resource_interfaces/some-id', ['headers' => ['Accept' => $mimeType]]);
+        $this->assertMatchesResourceItemJsonSchema(ResourceInterface::class, format: $format);
     }
 
-    public function testAssertMatchesResourceItemJsonSchemaWithCustomJson(): void
+    /**
+     * @dataProvider providerFormats
+     */
+    public function testAssertMatchesResourceItemJsonSchemaWithCustomJson(string $format, string $mimeType): void
     {
         $this->recreateSchema();
 
@@ -169,11 +188,14 @@ JSON;
         $manager->persist($jsonSchemaContextDummy);
         $manager->flush();
 
-        self::createClient()->request('GET', '/json_schema_context_dummies/1');
-        $this->assertMatchesResourceItemJsonSchema(JsonSchemaContextDummy::class);
+        self::createClient()->request('GET', '/json_schema_context_dummies/1', ['headers' => ['Accept' => $mimeType]]);
+        $this->assertMatchesResourceItemJsonSchema(JsonSchemaContextDummy::class, format: $format);
     }
 
-    public function testAssertMatchesResourceItemJsonSchemaOutput(): void
+    /**
+     * @dataProvider providerFormats
+     */
+    public function testAssertMatchesResourceItemJsonSchemaOutput(string $format, string $mimeType): void
     {
         $this->recreateSchema();
 
@@ -184,11 +206,14 @@ JSON;
         $dummyDtoInputOutput->num = 54;
         $manager->persist($dummyDtoInputOutput);
         $manager->flush();
-        self::createClient()->request('GET', '/dummy_dto_input_outputs/1');
-        $this->assertMatchesResourceItemJsonSchema(DummyDtoInputOutput::class);
+        self::createClient()->request('GET', '/dummy_dto_input_outputs/1', ['headers' => ['Accept' => $mimeType]]);
+        $this->assertMatchesResourceItemJsonSchema(DummyDtoInputOutput::class, format: $format);
     }
 
-    public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithContext(): void
+    /**
+     * @dataProvider providerFormats
+     */
+    public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithContext(string $format, string $mimeType): void
     {
         $this->recreateSchema();
 
@@ -201,11 +226,11 @@ JSON;
         $manager->persist($user);
         $manager->flush();
 
-        self::createClient()->request('GET', "/users-with-groups/{$user->getId()}");
-        $this->assertMatchesResourceItemJsonSchema(User::class, null, 'jsonld', ['groups' => ['api-test-case-group']]);
+        self::createClient()->request('GET', "/users-with-groups/{$user->getId()}", ['headers' => ['Accept' => $mimeType]]);
+        $this->assertMatchesResourceItemJsonSchema(User::class, null, $format, ['groups' => ['api-test-case-group']]);
 
-        self::createClient()->request('GET', '/users-with-groups');
-        $this->assertMatchesResourceCollectionJsonSchema(User::class, null, 'jsonld', ['groups' => ['api-test-case-group']]);
+        self::createClient()->request('GET', '/users-with-groups', ['headers' => ['Accept' => $mimeType]]);
+        $this->assertMatchesResourceCollectionJsonSchema(User::class, null, $format, ['groups' => ['api-test-case-group']]);
     }
 
     public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithRangeAssertions(): void

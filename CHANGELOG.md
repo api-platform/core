@@ -81,6 +81,16 @@ api_platform:
         form: ['multipart/form-data']
 ```
 
+## v3.2.18
+
+### Bug fixes
+
+* [0073a2a1b](https://github.com/api-platform/core/commit/0073a2a1b752001c9bff666ad350e248b725a80a) fix(serializer): json non-resource intermittent class (HAL & JSON:API) (#6231)
+* [3689ae5f4](https://github.com/api-platform/core/commit/3689ae5f47e68e77f6938b71e9e355c13623dbdb) fix(hydra): owl:maxCardinality should be an int (#6235)
+* [4b70b7405](https://github.com/api-platform/core/commit/4b70b74054658f9d1c704b56f940ec9742e4482f) fix(jsonschema): generation of non-LD+JSON distinct schema formats (#6236)
+* [818b9cd62](https://github.com/api-platform/core/commit/818b9cd625f56c77c9f1fd0286672973d817bb3b) fix(jsonschema): don't skip remaining multiple union types (#6223)
+* [874e4d670](https://github.com/api-platform/core/commit/874e4d6707ecdd48b27ed91b0b66ea5e33691e7c) fix(serializer): collection property in an output dto (#6239)
+
 ## v3.2.17
 
 ### Bug fixes

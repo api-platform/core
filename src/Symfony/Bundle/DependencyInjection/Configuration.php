@@ -177,6 +177,14 @@ final class Configuration implements ConfigurationInterface
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
             'json' => ['mime_types' => ['application/problem+json', 'application/json']],
         ]);
+        $rootNode
+            ->children()
+                ->arrayNode('jsonschema_formats')
+                    ->scalarPrototype()->end()
+                    ->defaultValue([])
+                    ->info('The JSON formats to compute the JSON Schemas for.')
+                ->end()
+            ->end();
 
         $this->addDefaultsSection($rootNode);
 

@@ -98,6 +98,7 @@ class ConfigurationTest extends TestCase
                 'jsonld' => ['mime_types' => ['application/ld+json']],
                 'json' => ['mime_types' => ['application/problem+json', 'application/json']],
             ],
+            'jsonschema_formats' => [],
             'exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,

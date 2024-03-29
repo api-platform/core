@@ -53,7 +53,10 @@ class SchemaFactoryTest extends TestCase
             null,
             $resourceMetadataFactory->reveal(),
             $propertyNameCollectionFactory->reveal(),
-            $propertyMetadataFactory->reveal()
+            $propertyMetadataFactory->reveal(),
+            null,
+            null,
+            ['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true],
         );
 
         $hydraSchemaFactory = new HydraSchemaFactory($baseSchemaFactory);
