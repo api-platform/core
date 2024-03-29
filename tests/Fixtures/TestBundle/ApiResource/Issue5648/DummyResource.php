@@ -21,10 +21,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: '/dummy_resource_with_custom_filter', itemUriTemplate: '/dummy_resource_with_custom_filter/{id}'),
+        new GetCollection(uriTemplate: '/dummy_resource_with_custom_filter{._format}', itemUriTemplate: '/dummy_resource_with_custom_filter/{id}'),
         new Get(uriTemplate: '/dummy_resource_with_custom_filter/{id}', uriVariables: ['id' => new Link(fromClass: Dummy::class)]),
     ],
     stateOptions: new Options(entityClass: Dummy::class)
@@ -37,5 +38,8 @@ class DummyResource
 
     public string $name;
 
+    /**
+     * @var RelatedDummy[]
+     */
     public array $relatedDummies;
 }
