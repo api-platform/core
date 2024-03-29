@@ -10,4 +10,5 @@ api_platform:
   keep_legacy_inflector: false
   defaults:
     extra_properties:
+      rfc_7807_compliant_errors: true
       standard_put: true
