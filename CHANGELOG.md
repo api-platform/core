@@ -1,5 +1,32 @@
 # Changelog
 
+## v3.3.0-beta.1
+
+### Bug fixes
+
+* [23a9f2a7f](https://github.com/api-platform/core/commit/23a9f2a7f6b868c1eaaa3ec967bd718790f6caa6) fix(openapi): webhook has pathItem
+* [54638d3ca](https://github.com/api-platform/core/commit/54638d3ca6d497ff829a6978dd1db9137b5bcf3a) fix: fix PHPUnit 11 compatibility (#6202)
+* [bc96751e0](https://github.com/api-platform/core/commit/bc96751e040406de65a690f53003c3db5626a013) fix(graphql): nested collection for mongo (#6174)
+* [ca6be326d](https://github.com/api-platform/core/commit/ca6be326d533282a4a1c1284a289c2f1e3f92219) fix(doctrine): fix case on Mercure ExpressionLanguage (#6207)
+* [dad8b7df3](https://github.com/api-platform/core/commit/dad8b7df3ce47189925dad2106bb4d6477ce8f45) fix(validation): move validation exception resource (#6204)
+
+
+### Features
+
+* [0b724d93b](https://github.com/api-platform/core/commit/0b724d93b7585ce1f49fc97971840c986ecc495b) feat(openapi): document parameter
+* [125f2cef4](https://github.com/api-platform/core/commit/125f2cef42e6584c219fd21982a7999d141a2f9d) feat: add webhook - openapi (#5873)
+* [31d24aca4](https://github.com/api-platform/core/commit/31d24aca4b8d45f9838546954b61a55f25c39799) feat(hydra): read hydra:property from ApiProperty::jsonLdContext (#6240)
+* [3ad3836d5](https://github.com/api-platform/core/commit/3ad3836d5427951ff2519380738f6c423f697742) feat(metadata): attribute Parameter (#6246)
+* [52322048c](https://github.com/api-platform/core/commit/52322048cfccdb68ddf2df6a7952efb3e23ffece) feat(state): provide parameter values
+* [5523bf5df](https://github.com/api-platform/core/commit/5523bf5df93783582bed5591ff35c71e0942a978) feat(openapi): disable response override (#6221)
+* [683c34c6f](https://github.com/api-platform/core/commit/683c34c6f5721caede4f739e11c944b77b2243dc) feat(hydra): parameter documentation
+* [732d4aa8c](https://github.com/api-platform/core/commit/732d4aa8c32e6b3ec01a713b032a2c01adf66e5d) feat(symfony): parameter DI for metadata state serializer
+* [842030d55](https://github.com/api-platform/core/commit/842030d55737e8eb15ce575c89f5449493a157d8) feat(doctrine): parameter filter extension (#6248)
+* [b79c7ae0e](https://github.com/api-platform/core/commit/b79c7ae0e88b6dee9d97d73ce16f6ff2a974b272) feat(metadata): allow \Stringable for security parameters (#6095)
+* [e427bba70](https://github.com/api-platform/core/commit/e427bba70e1ecdcfe76dbe9926153156323cb371) feat(jsonschema): JSON:API schema factory (#6250)
+
+The v3.3.0-beta.1 introduces a new `QueryParameter` attribute to improve [the filtering system](https://github.com/api-platform/core/blob/main/docs/adr/0006-filtering-system-and-parameters.md).
+
 ## v3.3.0-alpha.2
 
 ### Bug fixes
