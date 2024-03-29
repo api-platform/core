@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Metadata\Operation;
@@ -29,7 +30,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-abstract class AbstractFilter implements FilterInterface
+abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInterface
 {
     use MongoDbOdmPropertyHelperTrait;
     use PropertyHelperTrait;
@@ -63,6 +64,14 @@ abstract class AbstractFilter implements FilterInterface
     protected function getProperties(): ?array
     {
         return $this->properties;
+    }
+
+    /**
+     * @param string[] $properties
+     */
+    public function setProperties(array $properties): void
+    {
+        $this->properties = $properties;
     }
 
     protected function getLogger(): LoggerInterface

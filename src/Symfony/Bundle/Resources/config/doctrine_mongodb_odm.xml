@@ -34,6 +34,18 @@
         <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" alias="api_platform.doctrine_mongodb.odm.state.persist_processor" />
 
         <!-- Filter -->
+        <service id="api_platform.doctrine_mongodb.odm.search_filter" class="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.identifiers_extractor" on-invalid="ignore" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" alias="api_platform.doctrine_mongodb.odm.search_filter" />
+        <service id="api_platform.doctrine_mongodb.odm.search_filter.instance" parent="api_platform.doctrine_mongodb.odm.search_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine_mongodb.odm.boolean_filter" class="ApiPlatform\Doctrine\Odm\Filter\BooleanFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
@@ -41,6 +53,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Filter\BooleanFilter" alias="api_platform.doctrine_mongodb.odm.boolean_filter" />
+        <service id="api_platform.doctrine_mongodb.odm.boolean_filter.instance" parent="api_platform.doctrine_mongodb.odm.boolean_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine_mongodb.odm.date_filter" class="ApiPlatform\Doctrine\Odm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
@@ -48,6 +63,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Filter\DateFilter" alias="api_platform.doctrine_mongodb.odm.date_filter" />
+        <service id="api_platform.doctrine_mongodb.odm.date_filter.instance" parent="api_platform.doctrine_mongodb.odm.date_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine_mongodb.odm.exists_filter" class="ApiPlatform\Doctrine\Odm\Filter\ExistsFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
@@ -56,6 +74,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Filter\ExistsFilter" alias="api_platform.doctrine_mongodb.odm.exists_filter" />
+        <service id="api_platform.doctrine_mongodb.odm.exists_filter.instance" parent="api_platform.doctrine_mongodb.odm.exists_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine_mongodb.odm.numeric_filter" class="ApiPlatform\Doctrine\Odm\Filter\NumericFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
@@ -63,6 +84,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Filter\NumericFilter" alias="api_platform.doctrine_mongodb.odm.numeric_filter" />
+        <service id="api_platform.doctrine_mongodb.odm.numeric_filter.instance" parent="api_platform.doctrine_mongodb.odm.numeric_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine_mongodb.odm.order_filter" class="ApiPlatform\Doctrine\Odm\Filter\OrderFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
@@ -71,6 +95,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Filter\OrderFilter" alias="api_platform.doctrine_mongodb.odm.order_filter" />
+        <service id="api_platform.doctrine_mongodb.odm.order_filter.instance" parent="api_platform.doctrine_mongodb.odm.order_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <service id="api_platform.doctrine_mongodb.odm.range_filter" class="ApiPlatform\Doctrine\Odm\Filter\RangeFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
@@ -78,6 +105,9 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Filter\RangeFilter" alias="api_platform.doctrine_mongodb.odm.range_filter" />
+        <service id="api_platform.doctrine_mongodb.odm.range_filter.instance" parent="api_platform.doctrine_mongodb.odm.range_filter">
+            <argument type="collection"></argument>
+        </service>
 
         <!-- Doctrine Aggregation extensions -->
 
@@ -105,6 +135,14 @@
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Extension\OrderExtension" alias="api_platform.doctrine_mongodb.odm.aggregation_extension.order" />
 
+        <service id="api_platform.doctrine_mongodb.odm.extension.parameter_extension" class="ApiPlatform\Doctrine\Odm\Extension\ParameterExtension" public="false">
+            <argument type="service" id="api_platform.filter_locator" />
+
+            <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" priority="32" />
+            <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.item"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Extension\ParameterExtension" alias="api_platform.doctrine_mongodb.odm.extension.parameter_extension" />
+
         <!-- Metadata loader -->
         <service id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory"
                  class="ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory"
@@ -112,17 +150,6 @@
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.inner"/>
         </service>
-
-        <service id="api_platform.doctrine_mongodb.odm.search_filter" class="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" public="false" abstract="true">
-            <argument type="service" id="doctrine_mongodb" />
-            <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.identifiers_extractor" on-invalid="ignore" />
-            <argument type="service" id="api_platform.property_accessor" />
-            <argument type="service" id="logger" on-invalid="ignore" />
-            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
-        </service>
-
-        <service id="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" alias="api_platform.doctrine_mongodb.odm.search_filter" />
 
         <service id="api_platform.doctrine_mongodb.odm.state.collection_provider" class="ApiPlatform\Doctrine\Odm\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
