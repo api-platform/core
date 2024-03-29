@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Tests\Fixtures\StateOptions;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
@@ -451,10 +451,12 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
         $elasticsearchOptions = $stateOptions->elasticsearchOptions ?? null;
         if ($elasticsearchOptions) {
-            return new StateOptions(
-                isset($elasticsearchOptions['index']) ? (string) $elasticsearchOptions['index'] : null,
-                isset($elasticsearchOptions['type']) ? (string) $elasticsearchOptions['type'] : null,
-            );
+            if (class_exists(Options::class)) {
+                return new Options(
+                    isset($elasticsearchOptions['index']) ? (string) $elasticsearchOptions['index'] : null,
+                    isset($elasticsearchOptions['type']) ? (string) $elasticsearchOptions['type'] : null,
+                );
+            }
         }
 
         return null;

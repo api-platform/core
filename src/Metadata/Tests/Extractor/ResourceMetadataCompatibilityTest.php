@@ -36,12 +36,10 @@ use ApiPlatform\Metadata\Tests\Extractor\Adapter\ResourceAdapterInterface;
 use ApiPlatform\Metadata\Tests\Extractor\Adapter\XmlResourceAdapter;
 use ApiPlatform\Metadata\Tests\Extractor\Adapter\YamlResourceAdapter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
-use ApiPlatform\Metadata\Tests\Fixtures\StateOptions;
 use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\RequestBody;
-use ApiPlatform\State\OptionsInterface;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\WebLink\Link;
@@ -720,7 +718,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         return $operations;
     }
 
-    private function withStateOptions(array $values): ?OptionsInterface
+    private function withStateOptions(array $values)
     {
         if (!$values) {
             return null;
@@ -733,7 +731,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         $configuration = reset($values);
         switch (key($values)) {
             case 'elasticsearchOptions':
-                return new StateOptions($configuration['index'] ?? null, $configuration['type'] ?? null);
+                return null;
         }
 
         throw new \LogicException(sprintf('Unsupported "%s" state options.', key($values)));
