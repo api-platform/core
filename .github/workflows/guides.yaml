@@ -42,7 +42,7 @@ jobs:
                     restore-keys: ${{ runner.os }}-composer-
             -   name: Install project dependencies
                 working-directory: docs
-                run: composer install --no-interaction --no-progress --ansi && composer require webonyx/graphql-php
+                run: composer update --no-interaction --no-progress --ansi
             -   name: Test guides
                 working-directory: docs
                 env:
