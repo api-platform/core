@@ -75,7 +75,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                         $operation = $operation->withName($routeName);
                     }
 
-                    $operations->add($routeName, $operation);
+                    $operations->add($operation->getName(), $operation);
                     continue;
                 }
 
