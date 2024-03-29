@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests\Extractor;
 
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
@@ -36,7 +37,6 @@ use ApiPlatform\Metadata\Tests\Extractor\Adapter\ResourceAdapterInterface;
 use ApiPlatform\Metadata\Tests\Extractor\Adapter\XmlResourceAdapter;
 use ApiPlatform\Metadata\Tests\Extractor\Adapter\YamlResourceAdapter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
-use ApiPlatform\Metadata\Tests\Fixtures\StateOptions;
 use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
@@ -714,7 +714,11 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         $configuration = reset($values);
         switch (key($values)) {
             case 'elasticsearchOptions':
-                return new StateOptions($configuration['index'] ?? null, $configuration['type'] ?? null);
+                if (class_exists(Options::class)) {
+                    return new Options(isset($elasticsearchOptions['index']) ? (string) $elasticsearchOptions['index'] : null, isset($elasticsearchOptions['type']) ? (string) $elasticsearchOptions['type'] : null);
+                }
+
+                return null;
         }
 
         throw new \LogicException(sprintf('Unsupported "%s" state options.', key($values)));
