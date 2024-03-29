@@ -103,6 +103,10 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         $paginationData = $this->getPaginationData($object, $collectionContext);
 
         $childContext = $this->createOperationContext($collectionContext, $resourceClass);
+        if (isset($collectionContext['force_resource_class'])) {
+            $childContext['force_resource_class'] = $collectionContext['force_resource_class'];
+        }
+
         $itemsData = $this->getItemsData($object, $format, $childContext);
 
         return array_merge_recursive($data, $paginationData, $itemsData);

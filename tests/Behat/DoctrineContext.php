@@ -155,6 +155,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\Event;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\ItemLog;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\Group;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6039\Issue6039EntityUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\LinkHandledDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
@@ -2266,6 +2267,22 @@ final class DoctrineContext implements Context
     public function thereIsADummyEntityWithAMappedSuperclass(): void
     {
         $entity = new DummyMappedSubclass();
+        $this->manager->persist($entity);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are issue6039 users
+     */
+    public function thereAreIssue6039Users(): void
+    {
+        $entity = new Issue6039EntityUser();
+        $entity->name = 'test';
+        $entity->bar = 'test';
+        $this->manager->persist($entity);
+        $entity = new Issue6039EntityUser();
+        $entity->name = 'test2';
+        $entity->bar = 'test';
         $this->manager->persist($entity);
         $this->manager->flush();
     }
