@@ -32,6 +32,7 @@ use Symfony\Component\WebLink\Link;
     operations: [
         new Operation(
             name: '_api_errors_problem',
+            routeName: 'api_errors',
             outputFormats: ['json' => ['application/problem+json']],
             normalizationContext: [
                 'groups' => ['jsonproblem'],
@@ -41,6 +42,7 @@ use Symfony\Component\WebLink\Link;
         ),
         new Operation(
             name: '_api_errors_hydra',
+            routeName: 'api_errors',
             outputFormats: ['jsonld' => ['application/problem+json']],
             normalizationContext: [
                 'groups' => ['jsonld'],
@@ -51,12 +53,17 @@ use Symfony\Component\WebLink\Link;
         ),
         new Operation(
             name: '_api_errors_jsonapi',
+            routeName: 'api_errors',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: [
                 'groups' => ['jsonapi'],
                 'skip_null_values' => true,
                 'rfc_7807_compliant_errors' => true,
             ],
+        ),
+        new Operation(
+            name: '_api_errors',
+            routeName: 'api_errors'
         ),
     ],
     provider: 'api_platform.state.error_provider',
@@ -119,12 +126,14 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[Ignore]
+    #[ApiProperty(readable: false)]
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
     #[Ignore]
+    #[ApiProperty(readable: false)]
     public function getStatusCode(): int
     {
         return $this->status;

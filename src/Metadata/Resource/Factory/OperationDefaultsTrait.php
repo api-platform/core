@@ -202,7 +202,7 @@ trait OperationDefaultsTrait
             throw new RuntimeException(sprintf('Operation should be an instance of "%s"', HttpOperation::class));
         }
 
-        if ($operation->getRouteName()) {
+        if (!$operation->getName() && $operation->getRouteName()) {
             /** @var HttpOperation $operation */
             $operation = $operation->withName($operation->getRouteName());
         }

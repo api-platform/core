@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
+use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
-use ApiPlatform\Metadata\Tests\Fixtures\StateOptions;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
@@ -414,7 +414,9 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         $configuration = reset($stateOptions);
         switch (key($stateOptions)) {
             case 'elasticsearchOptions':
-                return new StateOptions($configuration['index'] ?? null, $configuration['type'] ?? null);
+                if (class_exists(Options::class)) {
+                    return new Options($configuration['index'] ?? null, $configuration['type'] ?? null);
+                }
         }
 
         return null;
