@@ -86,7 +86,7 @@ abstract class AbstractFilter implements FilterInterface
     protected function denormalizePropertyName(string|int $property): string
     {
         if (!$this->nameConverter instanceof NameConverterInterface) {
-            return $property;
+            return (string) $property;
         }
 
         return implode('.', array_map($this->nameConverter->denormalize(...), explode('.', (string) $property)));
