@@ -107,6 +107,9 @@ Feature: Cache invalidation through HTTP Cache tags (custom TagCollector service
                         "type": "RelatedDummy",
                         "id": "/related_dummies/1"
                     }
+                },
+                "related": {
+                    "data": []
                 }
             }
         }

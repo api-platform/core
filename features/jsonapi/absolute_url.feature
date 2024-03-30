@@ -56,6 +56,11 @@ Feature: IRI should contain Absolute URL
         "type": "AbsoluteUrlRelationDummy",
         "attributes": {
           "_id": 2
+        },
+        "relationships": {
+          "absoluteUrlDummies": {
+            "data": []
+          }
         }
       }
     }

@@ -403,13 +403,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 $relationshipName = $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context);
             }
 
-            if (!$attributeValue) {
-                continue;
-            }
-
             $data[$relationshipName] = [
                 'data' => [],
             ];
+
+            if (!$attributeValue) {
+                continue;
+            }
 
             // Many to one relationship
             if ('one' === $relationshipDataArray['cardinality']) {
