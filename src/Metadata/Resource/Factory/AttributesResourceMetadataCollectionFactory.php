@@ -151,13 +151,13 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                     [$key, $operation] = $this->getOperationWithDefaults($resource, $operation, true);
                     $operations[$key] = $operation;
                 }
-                $resources[$index] = $resource->withOperations(new Operations($operations));
+                $resources[$index] = $resource = $resource->withOperations(new Operations($operations));
             }
 
             if ($parameters = $resource->getParameters()) {
                 $operations = [];
-                foreach ($resource->getOperations() ?? [] as $operation) {
-                    $operations[$operation->getName()] = $this->mergeOperationParameters($operation, $parameters);
+                foreach ($resource->getOperations() ?? [] as $i => $operation) {
+                    $operations[$i] = $this->mergeOperationParameters($operation, $parameters);
                 }
                 $resources[$index] = $resource = $resource->withOperations(new Operations($operations)); // @phpstan-ignore-line
             }
