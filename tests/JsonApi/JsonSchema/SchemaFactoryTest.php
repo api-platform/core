@@ -149,9 +149,11 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('$ref', $resultSchema['properties']['data']['items']);
 
         $properties = $resultSchema['definitions'][$definitionName]['properties'];
-        $this->assertArrayHasKey('id', $properties);
-        $this->assertArrayHasKey('type', $properties);
-        $this->assertArrayHasKey('attributes', $properties);
+        $this->assertArrayHasKey('data', $properties);
+        $this->assertArrayHasKey('properties', $properties['data']);
+        $this->assertArrayHasKey('id', $properties['data']['properties']);
+        $this->assertArrayHasKey('type', $properties['data']['properties']);
+        $this->assertArrayHasKey('attributes', $properties['data']['properties']);
 
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, forceCollection: true);
 
@@ -175,8 +177,10 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('$ref', $resultSchema['properties']['data']['items']);
 
         $properties = $resultSchema['definitions'][$definitionName]['properties'];
-        $this->assertArrayHasKey('id', $properties);
-        $this->assertArrayHasKey('type', $properties);
-        $this->assertArrayHasKey('attributes', $properties);
+        $this->assertArrayHasKey('data', $properties);
+        $this->assertArrayHasKey('properties', $properties['data']);
+        $this->assertArrayHasKey('id', $properties['data']['properties']);
+        $this->assertArrayHasKey('type', $properties['data']['properties']);
+        $this->assertArrayHasKey('attributes', $properties['data']['properties']);
     }
 }

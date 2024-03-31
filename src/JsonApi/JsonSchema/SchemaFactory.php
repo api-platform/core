@@ -119,31 +119,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
-        if ('input' === $type) {
-            return $schema;
-        }
-
-        if ($key = $schema->getRootDefinitionKey()) {
-            $definitions = $schema->getDefinitions();
-            $properties = $definitions[$key]['properties'] ?? [];
-
-            // Prevent reapplying
-            if (isset($properties['id'], $properties['type']) || isset($properties['data'])) {
-                return $schema;
-            }
-
-            $definitions[$key]['properties'] = [
-                'data' => [
-                    'type' => 'object',
-                    'properties' => $this->buildDefinitionPropertiesSchema($key, $className, $schema, $serializerContext),
-                    'required' => ['type', 'id'],
-                ],
-            ];
-
-            return $schema;
-        }
-
-        if ($key = $schema->getItemsDefinitionKey()) {
+        if (($key = $schema->getRootDefinitionKey()) || ($key = $schema->getItemsDefinitionKey())) {
             $definitions = $schema->getDefinitions();
             $properties = $definitions[$key]['properties'] ?? [];
 
@@ -153,7 +129,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             $definitions[$key]['properties'] = $this->buildDefinitionPropertiesSchema($key, $className, $schema, $serializerContext);
-            $definitions[$key]['required'] = ['type', 'id'];
+
+            if ($schema->getRootDefinitionKey()) {
+                return $schema;
+            }
         }
 
         if (($schema['type'] ?? '') === 'array') {
@@ -238,7 +217,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             unset($definitions[$key]['required']);
         }
 
-        return $replacement;
+        return [
+            'data' => [
+                'type' => 'object',
+                'properties' => $replacement,
+                'required' => ['type', 'id'],
+            ],
+        ];
     }
 
     private function getRelationship(string $resourceClass, string $property, ?array $serializerContext): ?array
