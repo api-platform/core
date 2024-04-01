@@ -103,7 +103,7 @@ final class ContentNegotiationProvider implements ProviderInterface
         }
 
         /** @var string $contentType */
-        $formats = $operation->getInputFormats() ?? [];
+        $formats = array_merge($operation->getInputFormats() ?? [], $this->getOpenApiRequestBodyFormats($operation));
         if ($format = $this->getMimeTypeFormat($contentType, $formats)) {
             return $format;
         }
@@ -120,5 +120,20 @@ final class ContentNegotiationProvider implements ProviderInterface
         }
 
         return null;
+    }
+
+    private function getOpenApiRequestBodyFormats(HttpOperation $operation): array
+    {
+        if ($openApi = $operation->getOpenapi()) {
+            if ($openApi->getRequestBody()) {
+                foreach ($openApi->getRequestBody()->getContent() as $mimeType => $format) {
+                    // get the shortname as the mimetype after the slash
+                    $shortName = substr($mimeType, strpos($mimeType, '/') + 1);
+                    $openApiInputFormats[$shortName] = [$mimeType];
+                }
+            }
+        }
+
+        return $openApiInputFormats ?? [];
     }
 }
