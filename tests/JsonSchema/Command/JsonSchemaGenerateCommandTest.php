@@ -177,4 +177,16 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
         $this->assertArrayHasKey('@id', $json['definitions']['ThirdLevel.jsonld-friends']['properties']);
     }
+
+    public function testJsonApiIncludesSchema(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question', '--type' => 'output', '--format' => 'jsonapi']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertArrayHasKey('answer', $json['definitions']['Question.jsonapi']['properties']['data']['properties']['relationships']['properties']);
+        $this->assertArrayHasKey('anyOf', $json['definitions']['Question.jsonapi']['properties']['included']['items']);
+        $this->assertArrayHasKey('$ref', $json['definitions']['Question.jsonapi']['properties']['included']['items']['anyOf'][0]);
+        $this->assertSame('#/definitions/Answer.jsonapi', $json['definitions']['Question.jsonapi']['properties']['included']['items']['anyOf'][0]['$ref']);
+    }
 }

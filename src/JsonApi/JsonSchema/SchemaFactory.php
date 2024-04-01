@@ -128,7 +128,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 return $schema;
             }
 
-            $definitions[$key]['properties'] = $this->buildDefinitionPropertiesSchema($key, $className, $schema, $serializerContext);
+            $definitions[$key]['properties'] = $this->buildDefinitionPropertiesSchema($key, $className, $format, $schema, $serializerContext);
 
             if ($schema->getRootDefinitionKey()) {
                 return $schema;
@@ -166,17 +166,24 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
     }
 
-    private function buildDefinitionPropertiesSchema(string $key, string $className, Schema $schema, ?array $serializerContext): array
+    private function buildDefinitionPropertiesSchema(string $key, string $className, string $format, Schema $schema, ?array $serializerContext): array
     {
         $definitions = $schema->getDefinitions();
         $properties = $definitions[$key]['properties'] ?? [];
 
         $attributes = [];
         $relationships = [];
+        $relatedDefinitions = [];
         foreach ($properties as $propertyName => $property) {
             if ($relation = $this->getRelationship($className, $propertyName, $serializerContext)) {
-                [$isOne, $isMany] = $relation;
+                [$isOne, $hasOperations, $relatedClassName] = $relation;
+                if (false === $hasOperations) {
+                    continue;
+                }
 
+                $relatedDefName = $this->getShortClassName($relatedClassName).('json' === $format ? '' : ".$format");
+                $ref = Schema::VERSION_OPENAPI === $schema->getVersion() ? '#/components/schemas/'.$relatedDefName : '#/definitions/'.$relatedDefName;
+                $relatedDefinitions[$propertyName] = ['$ref' => $ref];
                 if ($isOne) {
                     $relationships[$propertyName]['properties']['data'] = self::RELATION_PROPS;
                     continue;
@@ -197,10 +204,24 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $replacement = self::PROPERTY_PROPS;
         $replacement['attributes']['properties'] = $attributes;
 
+        $included = [];
         if (\count($relationships) > 0) {
             $replacement['relationships'] = [
                 'type' => 'object',
                 'properties' => $relationships,
+            ];
+            $included = [
+                'included' => [
+                    'description' => 'Related resources requested via the "include" query parameter.',
+                    'type' => 'array',
+                    'items' => [
+                        'anyOf' => array_values($relatedDefinitions),
+                    ],
+                    'readOnly' => true,
+                    'externalDocs' => [
+                        'url' => 'https://jsonapi.org/format/#fetching-includes',
+                    ],
+                ],
             ];
         }
 
@@ -223,7 +244,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 'properties' => $replacement,
                 'required' => ['type', 'id'],
             ],
-        ];
+        ] + $included;
     }
 
     private function getRelationship(string $resourceClass, string $property, ?array $serializerContext): ?array
@@ -232,6 +253,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
         $isRelationship = false;
         $isOne = $isMany = false;
+        $className = $hasOperations = null;
 
         foreach ($types as $type) {
             if ($type->isCollection()) {
@@ -244,8 +266,20 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 continue;
             }
             $isRelationship = true;
+            $resourceMetadata = $this->resourceMetadataFactory->create($className);
+            $operation = $resourceMetadata->getOperation();
+            // @see https://github.com/api-platform/core/issues/5501
+            // @see https://github.com/api-platform/core/pull/5722
+            $hasOperations ??= $operation->canRead();
         }
 
-        return $isRelationship ? [$isOne, $isMany] : null;
+        return $isRelationship ? [$isOne, $hasOperations, $className] : null;
+    }
+
+    private function getShortClassName(string $fullyQualifiedName): string
+    {
+        $parts = explode('\\', $fullyQualifiedName);
+
+        return end($parts);
     }
 }
