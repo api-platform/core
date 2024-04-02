@@ -81,10 +81,10 @@ class SchemaFactoryTest extends TestCase
 
     public function testCustomFormatBuildSchema(): void
     {
-        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'json');
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi');
 
         $this->assertTrue($resultSchema->isDefined());
-        $this->assertSame('Dummy', $resultSchema->getRootDefinitionKey());
+        $this->assertSame('Dummy.jsonapi', $resultSchema->getRootDefinitionKey());
     }
 
     public function testHasRootDefinitionKeyBuildSchema(): void
