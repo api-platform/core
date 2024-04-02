@@ -14,11 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\JsonSchema;
 
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
+use ApiPlatform\JsonSchema\DefinitionNameFactoryInterface;
+use ApiPlatform\JsonSchema\ResourceMetadataTrait;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 
 /**
@@ -28,6 +31,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
  */
 final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
+    use ResourceMetadataTrait;
     private const LINKS_PROPS = [
         'type' => 'object',
         'properties' => [
@@ -102,11 +106,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         ],
     ];
 
-    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver)
+    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private readonly ?DefinitionNameFactoryInterface $definitionNameFactory = null)
     {
         if ($this->schemaFactory instanceof SchemaFactoryAwareInterface) {
             $this->schemaFactory->setSchemaFactory($this);
         }
+        $this->resourceClassResolver = $resourceClassResolver;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -114,10 +120,12 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
      */
     public function buildSchema(string $className, string $format = 'jsonapi', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
-        $schema = $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         if ('jsonapi' !== $format) {
-            return $schema;
+            return $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         }
+        // We don't use the serializer context here as JSON:API doesn't leverage serializer groups for related resources.
+        // That is done by query parameter. @see https://jsonapi.org/format/#fetching-includes
+        $schema = $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, [], $forceCollection);
 
         if (($key = $schema->getRootDefinitionKey()) || ($key = $schema->getItemsDefinitionKey())) {
             $definitions = $schema->getDefinitions();
@@ -128,7 +136,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 return $schema;
             }
 
-            $definitions[$key]['properties'] = $this->buildDefinitionPropertiesSchema($key, $className, $format, $schema, $serializerContext);
+            $definitions[$key]['properties'] = $this->buildDefinitionPropertiesSchema($key, $className, $format, $type, $operation, $schema, []);
 
             if ($schema->getRootDefinitionKey()) {
                 return $schema;
@@ -166,7 +174,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
     }
 
-    private function buildDefinitionPropertiesSchema(string $key, string $className, string $format, Schema $schema, ?array $serializerContext): array
+    private function buildDefinitionPropertiesSchema(string $key, string $className, string $format, string $type, ?Operation $operation, Schema $schema, ?array $serializerContext): array
     {
         $definitions = $schema->getDefinitions();
         $properties = $definitions[$key]['properties'] ?? [];
@@ -181,8 +189,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     continue;
                 }
 
-                $relatedDefName = $this->getShortClassName($relatedClassName).('json' === $format ? '' : ".$format");
-                $ref = Schema::VERSION_OPENAPI === $schema->getVersion() ? '#/components/schemas/'.$relatedDefName : '#/definitions/'.$relatedDefName;
+                $operation = $this->findOperation($relatedClassName, $type, $operation, $serializerContext);
+                $inputOrOutputClass = $this->findOutputClass($relatedClassName, $type, $operation, $serializerContext);
+                $serializerContext ??= $this->getSerializerContext($operation, $type);
+                $definitionName = $this->definitionNameFactory->create($relatedClassName, $format, $inputOrOutputClass, $operation, $serializerContext);
+                $ref = Schema::VERSION_OPENAPI === $schema->getVersion() ? '#/components/schemas/'.$definitionName : '#/definitions/'.$definitionName;
                 $relatedDefinitions[$propertyName] = ['$ref' => $ref];
                 if ($isOne) {
                     $relationships[$propertyName]['properties']['data'] = self::RELATION_PROPS;
@@ -274,12 +285,5 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         return $isRelationship ? [$isOne, $hasOperations, $className] : null;
-    }
-
-    private function getShortClassName(string $fullyQualifiedName): string
-    {
-        $parts = explode('\\', $fullyQualifiedName);
-
-        return end($parts);
     }
 }

@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Hal\JsonSchema;
 
 use ApiPlatform\Hal\JsonSchema\SchemaFactory;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
+use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
 use ApiPlatform\Metadata\ApiResource;
@@ -49,14 +50,14 @@ class SchemaFactoryTest extends TestCase
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
+        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+
         $baseSchemaFactory = new BaseSchemaFactory(
-            null,
-            $resourceMetadataFactory->reveal(),
-            $propertyNameCollectionFactory->reveal(),
-            $propertyMetadataFactory->reveal(),
-            null,
-            null,
-            ['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true],
+            typeFactory: null,
+            resourceMetadataFactory: $resourceMetadataFactory->reveal(),
+            propertyNameCollectionFactory: $propertyNameCollectionFactory->reveal(),
+            propertyMetadataFactory: $propertyMetadataFactory->reveal(),
+            definitionNameFactory: $definitionNameFactory,
         );
 
         $hydraSchemaFactory = new HydraSchemaFactory($baseSchemaFactory);
