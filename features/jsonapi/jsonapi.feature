@@ -205,6 +205,9 @@ Feature: JSON API basic support
               "type": "ThirdLevel",
               "id": "/third_levels/1"
             }
+          },
+          "relatedToDummyFriend": {
+            "data": []
           }
         }
       }

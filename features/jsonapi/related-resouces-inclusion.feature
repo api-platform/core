@@ -33,6 +33,9 @@ Feature: JSON API Inclusion of Related Resources
                         "type": "DummyGroup",
                         "id": "/dummy_groups/1"
                     }
+                },
+                "groups": {
+                    "data": []
                 }
             }
         },
@@ -75,6 +78,9 @@ Feature: JSON API Inclusion of Related Resources
                         "type": "DummyGroup",
                         "id": "/dummy_groups/1"
                     }
+                },
+                "groups": {
+                    "data": []
                 }
             }
         }
@@ -355,6 +361,15 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "RelatedDummy",
                             "id": "/related_dummies/1"
                         }
+                    },
+                    "relatedDummies": {
+                        "data": []
+                    },
+                    "relatedOwnedDummy": {
+                        "data": []
+                    },
+                    "relatedOwningDummy": {
+                        "data": []
                     }
                 }
             },
@@ -384,6 +399,9 @@ Feature: JSON API Inclusion of Related Resources
                                 "type": "ThirdLevel",
                                 "id": "/third_levels/1"
                             }
+                        },
+                        "relatedToDummyFriend": {
+                            "data": []
                         }
                     }
                 }
@@ -437,6 +455,12 @@ Feature: JSON API Inclusion of Related Resources
                             "id": "/related_dummies/2"
                         }
                     ]
+                },
+                "relatedOwnedDummy": {
+                    "data": []
+                },
+                "relatedOwningDummy": {
+                    "data": []
                 }
             }
         },
@@ -466,6 +490,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/1"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             },
@@ -483,6 +510,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "FourthLevel",
                             "id": "/fourth_levels/1"
                         }
+                    },
+                    "badFourthLevel": {
+                        "data": []
                     },
                     "relatedDummies": {
                         "data": [
@@ -504,6 +534,11 @@ Feature: JSON API Inclusion of Related Resources
                 "attributes": {
                     "_id": 1,
                     "level": 4
+                },
+                "relationships": {
+                    "badThirdLevel": {
+                        "data": []
+                    }
                 }
             }
         ]
@@ -539,6 +574,9 @@ Feature: JSON API Inclusion of Related Resources
                 "name_converted": null
             },
             "relationships": {
+                "relatedDummy": {
+                    "data": []
+                },
                 "relatedDummies": {
                     "data": [
                         {
@@ -554,6 +592,12 @@ Feature: JSON API Inclusion of Related Resources
                             "id": "/related_dummies/3"
                         }
                     ]
+                },
+                "relatedOwnedDummy": {
+                    "data": []
+                },
+                "relatedOwningDummy": {
+                    "data": []
                 }
             }
         },
@@ -583,6 +627,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/1"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             },
@@ -595,6 +642,12 @@ Feature: JSON API Inclusion of Related Resources
                     "test": true
                 },
                 "relationships": {
+                    "fourthLevel": {
+                        "data": []
+                    },
+                    "badFourthLevel": {
+                        "data": []
+                    },
                     "relatedDummies": {
                         "data": [
                             {
@@ -630,6 +683,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/2"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             },
@@ -642,6 +698,12 @@ Feature: JSON API Inclusion of Related Resources
                     "test": true
                 },
                 "relationships": {
+                    "fourthLevel": {
+                        "data": []
+                    },
+                    "badFourthLevel": {
+                        "data": []
+                    },
                     "relatedDummies": {
                         "data": [
                             {
@@ -677,6 +739,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/3"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             },
@@ -689,6 +754,12 @@ Feature: JSON API Inclusion of Related Resources
                     "test": true
                 },
                 "relationships": {
+                    "fourthLevel": {
+                        "data": []
+                    },
+                    "badFourthLevel": {
+                        "data": []
+                    },
                     "relatedDummies": {
                         "data": [
                             {
@@ -732,6 +803,15 @@ Feature: JSON API Inclusion of Related Resources
                 "foo": null
             },
             "relationships": {
+                "relatedDummy": {
+                    "data": []
+                },
+                "relatedDummies": {
+                    "data": []
+                },
+                "relatedOwnedDummy": {
+                    "data": []
+                },
                 "relatedOwningDummy": {
                     "data": {
                         "type": "RelatedOwningDummy",
@@ -790,6 +870,9 @@ Feature: JSON API Inclusion of Related Resources
                 "name_converted": null
             },
             "relationships": {
+                "relatedDummy": {
+                    "data": []
+                },
                 "relatedDummies": {
                     "data": [
                         {
@@ -805,6 +888,12 @@ Feature: JSON API Inclusion of Related Resources
                             "id": "/related_dummies/3"
                         }
                     ]
+                },
+                "relatedOwnedDummy": {
+                    "data": []
+                },
+                "relatedOwningDummy": {
+                    "data": []
                 }
             }
         },
@@ -834,6 +923,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/1"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             },
@@ -846,6 +938,12 @@ Feature: JSON API Inclusion of Related Resources
                     "test": true
                 },
                 "relationships": {
+                    "fourthLevel": {
+                        "data": []
+                    },
+                    "badFourthLevel": {
+                        "data": []
+                    },
                     "relatedDummies": {
                         "data": [
                             {
@@ -889,6 +987,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/1"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             },
@@ -917,6 +1018,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/1"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             }
@@ -960,6 +1064,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "DummyGroup",
                             "id": "/dummy_groups/1"
                         }
+                    },
+                    "groups": {
+                        "data": []
                     }
                 }
             },
@@ -979,6 +1086,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "DummyGroup",
                             "id": "/dummy_groups/2"
                         }
+                    },
+                    "groups": {
+                        "data": []
                     }
                 }
             },
@@ -998,6 +1108,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "DummyGroup",
                             "id": "/dummy_groups/3"
                         }
+                    },
+                    "groups": {
+                        "data": []
                     }
                 }
             }
@@ -1072,6 +1185,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "DummyGroup",
                             "id": "/dummy_groups/1"
                         }
+                    },
+                    "groups": {
+                        "data": []
                     }
                 }
             },
@@ -1091,6 +1207,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "DummyGroup",
                             "id": "/dummy_groups/1"
                         }
+                    },
+                    "groups": {
+                        "data": []
                     }
                 }
             },
@@ -1110,6 +1229,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "DummyGroup",
                             "id": "/dummy_groups/1"
                         }
+                    },
+                    "groups": {
+                        "data": []
                     }
                 }
             }
@@ -1252,6 +1374,15 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "RelatedDummy",
                             "id": "/related_dummies/1"
                         }
+                    },
+                    "relatedDummies": {
+                        "data": []
+                    },
+                    "relatedOwnedDummy": {
+                        "data": []
+                    },
+                    "relatedOwningDummy": {
+                        "data": []
                     }
                 }
             },
@@ -1279,6 +1410,15 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "RelatedDummy",
                             "id": "/related_dummies/2"
                         }
+                    },
+                    "relatedDummies": {
+                        "data": []
+                    },
+                    "relatedOwnedDummy": {
+                        "data": []
+                    },
+                    "relatedOwningDummy": {
+                        "data": []
                     }
                 }
             },
@@ -1306,6 +1446,15 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "RelatedDummy",
                             "id": "/related_dummies/3"
                         }
+                    },
+                    "relatedDummies": {
+                        "data": []
+                    },
+                    "relatedOwnedDummy": {
+                        "data": []
+                    },
+                    "relatedOwningDummy": {
+                        "data": []
                     }
                 }
             }
@@ -1336,6 +1485,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/1"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             },
@@ -1348,6 +1500,12 @@ Feature: JSON API Inclusion of Related Resources
                     "test": true
                 },
                 "relationships": {
+                    "fourthLevel": {
+                        "data": []
+                    },
+                    "badFourthLevel": {
+                        "data": []
+                    },
                     "relatedDummies": {
                         "data": [
                             {
@@ -1383,6 +1541,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/2"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             },
@@ -1395,6 +1556,12 @@ Feature: JSON API Inclusion of Related Resources
                     "test": true
                 },
                 "relationships": {
+                    "fourthLevel": {
+                        "data": []
+                    },
+                    "badFourthLevel": {
+                        "data": []
+                    },
                     "relatedDummies": {
                         "data": [
                             {
@@ -1430,6 +1597,9 @@ Feature: JSON API Inclusion of Related Resources
                             "type": "ThirdLevel",
                             "id": "/third_levels/3"
                         }
+                    },
+                    "relatedToDummyFriend": {
+                        "data": []
                     }
                 }
             },
@@ -1442,6 +1612,12 @@ Feature: JSON API Inclusion of Related Resources
                     "test": true
                 },
                 "relationships": {
+                    "fourthLevel": {
+                        "data": []
+                    },
+                    "badFourthLevel": {
+                        "data": []
+                    },
                     "relatedDummies": {
                         "data": [
                             {

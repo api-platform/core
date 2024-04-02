@@ -56,6 +56,11 @@ Feature: IRI should contain network path
         "type": "NetworkPathRelationDummy",
         "attributes": {
           "_id": 2
+        },
+        "relationships": {
+          "networkPathDummies": {
+            "data": []
+          }
         }
       }
     }
