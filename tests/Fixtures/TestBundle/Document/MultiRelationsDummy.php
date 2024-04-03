@@ -38,6 +38,9 @@ class MultiRelationsDummy
     #[ODM\ReferenceOne(targetDocument: MultiRelationsRelatedDummy::class, storeAs: 'id', nullable: true)]
     public ?MultiRelationsRelatedDummy $manyToOneRelation = null;
 
+    #[ODM\ReferenceOne(targetDocument: MultiRelationsResolveDummy::class, storeAs: 'id', nullable: true)]
+    public ?MultiRelationsResolveDummy $manyToOneResolveRelation = null;
+
     /** @var Collection<int, MultiRelationsRelatedDummy> */
     #[ODM\ReferenceMany(targetDocument: MultiRelationsRelatedDummy::class, storeAs: 'id', nullable: true)]
     public Collection $manyToManyRelations;
@@ -65,6 +68,18 @@ class MultiRelationsDummy
     public function setManyToOneRelation(?MultiRelationsRelatedDummy $relatedMultiUsedDummy): void
     {
         $this->manyToOneRelation = $relatedMultiUsedDummy;
+    }
+
+    public function getManyToOneResolveRelation(): ?MultiRelationsResolveDummy
+    {
+        return $this->manyToOneResolveRelation;
+    }
+
+    public function setManyToOneResolveRelation(?MultiRelationsResolveDummy $manyToOneResolveRelation): self
+    {
+        $this->manyToOneResolveRelation = $manyToOneResolveRelation;
+
+        return $this;
     }
 
     public function addManyToManyRelation(MultiRelationsRelatedDummy $relatedMultiUsedDummy): void

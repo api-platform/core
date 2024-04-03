@@ -14,25 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\MultiRelationsResolveDummy as MultiRelationsResolveDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsResolveDummy;
 
 /**
  * Resolver for dummy item custom query.
  *
  * @author Lukas Lücke <lukas@luecke.me>
  */
-class DummyCustomQueryNotRetrievedItemDocumentResolver implements QueryItemResolverInterface
+class MultiRelationsResolveQueryItemResolver implements QueryItemResolverInterface
 {
-    public function __invoke(?object $item, array $context): DummyCustomQueryDocument
+    public function __invoke(?object $item, array $context): MultiRelationsResolveDummy|MultiRelationsResolveDummyDocument
     {
-        if (null === $item) {
-            $item = new DummyCustomQueryDocument();
-            $item->id = 0;
-            $item->message = 'Success (not retrieved)!';
-
-            return $item;
-        }
-
-        return $item;
+        return $context['source']['manyToOneResolveRelation'];
     }
 }

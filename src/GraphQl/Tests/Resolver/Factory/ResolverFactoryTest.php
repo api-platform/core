@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Tests\Resolver\Factory;
 
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -38,11 +40,13 @@ class ResolverFactoryTest extends TestCase
         $provider->expects($this->once())->method('provide')->with($providedOperation ?: $operation, [], $context)->willReturn($body);
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')->with($body, $processedOperation ?: $operation, [], $context)->willReturn($returnValue);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->expects($this->once())->method('create')->with($rootClass, 'test')->willReturn(new ApiProperty(schema: ['type' => 'array']));
         $resolveInfo = $this->createMock(ResolveInfo::class);
         $resolveInfo->fieldName = 'test';
 
         $resolverFactory = new ResolverFactory($provider, $processor);
-        $this->assertEquals($resolverFactory->__invoke($resourceClass, $rootClass, $operation)(['test' => null], [], [], $resolveInfo), $returnValue);
+        $this->assertEquals($resolverFactory->__invoke($resourceClass, $rootClass, $operation, $propertyMetadataFactory)(['test' => null], [], [], $resolveInfo), $returnValue);
     }
 
     public function graphQlQueries(): array
