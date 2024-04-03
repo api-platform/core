@@ -85,6 +85,10 @@ Feature: GraphQL query support
           id
           name
         }
+        manyToOneResolveRelation {
+          id
+          name
+        }
         manyToManyRelations {
           edges{
             node {

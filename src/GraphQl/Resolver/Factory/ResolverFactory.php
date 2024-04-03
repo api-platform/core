@@ -27,14 +27,13 @@ class ResolverFactory implements ResolverFactoryInterface
 {
     public function __construct(
         private readonly ProviderInterface $provider,
-        private readonly ProcessorInterface $processor,
-        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory
+        private readonly ProcessorInterface $processor
     ) {
     }
 
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null, ?PropertyMetadataFactoryInterface $propertyMetadataFactory = null): callable
     {
-        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
+        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation, $propertyMetadataFactory) {
             if (\array_key_exists($info->fieldName, $source ?? [])) {
                 $body = $source[$info->fieldName];
 
@@ -50,10 +49,10 @@ class ResolverFactory implements ResolverFactoryInterface
                     ) : $body;
                 }
 
-                $propertyMetadata = $rootClass ? $this->propertyMetadataFactory->create($rootClass, $info->fieldName) : null;
-                $propertySchemaType = $propertyMetadata?->getSchema()['type'] ?? null;
+                $propertyMetadata = $rootClass ? $propertyMetadataFactory?->create($rootClass, $info->fieldName) : null;
+                $type = $propertyMetadata?->getBuiltinTypes()[0] ?? null;
                 // Data already fetched and normalized (field or nested resource)
-                if ($body || null === $resourceClass || 'array' !== $propertySchemaType) {
+                if ($body || null === $resourceClass || ($type && !$type->isCollection())) {
                     return $body;
                 }
             }
