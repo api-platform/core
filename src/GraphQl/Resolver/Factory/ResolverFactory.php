@@ -36,9 +36,9 @@ class ResolverFactory implements ResolverFactoryInterface
                 $body = $source[$info->fieldName];
 
                 $propertyMetadata = $rootClass ? $propertyMetadataFactory?->create($rootClass, $info->fieldName) : null;
-                $propertySchemaType = $propertyMetadata?->getSchema()['type'] ?? null;
+                $type = $propertyMetadata?->getBuiltinTypes()[0] ?? null;
                 // Data already fetched and normalized (field or nested resource)
-                if ($body || null === $resourceClass || $propertyMetadata && 'array' !== $propertySchemaType) {
+                if ($body || null === $resourceClass || ($type && !$type->isCollection())) {
                     return $body;
                 }
             }
