@@ -17,8 +17,8 @@ use ApiPlatform\GraphQl\State\Provider\NoopProvider;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -34,17 +34,19 @@ class ResolverFactory implements ResolverFactoryInterface
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null, ?PropertyMetadataFactoryInterface $propertyMetadataFactory = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation, $propertyMetadataFactory) {
-            if ($body = $source[$info->fieldName] ?? null) {
-                // special treatment for nested resources without a resolver/provider
-
-                return $body;
-            }
-
             if (\array_key_exists($info->fieldName, $source ?? [])) {
                 $body = $source[$info->fieldName];
 
+                // special treatment for nested resources without a resolver/provider
                 if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && (!$operation->getProvider() || NoopProvider::class === $operation->getProvider())) {
-                    return $this->resolve($source, $args, $info, $rootClass, $operation, new ArrayPaginator($body, 0, \count($body)));
+                    return \is_array($body) ? $this->resolve(
+                        $source,
+                        $args,
+                        $info,
+                        $rootClass,
+                        $operation,
+                        new ArrayPaginator($body, 0, \count($body))
+                    ) : $body;
                 }
 
                 $propertyMetadata = $rootClass ? $propertyMetadataFactory?->create($rootClass, $info->fieldName) : null;
