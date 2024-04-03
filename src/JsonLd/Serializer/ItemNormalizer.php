@@ -82,7 +82,20 @@ final class ItemNormalizer extends AbstractItemNormalizer
         // TODO: we should not remove the resource_class in the normalizeRawCollection as we would find out anyway that it's not the same as the requested one
         $previousResourceClass = $context['resource_class'] ?? null;
         $metadata = [];
-        if ($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass) && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
+        $isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass);
+
+        /*
+         * Ignore context resource class if it's an abstract class or an interface
+         * and the current object is a resource class.
+         */
+        if (null !== $previousResourceClass && $isResourceClass) {
+            $previousResourceClassReflection = new \ReflectionClass($previousResourceClass);
+            if ($previousResourceClassReflection->isAbstract() || $previousResourceClassReflection->isInterface()) {
+                $previousResourceClass = null;
+            }
+        }
+
+        if ($isResourceClass && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($object, $previousResourceClass);
             $context = $this->initContext($resourceClass, $context);
             $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
