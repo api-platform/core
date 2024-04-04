@@ -214,7 +214,7 @@
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
 
             <!-- Run before serializer.normalizer.json_serializable and before serializer.normalizer.backed_enum which is at 880 -->
-            <tag name="serializer.normalizer" priority="-878" />
+            <tag name="serializer.normalizer" priority="-890" />
         </service>
 
         <service id="api_platform.graphql.normalizer.object" class="ApiPlatform\GraphQl\Serializer\ObjectNormalizer" public="false">
