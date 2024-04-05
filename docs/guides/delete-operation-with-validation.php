@@ -42,7 +42,7 @@ namespace App\Validator {
 
 namespace App\Entity {
     use ApiPlatform\Metadata\Delete;
-    use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+    use ApiPlatform\Validator\Exception\ValidationException;
     use App\Validator\AssertCanDelete;
     use Doctrine\ORM\Mapping as ORM;
 
