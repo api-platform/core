@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\JsonApi\JsonSchema;
 use ApiPlatform\Hal\JsonSchema\SchemaFactory as HalSchemaFactory;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\JsonApi\JsonSchema\SchemaFactory;
+use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
 use ApiPlatform\Metadata\ApiResource;
@@ -51,12 +52,14 @@ class SchemaFactoryTest extends TestCase
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
+        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true]);
+
         $baseSchemaFactory = new BaseSchemaFactory(
             typeFactory: null,
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),
             propertyNameCollectionFactory: $propertyNameCollectionFactory->reveal(),
             propertyMetadataFactory: $propertyMetadataFactory->reveal(),
-            distinctFormats: ['jsonhal' => true, 'jsonapi' => true, 'jsonld' => true],
+            definitionNameFactory: $definitionNameFactory,
         );
 
         $halSchemaFactory = new HalSchemaFactory($baseSchemaFactory);
@@ -68,6 +71,8 @@ class SchemaFactoryTest extends TestCase
             schemaFactory: $hydraSchemaFactory,
             propertyMetadataFactory: $propertyMetadataFactory->reveal(),
             resourceClassResolver: $resourceClassResolver->reveal(),
+            resourceMetadataFactory: $resourceMetadataFactory->reveal(),
+            definitionNameFactory: $definitionNameFactory,
         );
     }
 
@@ -81,10 +86,10 @@ class SchemaFactoryTest extends TestCase
 
     public function testCustomFormatBuildSchema(): void
     {
-        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'json');
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi');
 
         $this->assertTrue($resultSchema->isDefined());
-        $this->assertSame('Dummy', $resultSchema->getRootDefinitionKey());
+        $this->assertSame('Dummy.jsonapi', $resultSchema->getRootDefinitionKey());
     }
 
     public function testHasRootDefinitionKeyBuildSchema(): void

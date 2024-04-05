@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Tests\Factory;
 
+use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\TypeFactory;
@@ -432,7 +433,16 @@ class OpenApiFactoryTest extends TestCase
 
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $schemaFactory = new SchemaFactory(null, $resourceCollectionMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $definitionNameFactory = new DefinitionNameFactory([]);
+
+        $schemaFactory = new SchemaFactory(
+            typeFactory: null,
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
 
         $typeFactory = new TypeFactory();
         $typeFactory->setSchemaFactory($schemaFactory);

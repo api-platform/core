@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Tests\Serializer;
 
+use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\Metadata\ApiProperty;
@@ -50,7 +51,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -205,7 +205,15 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $schemaFactory = new SchemaFactory(null, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+
+        $schemaFactory = new SchemaFactory(
+            typeFactory: null,
+            resourceMetadataFactory: $resourceMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            definitionNameFactory: $definitionNameFactory,
+        );
 
         $typeFactory = new TypeFactory();
         $typeFactory->setSchemaFactory($schemaFactory);
