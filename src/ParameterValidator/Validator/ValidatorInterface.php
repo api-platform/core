@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\ParameterValidator\Validator;
 
+/**
+ * @deprecated use Parameter constraint instead
+ */
 interface ValidatorInterface
 {
     /**

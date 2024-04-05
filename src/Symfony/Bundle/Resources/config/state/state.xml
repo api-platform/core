@@ -54,5 +54,10 @@
             <tag name="api_platform.state_provider" key="api_platform.state_provider.object" />
         </service>
         <service id="ApiPlatform\State\ObjectProvider" alias="api_platform.state_provider.object" />
+
+        <service id="api_platform.state_provider.parameter" class="ApiPlatform\State\Provider\ParameterProvider" decorates="api_platform.state_provider.read" decoration-priority="300">
+            <argument type="service" id="api_platform.state_provider.parameter.inner" />
+            <argument type="tagged_locator" tag="api_platform.parameter_provider" index-by="key" />
+        </service>
     </services>
 </container>
