@@ -40,6 +40,9 @@ class MultiRelationsDummy
     #[ORM\ManyToOne(targetEntity: MultiRelationsRelatedDummy::class)]
     public ?MultiRelationsRelatedDummy $manyToOneRelation = null;
 
+    #[ORM\ManyToOne(targetEntity: MultiRelationsResolveDummy::class)]
+    public ?MultiRelationsResolveDummy $manyToOneResolveRelation = null;
+
     /** @var Collection<int, MultiRelationsRelatedDummy> */
     #[ORM\ManyToMany(targetEntity: MultiRelationsRelatedDummy::class)]
     public Collection $manyToManyRelations;
@@ -77,6 +80,18 @@ class MultiRelationsDummy
     public function setManyToOneRelation(?MultiRelationsRelatedDummy $relatedMultiUsedDummy): void
     {
         $this->manyToOneRelation = $relatedMultiUsedDummy;
+    }
+
+    public function getManyToOneResolveRelation(): ?MultiRelationsResolveDummy
+    {
+        return $this->manyToOneResolveRelation;
+    }
+
+    public function setManyToOneResolveRelation(?MultiRelationsResolveDummy $manyToOneResolveRelation): self
+    {
+        $this->manyToOneResolveRelation = $manyToOneResolveRelation;
+
+        return $this;
     }
 
     public function addManyToManyRelation(MultiRelationsRelatedDummy $relatedMultiUsedDummy): void

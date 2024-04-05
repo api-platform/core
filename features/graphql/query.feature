@@ -22,7 +22,7 @@ Feature: GraphQL query support
 
   @createSchema
   Scenario: Retrieve an item with different relations to the same resource
-    Given there are 2 multiRelationsDummy objects having each a manyToOneRelation, 2 manyToManyRelations, 3 oneToManyRelations and 4 embeddedRelations
+    Given there are 2 multiRelationsDummy objects having each 1 manyToOneRelation, 2 manyToManyRelations, 3 oneToManyRelations and 4 embeddedRelations
     When I send the following GraphQL request:
     """
     {
@@ -30,6 +30,10 @@ Feature: GraphQL query support
         id
         name
         manyToOneRelation {
+          id
+          name
+        }
+        manyToOneResolveRelation {
           id
           name
         }
@@ -70,7 +74,7 @@ Feature: GraphQL query support
 
   @createSchema
   Scenario: Retrieve embedded collections
-    Given there are 2 multiRelationsDummy objects having each a manyToOneRelation, 2 manyToManyRelations, 3 oneToManyRelations and 4 embeddedRelations
+    Given there are 2 multiRelationsDummy objects having each 1 manyToOneRelation, 2 manyToManyRelations, 3 oneToManyRelations and 4 embeddedRelations
     When I send the following GraphQL request:
     """
     {
@@ -78,6 +82,10 @@ Feature: GraphQL query support
         id
         name
         manyToOneRelation {
+          id
+          name
+        }
+        manyToOneResolveRelation {
           id
           name
         }
@@ -113,10 +121,13 @@ Feature: GraphQL query support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors" should not exist
     And the JSON node "data.multiRelationsDummy.id" should be equal to "/multi_relations_dummies/2"
     And the JSON node "data.multiRelationsDummy.name" should be equal to "Dummy #2"
     And the JSON node "data.multiRelationsDummy.manyToOneRelation.id" should not be null
     And the JSON node "data.multiRelationsDummy.manyToOneRelation.name" should be equal to "RelatedManyToOneDummy #2"
+    And the JSON node "data.multiRelationsDummy.manyToOneResolveRelation.id" should not be null
+    And the JSON node "data.multiRelationsDummy.manyToOneResolveRelation.name" should be equal to "RelatedManyToOneResolveDummy #2"
     And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges" should have 2 element
     And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[1].node.id" should not be null
     And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges[0].node.name" should match "#RelatedManyToManyDummy(1|2)2#"
@@ -134,6 +145,65 @@ Feature: GraphQL query support
     And the JSON node "data.multiRelationsDummy.nestedPaginatedCollection.edges[1].node.name" should be equal to "NestedPaginatedDummy2"
     And the JSON node "data.multiRelationsDummy.nestedPaginatedCollection.edges[2].node.name" should be equal to "NestedPaginatedDummy3"
     And the JSON node "data.multiRelationsDummy.nestedPaginatedCollection.edges[3].node.name" should be equal to "NestedPaginatedDummy4"
+
+  @createSchema
+  Scenario: Retrieve an item with different relations (all unset)
+    Given there are 2 multiRelationsDummy objects having each 0 manyToOneRelation, 0 manyToManyRelations, 0 oneToManyRelations and 0 embeddedRelations
+    When I send the following GraphQL request:
+    """
+    {
+      multiRelationsDummy(id: "/multi_relations_dummies/2") {
+        id
+        name
+        manyToOneRelation {
+          id
+          name
+        }
+        manyToOneResolveRelation {
+          id
+          name
+        }
+        manyToManyRelations {
+          edges{
+            node {
+             id
+              name
+            }
+          }
+        }
+        oneToManyRelations {
+          edges{
+            node {
+              id
+              name
+            }
+          }
+        }
+        nestedCollection {
+          name
+        }
+        nestedPaginatedCollection {
+          edges{
+            node {
+              name
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors" should not exist
+    And the JSON node "data.multiRelationsDummy.id" should be equal to "/multi_relations_dummies/2"
+    And the JSON node "data.multiRelationsDummy.name" should be equal to "Dummy #2"
+    And the JSON node "data.multiRelationsDummy.manyToOneRelation" should be null
+    And the JSON node "data.multiRelationsDummy.manyToOneResolveRelation" should be null
+    And the JSON node "data.multiRelationsDummy.manyToManyRelations.edges" should have 0 element
+    And the JSON node "data.multiRelationsDummy.oneToManyRelations.edges" should have 0 element
+    And the JSON node "data.multiRelationsDummy.nestedCollection" should have 0 element
+    And the JSON node "data.multiRelationsDummy.nestedPaginatedCollection.edges" should have 0 element
 
   @createSchema @!mongodb
   Scenario: Retrieve an item with child relation to the same resource

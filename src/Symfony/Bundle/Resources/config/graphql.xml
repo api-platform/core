@@ -218,7 +218,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
 
-            <!-- Run before serializer.normalizer.json_serializable -->
+            <!-- Run before serializer.normalizer.json_serializable and before serializer.normalizer.backed_enum which is at 880 -->
             <tag name="serializer.normalizer" priority="-890" />
         </service>
 
