@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing
+        http://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="api_errors" path="/errors/{status}">
+        <default key="_controller">api_platform.action.not_exposed</default>
+        <default key="status">500</default>
+
+        <requirement key="status">\d+</requirement>
+    </route>
+
+    <route id="api_validation_errors" path="/validation_errors/{id}">
+        <default key="_controller">api_platform.action.not_exposed</default>
+    </route>
+</routes>

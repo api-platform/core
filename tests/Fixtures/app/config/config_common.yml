@@ -301,6 +301,11 @@ services:
         tags:
             - name: 'api_platform.graphql.resolver'
 
+    app.graphql.query_resolver.multi_relations_custom_item:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\MultiRelationsResolveQueryItemResolver'
+        tags:
+            - { name: 'api_platform.graphql.resolver' }
+
     app.graphql.mutation_resolver.upload_media_object:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMediaObjectResolver'
         tags:

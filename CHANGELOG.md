@@ -108,6 +108,13 @@ api_platform:
         form: ['multipart/form-data']
 ```
 
+## v3.2.20
+
+### Bug fixes
+
+* [90c9fb31a](https://github.com/api-platform/core/commit/90c9fb31a322a2c7891fbbafb75d60b09fd67772) fix(symfony): register api_error route (#6281)
+* [d061c3811](https://github.com/api-platform/core/commit/d061c381120b858c471157dbdccbb5084a39fb04) fix(graphql): increment graphql normalizer priority (#6283)
+
 ## v3.2.19
 
 ### Bug fixes
