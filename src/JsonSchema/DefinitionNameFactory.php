@@ -25,9 +25,6 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     {
     }
 
-    /**
-     * @param class-string $className
-     */
     public function create(string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): string
     {
         if ($operation) {
