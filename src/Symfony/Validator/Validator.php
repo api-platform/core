@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator;
 
-use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
