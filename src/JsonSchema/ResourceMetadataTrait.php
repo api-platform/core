@@ -99,7 +99,6 @@ trait ResourceMetadataTrait
     private function getShortClassName(string $fullyQualifiedName): string
     {
         $parts = explode('\\', $fullyQualifiedName);
-
         return end($parts);
     }
 }
