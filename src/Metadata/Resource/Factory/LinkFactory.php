@@ -19,7 +19,13 @@ use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 
 /**
  * @internal
@@ -159,19 +165,45 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     }
 
     /**
-     * @param Type[]|null $types
+     * @param Type|LegacyType[]|null $types
      */
-    private function getPropertyClassType(?array $types): ?string
+    private function getPropertyClassType(Type|array|null $types): ?string
     {
-        foreach ($types ?? [] as $type) {
-            if ($type->isCollection()) {
-                return $this->getPropertyClassType($type->getCollectionValueTypes());
-            }
+        if (!$types) {
+            return null;
+        }
 
-            if ($class = $type->getClassName()) {
-                return $class;
+        // BC layer for symfony/property-info < 7.1
+        if (is_array($types)) {
+            foreach ($types ?? [] as $type) {
+                if ($type->isCollection()) {
+                    return $this->getPropertyClassType($type->getCollectionValueTypes());
+                }
+
+                if ($class = $type->getClassName()) {
+                    return $class;
+                }
             }
         }
+
+        $types = $types instanceof UnionType || $types instanceof IntersectionType ? $types->getTypes() : [$types];
+
+        foreach ($types as $type) {
+            if ($type instanceof CollectionType) {
+                return $this->getPropertyClassType($type->getCollectionValueType());
+            }
+
+            try {
+                $baseType = $type->getBaseType();
+            } catch (LogicException) {
+                return null;
+            }
+
+            if ($baseType instanceof ObjectType) {
+                return $baseType->getClassName();
+            }
+        }
+
 
         return null;
     }

@@ -24,7 +24,8 @@ use ApiPlatform\Metadata\Tests\Extractor\Adapter\YamlPropertyAdapter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Ensures XML and YAML mappings are fully compatible with ApiPlatform\Metadata\ApiProperty.
@@ -124,8 +125,14 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         return $property;
     }
 
-    private function withBuiltinTypes(array $values, array $fixtures): array
+    private function withBuiltinTypes(array $values, array $fixtures): array|Type
     {
-        return array_map(fn (string $builtinType): Type => new Type($builtinType), $values);
+        if (!class_exists(Type::class)) {
+            return array_map(fn (string $builtinType): LegacyType => new LegacyType($builtinType), $values);
+        }
+
+        $types = array_map(fn (string $builtinType): Type => Type::builtin($builtinType), $values);
+
+        return \count($types) > 1 ? Type::union(...$types) : $types[0];
     }
 }

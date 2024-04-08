@@ -19,12 +19,15 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Interface implemented to build a GraphQL type.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @method bool isObjectCollection(Type $type)
  */
 interface TypeBuilderEnumInterface
 {
@@ -51,7 +54,9 @@ interface TypeBuilderEnumInterface
     public function getEnumType(Operation $operation): GraphQLType;
 
     /**
+     * @deprecated TODO mtarld
+     *
      * Returns true if a type is a collection.
      */
-    public function isCollection(Type $type): bool;
+    public function isCollection(LegacyType $type): bool;
 }

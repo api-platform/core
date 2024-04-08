@@ -23,7 +23,8 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\DummyIgnoreProperty;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata as SerializerAttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata as SerializerClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
@@ -74,15 +75,15 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
 
         $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $fooPropertyMetadata = (new ApiProperty())
-            ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY, true)])
+            ->withBuiltinTypes(class_exists(Type::class) ? Type::nullable(Type::array()) : [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, true)])
             ->withReadable(false)
             ->withWritable(true);
         $decoratedProphecy->create(Dummy::class, 'foo', $context)->willReturn($fooPropertyMetadata);
         $relatedDummyPropertyMetadata = (new ApiProperty())
-            ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class)]);
+            ->withBuiltinTypes(class_exists(Type::class) ? Type::nullable(Type::object(RelatedDummy::class)) : [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class)]);
         $decoratedProphecy->create(Dummy::class, 'relatedDummy', $context)->willReturn($relatedDummyPropertyMetadata);
         $nameConvertedPropertyMetadata = (new ApiProperty())
-            ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, true)]);
+            ->withBuiltinTypes(class_exists(Type::class) ? Type::nullable(Type::string()) : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true)]);
         $decoratedProphecy->create(Dummy::class, 'nameConverted', $context)->willReturn($nameConvertedPropertyMetadata);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -128,7 +129,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(DummyIgnoreProperty::class)->willReturn(true);
 
-        $ignoredPropertyMetadata = (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, true)]);
+        $ignoredPropertyMetadata = (new ApiProperty())->withBuiltinTypes(class_exists(Type::class) ? Type::nullable(Type::string()) : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true)]);
 
         $options = [
             'normalization_groups' => ['dummy'],

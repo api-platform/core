@@ -14,33 +14,27 @@ declare(strict_types=1);
 namespace ApiPlatform\Api;
 
 use ApiPlatform\Exception\InvalidUriVariableException;
+use Symfony\Component\TypeInfo\Type;
 
-/**
- * @deprecated TODO mtarld
- */
-interface UriVariableTransformerInterface
+interface UriVariableConverterInterface
 {
     /**
-     * Transforms the value of a URI variable (identifier) to its type.
-     *
-     * @deprecated TODO mtarld
+     * Converts the value of a URI variable (identifier) to its type.
      *
      * @param mixed $value   The URI variable value to transform
      * @param array $types   The guessed type behind the URI variable
      * @param array $context Options available to the transformer
      *
-     * @throws InvalidUriVariableException Occurs when the URI variable could not be transformed
+     * @throws InvalidUriVariableException Occurs when the URI variable could not be converted
      */
-    public function transform(mixed $value, array $types, array $context = []);
+    public function convert(mixed $value, Type $type, array $context = []);
 
     /**
-     * Checks whether the value of a URI variable can be transformed to its type by this transformer.
-     *
-     * @deprecated TODO mtarld
+     * Checks whether the value of a URI variable can be converted to its type by this converter.
      *
      * @param mixed $value   The URI variable value to transform
      * @param array $types   The types to which the URI variable value should be transformed
      * @param array $context Options available to the transformer
      */
-    public function supportsTransformation(mixed $value, array $types, array $context = []): bool;
+    public function supportsConversion(mixed $value, Type $type, array $context = []): bool;
 }

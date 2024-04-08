@@ -36,7 +36,13 @@ use GraphQL\Type\Definition\Type as GraphQLType;
 use GraphQL\Type\Definition\WrappingType;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -82,7 +88,15 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
 
         $fieldName = lcfirst('item_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
-        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $operation)) {
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(
+            null,
+            $operation->getDescription(),
+            $operation->getDeprecationReason(),
+            class_exists(Type::class) ? Type::nullable(Type::object($resourceClass)) : new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, $resourceClass),
+            $resourceClass,
+            false,
+            $operation,
+        )) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
             $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
             $configuration['args'] = $args ?: $configuration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]] + $extraArgs;
@@ -104,7 +118,15 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
 
         $fieldName = lcfirst('collection_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
-        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $operation)) {
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(
+            null,
+            $operation->getDescription(),
+            $operation->getDeprecationReason(),
+            class_exists(Type::class) ? Type::collection(Type::object(), Type::object($resourceClass)) : new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true, null, new LegacyType(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)),
+            $resourceClass,
+            false,
+            $operation,
+        )) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
             $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
             $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'] + $extraArgs;
@@ -121,7 +143,8 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
     public function getMutationFields(string $resourceClass, Operation $operation): array
     {
         $mutationFields = [];
-        $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
+        // BC layer for symfony/property-info < 7.1
+        $resourceType = class_exists(Type::class) ? Type::nullable(Type::object($resourceClass)) : new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, $resourceClass);
         $description = $operation->getDescription() ?? ucfirst("{$operation->getName()}s a {$operation->getShortName()}.");
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $operation->getDeprecationReason(), $resourceType, $resourceClass, false, $operation)) {
@@ -139,7 +162,8 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
     public function getSubscriptionFields(string $resourceClass, Operation $operation): array
     {
         $subscriptionFields = [];
-        $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
+        // BC layer for symfony/property-info < 7.1
+        $resourceType = class_exists(Type::class) ? Type::nullable(Type::object($resourceClass)) : new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, $resourceClass);
         $description = $operation->getDescription() ?? sprintf('Subscribes to the action event of a %s.', $operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $operation->getDeprecationReason(), $resourceType, $resourceClass, false, $operation)) {
@@ -225,6 +249,10 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                     continue;
                 }
 
+                if ($propertyTypes instanceof Type) {
+                    $propertyTypes = $propertyTypes instanceof UnionType || $propertyTypes instanceof IntersectionType ? $propertyTypes->getTypes() : [$propertyTypes];
+                }
+
                 // guess union/intersect types: check each type until finding a valid one
                 foreach ($propertyTypes as $propertyType) {
                     if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
@@ -295,18 +323,33 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
      *
      * @see http://webonyx.github.io/graphql-php/type-system/object-types/
      */
-    private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, ?string $deprecationReason, Type $type, string $rootResource, bool $input, Operation $rootOperation, int $depth = 0, bool $forceNullable = false): ?array
+    private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, ?string $deprecationReason, LegacyType|Type $type, string $rootResource, bool $input, Operation $rootOperation, int $depth = 0, bool $forceNullable = false): ?array
     {
         try {
-            $isCollectionType = $this->typeBuilder->isCollection($type);
+            // BC layer for symfony/property-info < 7.1
+            if ($type instanceof LegacyType) {
+                $isCollectionType = $this->typeBuilder->isCollection($type);
 
-            if (
-                $isCollectionType
-                && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
-            ) {
-                $resourceClass = $collectionValueType->getClassName();
+                if ($isCollectionType && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null) {
+                    $resourceClass = $collectionValueType->getClassName();
+                } else {
+                    $resourceClass = $type->getClassName();
+                }
             } else {
-                $resourceClass = $type->getClassName();
+                $resourceClass = null;
+                $isCollectionType = $this->typeBuilder->isObjectCollection($type);
+
+                if ($isCollectionType) {
+                    $resourceClass = $type->getCollectionValueType()->getBaseType()->getClassName();
+                } else {
+                    try {
+                        $baseType = $type->asNonNullable()->getBaseType();
+                        if ($baseType instanceof ObjectType) {
+                            $resourceClass = $baseType->getClassName();
+                        }
+                    } catch (LogicException) {
+                    }
+                }
             }
 
             $resourceOperation = $rootOperation;
@@ -360,7 +403,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                     $resolve = null;
                 } elseif (($rootOperation instanceof Mutation || $rootOperation instanceof Subscription) && $depth <= 0) {
                     $resolve = $rootOperation instanceof Mutation ? ($this->itemMutationResolverFactory)($resourceClass, $rootResource, $resourceOperation) : ($this->itemSubscriptionResolverFactory)($resourceClass, $rootResource, $resourceOperation);
-                } elseif ($this->typeBuilder->isCollection($type)) {
+                } elseif ($isCollectionType) {
                     $resolve = ($this->collectionResolverFactory)($resourceClass, $rootResource, $resourceOperation);
                 } else {
                     $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resourceOperation);
@@ -449,7 +492,15 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
 
             foreach ($this->filterLocator->get($filterId)->getDescription($entityClass) as $key => $value) {
                 $nullable = isset($value['required']) ? !$value['required'] : true;
-                $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
+
+                // BC layer for symfony/property-info < 7.1
+                if (class_exists(Type::class)) {
+                    $filterType = \in_array($value['type'], TypeIdentifier::values(), true) ? Type::builtin($value['type']) : Type::object($value['type']);
+                    $filterType = $nullable ? Type::nullable($filterType) : $filterType;
+                } else {
+                    $filterType = \in_array($value['type'], LegacyType::$builtinTypes, true) ? new LegacyType($value['type'], $nullable) : new LegacyType('object', $nullable, $value['type']);
+                }
+
                 $graphqlFilterType = $this->convertType($filterType, false, $resourceOperation, $rootOperation, $resourceClass, $rootResource, $property, $depth);
 
                 if (str_ends_with($key, '[]')) {
@@ -538,12 +589,15 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
      *
      * @throws InvalidTypeException
      */
-    private function convertType(Type $type, bool $input, Operation $resourceOperation, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth, bool $forceNullable = false): GraphQLType|ListOfType|NonNull
+    private function convertType(LegacyType|Type $type, bool $input, Operation $resourceOperation, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth, bool $forceNullable = false): GraphQLType|ListOfType|NonNull
     {
-        $graphqlType = $this->typeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
+        // BC layer for symfony/property-info < 7.1
+        $graphqlType = $type instanceof LegacyType
+            ? $this->typeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth)
+            : $this->typeConverter->convertPhpType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
 
         if (null === $graphqlType) {
-            throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $type->getBuiltinType()));
+            throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $type instanceof LegacyType ? $type->getBuiltinType() : (string) $type));
         }
 
         if (\is_string($graphqlType)) {
@@ -554,7 +608,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
             $graphqlType = $this->typesContainer->get($graphqlType);
         }
 
-        if ($this->typeBuilder->isCollection($type)) {
+        if ($type instanceof LegacyType ? $this->typeBuilder->isCollection($type) : $this->typeBuilder->isObjectCollection($type)) {
             if (!$input && !$this->isEnumClass($resourceClass) && $this->pagination->isGraphQlEnabled($resourceOperation)) {
                 // Deprecated path, to remove in API Platform 4.
                 if ($this->typeBuilder instanceof TypeBuilderInterface) {

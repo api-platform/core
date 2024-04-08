@@ -28,7 +28,13 @@ use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 
 /**
  * Converts a type to its GraphQL equivalent.
@@ -47,30 +53,81 @@ final class TypeConverter implements TypeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
+    public function convertPhpType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
     {
-        switch ($type->getBuiltinType()) {
-            case Type::BUILTIN_TYPE_BOOL:
-                return GraphQLType::boolean();
-            case Type::BUILTIN_TYPE_INT:
-                return GraphQLType::int();
-            case Type::BUILTIN_TYPE_FLOAT:
-                return GraphQLType::float();
-            case Type::BUILTIN_TYPE_STRING:
+        try {
+            $baseType = $type->asNonNullable()->getBaseType();
+        } catch (LogicException) {
+            return null;
+        }
+
+        $typeIdentifier = $baseType->getTypeIdentifier();
+
+        if (TypeIdentifier::BOOL === $typeIdentifier) {
+            return GraphQLType::boolean();
+        }
+
+        if (TypeIdentifier::INT === $typeIdentifier) {
+            return GraphQLType::int();
+        }
+
+        if (TypeIdentifier::FLOAT === $typeIdentifier) {
+            return GraphQLType::float();
+        }
+
+        if (TypeIdentifier::STRING === $typeIdentifier) {
+            return GraphQLType::string();
+        }
+
+        if (TypeIdentifier::ARRAY === $typeIdentifier || TypeIdentifier::ITERABLE === $typeIdentifier) {
+            if ($resourceType = $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth)) {
+                return $resourceType;
+            }
+
+            return 'Iterable';
+        }
+
+        if ($baseType instanceof ObjectType) {
+            if (is_a($baseType->getClassName(), \DateTimeInterface::class, true)) {
                 return GraphQLType::string();
-            case Type::BUILTIN_TYPE_ARRAY:
-            case Type::BUILTIN_TYPE_ITERABLE:
-                if ($resourceType = $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth)) {
+            }
+
+            return $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth);
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertType(LegacyType $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
+    {
+        // TODO mtarld
+        trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
+
+        switch ($type->getBuiltinType()) {
+            case LegacyType::BUILTIN_TYPE_BOOL:
+                return GraphQLType::boolean();
+            case LegacyType::BUILTIN_TYPE_INT:
+                return GraphQLType::int();
+            case LegacyType::BUILTIN_TYPE_FLOAT:
+                return GraphQLType::float();
+            case LegacyType::BUILTIN_TYPE_STRING:
+                return GraphQLType::string();
+            case LegacyType::BUILTIN_TYPE_ARRAY:
+            case LegacyType::BUILTIN_TYPE_ITERABLE:
+                if ($resourceType = $this->getResourceTypeLegacy($type, $input, $rootOperation, $rootResource, $property, $depth)) {
                     return $resourceType;
                 }
 
                 return 'Iterable';
-            case Type::BUILTIN_TYPE_OBJECT:
+            case LegacyType::BUILTIN_TYPE_OBJECT:
                 if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                     return GraphQLType::string();
                 }
 
-                return $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth);
+                return $this->getResourceTypeLegacy($type, $input, $rootOperation, $rootResource, $property, $depth);
             default:
                 return null;
         }
@@ -95,6 +152,100 @@ final class TypeConverter implements TypeConverterInterface
     }
 
     private function getResourceType(Type $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType
+    {
+        try {
+            $baseType = $type->asNonNullable()->getBaseType();
+        } catch (LogicException) {
+            return null;
+        }
+
+        $resourceClass = null;
+        $isCollection = $this->typeBuilder->isObjectCollection($type);
+
+        if ($isCollection) {
+            $resourceClass = $type->getCollectionValueType()->getBaseType()->getClassName();
+        } elseif ($baseType instanceof ObjectType) {
+            $resourceClass = $baseType->getClassName();
+        }
+
+        if (null === $resourceClass) {
+            return null;
+        }
+
+        try {
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        } catch (ResourceClassNotFoundException) {
+            return null;
+        }
+
+        $hasGraphQl = false;
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            if (null !== $resourceMetadata->getGraphQlOperations()) {
+                $hasGraphQl = true;
+                break;
+            }
+        }
+
+        if (isset($resourceMetadataCollection[0]) && 'Node' === $resourceMetadataCollection[0]->getShortName()) {
+            throw new \UnexpectedValueException('A "Node" resource cannot be used with GraphQL because the type is already used by the Relay specification.');
+        }
+
+        if (!$hasGraphQl) {
+            if (is_a($resourceClass, \BackedEnum::class, true)) {
+                // Remove the condition in API Platform 4.
+                if ($this->typeBuilder instanceof TypeBuilderEnumInterface) {
+                    $operation = null;
+                    try {
+                        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+                        $operation = $resourceMetadataCollection->getOperation();
+                    } catch (ResourceClassNotFoundException|OperationNotFoundException) {
+                    }
+                    /** @var Query $enumOperation */
+                    $enumOperation = (new Query())
+                        ->withClass($resourceClass)
+                        ->withShortName($operation?->getShortName() ?? (new \ReflectionClass($resourceClass))->getShortName())
+                        ->withDescription($operation?->getDescription());
+
+                    return $this->typeBuilder->getEnumType($enumOperation);
+                }
+            }
+
+            return null;
+        }
+
+        $propertyMetadata = null;
+        if ($property) {
+            $context = [
+                'normalization_groups' => $rootOperation->getNormalizationContext()['groups'] ?? null,
+                'denormalization_groups' => $rootOperation->getDenormalizationContext()['groups'] ?? null,
+            ];
+            $propertyMetadata = $this->propertyMetadataFactory->create($rootResource, $property, $context);
+        }
+
+        if ($input && $depth > 0 && (!$propertyMetadata || !$propertyMetadata->isWritableLink())) {
+            return GraphQLType::string();
+        }
+
+        $operationName = $rootOperation->getName();
+
+        // We're retrieving the type of a property which is a relation to the root resource.
+        if ($resourceClass !== $rootResource && $rootOperation instanceof Query) {
+            $operationName = $isCollection ? 'collection_query' : 'item_query';
+        }
+
+        try {
+            $operation = $resourceMetadataCollection->getOperation($operationName);
+        } catch (OperationNotFoundException) {
+            $operation = $resourceMetadataCollection->getOperation($isCollection ? 'collection_query' : 'item_query');
+        }
+        if (!$operation instanceof Operation) {
+            throw new OperationNotFoundException();
+        }
+
+        return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadataCollection, $operation, $input, false, $depth);
+    }
+
+    private function getResourceTypeLegacy(LegacyType $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType
     {
         if (
             $this->typeBuilder->isCollection($type)

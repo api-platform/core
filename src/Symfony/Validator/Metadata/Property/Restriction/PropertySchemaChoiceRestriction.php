@@ -14,7 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Validator\Metadata\Property\Restriction;
 
 use ApiPlatform\Metadata\ApiProperty;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Choice;
 
@@ -52,8 +56,18 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
 
         $restriction['type'] = 'array';
 
-        $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
-        $types = array_unique(array_map(fn (Type $type) => Type::BUILTIN_TYPE_STRING === $type->getBuiltinType() ? 'string' : 'number', $builtInTypes));
+        $builtinType = $propertyMetadata->getBuiltinTypes();
+        $types = [];
+
+        // BC layer for "symfony/property-info" < 7.1
+        if (is_array($builtinType)) {
+            $types = array_unique(array_map(fn (LegacyType $type) => 'string' === $type->getBuiltinType() ? 'string' : 'number', $builtinType));
+        } elseif ($builtinType instanceof Type) {
+            $types = array_values(array_unique(array_map(
+                fn (Type $type) => $type->isA(TypeIdentifier::STRING) ? 'string' : 'number',
+                $builtinType instanceof UnionType || $builtinType instanceof IntersectionType ? $builtinType->getTypes() : [$builtinType],
+            )));
+        }
 
         if ($count = \count($types)) {
             if (1 === $count) {
@@ -79,8 +93,22 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
      */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
-        $types = array_map(fn (Type $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+        if (!$constraint instanceof Choice) {
+            return false;
+        }
 
-        return $constraint instanceof Choice && \count($types) && array_intersect($types, [Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT]);
+        $builtinType = $propertyMetadata->getBuiltinTypes();
+        if (!$builtinType) {
+            return false;
+        }
+
+        // BC layer for "symfony/property-info" < 7.1
+        if (is_array($builtinType)) {
+            $types = array_map(fn (LegacyType $type) => $type->getBuiltinType(), $builtinType);
+
+            return $constraint instanceof Choice && \count($types) && array_intersect($types, [LegacyType::BUILTIN_TYPE_STRING, LegacyType::BUILTIN_TYPE_INT, LegacyType::BUILTIN_TYPE_FLOAT]);
+        }
+
+        return $builtinType->isA(TypeIdentifier::STRING) || $builtinType->isA(TypeIdentifier::INT) || $builtinType->isA(TypeIdentifier::FLOAT);
     }
 }

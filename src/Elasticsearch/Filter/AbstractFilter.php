@@ -19,7 +19,13 @@ use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -66,7 +72,7 @@ abstract class AbstractFilter implements FilterInterface
      * Gets info about the decomposed given property for the given resource class.
      *
      * Returns an array with the following info as values:
-     *   - the {@see Type} of the decomposed given property
+     *   - the {@see LegacyType} of the decomposed given property
      *   - is the decomposed given property an association?
      *   - the resource class of the decomposed given property
      *   - the property name of the decomposed given property
@@ -99,6 +105,10 @@ abstract class AbstractFilter implements FilterInterface
                 return $noop;
             }
 
+            if ($types instanceof Type) {
+                $types = $types instanceof UnionType || $types instanceof IntersectionType ? $types->getTypes() : [$types];
+            }
+
             ++$index;
 
             // check each type before deciding if it's noop or not
@@ -106,52 +116,114 @@ abstract class AbstractFilter implements FilterInterface
             $isNoop = false;
 
             foreach ($types as $type) {
-                $builtinType = $type->getBuiltinType();
+                // BC layer for symfony/property-info < 7.1
+                if ($type instanceof LegacyType) {
+                    $builtinType = $type->getBuiltinType();
 
-                if (Type::BUILTIN_TYPE_OBJECT !== $builtinType && Type::BUILTIN_TYPE_ARRAY !== $builtinType) {
-                    if ($totalProperties === $index) {
-                        break 2;
+                    if (LegacyType::BUILTIN_TYPE_OBJECT !== $builtinType && LegacyType::BUILTIN_TYPE_ARRAY !== $builtinType) {
+                        if ($totalProperties === $index) {
+                            break 2;
+                        }
+
+                        $isNoop = true;
+
+                        continue;
                     }
 
-                    $isNoop = true;
+                    if ($type->isCollection() && null === $type = $type->getCollectionValueTypes()[0] ?? null) {
+                        $isNoop = true;
 
-                    continue;
-                }
-
-                if ($type->isCollection() && null === $type = $type->getCollectionValueTypes()[0] ?? null) {
-                    $isNoop = true;
-
-                    continue;
-                }
-
-                if (Type::BUILTIN_TYPE_ARRAY === $builtinType && Type::BUILTIN_TYPE_OBJECT !== $type->getBuiltinType()) {
-                    if ($totalProperties === $index) {
-                        break 2;
+                        continue;
                     }
 
-                    $isNoop = true;
+                    if (LegacyType::BUILTIN_TYPE_ARRAY === $builtinType && LegacyType::BUILTIN_TYPE_OBJECT !== $type->getBuiltinType()) {
+                        if ($totalProperties === $index) {
+                            break 2;
+                        }
 
-                    continue;
+                        $isNoop = true;
+
+                        continue;
+                    }
+
+                    if (null === $className = $type->getClassName()) {
+                        $isNoop = true;
+
+                        continue;
+                    }
+
+                    if ($isResourceClass = $this->resourceClassResolver->isResourceClass($className)) {
+                        $currentResourceClass = $className;
+                    } elseif ($totalProperties !== $index) {
+                        $isNoop = true;
+
+                        continue;
+                    }
+
+                    $hasAssociation = $totalProperties === $index && $isResourceClass;
+                    $isNoop = false;
+
+                    break;
+                } else {
+                    try {
+                        $baseType = $type->getBaseType();
+                    } catch (LogicException) {
+                        $isNoop = true;
+
+                        continue;
+                    }
+
+                    if (!$baseType instanceof ObjectType && !$type instanceof CollectionType) {
+                        if ($totalProperties === $index) {
+                            break 2;
+                        }
+
+                        $isNoop = true;
+
+                        continue;
+                    }
+
+                    if ($type instanceof CollectionType) {
+                        // TODO nullable?
+                        $type = $type->getCollectionValueType();
+                        try {
+                            $baseType = $type->getBaseType();
+                        } catch (LogicException) {
+                            $isNoop = true;
+
+                            continue;
+                        }
+
+                        if (!$baseType instanceof ObjectType) {
+                            if ($totalProperties === $index) {
+                                break 2;
+                            }
+
+                            $isNoop = true;
+
+                            continue;
+                        }
+                    }
+
+                    if (null === $className = $type->getClassName()) {
+                        $isNoop = true;
+
+                        continue;
+                    }
+
+                    if ($isResourceClass = $this->resourceClassResolver->isResourceClass($className)) {
+                        $currentResourceClass = $className;
+                    } elseif ($totalProperties !== $index) {
+                        $isNoop = true;
+
+                        continue;
+                    }
+
+                    $hasAssociation = $totalProperties === $index && $isResourceClass;
+                    $isNoop = false;
+
+                    break;
                 }
-
-                if (null === $className = $type->getClassName()) {
-                    $isNoop = true;
-
-                    continue;
-                }
-
-                if ($isResourceClass = $this->resourceClassResolver->isResourceClass($className)) {
-                    $currentResourceClass = $className;
-                } elseif ($totalProperties !== $index) {
-                    $isNoop = true;
-
-                    continue;
-                }
-
-                $hasAssociation = $totalProperties === $index && $isResourceClass;
-                $isNoop = false;
-
-                break;
             }
 
             if ($isNoop) {

@@ -30,7 +30,8 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 final class LinkFactoryTest extends TestCase
 {
@@ -95,9 +96,47 @@ final class LinkFactoryTest extends TestCase
     }
 
     /**
+     * @group legacy
+     *
+     * @dataProvider legacyProvideCreateLinksFromAttributesCases
+     */
+    public function testCreateLinksFromAttributesLegacy(array $builtinTypes, array $expectedLinks): void
+    {
+        $propertyNameCollectionFactory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([new ReflectionExtractor()]));
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withBuiltinTypes($builtinTypes));
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+
+        self::assertEquals(
+            $expectedLinks,
+            $linkFactory->createLinksFromAttributes((new Get())->withClass(AttributeResource::class))
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public static function legacyProvideCreateLinksFromAttributesCases(): \Generator
+    {
+        yield 'no builtin types' => [
+            [],
+            [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(AttributeResource::class)->withParameterName('dummyId')],
+        ];
+        yield 'with builtin types' => [
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+            [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(Dummy::class)->withParameterName('dummyId')],
+        ];
+        yield 'with collection builtin types' => [
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, Dummy::class, true, null, [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])],
+            [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(RelatedDummy::class)->withParameterName('dummyId')],
+        ];
+    }
+
+    /**
      * @dataProvider provideCreateLinksFromAttributesCases
      */
-    public function testCreateLinksFromAttributes(array $builtinTypes, array $expectedLinks): void
+    public function testCreateLinksFromAttributes(?Type $builtinTypes, array $expectedLinks): void
     {
         $propertyNameCollectionFactory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([new ReflectionExtractor()]));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -114,15 +153,15 @@ final class LinkFactoryTest extends TestCase
     public static function provideCreateLinksFromAttributesCases(): \Generator
     {
         yield 'no builtin types' => [
-            [],
+            null,
             [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(AttributeResource::class)->withParameterName('dummyId')],
         ];
         yield 'with builtin types' => [
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+            Type::object(Dummy::class),
             [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(Dummy::class)->withParameterName('dummyId')],
         ];
         yield 'with collection builtin types' => [
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, Dummy::class, true, null, [new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])],
+            Type::array(Type::object(RelatedDummy::class)),
             [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(RelatedDummy::class)->withParameterName('dummyId')],
         ];
     }
@@ -144,13 +183,35 @@ final class LinkFactoryTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
+    public function testCreateLinkFromPropertyLegacy(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $property = 'test';
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'test')->willReturn(new ApiProperty(builtinTypes: [new LegacyType(builtinType: LegacyType::BUILTIN_TYPE_OBJECT, class: RelatedDummy::class)]));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(false);
+
+        $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+
+        self::assertEquals(
+            new Link(fromClass: RelatedDummy::class, toProperty: 'test', identifiers: ['id'], parameterName: 'test'),
+            $linkFactory->createLinkFromProperty(new Get(class: Dummy::class), 'test')
+        );
+    }
+
     public function testCreateLinkFromProperty(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
         $property = 'test';
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'test')->willReturn(new ApiProperty(builtinTypes: [new Type(builtinType: Type::BUILTIN_TYPE_OBJECT, class: RelatedDummy::class)]));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'test')->willReturn(new ApiProperty(builtinTypes: Type::object(RelatedDummy::class)));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(false);

@@ -16,7 +16,13 @@ namespace ApiPlatform\Elasticsearch\Util;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 
 /**
  * Field datatypes helpers.
@@ -64,28 +70,72 @@ trait FieldDatatypeTrait
             return null;
         }
 
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
+        $types = $propertyMetadata->getBuiltinTypes();
+
+        if (!$types) {
+            return null;
+        }
+
+        // BC layer for symfony/property-info < 7.1
+        if (is_array($types)) {
+            foreach ($types as $type) {
+                if (
+                    LegacyType::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
+                    && null !== ($nextResourceClass = $type->getClassName())
+                    && $this->resourceClassResolver->isResourceClass($nextResourceClass)
+                ) {
+                    $nestedPath = $this->getNestedFieldPath($nextResourceClass, implode('.', $properties));
+
+                    return null === $nestedPath ? $nestedPath : "$currentProperty.$nestedPath";
+                }
+
+                if (
+                    null !== ($type = $type->getCollectionValueTypes()[0] ?? null)
+                    && LegacyType::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
+                    && null !== ($className = $type->getClassName())
+                    && $this->resourceClassResolver->isResourceClass($className)
+                ) {
+                    $nestedPath = $this->getNestedFieldPath($className, implode('.', $properties));
+
+                    return null === $nestedPath ? $currentProperty : "$currentProperty.$nestedPath";
+                }
+            }
+
+            return null;
+        }
+
+        /** @var list<Type> $types */
+        $types = $types instanceof UnionType || $types instanceof IntersectionType ? $types->getTypes() : [$types];
 
         foreach ($types as $type) {
-            if (
-                Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
-                && null !== ($nextResourceClass = $type->getClassName())
-                && $this->resourceClassResolver->isResourceClass($nextResourceClass)
-            ) {
-                $nestedPath = $this->getNestedFieldPath($nextResourceClass, implode('.', $properties));
+            $type = $type->asNonNullable();
+
+            try {
+                $baseType = $type->getBaseType();
+            } catch (LogicException) {
+                continue;
+            }
+
+            if ($baseType instanceof ObjectType && $this->resourceClassResolver->isResourceClass($baseType->getClassName())) {
+                $nestedPath = $this->getNestedFieldPath($baseType->getClassName(), implode('.', $properties));
 
                 return null === $nestedPath ? $nestedPath : "$currentProperty.$nestedPath";
             }
 
-            if (
-                null !== ($type = $type->getCollectionValueTypes()[0] ?? null)
-                && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
-                && null !== ($className = $type->getClassName())
-                && $this->resourceClassResolver->isResourceClass($className)
-            ) {
-                $nestedPath = $this->getNestedFieldPath($className, implode('.', $properties));
+            if ($type instanceof CollectionType) {
+                $collectionValueType = $type->getCollectionValueType();
 
-                return null === $nestedPath ? $currentProperty : "$currentProperty.$nestedPath";
+                try {
+                    $collectionValueBaseType = $collectionValueType->asNonNullable()->getBaseType();
+                } catch (LogicException) {
+                    continue;
+                }
+
+                if ($collectionValueBaseType instanceof ObjectType && $this->resourceClassResolver->isResourceClass($collectionValueBaseType->getClassName())) {
+                    $nestedPath = $this->getNestedFieldPath($collectionValueBaseType->getClassName(), implode('.', $properties));
+
+                    return null === $nestedPath ? $currentProperty : "$currentProperty.$nestedPath";
+                }
             }
         }
 

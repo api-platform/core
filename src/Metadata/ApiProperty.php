@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * ApiProperty annotation.
@@ -39,7 +40,7 @@ final class ApiProperty
      * @param string|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param string[]    $types                   the RDF types of this property
      * @param string[]    $iris
-     * @param Type[]      $builtinTypes
+     * @param LegacyType[]|Type|null $builtinTypes
      * @param string|null $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
      */
     public function __construct(
@@ -109,9 +110,9 @@ final class ApiProperty
         private ?string $securityPostDenormalize = null,
         private array|string|null $types = null,
         /*
-         * The related php types.
+         * The related legacy php types.
          */
-        private ?array $builtinTypes = null,
+        private array|Type|null $builtinTypes = null,
         private ?array $schema = null,
         private ?bool $initializable = null,
         private $iris = null,
@@ -119,6 +120,10 @@ final class ApiProperty
         private ?string $uriTemplate = null,
         private array $extraProperties = [],
     ) {
+        if (is_array($builtinTypes)) {
+            trigger_deprecation('api-platform/metadata', '3.3', 'Using an array for $builtinTypes is deprecated, use "%s" instead.', Type::class);
+        }
+
         if (\is_string($types)) {
             $this->types = (array) $types;
         }
@@ -375,18 +380,22 @@ final class ApiProperty
     }
 
     /**
-     * @return Type[]
+     * @return LegacyType[]|Type|null
      */
-    public function getBuiltinTypes(): ?array
+    public function getBuiltinTypes(): array|Type|null
     {
         return $this->builtinTypes;
     }
 
     /**
-     * @param Type[] $builtinTypes
+     * @param LegacyType[]|Type|null $builtinTypes
      */
-    public function withBuiltinTypes(array $builtinTypes = []): self
+    public function withBuiltinTypes(array|Type|null $builtinTypes = null): self
     {
+        if (is_array($builtinTypes)) {
+            trigger_deprecation('api-platform/metadata', '3.3', 'Using an array for $builtinTypes is deprecated, use "%s" instead.', Type::class);
+        }
+
         $self = clone $this;
         $self->builtinTypes = $builtinTypes;
 

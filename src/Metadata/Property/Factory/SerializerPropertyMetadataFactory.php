@@ -19,6 +19,12 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
+use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 
 /**
  * Populates read/write and link status using serialization groups.
@@ -106,21 +112,81 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
-    private function transformLinkStatus(ApiProperty $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null, array $types = null): ApiProperty
+    private function transformLinkStatus(ApiProperty $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null, Type|array|null $types = null): ApiProperty
     {
         // No need to check link status if property is not readable and not writable
         if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
             return $propertyMetadata;
         }
 
+        if (!$types) {
+            return $propertyMetadata;
+        }
+
+        // BC layer for symfony/property-info < 7.1
+        if (is_array($types)) {
+            foreach ($types as $type) {
+                if (
+                    $type->isCollection()
+                    && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
+                ) {
+                    $relatedClass = $collectionValueType->getClassName();
+                } else {
+                    $relatedClass = $type->getClassName();
+                }
+
+                // if property is not a resource relation, don't set link status (as it would have no meaning)
+                if (null === $relatedClass || !$this->isResourceClass($relatedClass)) {
+                    continue;
+                }
+
+                // find the resource class
+                // this prevents serializer groups on non-resource child class from incorrectly influencing the decision
+                if (null !== $this->resourceClassResolver) {
+                    $relatedClass = $this->resourceClassResolver->getResourceClass(null, $relatedClass);
+                }
+
+                $relatedGroups = $this->getClassSerializerGroups($relatedClass);
+
+                if (null === $propertyMetadata->isReadableLink()) {
+                    $propertyMetadata = $propertyMetadata->withReadableLink(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups)));
+                }
+
+                if (null === $propertyMetadata->isWritableLink()) {
+                    $propertyMetadata = $propertyMetadata->withWritableLink(null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups)));
+                }
+
+                return $propertyMetadata;
+            }
+
+            return $propertyMetadata;
+        }
+
+        $types = $types instanceof UnionType || $types instanceof IntersectionType ? $types->getTypes() : [$types];
+
         foreach ($types as $type) {
-            if (
-                $type->isCollection()
-                && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
-            ) {
-                $relatedClass = $collectionValueType->getClassName();
-            } else {
-                $relatedClass = $type->getClassName();
+            $relatedClass = null;
+
+            try {
+                $baseType = $type->getBaseType();
+            } catch (LogicException) {
+                continue;
+            }
+
+            if ($type instanceof CollectionType) {
+                $collectionValueType = $type->getCollectionValueType();
+
+                try {
+                    $collectionValueBaseType = $collectionValueType->asNonNullable()->getBaseType();
+                } catch (LogicException) {
+                    continue;
+                }
+
+                if ($collectionValueBaseType instanceof ObjectType) {
+                    $relatedClass = $collectionValueBaseType->getClassName();
+                }
+            } elseif ($baseType instanceof ObjectType) {
+                $relatedClass = $type->getBaseType()->getClassName();
             }
 
             // if property is not a resource relation, don't set link status (as it would have no meaning)

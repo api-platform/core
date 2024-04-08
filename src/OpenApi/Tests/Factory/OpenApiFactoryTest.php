@@ -61,7 +61,8 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 class OpenApiFactoryTest extends TestCase
@@ -255,7 +256,7 @@ class OpenApiFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::int() : [new LegacyType(LegacyType::BUILTIN_TYPE_INT)])
                 ->withDescription('This is an id.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -264,7 +265,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::string() : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
                 ->withDescription('This is a name.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -276,7 +277,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::string() : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
                 ->withDescription('This is an initializable but not writable property.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -289,7 +290,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::object() : [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)])
                 ->withDescription('This is a \DateTimeInterface object.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -301,7 +302,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'enum', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::string() : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
                 ->withDescription('This is an enum.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -314,7 +315,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::int() : [new LegacyType(LegacyType::BUILTIN_TYPE_INT)])
                 ->withDescription('This is an id.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -323,7 +324,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::string() : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
                 ->withDescription('This is a name.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -335,7 +336,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::string() : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
                 ->withDescription('This is an initializable but not writable property.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -346,7 +347,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::object() : [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)])
                 ->withDescription('This is a \DateTimeInterface object.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -356,7 +357,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'enum', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::string() : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
                 ->withDescription('This is an enum.')
                 ->withReadable(true)
                 ->withWritable(true)

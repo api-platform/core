@@ -15,9 +15,12 @@ namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -99,11 +102,28 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
             $fieldName = $this->nameConverter->normalize($fieldName, $class, self::FORMAT);
         }
 
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
-        if ($type && null !== $type->getClassName()) {
-            return "data/relationships/$fieldName";
+        $types = $propertyMetadata->getBuiltinTypes();
+        $type = is_array($types) ? ($types[0] ?? null) : $types;
+
+        if (!$type) {
+            return "data/attributes/$fieldName";
         }
 
-        return "data/attributes/$fieldName";
+        $className = null;
+
+        // BC layer for symfony/property-info < 7.1
+        if ($type instanceof LegacyType) {
+            $className = $type->getClassName();
+        } else {
+            try {
+                // TODO mtarld handle mixed and non nullable
+                // TODO handle union and intersection
+                $baseType = $type->asNonNullable()->getBaseType();
+                $className = $baseType instanceof ObjectType ? $baseType->getClassName() : null;
+            } catch (LogicException) {
+            }
+        }
+
+        return $className ? "data/relationships/$fieldName" : "data/attributes/$fieldName";
     }
 }

@@ -48,9 +48,11 @@ use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\NormalizeOperationNameTrait;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Generates an Open API v3 specification.
@@ -573,7 +575,21 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             foreach ($filter->getDescription($entityClass) as $name => $data) {
-                $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false), 'openapi') : ['type' => 'string']);
+                // BC layer for symfony/property-info < 7.1
+                if (!class_exists(Type::class)) {
+                    $schema = $data['schema'] ?? (\in_array($data['type'], LegacyType::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new LegacyType($data['type'], false, null, $data['is_collection'] ?? false), 'openapi') : ['type' => 'string']);
+                } else {
+                    if (isset($data['schema'])) {
+                        $schema = $data['schema'];
+                    } else {
+                        $schema = ['type' => 'string'];
+
+                        if (\in_array($data['type'], TypeIdentifier::values(), true)) {
+                            $type = ($data['is_collection'] ?? false) ? Type::list(Type::builtin($data['type'])) : Type::builtin($data['type']);
+                            $schema = $this->jsonSchemaTypeFactory->getDataType($type, 'openapi');
+                        }
+                    }
+                }
 
                 $parameters[] = new Parameter(
                     $name,
@@ -583,16 +599,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $data['openapi']['deprecated'] ?? false,
                     $data['openapi']['allowEmptyValue'] ?? true,
                     $schema,
-                    'array' === $schema['type'] && \in_array(
-                        $data['type'],
-                        [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT],
-                        true
-                    ) ? 'deepObject' : 'form',
+                    'array' === $schema['type'] && \in_array($data['type'], ['array', 'object'], true) ? 'deepObject' : 'form',
                     $data['openapi']['explode'] ?? ('array' === $schema['type']),
                     $data['openapi']['allowReserved'] ?? false,
                     $data['openapi']['example'] ?? null,
-                    isset($data['openapi']['examples']
-                    ) ? new \ArrayObject($data['openapi']['examples']) : null
+                    isset($data['openapi']['examples']) ? new \ArrayObject($data['openapi']['examples']) : null
                 );
             }
         }

@@ -17,7 +17,8 @@ use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFacto
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Extractor\PropertyExtractorInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Creates properties's metadata using an extractor.
@@ -60,7 +61,13 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
         foreach ($propertyMetadata as $key => $value) {
             if ('builtinTypes' === $key && null !== $value) {
-                $value = array_map(fn (string $builtinType): Type => new Type($builtinType), $value);
+                // BC layer for symfony/property-info < 7.1
+                if (!class_exists(Type::class)) {
+                    $value = array_map(fn (string $builtinType): LegacyType => new LegacyType($builtinType), $value);
+                } else {
+                    $value = array_map(fn (string $builtinType): Type => Type::builtin($builtinType), $value);
+                    $value = \count($value) > 1 ? Type::union(...$value) : $value[0];
+                }
             }
 
             $methodName = 'with'.ucfirst($key);

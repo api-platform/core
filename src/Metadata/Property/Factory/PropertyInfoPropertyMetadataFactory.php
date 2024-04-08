@@ -44,7 +44,12 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
         }
 
         if (!$propertyMetadata->getBuiltinTypes()) {
-            $propertyMetadata = $propertyMetadata->withBuiltinTypes($this->propertyInfo->getTypes($resourceClass, $property, $options) ?? []);
+            // BC layer for symfony/property-info < 7.1
+            $builtinTypes = method_exists($this->propertyInfo, 'getType')
+                ? $this->propertyInfo->getType($resourceClass, $property, $options)
+                : $this->propertyInfo->getTypes($resourceClass, $property, $options);
+
+            $propertyMetadata = $propertyMetadata->withBuiltinTypes($builtinTypes);
         }
 
         if (null === $propertyMetadata->getDescription() && null !== $description = $this->propertyInfo->getShortDescription($resourceClass, $property, $options)) {

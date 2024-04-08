@@ -20,7 +20,15 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
@@ -83,13 +91,30 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             $propertySchema['externalDocs'] = ['url' => $iri];
         }
 
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
+        $types = $propertyMetadata->getBuiltinTypes();
 
-        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
-            if ($default instanceof \BackedEnum) {
-                $default = $default->value;
+        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault())) {
+            $type = is_array($types) ? ($types[0] ?? null) : $types;
+            $className = null;
+
+            // BC layer for symfony/property-info < 7.1
+            if ($type instanceof LegacyType) {
+                $className = $type->getClassName();
+            } else {
+                try {
+                    // TODO mtarld handle mixed and non nullable
+                    $baseType = $type->asNonNullable()->getBaseType();
+                    $className = $baseType instanceof ObjectType ? $baseType->getClassName() : null;
+                } catch (LogicException) {
+                }
             }
-            $propertySchema['default'] = $default;
+
+            if (null === $className || !$this->isResourceClass($className)) {
+                if ($default instanceof \BackedEnum) {
+                    $default = $default->value;
+                }
+                $propertySchema['default'] = $default;
+            }
         }
 
         if (!\array_key_exists('example', $propertySchema) && !empty($example = $propertyMetadata->getExample())) {
@@ -101,13 +126,98 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         // never override the following keys if at least one is already set
-        if ([] === $types
-            || ($propertySchema['type'] ?? $propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
-        ) {
+        if (!$types || ($propertySchema['type'] ?? $propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)) {
             return $propertyMetadata->withSchema($propertySchema);
         }
 
+        $valueSchema = is_array($types) ? $this->getValueSchemaLegacy($types, $propertyMetadata, $link) : $this->getValueSchema($types, $propertyMetadata, $propertySchema, $link);
+
+        // only one builtInType detected (should be "type" or "$ref")
+        if (1 === \count($valueSchema)) {
+            return $propertyMetadata->withSchema($propertySchema + $valueSchema[0]);
+        }
+
+        // TODO
+
+        // multiple builtInTypes detected: determine oneOf/allOf if union vs intersect types
+        try {
+            $reflectionClass = new \ReflectionClass($resourceClass);
+            $reflectionProperty = $reflectionClass->getProperty($property);
+            $composition = $reflectionProperty->getType() instanceof \ReflectionUnionType ? 'oneOf' : 'allOf';
+        } catch (\ReflectionException) {
+            // cannot detect types
+            $composition = 'anyOf';
+        }
+
+        return $propertyMetadata->withSchema($propertySchema + [$composition => $valueSchema]);
+    }
+
+    private function getValueSchema(Type $type, ApiProperty $propertyMetadata, array $propertySchema, ?bool $readableLink): array
+    {
+        $types = $type instanceof UnionType || $type instanceof IntersectionType ? $type->getTypes() : [$type];
+
         $valueSchema = [];
+        foreach ($types as $type) {
+            // TODO mtarld skip null?
+            if ($type instanceof BuiltinType && TypeIdentifier::NULL === $type->getTypeIdentifier()) {
+                continue;
+            }
+
+            $keyType = null;
+            $valueType = $type;
+            $isCollection = false;
+
+            if ($type instanceof CollectionType) {
+                $keyType = $type->getCollectionKeyType();
+                $valueType = $type->getCollectionValueType();
+                $isCollection = true;
+            }
+
+            if ($type instanceof LegacyType) {
+                $className = $type->getClassName();
+            } else {
+                try {
+                    // TODO mtarld handle mixed and non nullable
+                    $baseType = $type->asNonNullable()->getBaseType();
+                    $className = $baseType instanceof ObjectType ? $baseType->getClassName() : null;
+                    $typeIdentifier = $baseType->getTypeIdentifier();
+                } catch (LogicException) {
+                    $className = null;
+                    $typeIdentifier = TypeIdentifier::STRING;
+                }
+            }
+
+            if (!\array_key_exists('owl:maxCardinality', $propertySchema)
+                && !$isCollection
+                && null !== $className
+                && $this->resourceClassResolver->isResourceClass($className)
+            ) {
+                $propertySchema['owl:maxCardinality'] = 1;
+            }
+
+            if ($isCollection && null !== $propertyMetadata->getUriTemplate()) {
+                $keyType = null;
+                $isCollection = false;
+            }
+
+            $t = null !== $className ? Type::object($className) : Type::builtin($typeIdentifier);
+            if ($isCollection) {
+                $t = Type::collection($t, $valueType, $keyType);
+            }
+
+            $propertyType = $this->getType($t, $readableLink);
+            if (!\in_array($propertyType, $valueSchema, true)) {
+                $valueSchema[] = $propertyType;
+            }
+        }
+
+        return $valueSchema;
+    }
+
+    private function getValueSchemaLegacy(array $types, ApiProperty $propertyMetadata, ?bool $readableLink): array
+    {
+        $valueSchema = [];
+
         foreach ($types as $type) {
             if ($isCollection = $type->isCollection()) {
                 $keyType = $type->getCollectionKeyTypes()[0] ?? null;
@@ -125,47 +235,46 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
                 $className = $valueType->getClassName();
             }
 
-            if (!\array_key_exists('owl:maxCardinality', $propertySchema)
-                && !$isCollection
-                && null !== $className
-                && $this->resourceClassResolver->isResourceClass($className)
-            ) {
-                $propertySchema['owl:maxCardinality'] = 1;
-            }
-
             if ($isCollection && null !== $propertyMetadata->getUriTemplate()) {
                 $keyType = null;
                 $isCollection = false;
             }
 
-            $propertyType = $this->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $link);
+            $propertyType = $this->getTypeLegacy(new LegacyType($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $readableLink);
             if (!\in_array($propertyType, $valueSchema, true)) {
                 $valueSchema[] = $propertyType;
             }
         }
 
-        // only one builtInType detected (should be "type" or "$ref")
-        if (1 === \count($valueSchema)) {
-            return $propertyMetadata->withSchema($propertySchema + $valueSchema[0]);
-        }
-
-        // multiple builtInTypes detected: determine oneOf/allOf if union vs intersect types
-        try {
-            $reflectionClass = new \ReflectionClass($resourceClass);
-            $reflectionProperty = $reflectionClass->getProperty($property);
-            $composition = $reflectionProperty->getType() instanceof \ReflectionUnionType ? 'oneOf' : 'allOf';
-        } catch (\ReflectionException) {
-            // cannot detect types
-            $composition = 'anyOf';
-        }
-
-        return $propertyMetadata->withSchema($propertySchema + [$composition => $valueSchema]);
+        return $valueSchema;
     }
 
     private function getType(Type $type, bool $readableLink = null): array
     {
-        if (!$type->isCollection()) {
+        if (!$type instanceof CollectionType) {
             return $this->addNullabilityToTypeDefinition($this->typeToArray($type, $readableLink), $type);
+        }
+
+        $keyType = $type->getCollectionKeyTypes()[0] ?? null;
+        $subType = ($type->getCollectionValueTypes()[0] ?? null) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
+
+        if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
+            return $this->addNullabilityToTypeDefinition([
+                'type' => 'object',
+                'additionalProperties' => $this->getType($subType, $readableLink),
+            ], $type);
+        }
+
+        return $this->addNullabilityToTypeDefinition([
+            'type' => 'array',
+            'items' => $this->getType($subType, $readableLink),
+        ], $type);
+    }
+
+    private function getTypeLegacy(LegacyType $type, bool $readableLink = null): array
+    {
+        if (!$type->isCollection()) {
+            return $this->addNullabilityToTypeDefinition($this->typeToArrayLegacy($type, $readableLink), $type);
         }
 
         $keyType = $type->getCollectionKeyTypes()[0] ?? null;
@@ -186,11 +295,32 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
     private function typeToArray(Type $type, bool $readableLink = null): array
     {
+        if ($type->isA(TypeIdentifier::INT)) {
+            return ['type' => 'integer'];
+        }
+
+        if ($type->isA(TypeIdentifier::FLOAT)) {
+            return ['type' => 'number'];
+        }
+
+        if ($type->isA(TypeIdentifier::BOOL)) {
+            return ['type' => 'boolean'];
+        }
+
+        if ($type->isA(TypeIdentifier::OBJECT)) {
+            return $this->getClassType($type->getClassName(), $type->isNullable(), $readableLink);
+        }
+
+        return ['type' => 'string'];
+    }
+
+    private function typeToArrayLegacy(LegacyType $type, bool $readableLink = null): array
+    {
         return match ($type->getBuiltinType()) {
-            Type::BUILTIN_TYPE_INT => ['type' => 'integer'],
-            Type::BUILTIN_TYPE_FLOAT => ['type' => 'number'],
-            Type::BUILTIN_TYPE_BOOL => ['type' => 'boolean'],
-            Type::BUILTIN_TYPE_OBJECT => $this->getClassType($type->getClassName(), $type->isNullable(), $readableLink),
+            LegacyType::BUILTIN_TYPE_INT => ['type' => 'integer'],
+            LegacyType::BUILTIN_TYPE_FLOAT => ['type' => 'number'],
+            LegacyType::BUILTIN_TYPE_BOOL => ['type' => 'boolean'],
+            LegacyType::BUILTIN_TYPE_OBJECT => $this->getClassType($type->getClassName(), $type->isNullable(), $readableLink),
             default => ['type' => 'string'],
         };
     }

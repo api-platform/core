@@ -40,7 +40,8 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -594,25 +595,51 @@ class TypeBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider typesProvider
+     * @group legacy
+     *
+     * @dataProvider legacyTypesProvider
      */
-    public function testIsCollection(Type $type, bool $expectedIsCollection): void
+    public function testIsCollection(LegacyType $type, bool $expectedIsCollection): void
     {
         $this->assertSame($expectedIsCollection, $this->typeBuilder->isCollection($type));
     }
 
-    public static function typesProvider(): array
+    /**
+     * @group legacy
+     */
+    public static function legacyTypesProvider(): array
     {
         return [
-            [new Type(Type::BUILTIN_TYPE_BOOL), false],
-            [new Type(Type::BUILTIN_TYPE_OBJECT), false],
-            [new Type(Type::BUILTIN_TYPE_RESOURCE, false, null, false), false],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true), false],
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true), false],
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT)), false],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'className', true), false],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'className')), true],
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'className')), true],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_RESOURCE, false, null, false), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className', true), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className')), true],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className')), true],
         ];
+    }
+
+    /**
+     * @dataProvider typesProvider
+     */
+    public function testIsObjectCollection(Type $type, bool $expectedIsCollection): void
+    {
+        $this->assertSame($expectedIsCollection, $this->typeBuilder->isObjectCollection($type));
+    }
+
+    public static function typesProvider(): iterable
+    {
+        yield [Type::bool(), false];
+        yield [Type::object(), false];
+        yield [Type::resource(), false];
+        yield [Type::collection(Type::object()), false];
+        yield [Type::array(), false];
+        yield [Type::array(Type::object()), false];
+        yield [Type::object('className'), false];
+        yield [Type::collection(Type::object(), Type::object('className')), true];
+        yield [Type::array(Type::object('className')), true];
     }
 }

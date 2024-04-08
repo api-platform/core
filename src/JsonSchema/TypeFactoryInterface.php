@@ -13,17 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Factory for creating the JSON Schema document which specifies the data type corresponding to a PHP type.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @method array getDataType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null)
  */
 interface TypeFactoryInterface
 {
     /**
+     * @deprecated TODO mtarld
+     *
      * Gets the JSON Schema document which specifies the data type corresponding to the given PHP type, and recursively adds needed new schema to the current schema if provided.
      */
-    public function getType(Type $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array;
+    public function getType(LegacyType $type, string $format = 'json', bool $readableLink = null, array $serializerContext = null, Schema $schema = null): array;
 }

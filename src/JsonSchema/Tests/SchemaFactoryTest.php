@@ -34,7 +34,8 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class SchemaFactoryTest extends TestCase
@@ -51,13 +52,13 @@ class SchemaFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::string() : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
                 ->withReadable(true)
                 ->withSchema(['type' => 'string'])
         );
         $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::int() : [new LegacyType(LegacyType::BUILTIN_TYPE_INT)])
                 ->withReadable(true)
                 ->withDefault('default_bar')
                 ->withExample('example_bar')
@@ -65,7 +66,7 @@ class SchemaFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(NotAResource::class, 'genderType', Argument::cetera())->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::object() : [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)])
                 ->withReadable(true)
                 ->withDefault('male')
                 ->withSchema(['type' => 'object', 'default' => 'male', 'example' => 'male'])
@@ -119,13 +120,16 @@ class SchemaFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'ignoredProperty', Argument::cetera())->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, nullable: true)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::nullable(Type::string()) : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING, nullable: true)])
                 ->withReadable(true)
                 ->withSchema(['type' => ['string', 'null']])
         );
         $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'unionType', Argument::cetera())->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, nullable: true), new Type(Type::BUILTIN_TYPE_INT, nullable: true), new Type(Type::BUILTIN_TYPE_FLOAT, nullable: true)])
+                ->withBuiltinTypes(class_exists(Type::class)
+                    ? Type::union(Type::string(), Type::int(), Type::float(), Type::null())
+                    : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING, nullable: true), new LegacyType(LegacyType::BUILTIN_TYPE_INT, nullable: true), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT, nullable: true)],
+                )
                 ->withReadable(true)
                 ->withSchema(['oneOf' => [
                     ['type' => ['string', 'null']],
@@ -134,7 +138,10 @@ class SchemaFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'intersectType', Argument::cetera())->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, class: Serializable::class), new Type(Type::BUILTIN_TYPE_OBJECT, class: DummyResourceInterface::class)])
+                ->withBuiltinTypes(class_exists(Type::class)
+                    ? Type::intersection(Type::object(Serializable::class), Type::object(DummyResourceInterface::class))
+                    : [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, class: Serializable::class), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, class: DummyResourceInterface::class)]
+                )
                 ->withReadable(true)
                 ->withSchema(['type' => 'object'])
         );
@@ -195,19 +202,19 @@ class SchemaFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::type('array'))->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::string() : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
                 ->withReadable(true)
                 ->withSchema(['type' => 'string'])
         );
         $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::type('array'))->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::string() : [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
                 ->withReadable(true)
                 ->withSchema(['type' => 'string'])
         );
         $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'genderType', Argument::type('array'))->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)])
+                ->withBuiltinTypes(class_exists(Type::class) ? Type::enum(GenderTypeEnum::class) : [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)])
                 ->withReadable(true)
                 ->withDefault(GenderTypeEnum::MALE)
                 ->withSchema(['type' => 'object'])
@@ -253,13 +260,19 @@ class SchemaFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))])
+                ->withBuiltinTypes(class_exists(Type::class)
+                    ? Type::list(Type::string())
+                    : [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING))]
+                )
                 ->withReadable(true)
                 ->withSchema(['type' => 'array', 'items' => ['string', 'int']])
         );
         $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING))])
+                ->withBuiltinTypes(class_exists(Type::class)
+                    ? Type::dict(Type::string())
+                    : [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_STRING))]
+                )
                 ->withReadable(true)
                 ->withSchema(['type' => 'object', 'additionalProperties' => 'string'])
         );

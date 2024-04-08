@@ -22,7 +22,9 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Extracts data using Doctrine MongoDB ODM metadata.
@@ -50,12 +52,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         return $metadata->getFieldNames();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Type[]|null
-     */
-    public function getTypes($class, $property, array $context = []): ?array
+    public function getType($class, $property, array $context = []): ?Type
     {
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
@@ -72,19 +69,81 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             if ($metadata->isSingleValuedAssociation($property)) {
                 $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
 
-                return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class)];
+                return $nullable ? Type::nullable(Type::object($class)) : Type::object($class);
             }
 
-            $collectionKeyType = Type::BUILTIN_TYPE_INT;
+            return Type::collection(Type::object(Collection::class), Type::object($class), Type::int());
+        }
+
+        if (!$metadata->hasField($property)) {
+            return null;
+        }
+
+        $typeOfField = $metadata->getTypeOfField($property);
+
+        if (!$typeIdentifier = $this->getTypeIdentifier($typeOfField)) {
+            return null;
+        }
+
+        $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+        $enumType = null;
+
+        if (null !== $enumClass = $metadata instanceof MongoDbClassMetadata ? $metadata->getFieldMapping($property)['enumType'] ?? null : null) {
+            $enumType = $nullable ? Type::nullable(Type::enum($enumClass)) : Type::enum($enumClass);
+        }
+
+        $builtinType = $nullable ? Type::nullable(Type::builtin($typeIdentifier)) : Type::builtin($typeIdentifier);
+
+        return match ($typeOfField) {
+            MongoDbType::DATE => $nullable ? Type::nullable(Type::object(\DateTime::class)) : Type::object(\DateTime::class),
+            MongoDbType::DATE_IMMUTABLE => $nullable ? Type::nullable(Type::object(\DateTimeImmutable::class)) : Type::object(\DateTimeImmutable::class),
+            MongoDbType::HASH => $nullable ? Type::nullable(Type::array()) : Type::array(),
+            MongoDbType::COLLECTION => $nullable ? Type::nullable(Type::list()) : Type::list(),
+            MongoDbType::INT, MongoDbType::INTEGER, MongoDbType::STRING => $enumType ? $enumType : $builtinType,
+            default => $builtinType,
+        };
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated TODO mtarld
+     *
+     * @return LegacyType[]|null
+     */
+    public function getTypes($class, $property, array $context = []): ?array
+    {
+        // TODO mtarld
+        // trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
+
+        if (null === $metadata = $this->getMetadata($class)) {
+            return null;
+        }
+
+        if ($metadata->hasAssociation($property)) {
+            /** @var class-string|null */
+            $class = $metadata->getAssociationTargetClass($property);
+
+            if (null === $class) {
+                return null;
+            }
+
+            if ($metadata->isSingleValuedAssociation($property)) {
+                $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+
+                return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, $class)];
+            }
+
+            $collectionKeyType = LegacyType::BUILTIN_TYPE_INT;
 
             return [
-                new Type(
-                    Type::BUILTIN_TYPE_OBJECT,
+                new LegacyType(
+                    LegacyType::BUILTIN_TYPE_OBJECT,
                     false,
                     Collection::class,
                     true,
-                    new Type($collectionKeyType),
-                    new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)
+                    new LegacyType($collectionKeyType),
+                    new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, $class)
                 ),
             ];
         }
@@ -94,18 +153,18 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
             $enumType = null;
             if (null !== $enumClass = $metadata instanceof MongoDbClassMetadata ? $metadata->getFieldMapping($property)['enumType'] ?? null : null) {
-                $enumType = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
+                $enumType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
             }
 
             switch ($typeOfField) {
                 case MongoDbType::DATE:
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, \DateTime::class)];
+                    return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, \DateTime::class)];
                 case MongoDbType::DATE_IMMUTABLE:
-                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, \DateTimeImmutable::class)];
+                    return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, \DateTimeImmutable::class)];
                 case MongoDbType::HASH:
-                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
+                    return [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
                 case MongoDbType::COLLECTION:
-                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT))];
+                    return [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $nullable, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT))];
                 case MongoDbType::INT:
                 case MongoDbType::STRING:
                     if ($enumType) {
@@ -113,9 +172,9 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
                     }
             }
 
-            $builtinType = $this->getPhpType($typeOfField);
+            $builtinType = $this->getPhpTypeLegacy($typeOfField);
 
-            return $builtinType ? [new Type($builtinType, $nullable)] : null;
+            return $builtinType ? [new LegacyType($builtinType, $nullable)] : null;
         }
 
         return null;
@@ -155,15 +214,28 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
     }
 
     /**
-     * Gets the corresponding built-in PHP type.
+     * Gets the corresponding built-in PHP type identifier.
      */
-    private function getPhpType(string $doctrineType): ?string
+    private function getTypeIdentifier(string $doctrineType): ?TypeIdentifier
     {
         return match ($doctrineType) {
-            MongoDbType::INTEGER, MongoDbType::INT, MongoDbType::INTID, MongoDbType::KEY => Type::BUILTIN_TYPE_INT,
-            MongoDbType::FLOAT => Type::BUILTIN_TYPE_FLOAT,
-            MongoDbType::STRING, MongoDbType::ID, MongoDbType::OBJECTID, MongoDbType::TIMESTAMP, MongoDbType::BINDATA, MongoDbType::BINDATABYTEARRAY, MongoDbType::BINDATACUSTOM, MongoDbType::BINDATAFUNC, MongoDbType::BINDATAMD5, MongoDbType::BINDATAUUID, MongoDbType::BINDATAUUIDRFC4122 => Type::BUILTIN_TYPE_STRING,
-            MongoDbType::BOOLEAN, MongoDbType::BOOL => Type::BUILTIN_TYPE_BOOL,
+            MongoDbType::INTEGER, MongoDbType::INT, MongoDbType::INTID, MongoDbType::KEY => TypeIdentifier::INT,
+            MongoDbType::FLOAT => TypeIdentifier::FLOAT,
+            MongoDbType::STRING, MongoDbType::ID, MongoDbType::OBJECTID, MongoDbType::TIMESTAMP, MongoDbType::BINDATA, MongoDbType::BINDATABYTEARRAY, MongoDbType::BINDATACUSTOM, MongoDbType::BINDATAFUNC, MongoDbType::BINDATAMD5, MongoDbType::BINDATAUUID, MongoDbType::BINDATAUUIDRFC4122 => TypeIdentifier::STRING,
+            MongoDbType::BOOLEAN, MongoDbType::BOOL => TypeIdentifier::BOOL,
+            MongoDbType::DATE, MongoDbType::DATE_IMMUTABLE => TypeIdentifier::OBJECT,
+            MongoDbType::HASH, MongoDbType::COLLECTION => TypeIdentifier::ARRAY,
+            default => null,
+        };
+    }
+
+    private function getPhpTypeLegacy(string $doctrineType): ?string
+    {
+        return match ($doctrineType) {
+            MongoDbType::INTEGER, MongoDbType::INT, MongoDbType::INTID, MongoDbType::KEY => LegacyType::BUILTIN_TYPE_INT,
+            MongoDbType::FLOAT => LegacyType::BUILTIN_TYPE_FLOAT,
+            MongoDbType::STRING, MongoDbType::ID, MongoDbType::OBJECTID, MongoDbType::TIMESTAMP, MongoDbType::BINDATA, MongoDbType::BINDATABYTEARRAY, MongoDbType::BINDATACUSTOM, MongoDbType::BINDATAFUNC, MongoDbType::BINDATAMD5, MongoDbType::BINDATAUUID, MongoDbType::BINDATAUUIDRFC4122 => LegacyType::BUILTIN_TYPE_STRING,
+            MongoDbType::BOOLEAN, MongoDbType::BOOL => LegacyType::BUILTIN_TYPE_BOOL,
             default => null,
         };
     }

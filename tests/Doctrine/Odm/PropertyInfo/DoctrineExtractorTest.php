@@ -28,7 +28,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @group mongodb
@@ -85,18 +86,31 @@ class DoctrineExtractorTest extends TestCase
     }
 
     /**
-     * @dataProvider typesProvider
+     * @group legacy
+     *
+     * @dataProvider legacyTypesProvider
      */
-    public function testExtract(string $property, array $type = null): void
+    public function testExtractLegacy(string $property, array $type = null): void
     {
         $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property));
     }
 
-    public function testExtractWithEmbedOne(): void
+    /**
+     * @dataProvider typesProvider
+     */
+    public function testExtract(string $property, ?Type $type): void
+    {
+        $this->assertEquals($type, $this->createExtractor()->getType(DoctrineDummy::class, $property));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testExtractWithEmbedOneLegacy(): void
     {
         $expectedTypes = [
-            new Type(
-                Type::BUILTIN_TYPE_OBJECT,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_OBJECT,
                 false,
                 DoctrineEmbeddable::class
             ),
@@ -110,16 +124,27 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($expectedTypes, $actualTypes);
     }
 
-    public function testExtractWithEmbedMany(): void
+    public function testExtractWithEmbedOne(): void
+    {
+        $this->assertEquals(
+            Type::object(DoctrineEmbeddable::class),
+            $this->createExtractor()->getType(DoctrineWithEmbedded::class, 'embedOne'),
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testExtractWithEmbedManyLegacy(): void
     {
         $expectedTypes = [
-            new Type(
-                Type::BUILTIN_TYPE_OBJECT,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_OBJECT,
                 false,
                 Collection::class,
                 true,
-                new Type(Type::BUILTIN_TYPE_INT),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineEmbeddable::class)
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT),
+                new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DoctrineEmbeddable::class)
             ),
         ];
 
@@ -131,58 +156,79 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($expectedTypes, $actualTypes);
     }
 
-    public function testExtractEnum(): void
+    public function testExtractWithEmbedMany(): void
     {
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString'));
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt'));
+        $this->assertEquals(
+            Type::collection(Type::object(Collection::class), Type::object(DoctrineEmbeddable::class), Type::int()),
+            $this->createExtractor()->getType(DoctrineWithEmbedded::class, 'embedMany'),
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testExtractEnumLegacy(): void
+    {
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt'));
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom'));
     }
 
-    public static function typesProvider(): array
+    public function testExtractEnum(): void
+    {
+        $this->assertEquals(Type::enum(EnumString::class), $this->createExtractor()->getType(DoctrineEnum::class, 'enumString'));
+        $this->assertEquals(Type::enum(EnumInt::class), $this->createExtractor()->getType(DoctrineEnum::class, 'enumInt'));
+        $this->assertEquals(null, $this->createExtractor()->getType(DoctrineEnum::class, 'enumCustom'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public static function legacyTypesProvider(): array
     {
         return [
-            ['id', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['bin', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['binByteArray', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['binCustom', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['binFunc', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['binMd5', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['binUuid', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['binUuidRfc4122', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['timestamp', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class)]],
-            ['dateImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)]],
-            ['float', [new Type(Type::BUILTIN_TYPE_FLOAT)]],
-            ['bool', [new Type(Type::BUILTIN_TYPE_BOOL)]],
-            ['int', [new Type(Type::BUILTIN_TYPE_INT)]],
-            ['string', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['key', [new Type(Type::BUILTIN_TYPE_INT)]],
-            ['hash', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
-            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(TYPE::BUILTIN_TYPE_INT))]],
-            ['objectId', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            ['id', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['bin', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['binByteArray', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['binCustom', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['binFunc', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['binMd5', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['binUuid', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['binUuidRfc4122', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['timestamp', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['date', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \DateTime::class)]],
+            ['dateImmutable', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)]],
+            ['float', [new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]],
+            ['bool', [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL)]],
+            ['int', [new LegacyType(LegacyType::BUILTIN_TYPE_INT)]],
+            ['string', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['key', [new LegacyType(LegacyType::BUILTIN_TYPE_INT)]],
+            ['hash', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true)]],
+            ['collection', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT))]],
+            ['objectId', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
             ['raw', null],
-            ['foo', [new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)]],
+            ['foo', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)]],
             ['bar',
                 [
-                    new Type(
-                        Type::BUILTIN_TYPE_OBJECT,
+                    new LegacyType(
+                        LegacyType::BUILTIN_TYPE_OBJECT,
                         false,
                         Collection::class,
                         true,
-                        new Type(Type::BUILTIN_TYPE_INT),
-                        new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+                        new LegacyType(LegacyType::BUILTIN_TYPE_INT),
+                        new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
                     ),
                 ],
             ],
             ['indexedFoo',
                 [
-                    new Type(
-                        Type::BUILTIN_TYPE_OBJECT,
+                    new LegacyType(
+                        LegacyType::BUILTIN_TYPE_OBJECT,
                         false,
                         Collection::class,
                         true,
-                        new Type(Type::BUILTIN_TYPE_INT),
-                        new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+                        new LegacyType(LegacyType::BUILTIN_TYPE_INT),
+                        new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
                     ),
                 ],
             ],
@@ -191,14 +237,54 @@ class DoctrineExtractorTest extends TestCase
         ];
     }
 
+    /**
+     * @return iterable<array{0: string, 1: ?Type}>
+     */
+    public static function typesProvider(): iterable
+    {
+        yield ['id', Type::string()];
+        yield ['bin', Type::string()];
+        yield ['binByteArray', Type::string()];
+        yield ['binCustom', Type::string()];
+        yield ['binFunc', Type::string()];
+        yield ['binMd5', Type::string()];
+        yield ['binUuid', Type::string()];
+        yield ['binUuidRfc4122', Type::string()];
+        yield ['timestamp', Type::string()];
+        yield ['date', Type::object(\DateTime::class)];
+        yield ['dateImmutable', Type::object(\DateTimeImmutable::class)];
+        yield ['float', Type::float()];
+        yield ['bool', Type::bool()];
+        yield ['int', Type::int()];
+        yield ['string', Type::string()];
+        yield ['key', Type::int()];
+        yield ['hash', Type::array()];
+        yield ['collection', Type::list()];
+        yield ['objectId', Type::string()];
+        yield ['raw', null];
+        yield ['foo', Type::object(DoctrineRelation::class)];
+        yield ['bar', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::int())];
+        yield ['indexedFoo', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::int())];
+        yield ['customFoo', null];
+        yield ['notMapped', null];
+    }
+
     public function testGetPropertiesCatchException(): void
     {
         $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
     }
 
-    public function testGetTypesCatchException(): void
+    /**
+     * @group legacy
+     */
+    public function testGetTypesCatchExceptionLegacy(): void
     {
         $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
+    }
+
+    public function testGetTypesCatchException(): void
+    {
+        $this->assertNull($this->createExtractor()->getType('Not\Exist', 'baz'));
     }
 
     public function testGeneratedValueNotWritable(): void
@@ -210,7 +296,10 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
     }
 
-    public function testGetTypesWithEmbedManyOmittingTargetDocument(): void
+    /**
+     * @group legacy
+     */
+    public function testGetTypesWithEmbedManyOmittingTargetDocumentLegacy(): void
     {
         $actualTypes = $this->createExtractor()->getTypes(
             DoctrineWithEmbedded::class,
@@ -218,6 +307,11 @@ class DoctrineExtractorTest extends TestCase
         );
 
         self::assertNull($actualTypes);
+    }
+
+    public function testGetTypesWithEmbedManyOmittingTargetDocument(): void
+    {
+        $this->assertNull($this->createExtractor()->getType(DoctrineWithEmbedded::class, 'embedManyOmittingTargetDocument'));
     }
 
     private function createExtractor(): DoctrineExtractor

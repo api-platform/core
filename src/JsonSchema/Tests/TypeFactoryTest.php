@@ -23,16 +23,19 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 class TypeFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
     /**
-     * @dataProvider typeProvider
+     * @group legacy
+     *
+     * @dataProvider legacyTypeProvider
      */
-    public function testGetType(array $schema, Type $type): void
+    public function testGetType(array $schema, LegacyType $type): void
     {
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolver->isResourceClass(GenderTypeEnum::class)->willReturn(false);
@@ -41,32 +44,35 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_OPENAPI)));
     }
 
-    public static function typeProvider(): iterable
+    /**
+     * @group legacy
+     */
+    public static function legacyTypeProvider(): iterable
     {
-        yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
-        yield [['nullable' => true, 'type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT, true)];
-        yield [['type' => 'number'], new Type(Type::BUILTIN_TYPE_FLOAT)];
-        yield [['nullable' => true, 'type' => 'number'], new Type(Type::BUILTIN_TYPE_FLOAT, true)];
-        yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL)];
-        yield [['nullable' => true, 'type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL, true)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING)];
-        yield [['nullable' => true, 'type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING, true)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT)];
-        yield [['nullable' => true, 'type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
-        yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
-        yield [['nullable' => true, 'type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
-        yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
-        yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
-        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
-        yield [['nullable' => true, 'type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
-        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
-        yield ['nullable enum' => ['type' => 'string', 'enum' => ['male', 'female', null], 'nullable' => true], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
-        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
-        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference', 'nullable' => true], new Type(Type::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
-        yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
+        yield [['type' => 'integer'], new LegacyType(LegacyType::BUILTIN_TYPE_INT)];
+        yield [['nullable' => true, 'type' => 'integer'], new LegacyType(LegacyType::BUILTIN_TYPE_INT, true)];
+        yield [['type' => 'number'], new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)];
+        yield [['nullable' => true, 'type' => 'number'], new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT, true)];
+        yield [['type' => 'boolean'], new LegacyType(LegacyType::BUILTIN_TYPE_BOOL)];
+        yield [['nullable' => true, 'type' => 'boolean'], new LegacyType(LegacyType::BUILTIN_TYPE_BOOL, true)];
+        yield [['type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
+        yield [['nullable' => true, 'type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true)];
+        yield [['type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)];
+        yield [['nullable' => true, 'type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true)];
+        yield [['type' => 'string', 'format' => 'date-time'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
+        yield [['nullable' => true, 'type' => 'string', 'format' => 'date-time'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'duration'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
+        yield [['type' => 'string', 'format' => 'binary'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['nullable' => true, 'type' => 'string', 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
+        yield ['nullable enum' => ['type' => 'string', 'enum' => ['male', 'female', null], 'nullable' => true], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference', 'nullable' => true], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
+        yield [['type' => 'array', 'items' => ['type' => 'string']], new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable' => [
             ['nullable' => true, 'type' => 'array', 'items' => ['type' => 'string']],
-            new Type(Type::BUILTIN_TYPE_STRING, true, null, true),
+            new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true, null, true),
         ];
 
         yield 'array can contain nullable values' => [
@@ -77,17 +83,17 @@ class TypeFactoryTest extends TestCase
                     'type' => 'string',
                 ],
             ],
-            new Type(Type::BUILTIN_TYPE_STRING, false, null, true, null, new Type(Type::BUILTIN_TYPE_STRING, true, null, false)),
+            new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true, null, false)),
         ];
 
         yield 'map with string keys becomes an object' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_STRING,
                 false,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false)
             ),
         ];
 
@@ -97,25 +103,25 @@ class TypeFactoryTest extends TestCase
                 'type' => 'object',
                 'additionalProperties' => ['type' => 'string'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_STRING,
                 true,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false)
             ),
         ];
 
         yield 'map value type will be considered' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'integer']],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_ARRAY,
                 false,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, false, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, false, null, false)
             ),
         ];
 
@@ -127,13 +133,13 @@ class TypeFactoryTest extends TestCase
                     'type' => 'integer',
                 ],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_ARRAY,
                 false,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, true, null, false)
             ),
         ];
 
@@ -146,21 +152,67 @@ class TypeFactoryTest extends TestCase
                     'type' => 'integer',
                 ],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_ARRAY,
                 true,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, true, null, false)
             ),
         ];
     }
 
     /**
-     * @dataProvider jsonSchemaTypeProvider
+     * @dataProvider typeProvider
      */
-    public function testGetTypeWithJsonSchemaSyntax(array $schema, Type $type): void
+    public function testGetDataType(array $schema, Type $type): void
+    {
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(GenderTypeEnum::class)->willReturn(false);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
+        $typeFactory = new TypeFactory($resourceClassResolver->reveal());
+        $this->assertEquals($schema, $typeFactory->getDataType($type, 'json', null, null, new Schema(Schema::VERSION_OPENAPI)));
+    }
+
+    public static function typeProvider(): iterable
+    {
+        yield [['type' => 'integer'], Type::int()];
+        yield [['nullable' => true, 'type' => 'integer'], Type::nullable(Type::int())];
+        yield [['type' => 'number'], Type::float()];
+        yield [['nullable' => true, 'type' => 'number'], Type::nullable(Type::float())];
+        yield [['type' => 'boolean'], Type::bool()];
+        yield [['nullable' => true, 'type' => 'boolean'], Type::nullable(Type::bool())];
+        yield [['type' => 'string'], Type::string()];
+        yield [['nullable' => true, 'type' => 'string'], Type::nullable(Type::string())];
+        yield [['type' => 'string'], Type::object()];
+        yield [['nullable' => true, 'type' => 'string'], Type::nullable(Type::object())];
+        yield [['type' => 'string', 'format' => 'date-time'], Type::object(\DateTimeImmutable::class)];
+        yield [['nullable' => true, 'type' => 'string', 'format' => 'date-time'], Type::nullable(Type::object(\DateTimeImmutable::class))];
+        yield [['type' => 'string', 'format' => 'duration'], Type::object(\DateInterval::class)];
+        yield [['type' => 'string', 'format' => 'binary'], Type::object(\SplFileInfo::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], Type::object(Dummy::class)];
+        yield [['nullable' => true, 'type' => 'string', 'format' => 'iri-reference'], Type::nullable(Type::object(Dummy::class))];
+        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], Type::enum(GenderTypeEnum::class)];
+        yield ['nullable enum' => ['type' => 'string', 'enum' => ['male', 'female', null], 'nullable' => true], Type::nullable(Type::enum(GenderTypeEnum::class))];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], Type::enum(GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference', 'nullable' => true], Type::nullable(Type::enum(GamePlayMode::class))];
+        yield [['type' => 'array', 'items' => ['type' => 'string']], Type::list(Type::string())];
+        yield 'array can be itself nullable' => [['nullable' => true, 'type' => 'array', 'items' => ['type' => 'string']], Type::nullable(Type::list(Type::string()))];
+        yield 'array can contain nullable values' => [['type' => 'array', 'items' => ['nullable' => true, 'type' => 'string']], Type::list(Type::nullable(Type::string()))];
+        yield 'map with string keys becomes an object' => [['type' => 'object', 'additionalProperties' => ['type' => 'string']], Type::dict(Type::string())];
+        yield 'nullable map with string keys becomes a nullable object' => [['nullable' => true, 'type' => 'object', 'additionalProperties' => ['type' => 'string']], Type::nullable(Type::dict(Type::string()))];
+        yield 'map value type will be considered' => [['type' => 'object', 'additionalProperties' => ['type' => 'integer']], Type::dict(Type::int())];
+        yield 'map value type nullability will be considered' => [['type' => 'object', 'additionalProperties' => ['nullable' => true, 'type' => 'integer']], Type::dict(Type::nullable(Type::int()))];
+        yield 'nullable map can contain nullable values' => [['nullable' => true, 'type' => 'object', 'additionalProperties' => ['nullable' => true, 'type' => 'integer']], Type::nullable(Type::dict(Type::nullable(Type::int())))];
+    }
+
+    /**
+     * @group legacy
+     *
+     * @dataProvider legacyJsonSchemaTypeProvider
+     */
+    public function testGetTypeWithJsonSchemaSyntax(array $schema, LegacyType $type): void
     {
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolver->isResourceClass(GenderTypeEnum::class)->willReturn(false);
@@ -169,32 +221,32 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_JSON_SCHEMA)));
     }
 
-    public static function jsonSchemaTypeProvider(): iterable
+    public static function legacyJsonSchemaTypeProvider(): iterable
     {
-        yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
-        yield [['type' => ['integer', 'null']], new Type(Type::BUILTIN_TYPE_INT, true)];
-        yield [['type' => 'number'], new Type(Type::BUILTIN_TYPE_FLOAT)];
-        yield [['type' => ['number', 'null']], new Type(Type::BUILTIN_TYPE_FLOAT, true)];
-        yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL)];
-        yield [['type' => ['boolean', 'null']], new Type(Type::BUILTIN_TYPE_BOOL, true)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING)];
-        yield [['type' => ['string', 'null']], new Type(Type::BUILTIN_TYPE_STRING, true)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT)];
-        yield [['type' => ['string', 'null']], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
-        yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
-        yield [['type' => ['string', 'null'], 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
-        yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
-        yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
-        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
-        yield [['type' => ['string', 'null'], 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
-        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
-        yield ['nullable enum' => ['type' => ['string', 'null'], 'enum' => ['male', 'female', null]], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
-        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
-        yield ['nullable enum resource' => ['type' => ['string', 'null'], 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
-        yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
+        yield [['type' => 'integer'], new LegacyType(LegacyType::BUILTIN_TYPE_INT)];
+        yield [['type' => ['integer', 'null']], new LegacyType(LegacyType::BUILTIN_TYPE_INT, true)];
+        yield [['type' => 'number'], new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)];
+        yield [['type' => ['number', 'null']], new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT, true)];
+        yield [['type' => 'boolean'], new LegacyType(LegacyType::BUILTIN_TYPE_BOOL)];
+        yield [['type' => ['boolean', 'null']], new LegacyType(LegacyType::BUILTIN_TYPE_BOOL, true)];
+        yield [['type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
+        yield [['type' => ['string', 'null']], new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true)];
+        yield [['type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)];
+        yield [['type' => ['string', 'null']], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true)];
+        yield [['type' => 'string', 'format' => 'date-time'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
+        yield [['type' => ['string', 'null'], 'format' => 'date-time'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'duration'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
+        yield [['type' => 'string', 'format' => 'binary'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['type' => ['string', 'null'], 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
+        yield ['nullable enum' => ['type' => ['string', 'null'], 'enum' => ['male', 'female', null]], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => ['string', 'null'], 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
+        yield [['type' => 'array', 'items' => ['type' => 'string']], new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable' => [
             ['type' => ['array', 'null'], 'items' => ['type' => 'string']],
-            new Type(Type::BUILTIN_TYPE_STRING, true, null, true),
+            new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true, null, true),
         ];
 
         yield 'array can contain nullable values' => [
@@ -204,17 +256,17 @@ class TypeFactoryTest extends TestCase
                     'type' => ['string', 'null'],
                 ],
             ],
-            new Type(Type::BUILTIN_TYPE_STRING, false, null, true, null, new Type(Type::BUILTIN_TYPE_STRING, true, null, false)),
+            new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true, null, false)),
         ];
 
         yield 'map with string keys becomes an object' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_STRING,
                 false,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false)
             ),
         ];
 
@@ -223,25 +275,25 @@ class TypeFactoryTest extends TestCase
                 'type' => ['object', 'null'],
                 'additionalProperties' => ['type' => 'string'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_STRING,
                 true,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false)
             ),
         ];
 
         yield 'map value type will be considered' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'integer']],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_ARRAY,
                 false,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, false, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, false, null, false)
             ),
         ];
 
@@ -252,13 +304,13 @@ class TypeFactoryTest extends TestCase
                     'type' => ['integer', 'null'],
                 ],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_ARRAY,
                 false,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, true, null, false)
             ),
         ];
 
@@ -269,19 +321,67 @@ class TypeFactoryTest extends TestCase
                     'type' => ['integer', 'null'],
                 ],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_ARRAY,
                 true,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, true, null, false)
             ),
         ];
     }
 
-    /** @dataProvider openAPIV2TypeProvider */
-    public function testGetTypeWithOpenAPIV2Syntax(array $schema, Type $type): void
+    /**
+     * @dataProvider jsonSchemaTypeProvider
+     */
+    public function testGetDataTypeWithJsonSchemaSyntax(array $schema, Type $type): void
+    {
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(GenderTypeEnum::class)->willReturn(false);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
+        $typeFactory = new TypeFactory($resourceClassResolver->reveal());
+        $this->assertEquals($schema, $typeFactory->getDataType($type, 'json', null, null, new Schema(Schema::VERSION_JSON_SCHEMA)));
+    }
+
+    public static function jsonSchemaTypeProvider(): iterable
+    {
+        yield [['type' => 'integer'], Type::int()];
+        yield [['type' => ['integer', 'null']], Type::nullable(Type::int())];
+        yield [['type' => 'number'], Type::float()];
+        yield [['type' => ['number', 'null']], Type::nullable(Type::float())];
+        yield [['type' => 'boolean'], Type::bool()];
+        yield [['type' => ['boolean', 'null']], Type::nullable(Type::bool())];
+        yield [['type' => 'string'], Type::string()];
+        yield [['type' => ['string', 'null']], Type::nullable(Type::string())];
+        yield [['type' => 'string'], Type::object()];
+        yield [['type' => ['string', 'null']], Type::nullable(Type::object())];
+        yield [['type' => 'string', 'format' => 'date-time'], Type::object(\DateTimeImmutable::class)];
+        yield [['type' => ['string', 'null'], 'format' => 'date-time'], Type::nullable(Type::object(\DateTimeImmutable::class))];
+        yield [['type' => 'string', 'format' => 'duration'], Type::object(\DateInterval::class)];
+        yield [['type' => 'string', 'format' => 'binary'], Type::object(\SplFileInfo::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], Type::object(Dummy::class)];
+        yield [['type' => ['string', 'null'], 'format' => 'iri-reference'], Type::nullable(Type::object(Dummy::class))];
+        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], Type::enum(GenderTypeEnum::class)];
+        yield ['nullable enum' => ['type' => ['string', 'null'], 'enum' => ['male', 'female', null]], Type::nullable(Type::enum(GenderTypeEnum::class))];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], Type::enum(GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => ['string', 'null'], 'format' => 'iri-reference'], Type::nullable(Type::enum(GamePlayMode::class))];
+        yield [['type' => 'array', 'items' => ['type' => 'string']], Type::list(Type::string())];
+        yield 'array can be itself nullable' => [['type' => ['array', 'null'], 'items' => ['type' => 'string']], Type::nullable(Type::list(Type::string()))];
+        yield 'array can contain nullable values' => [['type' => 'array', 'items' => ['type' => ['string', 'null']]], Type::list(Type::nullable(Type::string()))];
+        yield 'map with string keys becomes an object' => [['type' => 'object', 'additionalProperties' => ['type' => 'string']], Type::dict(Type::string())];
+        yield 'nullable map with string keys becomes a nullable object' => [['type' => ['object', 'null'], 'additionalProperties' => ['type' => 'string']], Type::nullable(Type::dict(Type::string()))];
+        yield 'map value type will be considered' => [['type' => 'object', 'additionalProperties' => ['type' => 'integer']], Type::dict(Type::int())];
+        yield 'map value type nullability will be considered' => [['type' => 'object', 'additionalProperties' => ['type' => ['integer', 'null']]], Type::dict(Type::nullable(Type::int()))];
+        yield 'nullable map can contain nullable values' => [['type' => ['object', 'null'], 'additionalProperties' => ['type' => ['integer', 'null']]], Type::nullable(Type::dict(Type::nullable(Type::int())))];
+    }
+
+    /**
+     * @group legacy
+     *
+     * @dataProvider legacyOpenAPIV2TypeProvider
+     */
+    public function testGetTypeWithOpenAPIV2Syntax(array $schema, LegacyType $type): void
     {
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolver->isResourceClass(GenderTypeEnum::class)->willReturn(false);
@@ -290,32 +390,35 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_SWAGGER)));
     }
 
-    public static function openAPIV2TypeProvider(): iterable
+    /**
+     * @group legacy
+     */
+    public static function legacyOpenAPIV2TypeProvider(): iterable
     {
-        yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
-        yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT, true)];
-        yield [['type' => 'number'], new Type(Type::BUILTIN_TYPE_FLOAT)];
-        yield [['type' => 'number'], new Type(Type::BUILTIN_TYPE_FLOAT, true)];
-        yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL)];
-        yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL, true)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING, true)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
-        yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
-        yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
-        yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
-        yield [['type' => 'string', 'format' => 'binary'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
-        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
-        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
-        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
-        yield ['nullable enum' => ['type' => 'string', 'enum' => ['male', 'female', null]], new Type(Type::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
-        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
-        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
-        yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
+        yield [['type' => 'integer'], new LegacyType(LegacyType::BUILTIN_TYPE_INT)];
+        yield [['type' => 'integer'], new LegacyType(LegacyType::BUILTIN_TYPE_INT, true)];
+        yield [['type' => 'number'], new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)];
+        yield [['type' => 'number'], new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT, true)];
+        yield [['type' => 'boolean'], new LegacyType(LegacyType::BUILTIN_TYPE_BOOL)];
+        yield [['type' => 'boolean'], new LegacyType(LegacyType::BUILTIN_TYPE_BOOL, true)];
+        yield [['type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
+        yield [['type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true)];
+        yield [['type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)];
+        yield [['type' => 'string'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true)];
+        yield [['type' => 'string', 'format' => 'date-time'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'date-time'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'duration'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
+        yield [['type' => 'string', 'format' => 'binary'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \SplFileInfo::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)];
+        yield ['nullable enum' => ['type' => 'string', 'enum' => ['male', 'female', null]], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, GenderTypeEnum::class)];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference'], new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, GamePlayMode::class)];
+        yield [['type' => 'array', 'items' => ['type' => 'string']], new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable, but ignored in OpenAPI V2' => [
             ['type' => 'array', 'items' => ['type' => 'string']],
-            new Type(Type::BUILTIN_TYPE_STRING, true, null, true),
+            new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true, null, true),
         ];
 
         yield 'array can contain nullable values, but ignored in OpenAPI V2' => [
@@ -323,17 +426,17 @@ class TypeFactoryTest extends TestCase
                 'type' => 'array',
                 'items' => ['type' => 'string'],
             ],
-            new Type(Type::BUILTIN_TYPE_STRING, false, null, true, null, new Type(Type::BUILTIN_TYPE_STRING, true, null, false)),
+            new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true, null, false)),
         ];
 
         yield 'map with string keys becomes an object' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_STRING,
                 false,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false)
             ),
         ];
 
@@ -342,25 +445,25 @@ class TypeFactoryTest extends TestCase
                 'type' => 'object',
                 'additionalProperties' => ['type' => 'string'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_STRING,
                 true,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false)
             ),
         ];
 
         yield 'map value type will be considered' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'integer']],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_ARRAY,
                 false,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, false, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, false, null, false)
             ),
         ];
 
@@ -369,13 +472,13 @@ class TypeFactoryTest extends TestCase
                 'type' => 'object',
                 'additionalProperties' => ['type' => 'integer'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_ARRAY,
                 false,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, true, null, false)
             ),
         ];
 
@@ -384,17 +487,64 @@ class TypeFactoryTest extends TestCase
                 'type' => 'object',
                 'additionalProperties' => ['type' => 'integer'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
+            new LegacyType(
+                LegacyType::BUILTIN_TYPE_ARRAY,
                 true,
                 null,
                 true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, false),
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, true, null, false)
             ),
         ];
     }
 
+    /**
+     * @dataProvider openAPIV2TypeProvider
+     */
+    public function testGetDataTypeWithOpenAPIV2Syntax(array $schema, Type $type): void
+    {
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(GenderTypeEnum::class)->willReturn(false);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
+        $typeFactory = new TypeFactory($resourceClassResolver->reveal());
+        $this->assertEquals($schema, $typeFactory->getDataType($type, 'json', null, null, new Schema(Schema::VERSION_SWAGGER)));
+    }
+
+    public static function openAPIV2TypeProvider(): iterable
+    {
+        yield [['type' => 'integer'], Type::int()];
+        yield [['type' => 'integer'], Type::nullable(Type::int())];
+        yield [['type' => 'number'], Type::float()];
+        yield [['type' => 'number'], Type::nullable(Type::float())];
+        yield [['type' => 'boolean'], Type::bool()];
+        yield [['type' => 'boolean'], Type::nullable(Type::bool())];
+        yield [['type' => 'string'], Type::string()];
+        yield [['type' => 'string'], Type::nullable(Type::string())];
+        yield [['type' => 'string'], Type::object()];
+        yield [['type' => 'string'], Type::nullable(Type::object())];
+        yield [['type' => 'string', 'format' => 'date-time'], Type::object(\DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'date-time'], Type::nullable(Type::object(\DateTimeImmutable::class))];
+        yield [['type' => 'string', 'format' => 'duration'], Type::object(\DateInterval::class)];
+        yield [['type' => 'string', 'format' => 'binary'], Type::object(\SplFileInfo::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], Type::object(Dummy::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], Type::nullable(Type::object(Dummy::class))];
+        yield ['enum' => ['type' => 'string', 'enum' => ['male', 'female']], Type::enum(GenderTypeEnum::class)];
+        yield ['nullable enum' => ['type' => 'string', 'enum' => ['male', 'female', null]], Type::nullable(Type::enum(GenderTypeEnum::class))];
+        yield ['enum resource' => ['type' => 'string', 'format' => 'iri-reference'], Type::enum(GamePlayMode::class)];
+        yield ['nullable enum resource' => ['type' => 'string', 'format' => 'iri-reference'], Type::nullable(Type::enum(GamePlayMode::class))];
+        yield [['type' => 'array', 'items' => ['type' => 'string']], Type::list(Type::string())];
+        yield 'array can be itself nullable, but ignored in OpenAPI V2' => [['type' => 'array', 'items' => ['type' => 'string']], Type::nullable(Type::list(Type::string()))];
+        yield 'array can contain nullable values, but ignored in OpenAPI V2' => [['type' => 'array', 'items' => ['type' => 'string']], Type::list(Type::nullable(Type::string()))];
+        yield 'map with string keys becomes an object' => [['type' => 'object', 'additionalProperties' => ['type' => 'string']], Type::dict(Type::string())];
+        yield 'nullable map with string keys becomes a nullable object, but ignored in OpenAPI V2' => [['type' => 'object', 'additionalProperties' => ['type' => 'string']], Type::nullable(Type::dict(Type::string()))];
+        yield 'map value type will be considered' => [['type' => 'object', 'additionalProperties' => ['type' => 'integer']], Type::dict(Type::int())];
+        yield 'map value type nullability will be considered, but ignored in OpenAPI V2' => [['type' => 'object', 'additionalProperties' => ['type' => 'integer']], Type::dict(Type::nullable(Type::int()))];
+        yield 'nullable map can contain nullable values, but ignored in OpenAPI V2' => [['type' => 'object', 'additionalProperties' => ['type' => 'integer']], Type::nullable(Type::dict(Type::nullable(Type::int())))];
+    }
+
+    /**
+     * @group legacy
+     */
     public function testGetClassType(): void
     {
         $schemaFactoryProphecy = $this->prophesize(SchemaFactoryInterface::class);
@@ -408,10 +558,30 @@ class TypeFactoryTest extends TestCase
         $typeFactory = new TypeFactory();
         $typeFactory->setSchemaFactory($schemaFactoryProphecy->reveal());
 
-        $this->assertEquals(['$ref' => 'ref'], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
+        $this->assertEquals(['$ref' => 'ref'], $typeFactory->getType(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
     }
 
-    /** @dataProvider classTypeWithNullabilityDataProvider */
+    public function testGetClassDataType(): void
+    {
+        $schemaFactoryProphecy = $this->prophesize(SchemaFactoryInterface::class);
+
+        $schemaFactoryProphecy->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, Argument::type(Schema::class), Argument::type('array'), false)->will(function (array $args) {
+            $args[4]['$ref'] = 'ref';
+
+            return $args[4];
+        });
+
+        $typeFactory = new TypeFactory();
+        $typeFactory->setSchemaFactory($schemaFactoryProphecy->reveal());
+
+        $this->assertEquals(['$ref' => 'ref'], $typeFactory->getDataType(Type::object(Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
+    }
+
+    /**
+     * @group legacy
+     *
+     * @dataProvider classTypeWithNullabilityDataProvider
+     */
     public function testGetClassTypeWithNullability(array $expected, callable $schemaFactoryFactory, Schema $schema): void
     {
         $typeFactory = new TypeFactory();
@@ -419,7 +589,21 @@ class TypeFactoryTest extends TestCase
 
         self::assertEquals(
             $expected,
-            $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class), 'jsonld', true, ['foo' => 'bar'], $schema)
+            $typeFactory->getType(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, Dummy::class), 'jsonld', true, ['foo' => 'bar'], $schema)
+        );
+    }
+
+    /**
+     * @dataProvider classTypeWithNullabilityDataProvider
+     */
+    public function testGetClassDataTypeWithNullability(array $expected, callable $schemaFactoryFactory, Schema $schema): void
+    {
+        $typeFactory = new TypeFactory();
+        $typeFactory->setSchemaFactory($schemaFactoryFactory($this));
+
+        self::assertEquals(
+            $expected,
+            $typeFactory->getDataType(Type::nullable(Type::object(Dummy::class)), 'jsonld', true, ['foo' => 'bar'], $schema)
         );
     }
 
