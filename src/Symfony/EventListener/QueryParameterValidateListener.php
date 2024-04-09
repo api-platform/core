@@ -15,7 +15,7 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\ParameterValidator\ParameterValidator;
 use ApiPlatform\State\ProviderInterface;
@@ -54,20 +54,6 @@ final class QueryParameterValidateListener
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
 
-        if ($operation && $this->provider instanceof ProviderInterface) {
-            if (null === $operation->getQueryParameterValidationEnabled()) {
-                $operation = $operation->withQueryParameterValidationEnabled($request->isMethodSafe() && 'GET' === $request->getMethod() && $operation instanceof CollectionOperationInterface);
-            }
-
-            $this->provider->provide($operation, $request->attributes->get('_api_uri_variables') ?? [], [
-                'request' => $request,
-                'uri_variables' => $request->attributes->get('_api_uri_variables') ?? [],
-                'resource_class' => $operation->getClass(),
-            ]);
-
-            return;
-        }
-
         if (
             !$request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
@@ -81,7 +67,21 @@ final class QueryParameterValidateListener
             return;
         }
 
-        if (!($operation?->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface) {
+        if (!($operation?->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof HttpOperation) {
+            return;
+        }
+
+        if ($this->provider instanceof ProviderInterface) {
+            if (null === $operation->getQueryParameterValidationEnabled()) {
+                $operation = $operation->withQueryParameterValidationEnabled('GET' === $request->getMethod());
+            }
+
+            $this->provider->provide($operation, $request->attributes->get('_api_uri_variables') ?? [], [
+                'request' => $request,
+                'uri_variables' => $request->attributes->get('_api_uri_variables') ?? [],
+                'resource_class' => $operation->getClass(),
+            ]);
+
             return;
         }
 

@@ -29,6 +29,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class QueryParameterValidateListenerTest extends TestCase
 {
@@ -185,6 +186,30 @@ class QueryParameterValidateListenerTest extends TestCase
         $this->testedInstance->onKernelRequest($eventProphecy->reveal());
     }
 
+    /**
+     * if parameter use_symfony_listeners is true.
+     *
+     * @group legacy
+     */
+    public function testDoNothingWhenListenersDisabled(): void
+    {
+        $parameterValidator = $this->prophesize(ProviderInterface::class);
+        $parameterValidator->provide()->shouldNotBeCalled();
+
+        $factory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [new ApiResource(operations: ['get' => new Get(name: 'get')])]))->shouldBeCalled();
+
+        $listener = new QueryParameterValidateListener($parameterValidator->reveal(), $factory->reveal());
+
+        $event = new RequestEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_platform_disable_listeners' => true]),
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
+        );
+
+        $listener->onKernelRequest($event);
+    }
+
     private function setUpWithFilters(array $filters = []): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -207,7 +232,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $request = new Request(
             [],
             [],
-            ['_api_resource_class' => Dummy::class, '_api_operation' => new GetCollection()],
+            ['_api_resource_class' => Dummy::class, '_api_operation' => new GetCollection(), '_api_operation_name' => 'get'],
             [],
             [],
             ['QUERY_STRING' => 'required=foo']
