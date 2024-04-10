@@ -167,6 +167,19 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
     }
 
     /**
+     * Test issue #6299.
+     */
+    public function testOpenApiResourceRefIsNotOverwritten(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6299\Issue6299', '--type' => 'output']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals('#/definitions/DummyFriend', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['properties']['itemDto']['$ref']);
+        $this->assertEquals('#/definitions/DummyDate', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['properties']['collectionDto']['items']['$ref']);
+    }
+
+    /**
      * Test related Schema keeps json-ld context.
      */
     public function testSubSchemaJsonLd(): void
