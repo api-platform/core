@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumIntegerResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumStringResource;
@@ -284,5 +285,284 @@ GRAPHQL;
         $this->assertCount(2, $operations);
 
         $this->assertInstanceOf($operationClass, $operations[$operationName]);
+    }
+
+    public function testEnumsAreAssignedValuePropertyAsIdentifierByDefault(): void
+    {
+        $linkFactory = self::getContainer()->get('api_platform.metadata.resource.link_factory');
+        $result = $linkFactory->completeLink(new Link(fromClass: BackedEnumIntegerResource::class));
+        $identifiers = $result->getIdentifiers();
+
+        $this->assertCount(1, $identifiers);
+        $this->assertNotContains('id', $identifiers);
+        $this->assertContains('value', $identifiers);
+    }
+
+    public static function providerCollection(): iterable
+    {
+        yield 'JSON' => ['application/json', [
+            [
+                'name' => 'Yes',
+                'value' => 1,
+                'description' => 'We say yes',
+            ],
+            [
+                'name' => 'No',
+                'value' => 2,
+                'description' => 'Computer says no',
+            ],
+            [
+                'name' => 'Maybe',
+                'value' => 3,
+                'description' => 'Let me think about it',
+            ],
+        ]];
+
+        yield 'JSON:API' => ['application/vnd.api+json',  [
+            'links' => [
+                'self' => '/backed_enum_integer_resources',
+            ],
+            'meta' => [
+                'totalItems' => 3,
+            ],
+            'data' => [
+                [
+                    'id' => '/backed_enum_integer_resources/1',
+                    'type' => 'BackedEnumIntegerResource',
+                    'attributes' => [
+                        'name' => 'Yes',
+                        'value' => 1,
+                        'description' => 'We say yes',
+                    ],
+                ],
+                [
+                    'id' => '/backed_enum_integer_resources/2',
+                    'type' => 'BackedEnumIntegerResource',
+                    'attributes' => [
+                        'name' => 'No',
+                        'value' => 2,
+                        'description' => 'Computer says no',
+                    ],
+                ],
+                [
+                    'id' => '/backed_enum_integer_resources/3',
+                    'type' => 'BackedEnumIntegerResource',
+                    'attributes' => [
+                        'name' => 'Maybe',
+                        'value' => 3,
+                        'description' => 'Let me think about it',
+                    ],
+                ],
+            ],
+        ]];
+
+        yield 'LD+JSON' => ['application/ld+json', [
+            '@context' => '/contexts/BackedEnumIntegerResource',
+            '@id' => '/backed_enum_integer_resources',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 3,
+            'hydra:member' => [
+                [
+                    '@id' => '/backed_enum_integer_resources/1',
+                    '@type' => 'BackedEnumIntegerResource',
+                    'name' => 'Yes',
+                    'value' => 1,
+                    'description' => 'We say yes',
+                ],
+                [
+                    '@id' => '/backed_enum_integer_resources/2',
+                    '@type' => 'BackedEnumIntegerResource',
+                    'name' => 'No',
+                    'value' => 2,
+                    'description' => 'Computer says no',
+                ],
+                [
+                    '@id' => '/backed_enum_integer_resources/3',
+                    '@type' => 'BackedEnumIntegerResource',
+                    'name' => 'Maybe',
+                    'value' => 3,
+                    'description' => 'Let me think about it',
+                ],
+            ],
+        ]];
+
+        yield 'HAL+JSON' => ['application/hal+json',  [
+            '_links' => [
+                'self' => [
+                    'href' => '/backed_enum_integer_resources',
+                ],
+                'item' => [
+                    [
+                        'href' => '/backed_enum_integer_resources/1',
+                    ],
+                    [
+                        'href' => '/backed_enum_integer_resources/2',
+                    ],
+                    [
+                        'href' => '/backed_enum_integer_resources/3',
+                    ],
+                ],
+            ],
+            'totalItems' => 3,
+            '_embedded' => [
+                'item' => [
+                    [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/backed_enum_integer_resources/1',
+                            ],
+                        ],
+                        'name' => 'Yes',
+                        'value' => 1,
+                        'description' => 'We say yes',
+                    ],
+                    [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/backed_enum_integer_resources/2',
+                            ],
+                        ],
+                        'name' => 'No',
+                        'value' => 2,
+                        'description' => 'Computer says no',
+                    ],
+                    [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/backed_enum_integer_resources/3',
+                            ],
+                        ],
+                        'name' => 'Maybe',
+                        'value' => 3,
+                        'description' => 'Let me think about it',
+                    ],
+                ],
+            ],
+        ]];
+    }
+
+    /** @dataProvider providerCollection */
+    public function testCollection(string $mimeType, array $expected): void
+    {
+        self::createClient()->request('GET', '/backed_enum_integer_resources', ['headers' => ['Accept' => $mimeType]]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonEquals($expected);
+    }
+
+    public static function providerItem(): iterable
+    {
+        yield 'JSON' => ['application/json', [
+            'name' => 'Yes',
+            'value' => 1,
+            'description' => 'We say yes',
+        ]];
+
+        yield 'JSON:API' => ['application/vnd.api+json',  [
+            'data' => [
+                'id' => '/backed_enum_integer_resources/1',
+                'type' => 'BackedEnumIntegerResource',
+                'attributes' => [
+                    'name' => 'Yes',
+                    'value' => 1,
+                    'description' => 'We say yes',
+                ],
+            ],
+        ]];
+
+        yield 'JSON:HAL' => ['application/hal+json',  [
+            '_links' => [
+                'self' => [
+                    'href' => '/backed_enum_integer_resources/1',
+                ],
+            ],
+            'name' => 'Yes',
+            'value' => 1,
+            'description' => 'We say yes',
+        ]];
+
+        yield 'LD+JSON' => ['application/ld+json',  [
+            '@context' => '/contexts/BackedEnumIntegerResource',
+            '@id' => '/backed_enum_integer_resources/1',
+            '@type' => 'BackedEnumIntegerResource',
+            'name' => 'Yes',
+            'value' => 1,
+            'description' => 'We say yes',
+        ]];
+    }
+
+    /** @dataProvider providerItem */
+    public function testItem(string $mimeType, array $expected): void
+    {
+        self::createClient()->request('GET', '/backed_enum_integer_resources/1', ['headers' => ['Accept' => $mimeType]]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonEquals($expected);
+    }
+
+    public function testCollectionGraphQl(): void
+    {
+        $query = <<<'GRAPHQL'
+query {
+  backedEnumIntegerResources {
+    value
+  }
+}
+GRAPHQL;
+        $options = (new HttpOptions())
+            ->setJson(['query' => $query, 'variables' => []])
+            ->setHeaders(['Content-Type' => 'application/json']);
+        self::createClient()->request('POST', '/graphql', $options->toArray());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonEquals([
+            'data' => [
+                'backedEnumIntegerResources' => [
+                    ['value' => 1],
+                    ['value' => 2],
+                    ['value' => 3],
+                ],
+            ],
+        ]);
+    }
+
+    public function testItemGraphQlInteger(): void
+    {
+        $query = <<<'GRAPHQL'
+query GetBackedEnumIntegerResource($identifier: ID!) {
+    backedEnumIntegerResource(id: $identifier) {
+        name
+        value
+        description
+    }
+}
+GRAPHQL;
+        $options = (new HttpOptions())
+            ->setJson(['query' => $query, 'variables' => ['identifier' => '/backed_enum_integer_resources/1']])
+            ->setHeaders(['Content-Type' => 'application/json']);
+        self::createClient()->request('POST', '/graphql', $options->toArray());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonEquals([
+            'data' => [
+                'status' => [
+                    'value' => 1,
+                ],
+            ],
+        ]);
+    }
+
+    public static function provider404s(): iterable
+    {
+        yield ['/backed_enum_integer_resources/42'];
+        yield ['/backed_enum_integer_resources/fortytwo'];
+    }
+
+    /** @dataProvider provider404s */
+    public function testItem404(string $uri): void
+    {
+        self::createClient()->request('GET', $uri);
+
+        $this->assertResponseStatusCodeSame(404);
     }
 }
