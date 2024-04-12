@@ -711,7 +711,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             throw new \InvalidArgumentException('Only one options can be configured at a time.');
         }
 
-        $configuration = reset($values);
+        $elasticsearchOptions = reset($values);
         switch (key($values)) {
             case 'elasticsearchOptions':
                 if (class_exists(Options::class)) {
