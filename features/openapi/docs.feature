@@ -129,7 +129,7 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].name" should be equal to "page"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].in" should be equal to "query"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].required" should be false
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].schema.type" should be equal to "integer"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].schema.type" should be equal to "string"
 
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].name" should be equal to "itemsPerPage"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].in" should be equal to "query"
