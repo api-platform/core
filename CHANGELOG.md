@@ -1,5 +1,22 @@
 # Changelog
 
+## v3.3.0-beta.2
+
+### Bug fixes
+
+* [2a8767108](https://github.com/api-platform/core/commit/2a8767108690c35d873a936f9e2383365fdb4f00) revert: fix(graphql): increment graphql normalizer priority
+* [50f4f0eeb](https://github.com/api-platform/core/commit/50f4f0eeb55c29c57d8ca63dedb0534f86f07055) fix: change deprecated ValidationException (#6295)
+* [5e908c898](https://github.com/api-platform/core/commit/5e908c898dd6dca3a6abfd3f083e4d7b4fc4e85a) fix: reorder early return QueryParameterValidateListener (#6300)
+* [678eb4f84](https://github.com/api-platform/core/commit/678eb4f8474edc29b2fc806c85aaf203540e23ab) fix(jsonapi): add missing "included" schema parts (#6277)
+* [6c3d58c28](https://github.com/api-platform/core/commit/6c3d58c287650e32ae0d68e9197424b04acdab5a) fix(jsonschema): don't try to define $ref if set in attributes (#6303)
+* [8f8121865](https://github.com/api-platform/core/commit/8f8121865aca950b64559c6aa6acad9d8bef6bda) fix(graphql): query nullish ManyToOne-Relation
+* [90c9fb31a](https://github.com/api-platform/core/commit/90c9fb31a322a2c7891fbbafb75d60b09fd67772) fix(symfony): register api_error route (#6281)
+* [93f8b5f39](https://github.com/api-platform/core/commit/93f8b5f39727ee5aa48d78d56fd7e3376b7a813a) fix(jsonapi): return empty data array for empty relation (#6270)
+* [9ac0062a2](https://github.com/api-platform/core/commit/9ac0062a2d30776b94994e419b9bcc39832540b7) fix(symfony): context not serializable when session (#6302)
+* [ba1c61ff3](https://github.com/api-platform/core/commit/ba1c61ff352a0459bfa6010c000ed5b88d4f84ee) fix(jsonapi): correct data path (#6273)
+* [d061c3811](https://github.com/api-platform/core/commit/d061c381120b858c471157dbdccbb5084a39fb04) fix(graphql): increment graphql normalizer priority (#6283)
+* [da324e457](https://github.com/api-platform/core/commit/da324e45783c425b5165a3429464efe53e6f6094) fix(metadata): index operations (#6272)
+
 ## v3.3.0-beta.1
 
 ### Bug fixes
