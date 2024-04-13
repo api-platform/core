@@ -40,7 +40,7 @@ class ContextStampTest extends TestCase
     public function testSerializable(): void
     {
         $request = new Request();
-        $request->setSessionFactory(fn () => 'session');
+        $request->setSessionFactory(function (): void {}); // @phpstan-ignore-line
 
         $stamp = new ContextStamp(['request' => $request]);
         serialize($stamp);
