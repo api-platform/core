@@ -108,6 +108,14 @@ api_platform:
         form: ['multipart/form-data']
 ```
 
+## v3.2.21
+
+### Bug fixes
+
+* [2a8767108](https://github.com/api-platform/core/commit/2a8767108690c35d873a936f9e2383365fdb4f00) revert: fix(graphql): increment graphql normalizer priority
+* [6c3d58c28](https://github.com/api-platform/core/commit/6c3d58c287650e32ae0d68e9197424b04acdab5a) fix(jsonschema): don't try to define $ref if set in attributes (#6303)
+* [9ac0062a2](https://github.com/api-platform/core/commit/9ac0062a2d30776b94994e419b9bcc39832540b7) fix(symfony): context not serializable when session (#6302)
+
 ## v3.2.20
 
 ### Bug fixes
