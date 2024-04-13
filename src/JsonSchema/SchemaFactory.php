@@ -160,6 +160,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $additionalPropertySchema ?? []
         );
 
+        // @see https://github.com/api-platform/core/issues/6299
+        if (Schema::UNKNOWN_TYPE === ($propertySchema['type'] ?? null) && isset($propertySchema['$ref'])) {
+            unset($propertySchema['type']);
+        }
+
         $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
         // see AttributePropertyMetadataFactory
         if (true === ($extraProperties[SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED] ?? false)) {
