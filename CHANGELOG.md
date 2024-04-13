@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.1.28
+
+### Bug fixes
+
+* [2c25293ba](https://github.com/api-platform/core/commit/2c25293ba933d37a14f2db8229aa47bb75b10669) fix(symfony): context not serializable when session (#6302)
+
 ## v3.1.27
 
 ### Bug fixes
