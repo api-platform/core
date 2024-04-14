@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Serializer\Annotation\Groups;
-use ORM\OneToMany;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Post;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[
     Post,
