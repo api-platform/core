@@ -33,6 +33,10 @@ Feature: Exposing a property being a collection of resources
                 {
                   "type": "PropertyCollectionIriOnlyRelation",
                   "id": "/property_collection_iri_only_relations/1"
+                },
+                {
+                  "type": "PropertyCollectionIriOnlyRelation",
+                  "id": "/property_collection_iri_only_relations/2"
                 }
               ]
             },

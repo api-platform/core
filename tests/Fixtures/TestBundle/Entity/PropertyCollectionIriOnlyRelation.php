@@ -13,12 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Post;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ORM\OneToMany;
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\ApiProperty;
 
 #[
     Post,
@@ -49,6 +53,16 @@ class PropertyCollectionIriOnlyRelation
     #[ORM\ManyToOne(inversedBy: 'propertyCollectionIriOnlyRelation')]
     private ?PropertyCollectionIriOnly $propertyCollectionIriOnly = null;
 
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: PropertyCollectionIriOnlyRelationSecondLevel::class)]
+    #[ApiProperty(uriTemplate: '/property_collection_iri_only_relations/{parentId}/children')]
+    #[Groups('read')]
+    private Collection $children;
+
+    public function __construct()
+    {
+        $this->children = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id ?? 9999;
@@ -62,5 +76,35 @@ class PropertyCollectionIriOnlyRelation
     public function setPropertyCollectionIriOnly(?PropertyCollectionIriOnly $propertyCollectionIriOnly): void
     {
         $this->propertyCollectionIriOnly = $propertyCollectionIriOnly;
+    }
+
+    /**
+     * @return Collection<int, PropertyCollectionIriOnlyRelationSecondLevel>
+     */
+    public function getChildren(): Collection
+    {
+        return $this->children;
+    }
+
+    public function addChild(PropertyCollectionIriOnlyRelationSecondLevel $child): self
+    {
+        if (!$this->children->contains($child)) {
+            $this->children->add($child);
+            $child->setParent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChild(PropertyCollectionIriOnlyRelationSecondLevel $child): self
+    {
+        if ($this->children->removeElement($child)) {
+            // set the owning side to null (unless already changed)
+            if ($child->getParent() === $this) {
+                $child->setParent(null);
+            }
+        }
+
+        return $this;
     }
 }
