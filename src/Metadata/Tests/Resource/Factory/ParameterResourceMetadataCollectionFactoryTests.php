@@ -32,8 +32,18 @@ class ParameterResourceMetadataCollectionFactoryTests extends TestCase
             public function getDescription(string $resourceClass): array
             {
                 return [
-                    'hydra' => ['schema' => ['type' => 'foo'], 'openapi' => new Parameter('test', 'query')],
-                    'everywhere' => ['openapi' => ['allowEmptyValue' => true]],
+                    'hydra' => [
+                        'property' => 'hydra',
+                        'type' => 'string',
+                        'required' => false,
+                        'schema' => ['type' => 'foo'],
+                        'openapi' => new Parameter('test', 'query'),
+                    ],
+                    'everywhere' => [
+                        'property' => 'everywhere',
+                        'type' => 'string',
+                        'required' => false,
+                        'openapi' => ['allowEmptyValue' => true]],
                 ];
             }
         });
