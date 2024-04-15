@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\ParameterValidator;
 
+use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\FilterInterface as MetadataFilterInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -45,7 +46,7 @@ trait FilterLocatorTrait
     /**
      * Gets a filter with a backward compatibility.
      */
-    private function getFilter(string $filterId): ?FilterInterface
+    private function getFilter(string $filterId): FilterInterface|MetadataFilterInterface|null
     {
         if ($this->filterLocator && $this->filterLocator->has($filterId)) {
             return $this->filterLocator->get($filterId);
