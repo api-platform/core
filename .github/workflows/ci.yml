@@ -1027,10 +1027,10 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --prefer-lowest --no-interaction --no-progress --ansi
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit
         env:
