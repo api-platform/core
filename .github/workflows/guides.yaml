@@ -53,7 +53,11 @@ jobs:
                     KERNEL_CLASS: \ApiPlatform\Playground\Kernel
                 run: |
                     for d in guides/*.php; do
-                      rm -f var/data.db
-                      echo "Testing guide $d"
-                      pdg-phpunit $d || exit 1
+                        rm -f var/*.db
+                        echo "Testing guide $d"
+                        pdg-phpunit $d || exit 1
+                        exit_status=$?
+                        if [ $exit_status -ne 0 ]; then
+                          exit $exit_status
+                        fi
                     done
