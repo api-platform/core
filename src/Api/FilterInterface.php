@@ -17,6 +17,8 @@ namespace ApiPlatform\Api;
  * Filters applicable on a resource.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated
  */
 interface FilterInterface
 {
