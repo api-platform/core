@@ -60,14 +60,15 @@ final class JsonApiProvider implements ProviderInterface
             $filterParameter
             && \is_array($filterParameter)
         ) {
-            $filters = array_merge(['page' => $filterParameter], $filterParameter, $filters);
+            $filters = array_merge($filterParameter, $filters);
         }
 
         $pageParameter = $queryParameters['page'] ?? null;
         if (
             \is_array($pageParameter)
         ) {
-            $filters = array_merge($pageParameter, $filters);
+            // To not break existing integration, put page array in _page
+            $filters = array_merge(['_page' => $pageParameter], $pageParameter, $filters);
         }
 
         [$included, $properties] = $this->transformFieldsetsParameters($queryParameters, $operation->getShortName() ?? '');
