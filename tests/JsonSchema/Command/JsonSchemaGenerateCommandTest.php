@@ -124,9 +124,9 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         ]);
     }
 
-    public function testArraySchemaWithMultipleUnionTypes(): void
+    public function testArraySchemaWithMultipleUnionTypesJsonLd(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest', '--type' => 'output']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest', '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
@@ -138,6 +138,38 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
         $this->assertArrayHasKey('Wren.jsonld', $json['definitions']);
         $this->assertArrayHasKey('Robin.jsonld', $json['definitions']);
+    }
+
+    public function testArraySchemaWithMultipleUnionTypesJsonApi(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest', '--type' => 'output', '--format' => 'jsonapi']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals($json['definitions']['Nest.jsonapi']['properties']['data']['properties']['attributes']['properties']['owner']['anyOf'], [
+            ['$ref' => '#/definitions/Wren.jsonapi'],
+            ['$ref' => '#/definitions/Robin.jsonapi'],
+            ['type' => 'null'],
+        ]);
+
+        $this->assertArrayHasKey('Wren.jsonapi', $json['definitions']);
+        $this->assertArrayHasKey('Robin.jsonapi', $json['definitions']);
+    }
+
+    public function testArraySchemaWithMultipleUnionTypesJsonHal(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest', '--type' => 'output', '--format' => 'jsonhal']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals($json['definitions']['Nest.jsonhal']['properties']['owner']['anyOf'], [
+            ['$ref' => '#/definitions/Wren.jsonhal'],
+            ['$ref' => '#/definitions/Robin.jsonhal'],
+            ['type' => 'null'],
+        ]);
+
+        $this->assertArrayHasKey('Wren.jsonhal', $json['definitions']);
+        $this->assertArrayHasKey('Robin.jsonhal', $json['definitions']);
     }
 
     /**
