@@ -222,16 +222,16 @@ final class Pagination
     /**
      * Extract pagination parameter
      * page[page] => $contextFilters['page'] with default configuration page_parameter_name: page
-     * page[number] => $contextFilters['_page'][number] with configuration page_parameter_name: page[number]
+     * page[number] => $contextFilters['_page'][number] with configuration page_parameter_name: page[number].
      */
     private function extractParameter(array $contextFilters, string $parameterName)
     {
         preg_match_all("/[\w-]+/", $parameterName, $matches);
         foreach ($matches[0] as $i => $key) {
-            if ($i === 0 && $key === 'page' && count($matches[0]) > 1) {
+            if (0 === $i && 'page' === $key && \count($matches[0]) > 1) {
                 $key = '_page';
             }
-            if (\is_array($contextFilters) === false) {
+            if (false === \is_array($contextFilters)) {
                 return $contextFilters;
             }
             if (!\array_key_exists($key, $contextFilters)) {
