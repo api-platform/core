@@ -219,13 +219,28 @@ final class Pagination
         return $operation?->getPaginationEnabled() ?? $enabled;
     }
 
+    private function extractParameter(array $contextFilters, string $parameterName)
+    {
+        \preg_match_all("/[\w-]+/", $parameterName, $matches);
+
+        foreach($matches[0] as $key){
+            if (!\array_key_exists($key, $contextFilters)) {
+                return null;
+            }
+            $contextFilters = $contextFilters[$key];
+        }
+
+        return $contextFilters;
+    }
+
     /**
      * Gets the given pagination parameter name from the given context.
      */
     private function getParameterFromContext(array $context, string $parameterName, mixed $default = null)
     {
         $filters = $context['filters'] ?? [];
+        $filterValue = $this->extractParameter($filters, $parameterName);
 
-        return \array_key_exists($parameterName, $filters) ? $filters[$parameterName] : $default;
+        return $filterValue ?? $default;
     }
 }

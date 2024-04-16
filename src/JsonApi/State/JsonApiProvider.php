@@ -60,7 +60,7 @@ final class JsonApiProvider implements ProviderInterface
             $filterParameter
             && \is_array($filterParameter)
         ) {
-            $filters = array_merge($filterParameter, $filters);
+            $filters = array_merge(['page' => $filterParameter], $filterParameter, $filters);
         }
 
         $pageParameter = $queryParameters['page'] ?? null;
