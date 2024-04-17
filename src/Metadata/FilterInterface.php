@@ -27,16 +27,16 @@ interface FilterInterface
      *   - property: the property where the filter is applied
      *   - type: the type of the filter
      *   - required: if this filter is required
-     *   - description (optional) : the description of the filter
-     *   - strategy (optional): the used strategy
-     *   - is_collection (optional): if this filter is for collection
-     *   - swagger (optional): additional parameters for the path operation,
+     *   - description : the description of the filter
+     *   - strategy: the used strategy
+     *   - is_collection: if this filter is for collection
+     *   - swagger: additional parameters for the path operation,
      *     e.g. 'swagger' => [
      *       'description' => 'My Description',
      *       'name' => 'My Name',
      *       'type' => 'integer',
      *     ]
-     *   - openapi (optional): additional parameters for the path operation in the version 3 spec,
+     *   - openapi: additional parameters for the path operation in the version 3 spec,
      *     e.g. 'openapi' => [
      *       'description' => 'My Description',
      *       'name' => 'My Name',
@@ -44,7 +44,7 @@ interface FilterInterface
      *          'type' => 'integer',
      *       ]
      *     ]
-     *   - schema (optional): schema definition,
+     *   - schema: schema definition,
      *     e.g. 'schema' => [
      *       'type' => 'string',
      *       'enum' => ['value_1', 'value_2'],
@@ -53,7 +53,7 @@ interface FilterInterface
      *
      * @see \ApiPlatform\OpenApi\Factory\OpenApiFactory::getFiltersParameters
      *
-     * @return array<string, array{property: string, type: string, required: bool, description?: string, strategy?: string, is_collection?: bool, swagger?: array<string, mixed>, openapi?: array<string, mixed>|\ApiPlatform\OpenApi\Model\Parameter, schema?: array<string, mixed>}>
+     * @return array<string, array{property?: string, type?: string, required?: bool, description?: string, strategy?: string, is_collection?: bool, swagger?: array<string, mixed>, openapi?: array<string, mixed>|\ApiPlatform\OpenApi\Model\Parameter, schema?: array<string, mixed>}>
      */
     public function getDescription(string $resourceClass): array;
 }
