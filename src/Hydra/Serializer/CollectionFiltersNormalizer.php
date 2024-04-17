@@ -157,7 +157,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         foreach ($filters as $filter) {
             foreach ($filter->getDescription($resourceClass) as $variable => $data) {
                 $variables[] = $variable;
-                $mapping[] = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $data['property'], 'required' => $data['required']];
+                $mapping[] = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $data['property'] ?? null, 'required' => $data['required'] ?? false];
             }
         }
 
