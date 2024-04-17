@@ -116,7 +116,6 @@ class GroupFilterTest extends TestCase
         $groupFilter = new GroupFilter('custom_groups');
         $expectedDescription = [
             'custom_groups[]' => [
-                'property' => null,
                 'type' => 'string',
                 'is_collection' => true,
                 'required' => false,
@@ -131,7 +130,6 @@ class GroupFilterTest extends TestCase
         $groupFilter = new GroupFilter('custom_groups', false, ['default_group', 'another_default_group']);
         $expectedDescription = [
             'custom_groups[]' => [
-                'property' => null,
                 'type' => 'string',
                 'is_collection' => true,
                 'required' => false,

@@ -163,7 +163,6 @@ final class PropertyFilter implements FilterInterface
 
         return [
             "$this->parameterName[]" => [
-                'property' => null,
                 'type' => 'string',
                 'is_collection' => true,
                 'required' => false,

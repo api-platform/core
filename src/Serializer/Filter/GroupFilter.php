@@ -148,7 +148,6 @@ final class GroupFilter implements FilterInterface
     public function getDescription(string $resourceClass): array
     {
         $description = [
-            'property' => null,
             'type' => 'string',
             'is_collection' => true,
             'required' => false,
