@@ -214,7 +214,6 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('custom_properties');
         $expectedDescription = [
             'custom_properties[]' => [
-                'property' => null,
                 'type' => 'string',
                 'is_collection' => true,
                 'required' => false,

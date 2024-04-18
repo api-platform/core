@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Api\FilterInterface as LegacyFilterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
@@ -148,8 +147,8 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * Returns the content of the Hydra search property.
      *
-     * @param LegacyFilterInterface[]|FilterInterface[] $filters
-     * @param array<string, Parameter>                  $parameters
+     * @param FilterInterface[]        $filters
+     * @param array<string, Parameter> $parameters
      */
     private function getSearch(string $resourceClass, array $parts, array $filters, array|Parameters|null $parameters): array
     {
@@ -158,7 +157,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         foreach ($filters as $filter) {
             foreach ($filter->getDescription($resourceClass) as $variable => $data) {
                 $variables[] = $variable;
-                $mapping[] = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $data['property'], 'required' => $data['required']];
+                $mapping[] = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $data['property'] ?? null, 'required' => $data['required'] ?? false];
             }
         }
 
@@ -207,7 +206,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * Gets a filter with a backward compatibility.
      */
-    private function getFilter(string $filterId): LegacyFilterInterface|FilterInterface|null
+    private function getFilter(string $filterId): ?FilterInterface
     {
         if ($this->filterLocator && $this->filterLocator->has($filterId)) {
             return $this->filterLocator->get($filterId);
