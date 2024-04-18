@@ -109,6 +109,7 @@ class ConfigurationTest extends TestCase
             'validator' => [
                 'serialize_payload_fields' => [],
                 'query_parameter_validation' => true,
+                'legacy_validation_exception' => true,
             ],
             'name_converter' => null,
             'enable_swagger' => true,
