@@ -26,7 +26,8 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
+use ApiPlatform\State\Util\RequestAttributesExtractor;
+use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface as LegacyConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
@@ -192,7 +193,7 @@ final class ErrorListener extends SymfonyErrorListener
             return 400;
         }
 
-        if ($exception instanceof ConstraintViolationListAwareExceptionInterface) {
+        if ($exception instanceof ConstraintViolationListAwareExceptionInterface || $exception instanceof LegacyConstraintViolationListAwareExceptionInterface) {
             return 422;
         }
 
