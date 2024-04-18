@@ -184,17 +184,21 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $relatedDefinitions = [];
         foreach ($properties as $propertyName => $property) {
             if ($relation = $this->getRelationship($className, $propertyName, $serializerContext)) {
-                [$isOne, $hasOperations, $relatedClassName] = $relation;
-                if (false === $hasOperations) {
-                    continue;
-                }
+                [$isOne, $relatedClasses] = $relation;
+                $refs = [];
+                foreach ($relatedClasses as $relatedClassName => $hasOperations) {
+                    if (false === $hasOperations) {
+                        continue;
+                    }
 
-                $operation = $this->findOperation($relatedClassName, $type, $operation, $serializerContext);
-                $inputOrOutputClass = $this->findOutputClass($relatedClassName, $type, $operation, $serializerContext);
-                $serializerContext ??= $this->getSerializerContext($operation, $type);
-                $definitionName = $this->definitionNameFactory->create($relatedClassName, $format, $inputOrOutputClass, $operation, $serializerContext);
-                $ref = Schema::VERSION_OPENAPI === $schema->getVersion() ? '#/components/schemas/'.$definitionName : '#/definitions/'.$definitionName;
-                $relatedDefinitions[$propertyName] = ['$ref' => $ref];
+                    $operation = $this->findOperation($relatedClassName, $type, $operation, $serializerContext);
+                    $inputOrOutputClass = $this->findOutputClass($relatedClassName, $type, $operation, $serializerContext);
+                    $serializerContext ??= $this->getSerializerContext($operation, $type);
+                    $definitionName = $this->definitionNameFactory->create($relatedClassName, $format, $inputOrOutputClass, $operation, $serializerContext);
+                    $ref = Schema::VERSION_OPENAPI === $schema->getVersion() ? '#/components/schemas/'.$definitionName : '#/definitions/'.$definitionName;
+                    $refs[$ref] = '$ref';
+                }
+                $relatedDefinitions[$propertyName] = array_flip($refs);
                 if ($isOne) {
                     $relationships[$propertyName]['properties']['data'] = self::RELATION_PROPS;
                     continue;
@@ -203,7 +207,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     'type' => 'array',
                     'items' => self::RELATION_PROPS,
                 ];
-                continue;
             }
             if ('id' === $propertyName) {
                 $attributes['_id'] = $property;
@@ -264,7 +267,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
         $isRelationship = false;
         $isOne = $isMany = false;
-        $className = $hasOperations = null;
+        $relatedClasses = [];
 
         foreach ($types as $type) {
             if ($type->isCollection()) {
@@ -281,9 +284,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $operation = $resourceMetadata->getOperation();
             // @see https://github.com/api-platform/core/issues/5501
             // @see https://github.com/api-platform/core/pull/5722
-            $hasOperations ??= $operation->canRead();
+            $relatedClasses[$className] = $operation->canRead();
         }
 
-        return $isRelationship ? [$isOne, $hasOperations, $className] : null;
+        return $isRelationship ? [$isOne, $relatedClasses] : null;
     }
 }
