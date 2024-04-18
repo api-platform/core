@@ -816,6 +816,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         if (interface_exists(ValidatorInterface::class)) {
+            $container->setParameter('api_platform.validator.legacy_validation_exception', $config['validator']['legacy_validation_exception'] ?? true);
             $loader->load('metadata/validator.xml');
             $loader->load('validator/validator.xml');
 
