@@ -224,7 +224,7 @@ final class Pagination
      * page[page] => $contextFilters['page'] with default configuration page_parameter_name: page
      * page[number] => $contextFilters['_page'][number] with configuration page_parameter_name: page[number].
      */
-    private function extractParameter(array $contextFilters, string $parameterName)
+    private function extractParameter(array $contextFilters, string $parameterName): mixed
     {
         preg_match_all("/[\w-]+/", $parameterName, $matches);
         foreach ($matches[0] as $i => $key) {
@@ -246,7 +246,7 @@ final class Pagination
     /**
      * Gets the given pagination parameter name from the given context.
      */
-    private function getParameterFromContext(array $context, string $parameterName, mixed $default = null)
+    private function getParameterFromContext(array $context, string $parameterName, mixed $default = null): mixed
     {
         $filters = $context['filters'] ?? [];
         $filterValue = $this->extractParameter($filters, $parameterName);
