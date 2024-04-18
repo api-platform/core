@@ -34,15 +34,11 @@ class ContextStampTest extends TestCase
         $this->assertIsArray($contextStamp->getContext());
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
-    public function testSerializable(): void
+    public function testRequestIsUnset(): void
     {
         $request = new Request();
-        $request->setSessionFactory(function (): void {}); // @phpstan-ignore-line
-
         $stamp = new ContextStamp(['request' => $request]);
-        serialize($stamp);
+
+        self::assertArrayNotHasKey('request', $stamp->getContext());
     }
 }

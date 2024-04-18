@@ -27,7 +27,8 @@ final class ContextStamp implements StampInterface
 
     public function __construct(array $context = [])
     {
-        if (($request = ($context['request'] ?? null)) && $request instanceof Request && $request->hasSession()) {
+        /* Symfony does not guarantee that the Request object is serializable */
+        if (($request = ($context['request'] ?? null)) && $request instanceof Request) {
             unset($context['request']);
         }
 
