@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
-use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface as ApiPlatformConstraintViolationListAwareExceptionInterface;
+use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Validator\Exception\ValidationException as BaseValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 use Symfony\Component\WebLink\Link;
@@ -71,6 +71,6 @@ use Symfony\Component\WebLink\Link;
     ],
     graphQlOperations: []
 )]
-final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, ApiPlatformConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface, HttpExceptionInterface, SymfonyHttpExceptionInterface
+final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface, HttpExceptionInterface, SymfonyHttpExceptionInterface
 {
 }

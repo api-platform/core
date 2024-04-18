@@ -15,8 +15,8 @@ namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
-use ApiPlatform\State\ApiResource\Error;
-use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
+use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface as LegacyConstraintViolationListAwareExceptionInterface;
+use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -48,7 +48,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     {
         // TODO: in api platform 4 this will be the default, note that JSON:API is close to Problem so we should use the same normalizer
         if ($context['rfc_7807_compliant_errors'] ?? false) {
-            if ($object instanceof ConstraintViolationListAwareExceptionInterface) {
+            if ($object instanceof LegacyConstraintViolationListAwareExceptionInterface || $object instanceof ConstraintViolationListAwareExceptionInterface) {
                 // TODO: return ['errors' => $this->constraintViolationListNormalizer(...)]
                 return $this->constraintViolationListNormalizer->normalize($object->getConstraintViolationList(), $format, $context);
             }

@@ -8,6 +8,7 @@
         <service id="api_platform.validator" class="ApiPlatform\Symfony\Validator\Validator">
             <argument type="service" id="validator" />
             <argument type="tagged_locator" tag="api_platform.validation_groups_generator" />
+            <argument>%api_platform.validator.legacy_validation_exception%</argument>
         </service>
         <service id="ApiPlatform\Validator\ValidatorInterface" alias="api_platform.validator" />
 

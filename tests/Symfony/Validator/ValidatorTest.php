@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator;
 
-use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException as LegacyValidationException;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Symfony\Validator\Validator;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
+use ApiPlatform\Validator\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
@@ -43,7 +44,7 @@ class ValidatorTest extends TestCase
         $symfonyValidatorProphecy->validate($data, null, null)->willReturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
 
-        $validator = new Validator($symfonyValidator);
+        $validator = new Validator($symfonyValidator, legacyValidationException: false);
         $validator->validate(new DummyEntity());
     }
 
@@ -58,7 +59,25 @@ class ValidatorTest extends TestCase
         $symfonyValidatorProphecy->validate($data, null, null)->willReturn($constraintViolationList)->shouldBeCalled();
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
 
-        $validator = new Validator($symfonyValidator);
+        $validator = new Validator($symfonyValidator, legacyValidationException: false);
+        $validator->validate(new DummyEntity());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedInvalid(): void
+    {
+        $this->expectException(LegacyValidationException::class);
+
+        $data = new DummyEntity();
+        $constraintViolationList = new ConstraintViolationList([new ConstraintViolation('test', null, [], null, 'test', null), new ConstraintViolation('test', null, [], null, 'test', null)]);
+
+        $symfonyValidatorProphecy = $this->prophesize(SymfonyValidatorInterface::class);
+        $symfonyValidatorProphecy->validate($data, null, null)->willReturn($constraintViolationList)->shouldBeCalled();
+        $symfonyValidator = $symfonyValidatorProphecy->reveal();
+
+        $validator = new Validator($symfonyValidator, legacyValidationException: true);
         $validator->validate(new DummyEntity());
     }
 
@@ -74,7 +93,7 @@ class ValidatorTest extends TestCase
         $symfonyValidatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
 
-        $validator = new Validator($symfonyValidator);
+        $validator = new Validator($symfonyValidator, legacyValidationException: false);
         $validator->validate(new DummyEntity(), ['groups' => fn ($data): array => $data instanceof DummyEntity ? $expectedValidationGroups : []]);
     }
 
@@ -97,7 +116,7 @@ class ValidatorTest extends TestCase
             }
         });
 
-        $validator = new Validator($symfonyValidatorProphecy->reveal(), $containerProphecy->reveal());
+        $validator = new Validator($symfonyValidatorProphecy->reveal(), $containerProphecy->reveal(), legacyValidationException: false);
         $validator->validate(new DummyEntity(), ['groups' => 'groups_builder']);
     }
 
@@ -116,7 +135,7 @@ class ValidatorTest extends TestCase
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('foo')->willReturn(false)->shouldBeCalled();
 
-        $validator = new Validator($symfonyValidator, $containerProphecy->reveal());
+        $validator = new Validator($symfonyValidator, $containerProphecy->reveal(), legacyValidationException: false);
         $validator->validate(new DummyEntity(), ['groups' => 'foo']);
     }
 }

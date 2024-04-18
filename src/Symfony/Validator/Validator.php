@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator;
 
-use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException as LegacyValidationException;
+use ApiPlatform\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
@@ -28,7 +29,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidator
  */
 class Validator implements ValidatorInterface
 {
-    public function __construct(private readonly SymfonyValidatorInterface $validator, private readonly ?ContainerInterface $container = null)
+    public function __construct(private readonly SymfonyValidatorInterface $validator, private readonly ?ContainerInterface $container = null, private readonly ?bool $legacyValidationException = true)
     {
     }
 
@@ -57,6 +58,9 @@ class Validator implements ValidatorInterface
 
         $violations = $this->validator->validate($data, null, $validationGroups);
         if (0 !== \count($violations)) {
+            if (true === $this->legacyValidationException) {
+                throw new LegacyValidationException($violations);
+            }
             throw new ValidationException($violations);
         }
     }
