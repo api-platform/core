@@ -69,7 +69,7 @@ final class ResolverProvider implements ProviderInterface
             return $itemClass;
         }
 
-        if ($resourceClass !== $itemClass) {
+        if ($resourceClass !== $itemClass && !$item instanceof $resourceClass) {
             throw new \UnexpectedValueException(sprintf($errorMessage, (new \ReflectionClass($resourceClass))->getShortName(), (new \ReflectionClass($itemClass))->getShortName()));
         }
 
