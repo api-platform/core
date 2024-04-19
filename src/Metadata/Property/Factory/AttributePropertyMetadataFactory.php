@@ -59,15 +59,11 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
             return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
         }
 
-        if ($reflectionEnum) {
-            if ($reflectionEnum->hasCase($property)) {
-                $reflectionCase = $reflectionEnum->getCase($property);
-                if ($attributes = $reflectionCase->getAttributes(ApiProperty::class)) {
-                    return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
-                }
+        if ($reflectionEnum && $reflectionEnum->hasCase($property)) {
+            $reflectionCase = $reflectionEnum->getCase($property);
+            if ($attributes = $reflectionCase->getAttributes(ApiProperty::class)) {
+                return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
             }
-
-            return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
         }
 
         if ($reflectionClass->hasProperty($property)) {
@@ -79,11 +75,11 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
 
         foreach (array_merge(Reflection::ACCESSOR_PREFIXES, Reflection::MUTATOR_PREFIXES) as $prefix) {
             $methodName = $prefix.ucfirst($property);
-            if (!$reflectionClass->hasMethod($methodName)) {
+            if (!$reflectionClass->hasMethod($methodName) && !$reflectionEnum?->hasMethod($methodName)) {
                 continue;
             }
 
-            $reflectionMethod = $reflectionClass->getMethod($methodName);
+            $reflectionMethod = $reflectionClass->hasMethod($methodName) ? $reflectionClass->getMethod($methodName) : $reflectionEnum?->getMethod($methodName);
             if (!$reflectionMethod->isPublic()) {
                 continue;
             }
