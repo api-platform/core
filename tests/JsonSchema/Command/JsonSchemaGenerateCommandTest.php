@@ -287,4 +287,49 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         // openapiContext
         $this->assertArrayNotHasKey('example', $properties['cardinal']);
     }
+
+    public function testResourceWithEnumPropertiesSchema(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty', '--type' => 'output', '--format' => 'jsonld']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+        $properties = $json['definitions']['ResourceWithEnumProperty.jsonld']['properties'];
+
+        $this->assertSame(
+            [
+                'type' => ['string', 'null'],
+                'format' => 'iri-reference',
+                'example' => 'https://example.com/',
+            ],
+            $properties['intEnum']
+        );
+        $this->assertSame(
+            [
+                'type' => 'array',
+                'items' => [
+                    'type' => 'string',
+                    'format' => 'iri-reference',
+                    'example' => 'https://example.com/',
+                ],
+            ],
+            $properties['stringEnum']
+        );
+        $this->assertSame(
+            [
+                'type' => ['string', 'null'],
+                'enum' => ['male', 'female', null],
+            ],
+            $properties['gender']
+        );
+        $this->assertSame(
+            [
+                'type' => 'array',
+                'items' => [
+                    'type' => 'string',
+                    'enum' => ['male', 'female'],
+                ],
+            ],
+            $properties['genders']
+        );
+    }
 }
