@@ -14,6 +14,7 @@
 //            rfc_7807_compliant_errors: true
 // ```
 // To customize the API Platform response, replace the api_platform.state.error_provider with your own provider:
+
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ApiResource;
     use ApiPlatform\Metadata\Get;
@@ -75,6 +76,7 @@ namespace App\State {
 
 // This is replacing the service, the "key" is important as this is the provider we
 // will look for when handling an exception.
+
 namespace App\DependencyInjection {
     use App\State\ErrorProvider;
     use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -86,9 +88,7 @@ namespace App\DependencyInjection {
             ->class(ErrorProvider::class)
             ->tag('api_platform.state_provider', ['key' => 'api_platform.state.error_provider']);
     }
-
 }
-
 
 namespace App\Tests {
     use ApiPlatform\Playground\Test\TestGuideTrait;
@@ -103,7 +103,7 @@ namespace App\Tests {
             static::createClient()->request('GET', '/books/1', options: ['headers' => ['accept' => 'application/ld+json']]);
             $this->assertResponseStatusCodeSame(400);
             $this->assertJsonContains([
-                'detail' => 'les calculs ne sont pas bons'
+                'detail' => 'les calculs ne sont pas bons',
             ]);
         }
     }

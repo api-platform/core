@@ -38,8 +38,8 @@ namespace App\State {
                 $book = new Book();
                 $book->id = '1';
 
-                /** $book2 = new Book();
-                $book2->id = '2'; */
+                /* $book2 = new Book();
+                 * $book2->id = '2'; */
                 // As an exercise you can edit the code and add a second book in the collection.
                 return [$book/* $book2 */];
             }

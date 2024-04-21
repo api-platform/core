@@ -13,6 +13,7 @@
 //    defaults:
 //            rfc_7807_compliant_errors: true
 // ```
+
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ErrorResource;
     use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
@@ -71,7 +72,6 @@ namespace App\ApiResource {
             throw new MyDomainException('I am teapot');
         }
     }
-
 }
 
 namespace App\Tests {
@@ -90,7 +90,7 @@ namespace App\Tests {
             // you can override this by looking at the [Error Provider guide](/docs/guides/error-provider).
             $this->assertResponseStatusCodeSame(418);
             $this->assertJsonContains([
-                'detail' => 'I am teapot'
+                'detail' => 'I am teapot',
             ]);
         }
     }
@@ -104,4 +104,3 @@ namespace App\Playground {
         return Request::create('/books/1.jsonld', 'GET');
     }
 }
-
