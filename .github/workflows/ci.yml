@@ -998,8 +998,6 @@ jobs:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony lowest)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      SYMFONY_PHPUNIT_VERSION: '9.5'
     strategy:
       matrix:
         php:

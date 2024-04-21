@@ -89,7 +89,7 @@
         "symfony/maker-bundle": "^1.24",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^6.4 || ^7.0",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0",
+        "symfony/phpunit-bridge": "^6.4.1 || ^7.0",
         "symfony/routing": "^6.4 || ^7.0",
         "symfony/security-bundle": "^6.4 || ^7.0",
         "symfony/security-core": "^6.4 || ^7.0",
