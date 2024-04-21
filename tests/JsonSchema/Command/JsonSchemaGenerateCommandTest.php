@@ -228,10 +228,45 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question', '--type' => 'output', '--format' => 'jsonapi']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
+        $properties = $json['definitions']['Question.jsonapi']['properties']['data']['properties'];
+        $included = $json['definitions']['Question.jsonapi']['properties']['included'];
 
-        $this->assertArrayHasKey('answer', $json['definitions']['Question.jsonapi']['properties']['data']['properties']['relationships']['properties']);
-        $this->assertArrayHasKey('anyOf', $json['definitions']['Question.jsonapi']['properties']['included']['items']);
-        $this->assertArrayHasKey('$ref', $json['definitions']['Question.jsonapi']['properties']['included']['items']['anyOf'][0]);
-        $this->assertSame('#/definitions/Answer.jsonapi', $json['definitions']['Question.jsonapi']['properties']['included']['items']['anyOf'][0]['$ref']);
+        $this->assertArrayHasKey('answer', $properties['relationships']['properties']);
+        $this->assertArrayHasKey('anyOf', $included['items']);
+        $this->assertCount(1, $included['items']['anyOf']);
+        $this->assertArrayHasKey('$ref', $included['items']['anyOf'][0]);
+        $this->assertSame('#/definitions/Answer.jsonapi', $included['items']['anyOf'][0]['$ref']);
+
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AnimalObservation', '--type' => 'output', '--format' => 'jsonapi']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+        $properties = $json['definitions']['AnimalObservation.jsonapi']['properties']['data']['properties'];
+        $included = $json['definitions']['AnimalObservation.jsonapi']['properties']['included'];
+
+        $this->assertArrayHasKey('individuals', $properties['relationships']['properties']);
+        $this->assertArrayNotHasKey('individuals', $properties['attributes']['properties']);
+        $this->assertArrayHasKey('anyOf', $included['items']);
+        $this->assertCount(1, $included['items']['anyOf']);
+        $this->assertSame('#/definitions/Animal.jsonapi', $included['items']['anyOf'][0]['$ref']);
+
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Animal', '--type' => 'output', '--format' => 'jsonapi']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+        $properties = $json['definitions']['Animal.jsonapi']['properties']['data']['properties'];
+        $included = $json['definitions']['Animal.jsonapi']['properties']['included'];
+
+        $this->assertArrayHasKey('species', $properties['relationships']['properties']);
+        $this->assertArrayNotHasKey('species', $properties['attributes']['properties']);
+        $this->assertArrayHasKey('anyOf', $included['items']);
+        $this->assertCount(1, $included['items']['anyOf']);
+        $this->assertSame('#/definitions/Species.jsonapi', $included['items']['anyOf'][0]['$ref']);
+
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Species', '--type' => 'output', '--format' => 'jsonapi']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+        $properties = $json['definitions']['Species.jsonapi']['properties']['data']['properties'];
+
+        $this->assertArrayHasKey('kingdom', $properties['attributes']['properties']);
+        $this->assertArrayHasKey('phylum', $properties['attributes']['properties']);
     }
 }

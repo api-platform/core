@@ -207,6 +207,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     'type' => 'array',
                     'items' => self::RELATION_PROPS,
                 ];
+                continue;
             }
             if ('id' === $propertyName) {
                 $attributes['_id'] = $property;
