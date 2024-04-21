@@ -12,18 +12,18 @@
 // By default, all filters are disabled. They must be enabled explicitly.
 
 namespace App\Entity {
-    use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-    use ApiPlatform\Metadata\ApiFilter;
-    use ApiPlatform\Metadata\ApiResource;
+    use ApiPlatform\Metadata\GetCollection;
+    use ApiPlatform\Metadata\QueryParameter;
     use Doctrine\ORM\Mapping as ORM;
 
-    #[ApiResource]
-    //
-    // By using the `#[ApiFilter]` attribute, this attribute automatically declares the service,
-    // and you just have to use the filter class you want.
-    //
-    // If the filter is declared on the resource, you can specify on which properties it applies.
-    #[ApiFilter(SearchFilter::class, properties: ['title'])]
+    #[GetCollection(
+        uriTemplate: 'books{._format}',
+        parameters: [
+            // Declare a QueryParameter with the :property pattern that matches the properties declared on the Filter.
+            // The filter is a service declared in the next class.
+            ':property' => new QueryParameter(filter: 'app.search_filter'),
+        ]
+    )]
     #[ORM\Entity]
     class Book
     {
@@ -34,10 +34,22 @@ namespace App\Entity {
         public ?string $title = null;
 
         #[ORM\Column]
-        // We can also declare the filter attribute on a property and specify the strategy that should be used.
-        // For a list of availabe options [head to the documentation](/docs/core/filters/#search-filter)
-        #[ApiFilter(SearchFilter::class, strategy: 'partial')]
         public ?string $author = null;
+    }
+}
+
+namespace App\DependencyInjection {
+    use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+    function configure(ContainerConfigurator $configurator): void
+    {
+        // This is the custom search filter we declare, if you prefer to use decoration, suffix the parent service with `.instance`. They implement the `PropertyAwareFilterInterface` that allows you to override a filter's property.
+        $services = $configurator->services();
+        $services->set('app.search_filter')
+                 ->parent('api_platform.doctrine.orm.search_filter')
+                // Search strategies may be defined here per properties, [read more](https://api-platform.com/docs/core/filters/) on the filter documentation.
+                 ->args([['author' => 'partial', 'title' => 'partial']])
+                 ->tag('api_platform.filter');
     }
 }
 
@@ -85,8 +97,7 @@ namespace App\Fixtures {
             $bookFactory->many(10)->create(fn () => [
                 'title' => faker()->name(),
                 'author' => faker()->firstName(),
-            ]
-            );
+            ]);
         }
     }
 }
@@ -100,34 +111,28 @@ namespace App\Tests {
     {
         use TestGuideTrait;
 
-        public function testAsAnonymousICanAccessTheDocumentation(): void
+        public function testGetDocumentation(): void
         {
             static::createClient()->request('GET', '/books.jsonld');
 
             $this->assertResponseIsSuccessful();
-            $this->assertMatchesResourceCollectionJsonSchema(Book::class, '_api_/books{._format}_get_collection', 'jsonld');
+            $this->assertMatchesResourceCollectionJsonSchema(Book::class, '_api_books{._format}_get_collection', 'jsonld');
             $this->assertJsonContains([
                 'hydra:search' => [
                     '@type' => 'hydra:IriTemplate',
-                    'hydra:template' => '/books.jsonld{?title,title[],author}',
+                    'hydra:template' => '/books.jsonld{?author,title}',
                     'hydra:variableRepresentation' => 'BasicRepresentation',
                     'hydra:mapping' => [
                         [
                             '@type' => 'IriTemplateMapping',
-                            'variable' => 'title',
-                            'property' => 'title',
-                            'required' => false,
-                        ],
-                        [
-                            '@type' => 'IriTemplateMapping',
-                            'variable' => 'title[]',
-                            'property' => 'title',
-                            'required' => false,
-                        ],
-                        [
-                            '@type' => 'IriTemplateMapping',
                             'variable' => 'author',
                             'property' => 'author',
+                            'required' => false,
+                        ],
+                        [
+                            '@type' => 'IriTemplateMapping',
+                            'variable' => 'title',
+                            'property' => 'title',
                             'required' => false,
                         ],
                     ],

@@ -28,6 +28,6 @@ Use `KERNEL_CLASS` and `PDG_AUTOLOAD` to run a guide:
 
 ```
 APP_DEBUG=0 \
-PDG_AUTOLOAD='/home/soyuka/forks/core/docs/vendor/autoload.php' \
+PDG_AUTOLOAD='vendor/autoload.php' \
 KERNEL_CLASS='\ApiPlatform\Playground\Kernel' pdg-phpunit guides/doctrine-search-filter.php
 ```

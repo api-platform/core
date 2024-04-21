@@ -34,6 +34,6 @@ final class FilterPass implements CompilerPassInterface
     {
         $container
             ->getDefinition('api_platform.filter_locator')
-            ->addArgument($this->findAndSortTaggedServices('api_platform.filter', $container));
+            ->addArgument($this->findAndSortTaggedServices('api_platform.playground.filter', $container));
     }
 }

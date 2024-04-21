@@ -27,7 +27,7 @@ final class AttributeFilterPass implements CompilerPassInterface
 {
     use AttributeFilterExtractorTrait;
 
-    private const TAG_FILTER_NAME = 'api_platform.filter';
+    private const TAG_FILTER_NAME = 'api_platform.playground.filter';
 
     /**
      * {@inheritdoc}
