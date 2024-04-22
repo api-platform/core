@@ -273,6 +273,7 @@ class XmlExtractorTest extends TestCase
                             'itemUriTemplate' => null,
                             'stateOptions' => null,
                             'links' => null,
+                            'routeName' => 'custom_route_name',
                         ],
                         [
                             'name' => null,
@@ -373,6 +374,7 @@ class XmlExtractorTest extends TestCase
                             'provider' => null,
                             'stateOptions' => null,
                             'links' => null,
+                            'routeName' => null,
                         ],
                     ],
                     'graphQlOperations' => null,

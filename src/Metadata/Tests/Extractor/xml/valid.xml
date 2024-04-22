@@ -95,7 +95,7 @@
         </exceptionToStatus>
 
         <operations>
-            <operation class="ApiPlatform\Metadata\GetCollection" name="custom_operation_name"/>
+            <operation class="ApiPlatform\Metadata\GetCollection" name="custom_operation_name" routeName="custom_route_name"/>
             <operation class="ApiPlatform\Metadata\Get" uriTemplate="/users/{userId}/comments/{id}{._format}">
                 <uriVariables>
                     <uriVariable parameterName="userId" fromClass="ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User" fromProperty="author"/>
