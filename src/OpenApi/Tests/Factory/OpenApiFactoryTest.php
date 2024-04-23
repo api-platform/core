@@ -56,6 +56,7 @@ use ApiPlatform\OpenApi\Model\Server;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Tests\Fixtures\Dummy;
+use ApiPlatform\OpenApi\Tests\Fixtures\DummyErrorResource;
 use ApiPlatform\OpenApi\Tests\Fixtures\DummyFilter;
 use ApiPlatform\OpenApi\Tests\Fixtures\OutputDto;
 use ApiPlatform\State\Pagination\PaginationOptions;
@@ -257,6 +258,7 @@ class OpenApiFactoryTest extends TestCase
                 ],
             )),
             'postDummyItemWithoutInput' => (new Post())->withUriTemplate('/dummyitem/noinput')->withOperation($baseOperation)->withInput(false),
+            'getDummyCollectionWithErrors' => (new GetCollection())->withUriTemplate('erroredDummies')->withErrors([DummyErrorResource::class])->withOperation($baseOperation),
         ])
         );
 
@@ -273,10 +275,12 @@ class OpenApiFactoryTest extends TestCase
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [$dummyResource, $dummyResourceWebhook]));
+        $resourceCollectionMetadataFactoryProphecy->create(DummyErrorResource::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(DummyErrorResource::class, []));
         $resourceCollectionMetadataFactoryProphecy->create(WithParameter::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(WithParameter::class, [$parameterResource]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
+        $propertyNameCollectionFactoryProphecy->create(DummyErrorResource::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['type', 'title', 'status', 'detail', 'instance']));
         $propertyNameCollectionFactoryProphecy->create(OutputDto::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -391,6 +395,59 @@ class OpenApiFactoryTest extends TestCase
                 ->withWritableLink(true)
                 ->withSchema(['type' => 'string', 'description' => 'This is an enum.'])
                 ->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one'])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'type', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an error type.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an error type.'])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'title', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an error title.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an error title.'])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'status', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withDescription('This is an error status.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withIdentifier(true)
+                ->withSchema(['type' => 'integer', 'description' => 'This is an error status.', 'readOnly' => true])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'detail', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an error detail.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an error detail.'])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'instance', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an error instance.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an error instance.'])
         );
 
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
@@ -510,6 +567,35 @@ class OpenApiFactoryTest extends TestCase
                 ]),
             ],
         ]));
+        $dummyErrorSchema = new Schema('openapi');
+        $dummyErrorSchema->setDefinitions(new \ArrayObject([
+            'type' => 'object',
+            'description' => '',
+            'deprecated' => false,
+            'properties' => [
+                'type' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an error type.',
+                ]),
+                'title' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an error title.',
+                ]),
+                'status' => new \ArrayObject([
+                    'type' => 'integer',
+                    'description' => 'This is an error status.',
+                    'readOnly' => true,
+                ]),
+                'detail' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an error detail.',
+                ]),
+                'instance' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an error instance.',
+                ]),
+            ],
+        ]));
 
         $openApi = $factory(['base_url' => '/app_dev.php/']);
 
@@ -534,6 +620,7 @@ class OpenApiFactoryTest extends TestCase
         $this->assertEquals($components->getSchemas(), new \ArrayObject([
             'Dummy' => $dummySchema->getDefinitions(),
             'Dummy.OutputDto' => $dummySchema->getDefinitions(),
+            'DummyErrorResource' => $dummyErrorSchema->getDefinitions(),
             'Parameter' => $parameterSchema,
         ]));
 
@@ -1041,5 +1128,44 @@ class OpenApiFactoryTest extends TestCase
         $this->assertEquals(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());
         $this->assertEquals('header', $parameter->getIn());
         $this->assertEquals('hi', $parameter->getDescription());
+
+        $this->assertEquals(new Operation(
+            'getDummyCollectionWithErrors',
+            ['Dummy'],
+            [
+                '200' => new Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([
+                        'type' => 'array',
+                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+                    ]))),
+                ])),
+                '418' => new Response('A Teapot Exception', new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([
+                        'type' => 'array',
+                        'items' => ['$ref' => '#/components/schemas/DummyErrorResource'],
+                    ]))),
+                ]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+            ],
+            'Retrieves the collection of Dummy resources.',
+            'Retrieves the collection of Dummy resources.',
+            null,
+            [
+                new Parameter('page', 'query', 'The collection page number', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 1,
+                ]),
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 30,
+                    'minimum' => 0,
+                ]),
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                    'type' => 'boolean',
+                ]),
+            ],
+            deprecated: false
+        ), $paths->getPath('/erroredDummies')->getGet());
     }
 }

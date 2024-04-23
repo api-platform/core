@@ -20,6 +20,9 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -50,6 +53,7 @@ use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\NormalizeOperationNameTrait;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -75,8 +79,20 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, ?TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, private readonly array $formats = [], ?Options $openApiOptions = null, ?PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
-    {
+    public function __construct(
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly SchemaFactoryInterface $jsonSchemaFactory,
+        ?TypeFactoryInterface $jsonSchemaTypeFactory,
+        ContainerInterface $filterLocator,
+        private readonly array $formats = [],
+        ?Options $openApiOptions = null,
+        ?PaginationOptions $paginationOptions = null,
+        private readonly ?RouterInterface $router = null,
+        private readonly ?LoggerInterface $logger = null
+    ) {
         $this->filterLocator = $filterLocator;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
@@ -339,6 +355,48 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $existingResponses = $openapiOperation?->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
+            if ($operation instanceof HttpOperation && null !== $operation->getErrors()) {
+                foreach ($operation->getErrors() as $error) {
+                    $status = null;
+                    $description = null;
+                    try {
+                        /** @var ProblemExceptionInterface $exception */
+                        $exception = (new \ReflectionClass($error))->newInstanceWithoutConstructor();
+                        $status = $exception->getStatus();
+                        $description = $exception->getTitle();
+                    } catch (\ReflectionException) {
+                    }
+
+                    try {
+                        $errorOperation = $this->resourceMetadataFactory->create($error)->getOperation();
+                        if (!is_a($errorOperation, Error::class)) {
+                            $this->logger?->warning(\sprintf('The error class %s is not an ErrorResource', $error));
+                            continue;
+                        }
+                        $status ??= $errorOperation->getStatus();
+                        $description ??= $errorOperation->getDescription();
+                    } catch (ResourceClassNotFoundException) {
+                        $this->logger?->warning(\sprintf('The error class %s is not an ErrorResource', $error));
+                        continue;
+                    }
+
+                    if (!$status) {
+                        $this->logger?->error(\sprintf(
+                            'The error class %s has no status defined, please either implement ProblemExceptionInterface, or make it an ErrorResource with a status',
+                            $error));
+                        continue;
+                    }
+
+                    $operationErrorSchemas = [];
+                    foreach ($responseMimeTypes as $operationFormat) {
+                        $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($error, $operationFormat, Schema::TYPE_OUTPUT, null, $schema, null, $forceSchemaCollection);
+                        $operationErrorSchemas[$operationFormat] = $operationErrorSchema;
+                        $this->appendSchemaDefinitions($schemas, $operationErrorSchema->getDefinitions());
+                    }
+
+                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, $status, $description ?? '', $openapiOperation, $operation, $responseMimeTypes, $operationErrorSchemas, $resourceMetadataCollection);
+                }
+            }
             if ($overrideResponses || !$existingResponses) {
                 // Create responses
                 switch ($method) {

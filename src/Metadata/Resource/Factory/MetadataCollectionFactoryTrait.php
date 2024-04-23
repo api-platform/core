@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
@@ -88,6 +90,13 @@ trait MetadataCollectionFactoryTrait
                 foreach ($resource->getOperations() ?? new Operations() as $operation) {
                     [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
                     $operations[$key] = $operation;
+                    if (null !== $operation->getErrors()) {
+                        foreach ($operation->getErrors() as $error) {
+                            if (!is_a($error, ProblemExceptionInterface::class, true)) {
+                                throw new InvalidArgumentException(\sprintf('The error class "%s" does not implement "%s". Did you forget a use statement?', $error, ProblemExceptionInterface::class));
+                            }
+                        }
+                    }
                 }
                 if ($operations) {
                     $resource = $resource->withOperations(new Operations($operations));
