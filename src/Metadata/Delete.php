@@ -49,6 +49,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
         ?array $links = null,
+        ?array $errors = null,
 
         ?string $shortName = null,
         ?string $class = null,
@@ -127,6 +128,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             links: $links,
+            errors: $errors,
             shortName: $shortName,
             class: $class,
             paginationEnabled: $paginationEnabled,
@@ -143,6 +145,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             description: $description,
             normalizationContext: $normalizationContext,
             denormalizationContext: $denormalizationContext,
+            collectDenormalizationErrors: $collectDenormalizationErrors,
             security: $security,
             securityMessage: $securityMessage,
             securityPostDenormalize: $securityPostDenormalize,
@@ -169,10 +172,9 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             name: $name,
             provider: $provider,
             processor: $processor,
-            extraProperties: $extraProperties,
-            collectDenormalizationErrors: $collectDenormalizationErrors,
-            parameters: $parameters,
             stateOptions: $stateOptions,
+            parameters: $parameters,
+            extraProperties: $extraProperties,
         );
     }
 }
