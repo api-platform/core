@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.2.22
+
+### Bug fixes
+
+* [50c738cf6](https://github.com/api-platform/core/commit/50c738cf6b31bb7f2ddcd74037c12315c8bcac6d) fix(graphql): check inheritance in ResolverProvider (#6314)
+* [9cd597f80](https://github.com/api-platform/core/commit/9cd597f80d9eecafb28b4229a313ba9b9618bf8c) fix(doctrine): remove usage of deprecated ClassUtils in PurgeHttpCacheListener for Doctrine ORM 3 (#6331)
+* [a59fbee97](https://github.com/api-platform/core/commit/a59fbee97dc09b7cb7e12ee3bef9451f0fbea957) fix(serializer): uriTemplate wrong cache usage in hal format (#6313)
+* [c083af346](https://github.com/api-platform/core/commit/c083af3461a926ea68837f216eacc67ca43a6fc3) fix(metadata): allow extracting routeName from XML config (#6329)
+
 ## v3.2.21
 
 ### Bug fixes
