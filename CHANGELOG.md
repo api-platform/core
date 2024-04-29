@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.1.29
+
+### Bug fixes
+
+* [9f6ef081f](https://github.com/api-platform/core/commit/9f6ef081fa3c56d548da9993826b484af1405ac6) fix(doctrine): test Doctrine Types:ARRAY existence before using it (#6333)
+
 ## v3.1.28
 
 ### Bug fixes
