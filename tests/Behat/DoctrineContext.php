@@ -2019,18 +2019,23 @@ final class DoctrineContext implements Context
      */
     public function thereAreResourcesWithPropertyUriTemplates(): void
     {
-        $propertyCollectionIriOnlyRelation = $this->isOrm() ? new PropertyCollectionIriOnlyRelation() : new PropertyCollectionIriOnlyRelationDocument();
-        $propertyCollectionIriOnlyRelation->name = 'asb';
+        $propertyCollectionIriOnlyRelation1 = $this->isOrm() ? new PropertyCollectionIriOnlyRelation() : new PropertyCollectionIriOnlyRelationDocument();
+        $propertyCollectionIriOnlyRelation1->name = 'asb1';
+
+        $propertyCollectionIriOnlyRelation2 = $this->isOrm() ? new PropertyCollectionIriOnlyRelation() : new PropertyCollectionIriOnlyRelationDocument();
+        $propertyCollectionIriOnlyRelation2->name = 'asb2';
 
         $propertyToOneRelation = $this->isOrm() ? new PropertyUriTemplateOneToOneRelation() : new PropertyUriTemplateOneToOneRelationDocument();
         $propertyToOneRelation->name = 'xarguš';
 
         $propertyCollectionIriOnly = $this->isOrm() ? new PropertyCollectionIriOnly() : new PropertyCollectionIriOnlyDocument();
-        $propertyCollectionIriOnly->addPropertyCollectionIriOnlyRelation($propertyCollectionIriOnlyRelation);
+        $propertyCollectionIriOnly->addPropertyCollectionIriOnlyRelation($propertyCollectionIriOnlyRelation1);
+        $propertyCollectionIriOnly->addPropertyCollectionIriOnlyRelation($propertyCollectionIriOnlyRelation2);
         $propertyCollectionIriOnly->setToOneRelation($propertyToOneRelation);
 
         $this->manager->persist($propertyCollectionIriOnly);
-        $this->manager->persist($propertyCollectionIriOnlyRelation);
+        $this->manager->persist($propertyCollectionIriOnlyRelation1);
+        $this->manager->persist($propertyCollectionIriOnlyRelation2);
         $this->manager->persist($propertyToOneRelation);
         $this->manager->flush();
     }

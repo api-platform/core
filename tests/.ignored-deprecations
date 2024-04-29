@@ -10,3 +10,5 @@
 
 # Fixed when ApiPlatform\Api\FilterLocatorTrait will we deleted
 %ApiPlatform\\Api\\FilterInterface is deprecated in favor of ApiPlatform\\Metadata\\FilterInterface%
+
+%The "Symfony\\Bundle\\MakerBundle\\Maker\\MakeAuthenticator" class is deprecated, use any of the Security\\Make\* commands instead%

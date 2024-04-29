@@ -408,6 +408,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
+                'routeName' => $this->phpize($operation, 'routeName', 'string'),
             ]);
         }
 

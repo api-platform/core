@@ -278,6 +278,7 @@ class XmlExtractorTest extends TestCase
                             'links' => null,
                             'headers' => ['hello' => 'world'],
                             'parameters' => null,
+                            'routeName' => 'custom_route_name',
                         ],
                         [
                             'name' => null,
@@ -389,6 +390,7 @@ class XmlExtractorTest extends TestCase
                                     extraProperties: ['foo' => 'bar']
                                 ),
                             ],
+                            'routeName' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
