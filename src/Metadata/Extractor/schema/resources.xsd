@@ -48,6 +48,7 @@
         <xsd:attribute type="xsd:positiveInteger" name="priority"/>
         <xsd:attribute type="xsd:string" name="name"/>
         <xsd:attribute type="xsd:string" name="itemUriTemplate"/>
+        <xsd:attribute type="xsd:string" name="routeName"/>
     </xsd:complexType>
 
     <xsd:complexType name="graphQlOperations">

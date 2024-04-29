@@ -24,7 +24,6 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
@@ -60,7 +59,7 @@ final class PurgeHttpCacheListener
         $changeSet = $eventArgs->getEntityChangeSet();
         // @phpstan-ignore-next-line
         $objectManager = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
-        $associationMappings = $objectManager->getClassMetadata(ClassUtils::getClass($eventArgs->getObject()))->getAssociationMappings();
+        $associationMappings = $objectManager->getClassMetadata(\get_class($eventArgs->getObject()))->getAssociationMappings();
 
         foreach ($changeSet as $key => $value) {
             if (!isset($associationMappings[$key])) {
@@ -127,7 +126,7 @@ final class PurgeHttpCacheListener
 
     private function gatherRelationTags(EntityManagerInterface $em, object $entity): void
     {
-        $associationMappings = $em->getClassMetadata(ClassUtils::getClass($entity))->getAssociationMappings();
+        $associationMappings = $em->getClassMetadata($entity::class)->getAssociationMappings();
         /** @var array|AssociationMapping $associationMapping according to the version of doctrine orm */
         foreach ($associationMappings as $property => $associationMapping) {
             if ($associationMapping instanceof AssociationMapping && ($associationMapping->targetEntity ?? null) && !$this->resourceClassResolver->isResourceClass($associationMapping->targetEntity)) {

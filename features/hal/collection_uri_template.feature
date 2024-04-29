@@ -36,9 +36,23 @@ Feature: Exposing a property being a collection of resources
               "_links": {
                 "self": {
                   "href": "/property_collection_iri_only_relations/1"
+                },
+                "children": {
+                  "href": "/property_collection_iri_only_relations/1/children"
                 }
               },
-              "name": "asb"
+              "name": "asb1"
+            },
+            {
+              "_links": {
+                "self": {
+                    "href": "/property_collection_iri_only_relations/2"
+                },
+                "children": {
+                  "href": "/property_collection_iri_only_relations/2/children"
+                }
+              },
+              "name": "asb2"
             }
           ],
           "iterableIri": [
@@ -46,6 +60,9 @@ Feature: Exposing a property being a collection of resources
               "_links": {
                 "self": {
                   "href": "/property_collection_iri_only_relations/9999"
+                },
+                "children": {
+                  "href": "/property_collection_iri_only_relations/9999/children"
                 }
               },
               "name": "Michel"
