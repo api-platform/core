@@ -7,3 +7,5 @@
 # Fixed in DoctrineMongoDBBundle 4.6
 %Accessing Doctrine\\Common\\Lexer\\Token properties via ArrayAccess is deprecated, use the value, type or position property instead%
 %Do the same.*Doctrine\\Bundle\\MongoDBBundle%
+
+%The "Symfony\\Bundle\\MakerBundle\\Maker\\MakeAuthenticator" class is deprecated, use any of the Security\\Make\* commands instead%
