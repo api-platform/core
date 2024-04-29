@@ -15,6 +15,9 @@ namespace ApiPlatform\ParameterValidator\Validator;
 
 use ApiPlatform\State\Util\RequestParser;
 
+/**
+ * @deprecated use Parameter constraint instead
+ */
 final class Required implements ValidatorInterface
 {
     use CheckFilterDeprecationsTrait;

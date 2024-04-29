@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.symfony.parameter_validator" class="ApiPlatform\Symfony\Validator\State\ParameterValidatorProvider" public="true" decorates="api_platform.state_provider.parameter">
+            <argument type="service" id="api_platform.symfony.parameter_validator.inner" />
+            <argument type="service" id="validator" />
+        </service>
+    </services>
+</container>

@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi;
 use ApiPlatform\State\ProviderInterface;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * @experimental
@@ -26,6 +27,7 @@ abstract class Parameter
      * @param array<string, mixed>                   $extraProperties
      * @param ProviderInterface|callable|string|null $provider
      * @param FilterInterface|string|null            $filter
+     * @param Constraint|Constraint[]|null           $constraints
      */
     public function __construct(
         protected ?string $key = null,
@@ -37,6 +39,7 @@ abstract class Parameter
         protected ?string $description = null,
         protected ?bool $required = null,
         protected ?int $priority = null,
+        protected Constraint|array|null $constraints = null,
         protected ?array $extraProperties = [],
     ) {
     }
@@ -87,6 +90,14 @@ abstract class Parameter
     public function getPriority(): ?int
     {
         return $this->priority;
+    }
+
+    /**
+     * @return Constraint|Constraint[]|null
+     */
+    public function getConstraints(): Constraint|array|null
+    {
+        return $this->constraints;
     }
 
     /**
@@ -174,6 +185,14 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->required = $required;
+
+        return $self;
+    }
+
+    public function withConstraints(array|Constraint $constraints): static
+    {
+        $self = clone $this;
+        $self->constraints = $constraints;
 
         return $self;
     }
