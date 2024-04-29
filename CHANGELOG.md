@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.3.0
+
+### Bug fixes
+
+* [629da787b](https://github.com/api-platform/core/commit/629da787bc49fe06db02933d41dc550aee87b429) fix(symfony): use non deprecated validator exception (#6297)
+* [8a232a474](https://github.com/api-platform/core/commit/8a232a474466f4fbcf2001d6894fa0fec272ae6e) fix: add legacy FilterInterface as return type of getFilter function (#6311)
+* [97c8ae26e](https://github.com/api-platform/core/commit/97c8ae26eb5eb4cfaafadcc36b7d497b9fa2cb9e) fix(jsonapi): handle multiple relation classes, unrelated unions (#6320)
+* [af61482c2](https://github.com/api-platform/core/commit/af61482c21618e8abcbe7486df05e30a961bc5b6) fix(symfony)!: context stamp not serializable because of request object (#6323)
+* [fce42e0e7](https://github.com/api-platform/core/commit/fce42e0e783f3eb0331afad702d553f3bd63a2b3) fix(jsonapi): re-add continue once relation is determined (#6325)
+
+
+### Features
+
+* [57fe13615](https://github.com/api-platform/core/commit/57fe13615dfda724fd17d18658a1cdb062d261e5) feat(serializer): update MissingConstructorArgumentsException message (#5902)
+* [e867d07f5](https://github.com/api-platform/core/commit/e867d07f59b82d5f1bdca69e096ddf452dd7efc8) feat(parametervalidator): parameter validation (#6296)
+
 ## v3.3.0-beta.2
 
 ### Bug fixes
