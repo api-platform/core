@@ -8,6 +8,7 @@ api_platform:
   docs_formats:
     jsonopenapi: ['application/vnd.openapi+json']
   keep_legacy_inflector: false
+  use_symfony_listeners: false
   defaults:
     extra_properties:
       rfc_7807_compliant_errors: true
