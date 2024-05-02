@@ -71,10 +71,11 @@ final class ReadProvider implements ProviderInterface
 
         if ($this->serializerContextBuilder && $request) {
             // Builtin data providers are able to use the serialization context to automatically add join clauses
-            $context += $this->serializerContextBuilder->createFromRequest($request, true, [
+            $context += $normalizationContext = $this->serializerContextBuilder->createFromRequest($request, true, [
                 'resource_class' => $operation->getClass(),
                 'operation' => $operation,
             ]);
+            $request->attributes->set('_api_normalization_context', $normalizationContext);
         }
 
         try {
