@@ -53,13 +53,6 @@ final class ReadProvider implements ProviderInterface
             return null;
         }
 
-        $output = $operation->getOutput() ?? [];
-        if (\array_key_exists('class', $output) && null === $output['class']) {
-            $request?->attributes->set('data', null);
-
-            return null;
-        }
-
         if (null === $filters = $request?->attributes->get('_api_filters')) {
             $queryString = RequestParser::getQueryString($request);
             $filters = $queryString ? RequestParser::parseRequestParams($queryString) : null;
