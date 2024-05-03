@@ -4,8 +4,6 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="api_platform.state_provider.main" alias="api_platform.state_provider.locator" />
-
         <service id="api_platform.state_provider.content_negotiation" class="ApiPlatform\State\Provider\ContentNegotiationProvider" decorates="api_platform.state_provider.main" decoration-priority="100">
             <argument type="service" id="api_platform.state_provider.content_negotiation.inner" />
             <argument type="service" id="api_platform.negotiator" />

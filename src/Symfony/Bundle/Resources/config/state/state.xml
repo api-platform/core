@@ -4,6 +4,8 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
+        <service id="api_platform.state_provider.main" alias="api_platform.state_provider.locator" />
+
         <service id="api_platform.state_provider.locator" class="ApiPlatform\State\CallableProvider">
             <argument type="tagged_locator" tag="api_platform.state_provider" index-by="key" />
         </service>
