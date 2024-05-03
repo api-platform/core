@@ -53,13 +53,6 @@ final class ReadProvider implements ProviderInterface
             return null;
         }
 
-        $output = $operation->getOutput() ?? [];
-        if (\array_key_exists('class', $output) && null === $output['class']) {
-            $request?->attributes->set('data', null);
-
-            return null;
-        }
-
         if (null === $filters = $request?->attributes->get('_api_filters')) {
             $queryString = RequestParser::getQueryString($request);
             $filters = $queryString ? RequestParser::parseRequestParams($queryString) : null;
@@ -71,10 +64,11 @@ final class ReadProvider implements ProviderInterface
 
         if ($this->serializerContextBuilder && $request) {
             // Builtin data providers are able to use the serialization context to automatically add join clauses
-            $context += $this->serializerContextBuilder->createFromRequest($request, true, [
+            $context += $normalizationContext = $this->serializerContextBuilder->createFromRequest($request, true, [
                 'resource_class' => $operation->getClass(),
                 'operation' => $operation,
             ]);
+            $request->attributes->set('_api_normalization_context', $normalizationContext);
         }
 
         try {

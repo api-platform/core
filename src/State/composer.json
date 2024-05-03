@@ -36,7 +36,8 @@
         "symfony/web-link": "^6.4 || ^7.0",
         "symfony/http-foundation": "^6.4 || 7.0",
         "willdurand/negotiation": "^3.1",
-        "api-platform/validator": "*@dev || ^3.1"
+        "api-platform/validator": "*@dev || ^3.1",
+        "api-platform/serializer": "*@dev || ^3.1"
     },
     "autoload": {
         "psr-4": {

@@ -12,6 +12,7 @@ api_platform:
         invalidation:
             enabled: true
         public: true
+  use_symfony_listeners: false
   defaults:
     extra_properties:
       rfc_7807_compliant_errors: true
