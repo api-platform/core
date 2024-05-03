@@ -1,11 +1,12 @@
 # Changelog
 
-## v3.3.1
+## v3.3.2
 
 ### Bug fixes
 
 * [6f806f4ee](https://github.com/api-platform/core/commit/6f806f4eeec3d120da7a4c145f9dbda9bd4be2ed) fix(state): read without output (#6347)
 * [735e1509e](https://github.com/api-platform/core/commit/735e1509ef67deb1c4c837ff86b445f40e2f7c8b) fix(symfony): set normalization context in request attributes (#6345)
+* [b4984126a](https://github.com/api-platform/core/commit/b4984126a109ec7951012614616035035978b255) fix(symfony): use_symfony_listeners before registering services (#6350)
 * [f63fd8101](https://github.com/api-platform/core/commit/f63fd8101f8211707806e013668f50dafab2865d) fix(symfony): define use_symfony_listeners (#6344)
 
 ### Notes
@@ -27,6 +28,14 @@ if (null === $operation->canDeserialize()) {
 ```
 
 Previously listeners did the checks before reading our flags and you could not force the values. 
+
+## v3.3.1 (pre-release)
+
+### Bug fixes
+
+* [6f806f4ee](https://github.com/api-platform/core/commit/6f806f4eeec3d120da7a4c145f9dbda9bd4be2ed) fix(state): read without output (#6347)
+* [735e1509e](https://github.com/api-platform/core/commit/735e1509ef67deb1c4c837ff86b445f40e2f7c8b) fix(symfony): set normalization context in request attributes (#6345)
+* [f63fd8101](https://github.com/api-platform/core/commit/f63fd8101f8211707806e013668f50dafab2865d) fix(symfony): define use_symfony_listeners (#6344)
 
 ## v3.3.0
 
