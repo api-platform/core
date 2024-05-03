@@ -114,6 +114,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        if (null === $config['use_symfony_listeners']) {
+            $config['use_symfony_listeners'] = true;
+            trigger_deprecation('api-platform/core', '3.3', 'Setting the value of "use_symfony_listeners" will be mandatory in 4.0 as it will default to "false". Use "true" if you use Symfony Controllers or Event Listeners.');
+        }
+
+        $container->setParameter('api_platform.use_symfony_listeners', $config['use_symfony_listeners']);
+
         if (!$config['formats']) {
             trigger_deprecation('api-platform/core', '3.2', 'Setting the "formats" section will be mandatory in API Platform 4.');
             $config['formats'] = [
@@ -218,14 +225,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('symfony/uid.xml');
         }
 
-        if (null === $config['use_symfony_listeners']) {
-            $config['use_symfony_listeners'] = true;
-            trigger_deprecation('api-platform/core', '3.3', 'Setting the value of "use_symfony_listeners" will be mandatory in 4.0 as it will default to "false". Use "true" if you use Symfony Controllers or Event Listeners.');
-        }
-
         // TODO: remove in 4.x
         $container->setParameter('api_platform.event_listeners_backward_compatibility_layer', $config['event_listeners_backward_compatibility_layer']);
-        $container->setParameter('api_platform.use_symfony_listeners', $config['use_symfony_listeners']);
 
         if ($config['event_listeners_backward_compatibility_layer']) {
             trigger_deprecation('api-platform/core', '3.3', sprintf('The "event_listeners_backward_compatibility_layer" will be removed in 4.0. Use the configuration "use_symfony_listeners" to use Symfony listeners. The following listeners are deprecated and will be removed in API Platform 4.0: "%s"', implode(', ', [
