@@ -1,5 +1,33 @@
 # Changelog
 
+## v3.3.1
+
+### Bug fixes
+
+* [6f806f4ee](https://github.com/api-platform/core/commit/6f806f4eeec3d120da7a4c145f9dbda9bd4be2ed) fix(state): read without output (#6347)
+* [735e1509e](https://github.com/api-platform/core/commit/735e1509ef67deb1c4c837ff86b445f40e2f7c8b) fix(symfony): set normalization context in request attributes (#6345)
+* [f63fd8101](https://github.com/api-platform/core/commit/f63fd8101f8211707806e013668f50dafab2865d) fix(symfony): define use_symfony_listeners (#6344)
+
+### Notes
+
+You can remove the `event_listeners_backward_compatibility_layer` flag and set `use_symfony_listeners` instead. The `use_symfony_listeners` should be `true` if you use controllers or if you rely on Symfony event listeners. Note that now flags like `read` can be forced to `true` if you want to call a Provider even on `POST` operations. These are the rules we set up on runtime if no value has been set: 
+
+```php
+if (null === $operation->canValidate()) {
+    $operation = $operation->withValidate(!$request->isMethodSafe() && !$request->isMethod('DELETE'));
+}
+
+if (null === $operation->canRead()) {
+    $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe());
+}
+
+if (null === $operation->canDeserialize()) {
+    $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
+}
+```
+
+Previously listeners did the checks before reading our flags and you could not force the values. 
+
 ## v3.3.0
 
 ### Bug fixes
