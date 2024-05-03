@@ -35,4 +35,18 @@ class ReadProviderTest extends TestCase
         $provider->provide($operation, ['id' => 1], ['request' => $request]);
         $this->assertEquals(['a'], $request->attributes->get('_api_normalization_context'));
     }
+
+    public function testShouldReadWithOutputFalse(): void
+    {
+        $data = new \stdClass();
+        $operation = new Get(read: true, output: false);
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($data);
+        $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
+        $serializerContextBuilder->expects($this->once())->method('createFromRequest')->willReturn(['a']);
+        $provider = new ReadProvider($decorated, $serializerContextBuilder);
+        $request = new Request();
+        $provider->provide($operation, ['id' => 1], ['request' => $request]);
+        $this->assertEquals($data, $request->attributes->get('data'));
+    }
 }

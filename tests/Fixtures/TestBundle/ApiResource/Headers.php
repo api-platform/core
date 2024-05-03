@@ -21,11 +21,19 @@ use ApiPlatform\Metadata\Get;
     status: 301,
     output: false,
     operations: [
-        new Get(uriTemplate: 'redirect_to_foobar'),
+        new Get(uriTemplate: 'redirect_to_foobar', provider: [self::class, 'provide']),
     ],
     graphQlOperations: []
 )]
 class Headers
 {
     public $id;
+
+    public static function provide(): self
+    {
+        $s = new self();
+        $s->id = 1;
+
+        return $s;
+    }
 }
