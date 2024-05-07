@@ -80,3 +80,14 @@ Feature: Sending PATCH requets
       "alpha": "/alphas/2"
     }
     """
+
+  Scenario: Patch a non-readable resource
+    When I add "Content-Type" header equal to "application/merge-patch+json"
+    And I send a "PATCH" request to "/order_products/1/count" with body:
+    """
+      {
+        "id": 1,
+        "count": 10
+      }
+    """
+    Then print last JSON response
