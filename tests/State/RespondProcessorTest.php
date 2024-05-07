@@ -35,6 +35,7 @@ class RespondProcessorTest extends TestCase
     {
         $canonicalUriTemplateRedirectingOperation = new Get(
             status: 302,
+            class: Employee::class,
             extraProperties: [
                 'canonical_uri_template' => '/canonical',
             ]
@@ -42,12 +43,14 @@ class RespondProcessorTest extends TestCase
 
         $alternateRedirectingResourceOperation = new Get(
             status: 308,
+            class: Employee::class,
             extraProperties: [
                 'is_alternate_resource_metadata' => true,
             ]
         );
 
         $alternateResourceOperation = new Get(
+            class: Employee::class,
             extraProperties: [
                 'is_alternate_resource_metadata' => true,
             ]
