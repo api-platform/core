@@ -88,7 +88,11 @@ final class RespondProcessor implements ProcessorInterface
         $method = $request->getMethod();
         $originalData = $context['original_data'] ?? null;
 
-        if ($hasData = ($this->resourceClassResolver && $originalData && \is_object($originalData) && $this->resourceClassResolver->isResourceClass($this->getObjectClass($originalData))) && $this->iriConverter) {
+        $outputMetadata = $operation->getOutput() ?? ['class' => $operation->getClass()];
+        $hasOutput = \is_array($outputMetadata) && \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
+        $hasData = !$hasOutput ? false : ($this->resourceClassResolver && $originalData && \is_object($originalData) && $this->resourceClassResolver->isResourceClass($this->getObjectClass($originalData)));
+
+        if ($hasData && $this->iriConverter) {
             if (
                 !isset($headers['Location'])
                 && 300 <= $status && $status < 400
