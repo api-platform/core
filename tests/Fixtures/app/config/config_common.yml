@@ -455,3 +455,8 @@ services:
         tags:
             - name: 'api_platform.parameter_provider'
               key: 'ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider'
+
+    app.graphql.mutation_resolver.activity_log:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6354\CreateActivityLogResolver'
+        tags:
+            - name: 'api_platform.graphql.resolver'
