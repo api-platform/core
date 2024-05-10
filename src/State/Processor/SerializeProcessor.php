@@ -52,7 +52,7 @@ final class SerializeProcessor implements ProcessorInterface
         $context['original_data'] = $data;
 
         $class = $operation->getClass();
-        if ($request->attributes->get('_api_resource_class') !== $operation->getClass()) {
+        if ($request->attributes->get('_api_resource_class') && $request->attributes->get('_api_resource_class') !== $operation->getClass()) {
             $class = $request->attributes->get('_api_resource_class');
             trigger_deprecation('api-platform/core', '3.3', 'The resource class on the router is not the same as the operation\'s class which leads to wrong behaviors. Prefer using "stateOptions" if you need to change the entity class.');
         }
