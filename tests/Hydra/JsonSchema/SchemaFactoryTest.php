@@ -181,4 +181,42 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('hydra:previous', $resultSchema['properties']['hydra:view']['properties']);
         $this->assertArrayHasKey('hydra:next', $resultSchema['properties']['hydra:view']['properties']);
     }
+
+    public function testRequiredBasePropertiesBuildSchema(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class);
+        $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+
+        // @noRector
+        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
+        // @noRector
+        $this->assertTrue(isset($definitions[$rootDefinitionKey]['required']));
+        $requiredProperties = $resultSchema['definitions'][$rootDefinitionKey]['required'];
+        $this->assertContains('@context', $requiredProperties);
+        $this->assertContains('@id', $requiredProperties);
+        $this->assertContains('@type', $requiredProperties);
+
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new GetCollection());
+        $definitions = $resultSchema->getDefinitions();
+        $itemsDefinitionKey = array_key_first($definitions->getArrayCopy());
+
+        // @noRector
+        $this->assertTrue(isset($definitions[$itemsDefinitionKey]));
+        // @noRector
+        $this->assertTrue(isset($definitions[$itemsDefinitionKey]['required']));
+        $requiredProperties = $resultSchema['definitions'][$itemsDefinitionKey]['required'];
+        $this->assertNotContains('@context', $requiredProperties);
+        $this->assertContains('@id', $requiredProperties);
+        $this->assertContains('@type', $requiredProperties);
+
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_INPUT, new Post());
+        $definitions = $resultSchema->getDefinitions();
+        $itemsDefinitionKey = array_key_first($definitions->getArrayCopy());
+
+        // @noRector
+        $this->assertTrue(isset($definitions[$itemsDefinitionKey]));
+        // @noRector
+        $this->assertFalse(isset($definitions[$itemsDefinitionKey]['required']));
+    }
 }
