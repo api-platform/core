@@ -82,6 +82,7 @@ Feature: Sending PATCH requets
     """
 
   @use_listener
+  @controller
   # Previously to 3.3 it was not possible to disable a read, this test is ignored on the
   # legacy test suite (EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER=1)
   Scenario: Patch a non-readable resource

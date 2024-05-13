@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Controller\Issue6355;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6355\OrderDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 
 #[AsController]
