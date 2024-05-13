@@ -19,6 +19,7 @@ class PaginationTest extends TestCase
         $this->assertSame(0, $paginationInfo[1]);
         $this->assertSame(30, $paginationInfo[2]);
     }
+
     public function testPaginationGetPaginationWithPageParameterNameAsArrayAndDefaultContext(): void
     {
         $operation = new GetCollection(name: 'hello', provider: 'provider');
@@ -28,6 +29,7 @@ class PaginationTest extends TestCase
         $this->assertSame(0, $paginationInfo[1]);
         $this->assertSame(30, $paginationInfo[2]);
     }
+
     public function testPaginationGetPaginationWithPageParametersAsArrayAndCustomContext(): void
     {
         $operation = new GetCollection(paginationClientItemsPerPage: true, name: 'hello', provider: 'provider');
