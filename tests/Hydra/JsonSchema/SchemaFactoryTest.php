@@ -21,6 +21,7 @@ use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -49,6 +50,7 @@ class SchemaFactoryTest extends TestCase
 
         $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
+        $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_INPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
@@ -69,7 +71,12 @@ class SchemaFactoryTest extends TestCase
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class);
 
         $this->assertTrue($resultSchema->isDefined());
-        $this->assertSame('Dummy.jsonld', $resultSchema->getRootDefinitionKey());
+        $this->assertSame('Dummy.jsonld.output', $resultSchema->getRootDefinitionKey());
+
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_INPUT, new Post());
+
+        $this->assertTrue($resultSchema->isDefined());
+        $this->assertSame('Dummy.jsonld.input', $resultSchema->getRootDefinitionKey());
     }
 
     public function testCustomFormatBuildSchema(): void
@@ -122,7 +129,7 @@ class SchemaFactoryTest extends TestCase
     public function testSchemaTypeBuildSchema(): void
     {
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new GetCollection());
-        $definitionName = 'Dummy.jsonld';
+        $definitionName = 'Dummy.jsonld.output';
 
         $this->assertNull($resultSchema->getRootDefinitionKey());
         // @noRector
@@ -151,6 +158,12 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayNotHasKey('@context', $properties);
         $this->assertArrayHasKey('@type', $properties);
         $this->assertArrayHasKey('@id', $properties);
+
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_INPUT, new Post());
+        $definitionName = 'Dummy.jsonld.input';
+
+        $this->assertSame($definitionName, $resultSchema->getRootDefinitionKey());
+        $this->assertFalse(isset($resultSchema['properties']));
     }
 
     public function testHasHydraViewNavigationBuildSchema(): void
