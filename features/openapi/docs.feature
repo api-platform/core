@@ -153,7 +153,7 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 6 elements
 
     # Subcollection - check schema
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany.output"
 
     # Deprecations
     And the JSON node "paths./dummies.get.deprecated" should be false
@@ -165,8 +165,8 @@ Feature: Documentation support
     And the JSON node "paths./deprecated_resources/{id}.patch.deprecated" should be true
 
     # Formats
-    And the OpenAPI class "Dummy.jsonld" exists
-    And the "@id" property exists for the OpenAPI class "Dummy.jsonld"
+    And the OpenAPI class "Dummy.jsonld.output" exists
+    And the "@id" property exists for the OpenAPI class "Dummy.jsonld.output"
     And the JSON node "paths./dummies.get.responses.200.content.application/ld+json" should be equal to:
     """
     {
@@ -176,7 +176,7 @@ Feature: Documentation support
                 "hydra:member": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/components/schemas/Dummy.jsonld"
+                        "$ref": "#/components/schemas/Dummy.jsonld.output"
                     }
                 },
                 "hydra:totalItems": {
