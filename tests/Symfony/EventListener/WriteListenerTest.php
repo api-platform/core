@@ -277,4 +277,33 @@ class WriteListenerTest extends TestCase
 
         (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
+
+    public function testHasOriginalData(): void
+    {
+        $operationResource = new OperationResource(1, 'foo');
+
+        $this->resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
+        $this->processorProphecy->process($operationResource, Argument::type(Operation::class), [], Argument::type('array'))->willReturn($operationResource)->shouldBeCalled();
+
+        $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
+            '_api_OperationResource_post_collection' => (new Post())->withName('_api_OperationResource_post_collection'),
+        ]))]);
+
+        $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
+
+        $request = new Request([], [], ['_api_resource_class' => OperationResource::class]);
+
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
+            $operationResource
+        );
+
+        $request->setMethod('POST');
+        $request->attributes->set('_api_operation_name', sprintf('_api_%s_%s%s', 'OperationResource', 'post', '_collection'));
+
+        (new WriteListener($this->processorProphecy->reveal(), null, $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
+        $this->assertEquals($operationResource, $request->attributes->get('original_data'));
+    }
 }

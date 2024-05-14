@@ -104,7 +104,6 @@ final class WriteListener
                 }
             }
 
-            // $request->attributes->set('original_data', $this->clone($controllerResult));
             $data = $this->processor->process($controllerResult, $operation, $uriVariables, [
                 'request' => $request,
                 'uri_variables' => $uriVariables,
@@ -113,7 +112,7 @@ final class WriteListener
             ]);
 
             if ($data) {
-                $request->attributes->set('original_data', $this->clone($data));
+                $request->attributes->set('original_data', $data);
             }
 
             $event->setControllerResult($data);
