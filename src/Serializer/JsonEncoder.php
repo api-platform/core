@@ -73,4 +73,6 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
     }
 }
 
-class_alias(JsonEncoder::class, \ApiPlatform\Core\Serializer\JsonEncoder::class);
+if (!class_exists(\ApiPlatform\Core\Serializer\JsonEncoder::class, false)) {
+    class_alias(JsonEncoder::class, \ApiPlatform\Core\Serializer\JsonEncoder::class);
+}

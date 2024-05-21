@@ -82,4 +82,6 @@ final class ArrayItems implements ValidatorInterface
     }
 }
 
-class_alias(ArrayItems::class, \ApiPlatform\Core\Filter\Validator\ArrayItems::class);
+if (!class_exists(\ApiPlatform\Core\Filter\Validator\ArrayItems::class, false)) {
+    class_alias(ArrayItems::class, \ApiPlatform\Core\Filter\Validator\ArrayItems::class);
+}

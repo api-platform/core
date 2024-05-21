@@ -43,4 +43,6 @@ final class GraphQlQueryResolverPass implements CompilerPassInterface
     }
 }
 
-class_alias(GraphQlQueryResolverPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass::class);
+if (!class_exists(\ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass::class, false)) {
+    class_alias(GraphQlQueryResolverPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass::class);
+}

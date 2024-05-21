@@ -108,4 +108,6 @@ final class Encoding
     }
 }
 
-class_alias(Encoding::class, \ApiPlatform\Core\OpenApi\Model\Encoding::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Encoding::class, false)) {
+    class_alias(Encoding::class, \ApiPlatform\Core\OpenApi\Model\Encoding::class);
+}

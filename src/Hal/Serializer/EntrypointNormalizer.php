@@ -110,4 +110,6 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
     }
 }
 
-class_alias(EntrypointNormalizer::class, \ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer::class);
+if (!class_exists(\ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer::class, false)) {
+    class_alias(EntrypointNormalizer::class, \ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer::class);
+}

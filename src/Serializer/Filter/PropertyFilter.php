@@ -163,4 +163,6 @@ final class PropertyFilter implements FilterInterface
     }
 }
 
-class_alias(PropertyFilter::class, \ApiPlatform\Core\Serializer\Filter\PropertyFilter::class);
+if (!class_exists(\ApiPlatform\Core\Serializer\Filter\PropertyFilter::class, false)) {
+    class_alias(PropertyFilter::class, \ApiPlatform\Core\Serializer\Filter\PropertyFilter::class);
+}

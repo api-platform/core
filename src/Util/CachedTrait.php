@@ -50,4 +50,6 @@ trait CachedTrait
     }
 }
 
-class_alias(CachedTrait::class, \ApiPlatform\Core\Cache\CachedTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Cache\CachedTrait::class, false)) {
+    class_alias(CachedTrait::class, \ApiPlatform\Core\Cache\CachedTrait::class);
+}

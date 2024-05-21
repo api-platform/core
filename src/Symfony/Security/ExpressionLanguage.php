@@ -45,4 +45,6 @@ class ExpressionLanguage extends BaseExpressionLanguage
     }
 }
 
-class_alias(ExpressionLanguage::class, \ApiPlatform\Core\Security\ExpressionLanguage::class);
+if (!class_exists(\ApiPlatform\Core\Security\ExpressionLanguage::class, false)) {
+    class_alias(ExpressionLanguage::class, \ApiPlatform\Core\Security\ExpressionLanguage::class);
+}

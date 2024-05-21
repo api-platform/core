@@ -31,4 +31,6 @@ final class PlaceholderAction
     }
 }
 
-class_alias(PlaceholderAction::class, \ApiPlatform\Core\Action\PlaceholderAction::class);
+if (!class_exists(\ApiPlatform\Core\Action\PlaceholderAction::class, false)) {
+    class_alias(PlaceholderAction::class, \ApiPlatform\Core\Action\PlaceholderAction::class);
+}

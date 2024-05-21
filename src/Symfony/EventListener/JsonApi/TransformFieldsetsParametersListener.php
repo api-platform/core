@@ -89,4 +89,6 @@ final class TransformFieldsetsParametersListener
     }
 }
 
-class_alias(TransformFieldsetsParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener::class);
+if (!class_exists(\ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener::class, false)) {
+    class_alias(TransformFieldsetsParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener::class);
+}

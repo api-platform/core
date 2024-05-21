@@ -170,4 +170,6 @@ final class Schema extends \ArrayObject
     }
 }
 
-class_alias(Schema::class, \ApiPlatform\Core\OpenApi\Model\Schema::class);
+if (!class_exists(\ApiPlatform\Core\OpenApi\Model\Schema::class, false)) {
+    class_alias(Schema::class, \ApiPlatform\Core\OpenApi\Model\Schema::class);
+}

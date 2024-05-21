@@ -17,7 +17,7 @@ use PHPUnit\Runner\Version;
 use PHPUnit\SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\ComparisonFailure as LegacyComparisonFailure;
 
-if (!class_exists(ComparisonFailure::class)) {
+if (!class_exists(ComparisonFailure::class, false)) {
     class_alias(LegacyComparisonFailure::class, 'PHPUnit\SebastianBergmann\Comparator\ComparisonFailure');
 }
 

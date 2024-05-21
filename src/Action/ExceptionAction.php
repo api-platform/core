@@ -122,4 +122,6 @@ final class ExceptionAction
     }
 }
 
-class_alias(ExceptionAction::class, \ApiPlatform\Core\Action\ExceptionAction::class);
+if (!class_exists(\ApiPlatform\Core\Action\ExceptionAction::class, false)) {
+    class_alias(ExceptionAction::class, \ApiPlatform\Core\Action\ExceptionAction::class);
+}

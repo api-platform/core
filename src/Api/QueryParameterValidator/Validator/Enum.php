@@ -34,4 +34,6 @@ final class Enum implements ValidatorInterface
     }
 }
 
-class_alias(Enum::class, \ApiPlatform\Core\Filter\Validator\Enum::class);
+if (!class_exists(\ApiPlatform\Core\Filter\Validator\Enum::class, false)) {
+    class_alias(Enum::class, \ApiPlatform\Core\Filter\Validator\Enum::class);
+}

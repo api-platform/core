@@ -41,4 +41,6 @@ trait ArrayTrait
     }
 }
 
-class_alias(ArrayTrait::class, \ApiPlatform\Core\Util\ArrayTrait::class);
+if (!trait_exists(\ApiPlatform\Core\Util\ArrayTrait::class, false)) {
+    class_alias(ArrayTrait::class, \ApiPlatform\Core\Util\ArrayTrait::class);
+}

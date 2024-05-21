@@ -26,4 +26,6 @@ final class ErrorHandler implements ErrorHandlerInterface
     }
 }
 
-class_alias(ErrorHandler::class, \ApiPlatform\Core\GraphQl\Error\ErrorHandler::class);
+if (!class_exists(\ApiPlatform\Core\GraphQl\Error\ErrorHandler::class, false)) {
+    class_alias(ErrorHandler::class, \ApiPlatform\Core\GraphQl\Error\ErrorHandler::class);
+}
