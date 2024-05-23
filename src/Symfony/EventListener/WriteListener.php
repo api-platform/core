@@ -110,6 +110,7 @@ final class WriteListener
                 'uri_variables' => $uriVariables,
                 'resource_class' => $operation->getClass(),
                 'previous_data' => false === $operation->canRead() ? null : $request->attributes->get('previous_data'),
+                'data' => false === $operation->canRead() ? null : $request->attributes->get('data'),
             ]);
 
             if ($data) {
