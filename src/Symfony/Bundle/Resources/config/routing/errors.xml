@@ -6,8 +6,7 @@
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="api_errors" path="/errors/{status}" methods="GET|HEAD">
-        <default key="_controller">api_platform.action.not_exposed</default>
-        <default key="status">500</default>
+        <default key="_controller">api_platform.action.error_page</default>
 
         <requirement key="status">\d+</requirement>
     </route>

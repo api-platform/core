@@ -13,6 +13,7 @@
         <service id="api_platform.property_accessor" alias="property_accessor" public="false" />
         <service id="api_platform.property_info" alias="property_info" public="false" />
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
+        <service id="api_platform.action.error_page" class="ApiPlatform\Symfony\Action\ErrorPageAction" public="true" />
 
         <!-- deprecated -->
         <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
