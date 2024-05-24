@@ -81,7 +81,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             }
         }
 
-        if (($options = $operation?->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
+        if (null === $context['output'] && ($options = $operation?->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
             $context['force_resource_class'] = $operation->getClass();
         }
 

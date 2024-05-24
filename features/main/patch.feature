@@ -80,3 +80,20 @@ Feature: Sending PATCH requets
       "alpha": "/alphas/2"
     }
     """
+
+  @use_listener
+  @controller
+  # Previously to 3.3 it was not possible to disable a read, this test is ignored on the
+  # legacy test suite (EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER=1)
+  Scenario: Patch a non-readable resource
+    When I add "Content-Type" header equal to "application/merge-patch+json"
+    And I send a "PATCH" request to "/order_products/1/count" with body:
+    """
+      {
+        "id": 1,
+        "count": 10
+      }
+
+    """
+    Then the response status code should be 200
+    And the JSON node "id" should contain "1"

@@ -38,7 +38,7 @@ namespace App\Tests {
             // We provide assertions based on your resource's JSON Schema to save time asserting that the data
             // matches an expected format, for example here with a collection.
             $this->assertMatchesResourceCollectionJsonSchema(Book::class);
-            // PHPUnit default assertios are also available.
+            // PHPUnit default assertions are also available.
             $this->assertCount(0, $response->toArray()['hydra:member']);
         }
     }

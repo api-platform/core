@@ -65,8 +65,8 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
                 && \array_key_exists('class', $operation->getInput())
                 && null === $operation->getInput()['class']
             ) {
-                $operation = $operation->withDeserialize(false);
-                $operation = $operation->withValidate(false);
+                $operation = $operation->withDeserialize(null === $operation->canDeserialize() ? false : $operation->canDeserialize());
+                $operation = $operation->withValidate(null === $operation->canValidate() ? false : $operation->canValidate());
             }
 
             if (
@@ -74,8 +74,9 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
                 && $operation->getOutput()
                 && \array_key_exists('class', $operation->getOutput())
                 && null === $operation->getOutput()['class']
+                && null === $operation->getStatus()
             ) {
-                $operation = $operation->withStatus($operation->getStatus() ?? 204);
+                $operation = $operation->withStatus(204);
             }
 
             $operations instanceof Operations ? $operations->add($key, $operation) : $operations[$key] = $operation;

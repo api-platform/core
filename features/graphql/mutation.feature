@@ -1034,3 +1034,21 @@ Feature: GraphQL mutation support
     """
     Then the response status code should be 200
     And the JSON node "data.uploadMultipleMediaObject.mediaObject.contentUrl" should be equal to "test.gif"
+
+  @!mongodb
+  Scenario: Delete an invalid item through a mutation
+    When I send the following GraphQL request:
+    """
+    mutation {
+      deleteActivityLog(input: {id: "/activity_logs/1"}) {
+        activityLog {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors" should not exist
+    And the JSON node "data.deleteActivityLog.activityLog" should exist

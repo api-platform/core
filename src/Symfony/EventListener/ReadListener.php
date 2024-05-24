@@ -84,7 +84,9 @@ final class ReadListener
                 try {
                     $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
                 } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
-                    throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+                    if ($operation->canRead()) {
+                        throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+                    }
                 }
             }
 

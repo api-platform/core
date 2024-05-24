@@ -20,7 +20,8 @@
         "serializer",
         "jsonschema",
         "validation",
-        "state"
+        "state",
+        "test"
       ]
     ],
     "scope-empty": [
@@ -55,8 +56,7 @@
       [
         "sentence-case",
         "start-case",
-        "pascal-case",
-        "upper-case"
+        "pascal-case"
       ]
     ],
     "subject-empty": [

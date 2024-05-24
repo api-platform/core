@@ -53,6 +53,8 @@ interface FilterInterface
      *
      * @see \ApiPlatform\OpenApi\Factory\OpenApiFactory::getFiltersParameters
      *
+     * @param class-string $resourceClass
+     *
      * @return array<string, array{property?: string, type?: string, required?: bool, description?: string, strategy?: string, is_collection?: bool, swagger?: array<string, mixed>, openapi?: array<string, mixed>|\ApiPlatform\OpenApi\Model\Parameter, schema?: array<string, mixed>}>
      */
     public function getDescription(string $resourceClass): array;
