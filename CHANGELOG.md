@@ -38,6 +38,8 @@ if (null === $operation->canDeserialize()) {
 
 Previously listeners did the checks before reading our flags and you could not force the values. 
 
+When using GraphQl, with `event_listeners_backward_compatibility_layer: true`, mutation resolver gets called before validation, when using `false` (the future default) validation occurs on the user's input.
+
 ## v3.3.1 (pre-release)
 
 ### Bug fixes
@@ -465,6 +467,13 @@ Listeners will not get removed in API Platform 4 but will rather use our new Pro
 ```php
 #[Post(read: true)] // to force reading even though it's a POST
 ```
+
+- `ApiPlatform\Api` got moved to `ApiPlatform\Metadata`
+
+- Adds `assertMercureUpdateMatchesJsonSchema(Update $update, array $topics, array|object|string $jsonSchema = '', bool $private = false, string $id = null, string $type = null, int $retry = null, string $message = '')`
+- The handle links feature is experimental
+
+When using GraphQl, with `event_listeners_backward_compatibility_layer: true`, mutation resolver gets called before validation, when using `false` (the future default) validation occurs on the user's input.
 
 ## v3.2.0-beta.2
 

@@ -1036,13 +1036,13 @@ Feature: GraphQL mutation support
     And the JSON node "data.uploadMultipleMediaObject.mediaObject.contentUrl" should be equal to "test.gif"
 
   @!mongodb
-  Scenario: Mutation should run before validation
+  Scenario: Delete an invalid item through a mutation
     When I send the following GraphQL request:
     """
     mutation {
-      createActivityLog(input: {name: ""}) {
+      deleteActivityLog(input: {id: "/activity_logs/1"}) {
         activityLog {
-          name
+          id
         }
       }
     }
@@ -1050,4 +1050,5 @@ Feature: GraphQL mutation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.createActivityLog.activityLog.name" should be equal to "hi"
+    And the JSON node "errors" should not exist
+    And the JSON node "data.deleteActivityLog.activityLog" should exist

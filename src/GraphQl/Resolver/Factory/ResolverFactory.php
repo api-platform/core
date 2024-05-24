@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Resolver\Factory;
 
 use ApiPlatform\GraphQl\State\Provider\NoopProvider;
+use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -75,7 +76,7 @@ class ResolverFactory implements ResolverFactoryInterface
         $context = ['source' => $source, 'args' => $args, 'info' => $info, 'root_class' => $rootClass, 'graphql_context' => &$graphQlContext];
 
         if (null === $operation->canValidate()) {
-            $operation = $operation->withValidate($operation instanceof Mutation);
+            $operation = $operation->withValidate($operation instanceof Mutation && !$operation instanceof DeleteOperationInterface);
         }
 
         $body ??= $this->provider->provide($operation, [], $context);
