@@ -158,8 +158,8 @@
             <argument type="tagged_locator" tag="api_platform.parameter_provider" index-by="key" />
         </service>
 
-        <!-- Validation occurs at 200, we want validation to be after we reach custom resolvers -->
-        <service id="api_platform.graphql.state_provider.resolver" class="ApiPlatform\GraphQl\State\Provider\ResolverProvider" decorates="api_platform.graphql.state_provider" decoration-priority="220">
+        <!-- Validation occurs at 200, we want validation to be over when we reach custom resolvers -->
+        <service id="api_platform.graphql.state_provider.resolver" class="ApiPlatform\GraphQl\State\Provider\ResolverProvider" decorates="api_platform.graphql.state_provider" decoration-priority="190">
             <argument type="service" id="api_platform.graphql.state_provider.resolver.inner" />
             <argument type="service" id="api_platform.graphql.resolver_locator" />
         </service>
