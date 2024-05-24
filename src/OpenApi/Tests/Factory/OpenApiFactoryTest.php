@@ -175,11 +175,11 @@ class OpenApiFactoryTest extends TestCase
             'filteredDummyCollection' => (new GetCollection())->withUriTemplate('/filtered')->withFilters(['f1', 'f2', 'f3', 'f4', 'f5'])->withOperation($baseOperation),
             // Paginated
             'paginatedDummyCollection' => (new GetCollection())->withUriTemplate('/paginated')
-                                           ->withPaginationClientEnabled(true)
-                                           ->withPaginationClientItemsPerPage(true)
-                                           ->withPaginationItemsPerPage(20)
-                                       ->withPaginationMaximumItemsPerPage(80)
-                                               ->withOperation($baseOperation),
+                ->withPaginationClientEnabled(true)
+                ->withPaginationClientItemsPerPage(true)
+                ->withPaginationItemsPerPage(20)
+                ->withPaginationMaximumItemsPerPage(80)
+                ->withOperation($baseOperation),
             'postDummyCollectionWithRequestBody' => (new Post())->withUriTemplate('/dummiesRequestBody')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
                 requestBody: new RequestBody(
                     description: 'List of Ids',
@@ -200,6 +200,11 @@ class OpenApiFactoryTest extends TestCase
                             ],
                         ],
                     ]),
+                ),
+            )),
+            'postDummyCollectionWithRequestBodyWithoutContent' => (new Post())->withUriTemplate('/dummiesRequestBodyWithoutContent')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                requestBody: new RequestBody(
+                    description: 'Extended description for the new Dummy resource',
                 ),
             )),
             'putDummyItemWithResponse' => (new Put())->withUriTemplate('/dummyitems/{id}')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
@@ -866,6 +871,36 @@ class OpenApiFactoryTest extends TestCase
                             ],
                         ],
                     ],
+                ]),
+                false
+            ),
+            deprecated: false,
+        ), $requestBodyPath->getPost());
+
+        $requestBodyPath = $paths->getPath('/dummiesRequestBodyWithoutContent');
+        $this->assertEquals(new Operation(
+            'postDummyCollectionWithRequestBodyWithoutContent',
+            ['Dummy'],
+            [
+                '201' => new Response(
+                    'Dummy resource created',
+                    new \ArrayObject([
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '400' => new Response('Invalid input'),
+                '422' => new Response('Unprocessable entity'),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [],
+            new RequestBody(
+                'Extended description for the new Dummy resource',
+                new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
                 ]),
                 false
             ),
