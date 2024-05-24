@@ -185,6 +185,12 @@ api_platform:
         form: ['multipart/form-data']
 ```
 
+## v3.2.23
+
+### Bug fixes
+
+* [fb7c4658c](https://github.com/api-platform/core/commit/fb7c4658c327c9628bcc86d42e85c3546a74d993) fix(test): canonicalizing json arrays (#6386)
+
 ## v3.2.22
 
 ### Bug fixes
