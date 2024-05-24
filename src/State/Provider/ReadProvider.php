@@ -17,9 +17,10 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Util\CloneTrait;
-use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Serializer\SerializerContextBuilderInterface as LegacySerializerContextBuilderInterface;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\State\Util\RequestParser;
@@ -38,7 +39,7 @@ final class ReadProvider implements ProviderInterface
 
     public function __construct(
         private readonly ProviderInterface $provider,
-        private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
+        private readonly LegacySerializerContextBuilderInterface|SerializerContextBuilderInterface|null $serializerContextBuilder = null,
     ) {
     }
 

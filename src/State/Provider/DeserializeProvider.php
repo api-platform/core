@@ -15,8 +15,9 @@ namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Serializer\SerializerContextBuilderInterface as LegacySerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -32,8 +33,12 @@ use Symfony\Contracts\Translation\TranslatorTrait;
 
 final class DeserializeProvider implements ProviderInterface
 {
-    public function __construct(private readonly ?ProviderInterface $decorated, private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder, private ?TranslatorInterface $translator = null)
-    {
+    public function __construct(
+        private readonly ?ProviderInterface $decorated,
+        private readonly SerializerInterface $serializer,
+        private readonly LegacySerializerContextBuilderInterface|SerializerContextBuilderInterface $serializerContextBuilder,
+        private ?TranslatorInterface $translator = null
+    ) {
         if (null === $this->translator) {
             $this->translator = new class() implements TranslatorInterface, LocaleAwareInterface {
                 use TranslatorTrait;

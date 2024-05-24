@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Tests\Provider;
 
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
