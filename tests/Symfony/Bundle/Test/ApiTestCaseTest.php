@@ -96,18 +96,6 @@ JSON
         );
     }
 
-    public function testAssertJsonEqualsWithJsonScalarString(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('$json must be array or string (JSON array or JSON object)');
-
-        self::createClient()->request('GET', '/contexts/Address');
-        $this->assertJsonEquals(<<<JSON
-"Address/name"
-JSON
-        );
-    }
-
     public function testAssertMatchesJsonSchema(): void
     {
         $jsonSchema = <<<JSON

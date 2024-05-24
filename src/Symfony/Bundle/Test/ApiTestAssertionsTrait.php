@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
+use PHPUnit\Framework\Constraint\JsonMatches;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Bundle\FrameworkBundle\Test\BrowserKitAssertionsTrait;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -71,14 +72,18 @@ trait ApiTestAssertionsTrait
      */
     public static function assertJsonEquals(array|string $json, string $message = ''): void
     {
-        if (\is_string($json)) {
-            $json = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
-        }
-        if (!\is_array($json)) {
-            throw new \InvalidArgumentException('$json must be array or string (JSON array or JSON object)');
+        if (\is_array($json)) {
+            $json = json_encode(
+                $json,
+                \JSON_UNESCAPED_UNICODE
+                | \JSON_UNESCAPED_SLASHES
+                | \JSON_PRESERVE_ZERO_FRACTION
+                | \JSON_THROW_ON_ERROR);
         }
 
-        static::assertEqualsCanonicalizing($json, self::getHttpResponse()->toArray(false), $message);
+        $constraint = new JsonMatches($json);
+
+        static::assertThat(self::getHttpResponse()->getContent(false), $constraint, $message);
     }
 
     /**

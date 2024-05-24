@@ -19,7 +19,8 @@
         "serializer",
         "jsonschema",
         "validation",
-        "state"
+        "state",
+        "test"
       ]
     ],
     "scope-empty": [
