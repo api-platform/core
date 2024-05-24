@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.3.4
+
+### Bug fixes
+
+* [002d8e514](https://github.com/api-platform/core/commit/002d8e51490dbe9f5d8e5551226d70db8a33c706) fix(validation): ValidationException causes TypeError exception when called with $code=null (#6375)
+* [77a917f2a](https://github.com/api-platform/core/commit/77a917f2a51b50af84bdc96c1a32ff671b3951db) fix(metadata): resource class php doc (#6381)
+* [d809315fb](https://github.com/api-platform/core/commit/d809315fbb3822dbc6fe50d5c908183f4428f0f2) fix(symfony): store original data without clone (#6367)
+* [fb7c4658c](https://github.com/api-platform/core/commit/fb7c4658c327c9628bcc86d42e85c3546a74d993) fix(test): canonicalizing json arrays (#6386)
+
 ## v3.3.3
 
 ### Bug fixes
