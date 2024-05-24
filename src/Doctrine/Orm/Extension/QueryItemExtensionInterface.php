@@ -25,5 +25,10 @@ use Doctrine\ORM\QueryBuilder;
  */
 interface QueryItemExtensionInterface
 {
+    /**
+     * @param class-string         $resourceClass
+     * @param array<string, mixed> $identifiers
+     * @param array<string, mixed> $context
+     */
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, ?Operation $operation = null, array $context = []): void;
 }
