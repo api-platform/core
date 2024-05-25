@@ -76,9 +76,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         if (($key = $schema->getRootDefinitionKey() ?? $schema->getItemsDefinitionKey()) !== null) {
             $postfix = '.'.$type;
-            $typedKey = $key.$postfix;
             $definitions = $schema->getDefinitions();
-            $definitions[$typedKey] = $definitions[$key];
+            $definitions[$key.$postfix] = $definitions[$key];
             unset($definitions[$key]);
 
             if (($schema['type'] ?? '') === 'array') {
