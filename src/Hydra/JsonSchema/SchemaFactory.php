@@ -95,7 +95,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         if ($key = $schema->getRootDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_ROOT_PROPS + ($definitions[$key]['properties'] ?? []);
             foreach (array_keys(self::BASE_ROOT_PROPS) as $property) {
-                $definitions[$key]['required'] = array_unique([...($definitions[$key]['required'] ?? []), $property]);
+                $definitions[$key]['required'] ??= [];
+                if (!\in_array($property, $definitions[$key]['required'], true)) {
+                    $definitions[$key]['required'][] = $property;
+                }
             }
 
             return $schema;
@@ -103,7 +106,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         if ($key = $schema->getItemsDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_PROPS + ($definitions[$key]['properties'] ?? []);
             foreach (array_keys(self::BASE_PROPS) as $property) {
-                $definitions[$key]['required'] = array_unique([...($definitions[$key]['required'] ?? []), $property]);
+                $definitions[$key]['required'] ??= [];
+                if (!\in_array($property, $definitions[$key]['required'], true)) {
+                    $definitions[$key]['required'][] = $property;
+                }
             }
         }
 
