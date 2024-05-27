@@ -29,6 +29,17 @@
         </service>
         <service id="ApiPlatform\OpenApi\Serializer\OpenApiNormalizer" alias="api_platform.openapi.normalizer" />
 
+        <service id="api_platform.openapi.provider" class="ApiPlatform\OpenApi\State\OpenApiProvider" public="false">
+            <argument type="service" id="api_platform.openapi.factory" />
+
+            <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\OpenApi\State\OpenApiProvider" />
+            <tag name="api_platform.state_provider" priority="-100" key="api_platform.openapi.provider" />
+        </service>
+
+        <service id="api_platform.openapi.serializer_context_builder" class="ApiPlatform\OpenApi\Serializer\SerializerContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
+            <argument type="service" id="api_platform.openapi.serializer_context_builder.inner" />
+        </service>
+
         <service id="api_platform.openapi.options" class="ApiPlatform\OpenApi\Options">
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>

@@ -19,7 +19,7 @@
 
 %Since api-platform/core 3.3: Use a "ApiPlatform\\State\\ProviderInterface" as first argument in "ApiPlatform\\Symfony\\EventListener\\AddFormatListener" instead of "Negotiation\\Negotiator".%
 
-%Since api-platform/core 3.3: Use a "ApiPlatform\\Metadata\\Resource\\Factory\\ResourceMetadataCollectionFactoryInterface" as second argument in "ApiPlatform\\Symfony\\EventListener\\DeserializeListener" instead of "ApiPlatform\\Serializer\\SerializerContextBuilderInterface".%
+%Since api-platform/core 3.3: Use a "ApiPlatform\\Metadata\\Resource\\Factory\\ResourceMetadataCollectionFactoryInterface" as second argument in "ApiPlatform\\Symfony\\EventListener\\DeserializeListener" instead of "ApiPlatform\\State\\SerializerContextBuilderInterface".%
 
 # Fixed when ApiPlatform\Api\FilterLocatorTrait will we deleted
 %ApiPlatform\\Api\\FilterInterface is deprecated in favor of ApiPlatform\\Metadata\\FilterInterface%

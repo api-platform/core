@@ -106,7 +106,7 @@ trait ContentNegotiationTrait
             }
         }
 
-        // Then use the Symfony request format if available and applicable
+        // Then, use the Symfony request format if available and applicable
         $requestFormat = $request->getRequestFormat('') ?: null;
         if (null !== $requestFormat) {
             $mimeType = $request->getMimeType($requestFormat);
@@ -134,5 +134,19 @@ trait ContentNegotiationTrait
             $accept,
             implode('", "', array_keys($mimeTypes))
         ));
+    }
+
+    /**
+     * Adds the supported formats to the request.
+     *
+     * This is necessary for {@see Request::getMimeType} and {@see Request::getMimeTypes} to work.
+     *
+     * @param array<string, string|string[]> $formats
+     */
+    private function addRequestFormats(Request $request, array $formats): void
+    {
+        foreach ($formats as $format => $mimeTypes) {
+            $request->setFormat($format, (array) $mimeTypes);
+        }
     }
 }
