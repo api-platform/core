@@ -38,6 +38,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -682,7 +683,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
         if (null === $this->nameConverter) {
             return $property;
         }
-        if ($this->nameConverter instanceof AdvancedNameConverterInterface) {
+        if ($this->nameConverter instanceof AdvancedNameConverterInterface || $this->nameConverter instanceof MetadataAwareNameConverter) {
             return $this->nameConverter->normalize($property, $resourceClass);
         }
 
