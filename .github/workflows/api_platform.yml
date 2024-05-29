@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - v*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  run-api-platform-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update distribution
+        run: gh workflow run -R api-platform/api-platfom release.yml -f tag=${{ github.ref_name }}
+
+
