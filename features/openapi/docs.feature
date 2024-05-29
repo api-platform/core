@@ -432,3 +432,9 @@ Feature: Documentation support
     ]
     """
     And the JSON node "components.schemas.DummyBoolean.properties.isDummyBoolean.owl:maxCardinality" should not exist
+
+  Scenario: Retrieve the OpenAPI documentation in JSON
+    Given I add "Accept" header equal to "text/html,*/*;q=0.8"
+    And I send a "GET" request to "/docs.jsonopenapi"
+    Then the response status code should be 200
+    And the response should be in JSON

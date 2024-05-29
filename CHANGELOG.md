@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.3.5
+
+### Bug fixes
+
+* [55f27dc7a](https://github.com/api-platform/core/commit/55f27dc7adbf2456ec7700dd57e10c036eb260c0) fix(symfony): documentation request _format (#6390)
+
 ## v3.3.4
 
 ### Bug fixes

@@ -67,6 +67,7 @@ final class DocumentationAction
             'spec_version' => (string) $request->query->get(LegacyOpenApiNormalizer::SPEC_VERSION),
         ];
         $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
+        $this->addRequestFormats($request, $this->documentationFormats);
         $format = $this->getRequestFormat($request, $this->documentationFormats);
 
         if (null !== $this->openApiFactory && ('html' === $format || OpenApiNormalizer::FORMAT === $format || OpenApiNormalizer::JSON_FORMAT === $format || OpenApiNormalizer::YAML_FORMAT === $format)) {
@@ -87,11 +88,7 @@ final class DocumentationAction
                 class: OpenApi::class,
                 read: true,
                 serialize: true,
-                provider: fn () => $this->openApiFactory->__invoke($context),
-                normalizationContext: [
-                    ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null,
-                    LegacyOpenApiNormalizer::SPEC_VERSION => $context['spec_version'] ?? null,
-                ],
+                provider: 'api_platform.openapi.provider',
                 outputFormats: $this->documentationFormats
             );
 

@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\State\Provider;
 
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
