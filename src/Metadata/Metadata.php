@@ -81,6 +81,7 @@ abstract class Metadata
         protected ?string $policy = null,
         protected array|string|null $middleware = null,
         protected ?bool $queryParameterValidationEnabled = null,
+        protected ?bool $strictQueryParameterValidation = null,
         protected array $extraProperties = [],
     ) {
         if (\is_array($parameters) && $parameters) {

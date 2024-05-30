@@ -811,6 +811,7 @@ abstract class Operation extends Metadata
         ?string $policy = null,
         array|string|null $middleware = null,
         ?bool $queryParameterValidationEnabled = null,
+        protected ?bool $strictQueryParameterValidation = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(

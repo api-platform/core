@@ -100,6 +100,7 @@ final class Post extends HttpOperation
         array|string|null $middleware = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null,
+        ?bool $strictQueryParameterValidation = null,
     ) {
         parent::__construct(
             method: 'POST',
@@ -179,6 +180,7 @@ final class Post extends HttpOperation
             rules: $rules,
             policy: $policy,
             middleware: $middleware,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
             extraProperties: $extraProperties
         );
     }

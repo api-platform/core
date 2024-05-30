@@ -99,6 +99,7 @@ final class Put extends HttpOperation
         ?string $policy = null,
         array|string|null $middleware = null,
         array $extraProperties = [],
+        ?bool $strictQueryParameterValidation = null,
         private ?bool $allowCreate = null,
     ) {
         parent::__construct(
@@ -179,6 +180,7 @@ final class Put extends HttpOperation
             rules: $rules,
             policy: $policy,
             middleware: $middleware,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
             extraProperties: $extraProperties
         );
     }
