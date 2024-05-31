@@ -67,7 +67,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 40), ['filters' => ['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 40), ['filters' => ['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]]);
     }
 
     public function testApplyToCollectionWithItemPerPageZero(): void
@@ -86,7 +86,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 0), ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 0), ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]]);
     }
 
     public function testApplyToCollectionWithItemPerPageZeroAndPage2(): void
@@ -108,7 +108,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 0), ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 0), ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]]);
     }
 
     public function testApplyToCollectionWithItemPerPageLessThan0(): void
@@ -130,7 +130,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: -20), ['filters' => ['pagination' => true, 'itemsPerPage' => -20, '_page' => 2]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: -20), ['filters' => ['pagination' => true, 'itemsPerPage' => -20, '_page' => 2]]);
     }
 
     public function testApplyToCollectionWithItemPerPageTooHigh(): void
@@ -149,7 +149,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationClientItemsPerPage: true), ['filters' => ['pagination' => true, 'itemsPerPage' => 301, '_page' => 2]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationClientItemsPerPage: true), ['filters' => ['pagination' => true, 'itemsPerPage' => 301, '_page' => 2]]);
     }
 
     public function testApplyToCollectionWithGraphql(): void
@@ -165,7 +165,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 20), ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql_operation_name' => 'query']);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 20), ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql_operation_name' => 'query']);
     }
 
     public function testApplyToCollectionNofilters(): void
@@ -181,7 +181,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection());
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection());
     }
 
     public function testApplyToCollectionPaginationDisabled(): void
@@ -199,7 +199,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection());
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection());
     }
 
     public function testApplyToCollectionGraphQlPaginationDisabled(): void
@@ -217,7 +217,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(), ['graphql_operation_name' => 'op']);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(), ['graphql_operation_name' => 'op']);
     }
 
     public function testApplyToCollectionWithMaximumItemsPerPage(): void
@@ -237,7 +237,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationMaximumItemsPerPage: 80), ['filters' => ['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationMaximumItemsPerPage: 80), ['filters' => ['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]]);
     }
 
     public function testSupportsResult(): void
@@ -248,7 +248,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $this->assertTrue($extension->supportsResult('Foo', new GetCollection()));
+        $this->assertTrue($extension->supportsResult(Dummy::class, new GetCollection()));
     }
 
     public function testSupportsResultClientNotAllowedToPaginate(): void
@@ -262,7 +262,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $this->assertFalse($extension->supportsResult('Foo', new GetCollection(), ['filters' => ['pagination' => true]]));
+        $this->assertFalse($extension->supportsResult(Dummy::class, new GetCollection(), ['filters' => ['pagination' => true]]));
     }
 
     public function testSupportsResultPaginationDisabled(): void
@@ -275,7 +275,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $this->assertFalse($extension->supportsResult('Foo', new GetCollection()));
+        $this->assertFalse($extension->supportsResult(Dummy::class, new GetCollection()));
     }
 
     public function testSupportsResultGraphQlPaginationDisabled(): void
@@ -288,7 +288,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $this->assertFalse($extension->supportsResult('Foo', new GetCollection(), ['graphql_operation_name' => 'op']));
+        $this->assertFalse($extension->supportsResult(Dummy::class, new GetCollection(), ['graphql_operation_name' => 'op']));
     }
 
     public function testGetResult(): void
