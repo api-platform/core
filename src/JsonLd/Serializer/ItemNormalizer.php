@@ -153,4 +153,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         return parent::denormalize($data, $class, $format, $context);
     }
+
+    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, ?string $format = null, array $context = []): bool
+    {
+        if ($attribute === '@id' || $attribute === '@context' || $attribute === '@type') {
+            return true;
+        }
+
+        return parent::isAllowedAttribute($classOrObject, $attribute, $format, $context);
+    }
 }
