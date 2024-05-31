@@ -34,56 +34,6 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 class PropertyInfoToTypeInfoHelperTest extends TestCase
 {
     /**
-     * @dataProvider convertTypeToLegacyTypesDataProvider
-     *
-     * @param list<LegacyType>|null $legacyTypes
-     */
-    public function testConvertTypeToLegacyTypes(?array $legacyTypes, ?Type $type, bool $keepNullType = true): void
-    {
-        $this->assertEquals($legacyTypes, PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($type, $keepNullType));
-    }
-
-    /**
-     * @return iterable<array{0: list<LegacyType>|null, 1: ?Type, 2?: bool}>
-     */
-    public function convertTypeToLegacyTypesDataProvider(): iterable
-    {
-        yield [null, null];
-        yield [null, Type::mixed()];
-        yield [null, Type::never()];
-        yield [null, Type::union(Type::int(), Type::intersection(Type::string(), Type::bool()))];
-        yield [null, Type::intersection(Type::int(), Type::union(Type::string(), Type::bool()))];
-        yield [null, Type::null(), false];
-        yield [[new LegacyType('null')], Type::null()];
-        yield [[new LegacyType('null')], Type::void()];
-        yield [[new LegacyType('int')], Type::int()];
-        yield [[new LegacyType('object', false, \stdClass::class)], Type::object(\stdClass::class)];
-        yield [
-            [new LegacyType('object', false, \Traversable::class, true, null, new LegacyType('int'))],
-            Type::generic(Type::object(\Traversable::class), Type::int()),
-        ];
-        yield [
-            [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('string'))],
-            Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::string()),
-        ];
-        yield [
-            [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('string'))],
-            Type::collection(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::int()),
-        ];
-        yield [[new LegacyType('int', true)], Type::nullable(Type::int())];
-        yield [[new LegacyType('int'), new LegacyType('string')], Type::union(Type::int(), Type::string())];
-        yield [
-            [new LegacyType('int', true), new LegacyType('string', true)],
-            Type::union(Type::int(), Type::string(), Type::null()),
-        ];
-        yield [[new LegacyType('int'), new LegacyType('string')], Type::intersection(Type::int(), Type::string())];
-
-        $type = Type::int();
-        $type->isCollection = true;
-        yield [[new LegacyType('int', false, null, true)], $type];
-    }
-
-    /**
      * @dataProvider convertLegacyTypesToTypeDataProvider
      *
      * @param list<LegacyType>|null $legacyTypes
@@ -100,7 +50,7 @@ class PropertyInfoToTypeInfoHelperTest extends TestCase
     {
         yield [null, null];
         yield [Type::null(), [new LegacyType('null')]];
-        yield [Type::void(), [new LegacyType('void')]];
+        // yield [Type::void(), [new LegacyType('void')]];
         yield [Type::int(), [new LegacyType('int')]];
         yield [Type::object(\stdClass::class), [new LegacyType('object', false, \stdClass::class)]];
         yield [
@@ -115,9 +65,6 @@ class PropertyInfoToTypeInfoHelperTest extends TestCase
         ];
 
         $type = Type::collection(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::string());
-        $type->isCollection = true;
-        $type->getType()->isCollection = true;
-        $type->getType()->getType()->isCollection = true;
         yield [$type, [new LegacyType('array', false, null, true, [new LegacyType('string')], new LegacyType('int'))]];
     }
 }

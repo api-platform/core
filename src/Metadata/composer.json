@@ -46,7 +46,8 @@
         "symfony/routing": "^6.4 || ^7.0",
         "symfony/var-dumper": "^6.4 || ^7.0",
         "symfony/web-link": "^6.4 || ^7.0",
-        "symfony/yaml": "^6.4 || ^7.0"
+        "symfony/yaml": "^6.4 || ^7.0",
+        "symfony/type-info": "^7.1"
     },
     "suggest": {
         "phpstan/phpdoc-parser": "For PHP documentation support.",
