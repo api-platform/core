@@ -102,5 +102,3 @@ parameters:
 		- '#Access to undefined constant Symfony\\Component\\HttpKernel\\HttpKernelInterface::MASTER_REQUEST\.#'
 		- '#Attribute class PHPUnit\\Framework\\Attributes\\DataProvider does not exist.#'
 		# Because of a bc-layer in MetadataAwareNameConverter it does not implement AdvancedNameConverterInterface
-		- '#Instanceof between Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface\|null and Symfony\\Component\\Serializer\\NameConverter\\MetadataAwareNameConverter will always evaluate to false\.#'
-		- '#Instanceof between Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface and Symfony\\Component\\Serializer\\NameConverter\\MetadataAwareNameConverter will always evaluate to false\.#'
