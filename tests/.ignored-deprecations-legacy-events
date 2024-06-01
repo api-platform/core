@@ -25,3 +25,4 @@
 %ApiPlatform\\Api\\FilterInterface is deprecated in favor of ApiPlatform\\Metadata\\FilterInterface%
 
 %The "Symfony\\Bundle\\MakerBundle\\Maker\\MakeAuthenticator" class is deprecated, use any of the Security\\Make\* commands instead%
+%Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".%

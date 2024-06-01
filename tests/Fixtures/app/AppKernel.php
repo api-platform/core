@@ -74,10 +74,13 @@ class AppKernel extends Kernel
             new MercureBundle(),
             new SecurityBundle(),
             new WebProfilerBundle(),
-            new FriendsOfBehatSymfonyExtensionBundle(),
             new FrameworkBundle(),
             new MakerBundle(),
         ];
+
+        if (null === ($_ENV['APP_PHPUNIT'] ?? null)) {
+            $bundles[] = new FriendsOfBehatSymfonyExtensionBundle();
+        }
 
         if (class_exists(DoctrineMongoDBBundle::class)) {
             $bundles[] = new DoctrineMongoDBBundle();

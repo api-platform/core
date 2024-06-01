@@ -259,10 +259,16 @@ jobs:
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
-      - name: Run ${{ matrix.component }} tests
+      - name: Run ${{ matrix.component }} install
         run: |
           composer update
           composer ${{matrix.component}} update
+      - name: PHP version tweaks
+        if: matrix.component == 'api-platform/metadata' && matrix.php != '8.1'
+        run: composer require symfony/type-info
+        working-directory: 'src/Metadata'
+      - name: Run ${{ matrix.component }} tests
+        run: |
           mkdir -p /tmp/build/logs/phpunit
           composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
