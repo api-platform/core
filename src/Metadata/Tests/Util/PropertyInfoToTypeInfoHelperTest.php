@@ -40,31 +40,39 @@ class PropertyInfoToTypeInfoHelperTest extends TestCase
      */
     public function testConvertLegacyTypesToType(?Type $type, ?array $legacyTypes): void
     {
+        if (!class_exists(Type::class)) {
+            $this->markTestSkipped('symfony/type-info requires PHP > 8.2');
+        }
+
         $this->assertEquals($type, PropertyInfoToTypeInfoHelper::convertLegacyTypesToType($legacyTypes));
     }
 
     /**
-     * @return iterable<array{): ?Type, 1: list<LegacyType>|null}>
+     * @return iterable<array{0: ?Type, 1: list<LegacyType>|null}>
      */
     public function convertLegacyTypesToTypeDataProvider(): iterable
     {
+        if (!class_exists(Type::class)) {
+            return;
+        }
+
         yield [null, null];
         yield [Type::null(), [new LegacyType('null')]];
         // yield [Type::void(), [new LegacyType('void')]];
         yield [Type::int(), [new LegacyType('int')]];
         yield [Type::object(\stdClass::class), [new LegacyType('object', false, \stdClass::class)]];
         yield [
-            Type::generic(Type::object('Foo'), Type::string(), Type::int()),
+            Type::generic(Type::object('Foo'), Type::string(), Type::int()), // @phpstan-ignore-line
             [new LegacyType('object', false, 'Foo', false, [new LegacyType('string')], new LegacyType('int'))],
         ];
-        yield [Type::nullable(Type::int()), [new LegacyType('int', true)]];
+        yield [Type::nullable(Type::int()), [new LegacyType('int', true)]]; // @phpstan-ignore-line
         yield [Type::union(Type::int(), Type::string()), [new LegacyType('int'), new LegacyType('string')]];
         yield [
             Type::union(Type::int(), Type::string(), Type::null()),
             [new LegacyType('int', true), new LegacyType('string', true)],
         ];
 
-        $type = Type::collection(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::string());
+        $type = Type::collection(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::string()); // @phpstan-ignore-line
         yield [$type, [new LegacyType('array', false, null, true, [new LegacyType('string')], new LegacyType('int'))]];
     }
 }

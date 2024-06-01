@@ -101,4 +101,3 @@ parameters:
 		- '#Class Symfony\\Component\\Serializer\\Normalizer\\CacheableSupportsMethodInterface not found\.#'
 		- '#Access to undefined constant Symfony\\Component\\HttpKernel\\HttpKernelInterface::MASTER_REQUEST\.#'
 		- '#Attribute class PHPUnit\\Framework\\Attributes\\DataProvider does not exist.#'
-		# Because of a bc-layer in MetadataAwareNameConverter it does not implement AdvancedNameConverterInterface
