@@ -34,7 +34,7 @@ final class PropertyInfoToTypeInfoHelper
     /**
      * Converts a {@see LegacyType} to what is should have been in the "symfony/type-info" component.
      *
-     * @param list<LegacyType>|null $types
+     * @param list<LegacyType>|null $legacyTypes
      */
     public static function convertLegacyTypesToType(?array $legacyTypes): ?Type
     {
@@ -92,7 +92,7 @@ final class PropertyInfoToTypeInfoHelper
 
         if ($collectionValueTypes) {
             if (!$collectionKeyTypes) {
-                $variableTypes[] = [] === $collectionKeyTypes ? Type::mixed() : Type::union(Type::int(), Type::string());
+                $variableTypes[] = \is_array($collectionKeyTypes) ? Type::mixed() : Type::union(Type::int(), Type::string()); // @phpstan-ignore-line
             }
 
             $collectionValueTypes = array_unique(array_map(self::convertLegacyTypeToType(...), $collectionValueTypes));
