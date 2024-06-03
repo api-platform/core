@@ -11,3 +11,5 @@
 %The "Symfony\\Bundle\\MakerBundle\\Maker\\MakeAuthenticator" class is deprecated, use any of the Security\\Make\* commands instead%
 # We don't care as we use this in our tests and the default value is just fine
 %Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".%
+# https://github.com/FriendsOfBehat/SymfonyExtension/pull/212
+%The "Symfony\\Component\\HttpKernel\\DependencyInjection\\Extension" class is considered internal since Symfony 7.1, to be deprecated in 8.1; use Symfony\\Component\\DependencyInjection\\Extension\\Extension instead. It may change without further notice. You should not use it from "FriendsOfBehat\\SymfonyExtension\\Bundle\\DependencyInjection\\FriendsOfBehatSymfonyExtensionExtension".%

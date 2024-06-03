@@ -10,8 +10,6 @@
     <server name="KERNEL_DIR" value="tests/Fixtures/app/"/>
     <server name="KERNEL_CLASS" value="AppKernel"/>
     <env name="APP_ENV" value="test"/>
-    <!-- to remove behat extensions in the AppKernel -->
-    <env name="APP_PHPUNIT" value="true"/>
   </php>
 
   <testsuites>
