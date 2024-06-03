@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Tests\Provider;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
@@ -48,5 +49,16 @@ class ReadProviderTest extends TestCase
         $request = new Request();
         $provider->provide($operation, ['id' => 1], ['request' => $request]);
         $this->assertEquals($data, $request->attributes->get('data'));
+    }
+
+    public function testWithoutRequest(): void
+    {
+        $operation = new GetCollection(read: true);
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->method('provide')->willReturn(['ok']);
+        $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
+
+        $readProvider = new ReadProvider($provider, $serializerContextBuilder);
+        $this->assertEquals($readProvider->provide($operation), ['ok']);
     }
 }
