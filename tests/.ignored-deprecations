@@ -9,3 +9,5 @@
 %Do the same.*Doctrine\\Bundle\\MongoDBBundle%
 
 %The "Symfony\\Bundle\\MakerBundle\\Maker\\MakeAuthenticator" class is deprecated, use any of the Security\\Make\* commands instead%
+# We don't care as we use this in our tests and the default value is just fine
+%Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".%

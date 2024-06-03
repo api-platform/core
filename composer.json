@@ -150,7 +150,8 @@
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "phpstan/extension-installer": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "soyuka/pmu": true
         }
     },
     "extra": {
