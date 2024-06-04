@@ -95,7 +95,6 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                             priority: 4,
                             status: 301,
                             provider: AttributeResourceProvider::class,
-                            // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
                             processor: [AttributeResourceProcessor::class, 'process']
                         ),
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}{._format}_patch' => new Patch(
@@ -106,14 +105,12 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                             priority: 5,
                             status: 301,
                             provider: AttributeResourceProvider::class,
-                            // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
                             processor: [AttributeResourceProcessor::class, 'process']
                         ),
                     ],
                     inputFormats: ['json' => ['application/merge-patch+json']],
                     status: 301,
                     provider: AttributeResourceProvider::class,
-                    // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
                     processor: [AttributeResourceProcessor::class, 'process']
                 ),
             ]),
