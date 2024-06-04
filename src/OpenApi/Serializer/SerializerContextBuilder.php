@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Serializer;
 
-use ApiPlatform\State\SerializerContextBuilderInterface;
+use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
