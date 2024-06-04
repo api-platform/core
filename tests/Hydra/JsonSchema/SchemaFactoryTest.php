@@ -188,9 +188,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
-        // @noRector
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
-        // @noRector
         $this->assertTrue(isset($definitions[$rootDefinitionKey]['required']));
         $requiredProperties = $resultSchema['definitions'][$rootDefinitionKey]['required'];
         $this->assertContains('@context', $requiredProperties);
@@ -201,9 +199,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $itemsDefinitionKey = array_key_first($definitions->getArrayCopy());
 
-        // @noRector
         $this->assertTrue(isset($definitions[$itemsDefinitionKey]));
-        // @noRector
         $this->assertTrue(isset($definitions[$itemsDefinitionKey]['required']));
         $requiredProperties = $resultSchema['definitions'][$itemsDefinitionKey]['required'];
         $this->assertNotContains('@context', $requiredProperties);
@@ -214,9 +210,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $itemsDefinitionKey = array_key_first($definitions->getArrayCopy());
 
-        // @noRector
         $this->assertTrue(isset($definitions[$itemsDefinitionKey]));
-        // @noRector
         $this->assertFalse(isset($definitions[$itemsDefinitionKey]['required']));
     }
 }
