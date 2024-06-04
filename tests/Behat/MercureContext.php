@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Behat;
 
+use ApiPlatform\Tests\Fixtures\TestBundle\Mercure\TestHub;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
@@ -37,7 +38,7 @@ final class MercureContext implements Context
      */
     public function mercureUpdatesShouldHaveBeenSent(int $number): void
     {
-        $updateHandler = $this->driverContainer->get('mercure.hub.default.message_handler');
+        $updateHandler = $this->getMercureTestHub();
         $total = \count($updateHandler->getUpdates());
 
         if (0 === $total) {
@@ -70,7 +71,7 @@ final class MercureContext implements Context
      */
     public function mercureUpdateShouldHaveTopics(int $index, TableNode $table): void
     {
-        $updateHandler = $this->driverContainer->get('mercure.hub.default.message_handler');
+        $updateHandler = $this->getMercureTestHub();
         $updates = $updateHandler->getUpdates();
 
         if (0 === \count($updates)) {
@@ -90,7 +91,7 @@ final class MercureContext implements Context
      */
     public function mercureUpdateShouldHaveData(int $index, PyStringNode $data): void
     {
-        $updateHandler = $this->driverContainer->get('mercure.hub.default.message_handler');
+        $updateHandler = $this->getMercureTestHub();
         $updates = $updateHandler->getUpdates();
 
         if (0 === \count($updates)) {
@@ -113,8 +114,7 @@ final class MercureContext implements Context
         $topics = explode(',', $topics);
         $update = json_decode($update->getRaw(), true, 512, \JSON_THROW_ON_ERROR);
 
-        $updateHandler = $this->driverContainer->get('mercure.hub.default.message_handler');
-
+        $updateHandler = $this->getMercureTestHub();
         foreach ($updateHandler->getUpdates() as $sentUpdate) {
             $toMatchTopics = \count($topics);
             foreach ($sentUpdate->getTopics() as $sentTopic) {
@@ -135,5 +135,10 @@ final class MercureContext implements Context
         }
 
         throw new \RuntimeException('Mercure update has not been sent.');
+    }
+
+    private function getMercureTestHub(): TestHub
+    {
+        return $this->driverContainer->get('mercure.hub.default.test_hub');
     }
 }
