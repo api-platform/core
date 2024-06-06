@@ -42,6 +42,7 @@ class ApiPlatformExtensionTest extends TestCase
         'title' => 'title',
         'description' => 'description',
         'version' => 'version',
+        'serializer' => ['hydra_prefix' => true],
         'formats' => [
             'json' => ['mime_types' => ['json']],
             'jsonld' => ['mime_types' => ['application/ld+json']],

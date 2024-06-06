@@ -231,6 +231,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         // TODO: remove in 4.x
         $container->setParameter('api_platform.event_listeners_backward_compatibility_layer', $config['event_listeners_backward_compatibility_layer']);
 
+        $defaultContext = ['hydra_prefix' => $config['serializer']['hydra_prefix']] + ($container->hasParameter('serializer.default_context') ? $container->getParameter('serializer.default_context') : []);
+
+        if (null === $defaultContext['hydra_prefix']) {
+            trigger_deprecation('api-platform/core', '3.3', 'The hydra: prefix will be removed in 4.0 by default, set "api_platform.serializer" or "serializer.default_context" to "hydra_prefix: true" to keep the current behavior.');
+            $defaultContext['hydra_prefix'] = true;
+        }
+
+        $container->setParameter('api_platform.serializer.default_context', $defaultContext);
+        if (!$container->hasParameter('serializer.default_context')) {
+            $container->setParameter('serializer.default_context', $container->getParameter('api_platform.serializer.default_context'));
+        }
+
         if ($config['event_listeners_backward_compatibility_layer']) {
             trigger_deprecation('api-platform/core', '3.3', \sprintf('The "event_listeners_backward_compatibility_layer" will be removed in 4.0. Use the configuration "use_symfony_listeners" to use Symfony listeners. The following listeners are deprecated and will be removed in API Platform 4.0: "%s"', implode(', ', [
                 AddHeadersListener::class,

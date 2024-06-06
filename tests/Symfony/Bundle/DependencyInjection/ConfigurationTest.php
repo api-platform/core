@@ -234,6 +234,9 @@ class ConfigurationTest extends TestCase
             'use_deprecated_json_schema_type_factory' => null,
             'handle_symfony_errors' => false,
             'enable_link_security' => false,
+            'serializer' => [
+                'hydra_prefix' => null,
+            ],
         ], $config);
     }
 
