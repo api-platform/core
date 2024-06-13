@@ -15,7 +15,7 @@ namespace App\Validator {
     #[\Attribute]
     class AssertCanDelete extends Constraint
     {
-        public string $message = 'For whatever reason we denied removeal of this data.';
+        public string $message = 'For whatever reason we denied removal of this data.';
         public string $mode = 'strict';
 
         public function getTargets(): string
