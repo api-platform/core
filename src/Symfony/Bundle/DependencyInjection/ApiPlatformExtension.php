@@ -536,7 +536,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('symfony/swagger_ui.xml');
         }
 
-        $loader->load('state/swagger_ui.xml');
+        if ($config['enable_swagger_ui']) {
+            $loader->load('state/swagger_ui.xml');
+        }
 
         if (!$config['enable_swagger_ui'] && !$config['enable_re_doc']) {
             // Remove the listener but keep the controller to allow customizing the path of the UI
