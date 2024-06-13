@@ -6,5 +6,12 @@
             <argument type="service" id="api_platform.graphql.state_provider.validate.inner" />
             <argument type="service" id="api_platform.validator" />
         </service>
+
+        <!-- see api_platform.graphql.state_provider.resolver and discussion at https://github.com/api-platform/core/issues/6354 this validates after resolver has been called -->
+        <service id="api_platform.graphql.state_provider.validate_after_resolver" class="ApiPlatform\Symfony\Validator\State\ValidateProvider" decorates="api_platform.graphql.state_provider" decoration-priority="180">
+            <argument type="service" id="api_platform.graphql.state_provider.validate_after_resolver.inner" />
+            <argument type="service" id="api_platform.validator" />
+            <argument>canValidateAfterResolver</argument>
+        </service>
     </services>
 </container>

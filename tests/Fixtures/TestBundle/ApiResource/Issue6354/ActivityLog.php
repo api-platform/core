@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6354;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\Operation;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -28,6 +29,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     graphQlOperations: [
         new DeleteMutation(
             name: 'delete'
+        ),
+        new Mutation(
+            resolver: 'app.graphql.mutation_resolver.activity_log',
+            name: 'create',
+            validateAfterResolver: true,
+            validate: false
         ),
     ]
 )]
