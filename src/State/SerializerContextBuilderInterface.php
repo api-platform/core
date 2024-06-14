@@ -48,7 +48,8 @@ interface SerializerContextBuilderInterface
      *   deep_object_to_populate?: bool,
      *   collect_denormalization_errors?: bool,
      *   exclude_from_cache_key?: string[],
-     *   api_included?: bool
+     *   api_included?: bool,
+     *   deserializer_type?: bool,
      * }
      */
     public function createFromRequest(Request $request, bool $normalization, ?array $extractedAttributes = null): array;
