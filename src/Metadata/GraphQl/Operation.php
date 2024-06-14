@@ -40,6 +40,7 @@ class Operation extends AbstractOperation
         protected ?array $args = null,
         protected ?array $extraArgs = null,
         protected ?array $links = null,
+        protected ?bool $validateAfterResolver = null,
 
         ?string $shortName = null,
         ?string $class = null,
@@ -192,6 +193,19 @@ class Operation extends AbstractOperation
     {
         $self = clone $this;
         $self->links = $links;
+
+        return $self;
+    }
+
+    public function canValidateAfterResolver(): ?bool
+    {
+        return $this->validateAfterResolver;
+    }
+
+    public function withValidateAfterResolver(bool $validateAfterResolver = true): self
+    {
+        $self = clone $this;
+        $self->validateAfterResolver = $validateAfterResolver;
 
         return $self;
     }
