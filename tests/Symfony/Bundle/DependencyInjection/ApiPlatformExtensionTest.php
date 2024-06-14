@@ -507,6 +507,16 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.swagger.listener.ui', ['kernel.event_listener']);
     }
 
+    public function testSwaggerUiDisabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_swagger_ui'] = false;
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertNotContainerHasService('api_platform.swagger_ui.provider');
+    }
+
     public function testJsonApiConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;

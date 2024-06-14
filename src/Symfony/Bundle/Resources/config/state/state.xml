@@ -59,5 +59,7 @@
             <argument type="service" id="api_platform.state_provider.parameter.inner" />
             <argument type="tagged_locator" tag="api_platform.parameter_provider" index-by="key" />
         </service>
+
+        <service id="ApiPlatform\State\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
     </services>
 </container>
