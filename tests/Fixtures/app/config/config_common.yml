@@ -27,6 +27,9 @@ mercure:
         default:
             url: '%env(MERCURE_URL)%'
             jwt: '%env(MERCURE_JWT_SECRET)%'
+        debug:
+            url: '%env(MERCURE_URL)%'
+            jwt: '%env(MERCURE_JWT_SECRET)%'
 
 api_platform:
     title:                             'My Dummy API'
@@ -252,11 +255,12 @@ services:
         tags:
             - name: 'api_platform.validation_groups_generator'
 
-    mercure.hub.default.message_handler:
-        class: ApiPlatform\Tests\Fixtures\DummyMercureUpdateHandler
+    mercure.hub.default.test_hub:
+        class: ApiPlatform\Tests\Fixtures\TestBundle\Mercure\TestHub
+        arguments:
+           $hub: '@mercure.hub.debug'
         public: true
-        tags: ['messenger.message_handler']
-    mercure.hub.default.publisher: '@mercure.hub.default.message_handler'
+    mercure.hub.default: '@mercure.hub.default.test_hub'
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\RecoverPasswordProcessor: 
         tags:
@@ -455,3 +459,8 @@ services:
         tags:
             - name: 'api_platform.parameter_provider'
               key: 'ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider'
+
+    app.graphql.mutation_resolver.activity_log:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6354\CreateActivityLogResolver'
+        tags:
+            - name: 'api_platform.graphql.resolver'

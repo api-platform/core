@@ -75,7 +75,7 @@ namespace App\Playground {
     function request(): Request
     {
         // Persistence is automatic, you can try to create or read data:
-        return Request::create('/company/1/employees', 'GET');
+        return Request::create('/companies/1/employees', 'GET');
     }
 }
 

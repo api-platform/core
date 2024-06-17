@@ -1,5 +1,28 @@
 # Changelog
 
+## v3.3.6
+
+### Bug fixes
+
+* [8e253d4d7](https://github.com/api-platform/core/commit/8e253d4d76c25c27c233b3cf4fd2314b13c1e193) fix(graphql): validate after resolver (#6426)
+* [d66769069](https://github.com/api-platform/core/commit/d66769069fda051e4ddc7be50764c3f34d055ad0) fix(symfony): load swagger_ui when enabled (#6424)
+* [e06c88b71](https://github.com/api-platform/core/commit/e06c88b7149da4e5b691d432f11ec3d27e41750a) fix(metadata): add some phpdoc annotations to ORM (#6387)
+* [fb7c4658c](https://github.com/api-platform/core/commit/fb7c4658c327c9628bcc86d42e85c3546a74d993) fix(test): canonicalizing json arrays (#6386)
+* [ff533565d](https://github.com/api-platform/core/commit/ff533565d9b976fcda818ab4f79a5a2642f14a32) fix(doctrine): use null-safe operator when retrieving parameters (#6423)
+
+Notes:
+
+The patch at #6426 introduces a new `validateAfterResolver` option to mitigate the BC-break introduced in 3.3 that does the validation before calling the resolver:
+
+```php
+new Mutation(
+    resolver: 'app.graphql.mutation_resolver.activity_log',
+    name: 'create',
+    validateAfterResolver: true,
+    validate: false
+)
+```
+
 ## v3.3.5
 
 ### Bug fixes
@@ -35,7 +58,7 @@
 
 ### Notes
 
-You can remove the `event_listeners_backward_compatibility_layer` flag and set `use_symfony_listeners` instead. The `use_symfony_listeners` should be `true` if you use controllers or if you rely on Symfony event listeners. Note that now flags like `read` can be forced to `true` if you want to call a Provider even on `POST` operations. These are the rules we set up on runtime if no value has been set: 
+You can remove the `event_listeners_backward_compatibility_layer` flag and set `use_symfony_listeners` instead. The `use_symfony_listeners` should be `true` if you use controllers or if you rely on Symfony event listeners. Note that now flags like `read` can be forced to `true` if you want to call a Provider even on `POST` operations. These are the rules we set up on runtime if no value has been set:
 
 ```php
 if (null === $operation->canValidate()) {
@@ -51,7 +74,7 @@ if (null === $operation->canDeserialize()) {
 }
 ```
 
-Previously listeners did the checks before reading our flags and you could not force the values. 
+Previously listeners did the checks before reading our flags and you could not force the values.
 
 When using GraphQl, with `event_listeners_backward_compatibility_layer: true`, mutation resolver gets called before validation, when using `false` (the future default) validation occurs on the user's input.
 
@@ -155,7 +178,7 @@ The v3.3.0-beta.1 introduces a new `QueryParameter` attribute to improve [the fi
 * [cc9f6a518](https://github.com/api-platform/core/commit/cc9f6a518222598d20556fc1ec62b7c4be52bf52) feat(symfony): request and view kernel listeners (#6102)
 * [ce9ab8226](https://github.com/api-platform/core/commit/ce9ab8226934bfac45e3408e9468bf32a02aa2e9) feat(metadata): headers configuration (#6074)
 
-Components: 
+Components:
   - `api-platform/parametervalidator`
   - `api-platform/doctrine-common`
   - `api-platform/doctrine-orm`
@@ -164,7 +187,7 @@ Components:
 A new interface `ApiPlatform\Serializer\TagCollectorInterface` allows to collect cache tags (IRIs) during serialization instead of using API Platform defaults.
 An experimental feature (#5290) gives the ability to use `security` on sub resource links.
 
-If you use controllers you should use: 
+If you use controllers you should use:
 
 ```yaml
 api_platform:
@@ -181,7 +204,7 @@ The default is `false` you can get rid of the `event_listeners_backward_compatib
 class Book {}
 ```
 
-These namespaces are deprecated: 
+These namespaces are deprecated:
 
 - `ApiPlatform\Api`
 - `ApiPlatform\Exception`
@@ -199,6 +222,14 @@ api_platform:
         jsonld: ['application/ld+json']
         form: ['multipart/form-data']
 ```
+
+## v3.2.24
+
+### Bug fixes
+
+* [451d50e53](https://github.com/api-platform/core/commit/451d50e538a4f7aac67d47601fee5474af99c870) fix(symfony): deprecations 7.1
+* [93e71eb82](https://github.com/api-platform/core/commit/93e71eb822aa06db2b6de303039f9b8c65cad7a8) fix(graphql): name converter with class (#6396)
+* [99314bf80](https://github.com/api-platform/core/commit/99314bf80e7c61147fb311da6403b37be5eab5b2) fix(state): handle empty request in read provider (#6403)
 
 ## v3.2.23
 
@@ -361,7 +392,7 @@ Symfony 7 support.
 
 ### Bug fixes
 
-To have errors backward compatible with 3.1, use: 
+To have errors backward compatible with 3.1, use:
 
 ```yaml
 api_platform:
