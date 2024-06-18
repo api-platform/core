@@ -38,6 +38,7 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\State\ApiResource\Error;
+use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\EventListener\AddHeadersListener;
@@ -202,6 +203,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.state_processor');
         $container->registerForAutoconfiguration(UriVariableTransformerInterface::class)
             ->addTag('api_platform.uri_variables.transformer');
+        $container->registerForAutoconfiguration(ParameterProviderInterface::class)
+            ->addTag('api_platform.parameter_provider');
 
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
