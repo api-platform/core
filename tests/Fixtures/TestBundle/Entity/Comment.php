@@ -27,7 +27,7 @@ class Comment
     private $id;
     #[ORM\Column(type: 'text')]
     public $comment;
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     public $date;
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
