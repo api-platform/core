@@ -22,7 +22,7 @@ use ApiPlatform\Metadata\GetCollection;
 #[Get(provider: AvailabilityStatus::class.'::getCase')]
 enum AvailabilityStatus: string
 {
-    use BackedEnumTrait;
+    use BackedEnumStringTrait;
 
     case Pending = 'pending';
     case Reviewed = 'reviewed';

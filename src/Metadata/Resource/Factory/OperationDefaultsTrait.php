@@ -88,6 +88,10 @@ trait OperationDefaultsTrait
 
     private function getDefaultHttpOperations($resource): iterable
     {
+        if (enum_exists($resource->getClass())) {
+            return new Operations([new GetCollection(paginationEnabled: false), new Get()]);
+        }
+
         if (($defaultOperations = $this->defaults['operations'] ?? null) && null === $resource->getOperations()) {
             $operations = [];
 
@@ -108,8 +112,9 @@ trait OperationDefaultsTrait
 
     private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource
     {
+        $operations = enum_exists($resource->getClass()) ? [new QueryCollection(paginationEnabled: false), new Query()] : [new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')];
         $graphQlOperations = [];
-        foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $operation) {
+        foreach ($operations as $operation) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
             $graphQlOperations[$key] = $operation;
         }

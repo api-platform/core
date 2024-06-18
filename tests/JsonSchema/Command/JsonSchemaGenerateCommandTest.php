@@ -269,4 +269,67 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->assertArrayHasKey('kingdom', $properties['attributes']['properties']);
         $this->assertArrayHasKey('phylum', $properties['attributes']['properties']);
     }
+
+    /**
+     * Test issue #6317.
+     */
+    public function testBackedEnumExamplesAreNotLost(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317', '--type' => 'output', '--format' => 'jsonld']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+        $properties = $json['definitions']['Issue6317.jsonld']['properties'];
+
+        $this->assertArrayHasKey('example', $properties['id']);
+        $this->assertArrayHasKey('example', $properties['name']);
+        // jsonldContext
+        $this->assertArrayNotHasKey('example', $properties['ordinal']);
+        // openapiContext
+        $this->assertArrayNotHasKey('example', $properties['cardinal']);
+    }
+
+    public function testResourceWithEnumPropertiesSchema(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty', '--type' => 'output', '--format' => 'jsonld']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+        $properties = $json['definitions']['ResourceWithEnumProperty.jsonld']['properties'];
+
+        $this->assertSame(
+            [
+                'type' => ['string', 'null'],
+                'format' => 'iri-reference',
+                'example' => 'https://example.com/',
+            ],
+            $properties['intEnum']
+        );
+        $this->assertSame(
+            [
+                'type' => 'array',
+                'items' => [
+                    'type' => 'string',
+                    'format' => 'iri-reference',
+                    'example' => 'https://example.com/',
+                ],
+            ],
+            $properties['stringEnum']
+        );
+        $this->assertSame(
+            [
+                'type' => ['string', 'null'],
+                'enum' => ['male', 'female', null],
+            ],
+            $properties['gender']
+        );
+        $this->assertSame(
+            [
+                'type' => 'array',
+                'items' => [
+                    'type' => 'string',
+                    'enum' => ['male', 'female'],
+                ],
+            ],
+            $properties['genders']
+        );
+    }
 }

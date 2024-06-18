@@ -117,6 +117,28 @@ YAML;
         @unlink($tmpFile);
     }
 
+    /**
+     * Test issue #6317.
+     */
+    public function testBackedEnumExamplesAreNotLost(): void
+    {
+        $this->tester->run(['command' => 'api:openapi:export']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
+
+        $assertExample = function (array $properties, string $id): void {
+            $this->assertArrayHasKey('example', $properties[$id]);          // default
+            $this->assertArrayHasKey('example', $properties['cardinal']);   // openapiContext
+            $this->assertArrayNotHasKey('example', $properties['name']);    // jsonSchemaContext
+            $this->assertArrayNotHasKey('example', $properties['ordinal']); // jsonldContext
+        };
+
+        $assertExample($json['components']['schemas']['Issue6317']['properties'], 'id');
+        $assertExample($json['components']['schemas']['Issue6317.jsonld']['properties'], 'id');
+        $assertExample($json['components']['schemas']['Issue6317.jsonapi']['properties']['data']['properties']['attributes']['properties'], '_id');
+        $assertExample($json['components']['schemas']['Issue6317.jsonhal']['properties'], 'id');
+    }
+
     private function assertYaml(string $data): void
     {
         try {

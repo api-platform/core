@@ -59,6 +59,9 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
 
         $link = (new Link())->withFromClass($resourceClass)->withIdentifiers($identifiers);
         $parameterName = $identifiers[0];
+        if ('value' === $parameterName && enum_exists($resourceClass)) {
+            $parameterName = 'id';
+        }
 
         if (1 < \count($identifiers)) {
             $parameterName = 'id';
@@ -153,6 +156,10 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
 
         if ($hasIdProperty && !$identifiers) {
             return ['id'];
+        }
+
+        if (!$hasIdProperty && !$identifiers && enum_exists($resourceClass)) {
+            return ['value'];
         }
 
         return $identifiers;

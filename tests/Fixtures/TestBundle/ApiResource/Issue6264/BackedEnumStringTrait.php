@@ -16,20 +16,20 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6264;
 use ApiPlatform\Metadata\Operation;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-trait BackedEnumTrait
+trait BackedEnumStringTrait
 {
     public static function values(): array
     {
         return array_map(static fn (\BackedEnum $feature) => $feature->value, self::cases());
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->value;
     }
 
     #[Groups(['get'])]
-    public function getValue(): int
+    public function getValue(): string
     {
         return $this->value;
     }

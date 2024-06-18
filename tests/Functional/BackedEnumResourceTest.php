@@ -13,7 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumIntegerResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumStringResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6264\Availability;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6264\AvailabilityStatus;
 use Symfony\Component\HttpClient\HttpOptions;
@@ -89,49 +94,6 @@ final class BackedEnumResourceTest extends ApiTestCase
     public function testItemJson(string $uri, string $mimeType, array $expected): void
     {
         self::createClient()->request('GET', $uri, ['headers' => ['Accept' => $mimeType]]);
-
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonEquals($expected);
-    }
-
-    public static function providerEnumItemsGraphQl(): iterable
-    {
-        // Integer cases
-        $query = <<<'GRAPHQL'
-query GetAvailability($identifier: ID!) {
-    availability(id: $identifier) {
-        value
-    }
-}
-GRAPHQL;
-        foreach (Availability::cases() as $case) {
-            yield [$query, ['identifier' => '/availabilities/'.$case->value], ['data' => ['availability' => ['value' => $case->value]]]];
-        }
-
-        // String cases
-        $query = <<<'GRAPHQL'
-query GetAvailabilityStatus($identifier: ID!) {
-    availabilityStatus(id: $identifier) {
-        value
-    }
-}
-GRAPHQL;
-        foreach (AvailabilityStatus::cases() as $case) {
-            yield [$query, ['identifier' => '/availability_statuses/'.$case->value], ['data' => ['availability_status' => ['value' => $case->value]]]];
-        }
-    }
-
-    /**
-     * @dataProvider providerEnumItemsGraphQl
-     *
-     * @group legacy
-     */
-    public function testItemGraphql(string $query, array $variables, array $expected): void
-    {
-        $options = (new HttpOptions())
-            ->setJson(['query' => $query, 'variables' => $variables])
-            ->setHeaders(['Content-Type' => 'application/json']);
-        self::createClient()->request('POST', '/graphql', $options->toArray());
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonEquals($expected);
@@ -254,6 +216,359 @@ GRAPHQL;
                     '@id' => '/availabilities/200',
                     '@type' => 'Availability',
                     'value' => 200,
+                ],
+            ],
+        ]);
+    }
+
+    public static function providerEnums(): iterable
+    {
+        yield 'Int enum collection' => [BackedEnumIntegerResource::class, GetCollection::class, '_api_/backed_enum_integer_resources{._format}_get_collection'];
+        yield 'Int enum item' => [BackedEnumIntegerResource::class, Get::class, '_api_/backed_enum_integer_resources/{id}{._format}_get'];
+
+        yield 'String enum collection' => [BackedEnumStringResource::class, GetCollection::class, '_api_/backed_enum_string_resources{._format}_get_collection'];
+        yield 'String enum item' => [BackedEnumStringResource::class, Get::class, '_api_/backed_enum_string_resources/{id}{._format}_get'];
+    }
+
+    /** @dataProvider providerEnums */
+    public function testOnlyGetOperationsAddedWhenNonSpecified(string $resourceClass, string $operationClass, string $operationName): void
+    {
+        $factory = self::getContainer()->get('api_platform.metadata.resource.metadata_collection_factory');
+        $resourceMetadata = $factory->create($resourceClass);
+
+        $this->assertCount(1, $resourceMetadata);
+        $resource = $resourceMetadata[0];
+        $operations = iterator_to_array($resource->getOperations());
+        $this->assertCount(2, $operations);
+
+        $this->assertInstanceOf($operationClass, $operations[$operationName]);
+    }
+
+    public function testEnumsAreAssignedValuePropertyAsIdentifierByDefault(): void
+    {
+        $linkFactory = self::getContainer()->get('api_platform.metadata.resource.link_factory');
+        $result = $linkFactory->completeLink(new Link(fromClass: BackedEnumIntegerResource::class));
+        $identifiers = $result->getIdentifiers();
+
+        $this->assertCount(1, $identifiers);
+        $this->assertNotContains('id', $identifiers);
+        $this->assertContains('value', $identifiers);
+    }
+
+    public static function providerCollection(): iterable
+    {
+        yield 'JSON' => ['application/json', [
+            [
+                'name' => 'Yes',
+                'value' => 1,
+                'description' => 'We say yes',
+            ],
+            [
+                'name' => 'No',
+                'value' => 2,
+                'description' => 'Computer says no',
+            ],
+            [
+                'name' => 'Maybe',
+                'value' => 3,
+                'description' => 'Let me think about it',
+            ],
+        ]];
+
+        yield 'JSON:API' => ['application/vnd.api+json',  [
+            'links' => [
+                'self' => '/backed_enum_integer_resources',
+            ],
+            'meta' => [
+                'totalItems' => 3,
+            ],
+            'data' => [
+                [
+                    'id' => '/backed_enum_integer_resources/1',
+                    'type' => 'BackedEnumIntegerResource',
+                    'attributes' => [
+                        'name' => 'Yes',
+                        'value' => 1,
+                        'description' => 'We say yes',
+                    ],
+                ],
+                [
+                    'id' => '/backed_enum_integer_resources/2',
+                    'type' => 'BackedEnumIntegerResource',
+                    'attributes' => [
+                        'name' => 'No',
+                        'value' => 2,
+                        'description' => 'Computer says no',
+                    ],
+                ],
+                [
+                    'id' => '/backed_enum_integer_resources/3',
+                    'type' => 'BackedEnumIntegerResource',
+                    'attributes' => [
+                        'name' => 'Maybe',
+                        'value' => 3,
+                        'description' => 'Let me think about it',
+                    ],
+                ],
+            ],
+        ]];
+
+        yield 'LD+JSON' => ['application/ld+json', [
+            '@context' => '/contexts/BackedEnumIntegerResource',
+            '@id' => '/backed_enum_integer_resources',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 3,
+            'hydra:member' => [
+                [
+                    '@id' => '/backed_enum_integer_resources/1',
+                    '@type' => 'BackedEnumIntegerResource',
+                    'name' => 'Yes',
+                    'value' => 1,
+                    'description' => 'We say yes',
+                ],
+                [
+                    '@id' => '/backed_enum_integer_resources/2',
+                    '@type' => 'BackedEnumIntegerResource',
+                    'name' => 'No',
+                    'value' => 2,
+                    'description' => 'Computer says no',
+                ],
+                [
+                    '@id' => '/backed_enum_integer_resources/3',
+                    '@type' => 'BackedEnumIntegerResource',
+                    'name' => 'Maybe',
+                    'value' => 3,
+                    'description' => 'Let me think about it',
+                ],
+            ],
+        ]];
+
+        yield 'HAL+JSON' => ['application/hal+json',  [
+            '_links' => [
+                'self' => [
+                    'href' => '/backed_enum_integer_resources',
+                ],
+                'item' => [
+                    [
+                        'href' => '/backed_enum_integer_resources/1',
+                    ],
+                    [
+                        'href' => '/backed_enum_integer_resources/2',
+                    ],
+                    [
+                        'href' => '/backed_enum_integer_resources/3',
+                    ],
+                ],
+            ],
+            'totalItems' => 3,
+            '_embedded' => [
+                'item' => [
+                    [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/backed_enum_integer_resources/1',
+                            ],
+                        ],
+                        'name' => 'Yes',
+                        'value' => 1,
+                        'description' => 'We say yes',
+                    ],
+                    [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/backed_enum_integer_resources/2',
+                            ],
+                        ],
+                        'name' => 'No',
+                        'value' => 2,
+                        'description' => 'Computer says no',
+                    ],
+                    [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/backed_enum_integer_resources/3',
+                            ],
+                        ],
+                        'name' => 'Maybe',
+                        'value' => 3,
+                        'description' => 'Let me think about it',
+                    ],
+                ],
+            ],
+        ]];
+    }
+
+    /** @dataProvider providerCollection */
+    public function testCollection(string $mimeType, array $expected): void
+    {
+        self::createClient()->request('GET', '/backed_enum_integer_resources', ['headers' => ['Accept' => $mimeType]]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonEquals($expected);
+    }
+
+    public static function providerItem(): iterable
+    {
+        yield 'JSON' => ['application/json', [
+            'name' => 'Yes',
+            'value' => 1,
+            'description' => 'We say yes',
+        ]];
+
+        yield 'JSON:API' => ['application/vnd.api+json',  [
+            'data' => [
+                'id' => '/backed_enum_integer_resources/1',
+                'type' => 'BackedEnumIntegerResource',
+                'attributes' => [
+                    'name' => 'Yes',
+                    'value' => 1,
+                    'description' => 'We say yes',
+                ],
+            ],
+        ]];
+
+        yield 'JSON:HAL' => ['application/hal+json',  [
+            '_links' => [
+                'self' => [
+                    'href' => '/backed_enum_integer_resources/1',
+                ],
+            ],
+            'name' => 'Yes',
+            'value' => 1,
+            'description' => 'We say yes',
+        ]];
+
+        yield 'LD+JSON' => ['application/ld+json',  [
+            '@context' => '/contexts/BackedEnumIntegerResource',
+            '@id' => '/backed_enum_integer_resources/1',
+            '@type' => 'BackedEnumIntegerResource',
+            'name' => 'Yes',
+            'value' => 1,
+            'description' => 'We say yes',
+        ]];
+    }
+
+    /** @dataProvider providerItem */
+    public function testItem(string $mimeType, array $expected): void
+    {
+        self::createClient()->request('GET', '/backed_enum_integer_resources/1', ['headers' => ['Accept' => $mimeType]]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonEquals($expected);
+    }
+
+    public static function provider404s(): iterable
+    {
+        yield ['/backed_enum_integer_resources/42'];
+        yield ['/backed_enum_integer_resources/fortytwo'];
+    }
+
+    /** @dataProvider provider404s */
+    public function testItem404(string $uri): void
+    {
+        self::createClient()->request('GET', $uri);
+
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public static function providerEnumItemsGraphQl(): iterable
+    {
+        // Integer cases
+        $query = <<<'GRAPHQL'
+query GetAvailability($identifier: ID!) {
+    availability(id: $identifier) {
+        value
+    }
+}
+GRAPHQL;
+        foreach (Availability::cases() as $case) {
+            yield [$query, ['identifier' => '/availabilities/'.$case->value], ['data' => ['availability' => ['value' => $case->value]]]];
+        }
+
+        // String cases
+        $query = <<<'GRAPHQL'
+query GetAvailabilityStatus($identifier: ID!) {
+    availabilityStatus(id: $identifier) {
+        value
+    }
+}
+GRAPHQL;
+        foreach (AvailabilityStatus::cases() as $case) {
+            yield [$query, ['identifier' => '/availability_statuses/'.$case->value], ['data' => ['availabilityStatus' => ['value' => $case->value]]]];
+        }
+    }
+
+    /**
+     * @dataProvider providerEnumItemsGraphQl
+     *
+     * @group legacy
+     */
+    public function testItemGraphql(string $query, array $variables, array $expected): void
+    {
+        $options = (new HttpOptions())
+            ->setJson(['query' => $query, 'variables' => $variables])
+            ->setHeaders(['Content-Type' => 'application/json']);
+        self::createClient()->request('POST', '/graphql', $options->toArray());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonEquals($expected);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCollectionGraphQl(): void
+    {
+        $query = <<<'GRAPHQL'
+query {
+  backedEnumIntegerResources {
+    value
+  }
+}
+GRAPHQL;
+        $options = (new HttpOptions())
+            ->setJson(['query' => $query, 'variables' => []])
+            ->setHeaders(['Content-Type' => 'application/json']);
+        self::createClient()->request('POST', '/graphql', $options->toArray());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonEquals([
+            'data' => [
+                'backedEnumIntegerResources' => [
+                    ['value' => 1],
+                    ['value' => 2],
+                    ['value' => 3],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testItemGraphQlInteger(): void
+    {
+        $query = <<<'GRAPHQL'
+query GetBackedEnumIntegerResource($identifier: ID!) {
+    backedEnumIntegerResource(id: $identifier) {
+        name
+        value
+        description
+    }
+}
+GRAPHQL;
+        $options = (new HttpOptions())
+            ->setJson(['query' => $query, 'variables' => ['identifier' => '/backed_enum_integer_resources/1']])
+            ->setHeaders(['Content-Type' => 'application/json']);
+        self::createClient()->request('POST', '/graphql', $options->toArray());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonEquals([
+            'data' => [
+                'backedEnumIntegerResource' => [
+                    'description' => 'We say yes',
+                    'name' => 'Yes',
+                    'value' => 1,
                 ],
             ],
         ]);
