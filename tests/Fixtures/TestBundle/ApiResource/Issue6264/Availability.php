@@ -16,10 +16,20 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6264;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 
-#[ApiResource(normalizationContext: ['groups' => ['get']])]
-#[GetCollection(provider: Availability::class.'::getCases')]
-#[Get(provider: Availability::class.'::getCase')]
+#[ApiResource(
+    normalizationContext: ['groups' => ['get']],
+        operations: [
+            new GetCollection(provider: Availability::class.'::getCases'),
+            new Get(provider: Availability::class.'::getCase')
+        ],
+        graphQlOperations: [
+            new Query(),
+            new QueryCollection(),
+        ]
+)]
 enum Availability: int
 {
     use BackedEnumTrait;

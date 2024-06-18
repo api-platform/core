@@ -14,21 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class BackedEnumProvider implements ProviderInterface
 {
-    public function __construct(private ProviderInterface $decorated)
-    {
-    }
-
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $resourceClass = $operation->getClass();
         if (!$resourceClass || !is_a($resourceClass, \BackedEnum::class, true)) {
-            return $this->decorated->provide($operation, $uriVariables, $context);
+            throw new RuntimeException('This resource is not an enum');
         }
 
         if ($operation instanceof CollectionOperationInterface) {

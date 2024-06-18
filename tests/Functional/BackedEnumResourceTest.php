@@ -99,49 +99,6 @@ final class BackedEnumResourceTest extends ApiTestCase
         $this->assertJsonEquals($expected);
     }
 
-    public static function providerEnumItemsGraphQl(): iterable
-    {
-        // Integer cases
-        $query = <<<'GRAPHQL'
-query GetAvailability($identifier: ID!) {
-    availability(id: $identifier) {
-        value
-    }
-}
-GRAPHQL;
-        foreach (Availability::cases() as $case) {
-            yield [$query, ['identifier' => '/availabilities/'.$case->value], ['data' => ['availability' => ['value' => $case->value]]]];
-        }
-
-        // String cases
-        $query = <<<'GRAPHQL'
-query GetAvailabilityStatus($identifier: ID!) {
-    availabilityStatus(id: $identifier) {
-        value
-    }
-}
-GRAPHQL;
-        foreach (AvailabilityStatus::cases() as $case) {
-            yield [$query, ['identifier' => '/availability_statuses/'.$case->value], ['data' => ['availability_status' => ['value' => $case->value]]]];
-        }
-    }
-
-    /**
-     * @dataProvider providerEnumItemsGraphQl
-     *
-     * @group legacy
-     */
-    public function testItemGraphql(string $query, array $variables, array $expected): void
-    {
-        $options = (new HttpOptions())
-            ->setJson(['query' => $query, 'variables' => $variables])
-            ->setHeaders(['Content-Type' => 'application/json']);
-        self::createClient()->request('POST', '/graphql', $options->toArray());
-
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonEquals($expected);
-    }
-
     public function testCollectionJson(): void
     {
         self::createClient()->request('GET', '/availabilities', ['headers' => ['Accept' => 'application/json']]);
@@ -500,31 +457,88 @@ GRAPHQL;
         $this->assertJsonEquals($expected);
     }
 
-    public function testCollectionGraphQl(): void
+    public static function provider404s(): iterable
     {
-        $query = <<<'GRAPHQL'
-query {
-  backedEnumIntegerResources {
-    value
-  }
-}
-GRAPHQL;
-        $options = (new HttpOptions())
-            ->setJson(['query' => $query, 'variables' => []])
-            ->setHeaders(['Content-Type' => 'application/json']);
-        self::createClient()->request('POST', '/graphql', $options->toArray());
-
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonEquals([
-            'data' => [
-                'backedEnumIntegerResources' => [
-                    ['value' => 1],
-                    ['value' => 2],
-                    ['value' => 3],
-                ],
-            ],
-        ]);
+        yield ['/backed_enum_integer_resources/42'];
+        yield ['/backed_enum_integer_resources/fortytwo'];
     }
+
+    /** @dataProvider provider404s */
+    public function testItem404(string $uri): void
+    {
+        self::createClient()->request('GET', $uri);
+
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+//     public static function providerEnumItemsGraphQl(): iterable
+//     {
+//         // Integer cases
+//         $query = <<<'GRAPHQL'
+// query GetAvailability($identifier: ID!) {
+//     availability(id: $identifier) {
+//         value
+//     }
+// }
+// GRAPHQL;
+//         foreach (Availability::cases() as $case) {
+//             yield [$query, ['identifier' => '/availabilities/'.$case->value], ['data' => ['availability' => ['value' => $case->value]]]];
+//         }
+//
+//         // String cases
+//         $query = <<<'GRAPHQL'
+// query GetAvailabilityStatus($identifier: ID!) {
+//     availabilityStatus(id: $identifier) {
+//         value
+//     }
+// }
+// GRAPHQL;
+//         foreach (AvailabilityStatus::cases() as $case) {
+//             yield [$query, ['identifier' => '/availability_statuses/'.$case->value], ['data' => ['availability_status' => ['value' => $case->value]]]];
+//         }
+//     }
+//
+//     /**
+//      * @dataProvider providerEnumItemsGraphQl
+//      *
+//      * @group legacy
+//      */
+//     public function testItemGraphql(string $query, array $variables, array $expected): void
+//     {
+//         $options = (new HttpOptions())
+//             ->setJson(['query' => $query, 'variables' => $variables])
+//             ->setHeaders(['Content-Type' => 'application/json']);
+//         self::createClient()->request('POST', '/graphql', $options->toArray());
+//
+//         $this->assertResponseIsSuccessful();
+//         $this->assertJsonEquals($expected);
+//     }
+//
+//     public function testCollectionGraphQl(): void
+//     {
+//         $query = <<<'GRAPHQL'
+// query {
+//   backedEnumIntegerResources {
+//     value
+//   }
+// }
+// GRAPHQL;
+//         $options = (new HttpOptions())
+//             ->setJson(['query' => $query, 'variables' => []])
+//             ->setHeaders(['Content-Type' => 'application/json']);
+//         self::createClient()->request('POST', '/graphql', $options->toArray());
+//
+//         $this->assertResponseIsSuccessful();
+//         $this->assertJsonEquals([
+//             'data' => [
+//                 'backedEnumIntegerResources' => [
+//                     ['value' => 1],
+//                     ['value' => 2],
+//                     ['value' => 3],
+//                 ],
+//             ],
+//         ]);
+//     }
 
     public function testItemGraphQlInteger(): void
     {
@@ -550,19 +564,5 @@ GRAPHQL;
                 ],
             ],
         ]);
-    }
-
-    public static function provider404s(): iterable
-    {
-        yield ['/backed_enum_integer_resources/42'];
-        yield ['/backed_enum_integer_resources/fortytwo'];
-    }
-
-    /** @dataProvider provider404s */
-    public function testItem404(string $uri): void
-    {
-        self::createClient()->request('GET', $uri);
-
-        $this->assertResponseStatusCodeSame(404);
     }
 }

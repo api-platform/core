@@ -146,10 +146,6 @@
         <service id="api_platform.graphql.state_provider" alias="api_platform.state_provider.locator" />
         <service id="api_platform.graphql.state_processor" alias="api_platform.graphql.state_processor.normalize" />
 
-        <service id="api_platform.graphql.state_provider.backed_enum" class="ApiPlatform\State\Provider\BackedEnumProvider" decorates="api_platform.graphql.state_provider" decoration-priority="450">
-            <argument type="service" id="api_platform.graphql.state_provider.backed_enum.inner" />
-        </service>
-
         <service id="api_platform.graphql.state_provider.read" class="ApiPlatform\GraphQl\State\Provider\ReadProvider" decorates="api_platform.graphql.state_provider" decoration-priority="500">
             <argument type="service" id="api_platform.graphql.state_provider.read.inner" />
             <argument type="service" id="api_platform.symfony.iri_converter" />

@@ -25,8 +25,9 @@
             <argument type="service" id="translator" on-invalid="null" />
         </service>
 
-        <service id="api_platform.state_provider.backed_enum" class="ApiPlatform\State\Provider\BackedEnumProvider" decorates="api_platform.state_provider.main" decoration-priority="300">
-            <argument type="service" id="api_platform.state_provider.backed_enum.inner" />
+        <service id="api_platform.state_provider.backed_enum" class="ApiPlatform\State\Provider\BackedEnumProvider">
+            <tag name="api_platform.state_provider" key="ApiPlatform\State\Provider\BackedEnumProvidevr" />
+            <tag name="api_platform.state_provider" key="api_platform.state_provider.backed_enum" />
         </service>
 
         <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener">
