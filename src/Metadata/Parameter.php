@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi;
-use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\ParameterProviderInterface;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -23,11 +23,11 @@ use Symfony\Component\Validator\Constraint;
 abstract class Parameter
 {
     /**
-     * @param array{type?: string}|null              $schema
-     * @param array<string, mixed>                   $extraProperties
-     * @param ProviderInterface|callable|string|null $provider
-     * @param FilterInterface|string|null            $filter
-     * @param Constraint|Constraint[]|null           $constraints
+     * @param array{type?: string}|null                       $schema
+     * @param array<string, mixed>                            $extraProperties
+     * @param ParameterProviderInterface|callable|string|null $provider
+     * @param FilterInterface|string|null                     $filter
+     * @param Constraint|Constraint[]|null                    $constraints
      */
     public function __construct(
         protected ?string $key = null,
@@ -144,7 +144,7 @@ abstract class Parameter
     }
 
     /**
-     * @param ProviderInterface|string $provider
+     * @param ParameterProviderInterface|string $provider
      */
     public function withProvider(mixed $provider): static
     {
