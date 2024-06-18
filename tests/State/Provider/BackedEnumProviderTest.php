@@ -60,7 +60,7 @@ final class BackedEnumProviderTest extends TestCase
     {
         $decorated = $this->prophesize(ProviderInterface::class);
         $decorated->provide(Argument::any())->shouldNotBeCalled();
-        $provider = new BackedEnumProvider($decorated->reveal());
+        $provider = new BackedEnumProvider();
 
         $this->assertSame($expected, $provider->provide($operation, $uriVariables, $context));
     }

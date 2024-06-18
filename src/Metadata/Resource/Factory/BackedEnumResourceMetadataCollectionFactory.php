@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 final class BackedEnumResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     public const PROVIDER = 'api_platform.state_provider.backed_enum';
+
     public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated)
     {
     }
