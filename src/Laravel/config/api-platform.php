@@ -32,6 +32,7 @@ return [
 
     'formats' => [
         'jsonld' => ['application/ld+json'],
+        'jsonapi' => ['application/vnd.api+json'],
     ],
 
     'patch_formats' => [
@@ -62,6 +63,9 @@ return [
             'enabled_parameter_name' => 'pagination',
             'items_per_page_parameter_name' => 'itemsPerPage',
             'partial_parameter_name' => 'partial',
+        ],
+        'order' => [
+            'parameter_name' => 'order',
         ],
     ],
 ];

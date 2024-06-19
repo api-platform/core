@@ -11,19 +11,21 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Laravel\Tests;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\Book;
 
-class BookTest extends TestCase
+class JsonLdTest extends TestCase
 {
     use RefreshDatabase;
     use WithWorkbench;
 
     public function testGetCollection(): void
     {
-        $response = $this->get('/api/books');
+        $response = $this->get('/api/books', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
         $response->assertJsonFragment([
@@ -38,7 +40,7 @@ class BookTest extends TestCase
     public function testGetBook(): void
     {
         $book = Book::find(1);
-        $response = $this->get('/api/books/1');
+        $response = $this->get('/api/books/1', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
         $response->assertJsonFragment([
@@ -58,8 +60,8 @@ class BookTest extends TestCase
                 'name' => 'Don Quichotte',
             ],
             [
-                'Accept' => 'application/ld+json',
-                'CONTENT_TYPE' => 'application/ld+json',
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
             ]
         );
 
@@ -82,8 +84,8 @@ class BookTest extends TestCase
                 'name' => 'updated title',
             ],
             [
-                'Accept' => 'application/ld+json',
-                'CONTENT_TYPE' => 'application/ld+json',
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
             ]
         );
         $response->assertStatus(200);
@@ -102,8 +104,8 @@ class BookTest extends TestCase
                 'name' => 'updated title',
             ],
             [
-                'Accept' => 'application/ld+json',
-                'CONTENT_TYPE' => 'application/merge-patch+json',
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/merge-patch+json',
             ]
         );
         $response->assertStatus(200);
@@ -115,7 +117,7 @@ class BookTest extends TestCase
 
     public function testDeleteBook(): void
     {
-        $response = $this->delete('/api/books/1');
+        $response = $this->delete('/api/books/1', ['accept' => 'application/ld+json']);
         $response->assertStatus(204);
         $this->assertNull(Book::find(1));
     }

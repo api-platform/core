@@ -19,12 +19,20 @@ use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormaliz
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer as HydraDocumentationNormalizer;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer as HydraEntrypointNormalizer;
 use ApiPlatform\Hydra\State\HydraLinkProcessor;
+use ApiPlatform\JsonApi\State\JsonApiProvider;
+use ApiPlatform\JsonApi\JsonSchema\SchemaFactory as JsonApiSchemaFactory;
+use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer as JsonApiEntrypointNormalizer;
+use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
+use ApiPlatform\JsonApi\Serializer\CollectionNormalizer as JsonApiCollectionNormalizer;
+use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
+use ApiPlatform\JsonApi\Serializer\ObjectNormalizer as JsonApiObjectNormalizer;
 use ApiPlatform\JsonLd\Action\ContextAction;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilder as JsonLdContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\ItemNormalizer as JsonLdItemNormalizer;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer as JsonLdObjectNormalizer;
+use ApiPlatform\JsonSchema\DefinitionNameFactoryInterface;
 use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
@@ -263,7 +271,11 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(DeserializeProvider::class, function (Application $app) {
-            return new DeserializeProvider($app->make(ReadProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
+            return new DeserializeProvider($app->make(JsonApiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
+        });
+
+        $this->app->singleton(JsonApiProvider::class, function (Application $app) use ($config) {
+            return new JsonApiProvider($app->make(ReadProvider::class), $config->get('api-platform.collection.order.parameter_name'));
         });
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
@@ -323,6 +335,10 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(IriConverterInterface::class, IriConverter::class);
+        $this->app->singleton(IriConverter::class, function (Application $app) {
+            return new IriConverter($app->make(CallableProvider::class), $app->make(OperationMetadataFactoryInterface::class), $app->make(UrlGeneratorRouter::class), $app->make(IdentifiersExtractorInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
+        });
+
         $this->app->singleton(SkolemIriConverter::class, function (Application $app) {
             return new SkolemIriConverter($app->make(Router::class));
         });
@@ -330,10 +346,6 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->bind(IdentifiersExtractorInterface::class, IdentifiersExtractor::class);
         $this->app->singleton(IdentifiersExtractor::class, function (Application $app) {
             return new IdentifiersExtractor($app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(PropertyNameCollectionFactoryInterface::class), $app->make(PropertyMetadataFactoryInterface::class), $app->make(PropertyAccessorInterface::class));
-        });
-
-        $this->app->singleton(IriConverter::class, function (Application $app) {
-            return new IriConverter($app->make(CallableProvider::class), $app->make(OperationMetadataFactoryInterface::class), $app->make(UrlGeneratorRouter::class), $app->make(IdentifiersExtractorInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
         });
 
         $this->app->bind(UrlGeneratorInterface::class, UrlGeneratorRouter::class);
@@ -467,7 +479,6 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->bind(SchemaFactoryInterface::class, SchemaFactory::class);
         $this->app->singleton(SchemaFactory::class, function (Application $app) {
             return new SchemaFactory(
                 $app->make(TypeFactoryInterface::class),
@@ -478,7 +489,17 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class)
             );
         });
+        $this->app->singleton(JsonApiSchemaFactory::class, function (Application $app) {
+            return new JsonApiSchemaFactory(
+                $app->make(SchemaFactory::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(DefinitionNameFactoryInterface::class),
+            );
+        });
 
+        $this->app->bind(SchemaFactoryInterface::class, JsonApiSchemaFactory::class);
         $this->app->bind(TypeFactoryInterface::class, TypeFactory::class);
         $this->app->singleton(TypeFactory::class, function (Application $app) {
             return new TypeFactory($app->make(ResourceClassResolverInterface::class));
@@ -501,11 +522,58 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(HydraCollectionNormalizer::class, function (Application $app) use ($defaultContext) {
             return new HydraCollectionNormalizer(
-                $this->app->make(ContextBuilderInterface::class),
-                $this->app->make(ResourceClassResolverInterface::class),
-                $this->app->make(IriConverterInterface::class),
-                $this->app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(ContextBuilderInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $defaultContext
+            );
+        });
+
+        $this->app->singleton(ReservedAttributeNameConverter::class, function (Application $app) {
+            return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class));
+        });
+
+        $this->app->singleton(JsonApiEntrypointNormalizer::class, function (Application $app) {
+            return new JsonApiEntrypointNormalizer(
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(UrlGeneratorInterface::class),
+            );
+        });
+
+        $this->app->singleton(JsonApiCollectionNormalizer::class, function (Application $app) use ($config) {
+            return new JsonApiCollectionNormalizer(
+                $app->make(ResourceClassResolverInterface::class),
+                $config->get('api-platform.collection.pagination.page_parameter_name'),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+            );
+        });
+
+        $this->app->singleton(JsonApiItemNormalizer::class, function (Application $app) use ($defaultContext) {
+            return new JsonApiItemNormalizer(
+               $app->make(PropertyNameCollectionFactoryInterface::class),
+               $app->make(PropertyMetadataFactoryInterface::class),
+               $app->make(IriConverterInterface::class),
+               $app->make(ResourceClassResolverInterface::class),
+               $app->make(PropertyAccessorInterface::class),
+               $app->make(NameConverterInterface::class),
+               $app->make(ClassMetadataFactoryInterface::class),
+               $defaultContext,
+               $app->make(ResourceMetadataCollectionFactoryInterface::class),
+               null,
+               null
+               // $app->make(ResourceAccessCheckerInterface::class),
+               // $app->make(TagCollectorInterface::class),
+            );
+        });
+
+        $this->app->singleton(JsonApiObjectNormalizer::class, function (Application $app) {
+            return new JsonApiObjectNormalizer(
+               $app->make(ObjectNormalizer::class),
+               $app->make(IriConverterInterface::class),
+               $app->make(ResourceClassResolverInterface::class),
+               $app->make(ResourceMetadataCollectionFactoryInterface::class),
             );
         });
 
@@ -525,6 +593,11 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(ItemNormalizer::class), -895);
             $list->insert($app->make(OpenApiNormalizer::class), -780);
             $list->insert($app->make(HydraDocumentationNormalizer::class), -790);
+
+            $list->insert($app->make(JsonApiEntrypointNormalizer::class), -800);
+            $list->insert($app->make(JsonApiCollectionNormalizer::class), -985);
+            $list->insert($app->make(JsonApiItemNormalizer::class), -890);
+            $list->insert($app->make(JsonApiObjectNormalizer::class), -995);
             // TODO: unused + implement hal/jsonapi ?
             // $list->insert($dataUriNormalizer, -920);
             // $list->insert($unwrappingDenormalizer, 1000);
@@ -535,14 +608,7 @@ class ApiPlatformProvider extends ServiceProvider
             // $list->insert($jsonserializableNormalizer, -900);
             // $list->insert($uuidDenormalizer, -895); //Todo ramsey uuid support ?
 
-            // deprecated
-            // $list->insert($problemNormalizer, -890);
-            // $list->insert($hydraConstraintViolationNormalizer, -780);
-            // $list->insert($hydraErrorNormalizer, -800);
-            // $list->insert($problemConstraintViolationListNormalizer, -780);
-            // $list->insert($problemErrorNormalizer, -810);
-            // $list->insert($constraintViolationListNormalizer, -915);
-            return new Serializer(iterator_to_array($list), [new JsonEncoder('json'), $app->make(JsonEncoder::class), new JsonEncoder('jsonopenapi')]);
+            return new Serializer(iterator_to_array($list), [new JsonEncoder('json'), $app->make(JsonEncoder::class), new JsonEncoder('jsonopenapi'), new JsonEncoder('jsonapi')]);
         });
 
         $this->app->singleton(JsonLdItemNormalizer::class, function (Application $app) use ($defaultContext) {

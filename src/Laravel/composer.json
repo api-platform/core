@@ -23,6 +23,7 @@
         "api-platform/hydra": "*@dev || ^3.1",
         "api-platform/json-schema": "*@dev || ^3.1",
         "api-platform/jsonld": "*@dev || ^3.1",
+        "api-platform/json-api": "*@dev || ^3.1",
         "api-platform/metadata": "*@dev || ^3.1",
         "api-platform/openapi": "*@dev || ^3.1",
         "api-platform/serializer": "*@dev || ^3.1",
@@ -110,17 +111,7 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": [
-            "@clear",
-            "@prepare"
-        ],
-        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
-        "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "build": "@php vendor/bin/testbench workbench:build --ansi",
-        "test": "@php vendor/bin/testbench package:test",
-        "serve": [
-            "@build",
-            "@php vendor/bin/testbench serve"
-        ]
+        "test": "@php vendor/bin/testbench package:test"
     }
 }
