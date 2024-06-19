@@ -15,23 +15,25 @@ namespace ApiPlatform\Laravel;
 
 use ApiPlatform\Documentation\Action\DocumentationAction;
 use ApiPlatform\Documentation\Action\EntrypointAction;
+use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer as HydraDocumentationNormalizer;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer as HydraEntrypointNormalizer;
 use ApiPlatform\Hydra\State\HydraLinkProcessor;
-use ApiPlatform\JsonApi\State\JsonApiProvider;
 use ApiPlatform\JsonApi\JsonSchema\SchemaFactory as JsonApiSchemaFactory;
-use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer as JsonApiEntrypointNormalizer;
-use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
 use ApiPlatform\JsonApi\Serializer\CollectionNormalizer as JsonApiCollectionNormalizer;
+use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer as JsonApiEntrypointNormalizer;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ObjectNormalizer as JsonApiObjectNormalizer;
+use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
+use ApiPlatform\JsonApi\State\JsonApiProvider;
 use ApiPlatform\JsonLd\Action\ContextAction;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilder as JsonLdContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\ItemNormalizer as JsonLdItemNormalizer;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer as JsonLdObjectNormalizer;
+use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\DefinitionNameFactoryInterface;
 use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
 use ApiPlatform\JsonSchema\SchemaFactory;
@@ -40,6 +42,9 @@ use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
+use ApiPlatform\Laravel\Eloquent\Metadata\IdentifiersExtractor as EloquentIdentifiersExtractor;
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
+use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResourceClassResolver;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
 use ApiPlatform\Laravel\Eloquent\State\CollectionProvider;
 use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
@@ -186,7 +191,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(ResourceClassResolverInterface::class, ResourceClassResolver::class);
         $this->app->singleton(ResourceClassResolver::class, function (Application $app) {
-            return new ResourceClassResolver($app->make(ResourceNameCollectionFactoryInterface::class));
+            return new EloquentResourceClassResolver(new ResourceClassResolver($app->make(ResourceNameCollectionFactoryInterface::class)));
         });
 
         $this->app->singleton(PropertyMetadataFactoryInterface::class, function (Application $app) {
@@ -196,15 +201,25 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->extend(PropertyMetadataFactoryInterface::class, function (PropertyInfoPropertyMetadataFactory $inner, Application $app) {
-            return new SchemaPropertyMetadataFactory($app->make(ResourceClassResolverInterface::class), new EloquentPropertyMetadataFactory($app, new SerializerPropertyMetadataFactory(
-                new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class)),
-                $inner,
-                $app->make(ResourceClassResolverInterface::class)
-            )));
+            return new SchemaPropertyMetadataFactory(
+                $app->make(ResourceClassResolverInterface::class),
+                new EloquentPropertyMetadataFactory(
+                    $app->make(ModelMetadata::class),
+                    new SerializerPropertyMetadataFactory(
+                        new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class)),
+                        $inner,
+                        $app->make(ResourceClassResolverInterface::class)
+                    ),
+                )
+            );
         });
 
         $this->app->singleton(PropertyNameCollectionFactoryInterface::class, function (Application $app) {
-            return new EloquentPropertyNameCollectionMetadataFactory($app, new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)));
+            return new EloquentPropertyNameCollectionMetadataFactory(
+                $app->make(ModelMetadata::class),
+                new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)),
+                $app->make(ResourceClassResolverInterface::class)
+            );
         });
 
         $this->app->singleton(LinkFactoryInterface::class, function (Application $app) {
@@ -297,7 +312,10 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $this->app->bind(SerializerContextBuilderInterface::class, EloquentSerializerContextBuilder::class);
         $this->app->singleton(EloquentSerializerContextBuilder::class, function (Application $app) {
-            return new EloquentSerializerContextBuilder($app->make(SerializerContextBuilder::class), $app->make(PropertyNameCollectionFactoryInterface::class));
+            return new EloquentSerializerContextBuilder(
+                $app->make(SerializerContextBuilder::class),
+                $app->make(PropertyNameCollectionFactoryInterface::class)
+            );
         });
 
         $this->app->singleton(SerializeProcessor::class, function (Application $app) {
@@ -345,7 +363,15 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(IdentifiersExtractorInterface::class, IdentifiersExtractor::class);
         $this->app->singleton(IdentifiersExtractor::class, function (Application $app) {
-            return new IdentifiersExtractor($app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(PropertyNameCollectionFactoryInterface::class), $app->make(PropertyMetadataFactoryInterface::class), $app->make(PropertyAccessorInterface::class));
+            return new EloquentIdentifiersExtractor(
+                new IdentifiersExtractor(
+                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                    $app->make(ResourceClassResolverInterface::class),
+                    $app->make(PropertyNameCollectionFactoryInterface::class),
+                    $app->make(PropertyMetadataFactoryInterface::class),
+                    $app->make(PropertyAccessorInterface::class)
+                )
+            );
         });
 
         $this->app->bind(UrlGeneratorInterface::class, UrlGeneratorRouter::class);
@@ -479,14 +505,21 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(SchemaFactory::class, function (Application $app) {
+        $this->app->bind(DefinitionNameFactoryInterface::class, DefinitionNameFactory::class);
+        $this->app->singleton(DefinitionNameFactory::class, function () use ($config) {
+            return new DefinitionNameFactory($config->get('api-platform.formats'));
+        });
+
+        $this->app->singleton(SchemaFactory::class, function (Application $app) use ($config) {
             return new SchemaFactory(
                 $app->make(TypeFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(NameConverterInterface::class),
-                $app->make(ResourceClassResolverInterface::class)
+                $app->make(ResourceClassResolverInterface::class),
+                $config->get('api-platform.formats'),
+                $app->make(DefinitionNameFactoryInterface::class),
             );
         });
         $this->app->singleton(JsonApiSchemaFactory::class, function (Application $app) {
@@ -498,8 +531,13 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(DefinitionNameFactoryInterface::class),
             );
         });
+        $this->app->singleton(HydraSchemaFactory::class, function (Application $app) {
+            return new HydraSchemaFactory(
+                $app->make(JsonApiSchemaFactory::class),
+            );
+        });
 
-        $this->app->bind(SchemaFactoryInterface::class, JsonApiSchemaFactory::class);
+        $this->app->bind(SchemaFactoryInterface::class, HydraSchemaFactory::class);
         $this->app->bind(TypeFactoryInterface::class, TypeFactory::class);
         $this->app->singleton(TypeFactory::class, function (Application $app) {
             return new TypeFactory($app->make(ResourceClassResolverInterface::class));
@@ -552,28 +590,28 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(JsonApiItemNormalizer::class, function (Application $app) use ($defaultContext) {
             return new JsonApiItemNormalizer(
-               $app->make(PropertyNameCollectionFactoryInterface::class),
-               $app->make(PropertyMetadataFactoryInterface::class),
-               $app->make(IriConverterInterface::class),
-               $app->make(ResourceClassResolverInterface::class),
-               $app->make(PropertyAccessorInterface::class),
-               $app->make(NameConverterInterface::class),
-               $app->make(ClassMetadataFactoryInterface::class),
-               $defaultContext,
-               $app->make(ResourceMetadataCollectionFactoryInterface::class),
-               null,
-               null
-               // $app->make(ResourceAccessCheckerInterface::class),
-               // $app->make(TagCollectorInterface::class),
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(PropertyAccessorInterface::class),
+                $app->make(NameConverterInterface::class),
+                $app->make(ClassMetadataFactoryInterface::class),
+                $defaultContext,
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                null,
+                null
+                // $app->make(ResourceAccessCheckerInterface::class),
+                // $app->make(TagCollectorInterface::class),
             );
         });
 
         $this->app->singleton(JsonApiObjectNormalizer::class, function (Application $app) {
             return new JsonApiObjectNormalizer(
-               $app->make(ObjectNormalizer::class),
-               $app->make(IriConverterInterface::class),
-               $app->make(ResourceClassResolverInterface::class),
-               $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(ObjectNormalizer::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
             );
         });
 

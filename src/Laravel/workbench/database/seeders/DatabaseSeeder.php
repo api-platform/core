@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Workbench\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Workbench\Database\Factories\AuthorFactory;
 use Workbench\Database\Factories\BookFactory;
 
 class DatabaseSeeder extends Seeder
@@ -23,6 +24,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        BookFactory::times(10)->create();
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
     }
 }

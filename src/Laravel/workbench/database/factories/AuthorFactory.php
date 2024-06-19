@@ -14,14 +14,21 @@ declare(strict_types=1);
 namespace Workbench\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Workbench\App\Models\Book;
+use Workbench\App\Models\Author;
 
 /**
- * @extends Factory<Book>
+ * @template TModel of \Workbench\App\Models\Author
+ *
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<TModel>
  */
-class BookFactory extends Factory
+class AuthorFactory extends Factory
 {
-    protected $model = Book::class;
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<TModel>
+     */
+    protected $model = Author::class;
 
     /**
      * Define the model's default state.
@@ -32,7 +39,6 @@ class BookFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'author_id' => AuthorFactory::new(),
         ];
     }
 }

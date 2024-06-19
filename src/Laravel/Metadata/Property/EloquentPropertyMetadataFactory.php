@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Metadata\Property;
 
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -28,22 +28,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    // TODO: copy paste ShowModelCommand to a service lazy right now
-    private ShowModelCommand $modelFactory;
-
-    public function __construct(private Application $application, private readonly PropertyMetadataFactoryInterface $decorated)
+    public function __construct(private ModelMetadata $modelMetadata, private readonly PropertyMetadataFactoryInterface $decorated)
     {
-        $this->modelFactory = new class() extends ShowModelCommand {
-            public function __construct()
-            {
-            }
-
-            public function getAttributes(...$args) // @phpstan-ignore-line
-            {
-                return parent::getAttributes(...$args);
-            }
-        };
-        $this->modelFactory->setLaravel($this->application);
     }
 
     /**
@@ -66,7 +52,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
 
         try {
             $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-        } catch (PropertyNotFoundException) { // @phpstan-ignore-line todo remove when no bc
+        } catch (PropertyNotFoundException) {
             $propertyMetadata = new ApiProperty();
         }
 
@@ -74,8 +60,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             $propertyMetadata = $propertyMetadata->withIdentifier(true);
         }
 
-        // I'm building a prototype this is ugly we need to put this in a service and work around fillable/hidden also
-        foreach ($this->modelFactory->getAttributes($model) as $p) { // @phpstan-ignore-line
+        foreach ($this->modelMetadata->getAttributes($model) as $p) {
             if ($p['name'] !== $property) {
                 continue;
             }
@@ -91,7 +76,32 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
                 }
             }
 
-            $propertyMetadata = $propertyMetadata->withBuiltinTypes([$type])->withWritable(true)->withReadable(!($p['hidden'] ?? false));
+            $propertyMetadata = $propertyMetadata
+                ->withBuiltinTypes([$type])
+                ->withWritable($propertyMetadata->isWritable() ?? $p['fillable'])
+                ->withReadable($propertyMetadata->isReadable() ?? false === $p['hidden']);
+
+            return $propertyMetadata;
+        }
+
+        foreach ($this->modelMetadata->getRelations($model) as $relation) {
+            if ($relation['name'] !== $property) {
+                continue;
+            }
+
+            $collection = false;
+            if (HasMany::class === $relation['type']) {
+                $collection = true;
+            }
+
+            $type = new Type($collection ? Type::BUILTIN_TYPE_ITERABLE : Type::BUILTIN_TYPE_OBJECT, false, $relation['related'], $collection, collectionValueType: new Type(Type::BUILTIN_TYPE_OBJECT, false, $relation['related']));
+            $propertyMetadata = $propertyMetadata
+                ->withBuiltinTypes([$type])
+                ->withWritable($propertyMetadata->isWritable() ?? true)
+                ->withReadable($propertyMetadata->isReadable() ?? true)
+                ->withExtraProperties(['eloquent_relation' => $relation] + $propertyMetadata->getExtraProperties());
+
+            return $propertyMetadata;
         }
 
         return $propertyMetadata;

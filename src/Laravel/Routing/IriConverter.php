@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\State\ProviderInterface;
+use Illuminate\Database\Eloquent\Relations\Relation;
 // use Illuminate\Routing\Router;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -107,6 +108,9 @@ class IriConverter implements IriConverterInterface
     public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
     {
         $resourceClass = $context['force_resource_class'] ?? (\is_string($resource) ? $resource : $this->getObjectClass($resource));
+        if ($resource instanceof Relation) {
+            $resourceClass = $this->getObjectClass($resource->getRelated());
+        }
 
         if (isset($context['item_uri_template'])) {
             $operation = $this->operationMetadataFactory->create($context['item_uri_template']);

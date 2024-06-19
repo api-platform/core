@@ -21,9 +21,17 @@ return new class() extends Migration {
      */
     public function up(): void
     {
+        Schema::create('authors', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
         Schema::create('books', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
+            $table->integer('author_id')->unsigned();
+            $table->foreign('author_id')->references('id')->on('authors');
             $table->timestamps();
         });
     }
@@ -34,5 +42,6 @@ return new class() extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('books');
+        Schema::dropIfExists('authors');
     }
 };

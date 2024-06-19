@@ -16,21 +16,17 @@ namespace Workbench\App\Models;
 use ApiPlatform\Metadata\ApiResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[ApiResource(
-    paginationEnabled: true,
-    paginationItemsPerPage: 5,
-)]
-class Book extends Model
+#[ApiResource]
+class Author extends Model
 {
     use HasFactory;
 
-    protected $visible = ['id', 'name', 'author'];
-    protected $fillable = ['name'];
+    // protected $fillable = ['name'];
 
-    public function author(): BelongsTo
-    {
-        return $this->belongsTo(Author::class);
-    }
+    // public function books(): HasMany
+    // {
+    //     return $this->hasMany(Book::class);
+    // }
 }

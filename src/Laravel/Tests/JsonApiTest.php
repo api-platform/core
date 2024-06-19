@@ -21,9 +21,9 @@ use Workbench\App\Models\Book;
 
 class JsonApiTest extends TestCase
 {
+    use ApiTestAssertionsTrait;
     use RefreshDatabase;
     use WithWorkbench;
-    use ApiTestAssertionsTrait;
 
     public function testGetCollection(): void
     {
@@ -35,7 +35,7 @@ class JsonApiTest extends TestCase
                 'self' => '/api/books?page=1',
                 'first' => '/api/books?page=1',
                 'last' => '/api/books?page=2',
-                'next' => '/api/books?page=2'
+                'next' => '/api/books?page=2',
             ],
             'meta' => ['totalItems' => 10, 'itemsPerPage' => 5, 'currentPage' => 1],
         ]);
@@ -50,14 +50,14 @@ class JsonApiTest extends TestCase
         $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
 
         $this->assertJsonContains([
-             'data' => [
-                 'id' => '/api/books/1',
-                 'type' => 'Book',
-                 'attributes' => [
-                     'id' => 1,
-                     'name' => $book->name, // @phpstan-ignore-line
-                 ]
-             ]
+            'data' => [
+                'id' => '/api/books/1',
+                'type' => 'Book',
+                'attributes' => [
+                    'id' => 1,
+                    'name' => $book->name, // @phpstan-ignore-line
+                ],
+            ],
         ], $response->json());
     }
 
@@ -66,7 +66,7 @@ class JsonApiTest extends TestCase
         $response = $this->postJson(
             '/api/books',
             [
-                'data' => ['attributes' => ['name' => 'Don Quichotte']]
+                'data' => ['attributes' => ['name' => 'Don Quichotte']],
             ],
             [
                 'accept' => 'application/vnd.api+json',
@@ -77,12 +77,12 @@ class JsonApiTest extends TestCase
         $response->assertStatus(201);
         $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
         $this->assertJsonContains([
-             'data' => [
-                 'type' => 'Book',
-                 'attributes' => [
-                     'name' => 'Don Quichotte',
-                 ]
-             ]
+            'data' => [
+                'type' => 'Book',
+                'attributes' => [
+                    'name' => 'Don Quichotte',
+                ],
+            ],
         ], $response->json());
         $this->assertMatchesRegularExpression('~^/api/books/\d+$~', $response->json('data')['id']);
     }
@@ -106,8 +106,8 @@ class JsonApiTest extends TestCase
                 'id' => $iri,
                 'attributes' => [
                     'name' => 'updated title',
-                ]
-            ]
+                ],
+            ],
         ], $response->json());
     }
 
@@ -130,8 +130,8 @@ class JsonApiTest extends TestCase
                 'id' => $iri,
                 'attributes' => [
                     'name' => 'updated title',
-                ]
-            ]
+                ],
+            ],
         ], $response->json());
     }
 
@@ -141,5 +141,4 @@ class JsonApiTest extends TestCase
         $response->assertStatus(204);
         $this->assertNull(Book::find(1));
     }
-
 }

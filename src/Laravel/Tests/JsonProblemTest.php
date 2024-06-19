@@ -16,7 +16,6 @@ namespace ApiPlatform\Laravel\Tests;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
-use Workbench\App\Models\Book;
 
 class JsonProblemTest extends TestCase
 {

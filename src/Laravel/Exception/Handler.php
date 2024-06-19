@@ -56,6 +56,7 @@ class Handler extends ExceptionsHandler
     public function register(): void
     {
         $this->renderable(function (\Throwable $exception, Request $request) {
+            dd($exception);
             $apiOperation = $this->initializeOperation($request);
             if (!$apiOperation) {
                 return null;

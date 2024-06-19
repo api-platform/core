@@ -13,30 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Metadata\Property;
 
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
-use Illuminate\Contracts\Foundation\Application;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Eloquent\Model;
 
 final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNameCollectionFactoryInterface
 {
-    // TODO: copy paste ShowModelCommand to a service lazy right now
-    private ShowModelCommand $modelFactory;
-
-    public function __construct(private Application $application, private PropertyNameCollectionFactoryInterface $decorated)
+    public function __construct(private ModelMetadata $modelMetadata, private PropertyNameCollectionFactoryInterface $decorated, private ResourceClassResolverInterface $resourceClassResolver)
     {
-        $this->modelFactory = new class() extends ShowModelCommand {
-            public function __construct()
-            {
-            }
-
-            public function getAttributes(...$args) // @phpstan-ignore-line
-            {
-                return parent::getAttributes(...$args);
-            }
-        };
-        $this->modelFactory->setLaravel($this->application);
     }
 
     /**
@@ -59,12 +46,20 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
 
         $properties = [];
         // When it's an Eloquent model we read attributes from database (@see ShowModelCommand)
-        foreach ($this->modelFactory->getAttributes($model) as $property) { // @phpstan-ignore-line
-            if ($property['hidden'] ?? false) {
+        foreach ($this->modelMetadata->getAttributes($model) as $property) { // @phpstan-ignore-line
+            if ($property['hidden']) {
                 continue;
             }
 
             $properties[] = $property['name'];
+        }
+
+        foreach ($this->modelMetadata->getRelations($model) as $relation) {
+            if (!$this->resourceClassResolver->isResourceClass($relation['related'])) {
+                continue;
+            }
+
+            $properties[] = $relation['name'];
         }
 
         return new PropertyNameCollection($properties);

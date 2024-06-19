@@ -13,19 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-use ApiPlatform\Exception\PropertyNotFoundException as LegacyPropertyNotFoundException;
-
-if (class_exists(LegacyPropertyNotFoundException::class)) {
-    class PropertyNotFoundException extends LegacyPropertyNotFoundException
-    {
-    }
-} else {
-    /**
-     * Property not found exception.
-     *
-     * @author Kévin Dunglas <dunglas@gmail.com>
-     */
-    class PropertyNotFoundException extends \Exception implements ExceptionInterface
-    {
-    }
+/**
+ * Property not found exception.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+class PropertyNotFoundException extends \Exception implements ExceptionInterface
+{
 }
