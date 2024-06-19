@@ -1,0 +1,73 @@
+{
+    "name": "api-platform/json-api",
+    "description": "API JSON-API support",
+    "type": "library",
+    "keywords": [
+        "REST",
+        "GraphQL",
+        "API",
+        "JSON-LD",
+        "Hydra",
+        "JSONAPI",
+        "OpenAPI",
+        "HAL",
+        "Swagger"
+    ],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        },
+        {
+            "name": "API Platform Community",
+            "homepage": "https://api-platform.com/community/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "api-platform/documentation": "*@dev || ^3.1",
+        "api-platform/json-schema": "*@dev || ^3.1",
+        "api-platform/metadata": "*@dev || ^3.1",
+        "api-platform/serializer": "*@dev || ^3.1",
+        "api-platform/state": "*@dev || ^3.1",
+        "symfony/error-handler": "^7.1",
+        "symfony/http-foundation": "^7.1"
+    },
+    "require-dev": {
+        "phpspec/prophecy": "^1.19",
+        "phpspec/prophecy-phpunit": "^2.2",
+        "phpunit/phpunit": "^10"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\JsonApi\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "3.3.x-dev"
+        },
+        "symfony": {
+            "require": "^6.1"
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    }
+}

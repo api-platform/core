@@ -11,13 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\Exception;
+namespace ApiPlatform\JsonApi\Tests\Fixtures;
 
-/**
- * Runtime exception.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-class RuntimeException extends \RuntimeException implements ExceptionInterface
+class CircularReference
 {
 }

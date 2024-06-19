@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonApi\State;
+namespace ApiPlatform\JsonApi\Tests\State;
 
 use ApiPlatform\JsonApi\State\JsonApiProvider;
 use ApiPlatform\Metadata\Get;

@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Mock\Exception;
+namespace ApiPlatform\JsonApi\Tests\Fixtures;
 
-use ApiPlatform\Exception\ErrorCodeSerializableInterface;
+use ApiPlatform\Metadata\Exception\ErrorCodeSerializableInterface;
 
 class ErrorCodeSerializable extends \Exception implements ErrorCodeSerializableInterface
 {

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
-use ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
 use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface as LegacyConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;

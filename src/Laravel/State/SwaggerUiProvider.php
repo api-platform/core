@@ -25,10 +25,15 @@ use ApiPlatform\State\ProviderInterface;
 /**
  * When an HTML request is sent we provide a swagger ui documentation.
  *
+ * @implements ProviderInterface<OpenApi|object>
+ *
  * @internal
  */
 final class SwaggerUiProvider implements ProviderInterface
 {
+    /**
+     * @param ProviderInterface<object> $decorated
+     */
     public function __construct(private readonly ProviderInterface $decorated, private readonly OpenApiFactoryInterface $openApiFactory)
     {
     }

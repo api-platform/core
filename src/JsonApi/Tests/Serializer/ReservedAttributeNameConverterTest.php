@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonApi\Serializer;
+namespace ApiPlatform\JsonApi\Tests\Serializer;
 
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
-use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
+use ApiPlatform\JsonApi\Tests\Fixtures\CustomConverter;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -55,7 +55,7 @@ final class SwaggerUiProcessor implements ProcessorInterface
         ];
 
         $swaggerData = [
-            'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']), // @phpstan-ignore-line todo remove once url generator has no more ifs because of BC
+            'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']),
             'spec' => $this->normalizer->normalize($openApi, 'json', []),
             'oauth' => [
                 'enabled' => $this->openApiOptions->getOAuthEnabled(),
@@ -101,6 +101,6 @@ final class SwaggerUiProcessor implements ProcessorInterface
             }
         }
 
-        throw new RuntimeException(sprintf('The operation "%s" cannot be found in the Swagger specification.', $swaggerData['operationId'])); // @phpstan-ignore-line same todo remove when no more bc inside the class
+        throw new RuntimeException(sprintf('The operation "%s" cannot be found in the Swagger specification.', $swaggerData['operationId']));
     }
 }

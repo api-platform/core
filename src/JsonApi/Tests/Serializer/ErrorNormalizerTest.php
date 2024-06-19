@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonApi\Serializer;
+namespace ApiPlatform\JsonApi\Tests\Serializer;
 
 use ApiPlatform\JsonApi\Serializer\ErrorNormalizer;
-use ApiPlatform\Tests\Mock\Exception\ErrorCodeSerializable;
+use ApiPlatform\JsonApi\Tests\Fixtures\ErrorCodeSerializable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;

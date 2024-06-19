@@ -13,19 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-use ApiPlatform\Exception\ResourceClassNotFoundException as LegacyResourceClassNotFoundException;
-
-if (class_exists(LegacyResourceClassNotFoundException::class)) {
-    class ResourceClassNotFoundException extends LegacyResourceClassNotFoundException
-    {
-    }
-} else {
-    /**
-     * Resource class not found exception.
-     *
-     * @author Kévin Dunglas <dunglas@gmail.com>
-     */
-    class ResourceClassNotFoundException extends \Exception implements ExceptionInterface
-    {
-    }
+/**
+ * Resource class not found exception.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+class ResourceClassNotFoundException extends \Exception implements ExceptionInterface
+{
 }

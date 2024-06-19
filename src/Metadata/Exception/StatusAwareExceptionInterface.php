@@ -13,11 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-/**
- * Runtime exception.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-class RuntimeException extends \RuntimeException implements ExceptionInterface
+interface StatusAwareExceptionInterface
 {
+    /**
+     * Sets the status code.
+     */
+    public function setStatus(): void;
 }

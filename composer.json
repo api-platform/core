@@ -190,7 +190,8 @@
             "api-platform/state",
             "api-platform/symfony",
             "api-platform/validator",
-            "api-platform/laravel"
+            "api-platform/laravel",
+            "api-platform/json-api"
         ]
     },
     "repositories": [
@@ -212,6 +213,7 @@
       {"type": "path", "url": "./src/State"},
       {"type": "path", "url": "./src/Symfony"},
       {"type": "path", "url": "./src/Validator"},
-      {"type": "path", "url": "./src/Laravel"}
+      {"type": "path", "url": "./src/Laravel"},
+      {"type": "path", "url": "./src/JsonApi"}
     ]
 }

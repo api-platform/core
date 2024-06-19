@@ -16,6 +16,7 @@ namespace ApiPlatform\Laravel\Exception;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
+use ApiPlatform\Metadata\Exception\StatusAwareExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -35,7 +36,7 @@ class Handler extends ExceptionsHandler
 {
     use ContentNegotiationTrait;
     use OperationRequestInitiatorTrait;
-    private static mixed $error;
+    public static mixed $error;
 
     public function __construct(
         Container $container,
@@ -86,7 +87,9 @@ class Handler extends ExceptionsHandler
                 if ($errorResource instanceof ProblemExceptionInterface && $operation instanceof HttpOperation) {
                     $statusCode = $this->getStatusCode($apiOperation, $operation, $exception);
                     $operation = $operation->withStatus($statusCode);
-                    $errorResource->setStatus($statusCode);
+                    if ($errorResource instanceof StatusAwareExceptionInterface) {
+                        $errorResource->setStatus($statusCode);
+                    }
                 }
             } else {
                 // Create a generic, rfc7807 compatible error according to the wanted format
@@ -101,8 +104,11 @@ class Handler extends ExceptionsHandler
                 $errorResource = Error::createFromException($exception, $statusCode);
             }
 
+            /** @var HttpOperation $operation */
             if (!$operation->getProvider()) {
-                static::$error = 'jsonapi' === $format && $errorResource instanceof ConstraintViolationListAwareExceptionInterface ? $errorResource->getConstraintViolationList() : $errorResource;
+                // TODO: validation
+                // static::$error = 'jsonapi' === $format && $errorResource instanceof ConstraintViolationListAwareExceptionInterface ? $errorResource->getConstraintViolationList() : $errorResource;
+                static::$error = $errorResource;
                 $operation = $operation->withProvider([self::class, 'provide']);
             }
 
@@ -115,19 +121,6 @@ class Handler extends ExceptionsHandler
             try {
                 $identifiers = $this->identifiersExtractor?->getIdentifiersFromItem($errorResource, $operation) ?? [];
             } catch (\Exception $e) {
-            }
-
-            if ($exception instanceof ValidationException && !($apiOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
-                $operation = $operation->withNormalizationContext([
-                    'groups' => ['legacy_'.$format],
-                    'force_iri_generation' => false,
-                ]);
-            }
-
-            if ('jsonld' === $format && !($apiOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
-                $operation = $operation->withOutputFormats(['jsonld' => ['application/ld+json']])
-                                       ->withLinks([])
-                                       ->withExtraProperties(['rfc_7807_compliant_errors' => false] + $operation->getExtraProperties());
             }
 
             $dup = $request->duplicate(null, null, []);

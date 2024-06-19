@@ -13,19 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-use ApiPlatform\Exception\InvalidIdentifierException as LegacyInvalidIdentifierException;
-
-if (class_exists(LegacyInvalidIdentifierException::class)) {
-    class InvalidIdentifierException extends LegacyInvalidIdentifierException
-    {
-    }
-} else {
-    /**
-     * Identifier is not valid exception.
-     *
-     * @author Antoine Bluchet <soyuka@gmail.com>
-     */
-    final class InvalidIdentifierException extends \Exception implements ExceptionInterface
-    {
-    }
+/**
+ * Identifier is not valid exception.
+ *
+ * @author Antoine Bluchet <soyuka@gmail.com>
+ */
+final class InvalidIdentifierException extends \Exception implements ExceptionInterface
+{
 }

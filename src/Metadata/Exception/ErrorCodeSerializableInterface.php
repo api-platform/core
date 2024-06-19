@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Exception;
 
 /**
- * Runtime exception.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * An exception which has a serializable application-specific error code.
  */
-class RuntimeException extends \RuntimeException implements ExceptionInterface
+interface ErrorCodeSerializableInterface
 {
+    /**
+     * Gets the application-specific error code.
+     */
+    public static function getErrorCode(): string;
 }

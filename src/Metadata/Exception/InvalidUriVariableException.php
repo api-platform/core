@@ -13,19 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-use ApiPlatform\Exception\InvalidUriVariableException as LegacyInvalidUriVariableException;
-
-if (class_exists(LegacyInvalidUriVariableException::class)) {
-    class InvalidUriVariableException extends LegacyInvalidUriVariableException
-    {
-    }
-} else {
-    /**
-     * Identifier is not valid exception.
-     *
-     * @author Antoine Bluchet <soyuka@gmail.com>
-     */
-    final class InvalidUriVariableException extends \Exception implements ExceptionInterface
-    {
-    }
+/**
+ * Identifier is not valid exception.
+ *
+ * @author Antoine Bluchet <soyuka@gmail.com>
+ */
+final class InvalidUriVariableException extends \Exception implements ExceptionInterface
+{
 }

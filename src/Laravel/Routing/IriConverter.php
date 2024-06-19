@@ -15,6 +15,7 @@ namespace ApiPlatform\Laravel\Routing;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
@@ -38,26 +39,76 @@ class IriConverter implements IriConverterInterface
 {
     use ClassInfoTrait;
     use ResourceClassInfoTrait;
+    /**
+     * @var array<string, Operation>
+     */
     private $localOperationCache = [];
+    /**
+     * @var array<string, Operation>
+     */
     private $localIdentifiersExtractorOperationCache = [];
     // use UriVariablesResolverTrait;
 
     // , UriVariablesConverterInterface $uriVariablesConverter = null TODO
+    /**
+     * @param ProviderInterface<object> $provider
+     */
     public function __construct(private readonly ProviderInterface $provider, private readonly OperationMetadataFactoryInterface $operationMetadataFactory, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ?IriConverterInterface $decorated = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
     {
-        dd('getResourceFromIri');
+        try {
+            // TODO: This is not working rn
+            $parameters = $this->router->match($iri);
+        } catch (RoutingExceptionInterface $e) {
+            throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
+        }
+
+        $parameters['_api_operation_name'] ??= null;
+
+        if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'])) {
+            throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
+        }
+
+        $operation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
+
+        if ($operation instanceof CollectionOperationInterface) {
+            throw new InvalidArgumentException(sprintf('The iri "%s" references a collection not an item.', $iri));
+        }
+
+        if (!$operation instanceof HttpOperation) {
+            throw new RuntimeException(sprintf('The iri "%s" does not reference an HTTP operation.', $iri));
+        }
+        // $attributes = AttributesExtractor::extractAttributes($parameters);
+        //
+        // try {
+        //     $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
+        // } catch (InvalidIdentifierException $e) {
+        //     throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+        // }
+
+        $uriVariables = [];
+        if ($item = $this->provider->provide($operation, $uriVariables, $context)) {
+            return $item; // @phpstan-ignore-line
+        }
+
+        throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
     {
         $resourceClass = $context['force_resource_class'] ?? (\is_string($resource) ? $resource : $this->getObjectClass($resource));
 
-        if ($this->operationMetadataFactory && isset($context['item_uri_template'])) {
+        if (isset($context['item_uri_template'])) {
             $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
         }
 
@@ -108,6 +159,9 @@ class IriConverter implements IriConverterInterface
         return $this->generateRoute($resource, $referenceType, $operation, $context, $identifiersExtractorOperation);
     }
 
+    /**
+     * @param array<string,mixed> $context
+     */
     private function generateRoute(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = [], ?Operation $identifiersExtractorOperation = null): string
     {
         $identifiers = $context['uri_variables'] ?? [];
@@ -130,6 +184,10 @@ class IriConverter implements IriConverterInterface
         }
     }
 
+    /**
+     * @param object|class-string  $resource
+     * @param array<string, mixed> $context
+     */
     private function generateSkolemIri(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = [], ?string $resourceClass = null): string
     {
         if (!$this->decorated) {

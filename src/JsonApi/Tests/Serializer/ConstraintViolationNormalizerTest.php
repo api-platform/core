@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonApi\Serializer;
+namespace ApiPlatform\JsonApi\Tests\Serializer;
 
 use ApiPlatform\JsonApi\Serializer\ConstraintViolationListNormalizer;
+use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
+use ApiPlatform\JsonApi\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;

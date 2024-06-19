@@ -31,15 +31,15 @@ use Symfony\Component\Routing\RouterInterface;
 final class Router implements RouterInterface, UrlGeneratorInterface
 {
     public const CONST_MAP = [
-        UrlGeneratorInterface::ABS_URL => RouterInterface::ABSOLUTE_URL, // @phpstan-ignore-line todo remove when removing bc
-        UrlGeneratorInterface::ABS_PATH => RouterInterface::ABSOLUTE_PATH, // @phpstan-ignore-line todo remove when removing bc
-        UrlGeneratorInterface::REL_PATH => RouterInterface::RELATIVE_PATH, // @phpstan-ignore-line todo remove when removing bc
-        UrlGeneratorInterface::NET_PATH => RouterInterface::NETWORK_PATH, // @phpstan-ignore-line todo remove when removing bc
+        UrlGeneratorInterface::ABS_URL => RouterInterface::ABSOLUTE_URL,
+        UrlGeneratorInterface::ABS_PATH => RouterInterface::ABSOLUTE_PATH,
+        UrlGeneratorInterface::REL_PATH => RouterInterface::RELATIVE_PATH,
+        UrlGeneratorInterface::NET_PATH => RouterInterface::NETWORK_PATH,
     ];
 
     private RequestContext $context;
 
-    public function __construct(private readonly BaseRouter $router, private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH) // @phpstan-ignore-line todo remove when removing bc
+    public function __construct(private readonly BaseRouter $router, private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH)
     {
     }
 
