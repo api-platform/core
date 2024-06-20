@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Test;
 
 use ApiPlatform\Laravel\Test\Constraint\ArraySubset;
+use ApiPlatform\Metadata\IriConverterInterface;
 
 trait ApiTestAssertionsTrait
 {
@@ -59,5 +60,15 @@ trait ApiTestAssertionsTrait
         }
 
         static::assertArraySubset($subset, $json, $checkForObjectIdentity, $message);
+    }
+
+    /**
+     * Generate the IRI of a resource item.
+     */
+    protected function getIriFromResource(object $resource): ?string
+    {
+        $iriConverter = $this->app->make(IriConverterInterface::class);
+
+        return $iriConverter->getIriFromResource($resource);
     }
 }

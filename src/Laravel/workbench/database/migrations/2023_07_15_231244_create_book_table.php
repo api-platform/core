@@ -34,6 +34,20 @@ return new class() extends Migration {
             $table->foreign('author_id')->references('id')->on('authors');
             $table->timestamps();
         });
+
+        Schema::create('posts', function (Blueprint $table): void {
+            $table->id();
+            $table->string('title');
+            $table->timestamps();
+        });
+
+        Schema::create('comments', function (Blueprint $table): void {
+            $table->id();
+            $table->text('text');
+            $table->integer('post_id')->unsigned();
+            $table->foreign('post_id')->references('id')->on('posts');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -43,5 +57,7 @@ return new class() extends Migration {
     {
         Schema::dropIfExists('books');
         Schema::dropIfExists('authors');
+        Schema::dropIfExists('posts');
+        Schema::dropIfExists('comments');
     }
 };

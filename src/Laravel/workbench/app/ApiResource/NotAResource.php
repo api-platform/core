@@ -11,14 +11,9 @@
 
 declare(strict_types=1);
 
-namespace Workbench\App\Models;
+namespace ApiPlatform\Laravel\workbench\app\ApiResource;
 
-use ApiPlatform\Metadata\ApiResource;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-#[ApiResource]
-class Author extends Model
+class NotAResource
 {
-    use HasFactory;
+    public string $name = 'test';
 }

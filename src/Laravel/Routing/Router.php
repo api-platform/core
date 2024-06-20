@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Routing;
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use Illuminate\Http\Request as LaravelRequest;
 use Illuminate\Routing\Router as BaseRouter;
-use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -73,37 +73,18 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      *
-     * @return array<string, mixed>
+     * @return array{_api_resource_class: class-string|string, _api_operation_name: string, uri_variables: array<string, mixed>}
      */
     public function match(string $pathInfo): array
     {
-        // TODO
+        $request = LaravelRequest::create($pathInfo, Request::METHOD_GET);
+        $route = $this->router->getRoutes()->match($request);
 
-        return [];
-        // $baseContext = $this->router->getContext();
-        // $baseUrl = $baseContext->getBaseUrl();
-        // if (str_starts_with($pathInfo, $baseUrl)) {
-        //     $pathInfo = substr($pathInfo, \strlen($baseUrl));
-        // }
-        //
-        // $request = Request::create($pathInfo, Request::METHOD_GET, [], [], [], ['HTTP_HOST' => $baseContext->getHost()]);
-        // try {
-        //     $context = (new RequestContext())->fromRequest($request);
-        // } catch (RequestExceptionInterface) {
-        //     throw new ResourceNotFoundException('Invalid request context.');
-        // }
-        //
-        // $context->setPathInfo($pathInfo);
-        // $context->setScheme($baseContext->getScheme());
-        // $context->setHost($baseContext->getHost());
-        //
-        // try {
-        //     $this->router->setContext($context);
-        //
-        //     return $this->router->match($request->getPathInfo());
-        // } finally {
-        //     $this->router->setContext($baseContext);
-        // }
+        if (!$route) {
+            throw new InvalidArgumentException(sprintf('No route matches "%s".', $pathInfo));
+        }
+
+        return $route->defaults + ['uri_variables' => array_diff_key($route->parameters, $route->defaults)];
     }
 
     /**

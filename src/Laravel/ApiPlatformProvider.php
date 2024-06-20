@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel;
 
+use ApiPlatform\Action\NotExposedAction;
 use ApiPlatform\Documentation\Action\DocumentationAction;
 use ApiPlatform\Documentation\Action\EntrypointAction;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
@@ -196,21 +197,21 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(PropertyMetadataFactoryInterface::class, function (Application $app) {
             return new PropertyInfoPropertyMetadataFactory(
-                $app->make(PropertyInfoExtractorInterface::class)
+                $app->make(PropertyInfoExtractorInterface::class),
+                new EloquentPropertyMetadataFactory(
+                    $app->make(ModelMetadata::class)
+                )
             );
         });
 
         $this->app->extend(PropertyMetadataFactoryInterface::class, function (PropertyInfoPropertyMetadataFactory $inner, Application $app) {
             return new SchemaPropertyMetadataFactory(
                 $app->make(ResourceClassResolverInterface::class),
-                new EloquentPropertyMetadataFactory(
-                    $app->make(ModelMetadata::class),
-                    new SerializerPropertyMetadataFactory(
-                        new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class)),
-                        $inner,
-                        $app->make(ResourceClassResolverInterface::class)
-                    ),
-                )
+                new SerializerPropertyMetadataFactory(
+                    new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class)),
+                    $inner,
+                    $app->make(ResourceClassResolverInterface::class)
+                ),
             );
         });
 
@@ -354,11 +355,11 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(IriConverterInterface::class, IriConverter::class);
         $this->app->singleton(IriConverter::class, function (Application $app) {
-            return new IriConverter($app->make(CallableProvider::class), $app->make(OperationMetadataFactoryInterface::class), $app->make(UrlGeneratorRouter::class), $app->make(IdentifiersExtractorInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
+            return new IriConverter($app->make(CallableProvider::class), $app->make(OperationMetadataFactoryInterface::class), $app->make(UrlGeneratorRouter::class), $app->make(IdentifiersExtractorInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(SkolemIriConverter::class));
         });
 
         $this->app->singleton(SkolemIriConverter::class, function (Application $app) {
-            return new SkolemIriConverter($app->make(Router::class));
+            return new SkolemIriConverter($app->make(UrlGeneratorRouter::class));
         });
 
         $this->app->bind(IdentifiersExtractorInterface::class, IdentifiersExtractor::class);
@@ -716,6 +717,7 @@ class ApiPlatformProvider extends ServiceProvider
                     $uriTemplate = $operation->getRoutePrefix().str_replace('{._format}', '{_format?}', $uriTemplate);
                     $route = new Route([$operation->getMethod()], $uriTemplate, [ApiPlatformController::class, '__invoke']);
                     $route->name($operation->getName());
+                    $route->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
                     // Another option then to use a middleware, not sure what's best (you then retrieve $request->getRoute() somehow ?)
                     // $route->??? = ['operation' => $operation];
                     $routeCollection->add($route)
@@ -743,6 +745,9 @@ class ApiPlatformProvider extends ServiceProvider
             return $entrypointAction->__invoke($request);
         });
         $route->name('api_entrypoint')->middleware(ApiPlatformMiddleware::class);
+        $routeCollection->add($route);
+        $route = new Route(['GET'], $prefix.'/.well-known/genid/{id}', [NotExposedAction::class, '__invoke']);
+        $route->name('api_genid')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);
         $router->setRoutes($routeCollection);
     }

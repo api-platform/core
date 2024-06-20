@@ -17,6 +17,7 @@ use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\App\Models\Author;
 use Workbench\App\Models\Book;
 
 class JsonApiTest extends TestCase
@@ -54,7 +55,6 @@ class JsonApiTest extends TestCase
                 'id' => '/api/books/1',
                 'type' => 'Book',
                 'attributes' => [
-                    'id' => 1,
                     'name' => $book->name, // @phpstan-ignore-line
                 ],
             ],
@@ -63,10 +63,14 @@ class JsonApiTest extends TestCase
 
     public function testCreateBook(): void
     {
+        $author = Author::find(1);
         $response = $this->postJson(
             '/api/books',
             [
-                'data' => ['attributes' => ['name' => 'Don Quichotte']],
+                'data' => [
+                    'attributes' => ['name' => 'Don Quichotte'],
+                    'relationships' => ['author' => ['data' => ['id' => $this->getIriFromResource($author), 'type' => 'Author']]],
+                ],
             ],
             [
                 'accept' => 'application/vnd.api+json',

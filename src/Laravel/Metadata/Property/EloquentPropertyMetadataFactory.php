@@ -28,7 +28,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    public function __construct(private ModelMetadata $modelMetadata, private readonly PropertyMetadataFactoryInterface $decorated)
+    public function __construct(private ModelMetadata $modelMetadata, private readonly ?PropertyMetadataFactoryInterface $decorated = null)
     {
     }
 
@@ -43,15 +43,15 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             $refl = new \ReflectionClass($resourceClass);
             $model = $refl->newInstanceWithoutConstructor();
         } catch (\ReflectionException) {
-            return $this->decorated->create($resourceClass, $property, $options);
+            return $this->decorated?->create($resourceClass, $property, $options) ?? new ApiProperty();
         }
 
         if (!$model instanceof Model) {
-            return $this->decorated->create($resourceClass, $property, $options);
+            return $this->decorated?->create($resourceClass, $property, $options) ?? new ApiProperty();
         }
 
         try {
-            $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
+            $propertyMetadata = $this->decorated?->create($resourceClass, $property, $options) ?? new ApiProperty();
         } catch (PropertyNotFoundException) {
             $propertyMetadata = new ApiProperty();
         }
@@ -78,7 +78,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
 
             $propertyMetadata = $propertyMetadata
                 ->withBuiltinTypes([$type])
-                ->withWritable($propertyMetadata->isWritable() ?? $p['fillable'])
+                ->withWritable($propertyMetadata->isWritable() ?? true)
                 ->withReadable($propertyMetadata->isReadable() ?? false === $p['hidden']);
 
             return $propertyMetadata;

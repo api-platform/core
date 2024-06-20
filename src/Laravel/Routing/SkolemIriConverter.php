@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use Illuminate\Routing\Router;
 
 /**
  * {@inheritdoc}
@@ -36,11 +35,9 @@ final class SkolemIriConverter implements IriConverterInterface
      * @var array<string, string>
      */
     private array $classHashMap = [];
-    // private $router;
 
-    public function __construct(/* Router $router */)
+    public function __construct(private readonly Router $router)
     {
-        // $this->router = $router;
         $this->objectHashMap = new \SplObjectStorage();
     }
 
@@ -59,13 +56,11 @@ final class SkolemIriConverter implements IriConverterInterface
     {
         $referenceType = $operation ? ($operation->getUrlGenerationStrategy() ?? $referenceType) : $referenceType;
         if (($isObject = \is_object($resource)) && $this->objectHashMap->contains($resource)) {
-            return '';
-            // return $this->router->generate('api_genid', ['id' => $this->objectHashMap[$resource]], $referenceType);
+            return $this->router->generate('api_genid', ['id' => $this->objectHashMap[$resource]], $referenceType);
         }
 
         if (\is_string($resource) && isset($this->classHashMap[$resource])) {
-            return '';
-            // return $this->router->generate('api_genid', ['id' => $this->classHashMap[$resource]], $referenceType);
+            return $this->router->generate('api_genid', ['id' => $this->classHashMap[$resource]], $referenceType);
         }
 
         $id = bin2hex(random_bytes(10));
@@ -76,7 +71,6 @@ final class SkolemIriConverter implements IriConverterInterface
             $this->classHashMap[$resource] = $id;
         }
 
-        return '';
-        // return $this->router->generate('api_genid', ['id' => $id], $referenceType);
+        return $this->router->generate('api_genid', ['id' => $id], $referenceType);
     }
 }

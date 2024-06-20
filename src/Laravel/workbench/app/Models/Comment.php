@@ -18,19 +18,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[ApiResource(
-    paginationEnabled: true,
-    paginationItemsPerPage: 5,
-)]
-class Book extends Model
+#[ApiResource]
+class Comment extends Model
 {
     use HasFactory;
 
-    protected $visible = ['name', 'author'];
-    protected $fillable = ['name'];
+    protected $visible = ['text', 'post'];
 
-    public function author(): BelongsTo
+    public function post(): BelongsTo
     {
-        return $this->belongsTo(Author::class);
+        return $this->belongsTo(Post::class);
     }
 }

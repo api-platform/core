@@ -11,14 +11,15 @@
 
 declare(strict_types=1);
 
-namespace Workbench\App\Models;
+namespace ApiPlatform\Laravel\workbench\app\ApiResource;
 
-use ApiPlatform\Metadata\ApiResource;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use ApiPlatform\Metadata\Get;
 
-#[ApiResource]
-class Author extends Model
+#[Get(output: NotAResource::class, provider: [Output::class, 'provide'])]
+class Output
 {
-    use HasFactory;
+    public static function provide(): NotAResource
+    {
+        return new NotAResource();
+    }
 }

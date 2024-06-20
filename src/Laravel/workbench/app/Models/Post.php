@@ -16,21 +16,18 @@ namespace Workbench\App\Models;
 use ApiPlatform\Metadata\ApiResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[ApiResource(
-    paginationEnabled: true,
-    paginationItemsPerPage: 5,
-)]
-class Book extends Model
+#[ApiResource]
+class Post extends Model
 {
     use HasFactory;
 
-    protected $visible = ['name', 'author'];
-    protected $fillable = ['name'];
-
-    public function author(): BelongsTo
+    /**
+     * Get the comments for the blog post.
+     */
+    public function comments(): HasMany
     {
-        return $this->belongsTo(Author::class);
+        return $this->hasMany(Comment::class);
     }
 }

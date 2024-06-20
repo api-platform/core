@@ -64,16 +64,8 @@ class IriConverter implements IriConverterInterface
      */
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
     {
-        try {
-            // TODO: This is not working rn
-            $parameters = $this->router->match($iri);
-        } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
-        }
-
-        $parameters['_api_operation_name'] ??= null;
-
-        if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'])) {
+        $parameters = $this->router->match($iri);
+        if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'], $parameters['uri_variables'])) {
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
@@ -86,16 +78,8 @@ class IriConverter implements IriConverterInterface
         if (!$operation instanceof HttpOperation) {
             throw new RuntimeException(sprintf('The iri "%s" does not reference an HTTP operation.', $iri));
         }
-        // $attributes = AttributesExtractor::extractAttributes($parameters);
-        //
-        // try {
-        //     $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
-        // } catch (InvalidIdentifierException $e) {
-        //     throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-        // }
 
-        $uriVariables = [];
-        if ($item = $this->provider->provide($operation, $uriVariables, $context)) {
+        if ($item = $this->provider->provide($operation, $parameters['uri_variables'], $context)) {
             return $item; // @phpstan-ignore-line
         }
 

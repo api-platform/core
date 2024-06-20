@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Tests;
 
+use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\App\Models\Author;
 use Workbench\App\Models\Book;
 
 class JsonLdTest extends TestCase
 {
+    use ApiTestAssertionsTrait;
     use RefreshDatabase;
     use WithWorkbench;
 
@@ -47,17 +50,18 @@ class JsonLdTest extends TestCase
             '@context' => '/api/contexts/Book',
             '@id' => '/api/books/1',
             '@type' => 'Book',
-            'id' => 1,
             'name' => $book->name, // @phpstan-ignore-line
         ]);
     }
 
     public function testCreateBook(): void
     {
+        $author = Author::find(1);
         $response = $this->postJson(
             '/api/books',
             [
                 'name' => 'Don Quichotte',
+                'author' => $this->getIriFromResource($author),
             ],
             [
                 'accept' => 'application/ld+json',
@@ -120,5 +124,40 @@ class JsonLdTest extends TestCase
         $response = $this->delete('/api/books/1', ['accept' => 'application/ld+json']);
         $response->assertStatus(204);
         $this->assertNull(Book::find(1));
+    }
+
+    public function testPatchBookAuthor(): void
+    {
+        $author = Author::find(2);
+        $authorIri = $this->getIriFromResource($author);
+        $iri = '/api/books/1';
+        $response = $this->patchJson(
+            $iri,
+            [
+                'author' => $authorIri,
+            ],
+            [
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/merge-patch+json',
+            ]
+        );
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            '@id' => $iri,
+            'author' => $authorIri,
+        ]);
+    }
+
+    public function testSkolemIris(): void
+    {
+        $response = $this->get('/api/outputs', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertJsonFragment([
+            '@type' => 'NotAResource',
+            'name' => 'test',
+        ]);
+
+        $this->assertMatchesRegularExpression('~^/api/.well-known/genid/~', $response->json('@id'));
     }
 }
