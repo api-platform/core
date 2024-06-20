@@ -16,6 +16,7 @@ namespace ApiPlatform\Hydra\Serializer;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
@@ -38,6 +39,7 @@ use Symfony\Component\Serializer\Serializer;
  */
 final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
+    use HydraPrefixTrait;
     private ?ContainerInterface $filterLocator = null;
 
     /**
@@ -128,7 +130,8 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
 
         if ($currentFilters || ($parameters && \count($parameters))) {
-            $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters, $parameters);
+            $hydraPrefix = $this->getHydraPrefix($context);
+            $data[$hydraPrefix.'search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters, $parameters, $hydraPrefix);
         }
 
         return $data;
@@ -150,7 +153,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      * @param FilterInterface[]        $filters
      * @param array<string, Parameter> $parameters
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters, array|Parameters|null $parameters): array
+    private function getSearch(string $resourceClass, array $parts, array $filters, array|Parameters|null $parameters, string $hydraPrefix): array
     {
         $variables = [];
         $mapping = [];
@@ -200,7 +203,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             $mapping[] = $m;
         }
 
-        return ['@type' => 'hydra:IriTemplate', 'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), 'hydra:variableRepresentation' => 'BasicRepresentation', 'hydra:mapping' => $mapping];
+        return ['@type' => $hydraPrefix.'IriTemplate', $hydraPrefix.'template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), $hydraPrefix.'variableRepresentation' => 'BasicRepresentation', $hydraPrefix.'mapping' => $mapping];
     }
 
     /**
