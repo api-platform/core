@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Workbench\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Symfony\Component\Uid\Ulid;
 use Workbench\App\Models\Book;
 
 /**
@@ -32,7 +33,9 @@ class BookFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'id' => (string) new Ulid(),
             'author_id' => AuthorFactory::new(),
+            'isbn' => fake()->isbn13(),
         ];
     }
 }

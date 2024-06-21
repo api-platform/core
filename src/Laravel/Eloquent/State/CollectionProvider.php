@@ -50,7 +50,7 @@ class CollectionProvider implements ProviderInterface
         }
 
         if (false === $this->pagination->isEnabled($operation, $context)) {
-            return $query::all();
+            return $query->get();
         }
 
         return new Paginator(

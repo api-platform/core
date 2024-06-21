@@ -28,8 +28,9 @@ return new class() extends Migration {
         });
 
         Schema::create('books', function (Blueprint $table): void {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->string('name');
+            $table->string('isbn');
             $table->integer('author_id')->unsigned();
             $table->foreign('author_id')->references('id')->on('authors');
             $table->timestamps();

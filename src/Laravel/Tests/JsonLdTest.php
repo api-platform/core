@@ -42,13 +42,13 @@ class JsonLdTest extends TestCase
 
     public function testGetBook(): void
     {
-        $book = Book::find(1);
-        $response = $this->get('/api/books/1', ['accept' => 'application/ld+json']);
+        $book = Book::first();
+        $response = $this->get($this->getIriFromResource($book), ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Book',
-            '@id' => '/api/books/1',
+            '@id' => $this->getIriFromResource($book),
             '@type' => 'Book',
             'name' => $book->name, // @phpstan-ignore-line
         ]);
@@ -62,6 +62,7 @@ class JsonLdTest extends TestCase
             [
                 'name' => 'Don Quichotte',
                 'author' => $this->getIriFromResource($author),
+                'isbn' => fake()->isbn13(),
             ],
             [
                 'accept' => 'application/ld+json',
@@ -76,12 +77,13 @@ class JsonLdTest extends TestCase
             '@type' => 'Book',
             'name' => 'Don Quichotte',
         ]);
-        $this->assertMatchesRegularExpression('~^/api/books/\d+$~', $response->json('@id'));
+        $this->assertMatchesRegularExpression('~^/api/books/~', $response->json('@id'));
     }
 
     public function testUpdateBook(): void
     {
-        $iri = '/api/books/1';
+        $book = Book::first();
+        $iri = $this->getIriFromResource($book);
         $response = $this->putJson(
             $iri,
             [
@@ -101,7 +103,8 @@ class JsonLdTest extends TestCase
 
     public function testPatchBook(): void
     {
-        $iri = '/api/books/1';
+        $book = Book::first();
+        $iri = $this->getIriFromResource($book);
         $response = $this->patchJson(
             $iri,
             [
@@ -121,16 +124,19 @@ class JsonLdTest extends TestCase
 
     public function testDeleteBook(): void
     {
-        $response = $this->delete('/api/books/1', ['accept' => 'application/ld+json']);
+        $book = Book::first();
+        $iri = $this->getIriFromResource($book);
+        $response = $this->delete($iri, ['accept' => 'application/ld+json']);
         $response->assertStatus(204);
-        $this->assertNull(Book::find(1));
+        $this->assertNull(Book::find($book->id));
     }
 
     public function testPatchBookAuthor(): void
     {
+        $book = Book::first();
+        $iri = $this->getIriFromResource($book);
         $author = Author::find(2);
         $authorIri = $this->getIriFromResource($author);
-        $iri = '/api/books/1';
         $response = $this->patchJson(
             $iri,
             [
