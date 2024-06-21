@@ -11,12 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Orm\State;
+namespace ApiPlatform\Laravel\Eloquent\State;
 
-use ApiPlatform\Doctrine\Common\State\Options as CommonOptions;
 use ApiPlatform\State\OptionsInterface;
 
-class Options extends CommonOptions implements OptionsInterface
+class Options implements OptionsInterface
 {
     /**
      * @param string|callable $handleLinks experimental callable, typed mixed as we may want a service name in the future
@@ -24,21 +23,19 @@ class Options extends CommonOptions implements OptionsInterface
      * @see LinksHandlerInterface
      */
     public function __construct(
-        protected ?string $entityClass = null,
-        mixed $handleLinks = null,
+        protected mixed $handleLinks = null,
     ) {
-        parent::__construct(handleLinks: $handleLinks);
     }
 
-    public function getEntityClass(): ?string
+    public function getHandleLinks(): mixed
     {
-        return $this->entityClass;
+        return $this->handleLinks;
     }
 
-    public function withEntityClass(?string $entityClass): self
+    public function withHandleLinks(mixed $handleLinks): self
     {
         $self = clone $this;
-        $self->entityClass = $entityClass;
+        $self->handleLinks = $handleLinks;
 
         return $self;
     }

@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ApiResource]
+#[ApiProperty(property: 'title', types: ['https://schema.org/name'])]
 class Post extends Model
 {
     use HasFactory;
@@ -26,6 +28,7 @@ class Post extends Model
     /**
      * Get the comments for the blog post.
      */
+    #[ApiProperty(uriTemplate: '/posts/{post}/comments{._format}')]
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);

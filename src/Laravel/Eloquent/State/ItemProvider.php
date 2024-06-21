@@ -15,19 +15,30 @@ namespace ApiPlatform\Laravel\Eloquent\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use Illuminate\Foundation\Application;
+use Psr\Container\ContainerInterface;
 
 /**
  * @implements ProviderInterface<\Illuminate\Database\Eloquent\Model>
  */
 class ItemProvider implements ProviderInterface
 {
-    public function __construct(private readonly Application $application)
+    use LinksHandlerLocatorTrait;
+
+    public function __construct(private readonly LinksHandlerInterface $linksHandler, ?ContainerInterface $handleLinksLocator = null)
     {
+        $this->handleLinksLocator = $handleLinksLocator;
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        return $this->application->make($operation->getClass())::find($uriVariables)->first();
+        $model = new ($operation->getClass())();
+
+        if ($handleLinks = $this->getLinksHandler($operation)) {
+            $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation] + $context);
+        } else {
+            $query = $this->linksHandler->handleLinks($model->query(), $uriVariables, ['operation' => $operation] + $context);
+        }
+
+        return $query->first();
     }
 }

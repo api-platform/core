@@ -85,8 +85,20 @@ final class ModelMetadata
                 'hidden' => $this->attributeIsHidden($column['name'], $model),
                 'appended' => null,
                 'cast' => $this->getCastType($column['name'], $model),
+                'primary' => $this->isColumnPrimaryKey($indexes, $column['name']),
             ])
             ->merge($this->getVirtualAttributes($model, $columns));
+    }
+
+    private function isColumnPrimaryKey(array $indexes, string $column): bool
+    {
+        foreach ($indexes as $index) {
+            if (\in_array($column, $index['columns'], true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -20,10 +20,11 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT | \Attribute::TARGET_CLASS)]
 final class ApiProperty
 {
     /**
+     * @param string|null             $property                The property name
      * @param bool|null               $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
      * @param bool|null               $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
      * @param bool|null               $required                https://api-platform.com/docs/admin/validation/#client-side-validation
@@ -43,6 +44,7 @@ final class ApiProperty
      * @param string|null             $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
      */
     public function __construct(
+        private ?string $property = null,
         private ?string $description = null,
         private ?bool $readable = null,
         private ?bool $writable = null,
@@ -208,6 +210,19 @@ final class ApiProperty
         if (\is_string($types)) {
             $this->types = (array) $types;
         }
+    }
+
+    public function getProperty(): ?string
+    {
+        return $this->property;
+    }
+
+    public function withProperty(string $property): self
+    {
+        $self = clone $this;
+        $self->property = $property;
+
+        return $self;
     }
 
     public function getDescription(): ?string

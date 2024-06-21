@@ -57,7 +57,7 @@ return new class() extends Migration {
     {
         Schema::dropIfExists('books');
         Schema::dropIfExists('authors');
-        Schema::dropIfExists('posts');
         Schema::dropIfExists('comments');
+        Schema::dropIfExists('posts');
     }
 };

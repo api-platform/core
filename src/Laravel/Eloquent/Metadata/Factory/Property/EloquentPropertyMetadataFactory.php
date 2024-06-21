@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Laravel\Metadata\Property;
+namespace ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property;
 
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\ApiProperty;

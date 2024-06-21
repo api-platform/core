@@ -28,6 +28,7 @@ return [
      */
     'resources' => [
         app_path('Models'),
+        app_path('ApiResource'), // TODO: move that to tests
     ],
 
     'formats' => [

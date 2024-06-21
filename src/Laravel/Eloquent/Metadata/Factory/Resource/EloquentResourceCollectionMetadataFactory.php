@@ -11,8 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Laravel\Metadata\Resource;
+namespace ApiPlatform\Laravel\Eloquent\Metadata\Factory\Resource;
 
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\State\CollectionProvider;
 use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
@@ -25,11 +26,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class EloquentResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    private ResourceMetadataCollectionFactoryInterface $decorated;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated)
-    {
-        $this->decorated = $decorated;
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $decorated,
+        private readonly ModelMetadata $modelMetadata
+    ) {
     }
 
     /**

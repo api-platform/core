@@ -11,13 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Laravel\Metadata\Property;
+namespace ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property;
 
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Eloquent\Model;
 
 final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNameCollectionFactoryInterface
@@ -47,7 +46,7 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
         $properties = [];
         // When it's an Eloquent model we read attributes from database (@see ShowModelCommand)
         foreach ($this->modelMetadata->getAttributes($model) as $property) { // @phpstan-ignore-line
-            if ('id' !== $property['name'] && $property['hidden']) {
+            if (!$property['primary'] && $property['hidden']) {
                 continue;
             }
 

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Laravel\workbench\app\ApiResource;
+namespace Workbench\App\ApiResource;
 
 class NotAResource
 {

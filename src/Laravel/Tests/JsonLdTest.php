@@ -160,4 +160,36 @@ class JsonLdTest extends TestCase
 
         $this->assertMatchesRegularExpression('~^/api/.well-known/genid/~', $response->json('@id'));
     }
+
+    public function testSubresourceCollection(): void
+    {
+        $response = $this->get('/api/posts', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+
+        $response->assertJsonFragment([
+            '@context' => '/api/contexts/Post',
+            '@id' => '/api/posts',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 10,
+        ]);
+        $response->assertJsonCount(10, 'hydra:member');
+        $postIri = $response->json('hydra:member.0.@id');
+        $commentsIri = $response->json('hydra:member.0.comments');
+        $this->assertMatchesRegularExpression('~^/api/posts/\d+/comments$~', $commentsIri);
+        $response = $this->get($commentsIri, ['accept' => 'application/ld+json']);
+        $response->assertJsonFragment([
+            '@context' => '/api/contexts/Comment',
+            '@id' => $commentsIri,
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 10,
+        ]);
+
+        $commentIri = $response->json('hydra:member.0.@id');
+        $response = $this->get($commentIri, ['accept' => 'application/ld+json']);
+        $response->assertJsonFragment([
+            '@id' => $commentIri,
+            'post' => $postIri,
+        ]);
+    }
 }

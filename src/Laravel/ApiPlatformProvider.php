@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel;
 
-use ApiPlatform\Action\NotExposedAction;
 use ApiPlatform\Documentation\Action\DocumentationAction;
 use ApiPlatform\Documentation\Action\EntrypointAction;
+use ApiPlatform\Exception\NotExposedHttpException;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer as HydraDocumentationNormalizer;
@@ -43,18 +43,23 @@ use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
+use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
+use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyNameCollectionFactory;
+use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
+use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyNameCollectionMetadataFactory;
+use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Resource\EloquentResourceCollectionMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\IdentifiersExtractor as EloquentIdentifiersExtractor;
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResourceClassResolver;
+use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
 use ApiPlatform\Laravel\Eloquent\State\CollectionProvider;
 use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
+use ApiPlatform\Laravel\Eloquent\State\LinksHandler;
+use ApiPlatform\Laravel\Eloquent\State\LinksHandlerInterface;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Laravel\Exception\Handler;
-use ApiPlatform\Laravel\Metadata\Property\EloquentPropertyMetadataFactory;
-use ApiPlatform\Laravel\Metadata\Property\EloquentPropertyNameCollectionMetadataFactory;
-use ApiPlatform\Laravel\Metadata\Resource\EloquentResourceCollectionMetadataFactory;
 use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
@@ -66,6 +71,7 @@ use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
+use ApiPlatform\Metadata\Property\Factory\AttributePropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyNameCollectionFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -199,7 +205,7 @@ class ApiPlatformProvider extends ServiceProvider
             return new PropertyInfoPropertyMetadataFactory(
                 $app->make(PropertyInfoExtractorInterface::class),
                 new EloquentPropertyMetadataFactory(
-                    $app->make(ModelMetadata::class)
+                    $app->make(ModelMetadata::class),
                 )
             );
         });
@@ -209,17 +215,23 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 new SerializerPropertyMetadataFactory(
                     new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class)),
-                    $inner,
+                    new AttributePropertyMetadataFactory(
+                        new EloquentAttributePropertyMetadataFactory(
+                            $inner,
+                        )
+                    ),
                     $app->make(ResourceClassResolverInterface::class)
                 ),
             );
         });
 
         $this->app->singleton(PropertyNameCollectionFactoryInterface::class, function (Application $app) {
-            return new EloquentPropertyNameCollectionMetadataFactory(
-                $app->make(ModelMetadata::class),
-                new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)),
-                $app->make(ResourceClassResolverInterface::class)
+            return new EloquentAttributePropertyNameCollectionFactory(
+                new EloquentPropertyNameCollectionMetadataFactory(
+                    $app->make(ModelMetadata::class),
+                    new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)),
+                    $app->make(ResourceClassResolverInterface::class)
+                )
             );
         });
 
@@ -233,36 +245,45 @@ class ApiPlatformProvider extends ServiceProvider
 
         // TODO: add cached metadata factories
         $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) use ($config) {
-            return new EloquentResourceCollectionMetadataFactory(new AlternateUriResourceMetadataCollectionFactory(
-                new FiltersResourceMetadataCollectionFactory(
-                    new FormatsResourceMetadataCollectionFactory(
-                        new InputOutputResourceMetadataCollectionFactory(
-                            new PhpDocResourceMetadataCollectionFactory(
-                                new OperationNameResourceMetadataCollectionFactory(
-                                    new LinkResourceMetadataCollectionFactory(
-                                        $this->app->make(LinkFactoryInterface::class),
-                                        new UriTemplateResourceMetadataCollectionFactory(
-                                            $this->app->make(LinkFactoryInterface::class),
-                                            $this->app->make(PathSegmentNameGeneratorInterface::class),
-                                            new NotExposedOperationResourceMetadataCollectionFactory(
-                                                $this->app->make(LinkFactoryInterface::class),
-                                                // TODO: graphql
-                                                new AttributesResourceMetadataCollectionFactory(null, $app->make(LoggerInterface::class), ['routePrefix' => $config->get('api-platform.prefix') ?? '/'], false)
+            return new EloquentResourceCollectionMetadataFactory(
+                new AlternateUriResourceMetadataCollectionFactory(
+                    new FiltersResourceMetadataCollectionFactory(
+                        new FormatsResourceMetadataCollectionFactory(
+                            new InputOutputResourceMetadataCollectionFactory(
+                                new PhpDocResourceMetadataCollectionFactory(
+                                    new OperationNameResourceMetadataCollectionFactory(
+                                        new LinkResourceMetadataCollectionFactory(
+                                            $app->make(LinkFactoryInterface::class),
+                                            new UriTemplateResourceMetadataCollectionFactory(
+                                                $app->make(LinkFactoryInterface::class),
+                                                $app->make(PathSegmentNameGeneratorInterface::class),
+                                                new NotExposedOperationResourceMetadataCollectionFactory(
+                                                    $app->make(LinkFactoryInterface::class),
+                                                    new AttributesResourceMetadataCollectionFactory(
+                                                        null,
+                                                        $app->make(LoggerInterface::class),
+                                                        [
+                                                            'routePrefix' => $config->get('api-platform.prefix') ?? '/',
+                                                        ],
+                                                        false
+                                                    )
+                                                )
                                             )
                                         )
                                     )
                                 )
-                            )
-                        ),
-                        $config->get('api-platform.formats'),
-                        $config->get('api-platform.patch_formats'),
+                            ),
+                            $config->get('api-platform.formats'),
+                            $config->get('api-platform.patch_formats'),
+                        )
                     )
-                )
-            ));
+                ),
+                $app->make(ModelMetadata::class)
+            );
         });
 
         $this->app->bind(PropertyAccessorInterface::class, function () {
-            return PropertyAccess::createPropertyAccessor();
+            return new EloquentPropertyAccessor(PropertyAccess::createPropertyAccessor());
         });
 
         $this->app->bind(NameConverterInterface::class, function (Application $app) {
@@ -271,6 +292,16 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
+        $this->app->singleton(ItemProvider::class, function (Application $app) {
+            $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
+
+            return new ItemProvider(new LinksHandler($app), new ServiceLocator($tagged));
+        });
+        $this->app->singleton(CollectionProvider::class, function (Application $app) {
+            $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
+
+            return new CollectionProvider($app->make(Pagination::class), new LinksHandler($app), new ServiceLocator($tagged));
+        });
         $this->app->tag([ItemProvider::class, CollectionProvider::class], ProviderInterface::class);
 
         $this->app->singleton(CallableProvider::class, function (Application $app) {
@@ -308,8 +339,8 @@ class ApiPlatformProvider extends ServiceProvider
             return new WriteProcessor($app->make(SerializeProcessor::class), $app->make(CallableProcessor::class));
         });
 
-        $this->app->singleton(SerializerContextBuilder::class, function (Application $app) {
-            return new SerializerContextBuilder($app->make(ResourceMetadataCollectionFactoryInterface::class));
+        $this->app->singleton(SerializerContextBuilder::class, function (Application $app) use ($config) {
+            return new SerializerContextBuilder($app->make(ResourceMetadataCollectionFactoryInterface::class), $config->get('app.debug') ?? false);
         });
         $this->app->bind(SerializerContextBuilderInterface::class, EloquentSerializerContextBuilder::class);
         $this->app->singleton(EloquentSerializerContextBuilder::class, function (Application $app) {
@@ -746,7 +777,9 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $route->name('api_entrypoint')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);
-        $route = new Route(['GET'], $prefix.'/.well-known/genid/{id}', [NotExposedAction::class, '__invoke']);
+        $route = new Route(['GET'], $prefix.'/.well-known/genid/{id}', function (): void {
+            throw new NotExposedHttpException('This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation.');
+        });
         $route->name('api_genid')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);
         $router->setRoutes($routeCollection);

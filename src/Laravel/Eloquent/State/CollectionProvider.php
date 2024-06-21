@@ -14,35 +14,51 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent\State;
 
 use ApiPlatform\Laravel\Eloquent\Paginator;
+use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Application;
+use Psr\Container\ContainerInterface;
 
 /**
  * @implements ProviderInterface<Paginator|\Illuminate\Database\Eloquent\Collection<int, Model>>
  */
 class CollectionProvider implements ProviderInterface
 {
-    public function __construct(private readonly Application $application, private readonly Pagination $pagination)
+    use LinksHandlerLocatorTrait;
+
+    public function __construct(private readonly Pagination $pagination, private readonly LinksHandlerInterface $linksHandler, ?ContainerInterface $handleLinksLocator = null)
     {
+        $this->handleLinksLocator = $handleLinksLocator;
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        /** @var Model $model */
-        $model = $this->application->make($operation->getClass());
-
-        if (false === $this->pagination->isEnabled($operation, $context)) {
-            return $model::all();
+        if (!$operation instanceof HttpOperation) {
+            throw new RuntimeException('Not an HTTP operation.');
         }
 
-        return new Paginator($model::query()
-            ->paginate(
-                perPage: $this->pagination->getLimit($operation, $context),
-                page: $this->pagination->getPage($context),
-            )
+        /** @var Model $model */
+        $model = new ($operation->getClass())();
+
+        if ($handleLinks = $this->getLinksHandler($operation)) {
+            $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation] + $context);
+        } else {
+            $query = $this->linksHandler->handleLinks($model->query(), $uriVariables, ['operation' => $operation] + $context);
+        }
+
+        if (false === $this->pagination->isEnabled($operation, $context)) {
+            return $query::all();
+        }
+
+        return new Paginator(
+            $query
+                ->paginate(
+                    perPage: $this->pagination->getLimit($operation, $context),
+                    page: $this->pagination->getPage($context),
+                )
         );
     }
 }

@@ -27,6 +27,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
-        PostFactory::new()->has(CommentFactory::new())->count(10)->create();
+        PostFactory::new()->has(CommentFactory::new()->count(10))->count(10)->create();
     }
 }

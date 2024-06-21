@@ -1,0 +1,7 @@
+test UUID / slug instead of id
+test hidden
+FormRequest =>
+FormRequest
+test 50 elements
+debug laravel trace ?
+debug command artisan
