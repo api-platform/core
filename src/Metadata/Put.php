@@ -96,6 +96,7 @@ final class Put extends HttpOperation
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
         array $extraProperties = [],
+        ?bool $strictQueryParameterValidation = null,
         private ?bool $allowCreate = null,
     ) {
         parent::__construct(
@@ -173,6 +174,7 @@ final class Put extends HttpOperation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
             extraProperties: $extraProperties
         );
     }

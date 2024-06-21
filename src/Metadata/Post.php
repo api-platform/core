@@ -96,6 +96,7 @@ final class Post extends HttpOperation
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
         array $extraProperties = [],
+        ?bool $strictQueryParameterValidation = null,
         private ?string $itemUriTemplate = null
     ) {
         parent::__construct(
@@ -173,6 +174,7 @@ final class Post extends HttpOperation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
             extraProperties: $extraProperties
         );
     }

@@ -155,6 +155,7 @@ class HttpOperation extends Operation
         protected ?array $exceptionToStatus = null,
         protected ?bool $queryParameterValidationEnabled = null,
         protected ?array $links = null,
+        protected ?bool $strictQueryParameterValidation = null,
 
         ?string $shortName = null,
         ?string $class = null,
@@ -632,6 +633,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->links = $links;
+
+        return $self;
+    }
+
+    public function getStrictQueryParameterValidation(): ?bool
+    {
+        return $this->strictQueryParameterValidation;
+    }
+
+    public function withStrictQueryParameterValidation(bool $strictQueryParameterValidation): self
+    {
+        $self = clone $this;
+        $self->strictQueryParameterValidation = $strictQueryParameterValidation;
 
         return $self;
     }

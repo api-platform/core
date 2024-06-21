@@ -95,6 +95,7 @@ final class Get extends HttpOperation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        ?bool $strictQueryParameterValidation = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -171,6 +172,7 @@ final class Get extends HttpOperation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
             extraProperties: $extraProperties,
         );
     }

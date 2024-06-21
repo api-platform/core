@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\HeaderParameterInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
+use ApiPlatform\State\Exception\ParameterNotSupportedException;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -52,6 +54,20 @@ final class ParameterProvider implements ProviderInterface
         $context = ['operation' => $operation] + $context;
         $parameters = $operation->getParameters() ?? [];
         $operationParameters = $parameters instanceof Parameters ? iterator_to_array($parameters) : $parameters;
+
+        if ($operation instanceof HttpOperation && true === $operation->getStrictQueryParameterValidation()) {
+            $keys = [];
+            foreach($operationParameters as $parameter) {
+                $keys[] = $parameter->getKey();
+            }
+
+            foreach (array_keys($request->attributes->get('_api_query_parameters')) as $key) {
+                if (!in_array($key, $keys)) {
+                    throw new ParameterNotSupportedException($key);
+                }
+            }
+        }
+
         foreach ($operationParameters as $parameter) {
             $key = $parameter->getKey();
             $parameters = $this->extractParameterValues($parameter, $request, $context);
