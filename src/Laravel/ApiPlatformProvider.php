@@ -64,6 +64,7 @@ use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
+use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -313,16 +314,21 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(ReadProvider::class, function (Application $app) {
             return new ReadProvider($app->make(CallableProvider::class));
         });
-        $this->app->singleton(ContentNegotiationProvider::class, function (Application $app) use ($config) {
-            return new ContentNegotiationProvider($app->make(DeserializeProvider::class), new Negotiator(), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
+
+        $this->app->singleton(ValidateProvider::class, function (Application $app) {
+            return new ValidateProvider($app->make(ReadProvider::class), $app, $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
+        });
+
+        $this->app->singleton(JsonApiProvider::class, function (Application $app) use ($config) {
+            return new JsonApiProvider($app->make(ValidateProvider::class), $config->get('api-platform.collection.order.parameter_name'));
         });
 
         $this->app->singleton(DeserializeProvider::class, function (Application $app) {
             return new DeserializeProvider($app->make(JsonApiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
-        $this->app->singleton(JsonApiProvider::class, function (Application $app) use ($config) {
-            return new JsonApiProvider($app->make(ReadProvider::class), $config->get('api-platform.collection.order.parameter_name'));
+        $this->app->singleton(ContentNegotiationProvider::class, function (Application $app) use ($config) {
+            return new ContentNegotiationProvider($app->make(DeserializeProvider::class), new Negotiator(), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
         });
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);

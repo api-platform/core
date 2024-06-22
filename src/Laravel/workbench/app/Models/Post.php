@@ -19,7 +19,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[ApiResource]
+// TODO: post slug
+#[ApiResource()]
 #[ApiProperty(property: 'title', types: ['https://schema.org/name'])]
 class Post extends Model
 {

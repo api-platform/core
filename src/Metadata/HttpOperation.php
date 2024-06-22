@@ -201,6 +201,7 @@ class HttpOperation extends Operation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        array|string|null $rules = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -249,6 +250,7 @@ class HttpOperation extends Operation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            rules: $rules,
             extraProperties: $extraProperties
         );
     }

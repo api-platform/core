@@ -18,10 +18,12 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Workbench\App\Http\Requests\BookFormRequest;
 
 #[ApiResource(
     paginationEnabled: true,
     paginationItemsPerPage: 5,
+    rules: BookFormRequest::class
 )]
 class Book extends Model
 {

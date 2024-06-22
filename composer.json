@@ -149,7 +149,10 @@
     "autoload-dev": {
         "psr-4": {
             "ApiPlatform\\Tests\\": "tests/",
-            "App\\": "tests/Fixtures/app/var/tmp/src/"
+            "App\\": "tests/Fixtures/app/var/tmp/src/",
+            "Workbench\\App\\": "src/Laravel/workbench/app/",
+            "Workbench\\Database\\Factories\\": "src/Laravel/workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "src/Laravel/workbench/database/seeders/"
         }
     },
     "config": {

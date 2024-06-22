@@ -46,13 +46,13 @@ use Symfony\Component\WebLink\Link;
                 'skip_null_values' => true,
             ],
             links: [new Link(rel: ContextBuilderInterface::JSONLD_NS.'error', href: 'http://www.w3.org/ns/hydra/error')],
-            uriTemplate: '/hydra_errors/{status}'
+            uriTemplate: '/errors/{status}.jsonld'
         ),
         new Operation(
             name: '_api_errors_jsonapi',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true],
-            uriTemplate: '/jsonapi_errors/{status}'
+            uriTemplate: '/errros/{status}.jsonapi'
         ),
     ],
     graphQlOperations: []
@@ -75,13 +75,6 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         parent::__construct();
     }
 
-    #[SerializedName('hydra:title')]
-    #[Groups(['jsonld'])]
-    public function getHydraTitle(): string
-    {
-        return $this->title;
-    }
-
     /**
      * @return array<int, mixed>
      */
@@ -92,15 +85,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         return $this->originalTrace;
     }
 
-    #[SerializedName('hydra:description')]
-    #[Groups(['jsonld'])]
-    public function getHydraDescription(): string
-    {
-        return $this->detail;
-    }
-
     #[SerializedName('description')]
-    #[Groups(['jsonapi'])]
     public function getDescription(): string
     {
         return $this->detail;

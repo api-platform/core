@@ -198,4 +198,58 @@ class JsonLdTest extends TestCase
             'post' => $postIri,
         ]);
     }
+
+    public function testCreateNotValid(): void
+    {
+        $author = Author::find(1);
+        $response = $this->postJson(
+            '/api/books',
+            [
+                'name' => 'Don Quichotte',
+                'author' => $this->getIriFromResource($author),
+                'isbn' => 'test@foo',
+            ],
+            [
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
+            ]
+        );
+
+        $response->assertStatus(422);
+        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
+        $response->assertJsonFragment([
+            '@context' => '/api/contexts/ValidationError',
+            '@type' => 'ValidationError',
+            'description' => 'The isbn field must only contain letters and numbers.',
+        ]);
+
+        $violations = $response->json('violations');
+        $this->assertCount(1, $violations);
+        $this->assertEquals($violations[0], ['propertyPath' => 'isbn', 'message' => 'The isbn field must only contain letters and numbers.']);
+    }
+
+    public function testCreateNotValidPost(): void
+    {
+        $response = $this->postJson(
+            '/api/posts',
+            [
+            ],
+            [
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
+            ]
+        );
+
+        $response->assertStatus(422);
+        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
+        $response->assertJsonFragment([
+            '@context' => '/api/contexts/ValidationError',
+            '@type' => 'ValidationError',
+            'description' => 'The title field is required.',
+        ]);
+
+        $violations = $response->json('violations');
+        $this->assertCount(1, $violations);
+        $this->assertEquals($violations[0], ['propertyPath' => 'title', 'message' => 'The title field is required.']);
+    }
 }
