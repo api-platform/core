@@ -20,6 +20,7 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -328,6 +329,21 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $existingResponses = $openapiOperation?->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
+            if ($operation instanceof HttpOperation && null !== $operation->getErrors()) {
+                foreach ($operation->getErrors() as $error) {
+                    /** @var ProblemExceptionInterface $exception */
+                    $exception = new $error();
+
+                    $operationErrorSchemas = [];
+                    foreach ($responseMimeTypes as $operationFormat) {
+                        $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($error, $operationFormat, Schema::TYPE_OUTPUT, null, $schema, null, $forceSchemaCollection);
+                        $operationErrorSchemas[$operationFormat] = $operationErrorSchema;
+                        $this->appendSchemaDefinitions($schemas, $operationErrorSchema->getDefinitions());
+                    }
+
+                    $openapiOperation = $this->buildOpenApiResponse($existingResponses, $exception->getStatus(), $exception->getType(), $openapiOperation, $operation, $responseMimeTypes, $operationErrorSchemas, $resourceMetadataCollection);
+                }
+            }
             if ($overrideResponses || !$existingResponses) {
                 // Create responses
                 switch ($method) {
