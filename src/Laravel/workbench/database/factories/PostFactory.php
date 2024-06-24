@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Workbench\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 use Workbench\App\Models\Post;
 
 /**
@@ -37,8 +38,10 @@ class PostFactory extends Factory
      */
     public function definition(): array
     {
+        $title = fake()->sentence(10);
         return [
-            'title' => fake()->title(),
+            'title' => $title,
+            'slug' => Str::slug($title)
         ];
     }
 }
