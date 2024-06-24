@@ -961,7 +961,7 @@ class ApiResource extends Metadata
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
         protected array|Parameters|null $parameters = null,
-        protected array|string|null $rules = null,
+        protected mixed $rules = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(

@@ -31,7 +31,7 @@ abstract class Metadata
      * @param mixed|null                                                                        $provider
      * @param mixed|null                                                                        $processor
      * @param Parameters|array<string, Parameter>                                               $parameters
-     * @param string|callable|array<string, \Illuminate\Contracts\Validation\Rule|array|string> $rules
+     * @param callable|string|array<string, \Illuminate\Contracts\Validation\Rule|array|string> $rules                   Laravel rules can be a FormRequest class, a callable or an array of rules
      */
     public function __construct(
         protected ?string $shortName = null,
@@ -75,7 +75,7 @@ abstract class Metadata
          * @experimental
          */
         protected array|Parameters|null $parameters = [],
-        protected array|string|null $rules = null,
+        protected mixed $rules = null,
         protected array $extraProperties = [],
     ) {
     }
@@ -576,7 +576,7 @@ abstract class Metadata
     /**
      * @return string|callable|array<string, \Illuminate\Contracts\Validation\Rule|array|string>
      */
-    public function getRules(): array|string|null
+    public function getRules(): mixed
     {
         return $this->rules;
     }
@@ -584,7 +584,7 @@ abstract class Metadata
     /**
      * @param string|callable|array<string, \Illuminate\Contracts\Validation\Rule|array|string> $rules
      */
-    public function withRules(array|string $rules): static
+    public function withRules(mixed $rules): static
     {
         $self = clone $this;
         $self->rules = $rules;
