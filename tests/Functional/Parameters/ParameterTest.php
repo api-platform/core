@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 
-final class ParameterTests extends ApiTestCase
+final class ParameterTest extends ApiTestCase
 {
     public function testWithGroupFilter(): void
     {

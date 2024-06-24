@@ -29,16 +29,15 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class ParameterValidatorProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly ProviderInterface $decorated,
-        private readonly ValidatorInterface $validator
+        private readonly ValidatorInterface $validator,
+        private readonly ProviderInterface $decorated
     ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $body = $this->decorated->provide($operation, $uriVariables, $context);
         if (!$context['request'] instanceof Request) {
-            return $body;
+            return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
         $operation = $context['request']->attributes->get('_api_operation');
@@ -70,6 +69,6 @@ final class ParameterValidatorProvider implements ProviderInterface
             }
         }
 
-        return $body;
+        return $this->decorated->provide($operation, $uriVariables, $context);
     }
 }

@@ -102,6 +102,11 @@
             <argument key="$problemCompliantErrors">%api_platform.rfc_7807_compliant_errors%</argument>
         </service>
 
+        <service id="api_platform.state_provider.parameter" class="ApiPlatform\State\Provider\ParameterProvider" decorates="api_platform.state_provider.read" decoration-priority="100">
+            <argument type="service" id="api_platform.state_provider.parameter.inner" />
+            <argument type="tagged_locator" tag="api_platform.parameter_provider" index-by="key" />
+        </service>
+
         <service id="api_platform.state_processor.documentation" alias="api_platform.state_processor.respond" />
 
         <service id="api_platform.state_processor.documentation.serialize" class="ApiPlatform\State\Processor\SerializeProcessor" decorates="api_platform.state_processor.documentation" decoration-priority="200">
