@@ -44,21 +44,35 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     private function getIdentifierValue(object $item, Link $link): mixed
     {
         if ($item instanceof ($link->getFromClass())) {
-            return $item->{$link->getIdentifiers()[0]};
+            return $this->getEloquentProperty($item, $link->getIdentifiers()[0]);
         }
 
         if ($item instanceof BelongsTo) {
-            return $item->getParent()->{$item->getForeignKeyName()};
+            return $this->getEloquentProperty($item->getParent(), $item->getForeignKeyName());
         }
 
         if ($toProperty = $link->getToProperty()) {
-            $relation = $item->{$toProperty}();
+            $relation = $this->getEloquentProperty($item, $toProperty);
 
             if ($relation instanceof BelongsTo) {
-                return $item->{$relation->getForeignKeyName()};
+                return $this->getEloquentProperty($item, $relation->getForeignKeyName());
             }
         }
 
-        return $item->{$link->getIdentifiers()[0]};
+        return $this->getEloquentProperty($item, $link->getIdentifiers()[0]);
+    }
+
+    private function getEloquentProperty(object $item, string $property): mixed
+    {
+        if (method_exists($item, $property)) {
+            return $item->{$property}();
+        }
+
+        $getter = 'get'.ucfirst($property);
+        if (method_exists($item, $getter)) {
+            return $item->{$getter}();
+        }
+
+        return $item->{$property};
     }
 }

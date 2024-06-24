@@ -177,10 +177,13 @@ jobs:
         run: |
           ./vendor/bin/phpstan --version
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
+      - name: Install Laravel
+        run: |
+          composer api-platform/laravel update
+          composer api-platform/laravel run-script build
       - name: Run PHPStan analysis (laravel)
         working-directory: 'src/Laravel'
         run: |
-          composer update
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
 
   phpunit:
@@ -960,7 +963,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo
           coverage: none
           ini-values: memory_limit=-1
       # Not in pecl
@@ -1011,7 +1014,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite 
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo
           coverage: none
           ini-values: memory_limit=-1
       # Not in pecl

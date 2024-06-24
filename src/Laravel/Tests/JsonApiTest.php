@@ -45,14 +45,15 @@ class JsonApiTest extends TestCase
 
     public function testGetBook(): void
     {
-        $book = Book::find(1);
-        $response = $this->get('/api/books/1', ['accept' => ['application/vnd.api+json']]);
+        $book = Book::first();
+        $iri = $this->getIriFromResource($book);
+        $response = $this->get($iri, ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
 
         $this->assertJsonContains([
             'data' => [
-                'id' => '/api/books/1',
+                'id' => $iri,
                 'type' => 'Book',
                 'attributes' => [
                     'name' => $book->name, // @phpstan-ignore-line
@@ -68,7 +69,7 @@ class JsonApiTest extends TestCase
             '/api/books',
             [
                 'data' => [
-                    'attributes' => ['name' => 'Don Quichotte'],
+                    'attributes' => ['name' => 'Don Quichotte', 'isbn' => fake()->isbn13()],
                     'relationships' => ['author' => ['data' => ['id' => $this->getIriFromResource($author), 'type' => 'Author']]],
                 ],
             ],
@@ -88,12 +89,13 @@ class JsonApiTest extends TestCase
                 ],
             ],
         ], $response->json());
-        $this->assertMatchesRegularExpression('~^/api/books/\d+$~', $response->json('data')['id']);
+        $this->assertMatchesRegularExpression('~^/api/books/~', $response->json('data.id'));
     }
 
     public function testUpdateBook(): void
     {
-        $iri = '/api/books/1';
+        $book = Book::first();
+        $iri = $this->getIriFromResource($book);
         $response = $this->putJson(
             $iri,
             [
@@ -117,7 +119,8 @@ class JsonApiTest extends TestCase
 
     public function testPatchBook(): void
     {
-        $iri = '/api/books/1';
+        $book = Book::first();
+        $iri = $this->getIriFromResource($book);
         $response = $this->patchJson(
             $iri,
             [
@@ -141,8 +144,10 @@ class JsonApiTest extends TestCase
 
     public function testDeleteBook(): void
     {
-        $response = $this->delete('/api/books/1');
+        $book = Book::first();
+        $iri = $this->getIriFromResource($book);
+        $response = $this->delete($iri, ['accept' => 'application/vnd.api+json']);
         $response->assertStatus(204);
-        $this->assertNull(Book::find(1));
+        $this->assertNull(Book::find($book->id));
     }
 }

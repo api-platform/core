@@ -29,7 +29,7 @@ class JsonProblemTest extends TestCase
         $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Error',
-            '@id' => '/api/hydra_errors/404',
+            '@id' => '/api/errors/404.jsonld',
             '@type' => 'hydra:Error',
             'type' => '/errors/404',
             'title' => 'An error occurred',

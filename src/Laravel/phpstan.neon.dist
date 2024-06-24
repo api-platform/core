@@ -9,9 +9,9 @@ parameters:
 		- Controller
 		- Eloquent
 		- Exception
-		- Metadata
 		- Routing
 		- State
+		- Test
 		- Tests
 #    ignoreErrors:
 #        - '#PHPDoc tag @var#'

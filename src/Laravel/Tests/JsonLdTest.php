@@ -252,4 +252,20 @@ class JsonLdTest extends TestCase
         $this->assertCount(1, $violations);
         $this->assertEquals($violations[0], ['propertyPath' => 'title', 'message' => 'The title field is required.']);
     }
+
+    public function testSluggable(): void
+    {
+        $response = $this->get('/api/sluggables', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertJsonFragment([
+            '@context' => '/api/contexts/Sluggable',
+            '@id' => '/api/sluggables',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 10,
+        ]);
+        $iri = $response->json('hydra:member.0.@id');
+        $response = $this->get($iri, ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+    }
 }

@@ -85,7 +85,6 @@ parameters:
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::denormalize\(\) invoked with (2|3|4) parameters, 1 required\.#'
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with (2|3|4) parameters, 1 required\.#'
 
-		- '#Service "behat\.driver\.service_container" is not registered in the container\.#'
 		# Expected, due to backward compatibility
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"

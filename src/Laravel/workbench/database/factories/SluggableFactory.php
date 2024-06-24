@@ -14,21 +14,22 @@ declare(strict_types=1);
 namespace Workbench\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Workbench\App\Models\Post;
+use Illuminate\Support\Str;
+use Workbench\App\Models\Sluggable;
 
 /**
  * @template TModel of \Workbench\App\Models\Author
  *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<TModel>
  */
-class PostFactory extends Factory
+class SluggableFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var class-string<TModel>
      */
-    protected $model = Post::class;
+    protected $model = Sluggable::class;
 
     /**
      * Define the model's default state.
@@ -41,6 +42,7 @@ class PostFactory extends Factory
 
         return [
             'title' => $title,
+            'slug' => Str::slug($title),
         ];
     }
 }
