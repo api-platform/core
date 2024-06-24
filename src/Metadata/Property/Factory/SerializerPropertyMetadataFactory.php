@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
+use Doctrine\ORM\Mapping\DiscriminatorMap;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 
@@ -30,7 +31,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 {
     use ResourceClassInfoTrait;
 
-    public function __construct(private readonly SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, ?ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(private readonly SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, ?ResourceClassResolverInterface $resourceClassResolver = null, private readonly ?bool $normalizeChildClassAttributeGroups = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
     }
@@ -201,6 +202,18 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         $groups = [];
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
             $groups[] = $serializerAttributeMetadata->getGroups();
+        }
+
+        if (true === $this->normalizeChildClassAttributeGroups) {
+            foreach ($serializerClassMetadata->getReflectionClass()->getAttributes() as $reflectionAttribute) {
+                if (DiscriminatorMap::class !== $reflectionAttribute->getName()) {
+                    continue;
+                }
+
+                foreach ($reflectionAttribute->getArguments()[0] as $class) {
+                    $groups = [...$groups, $this->getClassSerializerGroups($class)];
+                }
+            }
         }
 
         return array_unique(array_merge(...$groups));

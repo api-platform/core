@@ -232,6 +232,7 @@ class ConfigurationTest extends TestCase
             'use_symfony_listeners' => false,
             'handle_symfony_errors' => false,
             'enable_link_security' => false,
+            'normalize_child_class_attribute_groups' => null,
         ], $config);
     }
 
