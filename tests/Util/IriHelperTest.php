@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Util;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Util\IriHelper;
 use PHPUnit\Framework\TestCase;

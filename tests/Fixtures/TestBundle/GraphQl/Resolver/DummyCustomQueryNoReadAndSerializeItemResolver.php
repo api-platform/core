@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
 
 /**

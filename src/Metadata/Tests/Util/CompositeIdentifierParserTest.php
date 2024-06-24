@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Api;
+namespace ApiPlatform\Metadata\Tests\Util;
 
-use ApiPlatform\Api\CompositeIdentifierParser;
+use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use PHPUnit\Framework\TestCase;
 
 class CompositeIdentifierParserTest extends TestCase

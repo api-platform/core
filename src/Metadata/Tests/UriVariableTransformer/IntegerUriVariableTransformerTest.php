@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Api\UriVariableTransformer;
+namespace ApiPlatform\Metadata\Tests\UriVariableTransformer;
 
-use ApiPlatform\Api\UriVariableTransformer\IntegerUriVariableTransformer;
+use ApiPlatform\Metadata\UriVariableTransformer\IntegerUriVariableTransformer;
 use PHPUnit\Framework\TestCase;
 
 class IntegerUriVariableTransformerTest extends TestCase

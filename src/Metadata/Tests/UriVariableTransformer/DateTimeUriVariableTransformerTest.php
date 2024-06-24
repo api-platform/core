@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Api\UriVariableTransformer;
+namespace ApiPlatform\Metadata\Tests\UriVariableTransformer;
 
-use ApiPlatform\Api\UriVariableTransformer\DateTimeUriVariableTransformer;
-use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\UriVariableTransformer\DateTimeUriVariableTransformer;
 use PHPUnit\Framework\TestCase;
 
 class DateTimeUriVariableTransformerTest extends TestCase

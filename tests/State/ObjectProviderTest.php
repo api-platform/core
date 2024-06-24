@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\State;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ObjectProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyResourceWithComplexConstructor;

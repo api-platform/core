@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
