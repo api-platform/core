@@ -23,6 +23,8 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -141,7 +143,8 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface|LegacyIriConverterInterface $iriConverter, ?PropertyAccessorInterface $propertyAccessor = null, ?LoggerInterface $logger = null, ?array $properties = null, IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null, ?NameConverterInterface $nameConverter = null)
+
+    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface|LegacyIriConverterInterface $iriConverter, private PropertyMetadataFactoryInterface $propertyMetadataFactory, private ResourceAccessCheckerInterface $resourceAccessChecker, ?PropertyAccessorInterface $propertyAccessor = null, ?LoggerInterface $logger = null, ?array $properties = null, IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null, ?NameConverterInterface $nameConverter = null)
     {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
@@ -169,6 +172,14 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             null === $value
             || !$this->isPropertyEnabled($property, $resourceClass)
             || !$this->isPropertyMapped($property, $resourceClass, true)
+        ) {
+            return;
+        }
+
+        $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+        if (
+            (null === $security = $propertyMetadata->getSecurity())
+            || !$this->resourceAccessChecker->isGranted($resourceClass, $security)
         ) {
             return;
         }
