@@ -1,4 +1,3 @@
 test UUID / slug instead of id
 test hidden
-FormRequest => sec + validation
 debug command artisan

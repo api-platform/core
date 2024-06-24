@@ -15,7 +15,6 @@ namespace ApiPlatform\Laravel;
 
 use ApiPlatform\Documentation\Action\DocumentationAction;
 use ApiPlatform\Documentation\Action\EntrypointAction;
-use ApiPlatform\Exception\NotExposedHttpException;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer as HydraDocumentationNormalizer;
@@ -65,6 +64,7 @@ use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\ValidateProvider;
+use ApiPlatform\Metadata\Exception\NotExposedHttpException;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;

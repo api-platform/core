@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\FormatMatcher;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Symfony\Util\FormatMatcher;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Negotiation\Exception\InvalidArgument;
 use Negotiation\Negotiator;

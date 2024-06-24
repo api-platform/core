@@ -48,7 +48,7 @@ final class ValidateProvider implements ProviderInterface
         if (\is_string($rules) && is_a($rules, FormRequest::class, true)) {
             try {
                 $this->app->make($rules);
-            // } catch (AuthorizationException $e) { // TODO: we may want to catch this to transform to an error
+                // } catch (AuthorizationException $e) { // TODO: we may want to catch this to transform to an error
             } catch (ValidationException $e) {
                 throw $this->getValidationError($e);
             }

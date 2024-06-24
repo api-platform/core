@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hydra\Serializer;
 
-use ApiPlatform\Api\Entrypoint;
-use ApiPlatform\Documentation\Entrypoint as DocumentationEntrypoint;
+use ApiPlatform\Documentation\Entrypoint;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -38,9 +37,6 @@ class EntrypointNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
     public function testSupportNormalization(): void
     {
         $collection = new ResourceNameCollection();
@@ -56,7 +52,7 @@ class EntrypointNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization($entrypoint, 'json'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), EntrypointNormalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('json'));
-        $this->assertSame([Entrypoint::class => true, DocumentationEntrypoint::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+        $this->assertSame([Entrypoint::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
 
         if (!method_exists(Serializer::class, 'getSupportedTypes')) {
             $this->assertTrue($normalizer->hasCacheableSupportsMethod());

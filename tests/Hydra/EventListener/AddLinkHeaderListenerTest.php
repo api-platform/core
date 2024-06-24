@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hydra\EventListener;
 
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Hydra\EventListener\AddLinkHeaderListener;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;

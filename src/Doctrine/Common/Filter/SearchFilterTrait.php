@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common\Filter;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
-use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -32,9 +30,9 @@ trait SearchFilterTrait
 {
     use PropertyHelperTrait;
 
-    protected IriConverterInterface|LegacyIriConverterInterface $iriConverter;
+    protected IriConverterInterface $iriConverter;
     protected PropertyAccessorInterface $propertyAccessor;
-    protected IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null;
+    protected ?IdentifiersExtractorInterface $identifiersExtractor = null;
 
     /**
      * {@inheritdoc}
@@ -111,7 +109,7 @@ trait SearchFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function getIriConverter(): LegacyIriConverterInterface|IriConverterInterface;
+    abstract protected function getIriConverter(): IriConverterInterface;
 
     abstract protected function getPropertyAccessor(): PropertyAccessorInterface;
 

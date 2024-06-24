@@ -252,7 +252,7 @@ class ApiResource extends Metadata
          * ```yaml
          * # api/config/api_platform/resources.yaml
          * App\Entity\Book:
-         *     urlGenerationStrategy: !php/const ApiPlatform\Api\UrlGeneratorInterface::ABS_URL
+         *     urlGenerationStrategy: !php/const ApiPlatform\Metadata\UrlGeneratorInterface::ABS_URL
          * ```
          *
          * ```xml

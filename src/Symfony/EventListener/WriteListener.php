@@ -13,11 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
-use ApiPlatform\Api\UriVariablesConverterInterface as LegacyUriVariablesConverterInterface;
-use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -49,17 +46,17 @@ final class WriteListener
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
-    private LegacyIriConverterInterface|IriConverterInterface|null $iriConverter = null;
+    private ?IriConverterInterface $iriConverter = null;
 
     /**
      * @param ProcessorInterface<mixed, mixed> $processor
      */
     public function __construct(
         private readonly ProcessorInterface $processor,
-        LegacyIriConverterInterface|IriConverterInterface|ResourceMetadataCollectionFactoryInterface|null $iriConverter = null,
-        private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface|null $resourceClassResolver = null,
+        IriConverterInterface|ResourceMetadataCollectionFactoryInterface|null $iriConverter = null,
+        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
-        LegacyUriVariablesConverterInterface|UriVariablesConverterInterface|null $uriVariablesConverter = null,
+        ?UriVariablesConverterInterface $uriVariablesConverter = null,
     ) {
         $this->uriVariablesConverter = $uriVariablesConverter;
 

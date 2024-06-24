@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Exception\ErrorCodeSerializableInterface;
+use ApiPlatform\Metadata\Exception\ErrorCodeSerializableInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
