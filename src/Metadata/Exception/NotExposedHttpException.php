@@ -11,10 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\JsonApi\Tests\Fixtures;
+namespace ApiPlatform\Metadata\Exception;
 
-class CircularReference
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+/**
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ */
+class NotExposedHttpException extends NotFoundHttpException
 {
-    public $id;
-    public CircularReference $parent;
 }

@@ -38,7 +38,7 @@ class PostFactory extends Factory
      */
     public function definition(): array
     {
-        $title = fake()->sentence(10);
+        $title = fake()->unique()->sentence(10);
 
         return [
             'title' => $title,
