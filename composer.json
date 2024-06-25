@@ -52,8 +52,17 @@
         "friends-of-behat/mink-extension": "^2.2",
         "friends-of-behat/symfony-extension": "^2.1",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
+        "illuminate/config": "^10.0||^11.0",
+        "illuminate/contracts": "^10.0||^11.0",
+        "illuminate/database": "^10.0||^11.0",
+        "illuminate/http": "^10.0||^11.0",
+        "illuminate/pagination": "^10.0||^11.0",
+        "illuminate/routing": "^10.0||^11.0",
+        "illuminate/support": "^10.0||^11.0",
         "jangregor/phpstan-prophecy": "^1.0",
         "justinrainbow/json-schema": "^5.2.1",
+        "laravel/framework": "^10.0||^11.0",
+        "orchestra/testbench": "^8.18",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpdoc-parser": "^1.13",
@@ -141,7 +150,10 @@
     "autoload-dev": {
         "psr-4": {
             "ApiPlatform\\Tests\\": "tests/",
-            "App\\": "tests/Fixtures/app/var/tmp/src/"
+            "App\\": "tests/Fixtures/app/var/tmp/src/",
+            "Workbench\\App\\": "src/Laravel/workbench/app/",
+            "Workbench\\Database\\Factories\\": "src/Laravel/workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "src/Laravel/workbench/database/seeders/"
         }
     },
     "config": {
@@ -181,7 +193,9 @@
             "api-platform/serializer",
             "api-platform/state",
             "api-platform/symfony",
-            "api-platform/validator"
+            "api-platform/validator",
+            "api-platform/laravel",
+            "api-platform/json-api"
         ]
     },
     "repositories": [
@@ -202,6 +216,8 @@
       {"type": "path", "url": "./src/Serializer"},
       {"type": "path", "url": "./src/State"},
       {"type": "path", "url": "./src/Symfony"},
-      {"type": "path", "url": "./src/Validator"}
+      {"type": "path", "url": "./src/Validator"},
+      {"type": "path", "url": "./src/Laravel"},
+      {"type": "path", "url": "./src/JsonApi"}
     ]
 }

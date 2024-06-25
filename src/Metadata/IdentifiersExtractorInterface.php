@@ -13,32 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 
-if (interface_exists(\ApiPlatform\Api\IdentifiersExtractorInterface::class)) {
-    class_alias(
-        \ApiPlatform\Api\IdentifiersExtractorInterface::class,
-        __NAMESPACE__.'\IdentifiersExtractorInterface'
-    );
-
-    if (false) { // @phpstan-ignore-line
-        interface IdentifiersExtractorInterface extends \ApiPlatform\Api\IdentifiersExtractorInterface
-        {
-        }
-    }
-} else {
+/**
+ * Extracts identifiers for a given Resource according to the retrieved Metadata.
+ *
+ * @author Antoine Bluchet <soyuka@gmail.com>
+ */
+interface IdentifiersExtractorInterface
+{
     /**
-     * Extracts identifiers for a given Resource according to the retrieved Metadata.
+     * Finds identifiers from an Item (object).
      *
-     * @author Antoine Bluchet <soyuka@gmail.com>
+     * @param array<string, mixed> $context
+     *
+     * @throws RuntimeException
+     *
+     * @return array<string, mixed>
      */
-    interface IdentifiersExtractorInterface
-    {
-        /**
-         * Finds identifiers from an Item (object).
-         *
-         * @throws RuntimeException
-         */
-        public function getIdentifiersFromItem(object $item, ?Operation $operation = null, array $context = []): array;
-    }
+    public function getIdentifiersFromItem(object $item, ?Operation $operation = null, array $context = []): array;
 }

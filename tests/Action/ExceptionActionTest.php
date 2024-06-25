@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Action;
 
 use ApiPlatform\Action\ExceptionAction;
-use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;

@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Serializer;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
-use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -36,7 +34,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
     public const ITEM_RESOURCE_CLASS_KEY = '#itemResourceClass';
     public const ITEM_IDENTIFIERS_KEY = '#itemIdentifiers';
 
-    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface|LegacyIriConverterInterface $iriConverter, private readonly IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface $identifiersExtractor)
+    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter, private readonly IdentifiersExtractorInterface $identifiersExtractor)
     {
     }
 

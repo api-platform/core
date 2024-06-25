@@ -15,8 +15,8 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ResourceList;

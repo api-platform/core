@@ -336,6 +336,7 @@ resources:
                     index: foo_index
                     type: foo_type
             parameters: null
+            rules: null
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
                 another_custom_property:

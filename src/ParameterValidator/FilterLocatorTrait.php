@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\ParameterValidator;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\FilterInterface;
 use Psr\Container\ContainerInterface;
 

@@ -1,0 +1,22 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+	level: 7
+	paths:
+		- ApiResource
+		- config
+		- Controller
+		- Eloquent
+		- Exception
+		- Routing
+		- State
+		- Test
+		- Tests
+#    ignoreErrors:
+#        - '#PHPDoc tag @var#'
+#
+#    excludePaths:
+#        - ./*/*/FileToBeExcluded.php
+#
+#    checkMissingIterableValueType: false

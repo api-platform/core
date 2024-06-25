@@ -16,6 +16,8 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludePaths:
+		# uses larastan
+		- src/Laravel
 		- src/Symfony/Bundle/Command/OpenApiCommand.php
 		# Symfony config
 		- tests/Fixtures/app/config/config_swagger.php
@@ -86,7 +88,7 @@ parameters:
 		# Expected, due to backward compatibility
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
-			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
+			path: src/JsonApi/Tests/Serializer/ItemNormalizerTest.php
 		- '#Method GraphQL\\Type\\Definition\\WrappingType::getWrappedType\(\) invoked with 1 parameter, 0 required\.#'
 		- '#Access to an undefined property GraphQL\\Type\\Definition\\NamedType&GraphQL\\Type\\Definition\\Type::\$name\.#'
 		# See https://github.com/phpstan/phpstan-symfony/issues/27
@@ -99,5 +101,4 @@ parameters:
 		# Backward compatibility
 		- '#Call to method hasCacheableSupportsMethod\(\) on an unknown class Symfony\\Component\\Serializer\\Normalizer\\CacheableSupportsMethodInterface\.#'
 		- '#Class Symfony\\Component\\Serializer\\Normalizer\\CacheableSupportsMethodInterface not found\.#'
-		- '#Access to undefined constant Symfony\\Component\\HttpKernel\\HttpKernelInterface::MASTER_REQUEST\.#'
 		- '#Attribute class PHPUnit\\Framework\\Attributes\\DataProvider does not exist.#'

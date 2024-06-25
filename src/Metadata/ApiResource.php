@@ -252,7 +252,7 @@ class ApiResource extends Metadata
          * ```yaml
          * # api/config/api_platform/resources.yaml
          * App\Entity\Book:
-         *     urlGenerationStrategy: !php/const ApiPlatform\Api\UrlGeneratorInterface::ABS_URL
+         *     urlGenerationStrategy: !php/const ApiPlatform\Metadata\UrlGeneratorInterface::ABS_URL
          * ```
          *
          * ```xml
@@ -961,6 +961,7 @@ class ApiResource extends Metadata
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
         protected array|Parameters|null $parameters = null,
+        protected mixed $rules = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(
@@ -1002,6 +1003,7 @@ class ApiResource extends Metadata
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            rules: $rules,
             extraProperties: $extraProperties
         );
 

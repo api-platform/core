@@ -21,16 +21,17 @@ use ApiPlatform\State\OptionsInterface;
 abstract class Metadata
 {
     /**
-     * @param string|null                         $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param string|\Stringable|null             $security                https://api-platform.com/docs/core/security
-     * @param string|\Stringable|null             $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param mixed|null                          $mercure
-     * @param mixed|null                          $messenger
-     * @param mixed|null                          $input
-     * @param mixed|null                          $output
-     * @param mixed|null                          $provider
-     * @param mixed|null                          $processor
-     * @param Parameters|array<string, Parameter> $parameters
+     * @param string|null                                                                       $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param string|\Stringable|null                                                           $security                https://api-platform.com/docs/core/security
+     * @param string|\Stringable|null                                                           $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param mixed|null                                                                        $mercure
+     * @param mixed|null                                                                        $messenger
+     * @param mixed|null                                                                        $input
+     * @param mixed|null                                                                        $output
+     * @param mixed|null                                                                        $provider
+     * @param mixed|null                                                                        $processor
+     * @param Parameters|array<string, Parameter>                                               $parameters
+     * @param callable|string|array<string, \Illuminate\Contracts\Validation\Rule|array|string> $rules                   Laravel rules can be a FormRequest class, a callable or an array of rules
      */
     public function __construct(
         protected ?string $shortName = null,
@@ -74,7 +75,8 @@ abstract class Metadata
          * @experimental
          */
         protected array|Parameters|null $parameters = [],
-        protected array $extraProperties = []
+        protected mixed $rules = null,
+        protected array $extraProperties = [],
     ) {
     }
 
@@ -567,6 +569,25 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->stateOptions = $stateOptions;
+
+        return $self;
+    }
+
+    /**
+     * @return string|callable|array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     */
+    public function getRules(): mixed
+    {
+        return $this->rules;
+    }
+
+    /**
+     * @param string|callable|array<string, \Illuminate\Contracts\Validation\Rule|array|string> $rules
+     */
+    public function withRules(mixed $rules): static
+    {
+        $self = clone $this;
+        $self->rules = $rules;
 
         return $self;
     }

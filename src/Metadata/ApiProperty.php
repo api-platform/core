@@ -20,7 +20,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT | \Attribute::TARGET_CLASS)]
 final class ApiProperty
 {
     /**
@@ -41,6 +41,7 @@ final class ApiProperty
      * @param string[]                $iris
      * @param Type[]                  $builtinTypes
      * @param string|null             $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
+     * @param string|null             $property                The property name
      */
     public function __construct(
         private ?string $description = null,
@@ -203,11 +204,25 @@ final class ApiProperty
         private $iris = null,
         private ?bool $genId = null,
         private ?string $uriTemplate = null,
+        private ?string $property = null,
         private array $extraProperties = [],
     ) {
         if (\is_string($types)) {
             $this->types = (array) $types;
         }
+    }
+
+    public function getProperty(): ?string
+    {
+        return $this->property;
+    }
+
+    public function withProperty(string $property): self
+    {
+        $self = clone $this;
+        $self->property = $property;
+
+        return $self;
     }
 
     public function getDescription(): ?string

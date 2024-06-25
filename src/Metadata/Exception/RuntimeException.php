@@ -13,19 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-use ApiPlatform\Exception\RuntimeException as LegacyRuntimeException;
-
-if (class_exists(LegacyRuntimeException::class)) {
-    class RuntimeException extends LegacyRuntimeException
-    {
-    }
-} else {
-    /**
-     * Runtime exception.
-     *
-     * @author Kévin Dunglas <dunglas@gmail.com>
-     */
-    class RuntimeException extends \RuntimeException implements ExceptionInterface
-    {
-    }
+/**
+ * Runtime exception.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+class RuntimeException extends \RuntimeException implements ExceptionInterface
+{
 }

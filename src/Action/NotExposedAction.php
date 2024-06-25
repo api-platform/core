@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Action;
 
-use ApiPlatform\Exception\NotExposedHttpException;
+use ApiPlatform\Metadata\Exception\NotExposedHttpException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Put;
@@ -39,10 +38,10 @@ final class RespondListener
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
-    private IriConverterInterface|LegacyIriConverterInterface|null $iriConverter = null;
+    private ?IriConverterInterface $iriConverter = null;
     private ?ProcessorInterface $processor = null;
 
-    public function __construct(?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, IriConverterInterface|LegacyIriConverterInterface|ProcessorInterface|null $iriConverter = null)
+    public function __construct(?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, IriConverterInterface|ProcessorInterface|null $iriConverter = null)
     {
         if ($iriConverter instanceof ProcessorInterface) {
             $this->processor = $iriConverter;

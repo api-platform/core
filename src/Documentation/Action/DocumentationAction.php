@@ -98,6 +98,7 @@ final class DocumentationAction
             );
 
             if ('html' === $format) {
+                // TODO: support laravel this bounds Documentation with Symfony so it's not perfect
                 $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
             }
             if ('json' === $format) {

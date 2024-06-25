@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\EventListener;
 
-use ApiPlatform\Exception\FilterValidationException;
+use ApiPlatform\ParameterValidator\Exception\ValidationException as FilterValidationException;
 use ApiPlatform\Symfony\Validator\EventListener\ValidationExceptionListener;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;

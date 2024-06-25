@@ -13,17 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-use ApiPlatform\Exception\OperationNotFoundException as LegacyOperationNotFoundException;
-
-if (class_exists(LegacyOperationNotFoundException::class)) {
-    class OperationNotFoundException extends LegacyOperationNotFoundException
-    {
-    }
-} else {
-    /**
-     * Operation not found exception.
-     */
-    class OperationNotFoundException extends \InvalidArgumentException implements ExceptionInterface
-    {
-    }
+/**
+ * Operation not found exception.
+ */
+class OperationNotFoundException extends \InvalidArgumentException implements ExceptionInterface
+{
 }

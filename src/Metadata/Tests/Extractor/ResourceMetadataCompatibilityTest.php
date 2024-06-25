@@ -509,6 +509,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'paginationViaCursor',
         'stateOptions',
         'links',
+        'rules',
         'headers',
         'parameters',
     ];

@@ -508,6 +508,10 @@ XML_WRAP
         $childNode->addAttribute('href', $values[0]['href']);
     }
 
+    private function buildRules(\SimpleXMLElement $resource, ?array $values = null): void
+    {
+    }
+
     private function buildHeaders(\SimpleXMLElement $resource, ?array $values = null): void
     {
         if (!$values) {

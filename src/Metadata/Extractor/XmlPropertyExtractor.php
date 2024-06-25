@@ -73,6 +73,7 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
                 'iris' => $this->buildArrayValue($property, 'iri'),
                 'genId' => $this->phpize($property, 'genId', 'bool'),
                 'uriTemplate' => $this->phpize($property, 'uriTemplate', 'string'),
+                'property' => $this->phpize($property, 'property', 'string'),
             ];
         }
     }

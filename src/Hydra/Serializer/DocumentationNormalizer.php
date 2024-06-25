@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
-use ApiPlatform\Api\UrlGeneratorInterface as LegacyUrlGeneratorInterface;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
@@ -46,7 +44,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 {
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator, private readonly ?NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?NameConverterInterface $nameConverter = null)
     {
     }
 

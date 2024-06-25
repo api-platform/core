@@ -13,16 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\UriVariablesConverterInterface as LegacyUriVariablesConverterInterface;
-use ApiPlatform\Exception\InvalidIdentifierException;
-use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\Metadata\Util\CloneTrait;
-use ApiPlatform\Serializer\SerializerContextBuilderInterface as LegacySerializerContextBuilderInterface;
 use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\Provider\ReadProvider;
@@ -49,8 +47,8 @@ final class ReadListener
     public function __construct(
         private readonly ProviderInterface $provider,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
-        private readonly LegacySerializerContextBuilderInterface|SerializerContextBuilderInterface|null $serializerContextBuilder = null,
-        LegacyUriVariablesConverterInterface|UriVariablesConverterInterface|null $uriVariablesConverter = null,
+        private readonly ?SerializerContextBuilderInterface $serializerContextBuilder = null,
+        ?UriVariablesConverterInterface $uriVariablesConverter = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
