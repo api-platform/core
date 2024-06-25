@@ -67,16 +67,19 @@ use Symfony\Component\WebLink\Link;
 class ValidationError extends RuntimeException implements \Stringable, ProblemExceptionInterface, HttpExceptionInterface, SymfonyHttpExceptionInterface
 {
     private int $status = 422;
-    private mixed $id;
+    private string $id;
 
-    public function __construct(string $message = '', mixed $code = null, int|\Throwable|null $previous = null, protected array $violations = [])
+    /**
+     * @param array<int, array{propertyPath: string, message: string, code?: string}> $violations
+     */
+    public function __construct(string $message = '', mixed $code = null, ?\Throwable $previous = null, protected array $violations = [])
     {
-        $this->id = $code;
+        $this->id = (string) $code;
         $this->setDetail($message);
         parent::__construct($message ?: $this->__toString(), 422, $previous);
     }
 
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -130,11 +133,11 @@ class ValidationError extends RuntimeException implements \Stringable, ProblemEx
         return null;
     }
 
+    /**
+     * @return array<int,array{propertyPath:string,message:string,code?:string}>
+     */
     #[SerializedName('violations')]
     #[Groups(['json', 'jsonld'])]
-    /**
-     * @return array<int, array{propertyPath: string, message: string}>
-     */
     public function getViolations(): array
     {
         return $this->violations;
@@ -145,6 +148,9 @@ class ValidationError extends RuntimeException implements \Stringable, ProblemEx
         return $this->status;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getHeaders(): array
     {
         return [];

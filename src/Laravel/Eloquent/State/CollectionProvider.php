@@ -29,6 +29,9 @@ class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
 
+    /**
+     * @param LinksHandlerInterface<Model> $linksHandler
+     */
     public function __construct(private readonly Pagination $pagination, private readonly LinksHandlerInterface $linksHandler, ?ContainerInterface $handleLinksLocator = null)
     {
         $this->handleLinksLocator = $handleLinksLocator;
@@ -44,9 +47,9 @@ class CollectionProvider implements ProviderInterface
         $model = new ($operation->getClass())();
 
         if ($handleLinks = $this->getLinksHandler($operation)) {
-            $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation] + $context);
+            $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getClass()] + $context);
         } else {
-            $query = $this->linksHandler->handleLinks($model->query(), $uriVariables, ['operation' => $operation] + $context);
+            $query = $this->linksHandler->handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getClass()] + $context);
         }
 
         if (false === $this->pagination->isEnabled($operation, $context)) {

@@ -15,6 +15,7 @@ namespace ApiPlatform\Laravel\Eloquent\Metadata;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
@@ -28,7 +29,7 @@ final class ModelMetadata
     /**
      * The methods that can be called in a model to indicate a relation.
      *
-     * @var array
+     * @var string[]
      */
     public const RELATION_METHODS = [
         'hasMany',
@@ -63,9 +64,9 @@ final class ModelMetadata
      *
      * @param Model $model
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<string, mixed>
      */
-    public function getAttributes($model)
+    public function getAttributes($model): Collection
     {
         $connection = $model->getConnection();
         $schema = $connection->getSchemaBuilder();
@@ -90,6 +91,9 @@ final class ModelMetadata
             ->merge($this->getVirtualAttributes($model, $columns));
     }
 
+    /**
+     * @param array<int, array{columns: string[]}> $indexes
+     */
     private function isColumnPrimaryKey(array $indexes, string $column): bool
     {
         foreach ($indexes as $index) {
@@ -104,12 +108,11 @@ final class ModelMetadata
     /**
      * Get the virtual (non-column) attributes for the given model.
      *
-     * @param Model $model
-     * @param array $columns
+     * @param array<string, mixed> $columns
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, mixed>
      */
-    public function getVirtualAttributes($model, $columns)
+    public function getVirtualAttributes(Model $model, $columns): Collection
     {
         $class = new \ReflectionClass($model);
 
@@ -148,11 +151,9 @@ final class ModelMetadata
     /**
      * Get the relations from the given model.
      *
-     * @param Model $model
-     *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, mixed>
      */
-    public function getRelations($model)
+    public function getRelations(Model $model): Collection
     {
         return collect(get_class_methods($model))
             ->map(fn ($method) => new \ReflectionMethod($model, $method))
@@ -168,11 +169,19 @@ final class ModelMetadata
                     return true;
                 }
 
+                if (false === $method->getFileName()) {
+                    return false;
+                }
+
                 $file = new \SplFileObject($method->getFileName());
                 $file->seek($method->getStartLine() - 1);
                 $code = '';
                 while ($file->key() < $method->getEndLine()) {
-                    $code .= trim($file->current());
+                    $current = $file->current();
+                    if (\is_string($current)) {
+                        $code .= trim($current);
+                    }
+
                     $file->next();
                 }
 
@@ -199,11 +208,9 @@ final class ModelMetadata
     /**
      * Get the Events that the model dispatches.
      *
-     * @param Model $model
-     *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, mixed>
      */
-    public function getEvents($model)
+    public function getEvents(Model $model): Collection
     {
         return collect($model->dispatchesEvents())
             ->map(fn (string $class, string $event) => [
@@ -214,13 +221,8 @@ final class ModelMetadata
 
     /**
      * Get the cast type for the given column.
-     *
-     * @param string $column
-     * @param Model  $model
-     *
-     * @return string|null
      */
-    private function getCastType($column, $model)
+    private function getCastType(string $column, Model $model): ?string
     {
         if ($model->hasGetMutator($column) || $model->hasSetMutator($column)) {
             return 'accessor';
@@ -236,11 +238,9 @@ final class ModelMetadata
     /**
      * Get the model casts, including any date casts.
      *
-     * @param Model $model
-     *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<string, mixed>
      */
-    private function getCastsWithDates($model)
+    private function getCastsWithDates(Model $model): Collection
     {
         return collect($model->getDates())
             ->filter()
@@ -252,12 +252,11 @@ final class ModelMetadata
     /**
      * Get the default value for the given column.
      *
-     * @param array $column
-     * @param Model $model
+     * @param array<string, mixed>&array{name: string, default: string} $column
      *
      * @return mixed|null
      */
-    private function getColumnDefault($column, $model)
+    private function getColumnDefault(array $column, Model $model): mixed
     {
         $attributeDefault = $model->getAttributes()[$column['name']] ?? null;
 
@@ -270,13 +269,8 @@ final class ModelMetadata
 
     /**
      * Determine if the given attribute is hidden.
-     *
-     * @param string $attribute
-     * @param Model  $model
-     *
-     * @return bool
      */
-    private function attributeIsHidden($attribute, $model)
+    private function attributeIsHidden(string $attribute, Model $model): bool
     {
         if (\count($model->getHidden()) > 0) {
             return \in_array($attribute, $model->getHidden(), true);
@@ -292,12 +286,9 @@ final class ModelMetadata
     /**
      * Determine if the given attribute is unique.
      *
-     * @param string $column
-     * @param array  $indexes
-     *
-     * @return bool
+     * @param array<int, array{columns: string[], unique: bool}> $indexes
      */
-    private function columnIsUnique($column, $indexes)
+    private function columnIsUnique(string $column, array $indexes): bool
     {
         return collect($indexes)->contains(
             fn ($index) => 1 === \count($index['columns']) && $index['columns'][0] === $column && $index['unique']

@@ -26,6 +26,10 @@ final class EloquentAttributePropertyMetadataFactory implements PropertyMetadata
 
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
+        if (!class_exists($resourceClass)) {
+            return $this->decorated?->create($resourceClass, $property, $options) ?? new ApiProperty();
+        }
+
         $refl = new \ReflectionClass($resourceClass);
         $model = $refl->newInstanceWithoutConstructor();
 

@@ -15,6 +15,7 @@ namespace ApiPlatform\Laravel\Eloquent\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -24,6 +25,9 @@ class ItemProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
 
+    /**
+     * @param LinksHandlerInterface<Model> $linksHandler
+     */
     public function __construct(private readonly LinksHandlerInterface $linksHandler, ?ContainerInterface $handleLinksLocator = null)
     {
         $this->handleLinksLocator = $handleLinksLocator;

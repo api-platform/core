@@ -15,6 +15,7 @@ namespace ApiPlatform\Laravel\Test;
 
 use ApiPlatform\Laravel\Test\Constraint\ArraySubset;
 use ApiPlatform\Metadata\IriConverterInterface;
+use PHPUnit\Framework\ExpectationFailedException;
 
 trait ApiTestAssertionsTrait
 {
@@ -28,8 +29,10 @@ trait ApiTestAssertionsTrait
      *
      * @see https://github.com/sebastianbergmann/phpunit/issues/3494
      *
+     * @param array<mixed, mixed> $subset
+     * @param array<mixed, mixed> $array
+     *
      * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws \Exception
      */
     public static function assertArraySubset(iterable $subset, iterable $array, bool $checkForObjectIdentity = false, string $message = ''): void
@@ -44,11 +47,8 @@ trait ApiTestAssertionsTrait
      *
      * This method delegates to static::assertArraySubset().
      *
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
+     * @param array<mixed, mixed> $subset
+     * @param array<mixed, mixed> $json
      */
     public static function assertJsonContains(array|string $subset, array $json, bool $checkForObjectIdentity = true, string $message = ''): void
     {

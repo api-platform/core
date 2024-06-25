@@ -32,6 +32,10 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
+        if (!class_exists($resourceClass)) {
+            return $this->decorated->create($resourceClass, $options);
+        }
+
         try {
             $refl = new \ReflectionClass($resourceClass);
             $model = $refl->newInstanceWithoutConstructor();
@@ -45,7 +49,7 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
 
         $properties = [];
         // When it's an Eloquent model we read attributes from database (@see ShowModelCommand)
-        foreach ($this->modelMetadata->getAttributes($model) as $property) { // @phpstan-ignore-line
+        foreach ($this->modelMetadata->getAttributes($model) as $property) {
             if (!$property['primary'] && $property['hidden']) {
                 continue;
             }

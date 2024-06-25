@@ -14,8 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent\State;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 
+/**
+ * @implements LinksHandlerInterface<Model>
+ */
 class LinksHandler implements LinksHandlerInterface
 {
     public function __construct(private readonly Application $application)
@@ -40,9 +44,7 @@ class LinksHandler implements LinksHandlerInterface
                 continue;
             }
 
-            if (!$to && !$from) {
-                $builder->where($builder->getModel()->getTable().'.'.$link->getIdentifiers()[0], $identifier);
-            }
+            $builder->where($builder->getModel()->getTable().'.'.$link->getIdentifiers()[0], $identifier);
         }
 
         return $builder;

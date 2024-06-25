@@ -31,11 +31,14 @@ use SebastianBergmann\Exporter\Exporter;
  */
 trait ArraySubsetTrait
 {
+    /**
+     * @param array<mixed, mixed> $subset
+     */
     public function __construct(private iterable $subset, private readonly bool $strict = false)
     {
     }
 
-    private function _evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    private function _evaluate(mixed $other, string $description = '', bool $returnResult = false): ?bool
     {
         // type cast $other & $this->subset as an array to allow
         // support in standard array functions.
@@ -74,11 +77,16 @@ trait ArraySubsetTrait
     /**
      * {@inheritdoc}
      */
-    protected function failureDescription($other): string
+    protected function failureDescription(mixed $other): string
     {
         return 'an array '.$this->toString();
     }
 
+    /**
+     * @param array<mixed, mixed> $other
+     *
+     * @return array<mixed, mixed>
+     */
     private function toArray(iterable $other): array
     {
         if (\is_array($other)) {

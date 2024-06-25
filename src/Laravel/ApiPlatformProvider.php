@@ -279,7 +279,6 @@ class ApiPlatformProvider extends ServiceProvider
                         )
                     )
                 ),
-                $app->make(ModelMetadata::class)
             );
         });
 
@@ -316,7 +315,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(ValidateProvider::class, function (Application $app) {
-            return new ValidateProvider($app->make(ReadProvider::class), $app, $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
+            return new ValidateProvider($app->make(ReadProvider::class), $app);
         });
 
         $this->app->singleton(JsonApiProvider::class, function (Application $app) use ($config) {

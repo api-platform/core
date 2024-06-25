@@ -17,17 +17,20 @@ use ApiPlatform\Laravel\ApiResource\ValidationError;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\State\SerializerContextBuilderInterface;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
 
+/**
+ * @implements ProviderInterface<object>
+ */
 final class ValidateProvider implements ProviderInterface
 {
-    public function __construct(private readonly ProviderInterface $inner, private readonly Application $app, private readonly DecoderInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
+    /**
+     * @param ProviderInterface<object> $inner
+     */
+    public function __construct(private readonly ProviderInterface $inner, private readonly Application $app)
     {
     }
 
@@ -49,7 +52,7 @@ final class ValidateProvider implements ProviderInterface
             try {
                 $this->app->make($rules);
                 // } catch (AuthorizationException $e) { // TODO: we may want to catch this to transform to an error
-            } catch (ValidationException $e) {
+            } catch (ValidationException $e) { // @phpstan-ignore-line make->($rules) may throw this
                 throw $this->getValidationError($e);
             }
 

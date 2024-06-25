@@ -36,7 +36,7 @@ trait LinksHandlerLocatorTrait
         }
 
         if ($this->handleLinksLocator && \is_string($handleLinks) && $this->handleLinksLocator->has($handleLinks)) {
-            return [$this->handleLinksLocator->get($handleLinks), 'handleLinks'];
+            return [$this->handleLinksLocator->get($handleLinks), 'handleLinks']; // @phpstan-ignore-line
         }
 
         throw new RuntimeException(sprintf('Could not find handleLinks service "%s"', $handleLinks));

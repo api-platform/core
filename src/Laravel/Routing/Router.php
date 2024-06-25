@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Routing;
 
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Http\Request as LaravelRequest;
 use Illuminate\Routing\Router as BaseRouter;
@@ -73,16 +72,12 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      *
-     * @return array{_api_resource_class: class-string|string, _api_operation_name: string, uri_variables: array<string, mixed>}
+     * @return array<string, mixed>|array{_api_resource_class?: class-string|string, _api_operation_name?: string, uri_variables?: array<string, mixed>}
      */
     public function match(string $pathInfo): array
     {
         $request = LaravelRequest::create($pathInfo, Request::METHOD_GET);
         $route = $this->router->getRoutes()->match($request);
-
-        if (!$route) {
-            throw new InvalidArgumentException(sprintf('No route matches "%s".', $pathInfo));
-        }
 
         return $route->defaults + ['uri_variables' => array_diff_key($route->parameters, $route->defaults)];
     }

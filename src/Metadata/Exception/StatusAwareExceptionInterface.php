@@ -18,5 +18,5 @@ interface StatusAwareExceptionInterface
     /**
      * Sets the status code.
      */
-    public function setStatus(): void;
+    public function setStatus(int $status): void;
 }

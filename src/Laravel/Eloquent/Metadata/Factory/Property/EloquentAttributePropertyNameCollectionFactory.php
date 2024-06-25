@@ -27,6 +27,10 @@ final class EloquentAttributePropertyNameCollectionFactory implements PropertyNa
     {
         $properties = $this->decorated ? iterator_to_array($this->decorated->create($resourceClass, $options)) : [];
 
+        if (!class_exists($resourceClass)) {
+            return new PropertyNameCollection($properties);
+        }
+
         $refl = new \ReflectionClass($resourceClass);
         $attributes = $refl->getAttributes(ApiProperty::class);
         foreach ($attributes as $attribute) {

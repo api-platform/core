@@ -27,7 +27,7 @@ final class ArraySubset extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    public function evaluate(mixed $other, string $description = '', bool $returnResult = false): ?bool
     {
         return $this->_evaluate($other, $description, $returnResult);
     }
