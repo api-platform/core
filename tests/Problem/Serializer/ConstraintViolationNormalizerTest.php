@@ -73,23 +73,18 @@ class ConstraintViolationNormalizerTest extends TestCase
     public static function nameConverterProvider(): iterable
     {
         $expected = [
-            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-            'title' => 'An error occurred',
-            'detail' => "_d: a\n_4: 1",
-            'violations' => [
-                [
-                    'propertyPath' => '_d',
-                    'message' => 'a',
-                    'code' => 'f24bdbad0becef97a6887238aa58221c',
-                    'payload' => [
-                        'severity' => 'warning',
-                    ],
+            [
+                'propertyPath' => '_d',
+                'message' => 'a',
+                'code' => 'f24bdbad0becef97a6887238aa58221c',
+                'payload' => [
+                    'severity' => 'warning',
                 ],
-                [
-                    'propertyPath' => '_4',
-                    'message' => '1',
-                    'code' => null,
-                ],
+            ],
+            [
+                'propertyPath' => '_4',
+                'message' => '1',
+                'code' => null,
             ],
         ];
 
@@ -112,23 +107,18 @@ class ConstraintViolationNormalizerTest extends TestCase
         yield [$nameConverterFactory, $expected];
 
         $expected = [
-            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-            'title' => 'An error occurred',
-            'detail' => "d: a\n4: 1",
-            'violations' => [
-                [
-                    'propertyPath' => 'd',
-                    'message' => 'a',
-                    'code' => 'f24bdbad0becef97a6887238aa58221c',
-                    'payload' => [
-                        'severity' => 'warning',
-                    ],
+            [
+                'propertyPath' => 'd',
+                'message' => 'a',
+                'code' => 'f24bdbad0becef97a6887238aa58221c',
+                'payload' => [
+                    'severity' => 'warning',
                 ],
-                [
-                    'propertyPath' => '4',
-                    'message' => '1',
-                    'code' => null,
-                ],
+            ],
+            [
+                'propertyPath' => '4',
+                'message' => '1',
+                'code' => null,
             ],
         ];
         yield [fn () => null, $expected];

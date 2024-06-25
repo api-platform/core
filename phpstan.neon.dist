@@ -72,10 +72,6 @@ parameters:
 			paths:
 				- src/GraphQl/Tests/Resolver/Factory/
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
-		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
-		-
-			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
-			path: src/Symfony/EventListener/AddFormatListener.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
 			message: '#Service "test" is not registered in the container\.#'

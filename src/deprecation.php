@@ -12,8 +12,6 @@
 declare(strict_types=1);
 
 $deprecatedClassesWithAliases = [
-    ApiPlatform\HttpCache\EventListener\AddHeadersListener::class => ApiPlatform\Symfony\EventListener\AddHeadersListener::class,
-    ApiPlatform\HttpCache\EventListener\AddTagsListener::class => ApiPlatform\Symfony\EventListener\AddTagsListener::class,
     ApiPlatform\Exception\FilterValidationException::class => ApiPlatform\ParameterValidator\Exception\ValidationException::class,
     ApiPlatform\Api\QueryParameterValidator\Validator\ArrayItems::class => ApiPlatform\ParameterValidator\Validator\ArrayItems::class,
     ApiPlatform\Api\QueryParameterValidator\Validator\Bounds::class => ApiPlatform\ParameterValidator\Validator\Bounds::class,

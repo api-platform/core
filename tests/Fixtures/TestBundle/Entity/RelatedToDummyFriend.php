@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Related To Dummy Friend represent an association table for a manytomany relation.
  */
-#[ApiResource(normalizationContext: ['groups' => ['fakemanytomany']], filters: ['related_to_dummy_friend.name'], extraProperties: ['rfc_7807_compliant_errors' => false])]
+#[ApiResource(normalizationContext: ['groups' => ['fakemanytomany']], filters: ['related_to_dummy_friend.name'])]
 #[ApiResource(uriTemplate: '/dummies/{id}/related_dummies/{relatedDummies}/related_to_dummy_friends{._format}', uriVariables: ['id' => new Link(fromClass: Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/related_dummies/{id}/id/related_to_dummy_friends{._format}', uriVariables: ['id' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/related_dummies/{id}/related_to_dummy_friends{._format}', uriVariables: ['id' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]

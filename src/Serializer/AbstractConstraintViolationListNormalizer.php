@@ -44,7 +44,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
      */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        if (!isset($context['rfc_7807_compliant_errors']) && !($context['api_error_resource'] ?? false)) {
+        if (!($context['api_error_resource'] ?? false)) {
             return false;
         }
 

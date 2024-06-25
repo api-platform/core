@@ -86,8 +86,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue('0.0.0')
                 ->end()
                 ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
-                ->booleanNode('event_listeners_backward_compatibility_layer')->defaultNull()->info('If true API Platform uses Symfony event listeners instead of providers and processors.')->end()
-                ->booleanNode('use_symfony_listeners')->defaultNull()->info(sprintf('Uses Symfony event listeners instead of the %s.', MainController::class))->end()
+                ->booleanNode('use_symfony_listeners')->defaultFalse()->info(sprintf('Uses Symfony event listeners instead of the %s.', MainController::class))->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()
                 ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.metadata.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
@@ -172,7 +171,6 @@ final class Configuration implements ConfigurationInterface
         $this->addFormatSection($rootNode, 'docs_formats', [
             'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
             'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']],
-            'json' => ['mime_types' => ['application/json']], // this is only for legacy reasons, use jsonopenapi instead
             'jsonld' => ['mime_types' => ['application/ld+json']],
             'html' => ['mime_types' => ['text/html']],
         ]);

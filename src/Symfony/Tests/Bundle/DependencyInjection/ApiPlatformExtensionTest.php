@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Tests\Bundle\DependencyInjection;
 
-use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Metadata\Exception\ExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -25,6 +24,7 @@ use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\Symfony\Action\NotFoundAction;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -109,7 +109,6 @@ class ApiPlatformExtensionTest extends TestCase
         'graphql' => [
             'graphql_playground' => ['enabled' => false],
         ],
-        'event_listeners_backward_compatibility_layer' => false,
         'use_symfony_listeners' => false,
         'keep_legacy_inflector' => false,
     ]];

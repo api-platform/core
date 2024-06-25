@@ -15,5 +15,4 @@ api_platform:
   use_symfony_listeners: false
   defaults:
     extra_properties:
-      rfc_7807_compliant_errors: true
       standard_put: true

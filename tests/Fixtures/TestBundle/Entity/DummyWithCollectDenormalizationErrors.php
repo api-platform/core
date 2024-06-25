@@ -23,8 +23,7 @@ use Ramsey\Uuid\UuidInterface;
     operations: [
         new Post(uriTemplate: 'dummy_collect_denormalization'),
     ],
-    collectDenormalizationErrors: true,
-    extraProperties: ['rfc_7807_compliant_errors' => false]
+    collectDenormalizationErrors: true
 )]
 #[ORM\Entity]
 class DummyWithCollectDenormalizationErrors

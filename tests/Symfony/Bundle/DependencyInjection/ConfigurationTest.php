@@ -86,7 +86,6 @@ class ConfigurationTest extends TestCase
             'docs_formats' => [
                 'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
                 'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']],
-                'json' => ['mime_types' => ['application/json']],
                 'jsonld' => ['mime_types' => ['application/ld+json']],
                 'html' => ['mime_types' => ['text/html']],
             ],
@@ -229,7 +228,6 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'keep_legacy_inflector' => true,
-            'event_listeners_backward_compatibility_layer' => null,
             'use_symfony_listeners' => false,
             'handle_symfony_errors' => false,
             'enable_link_security' => false,

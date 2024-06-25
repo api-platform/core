@@ -13,14 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
-use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\ParameterValidator\ParameterValidator;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
-use ApiPlatform\State\Util\RequestParser;
 use ApiPlatform\Symfony\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -34,18 +30,14 @@ final class QueryParameterValidateListener
     use OperationRequestInitiatorTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'query_parameter_validate';
-    private ?ParameterValidator $queryParameterValidator = null;
-    private ?ProviderInterface $provider = null;
 
-    public function __construct($queryParameterValidator, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
-    {
-        if ($queryParameterValidator instanceof ProviderInterface) {
-            $this->provider = $queryParameterValidator;
-        } else {
-            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as first argument in "%s" instead of "%s".', ProviderInterface::class, self::class, ParameterValidator::class);
-            $this->queryParameterValidator = $queryParameterValidator;
-        }
-
+    /**
+     * @param ProviderInterface<object> $provider
+     */
+    public function __construct(
+        private readonly ProviderInterface $provider,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null
+    ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
@@ -58,48 +50,22 @@ final class QueryParameterValidateListener
             !$request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || 'GET' !== $request->getMethod()
-            || $request->attributes->get('_api_platform_disable_listeners')
         ) {
             return;
         }
 
-        if ('api_platform.symfony.main_controller' === $operation?->getController()) {
+        if (!$operation instanceof HttpOperation) {
             return;
         }
 
-        if (!($operation?->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof HttpOperation) {
-            return;
+        if (null === $operation->getQueryParameterValidationEnabled()) {
+            $operation = $operation->withQueryParameterValidationEnabled('GET' === $request->getMethod());
         }
 
-        if ($this->provider instanceof ProviderInterface) {
-            if (null === $operation->getQueryParameterValidationEnabled()) {
-                $operation = $operation->withQueryParameterValidationEnabled('GET' === $request->getMethod());
-            }
-
-            $this->provider->provide($operation, $request->attributes->get('_api_uri_variables') ?? [], [
-                'request' => $request,
-                'uri_variables' => $request->attributes->get('_api_uri_variables') ?? [],
-                'resource_class' => $operation->getClass(),
-            ]);
-
-            return;
-        }
-
-        $queryString = RequestParser::getQueryString($request);
-        $queryParameters = $queryString ? RequestParser::parseRequestParams($queryString) : [];
-
-        $class = $attributes['resource_class'];
-
-        if ($options = $operation->getStateOptions()) {
-            if ($options instanceof Options && $options->getEntityClass()) {
-                $class = $options->getEntityClass();
-            }
-
-            if ($options instanceof ODMOptions && $options->getDocumentClass()) {
-                $class = $options->getDocumentClass();
-            }
-        }
-
-        $this->queryParameterValidator->validateFilters($class, $operation->getFilters() ?? [], $queryParameters);
+        $this->provider->provide($operation, $request->attributes->get('_api_uri_variables') ?? [], [
+            'request' => $request,
+            'uri_variables' => $request->attributes->get('_api_uri_variables') ?? [],
+            'resource_class' => $operation->getClass(),
+        ]);
     }
 }

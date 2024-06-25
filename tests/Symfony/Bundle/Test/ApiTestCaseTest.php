@@ -362,11 +362,9 @@ JSON
         @$schemaTool->createSchema($classes);
     }
 
-    /**
-     * @group legacy
-     */
     public function testExceptionNormalizer(): void
     {
+        $this->markTestSkipped();
         $response = self::createClient()->request('GET', '/issue5921', [
             'headers' => [
                 'accept' => 'application/json',

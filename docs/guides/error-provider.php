@@ -7,14 +7,6 @@
 // tags: design, state
 // ---
 
-// Note that we use the following configuration:
-// ```
-// api_platform:
-//    defaults:
-//            rfc_7807_compliant_errors: true
-// ```
-// To customize the API Platform response, replace the api_platform.state.error_provider with your own provider:
-
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ApiResource;
     use ApiPlatform\Metadata\Get;

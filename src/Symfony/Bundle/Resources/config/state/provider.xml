@@ -25,11 +25,6 @@
             <argument type="service" id="translator" on-invalid="null" />
         </service>
 
-        <service id="api_platform.state_provider.backed_enum" class="ApiPlatform\State\Provider\BackedEnumProvider">
-            <tag name="api_platform.state_provider" key="ApiPlatform\State\Provider\BackedEnumProvidevr" />
-            <tag name="api_platform.state_provider" key="api_platform.state_provider.backed_enum" />
-        </service>
-
         <service id="api_platform.error_listener" class="ApiPlatform\Symfony\EventListener\ErrorListener">
             <argument key="$controller">api_platform.symfony.main_controller</argument>
             <argument key="$logger" type="service" id="logger" on-invalid="null" />
@@ -40,8 +35,7 @@
             <argument key="$exceptionToStatus">%api_platform.exception_to_status%</argument>
             <argument key="$identifiersExtractor">null</argument>
             <argument key="$resourceClassResolver" type="service" id="api_platform.resource_class_resolver"/>
-            <argument key="$negotiator">null</argument>
-            <argument key="$problemCompliantErrors">%api_platform.rfc_7807_compliant_errors%</argument>
+            <argument key="$negotiator" type="service" id="api_platform.negotiator"/>
         </service>
 
         <service id="api_platform.state_provider.parameter" class="ApiPlatform\State\Provider\ParameterProvider" decorates="api_platform.state_provider.main" decoration-priority="190">
