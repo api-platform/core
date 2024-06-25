@@ -14,9 +14,21 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6211\ArrayPropertyDtoOperation;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class ArrayDtoTest extends ApiTestCase
 {
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [ArrayPropertyDtoOperation::class];
+    }
+
     public function testWithGroupFilter(): void
     {
         $response = self::createClient()->request('GET', '/array_property_dto_operations');

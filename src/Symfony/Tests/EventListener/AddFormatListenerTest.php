@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Tests\EventListener;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -70,6 +71,7 @@ class AddFormatListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->never())->method('provide');
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection($attributes['_api_resource_class'] ?? ''));
         $listener = new AddFormatListener($provider, $metadata);
         $listener->onKernelRequest(
             new RequestEvent(
@@ -83,10 +85,34 @@ class AddFormatListenerTest extends TestCase
     public static function provideNonApiAttributes(): array
     {
         return [
-            ['_api_resource_class' => 'dummy'],
-            ['_api_resource_class' => 'dummy', '_api_operation_name' => 'dummy'],
             ['_api_respond' => false, '_api_operation_name' => 'dummy'],
             [],
+        ];
+    }
+
+    #[DataProvider('provideOperationNotFound')]
+    public function testNoOperation(...$attributes): void
+    {
+        $this->expectException(OperationNotFoundException::class);
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->never())->method('provide');
+        $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection($attributes['_api_resource_class'] ?? ''));
+        $listener = new AddFormatListener($provider, $metadata);
+        $listener->onKernelRequest(
+            new RequestEvent(
+                $this->createStub(HttpKernelInterface::class),
+                new Request([], [], $attributes),
+                HttpKernelInterface::MAIN_REQUEST
+            )
+        );
+    }
+
+    public static function provideOperationNotFound(): array
+    {
+        return [
+            ['_api_resource_class' => 'dummy'],
+            ['_api_resource_class' => 'dummy', '_api_operation_name' => 'dummy'],
         ];
     }
 }

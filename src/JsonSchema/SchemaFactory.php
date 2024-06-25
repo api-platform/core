@@ -37,17 +37,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
     private const PATCH_SCHEMA_POSTFIX = '.patch';
 
-    private ?TypeFactoryInterface $typeFactory = null;
     private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
     public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
-    public function __construct(?TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private readonly ?array $distinctFormats = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private readonly ?array $distinctFormats = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
     {
-        if ($typeFactory) {
-            $this->typeFactory = $typeFactory;
-        }
         if (!$definitionNameFactory) {
             $this->definitionNameFactory = new DefinitionNameFactory($this->distinctFormats);
         }
@@ -216,12 +212,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         foreach ($types as $type) {
             $subSchema = new Schema($version);
             $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
-
-            // TODO: in 3.3 add trigger_deprecation() as type factories are not used anymore, we moved this logic to SchemaPropertyMetadataFactory so that it gets cached
-            if ($typeFromFactory = $this->typeFactory?->getType($type, 'jsonschema', $propertyMetadata->isReadableLink(), $serializerContext)) {
-                $propertySchema = $typeFromFactory;
-                break;
-            }
 
             $isCollection = $type->isCollection();
             if ($isCollection) {

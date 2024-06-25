@@ -19,9 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 class SelectablePaginatorTest extends TestCase
 {
-    /**
-     * @dataProvider initializeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('initializeProvider')]
     public function testInitialize($results, $currentPage, $itemsPerPage, $totalItems, $lastPage, $currentItems): void
     {
         $results = new ArrayCollection($results);

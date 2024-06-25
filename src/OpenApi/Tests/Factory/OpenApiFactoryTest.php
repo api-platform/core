@@ -16,7 +16,6 @@ namespace ApiPlatform\OpenApi\Tests\Factory;
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory;
-use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -64,13 +63,11 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 class OpenApiFactoryTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     private const OPERATION_FORMATS = [
@@ -400,7 +397,7 @@ class OpenApiFactoryTest extends TestCase
                 'type' => 'string',
                 'required' => true,
                 'strategy' => 'exact',
-                'openapi' => ['example' => 'bar', 'deprecated' => true, 'allowEmptyValue' => true, 'allowReserved' => true, 'explode' => true],
+                'openapi' => new Parameter(in: 'query', name: 'name', example: 'bar', deprecated: true, allowEmptyValue: true, allowReserved: true, explode: true),
             ]]),
             'f2' => new DummyFilter(['ha' => [
                 'property' => 'foo',
@@ -441,7 +438,6 @@ class OpenApiFactoryTest extends TestCase
         $definitionNameFactory = new DefinitionNameFactory([]);
 
         $schemaFactory = new SchemaFactory(
-            typeFactory: null,
             resourceMetadataFactory: $resourceCollectionMetadataFactory,
             propertyNameCollectionFactory: $propertyNameCollectionFactory,
             propertyMetadataFactory: $propertyMetadataFactory,
@@ -449,16 +445,12 @@ class OpenApiFactoryTest extends TestCase
             definitionNameFactory: $definitionNameFactory,
         );
 
-        $typeFactory = new TypeFactory();
-        $typeFactory->setSchemaFactory($schemaFactory);
-
         $factory = new OpenApiFactory(
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceCollectionMetadataFactory,
             $propertyNameCollectionFactory,
             $propertyMetadataFactory,
             $schemaFactory,
-            $typeFactory,
             $filterLocatorProphecy->reveal(),
             [],
             new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
@@ -787,14 +779,14 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('name', 'query', '', true, true, true, [
                     'type' => 'string',
                 ], 'form', true, true, 'bar'),
-                new Parameter('ha', 'query', '', false, false, true, [
+                new Parameter('ha', 'query', '', false, false, false, [
                     'type' => 'integer',
                 ]),
-                new Parameter('toto', 'query', '', true, false, true, [
+                new Parameter('toto', 'query', '', true, false, false, [
                     'type' => 'array',
                     'items' => ['type' => 'string'],
                 ], 'deepObject', true),
-                new Parameter('order[name]', 'query', '', false, false, true, [
+                new Parameter('order[name]', 'query', '', false, false, false, [
                     'type' => 'string',
                     'enum' => ['asc', 'desc'],
                 ]),

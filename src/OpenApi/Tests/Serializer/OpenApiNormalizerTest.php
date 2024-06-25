@@ -15,7 +15,6 @@ namespace ApiPlatform\OpenApi\Tests\Serializer;
 
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\SchemaFactory;
-use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -208,15 +207,11 @@ class OpenApiNormalizerTest extends TestCase
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
 
         $schemaFactory = new SchemaFactory(
-            typeFactory: null,
             resourceMetadataFactory: $resourceMetadataFactory,
             propertyNameCollectionFactory: $propertyNameCollectionFactory,
             propertyMetadataFactory: $propertyMetadataFactory,
             definitionNameFactory: $definitionNameFactory,
         );
-
-        $typeFactory = new TypeFactory();
-        $typeFactory->setSchemaFactory($schemaFactory);
 
         $factory = new OpenApiFactory(
             $resourceNameCollectionFactoryProphecy->reveal(),
@@ -224,7 +219,6 @@ class OpenApiNormalizerTest extends TestCase
             $propertyNameCollectionFactory,
             $propertyMetadataFactory,
             $schemaFactory,
-            $typeFactory,
             $filterLocatorProphecy->reveal(),
             [],
             new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [

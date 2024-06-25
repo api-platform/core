@@ -14,16 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\ParameterValidator\Exception\ValidationExceptionInterface;
 use ApiPlatform\Symfony\Controller\MainController;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException as LegacyValidationException;
-use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\EntityManagerInterface;
@@ -86,8 +82,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue('0.0.0')
                 ->end()
                 ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
-                ->booleanNode('event_listeners_backward_compatibility_layer')->defaultNull()->info('If true API Platform uses Symfony event listeners instead of providers and processors.')->end()
-                ->booleanNode('use_symfony_listeners')->defaultNull()->info(sprintf('Uses Symfony event listeners instead of the %s.', MainController::class))->end()
+                ->booleanNode('use_symfony_listeners')->defaultFalse()->info(sprintf('Uses Symfony event listeners instead of the %s.', MainController::class))->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()
                 ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.metadata.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
@@ -97,7 +92,6 @@ final class Configuration implements ConfigurationInterface
                     ->children()
                         ->variableNode('serialize_payload_fields')->defaultValue([])->info('Set to null to serialize all payload fields when a validation error is thrown, or set the fields you want to include explicitly.')->end()
                         ->booleanNode('query_parameter_validation')->defaultValue(true)->end()
-                        ->booleanNode('legacy_validation_exception')->defaultValue(true)->info('Uses the legacy "%s" instead of "%s".', LegacyValidationException::class, ValidationException::class)->end()
                     ->end()
                 ->end()
                 ->arrayNode('eager_loading')
@@ -116,7 +110,6 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
                 ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
                 ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
-                ->booleanNode('keep_legacy_inflector')->defaultTrue()->info('Keep doctrine/inflector instead of symfony/string to generate plurals for routes.')->end()
                 ->booleanNode('enable_link_security')->defaultFalse()->info('Enable security for Links (sub resources)')->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
@@ -172,7 +165,6 @@ final class Configuration implements ConfigurationInterface
         $this->addFormatSection($rootNode, 'docs_formats', [
             'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
             'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']],
-            'json' => ['mime_types' => ['application/json']], // this is only for legacy reasons, use jsonopenapi instead
             'jsonld' => ['mime_types' => ['application/ld+json']],
             'html' => ['mime_types' => ['text/html']],
         ]);
@@ -453,17 +445,6 @@ final class Configuration implements ConfigurationInterface
                             ->defaultValue([])
                             ->prototype('scalar')->end()
                         ->end()
-                        ->arrayNode('mapping')
-                            ->setDeprecated('api-platform/core', '3.1', sprintf('The "%%node%%" option is deprecated. Configure an %s as $stateOptions.', Options::class))
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('resource_class')
-                            ->prototype('array')
-                                ->children()
-                                    ->scalarNode('index')->defaultNull()->end()
-                                    ->scalarNode('type')->defaultValue(DocumentMetadata::DEFAULT_TYPE)->end()
-                                ->end()
-                            ->end()
-                        ->end()
                     ->end()
                 ->end()
             ->end();
@@ -517,7 +498,6 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue([
                         SerializerExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                        ValidationExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         OptimisticLockException::class => Response::HTTP_CONFLICT,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')

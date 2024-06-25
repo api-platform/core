@@ -22,14 +22,6 @@ $finder = PhpCsFixer\Finder::create()
         'src/Doctrine/Odm/Tests/var'
     ])
     ->notPath('src/Symfony/Bundle/DependencyInjection/Configuration.php')
-    ->notPath('src/Annotation/ApiFilter.php') // temporary
-    ->notPath('src/Annotation/ApiProperty.php') // temporary
-    ->notPath('src/Annotation/ApiResource.php') // temporary
-    ->notPath('src/Annotation/ApiSubresource.php') // temporary
-    ->notPath('tests/Fixtures/TestBundle/Entity/DummyPhp8.php') // temporary
-    ->notPath('tests/Fixtures/TestBundle/Enum/EnumWithDescriptions.php') // PHPDoc on enum cases
-    ->notPath('tests/Fixtures/TestBundle/Enum/GamePlayMode.php') // PHPDoc on enum cases
-    ->notPath('tests/Fixtures/TestBundle/Enum/GenderTypeEnum.php') // PHPDoc on enum cases
     ->append([
         'tests/Fixtures/app/console',
     ]);

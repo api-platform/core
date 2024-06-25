@@ -62,9 +62,7 @@ class SchemaBuilderTest extends TestCase
         $this->schemaBuilder = new SchemaBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->typesFactoryProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->fieldsBuilderProphecy->reveal());
     }
 
-    /**
-     * @dataProvider schemaProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('schemaProvider')]
     public function testGetSchema(string $resourceClass, ResourceMetadataCollection $resourceMetadata, ObjectType $expectedQueryType, ?ObjectType $expectedMutationType, ?ObjectType $expectedSubscriptionType): void
     {
         $type = new StringType(['name' => 'MyType']);

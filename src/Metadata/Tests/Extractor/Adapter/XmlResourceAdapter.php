@@ -222,16 +222,6 @@ XML_WRAP
         $this->buildValues($resource->addChild('hydraContext'), $values);
     }
 
-    /**
-     * TODO Remove in 4.0.
-     *
-     * @deprecated
-     */
-    private function buildOpenapiContext(\SimpleXMLElement $resource, array $values): void
-    {
-        $this->buildValues($resource->addChild('openapiContext'), $values);
-    }
-
     private function buildOpenapi(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->openapi ?? $resource->addChild('openapi');

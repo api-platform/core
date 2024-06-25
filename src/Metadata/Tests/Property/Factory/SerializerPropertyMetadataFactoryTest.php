@@ -40,9 +40,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider groupsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('groupsProvider')]
     public function testCreate($readGroups, $writeGroups): void
     {
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);

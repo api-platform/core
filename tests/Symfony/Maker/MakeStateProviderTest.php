@@ -25,7 +25,7 @@ class MakeStateProviderTest extends KernelTestCase
         (new Filesystem())->remove(self::tempDir());
     }
 
-    /** @dataProvider stateProviderDataProvider */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stateProviderDataProvider')]
     public function testMakeStateProvider(bool $isInteractive): void
     {
         $inputs = ['name' => 'CustomStateProvider'];

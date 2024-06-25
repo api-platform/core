@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException as ExceptionValidationException;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 #[NotExposed(uriTemplate: '/post_with_uri_variables/{id}')]
@@ -34,6 +34,6 @@ final class PostWithUriVariables
 
     public static function provide(): void
     {
-        throw new ExceptionValidationException(new ConstraintViolationList());
+        throw new ValidationException(new ConstraintViolationList());
     }
 }

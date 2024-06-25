@@ -83,7 +83,6 @@ class XmlExtractorTest extends TestCase
                     'denormalizationContext' => null,
                     'collectDenormalizationErrors' => null,
                     'hydraContext' => null,
-                    'openapiContext' => null,
                     'openapi' => null,
                     'validationContext' => null,
                     'filters' => null,
@@ -168,7 +167,6 @@ class XmlExtractorTest extends TestCase
                     'hydraContext' => [
                         'foo' => ['bar' => 'baz'],
                     ],
-                    'openapiContext' => null,
                     'openapi' => null,
                     'validationContext' => null,
                     'filters' => ['comment.custom_filter'],
@@ -248,7 +246,6 @@ class XmlExtractorTest extends TestCase
                             'hydraContext' => [
                                 'foo' => ['bar' => 'baz'],
                             ],
-                            'openapiContext' => null,
                             'openapi' => null,
                             'validationContext' => null,
                             'filters' => ['comment.custom_filter'],
@@ -349,7 +346,6 @@ class XmlExtractorTest extends TestCase
                             'hydraContext' => [
                                 'foo' => ['bar' => 'baz'],
                             ],
-                            'openapiContext' => null,
                             'openapi' => null,
                             'validationContext' => null,
                             'filters' => ['comment.custom_filter'],
@@ -408,9 +404,7 @@ class XmlExtractorTest extends TestCase
         ], $extractor->getResources());
     }
 
-    /**
-     * @dataProvider getInvalidPaths
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidPaths')]
     public function testInvalidXML(string $path, string $error): void
     {
         $this->expectException(InvalidArgumentException::class);

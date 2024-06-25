@@ -82,9 +82,7 @@ class SerializerContextBuilderTest extends TestCase
         return $operation;
     }
 
-    /**
-     * @dataProvider createNormalizationContextProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('createNormalizationContextProvider')]
     public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, ?callable $advancedNameConverter = null, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $resolverContext = [];
@@ -242,9 +240,7 @@ class SerializerContextBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider createDenormalizationContextProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('createDenormalizationContextProvider')]
     public function testCreateDenormalizationContext(?string $resourceClass, string $operationName, array $expectedContext): void
     {
         $operation = $this->buildOperationFromContext(true, false, $expectedContext, false, $resourceClass);

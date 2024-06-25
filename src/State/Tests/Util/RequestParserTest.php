@@ -21,9 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class RequestParserTest extends TestCase
 {
-    /**
-     * @dataProvider parseRequestParamsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('parseRequestParamsProvider')]
     public function testParseRequestParams(string $source, array $expected): void
     {
         $actual = RequestParser::parseRequestParams($source);

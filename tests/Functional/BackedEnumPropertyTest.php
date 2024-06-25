@@ -14,15 +14,28 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Person;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PersonToPet;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Tools\SchemaTool;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Symfony\Component\HttpClient\HttpOptions;
 
 final class BackedEnumPropertyTest extends ApiTestCase
 {
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [Person::class, Pet::class];
+    }
+
     public function testJson(): void
     {
         $person = $this->createPerson();
@@ -38,7 +51,7 @@ final class BackedEnumPropertyTest extends ApiTestCase
         ]);
     }
 
-    /** @group legacy */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testGraphQl(): void
     {
         $person = $this->createPerson();
@@ -65,32 +78,17 @@ GRAPHQL;
         ]);
     }
 
-    private function createPerson(): Person
+    private function createPerson(): Person|PersonDocument
     {
-        $this->recreateSchema();
+        $this->recreateSchema([Person::class, PersonToPet::class, Pet::class]);
 
-        /** @var EntityManagerInterface $manager */
-        $manager = static::getContainer()->get('doctrine')->getManager();
-        $person = new Person();
+        $manager = $this->getManager();
+        $person = $this->isMongoDB() ? new PersonDocument() : new Person();
         $person->name = 'Sonja';
         $person->genderType = GenderTypeEnum::FEMALE;
         $manager->persist($person);
         $manager->flush();
 
         return $person;
-    }
-
-    private function recreateSchema(array $options = []): void
-    {
-        self::bootKernel($options);
-
-        /** @var EntityManagerInterface $manager */
-        $manager = static::getContainer()->get('doctrine')->getManager();
-        /** @var ClassMetadata[] $classes */
-        $classes = $manager->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($manager);
-
-        @$schemaTool->dropSchema($classes);
-        @$schemaTool->createSchema($classes);
     }
 }

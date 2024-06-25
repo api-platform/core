@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator\Serializer;
 
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
-class ValidationExceptionNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+class ValidationExceptionNormalizer implements NormalizerInterface
 {
     public function __construct(private readonly NormalizerInterface $decorated, private readonly ?NameConverterInterface $nameConverter)
     {
@@ -53,20 +51,6 @@ class ValidationExceptionNormalizer implements NormalizerInterface, CacheableSup
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof ValidationException && $this->decorated->supportsNormalization($data, $format, $context);
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return false;
     }
 
     public function getSupportedTypes($format): array

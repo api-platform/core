@@ -15,55 +15,32 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Twig;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
-class ApiPlatformProfilerPanelTest extends WebTestCase
+final class ApiPlatformProfilerPanelTest extends WebTestCase
 {
-    use ExpectDeprecationTrait;
-    private EntityManagerInterface $manager;
-    private SchemaTool $schemaTool;
-    private string $env;
-
-    protected function setUp(): void
-    {
-        $kernel = self::bootKernel();
-        $this->env = $kernel->getEnvironment();
-
-        /** @var ManagerRegistry $doctrine */
-        $doctrine = $kernel->getContainer()->get('doctrine');
-        /** @var EntityManagerInterface $manager */
-        $manager = $doctrine->getManager();
-        $this->manager = $manager;
-        $this->schemaTool = new SchemaTool($this->manager);
-        /** @var ClassMetadata[] $classes */
-        $classes = $this->manager->getMetadataFactory()->getAllMetadata();
-        @$this->schemaTool->dropSchema($classes);
-        $this->manager->clear();
-        @$this->schemaTool->createSchema($classes);
-
-        $this->ensureKernelShutdown();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->schemaTool->dropSchema($this->manager->getMetadataFactory()->getAllMetadata());
-        $this->manager->clear();
-        parent::tearDown();
-    }
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
 
     /**
-     * TODO: remove openapiContext to get rid of the legacy.
-     *
-     * @group legacy
+     * @return class-string[]
      */
+    public static function getResources(): array
+    {
+        return [
+            Dummy::class,
+            RelatedDummy::class,
+            RelatedOwnedDummy::class,
+        ];
+    }
+
     public function testDebugBarContentNotResourceClass(): void
     {
         $client = static::createClient();
@@ -83,12 +60,11 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('Not an API Platform resource', $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testDebugBarContent(): void
     {
         $client = static::createClient();
+        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class]);
         $client->enableProfiler();
         $client->request('GET', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -101,14 +77,9 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Check extra info content
         $this->assertStringContainsString('sf-toolbar-status-default', $block->attr('class'), 'The toolbar block should have the default color.');
-        $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
+        $this->assertSame($this->isMongoDB() ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    /**
-     * TODO: remove openapiContext to get rid of the legacy.
-     *
-     * @group legacy
-     */
     public function testProfilerGeneralLayoutNotResourceClass(): void
     {
         $client = static::createClient();
@@ -133,6 +104,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
     public function testProfilerGeneralLayout(): void
     {
         $client = static::createClient();
+        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class]);
         $client->enableProfiler();
         $client->request('GET', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -145,7 +117,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         $metrics = $crawler->filter('.metrics');
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
-        $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
+        $this->assertSame($this->isMongoDB() ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
         $this->assertCount(4, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
 

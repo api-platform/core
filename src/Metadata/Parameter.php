@@ -33,14 +33,14 @@ abstract class Parameter
     public function __construct(
         protected ?string $key = null,
         protected ?array $schema = null,
-        protected OpenApi\Model\Parameter|bool|null $openApi = null, // TODO: use false as type instead of bool
+        protected OpenApi\Model\Parameter|false|null $openApi = null,
         protected mixed $provider = null,
         protected mixed $filter = null,
         protected ?string $property = null,
         protected ?string $description = null,
         protected ?bool $required = null,
         protected ?int $priority = null,
-        protected ?bool $hydra = null,
+        protected ?false $hydra = null,
         protected Constraint|array|null $constraints = null,
         protected string|\Stringable|null $security = null,
         protected ?string $securityMessage = null,
@@ -218,7 +218,7 @@ abstract class Parameter
         return $self;
     }
 
-    public function withHydra(bool $hydra): static
+    public function withHydra(false $hydra): static
     {
         $self = clone $this;
         $self->hydra = $hydra;

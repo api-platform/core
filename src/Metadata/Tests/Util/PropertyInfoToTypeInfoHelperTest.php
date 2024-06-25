@@ -28,34 +28,22 @@ use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-/**
- * @group legacy
- */
 class PropertyInfoToTypeInfoHelperTest extends TestCase
 {
     /**
-     * @dataProvider convertLegacyTypesToTypeDataProvider
-     *
      * @param list<LegacyType>|null $legacyTypes
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('convertLegacyTypesToTypeDataProvider')]
     public function testConvertLegacyTypesToType(?Type $type, ?array $legacyTypes): void
     {
-        if (!class_exists(Type::class)) {
-            $this->markTestSkipped('symfony/type-info requires PHP > 8.2');
-        }
-
         $this->assertEquals($type, PropertyInfoToTypeInfoHelper::convertLegacyTypesToType($legacyTypes));
     }
 
     /**
      * @return iterable<array{0: ?Type, 1: list<LegacyType>|null}>
      */
-    public function convertLegacyTypesToTypeDataProvider(): iterable
+    public static function convertLegacyTypesToTypeDataProvider(): iterable
     {
-        if (!class_exists(Type::class)) {
-            return;
-        }
-
         yield [null, null];
         yield [Type::null(), [new LegacyType('null')]];
         // yield [Type::void(), [new LegacyType('void')]];

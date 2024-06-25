@@ -35,7 +35,7 @@ class LengthFilter extends AbstractFilter
                 'property' => 'max-length-3',
                 'type' => 'string',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'maxLength' => 3,
                 ],
             ],
@@ -43,7 +43,7 @@ class LengthFilter extends AbstractFilter
                 'property' => 'min-length-3',
                 'type' => 'string',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'minLength' => 3,
                 ],
             ],

@@ -30,8 +30,9 @@
         "symfony/validator": "^6.4 || ^7.0"
     },
     "require-dev": {
+        "api-platform/openapi": "*@dev || ^3.1",
+        "api-platform/json-schema": "*@dev || ^3.1",
         "phpspec/prophecy-phpunit": "^2.0",
-        "sebastian/comparator": "<5.0",
         "symfony/mercure-bundle": "*",
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/var-dumper": "^6.4 || ^7.0",

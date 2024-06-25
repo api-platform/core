@@ -74,12 +74,8 @@
             <tag name="serializer.normalizer" priority="-780" />
         </service>
 
-        <!-- deprecated -->
         <service id="api_platform.jsonapi.normalizer.error" class="ApiPlatform\JsonApi\Serializer\ErrorNormalizer" public="false">
-            <argument>%kernel.debug%</argument>
-            <argument type="collection"></argument>
-            <argument type="service" id="api_platform.jsonapi.normalizer.item" on-invalid="null" />
-            <argument type="service" id="api_platform.jsonapi.normalizer.constraint_violation_list" on-invalid="null" />
+            <argument type="service" id="api_platform.jsonapi.normalizer.item" />
 
             <tag name="serializer.normalizer" priority="-790"/>
         </service>

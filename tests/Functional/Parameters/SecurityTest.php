@@ -14,18 +14,30 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithSecurityParameter;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
-class SecurityTest extends ApiTestCase
+final class SecurityTest extends ApiTestCase
 {
-    public function dataUserAuthorization(): iterable
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [WithSecurityParameter::class];
+    }
+
+    public static function dataUserAuthorization(): iterable
     {
         yield [['ROLE_ADMIN'], Response::HTTP_OK];
         yield [['ROLE_USER'], Response::HTTP_FORBIDDEN];
     }
 
-    /** @dataProvider dataUserAuthorization */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataUserAuthorization')]
     public function testUserAuthorization(array $roles, int $expectedStatusCode): void
     {
         $client = self::createClient();
@@ -44,13 +56,13 @@ class SecurityTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function dataSecurityValues(): iterable
+    public static function dataSecurityValues(): iterable
     {
         yield ['secured', Response::HTTP_OK];
         yield ['not_the_expected_parameter_value', Response::HTTP_UNAUTHORIZED];
     }
 
-    /** @dataProvider dataSecurityValues */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataSecurityValues')]
     public function testSecurityHeaderValues(string $parameterValue, int $expectedStatusCode): void
     {
         self::createClient()->request('GET', 'with_security_parameters_collection', [
@@ -61,7 +73,7 @@ class SecurityTest extends ApiTestCase
         $this->assertResponseStatusCodeSame($expectedStatusCode);
     }
 
-    /** @dataProvider dataSecurityValues */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataSecurityValues')]
     public function testSecurityQueryValues(string $parameterValue, int $expectedStatusCode): void
     {
         self::createClient()->request('GET', sprintf('with_security_parameters_collection?secret=%s', $parameterValue));

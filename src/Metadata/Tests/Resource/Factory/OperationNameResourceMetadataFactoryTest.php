@@ -26,9 +26,7 @@ class OperationNameResourceMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @dataProvider operationProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
     public function testGeneratesName(HttpOperation $operation, string $expectedOperationName): void
     {
         $decorated = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

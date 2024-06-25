@@ -73,9 +73,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer->denormalize(['foo'], 'Foo');
     }
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testSupportsNormalization(): void
     {
         $std = new \stdClass();
@@ -106,10 +104,6 @@ class ItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization($std, $normalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('xml'));
         $this->assertSame(['object' => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
-
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-        }
     }
 
     public function testNormalize(): void

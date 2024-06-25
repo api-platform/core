@@ -25,7 +25,6 @@ use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\State\Util\RequestAttributesExtractor;
-use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface as LegacyConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
@@ -58,8 +57,7 @@ final class ErrorListener extends SymfonyErrorListener
         /** @phpstan-ignore-next-line we're not using this anymore but keeping for bc layer */
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
         private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
-        ?Negotiator $negotiator = null,
-        private readonly bool $problemCompliantErrors = true,
+        ?Negotiator $negotiator = null
     ) {
         parent::__construct($controller, $logger, $debug, $exceptionsMapping);
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
@@ -83,18 +81,6 @@ final class ErrorListener extends SymfonyErrorListener
             $this->controller = 'error_controller';
 
             return parent::duplicateRequest($exception, $request);
-        }
-
-        $legacy = $apiOperation ? ($apiOperation->getExtraProperties()['rfc_7807_compliant_errors'] ?? false) : $this->problemCompliantErrors;
-
-        if (!$this->problemCompliantErrors || !$legacy) {
-            // TODO: deprecate in API Platform 3.3
-            $this->controller = 'api_platform.action.exception';
-            $dup = parent::duplicateRequest($exception, $request);
-            $dup->attributes->set('_api_operation', $apiOperation);
-            $dup->attributes->set('_api_exception_action', true);
-
-            return $dup;
         }
 
         if ($this->debug) {
@@ -191,7 +177,7 @@ final class ErrorListener extends SymfonyErrorListener
             return 400;
         }
 
-        if ($exception instanceof ConstraintViolationListAwareExceptionInterface || $exception instanceof LegacyConstraintViolationListAwareExceptionInterface) {
+        if ($exception instanceof ConstraintViolationListAwareExceptionInterface) {
             return 422;
         }
 

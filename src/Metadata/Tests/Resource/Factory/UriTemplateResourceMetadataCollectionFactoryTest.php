@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
@@ -31,18 +30,15 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
-use ApiPlatform\Metadata\Tests\Fixtures\ApiResourceNotLoaded\SymfonyFormatParameterLegacy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     public function testCreate(): void
@@ -225,26 +221,5 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
             ]),
             $uriTemplateResourceMetadataCollectionFactory->create(AttributeResource::class)
         );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testCreateWithLegacyFormat(): void
-    {
-        $this->expectDeprecation('Since api-platform/core 3.0: The special Symfony parameter ".{_format}" in your URI Template is deprecated, use an RFC6570 variable "{._format}" on the class "ApiPlatform\Metadata\Tests\Fixtures\ApiResourceNotLoaded\SymfonyFormatParameterLegacy" instead. We will only use the RFC6570 compatible variable in 4.0.');
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Argument::cetera())->willReturn(new PropertyNameCollection());
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
-        $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
-        $pathSegmentNameGeneratorProphecy->getSegmentName('SymfonyFormatParameterLegacy')->willReturn('attribute_resources');
-        $resourceCollectionMetadataFactoryProphecy = new AttributesResourceMetadataCollectionFactory();
-
-        $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
-        $uriTemplateResourceMetadataCollectionFactory = new UriTemplateResourceMetadataCollectionFactory($linkFactory, $pathSegmentNameGeneratorProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy);
-        $uriTemplateResourceMetadataCollectionFactory->create(SymfonyFormatParameterLegacy::class);
     }
 }

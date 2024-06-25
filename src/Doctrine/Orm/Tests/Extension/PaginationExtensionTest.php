@@ -355,9 +355,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertFalse($query->getHint(CountWalker::HINT_DISTINCT));
     }
 
-    /**
-     * @dataProvider fetchJoinCollectionProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fetchJoinCollectionProvider')]
     public function testGetResultWithFetchJoinCollection(bool $paginationFetchJoinCollection, array $context, bool $expected): void
     {
         $dummyMetadata = new ClassMetadata(Dummy::class);
@@ -405,9 +403,7 @@ class PaginationExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fetchUseOutputWalkersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fetchUseOutputWalkersProvider')]
     public function testGetResultWithUseOutputWalkers(bool $paginationUseOutputWalkers, array $context, bool $expected): void
     {
         $dummyMetadata = new ClassMetadata(Dummy::class);

@@ -16,6 +16,8 @@ namespace ApiPlatform\Symfony\Validator\State;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * @internal
@@ -26,7 +28,7 @@ final class ErrorProvider implements ProviderInterface
     {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): \Throwable
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ConstraintViolationListInterface|\Throwable
     {
         if (!($request = $context['request'] ?? null) || !$operation instanceof HttpOperation) {
             throw new \RuntimeException('Not an HTTP request');
@@ -34,6 +36,10 @@ final class ErrorProvider implements ProviderInterface
 
         $exception = $request->attributes->get('exception');
         $exception->setStatus($operation->getStatus());
+
+        if ('jsonapi' === $request->getRequestFormat() && $exception instanceof ConstraintViolationListAwareExceptionInterface) {
+            return $exception->getConstraintViolationList();
+        }
 
         return $exception;
     }

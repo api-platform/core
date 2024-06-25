@@ -821,9 +821,7 @@ class EagerLoadingExtensionTest extends TestCase
         $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
     }
 
-    /**
-     * @dataProvider provideExistingJoinCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideExistingJoinCases')]
     public function testApplyToCollectionWithExistingJoin(string $joinType): void
     {
         $context = ['groups' => ['foo']];

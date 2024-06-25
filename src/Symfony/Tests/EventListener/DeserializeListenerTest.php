@@ -74,6 +74,7 @@ class DeserializeListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->never())->method('provide');
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection('class'));
         $listener = new DeserializeListener($provider, $metadata);
         $listener->onKernelRequest(
             new RequestEvent(
@@ -82,6 +83,14 @@ class DeserializeListenerTest extends TestCase
                 HttpKernelInterface::MAIN_REQUEST
             )
         );
+    }
+
+    public static function provideNonApiAttributes(): array
+    {
+        return [
+            ['_api_receive' => false, '_api_operation_name' => 'dummy'],
+            [],
+        ];
     }
 
     public function testDeserializeFalse(): void
@@ -115,15 +124,5 @@ class DeserializeListenerTest extends TestCase
                 HttpKernelInterface::MAIN_REQUEST
             )
         );
-    }
-
-    public static function provideNonApiAttributes(): array
-    {
-        return [
-            ['_api_resource_class' => 'dummy'],
-            ['_api_resource_class' => 'dummy', '_api_operation_name' => 'dummy'],
-            ['_api_receive' => false, '_api_operation_name' => 'dummy'],
-            [],
-        ];
     }
 }

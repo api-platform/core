@@ -78,7 +78,6 @@ class SchemaFactoryTest extends TestCase
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
 
         $schemaFactory = new SchemaFactory(
-            typeFactory: null,
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
             propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
             propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
@@ -155,7 +154,6 @@ class SchemaFactoryTest extends TestCase
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
 
         $schemaFactory = new SchemaFactory(
-            typeFactory: null,
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
             propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
             propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
@@ -239,7 +237,6 @@ class SchemaFactoryTest extends TestCase
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
 
         $schemaFactory = new SchemaFactory(
-            typeFactory: null,
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
             propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
             propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
@@ -298,7 +295,6 @@ class SchemaFactoryTest extends TestCase
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
 
         $schemaFactory = new SchemaFactory(
-            typeFactory: null,
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
             propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
             propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),

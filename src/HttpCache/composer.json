@@ -30,8 +30,7 @@
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
-        "symfony/http-client": "^6.4 || ^7.0",
-        "sebastian/comparator": "<5.0"
+        "symfony/http-client": "^6.4 || ^7.0"
     },
     "autoload": {
         "psr-4": {

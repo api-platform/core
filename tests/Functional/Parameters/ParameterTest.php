@@ -14,9 +14,21 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class ParameterTest extends ApiTestCase
 {
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [WithParameter::class];
+    }
+
     public function testWithGroupFilter(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters/1?groups[]=b');
@@ -57,9 +69,9 @@ final class ParameterTest extends ApiTestCase
 
     /**
      * Because of the openapiContext deprecation.
-     *
-     * @group legacy
+     * TODO: only select a few classes to generate the docs for a faster test.
      */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testDisableOpenApi(): void
     {
         $response = self::createClient()->request('GET', 'docs', ['headers' => ['accept' => 'application/vnd.openapi+json']]);

@@ -21,21 +21,26 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class ODMSearchFilterValueTransformer implements FilterInterface
 {
-    public function __construct(#[Autowire('@api_platform.doctrine_mongodb.odm.search_filter.instance')] readonly FilterInterface $searchFilter, ?array $properties = null, private readonly ?string $key = null)
+    public function __construct(#[Autowire('@api_platform.doctrine_mongodb.odm.search_filter.instance')] private readonly FilterInterface $searchFilter, private ?array $properties = null, private readonly ?string $key = null)
     {
-        if ($searchFilter instanceof PropertyAwareFilterInterface) {
-            $searchFilter->setProperties($properties);
-        }
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
     public function getDescription(string $resourceClass): array
     {
+        if ($this->searchFilter instanceof PropertyAwareFilterInterface) {
+            $this->searchFilter->setProperties($this->properties);
+        }
+
         return $this->searchFilter->getDescription($resourceClass);
     }
 
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
+        if ($this->searchFilter instanceof PropertyAwareFilterInterface) {
+            $this->searchFilter->setProperties($this->properties);
+        }
+
         $filterContext = ['filters' => $context['filters'][$this->key]] + $context;
         $this->searchFilter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
     }
