@@ -35,6 +35,7 @@
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3.3",
         "symfony/web-link": "^6.4 || ^7.0",
+        "symfony/yaml": "^6.4 || ^7.0",
         "willdurand/negotiation": "^3.0"
     },
     "require-dev": {
@@ -108,7 +109,6 @@
         "symfony/uid": "^6.4 || ^7.0",
         "symfony/validator": "^6.4 || ^7.0",
         "symfony/web-profiler-bundle": "^6.4 || ^7.0",
-        "symfony/yaml": "^6.4 || ^7.0",
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
         "webonyx/graphql-php": "^14.0 || ^15.0"
     },
