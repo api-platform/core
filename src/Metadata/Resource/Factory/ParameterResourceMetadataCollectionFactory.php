@@ -142,11 +142,11 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             }
         }
 
-        $schema = $parameter->getSchema() ?? $parameter->getOpenApi()?->getSchema();
+        $schema = $parameter->getSchema() ?? (($openApi = $parameter->getOpenApi()) ? $openApi->getSchema() : null);
 
         // Only add validation if the Symfony Validator is installed
         if (interface_exists(ValidatorInterface::class) && !$parameter->getConstraints()) {
-            $parameter = $this->addSchemaValidation($parameter, $schema, $parameter->getRequired() ?? $description['required'] ?? false, $parameter->getOpenApi());
+            $parameter = $this->addSchemaValidation($parameter, $schema, $parameter->getRequired() ?? $description['required'] ?? false, $parameter->getOpenApi() ?: null);
         }
 
         return $parameter;

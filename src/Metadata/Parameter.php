@@ -32,7 +32,7 @@ abstract class Parameter
     public function __construct(
         protected ?string $key = null,
         protected ?array $schema = null,
-        protected ?OpenApi\Model\Parameter $openApi = null,
+        protected OpenApi\Model\Parameter|bool|null $openApi = null, // TODO: use false as type instead of bool
         protected mixed $provider = null,
         protected mixed $filter = null,
         protected ?string $property = null,
@@ -57,7 +57,7 @@ abstract class Parameter
         return $this->schema;
     }
 
-    public function getOpenApi(): ?OpenApi\Model\Parameter
+    public function getOpenApi(): OpenApi\Model\Parameter|bool|null
     {
         return $this->openApi;
     }
